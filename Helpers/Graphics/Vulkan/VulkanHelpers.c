@@ -5,6 +5,8 @@
 #include "VulkanHelpers.h"
 #include <cglm/clipspace/persp_lh_zo.h>
 #include <cglm/clipspace/view_lh_zo.h>
+#include <luna/luna.h>
+
 #include "../../CommonAssets.h"
 #include "../../Core/Error.h"
 #include "../../Core/Logging.h"
@@ -21,7 +23,6 @@ VkInstance instance = VK_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
 PhysicalDevice physicalDevice = {0};
 QueueFamilyIndices queueFamilyIndices = {0};
-SwapChainSupportDetails swapChainSupport = {0};
 VkDevice device = VK_NULL_HANDLE;
 VkQueue graphicsQueue = VK_NULL_HANDLE;
 VkQueue presentQueue = VK_NULL_HANDLE;
@@ -32,9 +33,8 @@ uint32_t swapChainCount = 0;
 VkFormat swapChainImageFormat = VK_FORMAT_UNDEFINED;
 VkExtent2D swapChainExtent = {0};
 VkImageView *swapChainImageViews = NULL;
-VkRenderPass renderPass = VK_NULL_HANDLE;
-VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+LunaRenderPass renderPass = VK_NULL_HANDLE;
+LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
 VkPipelineCache pipelineCache = VK_NULL_HANDLE;
 Pipelines pipelines = {.walls = VK_NULL_HANDLE, .actors = VK_NULL_HANDLE, .ui = VK_NULL_HANDLE};
 VkFramebuffer *swapChainFramebuffers = NULL;
@@ -59,11 +59,9 @@ MemoryPools memoryPools = {
 	},
 };
 Buffers buffers = {0};
-VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
-VkDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
+LunaDescriptorPool descriptorPool = LUNA_NULL_HANDLE;
+LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 List textures = {0};
-MemoryInfo textureMemory = {.type = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT};
-List texturesImageView = {0};
 uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 TextureSamplers textureSamplers = {
 	.linearRepeat = VK_NULL_HANDLE,
@@ -136,10 +134,10 @@ bool LoadActors(const Level *level)
 	}
 	ListUnlock(level->actors);
 
-	if (!ResizeActorBuffer())
-	{
-		return false;
-	}
+	// if (!ResizeActorBuffer())
+	// {
+	// return false;
+	// }
 
 	ActorVertex *actorVertices = calloc(buffers.actors.models.vertexCount, sizeof(ActorVertex));
 	CheckAlloc(actorVertices);
@@ -148,7 +146,7 @@ bool LoadActors(const Level *level)
 	LoadActorModels(level, actorVertices, actorIndices);
 
 	const size_t size = buffers.actors.models.vertexSize + buffers.actors.models.indexSize;
-	if (__builtin_expect(size > buffers.staging.size, false) && !ResizeStagingBuffer(size))
+	if (__builtin_expect(size > buffers.staging.size, false)) // && !ResizeStagingBuffer(size))
 	{
 		return false;
 	}
@@ -176,42 +174,6 @@ bool LoadActors(const Level *level)
 
 	free(actorVertices);
 	free(actorIndices);
-
-	return true;
-}
-
-bool QuerySwapChainSupport(const VkPhysicalDevice pDevice)
-{
-	VulkanTest(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pDevice, surface, &swapChainSupport.capabilities),
-			   "Failed to query Vulkan surface capabilities!");
-
-	VulkanTest(vkGetPhysicalDeviceSurfaceFormatsKHR(pDevice, surface, &swapChainSupport.formatCount, NULL),
-			   "Failed to query Vulkan surface color formats!");
-	if (swapChainSupport.formatCount != 0)
-	{
-		free(swapChainSupport.formats);
-		swapChainSupport.formats = malloc(sizeof(VkSurfaceFormatKHR) * swapChainSupport.formatCount);
-		CheckAlloc(swapChainSupport.formats);
-		VulkanTest(vkGetPhysicalDeviceSurfaceFormatsKHR(pDevice,
-														surface,
-														&swapChainSupport.formatCount,
-														swapChainSupport.formats),
-				   "Failed to query Vulkan surface color formats!");
-	}
-
-	VulkanTest(vkGetPhysicalDeviceSurfacePresentModesKHR(pDevice, surface, &swapChainSupport.presentModeCount, NULL),
-			   "Failed to query Vulkan surface presentation modes!");
-	if (swapChainSupport.presentModeCount != 0)
-	{
-		free(swapChainSupport.presentMode);
-		swapChainSupport.presentMode = calloc(swapChainSupport.presentModeCount, sizeof(VkPresentModeKHR));
-		CheckAlloc(swapChainSupport.presentMode);
-		VulkanTest(vkGetPhysicalDeviceSurfacePresentModesKHR(pDevice,
-															 surface,
-															 &swapChainSupport.presentModeCount,
-															 swapChainSupport.presentMode),
-				   "Failed to query Vulkan surface presentation modes!");
-	}
 
 	return true;
 }
@@ -252,24 +214,17 @@ bool CreateImageView(VkImageView *imageView,
 	return true;
 }
 
-VkShaderModule CreateShaderModule(const char *path)
+VkResult CreateShaderModule(const char *path, VkShaderModule *shaderModule)
 {
-	VkShaderModule shaderModule;
 	const Asset *shader = DecompressAsset(path);
 
-	const VkShaderModuleCreateInfo createInfo = {
-		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.codeSize = shader->size - sizeof(uint32_t) * 4, // sizeof(uint32_t) * 4 is the asset header
-		.pCode = (uint32_t *)shader->data,
-	};
+	// sizeof(uint32_t) * 4 is the asset header
+	VulkanTestReturnResult(lunaCreateShaderModule((uint32_t *)shader->data,
+												  shader->size - sizeof(uint32_t) * 4,
+												  shaderModule),
+						   "Failed to create shader module!");
 
-	VulkanTestWithReturn(vkCreateShaderModule(device, &createInfo, NULL, &shaderModule),
-						 NULL,
-						 "Failed to create shader module!");
-
-	return shaderModule;
+	return VK_SUCCESS;
 }
 
 bool CreateImage(VkImage *image,
@@ -548,14 +503,10 @@ void CleanupSwapChain()
 	}
 	vkDestroySwapchainKHR(device, swapChain, NULL);
 
-	free(swapChainSupport.formats);
-	free(swapChainSupport.presentMode);
 	free(swapChainImages);
 	free(swapChainImageViews);
 	free(swapChainFramebuffers);
 
-	swapChainSupport.formats = NULL;
-	swapChainSupport.presentMode = NULL;
 	swapChainImages = NULL;
 	swapChainImageViews = NULL;
 	swapChainFramebuffers = NULL;
@@ -580,7 +531,7 @@ void CleanupPipeline()
 	vkDestroyPipeline(device, pipelines.walls, NULL);
 	vkDestroyPipeline(device, pipelines.actors, NULL);
 	vkDestroyPipeline(device, pipelines.ui, NULL);
-	vkDestroyPipelineLayout(device, pipelineLayout, NULL);
+	// vkDestroyPipelineLayout(device, pipelineLayout, NULL);
 }
 
 void CleanupSyncObjects()
@@ -604,13 +555,7 @@ bool RecreateSwapChain()
 	CleanupPipeline();
 	CleanupSyncObjects();
 
-	return CreateSwapChain() &&
-		   CreateImageViews() &&
-		   CreateGraphicsPipelines() &&
-		   CreateColorImage() &&
-		   CreateDepthImage() &&
-		   CreateFramebuffers() &&
-		   CreateSyncObjects();
+	return CreateSwapChain() && CreateGraphicsPipelines();
 }
 
 bool DestroyBuffer(Buffer *buffer)

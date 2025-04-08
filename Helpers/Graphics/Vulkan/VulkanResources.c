@@ -3,12 +3,13 @@
 //
 
 #include "VulkanResources.h"
+#include <luna/luna.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../CommonAssets.h"
 #include "../../Core/Error.h"
 #include "../../Core/MathEx.h"
-#include "VulkanMemory.h"
 
+/*
 bool CreateLocalBuffer()
 {
 	buffers.walls.shadowSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
@@ -162,10 +163,10 @@ void SetSharedBufferAliasingInfo()
 
 	SetSharedMemoryMappingInfo();
 }
-
+*/
 // TODO: lossless
-bool ResizeBuffer(Buffer *buffer, bool /*lossy*/)
-{
+// bool ResizeBuffer(Buffer *buffer, bool /*lossy*/)
+/*{
 	vkDestroyBuffer(device, buffer->buffer, NULL);
 	buffer->buffer = VK_NULL_HANDLE;
 
@@ -549,32 +550,43 @@ bool ResizeActorBuffer()
 
 	return true;
 }
-
+*/
 bool LoadTexture(const Image *image)
 {
-	Texture *texture = calloc(1, sizeof(Texture));
-	CheckAlloc(texture);
-	ListAdd(&textures, texture);
-	texture->imageInfo = image;
-
-	const VkExtent3D extent = {
+	const LunaSampledImageCreationInfo imageCreationInfo = {
+		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.depth = 1,
+		// .mipmapLevels = GetState()->options.mipmaps && false ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
+		.pixels = image->pixelData,
+		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		.sampler = textureSamplers.nearestRepeat,
+		.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_TRANSFER_BIT,
 	};
-	texture->mipmapLevels = GetState()->options.mipmaps ? (uint8_t)log2(max(extent.width, extent.height)) + 1 : 1;
-	if (!CreateImage(&texture->image,
-					 NULL,
-					 VK_FORMAT_R8G8B8A8_UNORM,
-					 extent,
-					 texture->mipmapLevels,
-					 VK_SAMPLE_COUNT_1_BIT,
-					 VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-					 "texture"))
-	{
-		return false;
-	}
+	ListAdd(&textures, NULL);
+	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage*)&textures.data[textures.length - 1]), "Failed to create texture!");
+	imageAssetIdToIndexMap[image->id] = textures.length - 1;
 
+	const LunaDescriptorImageInfo imageInfo = {
+		.image = textures.data[textures.length - 1],
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+	};
+	LunaWriteDescriptorSet writeDescriptors[MAX_FRAMES_IN_FLIGHT];
+	for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		writeDescriptors[i] = (LunaWriteDescriptorSet){
+			.descriptorSet = descriptorSets[i],
+			.bindingName = "Textures",
+			.descriptorArrayElement = textures.length - 1,
+			.descriptorCount = 1,
+			.imageInfo = &imageInfo,
+		};
+	}
+	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
+
+	/*
 	vkGetImageMemoryRequirements(device, texture->image, &texture->allocationInfo.memoryRequirements);
 	if (textures.length == 1)
 	{
@@ -884,6 +896,6 @@ bool LoadTexture(const Image *image)
 		};
 		vkUpdateDescriptorSets(device, 1, &writeDescriptor, 0, NULL);
 	}
-
+*/
 	return true;
 }
