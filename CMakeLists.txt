@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(game C)
+project(game C CXX)
 
 # Adds the module folder to the CMake module path
 # This folder is populated by the setup-windows.py script
@@ -154,8 +154,6 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanInternal.h
         Helpers/Graphics/Vulkan/VulkanHelpers.c
         Helpers/Graphics/Vulkan/VulkanHelpers.h
-        Helpers/Graphics/Vulkan/VulkanMemory.c
-        Helpers/Graphics/Vulkan/VulkanMemory.h
         Helpers/Graphics/Vulkan/VulkanResources.c
         Helpers/Graphics/Vulkan/VulkanResources.h
         Helpers/Navigation.c
@@ -199,6 +197,8 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 
 include_directories("${CMAKE_SOURCE_DIR}/lib/box2d/include")
 
+include_directories("${CMAKE_SOURCE_DIR}/lib/Luna/include")
+
 if (UNIX)
     find_package(GLEW REQUIRED) # OpenGL Extension Wrangler
     include_directories(${GLEW_INCLUDE_DIRS})
@@ -212,11 +212,19 @@ elseif (WIN32) # Thank you Windows, I hate you.
     include_directories(${GLEW_INCLUDE_DIRS})
 endif ()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(LUNA_PATH "${CMAKE_SOURCE_DIR}/lib/Luna/libLuna_release.a")
+else ()
+    set(LUNA_PATH "${CMAKE_SOURCE_DIR}/lib/Luna/libLuna_debug.a")
+endif ()
+
 if (UNIX)
-    target_link_libraries(game -lGL -lGLU ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a m SDL2 SDL2_mixer z ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
+    target_link_libraries(game -lGL -lGLU ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a ${LUNA_PATH} m SDL2 SDL2_mixer z ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
 elseif (WIN32)
     target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
 endif ()
+
+set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX)
 
 #endregion
 

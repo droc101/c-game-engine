@@ -6,6 +6,7 @@
 #define VULKANHELPERS_H
 
 #include <cglm/cglm.h>
+#include <luna/lunaTypes.h>
 #include <vulkan/vulkan.h>
 #include "../../Core/AssetReader.h"
 #include "../../Core/DataReader.h"
@@ -31,13 +32,12 @@
 			printf("\033[0m Error code %d\n", result); \
 			if (result == VK_ERROR_DEVICE_LOST) \
 			{ \
-				printf("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.png for more information\n"); \
+				printf("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.webp for more information\n"); \
 			} \
 			fflush(stdout); \
 			return returnValue; \
 		} \
 	}
-#define VulkanTestWithReturn(function, returnValue, ...) VulkanTestInternal(function, returnValue, __VA_ARGS__)
 #define VulkanTestReturnResult(function, ...) VulkanTestInternal(function, result, __VA_ARGS__)
 #define VulkanTest(function, ...) VulkanTestInternal(function, false, __VA_ARGS__)
 #pragma endregion macros
@@ -87,15 +87,6 @@ typedef struct QueueFamilyIndices
 	/// The total count of unique families
 	uint8_t familyCount;
 } QueueFamilyIndices;
-
-typedef struct SwapChainSupportDetails
-{
-	uint32_t formatCount;
-	uint32_t presentModeCount;
-	VkSurfaceFormatKHR *formats;
-	VkPresentModeKHR *presentMode;
-	VkSurfaceCapabilitiesKHR capabilities;
-} SwapChainSupportDetails;
 
 /**
  * A struct used to hold information about the size and type of the memory, as well as a host pointer mapped to the
@@ -218,15 +209,6 @@ typedef struct WallVertex
 	float wallAngle;
 } WallVertex;
 
-typedef struct Texture
-{
-	VkImage image;
-	const Image *imageInfo;
-	VkExtent3D extent;
-	uint8_t mipmapLevels;
-	MemoryAllocationInfo allocationInfo;
-} Texture;
-
 /**
  * A structure holding data about a Vulkan buffer.
  *
@@ -254,7 +236,7 @@ typedef struct Buffer
  *
  * @note This is still C, so there are no actual guardrails preventing you from potentially causing a SEGFAULT by attempting to write to @c vertices[100] when @c maxQuads is only 5.
  */
-typedef struct UiVertexBuffer
+typedef struct UiBuffer
 {
 	/// A fallback pointer that can be used if it is necessary to write more than @code maxQuads * 4@endcode vertices to the buffer.
 	/// @note This pointer takes the form of @code UiVertex[fallbackMaxQuads * 4]@endcode.
@@ -264,43 +246,16 @@ typedef struct UiVertexBuffer
 	/// @note This pointer takes the form of @code uint32_t[fallbackMaxVertices * 6]@endcode.
 	/// @note This pointer is host only, meaning that there is no Vulkan memory backing it. This means that for the GPU to be able to access it the data must first be copied to a buffer.
 	uint32_t *indices;
-	/// The current number of vertices that are stored in the buffer.
+	/// The current number of quads that are stored in the buffer.
 	uint32_t quadCount;
-	/// The maximum number of vertices that can be stored in the fallback buffer with the currently allocated memory.
+	/// The maximum number of quads that can be stored in the buffer with the currently allocated memory.
 	uint32_t maxQuads;
 
-	/// The larger buffer within which this vertex buffer resides.
-	Buffer *bufferInfo;
-	/// The offset into the larger buffer at which this vertex buffer can be found.
-	VkDeviceSize vertexOffset;
-	/// The offset into the larger buffer at which the UI index buffer can be found.
-	VkDeviceSize indexOffset;
-	/// The allocated size of the vertex buffer
-	VkDeviceSize vertexSize;
-	/// The allocated size of the index buffer
-	VkDeviceSize indexSize;
-
-	/// The larger buffer within which this vertex buffer resides.
-	Buffer *stagingBufferInfo;
-	/// The offset into the larger buffer at which this vertex buffer can be found.
-	VkDeviceSize vertexStagingOffset;
-	/// The offset into the larger buffer at which the UI index buffer can be found.
-	VkDeviceSize indexStagingOffset;
-	/// The allocated size of the staging vertex buffer
-	VkDeviceSize vertexStagingSize;
-	/// The allocated size of the staging index buffer
-	VkDeviceSize indexStagingSize;
-	/// This pointer will be mapped directly to an offset into some larger block of memory.
-	/// It is able to be used to directly write up to @code maxQuads * 4@endcode elements of type @c UiVertex to the vertex buffer.
-	/// @note This pointer takes the form of @code UiVertex[maxQuads * 4]@endcode.
-	UiVertex *vertexStaging;
-	/// This pointer will be mapped directly to an offset into some larger block of memory.
-	/// It is able to be used to directly write up to @code maxQuads * 4@endcode elements of type @c uint32_t to the index buffer.
-	/// @note This pointer takes the form of @code uint32_t[maxQuads * 6]@endcode.
-	uint32_t *indexStaging;
+	LunaBuffer vertexBuffer;
+	LunaBuffer indexBuffer;
 
 	bool shouldResize;
-} UiVertexBuffer;
+} UiBuffer;
 
 /**
  * A structure holding data about a wall vertex buffer.
@@ -485,24 +440,24 @@ typedef struct Buffers
 	Buffer shared;
 	Buffer staging;
 
-	UiVertexBuffer ui;
+	UiBuffer ui;
 	WallVertexBuffer walls;
 	ActorBuffer actors;
 } Buffers;
 
 typedef struct Pipelines
 {
-	VkPipeline walls;
-	VkPipeline actors;
-	VkPipeline ui;
+	LunaGraphicsPipeline walls;
+	LunaGraphicsPipeline actors;
+	LunaGraphicsPipeline ui;
 } Pipelines;
 
 typedef struct TextureSamplers
 {
-	VkSampler linearRepeat;
-	VkSampler nearestRepeat;
-	VkSampler linearNoRepeat;
-	VkSampler nearestNoRepeat;
+	LunaSampler linearRepeat;
+	LunaSampler nearestRepeat;
+	LunaSampler linearNoRepeat;
+	LunaSampler nearestNoRepeat;
 } TextureSamplers;
 
 typedef struct PhysicalDevice
@@ -549,8 +504,6 @@ extern VkSurfaceKHR surface;
 extern PhysicalDevice physicalDevice;
 /// @todo Document this
 extern QueueFamilyIndices queueFamilyIndices;
-/// @todo Document this along with the struct
-extern SwapChainSupportDetails swapChainSupport;
 /// The logical device is a connection to a physical device, and is used for interfacing with Vulkan.
 /// @see https://docs.vulkan.org/spec/latest/chapters/devsandqueues.html#devsandqueues-devices
 /// @see https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkDevice.html
@@ -574,9 +527,8 @@ extern uint32_t swapChainCount;
 extern VkFormat swapChainImageFormat;
 extern VkExtent2D swapChainExtent;
 extern VkImageView *swapChainImageViews;
-extern VkRenderPass renderPass;
-extern VkDescriptorSetLayout descriptorSetLayout;
-extern VkPipelineLayout pipelineLayout;
+extern LunaRenderPass renderPass;
+extern LunaDescriptorSetLayout descriptorSetLayout;
 extern VkPipelineCache pipelineCache;
 extern Pipelines pipelines;
 extern VkFramebuffer *swapChainFramebuffers;
@@ -591,11 +543,9 @@ extern uint8_t currentFrame;
 extern uint32_t swapchainImageIndex;
 extern MemoryPools memoryPools;
 extern Buffers buffers;
-extern VkDescriptorPool descriptorPool;
-extern VkDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
+extern LunaDescriptorPool descriptorPool;
+extern LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 extern List textures;
-extern MemoryInfo textureMemory;
-extern List texturesImageView;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 extern TextureSamplers textureSamplers;
 extern VkFormat depthImageFormat;
@@ -607,7 +557,6 @@ extern VkDeviceMemory colorImageMemory;
 extern VkImageView colorImageView;
 extern VkClearColorValue clearColor;
 extern VkSampleCountFlagBits msaaSamples;
-extern uint16_t textureCount;
 extern PushConstants pushConstants;
 extern VkCommandBuffer transferCommandBuffer;
 extern VkFence transferBufferFence;
@@ -616,13 +565,6 @@ extern VkFence transferBufferFence;
 #pragma region helperFunctions
 bool LoadActors(const Level *level);
 
-/**
- * Provides information about the physical device's support for the swap chain.
- * @param pDevice The physical device to query for
- * @return A @c SwapChainSupportDetails struct
- */
-bool QuerySwapChainSupport(VkPhysicalDevice pDevice);
-
 bool CreateImageView(VkImageView *imageView,
 					 VkImage image,
 					 VkFormat format,
@@ -630,7 +572,7 @@ bool CreateImageView(VkImageView *imageView,
 					 uint8_t mipmapLevels,
 					 const char *errorMessage);
 
-VkShaderModule CreateShaderModule(const char *path);
+VkResult CreateShaderModule(const char *path, VkShaderModule *shaderModule);
 
 bool CreateImage(VkImage *image,
 				 VkDeviceMemory *imageMemory,
