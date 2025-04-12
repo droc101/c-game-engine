@@ -11,7 +11,6 @@
 #include "../../Core/Error.h"
 #include "../../Core/Logging.h"
 #include "../RenderingHelpers.h"
-#include "VulkanInternal.h"
 #include "VulkanResources.h"
 
 #pragma region variables
@@ -58,7 +57,22 @@ MemoryPools memoryPools = {
 		.type = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 	},
 };
-Buffers buffers = {0};
+Buffers buffers = {
+	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
+	.ui.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_UI_QUADS_INIT,
+	.walls.vertices.allocatedSize = sizeof(WallVertex) * 4 * MAX_WALLS_INIT,
+	.walls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALLS_INIT,
+	.shadows.vertices.allocatedSize = sizeof(WallVertex) * 4 * MAX_WALL_ACTORS_INIT,
+	.shadows.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
+	.wallActors.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_WALL_ACTORS_INIT,
+	.wallActors.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
+	.wallActors.instanceData.allocatedSize = sizeof(ActorInstanceData) * MAX_WALL_ACTORS_INIT,
+	.wallActors.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_WALL_ACTORS_INIT,
+	.modelActors.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_MODEL_ACTOR_QUADS_INIT,
+	.modelActors.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_MODEL_ACTOR_QUADS_INIT,
+	.modelActors.instanceData.allocatedSize = sizeof(ActorInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
+	.modelActors.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
+};
 LunaDescriptorPool descriptorPool = LUNA_NULL_HANDLE;
 LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 List textures = {0};
@@ -84,18 +98,18 @@ VkCommandBuffer transferCommandBuffer = VK_NULL_HANDLE;
 VkFence transferBufferFence = VK_NULL_HANDLE;
 #pragma endregion variables
 
-bool LoadActors(const Level *level)
+VkResult InitActors(const Level *level)
 {
 	if (__builtin_expect(loadedActors == level->actors.length, true))
 	{
-		return true;
+		return VK_SUCCESS;
 	}
 
-	ListClear(&buffers.actors.models.loadedModelIds);
-	ListClear(&buffers.actors.models.modelCounts);
-	buffers.walls.shadowCount = 0;
-	memset(&buffers.actors.models, 0, sizeof(ModelActorBuffer));
-	memset(&buffers.actors.walls, 0, sizeof(WallActorBuffer));
+	ListClear(&buffers.modelActors.loadedModelIds);
+	ListClear(&buffers.modelActors.modelCounts);
+	buffers.shadows.objectCount = 0;
+	memset(&buffers.wallActors, 0, sizeof(WallActorsBuffer));
+	memset(&buffers.modelActors, 0, sizeof(ModelActorsBuffer));
 	loadedActors = 0;
 	ListLock(level->actors);
 	for (size_t i = 0; i < level->actors.length; i++)
@@ -108,74 +122,43 @@ bool LoadActors(const Level *level)
 			{
 				continue;
 			}
-			buffers.actors.walls.count++;
+			buffers.wallActors.count++;
 		} else
 		{
-			size_t index = ListFind(buffers.actors.models.loadedModelIds, (void *)actor->actorModel->id);
+			size_t index = ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
 			if (index == -1)
 			{
-				index = buffers.actors.models.loadedModelIds.length;
-				ListAdd(&buffers.actors.models.loadedModelIds, (void *)actor->actorModel->id);
-				buffers.actors.models.vertexCount += actor->actorModel->vertexCount;
-				buffers.actors.models.indexCount += actor->actorModel->indexCount;
+				index = buffers.modelActors.loadedModelIds.length;
+				ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
+				buffers.modelActors.vertices.bytesUsed += sizeof(ActorVertex) * actor->actorModel->vertexCount;
+				buffers.modelActors.indices.bytesUsed += sizeof(uint32_t) * actor->actorModel->indexCount;
+				buffers.modelActors.instanceData.bytesUsed += sizeof(ActorInstanceData);
+				buffers.modelActors.drawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
 			}
-			if (index < buffers.actors.models.modelCounts.length)
+			if (index < buffers.modelActors.modelCounts.length)
 			{
-				buffers.actors.models.modelCounts.data[index]++;
+				buffers.modelActors.modelCounts.data[index]++;
 			} else
 			{
-				ListAdd(&buffers.actors.models.modelCounts, (void *)1);
+				ListAdd(&buffers.modelActors.modelCounts, (void *)1);
 			}
 		}
 		if (actor->showShadow)
 		{
-			buffers.walls.shadowCount++;
+			buffers.shadows.objectCount++;
 		}
 	}
 	ListUnlock(level->actors);
+	buffers.wallActors.vertices.bytesUsed = sizeof(ActorVertex) * 4 * buffers.wallActors.count;
+	buffers.wallActors.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.wallActors.count;
+	buffers.wallActors.instanceData.bytesUsed = sizeof(ActorInstanceData) * buffers.wallActors.count;
+	buffers.wallActors.drawInfo.bytesUsed = sizeof(VkDrawIndexedIndirectCommand) * buffers.wallActors.count;
 
-	// if (!ResizeActorBuffer())
-	// {
-	// return false;
-	// }
-
-	ActorVertex *actorVertices = calloc(buffers.actors.models.vertexCount, sizeof(ActorVertex));
-	CheckAlloc(actorVertices);
-	uint32_t *actorIndices = calloc(buffers.actors.models.indexCount, sizeof(uint32_t));
-	CheckAlloc(actorIndices);
-	LoadActorModels(level, actorVertices, actorIndices);
-
-	const size_t size = buffers.actors.models.vertexSize + buffers.actors.models.indexSize;
-	if (__builtin_expect(size > buffers.staging.size, false)) // && !ResizeStagingBuffer(size))
-	{
-		return false;
-	}
-	void *data = buffers.staging.memoryAllocationInfo.memoryInfo->mappedMemory;
-
-	memcpy(data, actorVertices, sizeof(ActorVertex) * buffers.actors.models.vertexCount);
-	memcpy(data + buffers.actors.models.vertexSize, actorIndices, sizeof(uint32_t) * buffers.actors.models.indexCount);
-
-	const VkBufferCopy regions[] = {
-		{
-			.srcOffset = 0,
-			.dstOffset = buffers.actors.vertexOffset,
-			.size = buffers.actors.models.vertexSize,
-		},
-		{
-			.srcOffset = buffers.actors.models.vertexSize,
-			.dstOffset = buffers.actors.indexOffset,
-			.size = buffers.actors.models.indexSize,
-		},
-	};
-	if (!CopyBuffer(buffers.staging.buffer, buffers.local.buffer, 2, regions))
-	{
-		return false;
-	}
-
-	free(actorVertices);
-	free(actorIndices);
-
-	return true;
+	VulkanTestReturnResult(ResizeWallActorBuffers(), "Failed to resize wall actor buffers!");
+	VulkanTestReturnResult(ResizeModelActorBuffers(), "Failed to resize model actor buffers!");
+	LoadActorModels(level);
+	return VK_SUCCESS;
+	// lunaWriteDataToBuffer();
 }
 
 bool CreateImageView(VkImageView *imageView,
@@ -366,84 +349,84 @@ bool EndCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandPool command
 	return true;
 }
 
-bool CreateBuffer(Buffer *buffer, const bool newAllocation)
-{
-	uint32_t pQueueFamilyIndices[queueFamilyIndices.familyCount];
-	switch (queueFamilyIndices.familyCount)
-	{
-		case 1:
-			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
-			break;
-		case 2:
-			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
-			pQueueFamilyIndices[1] = queueFamilyIndices.families & QUEUE_FAMILY_TRANSFER
-											 ? queueFamilyIndices.transferFamily
-											 : queueFamilyIndices.presentFamily;
-			break;
-		case 3:
-			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
-			pQueueFamilyIndices[1] = queueFamilyIndices.presentFamily;
-			pQueueFamilyIndices[2] = queueFamilyIndices.transferFamily;
-			break;
-		default:
-			VulkanLogError("Failed to create VkSwapchainCreateInfoKHR due to invalid queueFamilyIndices!\n");
-			return false;
-	}
-
-	const VkBufferCreateInfo bufferInfo = {
-		.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.size = buffer->size,
-		.usage = buffer->memoryAllocationInfo.usageFlags,
-		.sharingMode = queueFamilyIndices.families & QUEUE_FAMILY_PRESENTATION ? VK_SHARING_MODE_CONCURRENT
-																			   : VK_SHARING_MODE_EXCLUSIVE,
-		.queueFamilyIndexCount = queueFamilyIndices.familyCount,
-		.pQueueFamilyIndices = pQueueFamilyIndices,
-	};
-
-	VulkanTest(vkCreateBuffer(device, &bufferInfo, NULL, &buffer->buffer), "Failed to create Vulkan buffer!");
-
-	vkGetBufferMemoryRequirements(device, buffer->buffer, &buffer->memoryAllocationInfo.memoryRequirements);
-	const VkDeviceSize memorySize = buffer->memoryAllocationInfo.memoryRequirements.alignment *
-									(VkDeviceSize)
-											ceil((double)buffer->memoryAllocationInfo.memoryRequirements.size /
-												 (double)buffer->memoryAllocationInfo.memoryRequirements.alignment);
-
-	buffer->memoryAllocationInfo.memoryInfo->size = memorySize;
-
-	if (!newAllocation)
-	{
-		return true; // Allocation and binding will be handled elsewhere
-	}
-
-	for (uint32_t i = 0; i < physicalDevice.memoryProperties.memoryTypeCount; i++)
-	{
-		if (buffer->memoryAllocationInfo.memoryRequirements.memoryTypeBits & 1 << i &&
-			(physicalDevice.memoryProperties.memoryTypes[i].propertyFlags &
-			 buffer->memoryAllocationInfo.memoryInfo->type) == buffer->memoryAllocationInfo.memoryInfo->type)
-		{
-			const VkMemoryAllocateInfo allocInfo = {
-				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-				.pNext = NULL,
-				.allocationSize = memorySize,
-				.memoryTypeIndex = i,
-			};
-
-			VulkanTest(vkAllocateMemory(device, &allocInfo, NULL, &buffer->memoryAllocationInfo.memoryInfo->memory),
-					   "Failed to allocate Vulkan buffer memory!");
-
-			VulkanTest(vkBindBufferMemory(device, buffer->buffer, buffer->memoryAllocationInfo.memoryInfo->memory, 0),
-					   "Failed to bind Vulkan buffer memory!");
-
-			return true;
-		}
-	}
-
-	VulkanLogError("Failed to find suitable memory type for buffer!\n");
-
-	return false;
-}
+// bool CreateBuffer(Buffer *buffer, const bool newAllocation)
+// {
+// 	uint32_t pQueueFamilyIndices[queueFamilyIndices.familyCount];
+// 	switch (queueFamilyIndices.familyCount)
+// 	{
+// 		case 1:
+// 			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
+// 			break;
+// 		case 2:
+// 			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
+// 			pQueueFamilyIndices[1] = queueFamilyIndices.families & QUEUE_FAMILY_TRANSFER
+// 											 ? queueFamilyIndices.transferFamily
+// 											 : queueFamilyIndices.presentFamily;
+// 			break;
+// 		case 3:
+// 			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
+// 			pQueueFamilyIndices[1] = queueFamilyIndices.presentFamily;
+// 			pQueueFamilyIndices[2] = queueFamilyIndices.transferFamily;
+// 			break;
+// 		default:
+// 			VulkanLogError("Failed to create VkSwapchainCreateInfoKHR due to invalid queueFamilyIndices!\n");
+// 			return false;
+// 	}
+//
+// 	const VkBufferCreateInfo bufferInfo = {
+// 		.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+// 		.pNext = NULL,
+// 		.flags = 0,
+// 		.size = buffer->size,
+// 		.usage = buffer->memoryAllocationInfo.usageFlags,
+// 		.sharingMode = queueFamilyIndices.families & QUEUE_FAMILY_PRESENTATION ? VK_SHARING_MODE_CONCURRENT
+// 																			   : VK_SHARING_MODE_EXCLUSIVE,
+// 		.queueFamilyIndexCount = queueFamilyIndices.familyCount,
+// 		.pQueueFamilyIndices = pQueueFamilyIndices,
+// 	};
+//
+// 	VulkanTest(vkCreateBuffer(device, &bufferInfo, NULL, &buffer->buffer), "Failed to create Vulkan buffer!");
+//
+// 	vkGetBufferMemoryRequirements(device, buffer->buffer, &buffer->memoryAllocationInfo.memoryRequirements);
+// 	const VkDeviceSize memorySize = buffer->memoryAllocationInfo.memoryRequirements.alignment *
+// 									(VkDeviceSize)
+// 											ceil((double)buffer->memoryAllocationInfo.memoryRequirements.size /
+// 												 (double)buffer->memoryAllocationInfo.memoryRequirements.alignment);
+//
+// 	buffer->memoryAllocationInfo.memoryInfo->size = memorySize;
+//
+// 	if (!newAllocation)
+// 	{
+// 		return true; // Allocation and binding will be handled elsewhere
+// 	}
+//
+// 	for (uint32_t i = 0; i < physicalDevice.memoryProperties.memoryTypeCount; i++)
+// 	{
+// 		if (buffer->memoryAllocationInfo.memoryRequirements.memoryTypeBits & 1 << i &&
+// 			(physicalDevice.memoryProperties.memoryTypes[i].propertyFlags &
+// 			 buffer->memoryAllocationInfo.memoryInfo->type) == buffer->memoryAllocationInfo.memoryInfo->type)
+// 		{
+// 			const VkMemoryAllocateInfo allocInfo = {
+// 				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+// 				.pNext = NULL,
+// 				.allocationSize = memorySize,
+// 				.memoryTypeIndex = i,
+// 			};
+//
+// 			VulkanTest(vkAllocateMemory(device, &allocInfo, NULL, &buffer->memoryAllocationInfo.memoryInfo->memory),
+// 					   "Failed to allocate Vulkan buffer memory!");
+//
+// 			VulkanTest(vkBindBufferMemory(device, buffer->buffer, buffer->memoryAllocationInfo.memoryInfo->memory, 0),
+// 					   "Failed to bind Vulkan buffer memory!");
+//
+// 			return true;
+// 		}
+// 	}
+//
+// 	VulkanLogError("Failed to find suitable memory type for buffer!\n");
+//
+// 	return false;
+// }
 
 bool CopyBuffer(const VkBuffer srcBuffer,
 				const VkBuffer dstBuffer,
@@ -485,242 +468,173 @@ inline uint32_t ImageIndex(const Image *image)
 	return index;
 }
 
-void CleanupSwapChain()
+void LoadRoof(const bool hasCeiling)
 {
-	if (swapChainFramebuffers)
+	WallVertex *vertices = buffers.roof.vertices.data;
+	uint32_t *indices = buffers.roof.indices.data;
+	if (hasCeiling)
 	{
-		for (uint32_t i = 0; i < swapChainCount; i++)
-		{
-			vkDestroyFramebuffer(device, swapChainFramebuffers[i], NULL);
-		}
-	}
-	if (swapChainImageViews)
-	{
-		for (uint32_t i = 0; i < swapChainCount; i++)
-		{
-			vkDestroyImageView(device, swapChainImageViews[i], NULL);
-		}
-	}
-	vkDestroySwapchainKHR(device, swapChain, NULL);
+		vertices[0].x = -100;
+		vertices[0].y = 0.5f;
+		vertices[0].z = -100;
+		vertices[0].u = -100;
+		vertices[0].v = -100;
+		vertices[0].textureIndex = pushConstants.skyTextureIndex;
 
-	free(swapChainImages);
-	free(swapChainImageViews);
-	free(swapChainFramebuffers);
+		vertices[1].x = 100;
+		vertices[1].y = 0.5f;
+		vertices[1].z = -100;
+		vertices[1].u = 100;
+		vertices[1].v = -100;
+		vertices[1].textureIndex = pushConstants.skyTextureIndex;
 
-	swapChainImages = NULL;
-	swapChainImageViews = NULL;
-	swapChainFramebuffers = NULL;
-}
+		vertices[2].x = 100;
+		vertices[2].y = 0.5f;
+		vertices[2].z = 100;
+		vertices[2].u = 100;
+		vertices[2].v = 100;
+		vertices[2].textureIndex = pushConstants.skyTextureIndex;
 
-void CleanupColorImage()
-{
-	vkDestroyImageView(device, colorImageView, NULL);
-	vkDestroyImage(device, colorImage, NULL);
-	vkFreeMemory(device, colorImageMemory, NULL);
-}
+		vertices[3].x = -100;
+		vertices[3].y = 0.5f;
+		vertices[3].z = 100;
+		vertices[3].u = -100;
+		vertices[3].v = 100;
+		vertices[3].textureIndex = pushConstants.skyTextureIndex;
 
-void CleanupDepthImage()
-{
-	vkDestroyImageView(device, depthImageView, NULL);
-	vkDestroyImage(device, depthImage, NULL);
-	vkFreeMemory(device, depthImageMemory, NULL);
-}
-
-void CleanupPipeline()
-{
-	vkDestroyPipeline(device, pipelines.walls, NULL);
-	vkDestroyPipeline(device, pipelines.actors, NULL);
-	vkDestroyPipeline(device, pipelines.ui, NULL);
-	// vkDestroyPipelineLayout(device, pipelineLayout, NULL);
-}
-
-void CleanupSyncObjects()
-{
-	for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		vkDestroySemaphore(device, imageAvailableSemaphores[i], NULL);
-		vkDestroySemaphore(device, renderFinishedSemaphores[i], NULL);
-
-		vkDestroyFence(device, inFlightFences[i], NULL);
-	}
-}
-
-bool RecreateSwapChain()
-{
-	VulkanTest(vkDeviceWaitIdle(device), "Failed to wait for device to become idle!");
-
-	CleanupSwapChain();
-	CleanupColorImage();
-	CleanupDepthImage();
-	CleanupPipeline();
-	CleanupSyncObjects();
-
-	return CreateSwapChain() && CreateGraphicsPipelines();
-}
-
-bool DestroyBuffer(Buffer *buffer)
-{
-	VulkanTest(vkDeviceWaitIdle(device), "Failed to wait for device to become idle!");
-
-	vkDestroyBuffer(device, buffer->buffer, NULL);
-	buffer->buffer = VK_NULL_HANDLE;
-
-	if (buffer->memoryAllocationInfo.memoryInfo)
-	{
-		vkFreeMemory(device, buffer->memoryAllocationInfo.memoryInfo->memory, NULL);
-	}
-	buffer->memoryAllocationInfo = (MemoryAllocationInfo){0};
-
-	return true;
-}
-
-void LoadWalls(const Level *level,
-			   const Model *skyModel,
-			   WallVertex *vertices,
-			   uint32_t *indices,
-			   const uint32_t skyVertexCount)
-{
-	vertices[0 + skyVertexCount].x = -100;
-	vertices[0 + skyVertexCount].y = -0.5f;
-	vertices[0 + skyVertexCount].z = -100;
-	vertices[0 + skyVertexCount].u = -100;
-	vertices[0 + skyVertexCount].v = -100;
-	vertices[0 + skyVertexCount].textureIndex = TextureIndex(level->floorTex);
-
-	vertices[1 + skyVertexCount].x = 100;
-	vertices[1 + skyVertexCount].y = -0.5f;
-	vertices[1 + skyVertexCount].z = -100;
-	vertices[1 + skyVertexCount].u = 100;
-	vertices[1 + skyVertexCount].v = -100;
-	vertices[1 + skyVertexCount].textureIndex = TextureIndex(level->floorTex);
-
-	vertices[2 + skyVertexCount].x = 100;
-	vertices[2 + skyVertexCount].y = -0.5f;
-	vertices[2 + skyVertexCount].z = 100;
-	vertices[2 + skyVertexCount].u = 100;
-	vertices[2 + skyVertexCount].v = 100;
-	vertices[2 + skyVertexCount].textureIndex = TextureIndex(level->floorTex);
-
-	vertices[3 + skyVertexCount].x = -100;
-	vertices[3 + skyVertexCount].y = -0.5f;
-	vertices[3 + skyVertexCount].z = 100;
-	vertices[3 + skyVertexCount].u = -100;
-	vertices[3 + skyVertexCount].v = 100;
-	vertices[3 + skyVertexCount].textureIndex = TextureIndex(level->floorTex);
-
-	indices[0 + buffers.walls.skyIndexCount] = 0 + skyVertexCount;
-	indices[1 + buffers.walls.skyIndexCount] = 1 + skyVertexCount;
-	indices[2 + buffers.walls.skyIndexCount] = 2 + skyVertexCount;
-	indices[3 + buffers.walls.skyIndexCount] = 0 + skyVertexCount;
-	indices[4 + buffers.walls.skyIndexCount] = 2 + skyVertexCount;
-	indices[5 + buffers.walls.skyIndexCount] = 3 + skyVertexCount;
-
-	if (level->hasCeiling)
-	{
-		vertices[4].x = -100;
-		vertices[4].y = 0.5f;
-		vertices[4].z = -100;
-		vertices[4].u = -100;
-		vertices[4].v = -100;
-		vertices[4].textureIndex = TextureIndex(level->ceilOrSkyTex);
-
-		vertices[5].x = 100;
-		vertices[5].y = 0.5f;
-		vertices[5].z = -100;
-		vertices[5].u = 100;
-		vertices[5].v = -100;
-		vertices[5].textureIndex = TextureIndex(level->ceilOrSkyTex);
-
-		vertices[6].x = 100;
-		vertices[6].y = 0.5f;
-		vertices[6].z = 100;
-		vertices[6].u = 100;
-		vertices[6].v = 100;
-		vertices[6].textureIndex = TextureIndex(level->ceilOrSkyTex);
-
-		vertices[7].x = -100;
-		vertices[7].y = 0.5f;
-		vertices[7].z = 100;
-		vertices[7].u = -100;
-		vertices[7].v = 100;
-		vertices[7].textureIndex = TextureIndex(level->ceilOrSkyTex);
-
-		indices[6] = 4;
-		indices[7] = 5;
-		indices[8] = 6;
-		indices[9] = 4;
-		indices[10] = 6;
-		indices[11] = 7;
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+		indices[3] = 0;
+		indices[4] = 2;
+		indices[5] = 3;
 	} else
 	{
 		for (uint32_t i = 0; i < skyModel->vertexCount; i++)
 		{
+			// Copy {x, y, z, u, v} and discard {nx, ny, nz}
 			memcpy(&vertices[i], &skyModel->vertexData[i * 8], sizeof(float) * 5);
 			vertices[i].textureIndex = pushConstants.skyTextureIndex;
 		}
 		memcpy(indices, skyModel->indexData, sizeof(uint32_t) * skyModel->indexCount);
 	}
+	lunaWriteDataToBuffer(buffers.roof.vertices.buffer, vertices, buffers.roof.vertices.allocatedSize);
+	lunaWriteDataToBuffer(buffers.roof.indices.buffer, indices, buffers.roof.indices.allocatedSize);
+}
 
-	for (uint32_t i = level->hasCeiling ? 2 : 1; i < buffers.walls.wallCount; i++)
+void LoadWalls(const Level *level)
+{
+	WallVertex *vertices = buffers.walls.vertices.data;
+	uint32_t *indices = buffers.walls.indices.data;
+
+	vertices[0].x = -100;
+	vertices[0].y = -0.5f;
+	vertices[0].z = -100;
+	vertices[0].u = -100;
+	vertices[0].v = -100;
+	vertices[0].textureIndex = TextureIndex(level->floorTex);
+
+	vertices[1].x = 100;
+	vertices[1].y = -0.5f;
+	vertices[1].z = -100;
+	vertices[1].u = 100;
+	vertices[1].v = -100;
+	vertices[1].textureIndex = TextureIndex(level->floorTex);
+
+	vertices[2].x = 100;
+	vertices[2].y = -0.5f;
+	vertices[2].z = 100;
+	vertices[2].u = 100;
+	vertices[2].v = 100;
+	vertices[2].textureIndex = TextureIndex(level->floorTex);
+
+	vertices[3].x = -100;
+	vertices[3].y = -0.5f;
+	vertices[3].z = 100;
+	vertices[3].u = -100;
+	vertices[3].v = 100;
+	vertices[3].textureIndex = TextureIndex(level->floorTex);
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+
+	for (uint32_t i = 1; i < buffers.walls.objectCount; i++)
 	{
-		const Wall *wall = ListGet(level->walls, i - (level->hasCeiling ? 2 : 1));
+		const Wall *wall = ListGet(level->walls, i - 1);
 		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
 		const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};
 		const vec2 startUV = {wall->uvOffset, 0};
 		const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
 
-		vertices[4 * i + skyVertexCount].x = startVertex[0];
-		vertices[4 * i + skyVertexCount].y = halfHeight;
-		vertices[4 * i + skyVertexCount].z = startVertex[1];
-		vertices[4 * i + skyVertexCount].u = startUV[0];
-		vertices[4 * i + skyVertexCount].v = startUV[1];
-		vertices[4 * i + skyVertexCount].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + skyVertexCount].wallAngle = (float)wall->angle;
+		vertices[4 * i].x = startVertex[0];
+		vertices[4 * i].y = halfHeight;
+		vertices[4 * i].z = startVertex[1];
+		vertices[4 * i].u = startUV[0];
+		vertices[4 * i].v = startUV[1];
+		vertices[4 * i].textureIndex = TextureIndex(wall->tex);
+		vertices[4 * i].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 1 + skyVertexCount].x = endVertex[0];
-		vertices[4 * i + 1 + skyVertexCount].y = halfHeight;
-		vertices[4 * i + 1 + skyVertexCount].z = endVertex[1];
-		vertices[4 * i + 1 + skyVertexCount].u = endUV[0];
-		vertices[4 * i + 1 + skyVertexCount].v = startUV[1];
-		vertices[4 * i + 1 + skyVertexCount].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + 1 + skyVertexCount].wallAngle = (float)wall->angle;
+		vertices[4 * i + 1].x = endVertex[0];
+		vertices[4 * i + 1].y = halfHeight;
+		vertices[4 * i + 1].z = endVertex[1];
+		vertices[4 * i + 1].u = endUV[0];
+		vertices[4 * i + 1].v = startUV[1];
+		vertices[4 * i + 1].textureIndex = TextureIndex(wall->tex);
+		vertices[4 * i + 1].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 2 + skyVertexCount].x = endVertex[0];
-		vertices[4 * i + 2 + skyVertexCount].y = -halfHeight;
-		vertices[4 * i + 2 + skyVertexCount].z = endVertex[1];
-		vertices[4 * i + 2 + skyVertexCount].u = endUV[0];
-		vertices[4 * i + 2 + skyVertexCount].v = endUV[1];
-		vertices[4 * i + 2 + skyVertexCount].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + 2 + skyVertexCount].wallAngle = (float)wall->angle;
+		vertices[4 * i + 2].x = endVertex[0];
+		vertices[4 * i + 2].y = -halfHeight;
+		vertices[4 * i + 2].z = endVertex[1];
+		vertices[4 * i + 2].u = endUV[0];
+		vertices[4 * i + 2].v = endUV[1];
+		vertices[4 * i + 2].textureIndex = TextureIndex(wall->tex);
+		vertices[4 * i + 2].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 3 + skyVertexCount].x = startVertex[0];
-		vertices[4 * i + 3 + skyVertexCount].y = -halfHeight;
-		vertices[4 * i + 3 + skyVertexCount].z = startVertex[1];
-		vertices[4 * i + 3 + skyVertexCount].u = startUV[0];
-		vertices[4 * i + 3 + skyVertexCount].v = endUV[1];
-		vertices[4 * i + 3 + skyVertexCount].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + 3 + skyVertexCount].wallAngle = (float)wall->angle;
+		vertices[4 * i + 3].x = startVertex[0];
+		vertices[4 * i + 3].y = -halfHeight;
+		vertices[4 * i + 3].z = startVertex[1];
+		vertices[4 * i + 3].u = startUV[0];
+		vertices[4 * i + 3].v = endUV[1];
+		vertices[4 * i + 3].textureIndex = TextureIndex(wall->tex);
+		vertices[4 * i + 3].wallAngle = (float)wall->angle;
 
-		indices[6 * i + buffers.walls.skyIndexCount] = i * 4 + skyVertexCount;
-		indices[6 * i + 1 + buffers.walls.skyIndexCount] = i * 4 + 1 + skyVertexCount;
-		indices[6 * i + 2 + buffers.walls.skyIndexCount] = i * 4 + 2 + skyVertexCount;
-		indices[6 * i + 3 + buffers.walls.skyIndexCount] = i * 4 + skyVertexCount;
-		indices[6 * i + 4 + buffers.walls.skyIndexCount] = i * 4 + 2 + skyVertexCount;
-		indices[6 * i + 5 + buffers.walls.skyIndexCount] = i * 4 + 3 + skyVertexCount;
+		indices[6 * i] = i * 4;
+		indices[6 * i + 1] = i * 4 + 1;
+		indices[6 * i + 2] = i * 4 + 2;
+		indices[6 * i + 3] = i * 4;
+		indices[6 * i + 4] = i * 4 + 2;
+		indices[6 * i + 5] = i * 4 + 3;
 	}
+	lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed);
+	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed);
 }
 
-void LoadActorModels(const Level *level, ActorVertex *vertices, uint32_t *indices)
+void LoadActorModels(const Level *level)
 {
 	size_t vertexOffset = 0;
 	size_t indexOffset = 0;
-	ListClear(&buffers.actors.models.loadedModelIds);
+	ListClear(&buffers.modelActors.loadedModelIds);
 	ListLock(level->actors);
 	if (__builtin_expect(level->actors.length < loadedActors, false))
 	{
 		loadedActors = level->actors.length;
 	}
+	// // TODO: For this to be used the list must not be cleared at the start of this function
+	// for (size_t i = 0; i < buffers.modelActors.loadedModelIds.length; i++)
+	// {
+	// 	const Actor *actor = ListGet(level->actors, i);
+	// 	const size_t vertexSize = sizeof(ActorVertex) * actor->actorModel->vertexCount;
+	// 	const size_t indexSize = sizeof(uint32_t) * actor->actorModel->indexCount;
+	// 	memcpy(&buffers.modelActors.vertices.data[vertexOffset], actor->actorModel->vertexData, vertexSize);
+	// 	memcpy(&buffers.modelActors.indices.data[vertexOffset], actor->actorModel->indexData, indexSize);
+	// 	vertexOffset += vertexSize;
+	// 	indexOffset += indexSize;
+	// }
 	for (size_t i = 0; i < loadedActors; i++)
 	{
 		const Actor *actor = ListGet(level->actors, i);
@@ -728,31 +642,40 @@ void LoadActorModels(const Level *level, ActorVertex *vertices, uint32_t *indice
 		{
 			continue;
 		}
-		if (ListFind(buffers.actors.models.loadedModelIds, (void *)actor->actorModel->id) == -1)
+		// TODO: This list find could be replaced by looping through the list. This wouldn't be too hard,
+		//  but I don't want to do this before I can test just the Luna integration code. See implementation above
+		if (ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id) == -1)
 		{
-			ListAdd(&buffers.actors.models.loadedModelIds, (void *)actor->actorModel->id);
-			const size_t vertexSize = sizeof(*vertices) * actor->actorModel->vertexCount;
-			const size_t indexSize = sizeof(*indices) * actor->actorModel->indexCount;
-			memcpy(&vertices[vertexOffset], actor->actorModel->vertexData, vertexSize);
-			memcpy(&indices[vertexOffset], actor->actorModel->indexData, indexSize);
+			ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
+			const size_t vertexSize = sizeof(ActorVertex) * actor->actorModel->vertexCount;
+			const size_t indexSize = sizeof(uint32_t) * actor->actorModel->indexCount;
+			memcpy(buffers.modelActors.vertices.data + vertexOffset, actor->actorModel->vertexData, vertexSize);
+			memcpy(buffers.modelActors.indices.data + indexOffset, actor->actorModel->indexData, indexSize);
 			vertexOffset += vertexSize;
 			indexOffset += indexSize;
 		}
 	}
 	ListUnlock(level->actors);
+	lunaWriteDataToBuffer(buffers.modelActors.vertices.buffer,
+						  buffers.modelActors.vertices.data,
+						  buffers.modelActors.vertices.bytesUsed);
+	lunaWriteDataToBuffer(buffers.modelActors.indices.buffer,
+						  buffers.modelActors.indices.data,
+						  buffers.modelActors.indices.bytesUsed);
 }
 
-void LoadActorWalls(const Level *level, ActorVertex *vertices, uint32_t *indices)
+void LoadActorWalls(const Level *level)
 {
-	uint32_t wallCount = 0;
+	ActorVertex *vertices = buffers.wallActors.vertices.data;
+	uint32_t *indices = buffers.wallActors.indices.data;
 	ListLock(level->actors);
 	if (__builtin_expect(level->actors.length < loadedActors, false))
 	{
 		loadedActors = level->actors.length;
 	}
-	for (size_t i = 0; i < loadedActors; i++)
+	for (size_t wallCount = 0; wallCount < loadedActors; wallCount++)
 	{
-		const Actor *actor = ListGet(level->actors, i);
+		const Actor *actor = ListGet(level->actors, wallCount);
 		if (!actor->actorWall || actor->actorModel != NULL)
 		{
 			continue;
@@ -798,33 +721,35 @@ void LoadActorWalls(const Level *level, ActorVertex *vertices, uint32_t *indices
 		indices[6 * wallCount + 3] = wallCount * 4;
 		indices[6 * wallCount + 4] = wallCount * 4 + 2;
 		indices[6 * wallCount + 5] = wallCount * 4 + 3;
-
-		wallCount++;
 	}
 	ListUnlock(level->actors);
+	lunaWriteDataToBuffer(buffers.wallActors.vertices.buffer,
+						  buffers.wallActors.vertices.data,
+						  buffers.wallActors.vertices.bytesUsed);
+	lunaWriteDataToBuffer(buffers.wallActors.indices.buffer,
+						  buffers.wallActors.indices.data,
+						  buffers.wallActors.indices.bytesUsed);
 }
 
-void LoadActorInstanceData(const Level *level,
-						   ActorInstanceData *instanceData,
-						   ShadowVertex *shadowVertices,
-						   uint32_t *shadowIndices)
+void UpdateActorData(const Level *level)
 {
 	uint32_t wallCount = 0;
 	uint32_t shadowCount = 0;
-	uint16_t *modelCounts = calloc(buffers.actors.models.loadedModelIds.length, sizeof(uint16_t));
+	uint16_t *modelCounts = calloc(buffers.modelActors.loadedModelIds.length, sizeof(uint16_t));
 	CheckAlloc(modelCounts);
-	uint32_t *offsets = calloc(buffers.actors.models.loadedModelIds.length + 1, sizeof(uint32_t));
+	uint32_t *offsets = calloc(buffers.modelActors.loadedModelIds.length + 1, sizeof(uint32_t));
 	CheckAlloc(offsets);
-	for (size_t i = 1; i <= buffers.actors.models.loadedModelIds.length; i++)
+	for (size_t i = 1; i <= buffers.modelActors.loadedModelIds.length; i++)
 	{
 		offsets[i] = offsets[i - 1] +
-					 (size_t)ListGet(buffers.actors.models.modelCounts, i - 1) * sizeof(ActorInstanceData);
+					 (size_t)ListGet(buffers.modelActors.modelCounts, i - 1) * sizeof(ActorInstanceData);
 	}
 	ListLock(level->actors);
-	if (__builtin_expect(level->actors.length < loadedActors, false))
+	if (__builtin_expect(level->actors.length < loadedActors, false)) // How would this be possible?
 	{
 		loadedActors = level->actors.length;
 	}
+	ActorInstanceData *wallActorInstanceData = buffers.wallActors.instanceData.data;
 	for (size_t i = 0; i < loadedActors; i++)
 	{
 		const Actor *actor = ListGet(level->actors, i);
@@ -837,8 +762,10 @@ void LoadActorInstanceData(const Level *level,
 		{
 			mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
 			ActorTransformMatrix(actor, &transformMatrix);
-			const size_t index = ListFind(buffers.actors.models.loadedModelIds, (void *)actor->actorModel->id);
-			ActorInstanceData *offsetInstanceData = (void *)instanceData + offsets[index];
+			// TODO: This list find could be replaced by looping through the list. This wouldn't be too hard,
+			//  but I don't want to do this before I can test just the Luna integration code
+			const size_t index = ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
+			ActorInstanceData *offsetInstanceData = buffers.modelActors.instanceData.data + offsets[index];
 			memcpy(offsetInstanceData[modelCounts[index]].transform, transformMatrix, sizeof(mat4));
 			offsetInstanceData[modelCounts[index]].textureIndex = TextureIndex(actor->actorModelTexture);
 
@@ -846,56 +773,64 @@ void LoadActorInstanceData(const Level *level,
 		} else if (actor->actorWall)
 		{
 			const Wall *wall = actor->actorWall;
-			ActorInstanceData *offsetInstanceData = (void *)instanceData +
-													offsets[buffers.actors.models.loadedModelIds.length];
-			memcpy(offsetInstanceData[wallCount].transform, GLM_MAT4_IDENTITY, sizeof(mat4));
-			offsetInstanceData[wallCount].textureIndex = TextureIndex(wall->tex);
-			offsetInstanceData[wallCount].wallAngle = actor->actorWall->angle;
+			memcpy(wallActorInstanceData[wallCount].transform, GLM_MAT4_IDENTITY, sizeof(mat4));
+			wallActorInstanceData[wallCount].textureIndex = TextureIndex(wall->tex);
+			wallActorInstanceData[wallCount].wallAngle = actor->actorWall->angle;
 
 			wallCount++;
 		}
-		if (actor->showShadow)
-		{
-			shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount].y = -0.49f;
-			shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 1].y = -0.49f;
-			shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 2].y = -0.49f;
-			shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 3].y = -0.49f;
-			shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowIndices[6 * shadowCount] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
-			shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
-
-			shadowCount++;
-		}
+		// if (actor->showShadow)
+		// {
+		// 	shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
+		// 	shadowVertices[4 * shadowCount].y = -0.49f;
+		// 	shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
+		//
+		// 	shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
+		// 	shadowVertices[4 * shadowCount + 1].y = -0.49f;
+		// 	shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
+		//
+		// 	shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
+		// 	shadowVertices[4 * shadowCount + 2].y = -0.49f;
+		// 	shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
+		//
+		// 	shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
+		// 	shadowVertices[4 * shadowCount + 3].y = -0.49f;
+		// 	shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
+		//
+		// 	shadowIndices[6 * shadowCount] = shadowCount * 4;
+		// 	shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
+		// 	shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
+		// 	shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
+		// 	shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
+		// 	shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
+		//
+		// 	shadowCount++;
+		// }
 	}
 	ListUnlock(level->actors);
 	free(modelCounts);
 	free(offsets);
+	lunaWriteDataToBuffer(buffers.wallActors.instanceData.buffer,
+						  buffers.wallActors.instanceData.data,
+						  buffers.wallActors.instanceData.bytesUsed);
+	lunaWriteDataToBuffer(buffers.modelActors.instanceData.buffer,
+						  buffers.modelActors.instanceData.data,
+						  buffers.modelActors.instanceData.bytesUsed);
 }
 
-void LoadActorDrawInfo(const Level *level, VkDrawIndexedIndirectCommand *drawInfo)
+// TODO: This was being called every frame but I don't think it needs to be
+void LoadActorDrawInfo(const Level *level)
 {
+	VkDrawIndexedIndirectCommand *modelActorsDrawInfo = buffers.modelActors.drawInfo.data;
+	VkDrawIndexedIndirectCommand *wallActorsDrawInfo = buffers.wallActors.drawInfo.data;
 	uint32_t modelCount = 0;
-	uint32_t wallCount = 0;
-	for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
+	int32_t wallCount = 0;
+	for (size_t i = 0; i < buffers.modelActors.loadedModelIds.length; i++)
 	{
-		drawInfo[i].indexCount = GetModelFromId((size_t)ListGet(buffers.actors.models.loadedModelIds, i))->indexCount;
-		drawInfo[i].instanceCount = (size_t)ListGet(buffers.actors.models.modelCounts, i);
-		modelCount += (size_t)ListGet(buffers.actors.models.modelCounts, i);
+		modelActorsDrawInfo[i].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i))
+													->indexCount;
+		modelActorsDrawInfo[i].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, i);
+		modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
 	}
 	ListLock(level->actors);
 	if (__builtin_expect(level->actors.length < loadedActors, false))
@@ -911,127 +846,131 @@ void LoadActorDrawInfo(const Level *level, VkDrawIndexedIndirectCommand *drawInf
 		}
 		if (actor->actorWall)
 		{
-			const size_t index = wallCount + buffers.actors.models.loadedModelIds.length;
-			drawInfo[index].indexCount = 6;
-			drawInfo[index].instanceCount = 1;
-			drawInfo[index].firstInstance = wallCount + modelCount;
-			drawInfo[index].firstIndex = buffers.actors.models.indexCount + (int32_t)(wallCount * 6);
-			drawInfo[index].vertexOffset = (int32_t)buffers.actors.models.vertexCount;
+			wallActorsDrawInfo[wallCount].indexCount = 6;
+			wallActorsDrawInfo[wallCount].instanceCount = 1;
+			wallActorsDrawInfo[wallCount].firstIndex = wallCount * 6;
+			wallActorsDrawInfo[wallCount].vertexOffset = 0;
+			wallActorsDrawInfo[wallCount].firstInstance = wallCount;
 			wallCount++;
 		}
 	}
 	ListUnlock(level->actors);
+	lunaWriteDataToBuffer(buffers.wallActors.drawInfo.buffer,
+						  buffers.wallActors.drawInfo.data,
+						  buffers.wallActors.drawInfo.bytesUsed);
+	lunaWriteDataToBuffer(buffers.modelActors.drawInfo.buffer,
+						  buffers.modelActors.drawInfo.data,
+						  buffers.modelActors.drawInfo.bytesUsed);
 }
 
-VkResult CopyBuffers(const Level *level)
-{
-	if (buffers.actors.models.loadedModelIds.length ||
-		(buffers.actors.walls.vertexStagingSize && buffers.actors.walls.indexStagingSize))
-	{
-		ActorVertex *actorVertices = calloc(1, buffers.actors.walls.vertexStagingSize);
-		CheckAlloc(actorVertices);
-		uint32_t *actorIndices = calloc(1, buffers.actors.walls.indexStagingSize);
-		CheckAlloc(actorIndices);
-		LoadActorWalls(level, actorVertices, actorIndices);
-		memcpy(buffers.actors.walls.vertexStaging, actorVertices, buffers.actors.walls.vertexStagingSize);
-		memcpy(buffers.actors.walls.indexStaging, actorIndices, buffers.actors.walls.indexStagingSize);
-		free(actorVertices);
-		free(actorIndices);
-
-		ActorInstanceData *actorInstanceData = calloc(1, buffers.actors.instanceDataStagingSize);
-		CheckAlloc(actorInstanceData);
-		ShadowVertex *shadowVertices = calloc(buffers.walls.shadowCount * 4, sizeof(ShadowVertex));
-		CheckAlloc(shadowVertices);
-		uint32_t *shadowIndices = calloc(buffers.walls.shadowCount * 6, sizeof(uint32_t));
-		CheckAlloc(shadowIndices);
-		LoadActorInstanceData(level, actorInstanceData, shadowVertices, shadowIndices);
-		memcpy(buffers.actors.instanceDataStaging, actorInstanceData, buffers.actors.instanceDataStagingSize);
-		memcpy(buffers.walls.shadowVertexStaging, shadowVertices, sizeof(ShadowVertex) * buffers.walls.shadowCount * 4);
-		memcpy(buffers.walls.shadowIndexStaging, shadowIndices, sizeof(uint32_t) * buffers.walls.shadowCount * 6);
-		free(actorInstanceData);
-		free(shadowVertices);
-		free(shadowIndices);
-
-		VkDrawIndexedIndirectCommand *actorDrawInfo = calloc(1, buffers.actors.drawInfoStagingSize);
-		CheckAlloc(actorDrawInfo);
-		LoadActorDrawInfo(level, actorDrawInfo);
-		memcpy(buffers.actors.drawInfoStaging, actorDrawInfo, buffers.actors.drawInfoStagingSize);
-		free(actorDrawInfo);
-	}
-
-	// TODO: The transfer command buffer should be left open and multiple commands should be submitted, that way it can
-	//  be handled according to if it should be or not. That will allow this function to be broken into multiple more
-	//  manageable functions, and if submission is done from multiple threads it could increase performance as well.
-	if (buffers.ui.quadCount > 0 ||
-		buffers.walls.shadowCount ||
-		(buffers.actors.models.loadedModelIds.length ||
-		 (buffers.actors.walls.vertexSize && buffers.actors.walls.indexSize)))
-	{
-		if (buffers.walls.shadowCount)
-		{
-			vkCmdCopyBuffer(transferCommandBuffer,
-							buffers.walls.stagingBufferInfo->buffer,
-							buffers.walls.bufferInfo->buffer,
-							1,
-							(VkBufferCopy[]){
-								{
-									.srcOffset = buffers.walls.shadowStagingOffset,
-									.dstOffset = buffers.walls.shadowOffset,
-									.size = buffers.walls.shadowStagingSize,
-								},
-							});
-		}
-		if (buffers.actors.walls.vertexSize && buffers.actors.walls.indexSize)
-		{
-			vkCmdCopyBuffer(transferCommandBuffer,
-							buffers.actors.stagingBufferInfo->buffer,
-							buffers.actors.bufferInfo->buffer,
-							4,
-							(VkBufferCopy[]){
-								{
-									.srcOffset = buffers.actors.walls.vertexStagingOffset,
-									.dstOffset = buffers.actors.walls.vertexOffset,
-									.size = buffers.actors.walls.vertexStagingSize,
-								},
-								{
-									.srcOffset = buffers.actors.walls.indexStagingOffset,
-									.dstOffset = buffers.actors.walls.indexOffset,
-									.size = buffers.actors.walls.indexStagingSize,
-								},
-								{
-									.srcOffset = buffers.actors.instanceDataStagingOffset,
-									.dstOffset = buffers.actors.instanceDataOffset,
-									.size = buffers.actors.instanceDataStagingSize,
-								},
-								{
-									.srcOffset = buffers.actors.drawInfoStagingOffset,
-									.dstOffset = buffers.actors.drawInfoOffset,
-									.size = buffers.actors.drawInfoStagingSize,
-								},
-							});
-		} else if (buffers.actors.models.loadedModelIds.length)
-		{
-			vkCmdCopyBuffer(transferCommandBuffer,
-							buffers.actors.stagingBufferInfo->buffer,
-							buffers.actors.bufferInfo->buffer,
-							2,
-							(VkBufferCopy[]){
-								{
-									.srcOffset = buffers.actors.instanceDataStagingOffset,
-									.dstOffset = buffers.actors.instanceDataOffset,
-									.size = buffers.actors.instanceDataStagingSize,
-								},
-								{
-									.srcOffset = buffers.actors.drawInfoStagingOffset,
-									.dstOffset = buffers.actors.drawInfoOffset,
-									.size = buffers.actors.drawInfoStagingSize,
-								},
-							});
-		}
-	}
-
-	return VK_SUCCESS;
-}
+// VkResult CopyBuffers(const Level *level)
+// {
+// 	if (buffers.modelActors.loadedModelIds.length ||
+// 		(buffers.wallActors.vertexStagingSize && buffers.wallActors.indexStagingSize))
+// 	{
+// 		ActorVertex *actorVertices = calloc(1, buffers.wallActors.vertexStagingSize);
+// 		CheckAlloc(actorVertices);
+// 		uint32_t *actorIndices = calloc(1, buffers.wallActors.indexStagingSize);
+// 		CheckAlloc(actorIndices);
+// 		LoadActorWalls(level, actorVertices, actorIndices);
+// 		memcpy(buffers.wallActors.vertexStaging, actorVertices, buffers.wallActors.vertexStagingSize);
+// 		memcpy(buffers.wallActors.indexStaging, actorIndices, buffers.wallActors.indexStagingSize);
+// 		free(actorVertices);
+// 		free(actorIndices);
+//
+// 		ActorInstanceData *actorInstanceData = calloc(1, buffers.actors.instanceDataStagingSize);
+// 		CheckAlloc(actorInstanceData);
+// 		ShadowVertex *shadowVertices = calloc(buffers.walls.shadowCount * 4, sizeof(ShadowVertex));
+// 		CheckAlloc(shadowVertices);
+// 		uint32_t *shadowIndices = calloc(buffers.walls.shadowCount * 6, sizeof(uint32_t));
+// 		CheckAlloc(shadowIndices);
+// 		LoadActorInstanceData(level, actorInstanceData, shadowVertices, shadowIndices);
+// 		memcpy(buffers.actors.instanceDataStaging, actorInstanceData, buffers.actors.instanceDataStagingSize);
+// 		memcpy(buffers.walls.shadowVertexStaging, shadowVertices, sizeof(ShadowVertex) * buffers.walls.shadowCount * 4);
+// 		memcpy(buffers.walls.shadowIndexStaging, shadowIndices, sizeof(uint32_t) * buffers.walls.shadowCount * 6);
+// 		free(actorInstanceData);
+// 		free(shadowVertices);
+// 		free(shadowIndices);
+//
+// 		VkDrawIndexedIndirectCommand *actorDrawInfo = calloc(1, buffers.actors.drawInfoStagingSize);
+// 		CheckAlloc(actorDrawInfo);
+// 		LoadActorDrawInfo(level, actorDrawInfo);
+// 		memcpy(buffers.actors.drawInfoStaging, actorDrawInfo, buffers.actors.drawInfoStagingSize);
+// 		free(actorDrawInfo);
+// 	}
+//
+// 	// TODO: The transfer command buffer should be left open and multiple commands should be submitted, that way it can
+// 	//  be handled according to if it should be or not. That will allow this function to be broken into multiple more
+// 	//  manageable functions, and if submission is done from multiple threads it could increase performance as well.
+// 	if (buffers.ui.quadCount > 0 ||
+// 		buffers.walls.shadowCount ||
+// 		(buffers.modelActors.loadedModelIds.length || (buffers.wallActors.vertexSize && buffers.wallActors.indexSize)))
+// 	{
+// 		if (buffers.walls.shadowCount)
+// 		{
+// 			vkCmdCopyBuffer(transferCommandBuffer,
+// 							buffers.walls.stagingBufferInfo->buffer,
+// 							buffers.walls.bufferInfo->buffer,
+// 							1,
+// 							(VkBufferCopy[]){
+// 								{
+// 									.srcOffset = buffers.walls.shadowStagingOffset,
+// 									.dstOffset = buffers.walls.shadowOffset,
+// 									.size = buffers.walls.shadowStagingSize,
+// 								},
+// 							});
+// 		}
+// 		if (buffers.wallActors.vertexSize && buffers.wallActors.indexSize)
+// 		{
+// 			vkCmdCopyBuffer(transferCommandBuffer,
+// 							buffers.actors.stagingBufferInfo->buffer,
+// 							buffers.actors.bufferInfo->buffer,
+// 							4,
+// 							(VkBufferCopy[]){
+// 								{
+// 									.srcOffset = buffers.wallActors.vertexStagingOffset,
+// 									.dstOffset = buffers.wallActors.vertexOffset,
+// 									.size = buffers.wallActors.vertexStagingSize,
+// 								},
+// 								{
+// 									.srcOffset = buffers.wallActors.indexStagingOffset,
+// 									.dstOffset = buffers.wallActors.indexOffset,
+// 									.size = buffers.wallActors.indexStagingSize,
+// 								},
+// 								{
+// 									.srcOffset = buffers.actors.instanceDataStagingOffset,
+// 									.dstOffset = buffers.actors.instanceDataOffset,
+// 									.size = buffers.actors.instanceDataStagingSize,
+// 								},
+// 								{
+// 									.srcOffset = buffers.actors.drawInfoStagingOffset,
+// 									.dstOffset = buffers.actors.drawInfoOffset,
+// 									.size = buffers.actors.drawInfoStagingSize,
+// 								},
+// 							});
+// 		} else if (buffers.modelActors.loadedModelIds.length)
+// 		{
+// 			vkCmdCopyBuffer(transferCommandBuffer,
+// 							buffers.actors.stagingBufferInfo->buffer,
+// 							buffers.actors.bufferInfo->buffer,
+// 							2,
+// 							(VkBufferCopy[]){
+// 								{
+// 									.srcOffset = buffers.actors.instanceDataStagingOffset,
+// 									.dstOffset = buffers.actors.instanceDataOffset,
+// 									.size = buffers.actors.instanceDataStagingSize,
+// 								},
+// 								{
+// 									.srcOffset = buffers.actors.drawInfoStagingOffset,
+// 									.dstOffset = buffers.actors.drawInfoOffset,
+// 									.size = buffers.actors.drawInfoStagingSize,
+// 								},
+// 							});
+// 		}
+// 	}
+//
+// 	return VK_SUCCESS;
+// }
 
 void UpdateTranslationMatrix(const Camera *camera)
 {
@@ -1123,21 +1062,26 @@ void DrawRectInternal(const float ndcStartX,
 
 void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const uint32_t textureIndex)
 {
-	if (buffers.ui.quadCount >= buffers.ui.maxQuads)
+	if (buffers.ui.vertices.allocatedSize < buffers.ui.vertices.bytesUsed + sizeof(UiVertex) * 4 ||
+		buffers.ui.indices.allocatedSize < buffers.ui.indices.bytesUsed + sizeof(uint32_t) * 6)
 	{
-		buffers.ui.maxQuads += 16;
+		buffers.ui.vertices.allocatedSize += sizeof(UiVertex) * 4 * 16;
+		buffers.ui.indices.allocatedSize += sizeof(uint32_t) * 6 * 16;
 		buffers.ui.shouldResize = true;
 
-		UiVertex *newVertices = realloc(buffers.ui.vertices, sizeof(UiVertex) * buffers.ui.maxQuads * 4);
+		UiVertex *newVertices = realloc(buffers.ui.vertices.data, buffers.ui.vertices.allocatedSize);
 		CheckAlloc(newVertices);
-		buffers.ui.vertices = newVertices;
+		buffers.ui.vertices.data = newVertices;
 
-		uint32_t *newIndices = realloc(buffers.ui.indices, sizeof(uint32_t) * buffers.ui.maxQuads * 6);
+		uint32_t *newIndices = realloc(buffers.ui.indices.data, buffers.ui.indices.allocatedSize);
 		CheckAlloc(newIndices);
-		buffers.ui.indices = newIndices;
+		buffers.ui.indices.data = newIndices;
 	}
 
-	buffers.ui.vertices[4 * buffers.ui.quadCount] = (UiVertex){
+	uint32_t *indices = buffers.ui.indices.data;
+	UiVertex *vertices = buffers.ui.vertices.data;
+
+	vertices[4 * buffers.ui.objectCount] = (UiVertex){
 		.x = vertices_posXY_uvZW[0][0],
 		.y = vertices_posXY_uvZW[0][1],
 		.u = vertices_posXY_uvZW[0][2],
@@ -1148,7 +1092,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	buffers.ui.vertices[4 * buffers.ui.quadCount + 1] = (UiVertex){
+	vertices[4 * buffers.ui.objectCount + 1] = (UiVertex){
 		.x = vertices_posXY_uvZW[1][0],
 		.y = vertices_posXY_uvZW[1][1],
 		.u = vertices_posXY_uvZW[1][2],
@@ -1159,7 +1103,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	buffers.ui.vertices[4 * buffers.ui.quadCount + 2] = (UiVertex){
+	vertices[4 * buffers.ui.objectCount + 2] = (UiVertex){
 		.x = vertices_posXY_uvZW[2][0],
 		.y = vertices_posXY_uvZW[2][1],
 		.u = vertices_posXY_uvZW[2][2],
@@ -1170,7 +1114,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	buffers.ui.vertices[4 * buffers.ui.quadCount + 3] = (UiVertex){
+	vertices[4 * buffers.ui.objectCount + 3] = (UiVertex){
 		.x = vertices_posXY_uvZW[3][0],
 		.y = vertices_posXY_uvZW[3][1],
 		.u = vertices_posXY_uvZW[3][2],
@@ -1182,12 +1126,14 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.textureIndex = textureIndex,
 	};
 
-	buffers.ui.indices[6 * buffers.ui.quadCount] = buffers.ui.quadCount * 4;
-	buffers.ui.indices[6 * buffers.ui.quadCount + 1] = buffers.ui.quadCount * 4 + 1;
-	buffers.ui.indices[6 * buffers.ui.quadCount + 2] = buffers.ui.quadCount * 4 + 2;
-	buffers.ui.indices[6 * buffers.ui.quadCount + 3] = buffers.ui.quadCount * 4;
-	buffers.ui.indices[6 * buffers.ui.quadCount + 4] = buffers.ui.quadCount * 4 + 2;
-	buffers.ui.indices[6 * buffers.ui.quadCount + 5] = buffers.ui.quadCount * 4 + 3;
+	indices[6 * buffers.ui.objectCount] = buffers.ui.objectCount * 4;
+	indices[6 * buffers.ui.objectCount + 1] = buffers.ui.objectCount * 4 + 1;
+	indices[6 * buffers.ui.objectCount + 2] = buffers.ui.objectCount * 4 + 2;
+	indices[6 * buffers.ui.objectCount + 3] = buffers.ui.objectCount * 4;
+	indices[6 * buffers.ui.objectCount + 4] = buffers.ui.objectCount * 4 + 2;
+	indices[6 * buffers.ui.objectCount + 5] = buffers.ui.objectCount * 4 + 3;
 
-	buffers.ui.quadCount++;
+	buffers.ui.objectCount++;
+	buffers.ui.vertices.bytesUsed += sizeof(UiVertex) * 4;
+	buffers.ui.indices.bytesUsed += sizeof(uint32_t) * 6;
 }

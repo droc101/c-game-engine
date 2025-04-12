@@ -139,6 +139,8 @@ bool CreateSwapChain()
 
 	VulkanTest(lunaCreateSwapChain(&swapChainCreationInfo), "Failed to create swap chain!");
 
+	ListFree(&presentModes, false);
+
 	return true;
 }
 
@@ -234,6 +236,7 @@ bool CreateDescriptorSetLayouts()
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = MAX_TEXTURES,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
 	};
 	const LunaDescriptorSetLayoutCreationInfo descriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
@@ -680,6 +683,7 @@ bool CreateTextureSamplers()
 	VulkanTest(lunaCreateSampler(&nearestNoRepeatSamplerCreateInfo, &textureSamplers.nearestNoRepeat),
 			   "Failed to create nearest non-repeating texture sampler!");
 
+	ListCreate(&textures);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 
 	return true;
@@ -687,24 +691,12 @@ bool CreateTextureSamplers()
 
 bool CreateBuffers()
 {
-	buffers.walls.maxWallCount = MAX_WALLS_INIT;
-	buffers.ui.maxQuads = MAX_UI_QUADS_INIT;
-
-	const LunaBufferCreationInfo uiVertexBufferCreationInfo = {
-		.size = sizeof(UiVertex) * buffers.ui.maxQuads * 4,
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-	};
-	VulkanTest(lunaCreateBuffer(&uiVertexBufferCreationInfo, &buffers.ui.vertexBuffer),
-			   "Failed to create UI vertex buffer!");
-	buffers.ui.vertices = calloc(buffers.ui.maxQuads, sizeof(UiVertex) * 4);
-
-	const LunaBufferCreationInfo uiIndexBufferCreationInfo = {
-		.size = sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-	};
-	VulkanTest(lunaCreateBuffer(&uiIndexBufferCreationInfo, &buffers.ui.indexBuffer),
-			   "Failed to create UI index buffer!");
-	buffers.ui.indices = calloc(buffers.ui.maxQuads, sizeof(UiVertex) * 6);
+	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
+	VulkanTest(CreateWallBuffers(), "Failed to create wall buffers!");
+	VulkanTest(CreateShadowBuffers(), "Failed to create shadow buffers!");
+	VulkanTest(CreateWallActorBuffers(), "Failed to create wall actor buffers!");
+	VulkanTest(CreateModelActorBuffers(), "Failed to create model actor buffers!");
+	VulkanTest(CreateRoofBuffers(), "Failed to create roof buffers!");
 
 	return true;
 }
