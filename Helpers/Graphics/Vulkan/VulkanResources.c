@@ -9,555 +9,422 @@
 #include "../../Core/Error.h"
 #include "../../Core/MathEx.h"
 
-/*
-bool CreateLocalBuffer()
+VkResult CreateUiBuffers()
 {
-	buffers.walls.shadowSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-							   sizeof(uint32_t) * buffers.walls.shadowCount * 6;
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = buffers.ui.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.ui.vertices.buffer),
+						   "Failed to create UI vertex buffer!");
+	buffers.ui.vertices.data = malloc(buffers.ui.vertices.allocatedSize);
+	CheckAlloc(buffers.ui.vertices.data);
 
-	buffers.ui.vertexSize = sizeof(UiVertex) * buffers.ui.maxQuads * 4;
-	buffers.ui.indexSize = sizeof(uint32_t) * buffers.ui.maxQuads * 6;
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.size = buffers.ui.indices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.ui.indices.buffer),
+						   "Failed to create UI index buffer!");
+	buffers.ui.indices.data = malloc(buffers.ui.indices.allocatedSize);
+	CheckAlloc(buffers.ui.indices.data);
 
-	buffers.actors.instanceDataSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-	if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
-	{
-		for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
-		{
-			buffers.actors.instanceDataSize += sizeof(ActorInstanceData) *
-											   (size_t)ListGet(buffers.actors.models.modelCounts, i);
-		}
-	}
-	buffers.actors.drawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.models.loadedModelIds.length +
-								  sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count;
-
-	buffers.actors.models.vertexSize = sizeof(ActorVertex) * buffers.actors.models.vertexCount;
-	buffers.actors.models.indexSize = sizeof(uint32_t) * buffers.actors.models.indexCount;
-	buffers.actors.walls.vertexSize = sizeof(ActorVertex) * buffers.actors.walls.count * 4;
-	buffers.actors.walls.indexSize = sizeof(uint32_t) * buffers.actors.walls.count * 6;
-
-	const Model *_skyModel = !skyModel ? LoadModel(MODEL("model_sky")) : skyModel;
-	buffers.local.size = sizeof(WallVertex) * (buffers.walls.maxWallCount * 4 + _skyModel->vertexCount) +
-						 sizeof(uint32_t) * (buffers.walls.maxWallCount * 6 + _skyModel->indexCount) +
-						 buffers.walls.shadowSize +
-						 buffers.ui.vertexSize +
-						 buffers.ui.indexSize +
-						 buffers.actors.instanceDataSize +
-						 buffers.actors.drawInfoSize +
-						 buffers.actors.models.vertexSize +
-						 buffers.actors.models.indexSize +
-						 buffers.actors.walls.vertexSize +
-						 buffers.actors.walls.indexSize;
-
-
-	buffers.local.memoryAllocationInfo.usageFlags = VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
-													VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-													VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
-													VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-													VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
-
-	buffers.local.memoryAllocationInfo.memoryInfo = &memoryPools.localMemory;
-	if (!CreateBuffer(&buffers.local, false))
-	{
-		return false;
-	}
-
-	return true;
+	return VK_SUCCESS;
 }
 
-void SetLocalBufferAliasingInfo()
+VkResult CreateWallBuffers()
 {
-	const Model *_skyModel = !skyModel ? LoadModel(MODEL("model_sky")) : skyModel;
-	const VkDeviceSize wallVertexSize = sizeof(WallVertex) * (buffers.walls.maxWallCount * 4 + _skyModel->vertexCount);
-	const VkDeviceSize wallIndexSize = sizeof(uint32_t) * (buffers.walls.maxWallCount * 6 + _skyModel->indexCount);
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = buffers.walls.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.walls.vertices.buffer),
+						   "Failed to create wall vertex buffer!");
+	buffers.walls.vertices.data = malloc(buffers.walls.vertices.allocatedSize);
+	CheckAlloc(buffers.walls.vertices.data);
 
-	buffers.walls.bufferInfo = &buffers.local;
-	buffers.walls.vertexOffset = 0;
-	buffers.walls.indexOffset = buffers.walls.vertexOffset + wallVertexSize;
-	buffers.walls.shadowOffset = buffers.walls.indexOffset + wallIndexSize;
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.size = buffers.walls.indices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.walls.indices.buffer),
+						   "Failed to create wall index buffer!");
+	buffers.walls.indices.data = malloc(buffers.walls.indices.allocatedSize);
+	CheckAlloc(buffers.walls.indices.data);
 
-	buffers.ui.bufferInfo = &buffers.local;
-	buffers.ui.vertexOffset = buffers.walls.shadowOffset + buffers.walls.shadowSize;
-	buffers.ui.indexOffset = buffers.ui.vertexOffset + buffers.ui.vertexSize;
-
-	buffers.actors.bufferInfo = &buffers.local;
-	buffers.actors.instanceDataOffset = buffers.ui.indexOffset + buffers.ui.indexSize;
-	buffers.actors.drawInfoOffset = buffers.actors.instanceDataOffset + buffers.actors.instanceDataSize;
-	buffers.actors.vertexOffset = buffers.actors.drawInfoOffset + buffers.actors.drawInfoSize;
-	buffers.actors.walls.vertexOffset = buffers.actors.vertexOffset + buffers.actors.models.vertexSize;
-	buffers.actors.indexOffset = buffers.actors.walls.vertexOffset + buffers.actors.walls.vertexSize;
-	buffers.actors.walls.indexOffset = buffers.actors.indexOffset + buffers.actors.models.indexSize;
+	return VK_SUCCESS;
 }
 
-bool CreateSharedBuffer()
+VkResult CreateShadowBuffers()
 {
-	buffers.walls.shadowStagingSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-									  sizeof(uint32_t) * buffers.walls.shadowCount * 6;
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = buffers.shadows.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.shadows.vertices.buffer),
+						   "Failed to create shadow vertex buffer!");
+	buffers.shadows.vertices.data = malloc(buffers.shadows.vertices.allocatedSize);
+	CheckAlloc(buffers.shadows.vertices.data);
 
-	buffers.ui.vertexStagingSize = sizeof(UiVertex) * buffers.ui.maxQuads * 4;
-	buffers.ui.indexStagingSize = sizeof(uint32_t) * buffers.ui.maxQuads * 6;
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.size = buffers.shadows.indices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.shadows.indices.buffer),
+						   "Failed to create shadow index buffer!");
+	buffers.shadows.indices.data = malloc(buffers.shadows.indices.allocatedSize);
+	CheckAlloc(buffers.shadows.indices.data);
 
-	buffers.actors.instanceDataStagingSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-	if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
-	{
-		for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
-		{
-			buffers.actors.instanceDataStagingSize += sizeof(ActorInstanceData) *
-													  (size_t)ListGet(buffers.actors.models.modelCounts, i);
-		}
-	}
-	buffers.actors.drawInfoStagingSize = sizeof(VkDrawIndexedIndirectCommand) *
-												 buffers.actors.models.loadedModelIds.length +
-										 sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count;
-
-	buffers.actors.walls.vertexStagingSize = sizeof(ActorVertex) * buffers.actors.walls.count * 4;
-	buffers.actors.walls.indexStagingSize = sizeof(uint32_t) * buffers.actors.walls.count * 6;
-
-	buffers.shared.size = buffers.walls.shadowStagingSize +
-						  buffers.ui.vertexStagingSize +
-						  buffers.ui.indexStagingSize +
-						  buffers.actors.instanceDataStagingSize +
-						  buffers.actors.drawInfoStagingSize +
-						  buffers.actors.walls.vertexStagingSize +
-						  buffers.actors.walls.indexStagingSize;
-	buffers.shared.memoryAllocationInfo.usageFlags = VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
-													 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-
-	buffers.shared.memoryAllocationInfo.memoryInfo = &memoryPools.sharedMemory;
-	if (!CreateBuffer(&buffers.shared, false))
-	{
-		return false;
-	}
-
-	if (!buffers.ui.vertices)
-	{
-		buffers.ui.vertices = malloc(sizeof(UiVertex) * buffers.ui.maxQuads * 4);
-		CheckAlloc(buffers.ui.vertices);
-	}
-	if (!buffers.ui.indices)
-	{
-		buffers.ui.indices = malloc(sizeof(uint32_t) * buffers.ui.maxQuads * 6);
-		CheckAlloc(buffers.ui.vertices);
-	}
-
-
-	return true;
+	return VK_SUCCESS;
 }
 
-void SetSharedBufferAliasingInfo()
+VkResult CreateWallActorBuffers()
 {
-	buffers.walls.stagingBufferInfo = &buffers.shared;
-	buffers.walls.shadowStagingOffset = 0;
+	const LunaBufferCreationInfo wallActorsVertexBufferCreationInfo = {
+		.size = buffers.wallActors.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&wallActorsVertexBufferCreationInfo, &buffers.wallActors.vertices.buffer),
+						   "Failed to create wall actors vertex buffer!");
+	buffers.wallActors.vertices.data = malloc(buffers.wallActors.vertices.allocatedSize);
+	CheckAlloc(buffers.wallActors.vertices.data);
 
-	buffers.ui.stagingBufferInfo = &buffers.shared;
-	buffers.ui.vertexStagingOffset = buffers.walls.shadowStagingOffset + buffers.walls.shadowStagingSize;
-	buffers.ui.indexStagingOffset = buffers.ui.vertexStagingOffset + buffers.ui.vertexStagingSize;
+	const LunaBufferCreationInfo wallActorsIndexBufferCreationInfo = {
+		.size = buffers.wallActors.indices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&wallActorsIndexBufferCreationInfo, &buffers.wallActors.indices.buffer),
+						   "Failed to create wall actors index buffer!");
+	buffers.wallActors.indices.data = malloc(buffers.wallActors.indices.allocatedSize);
+	CheckAlloc(buffers.wallActors.indices.data);
 
-	buffers.actors.stagingBufferInfo = &buffers.shared;
-	buffers.actors.instanceDataStagingOffset = buffers.ui.indexStagingOffset + buffers.ui.indexStagingSize;
-	buffers.actors.drawInfoStagingOffset = buffers.actors.instanceDataStagingOffset +
-										   buffers.actors.instanceDataStagingSize;
-	buffers.actors.walls.vertexStagingOffset = buffers.actors.drawInfoStagingOffset +
-											   buffers.actors.drawInfoStagingSize;
-	buffers.actors.walls.indexStagingOffset = buffers.actors.walls.vertexStagingOffset +
-											  buffers.actors.walls.vertexStagingSize;
+	const LunaBufferCreationInfo wallActorsInstanceDataBufferCreationInfo = {
+		.size = buffers.wallActors.instanceData.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&wallActorsInstanceDataBufferCreationInfo,
+											&buffers.wallActors.instanceData.buffer),
+						   "Failed to create wall actors instance data buffer!");
+	buffers.wallActors.instanceData.data = calloc(1, buffers.wallActors.instanceData.allocatedSize);
+	CheckAlloc(buffers.wallActors.instanceData.data);
 
-	SetSharedMemoryMappingInfo();
-}
-*/
-// TODO: lossless
-// bool ResizeBuffer(Buffer *buffer, bool /*lossy*/)
-/*{
-	vkDestroyBuffer(device, buffer->buffer, NULL);
-	buffer->buffer = VK_NULL_HANDLE;
+	const LunaBufferCreationInfo wallActorsDrawInfoBufferCreationInfo = {
+		.size = buffers.wallActors.drawInfo.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&wallActorsDrawInfoBufferCreationInfo, &buffers.wallActors.drawInfo.buffer),
+						   "Failed to create wall actors draw info buffer!");
+	buffers.wallActors.drawInfo.data = calloc(1, buffers.wallActors.drawInfo.allocatedSize);
+	CheckAlloc(buffers.wallActors.drawInfo.data);
 
-	vkFreeMemory(device, buffer->memoryAllocationInfo.memoryInfo->memory, NULL);
-	buffer->memoryAllocationInfo.memoryInfo->memory = VK_NULL_HANDLE;
-
-	if (!CreateBuffer(buffer, false))
-	{
-		return false;
-	}
-
-	if (buffer == &buffers.shared)
-	{
-		buffers.walls.shadowStagingSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-										  sizeof(uint32_t) * buffers.walls.shadowCount * 6;
-
-		buffers.ui.vertexStagingSize = sizeof(UiVertex) * buffers.ui.maxQuads * 4;
-		buffers.ui.indexStagingSize = sizeof(uint32_t) * buffers.ui.maxQuads * 6;
-
-		buffers.actors.instanceDataStagingSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-		if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
-		{
-			for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
-			{
-				buffers.actors.instanceDataStagingSize += sizeof(ActorInstanceData) *
-														  (size_t)ListGet(buffers.actors.models.modelCounts, i);
-			}
-		}
-		buffers.actors.drawInfoStagingSize = sizeof(VkDrawIndexedIndirectCommand) *
-													 buffers.actors.models.loadedModelIds.length +
-											 sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count;
-
-		buffers.actors.walls.vertexStagingSize = sizeof(ActorVertex) * buffers.actors.walls.count * 4;
-		buffers.actors.walls.indexStagingSize = sizeof(uint32_t) * buffers.actors.walls.count * 6;
-
-		SetSharedBufferAliasingInfo();
-	}
-
-	if (!AllocateMemory(buffer->memoryAllocationInfo.memoryInfo,
-						buffer->memoryAllocationInfo.memoryRequirements.memoryTypeBits))
-	{
-		return false;
-	}
-	if (!BindMemory(buffer))
-	{
-		return false;
-	}
-	if (buffer == &buffers.shared)
-	{
-		return MapSharedMemory();
-	}
-
-	return true;
+	return VK_SUCCESS;
 }
 
-// TODO: Rewrite to allow for batched resizes
-bool ResizeBufferRegion(Buffer *buffer,
-						const VkDeviceSize offset,
-						const VkDeviceSize oldSize,
-						const VkDeviceSize newSize,
-						const bool lossy)
+VkResult CreateModelActorBuffers()
 {
-	const VkDeviceSize bufferSize = buffer->size;
-	void *resizedBufferData = NULL;
-	void *otherBufferData = NULL;
-	if (buffer->memoryAllocationInfo.memoryInfo->mappedMemory)
-	{
-		otherBufferData = malloc(bufferSize - oldSize);
-		CheckAlloc(otherBufferData);
+	const LunaBufferCreationInfo modelActorsVertexBufferCreationInfo = {
+		.size = buffers.modelActors.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&modelActorsVertexBufferCreationInfo, &buffers.modelActors.vertices.buffer),
+						   "Failed to create model actors vertex buffer!");
+	buffers.modelActors.vertices.data = malloc(buffers.modelActors.vertices.allocatedSize);
+	CheckAlloc(buffers.modelActors.vertices.data);
 
-		memcpy(otherBufferData, buffer->memoryAllocationInfo.memoryInfo->mappedMemory, offset);
-		memcpy(otherBufferData + offset,
-			   buffer->memoryAllocationInfo.memoryInfo->mappedMemory + offset + oldSize,
-			   bufferSize - offset - oldSize);
+	const LunaBufferCreationInfo modelActorsIndexBufferCreationInfo = {
+		.size = buffers.modelActors.indices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&modelActorsIndexBufferCreationInfo, &buffers.modelActors.indices.buffer),
+						   "Failed to create model actors index buffer!");
+	buffers.modelActors.indices.data = malloc(buffers.modelActors.indices.allocatedSize);
+	CheckAlloc(buffers.modelActors.indices.data);
 
-		if (!lossy)
-		{
-			resizedBufferData = malloc(oldSize);
-			CheckAlloc(resizedBufferData);
-			memcpy(resizedBufferData, buffer->memoryAllocationInfo.memoryInfo->mappedMemory + offset, oldSize);
-		}
-	} else
+	const LunaBufferCreationInfo modelActorsInstanceDataBufferCreationInfo = {
+		.size = buffers.modelActors.instanceData.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&modelActorsInstanceDataBufferCreationInfo,
+											&buffers.modelActors.instanceData.buffer),
+						   "Failed to create model actors instance data buffer!");
+	buffers.modelActors.instanceData.data = calloc(1, buffers.modelActors.instanceData.allocatedSize);
+	CheckAlloc(buffers.modelActors.instanceData.data);
+
+	const LunaBufferCreationInfo modelActorsDrawInfoBufferCreationInfo = {
+		.size = buffers.modelActors.drawInfo.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&modelActorsDrawInfoBufferCreationInfo,
+											&buffers.modelActors.drawInfo.buffer),
+						   "Failed to create model actors draw info buffer!");
+	buffers.modelActors.drawInfo.data = calloc(1, buffers.modelActors.drawInfo.allocatedSize);
+	CheckAlloc(buffers.modelActors.drawInfo.data);
+
+	return VK_SUCCESS;
+}
+
+VkResult CreateRoofBuffers()
+{
+	const Model *skyModel = LoadModel(MODEL("model_sky"));
+	buffers.roof.vertices.allocatedSize = sizeof(WallVertex) * skyModel->vertexCount;
+	buffers.roof.indices.allocatedSize = sizeof(uint32_t) * skyModel->indexCount;
+
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = buffers.roof.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.roof.vertices.buffer),
+						   "Failed to create roof vertex buffer!");
+	buffers.roof.vertices.data = malloc(buffers.roof.vertices.allocatedSize);
+	CheckAlloc(buffers.roof.vertices.data);
+
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.size = buffers.roof.indices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.roof.indices.buffer),
+						   "Failed to create roof index buffer!");
+	buffers.roof.indices.data = malloc(buffers.roof.indices.allocatedSize);
+	CheckAlloc(buffers.roof.indices.data);
+
+	return VK_SUCCESS;
+}
+
+VkResult ResizeWallBuffers()
+{
+	if (buffers.walls.vertices.allocatedSize < buffers.walls.vertices.bytesUsed)
 	{
-		if (__builtin_expect(buffer->size > buffers.staging.size, false) && !ResizeStagingBuffer(buffer->size))
+		if (buffers.walls.vertices.allocatedSize != 0)
 		{
-			return false;
+			lunaDestroyBuffer(buffers.walls.vertices.buffer);
 		}
-		VkBufferCopy regions[2] = {
-			{
-				.size = offset,
-			},
-			{
-				.srcOffset = offset + oldSize,
-				.dstOffset = offset,
-				.size = bufferSize - offset - oldSize,
-			},
+		buffers.walls.vertices.allocatedSize = buffers.walls.vertices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.walls.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		};
-		if (offset == 0)
-		{
-			regions[0] = regions[1];
-			if (!CopyBuffer(buffer->buffer, buffers.staging.buffer, 1, regions))
-			{
-				return false;
-			}
-		} else if (offset + oldSize == buffer->size)
-		{
-			if (!CopyBuffer(buffer->buffer, buffers.staging.buffer, 1, regions))
-			{
-				return false;
-			}
-		} else
-		{
-			if (!CopyBuffer(buffer->buffer, buffers.staging.buffer, 2, regions))
-			{
-				return false;
-			}
-		}
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.walls.vertices.buffer),
+							   "Failed to recreate wall vertex buffer!");
+		void *newVertices = realloc(buffers.walls.vertices.data, buffers.walls.vertices.allocatedSize);
+		CheckAlloc(newVertices);
+		buffers.walls.vertices.data = newVertices;
 	}
-
-	buffer->size = bufferSize - oldSize + newSize;
-	if (!ResizeBuffer(buffer, true))
+	if (buffers.walls.indices.allocatedSize < buffers.walls.indices.bytesUsed)
 	{
-		free(resizedBufferData);
-		free(otherBufferData);
-
-		return false;
-	}
-
-	if (buffer->memoryAllocationInfo.memoryInfo->mappedMemory)
-	{
-		memcpy(buffer->memoryAllocationInfo.memoryInfo->mappedMemory, otherBufferData, offset);
-		memcpy(buffer->memoryAllocationInfo.memoryInfo->mappedMemory + offset + newSize,
-			   // ReSharper disable once CppDFANullDereference
-			   otherBufferData + offset,
-			   bufferSize - offset - oldSize);
-		if (!lossy)
+		if (buffers.walls.indices.allocatedSize != 0)
 		{
-			memcpy(buffer->memoryAllocationInfo.memoryInfo->mappedMemory + offset, resizedBufferData, oldSize);
+			lunaDestroyBuffer(buffers.walls.indices.buffer);
 		}
-
-		free(resizedBufferData);
-		free(otherBufferData);
-	} else
-	{
-		VkBufferCopy regions[2] = {
-			{
-				.size = offset,
-			},
-			{
-				.srcOffset = offset,
-				.dstOffset = offset + newSize,
-				.size = bufferSize - offset - oldSize,
-			},
+		buffers.walls.indices.allocatedSize = buffers.walls.indices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.walls.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 		};
-		if (offset == 0)
-		{
-			regions[0] = regions[1];
-			if (!CopyBuffer(buffers.staging.buffer, buffer->buffer, 1, regions))
-			{
-				return false;
-			}
-		} else if (offset + newSize == buffer->size)
-		{
-			if (!CopyBuffer(buffers.staging.buffer, buffer->buffer, 1, regions))
-			{
-				return false;
-			}
-		} else
-		{
-			if (!CopyBuffer(buffers.staging.buffer, buffer->buffer, 2, regions))
-			{
-				return false;
-			}
-		}
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.walls.indices.buffer),
+							   "Failed to recreate wall index buffer!");
+		void *newIndices = realloc(buffers.walls.indices.data, buffers.walls.indices.allocatedSize);
+		CheckAlloc(newIndices);
+		buffers.walls.indices.data = newIndices;
 	}
-
-	return true;
+	return VK_SUCCESS;
 }
 
-bool ResizeStagingBuffer(const size_t size)
+VkResult ResizeShadowBuffers()
 {
-	buffers.staging.size = size;
-	if (!ResizeBuffer(&buffers.staging, true))
+	if (buffers.shadows.vertices.allocatedSize < buffers.shadows.vertices.bytesUsed)
 	{
-		return false;
+		if (buffers.shadows.vertices.allocatedSize != 0)
+		{
+			lunaDestroyBuffer(buffers.shadows.vertices.buffer);
+		}
+		buffers.shadows.vertices.allocatedSize = buffers.shadows.vertices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.shadows.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.shadows.vertices.buffer),
+							   "Failed to recreate shadow vertex buffer!");
+		void *newVertices = realloc(buffers.shadows.vertices.data, buffers.shadows.vertices.allocatedSize);
+		CheckAlloc(newVertices);
+		buffers.shadows.vertices.data = newVertices;
 	}
-	VulkanTest(vkMapMemory(device,
-						   buffers.staging.memoryAllocationInfo.memoryInfo->memory,
-						   0,
-						   VK_WHOLE_SIZE,
-						   0,
-						   &buffers.staging.memoryAllocationInfo.memoryInfo->mappedMemory),
-			   "Failed to map actor staging buffer memory!");
-
-	return true;
+	if (buffers.shadows.indices.allocatedSize < buffers.shadows.indices.bytesUsed)
+	{
+		if (buffers.shadows.indices.allocatedSize != 0)
+		{
+			lunaDestroyBuffer(buffers.shadows.indices.buffer);
+		}
+		buffers.shadows.indices.allocatedSize = buffers.shadows.indices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.shadows.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.shadows.indices.buffer),
+							   "Failed to recreate shadow index buffer!");
+		void *newIndices = realloc(buffers.shadows.indices.data, buffers.shadows.indices.allocatedSize);
+		CheckAlloc(newIndices);
+		buffers.shadows.indices.data = newIndices;
+	}
+	return VK_SUCCESS;
 }
 
-VkResult ResizeUiBuffer()
+VkResult ResizeWallActorBuffers()
 {
-	if (buffers.ui.vertexStagingOffset <= buffers.ui.indexStagingOffset &&
-		buffers.ui.indexStagingOffset == buffers.ui.vertexStagingOffset + buffers.ui.vertexStagingSize)
+	if (buffers.wallActors.vertices.allocatedSize < buffers.wallActors.vertices.bytesUsed)
 	{
-		if (!ResizeBufferRegion(&buffers.shared,
-								buffers.ui.vertexStagingOffset,
-								buffers.ui.vertexStagingSize + buffers.ui.indexStagingSize,
-								sizeof(UiVertex) * buffers.ui.maxQuads * 4 + sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-								true))
+		if (buffers.wallActors.vertices.allocatedSize != 0)
 		{
-			return VK_ERROR_UNKNOWN;
+			lunaDestroyBuffer(buffers.wallActors.vertices.buffer);
 		}
-	} else if (buffers.ui.indexStagingOffset < buffers.ui.vertexStagingOffset &&
-			   buffers.ui.vertexStagingOffset == buffers.ui.indexStagingOffset + buffers.ui.indexStagingSize)
-	{
-		if (!ResizeBufferRegion(&buffers.shared,
-								buffers.ui.indexStagingOffset,
-								buffers.ui.indexStagingSize + buffers.ui.vertexStagingSize,
-								sizeof(UiVertex) * buffers.ui.maxQuads * 4 + sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-								true))
-		{
-			return VK_ERROR_UNKNOWN;
-		}
-	} else
-	{
-		if (!ResizeBufferRegion(&buffers.shared,
-								buffers.ui.vertexStagingOffset,
-								buffers.ui.vertexStagingSize,
-								sizeof(UiVertex) * buffers.ui.maxQuads * 4,
-								true))
-		{
-			return VK_ERROR_UNKNOWN;
-		}
-		if (!ResizeBufferRegion(&buffers.shared,
-								buffers.ui.indexStagingOffset,
-								buffers.ui.indexStagingSize,
-								sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-								true))
-		{
-			return VK_ERROR_UNKNOWN;
-		}
+		buffers.wallActors.vertices.allocatedSize = buffers.wallActors.vertices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.wallActors.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.vertices.buffer),
+							   "Failed to recreate wall actors vertex buffer!");
+		void *newVertices = realloc(buffers.wallActors.vertices.data, buffers.wallActors.vertices.allocatedSize);
+		CheckAlloc(newVertices);
+		buffers.wallActors.vertices.data = newVertices;
 	}
-
-
-	if (buffers.ui.vertexOffset <= buffers.ui.indexOffset &&
-		buffers.ui.indexOffset == buffers.ui.vertexOffset + buffers.ui.vertexSize)
+	if (buffers.wallActors.indices.allocatedSize < buffers.wallActors.indices.bytesUsed)
 	{
-		if (!ResizeBufferRegion(&buffers.local,
-								buffers.ui.vertexOffset,
-								buffers.ui.vertexSize + buffers.ui.indexSize,
-								sizeof(UiVertex) * buffers.ui.maxQuads * 4 + sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-								true))
+		if (buffers.wallActors.indices.allocatedSize != 0)
 		{
-			return VK_ERROR_UNKNOWN;
+			lunaDestroyBuffer(buffers.wallActors.indices.buffer);
 		}
-	} else if (buffers.ui.indexOffset < buffers.ui.vertexOffset &&
-			   buffers.ui.vertexOffset == buffers.ui.indexOffset + buffers.ui.indexSize)
+		buffers.wallActors.indices.allocatedSize = buffers.wallActors.indices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.wallActors.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.indices.buffer),
+							   "Failed to recreate wall actors index buffer!");
+		void *newIndices = realloc(buffers.wallActors.indices.data, buffers.wallActors.indices.allocatedSize);
+		CheckAlloc(newIndices);
+		buffers.wallActors.indices.data = newIndices;
+	}
+	if (buffers.wallActors.instanceData.allocatedSize < buffers.wallActors.instanceData.bytesUsed)
 	{
-		if (!ResizeBufferRegion(&buffers.local,
-								buffers.ui.indexOffset,
-								buffers.ui.indexSize + buffers.ui.vertexSize,
-								sizeof(UiVertex) * buffers.ui.maxQuads * 4 + sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-								true))
+		if (buffers.wallActors.instanceData.allocatedSize != 0)
 		{
-			return VK_ERROR_UNKNOWN;
+			lunaDestroyBuffer(buffers.wallActors.instanceData.buffer);
 		}
-	} else
+		buffers.wallActors.instanceData.allocatedSize = buffers.wallActors.instanceData.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.wallActors.instanceData.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.instanceData.buffer),
+							   "Failed to recreate wall actors instance data buffer!");
+		void *newInstanceData = realloc(buffers.wallActors.instanceData.data,
+										buffers.wallActors.instanceData.allocatedSize);
+		CheckAlloc(newInstanceData);
+		buffers.wallActors.instanceData.data = newInstanceData;
+	}
+	if (buffers.wallActors.drawInfo.allocatedSize < buffers.wallActors.drawInfo.bytesUsed)
 	{
-		if (!ResizeBufferRegion(&buffers.local,
-								buffers.ui.vertexOffset,
-								buffers.ui.vertexSize,
-								sizeof(UiVertex) * buffers.ui.maxQuads * 4,
-								true))
+		if (buffers.wallActors.drawInfo.allocatedSize != 0)
 		{
-			return VK_ERROR_UNKNOWN;
+			lunaDestroyBuffer(buffers.wallActors.drawInfo.buffer);
 		}
-		if (!ResizeBufferRegion(&buffers.local,
-								buffers.ui.indexOffset,
-								buffers.ui.indexSize,
-								sizeof(uint32_t) * buffers.ui.maxQuads * 6,
-								true))
-		{
-			return VK_ERROR_UNKNOWN;
-		}
+		buffers.wallActors.drawInfo.allocatedSize = buffers.wallActors.drawInfo.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.wallActors.drawInfo.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.drawInfo.buffer),
+							   "Failed to recreate wall actors draw info buffer!");
+		void *newDrawInfo = realloc(buffers.wallActors.drawInfo.data, buffers.wallActors.drawInfo.allocatedSize);
+		CheckAlloc(newDrawInfo);
+		buffers.wallActors.drawInfo.data = newDrawInfo;
 	}
 
 	return VK_SUCCESS;
 }
 
-/// TODO: This assumes the current layout of the buffer (instanceData, vertex, index) and will not work if this is not
-///  the case. I have done this to greatly simplify this function, since a function that takes multiple regions and
-///  dynamically resizes them based on their layout is upcoming and will therefore be replacing this function entirely.
-bool ResizeActorBuffer()
+VkResult ResizeModelActorBuffers()
 {
-	const VkDeviceSize shadowStagingSize = buffers.walls.shadowStagingSize;
-	VkDeviceSize newInstanceDataSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-	if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
+	if (buffers.modelActors.vertices.allocatedSize < buffers.modelActors.vertices.bytesUsed)
 	{
-		for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
+		if (buffers.modelActors.vertices.allocatedSize != 0)
 		{
-			newInstanceDataSize += sizeof(ActorInstanceData) * (size_t)ListGet(buffers.actors.models.modelCounts, i);
+			lunaDestroyBuffer(buffers.modelActors.vertices.buffer);
 		}
+		buffers.modelActors.vertices.allocatedSize = buffers.modelActors.vertices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.modelActors.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.vertices.buffer),
+							   "Failed to recreate model actors vertex buffer!");
+		void *newVertices = realloc(buffers.modelActors.vertices.data, buffers.modelActors.vertices.allocatedSize);
+		CheckAlloc(newVertices);
+		buffers.modelActors.vertices.data = newVertices;
 	}
-	if (!ResizeBufferRegion(&buffers.shared,
-							buffers.actors.instanceDataStagingOffset,
-							buffers.actors.instanceDataStagingSize +
-									buffers.actors.drawInfoStagingSize +
-									buffers.actors.walls.vertexStagingSize +
-									buffers.actors.walls.indexStagingSize,
-							newInstanceDataSize +
-									sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.models.loadedModelIds.length +
-									sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count +
-									sizeof(ActorVertex) * buffers.actors.walls.count * 4 +
-									sizeof(uint32_t) * buffers.actors.walls.count * 6,
-							true))
+	if (buffers.modelActors.indices.allocatedSize < buffers.modelActors.indices.bytesUsed)
 	{
-		return false;
-	}
-
-	if (!ResizeBufferRegion(&buffers.local,
-							buffers.actors.instanceDataOffset,
-							buffers.actors.instanceDataSize +
-									buffers.actors.drawInfoSize +
-									buffers.actors.models.vertexSize +
-									buffers.actors.walls.vertexSize +
-									buffers.actors.models.indexSize +
-									buffers.actors.walls.indexSize,
-							newInstanceDataSize +
-									sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.models.loadedModelIds.length +
-									sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count +
-									sizeof(ActorVertex) * buffers.actors.models.vertexCount +
-									sizeof(ActorVertex) * buffers.actors.walls.count * 4 +
-									sizeof(uint32_t) * buffers.actors.models.indexCount +
-									sizeof(uint32_t) * buffers.actors.walls.count * 6,
-							true))
-	{
-		return false;
-	}
-
-	if (!ResizeBufferRegion(&buffers.shared,
-							buffers.walls.shadowStagingOffset,
-							shadowStagingSize,
-							sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-									sizeof(uint32_t) * buffers.walls.shadowCount * 6,
-							true))
-	{
-		return false;
-	}
-
-	if (!ResizeBufferRegion(&buffers.local,
-							buffers.walls.shadowOffset,
-							buffers.walls.shadowSize,
-							sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-									sizeof(uint32_t) * buffers.walls.shadowCount * 6,
-							true))
-	{
-		return false;
-	}
-
-	buffers.walls.shadowSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-							   sizeof(uint32_t) * buffers.walls.shadowCount * 6;
-
-	buffers.ui.vertexSize = sizeof(UiVertex) * buffers.ui.maxQuads * 4;
-	buffers.ui.indexSize = sizeof(uint32_t) * buffers.ui.maxQuads * 6;
-
-	buffers.actors.instanceDataSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-	if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
-	{
-		for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
+		if (buffers.modelActors.indices.allocatedSize != 0)
 		{
-			buffers.actors.instanceDataSize += sizeof(ActorInstanceData) *
-											   (size_t)ListGet(buffers.actors.models.modelCounts, i);
+			lunaDestroyBuffer(buffers.modelActors.indices.buffer);
 		}
+		buffers.modelActors.indices.allocatedSize = buffers.modelActors.indices.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.modelActors.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.indices.buffer),
+							   "Failed to recreate model actors index buffer!");
+		void *newIndices = realloc(buffers.modelActors.indices.data, buffers.modelActors.indices.allocatedSize);
+		CheckAlloc(newIndices);
+		buffers.modelActors.indices.data = newIndices;
 	}
-	buffers.actors.drawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.models.loadedModelIds.length +
-								  sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count;
+	if (buffers.modelActors.instanceData.allocatedSize < buffers.modelActors.instanceData.bytesUsed)
+	{
+		if (buffers.modelActors.instanceData.allocatedSize != 0)
+		{
+			lunaDestroyBuffer(buffers.modelActors.instanceData.buffer);
+		}
+		buffers.modelActors.instanceData.allocatedSize = buffers.modelActors.instanceData.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.modelActors.instanceData.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.instanceData.buffer),
+							   "Failed to recreate model actors instance data buffer!");
+		void *newInstanceData = realloc(buffers.modelActors.instanceData.data,
+										buffers.modelActors.instanceData.allocatedSize);
+		CheckAlloc(newInstanceData);
+		buffers.modelActors.instanceData.data = newInstanceData;
+	}
+	if (buffers.modelActors.drawInfo.allocatedSize < buffers.modelActors.drawInfo.bytesUsed)
+	{
+		if (buffers.modelActors.drawInfo.allocatedSize != 0)
+		{
+			lunaDestroyBuffer(buffers.modelActors.drawInfo.buffer);
+		}
+		buffers.modelActors.drawInfo.allocatedSize = buffers.modelActors.drawInfo.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.modelActors.drawInfo.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.drawInfo.buffer),
+							   "Failed to recreate model actors draw info buffer!");
+		void *newDrawInfo = realloc(buffers.modelActors.drawInfo.data, buffers.modelActors.drawInfo.allocatedSize);
+		CheckAlloc(newDrawInfo);
+		buffers.modelActors.drawInfo.data = newDrawInfo;
+	}
 
-	buffers.actors.models.vertexSize = sizeof(ActorVertex) * buffers.actors.models.vertexCount;
-	buffers.actors.models.indexSize = sizeof(uint32_t) * buffers.actors.models.indexCount;
-	buffers.actors.walls.vertexSize = sizeof(ActorVertex) * buffers.actors.walls.count * 4;
-	buffers.actors.walls.indexSize = sizeof(uint32_t) * buffers.actors.walls.count * 6;
-	SetLocalBufferAliasingInfo();
-
-	return true;
+	return VK_SUCCESS;
 }
-*/
+
 bool LoadTexture(const Image *image)
 {
 	const LunaSampledImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		// .mipmapLevels = GetState()->options.mipmaps && false ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.mipmapLevels = GetState()->options.mipmaps && false ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.pixels = image->pixelData,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -566,7 +433,8 @@ bool LoadTexture(const Image *image)
 		.destinationStageMask = VK_PIPELINE_STAGE_TRANSFER_BIT,
 	};
 	ListAdd(&textures, NULL);
-	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage*)&textures.data[textures.length - 1]), "Failed to create texture!");
+	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage *)&textures.data[textures.length - 1]),
+			   "Failed to create texture!");
 	imageAssetIdToIndexMap[image->id] = textures.length - 1;
 
 	const LunaDescriptorImageInfo imageInfo = {

@@ -13,6 +13,7 @@
 #include "../../Core/Error.h"
 #include "../../Core/Logging.h"
 #include "../../Core/MathEx.h"
+#include "../../Core/Timing.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
 #include "VulkanResources.h"
@@ -88,10 +89,7 @@ bool VK_Init(SDL_Window *window)
 
 VkResult VK_FrameStart()
 {
-	// if (!LoadActors(loadedLevel))
-	// {
-	// 	return VK_ERROR_UNKNOWN;
-	// }
+	// VulkanTestReturnResult(InitActors(loadedLevel), "Failed to init actors!");
 
 	if (minimized)
 	{
@@ -151,7 +149,15 @@ VkResult VK_FrameStart()
 	};
 	VulkanTestReturnResult(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
 
-	buffers.ui.quadCount = 0;
+	const LunaGraphicsPipelineBindInfo bindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSets[currentFrame],
+	};
+	lunaBindDescriptorSets(pipelines.ui, &bindInfo);
+
+	buffers.ui.objectCount = 0;
+	buffers.ui.vertices.bytesUsed = 0;
+	buffers.ui.indices.bytesUsed = 0;
 
 	return VK_SUCCESS;
 }
@@ -160,20 +166,19 @@ VkResult VK_FrameEnd()
 {
 	if (buffers.ui.shouldResize)
 	{
-		return VK_ERROR_OUT_OF_HOST_MEMORY;
-		// VulkanTestReturnResult(ResizeUiBuffer(), "Failed to resize UI buffer!");
-		// buffers.ui.shouldResize = false;
+		lunaDestroyBuffer(buffers.ui.vertices.buffer);
+		lunaDestroyBuffer(buffers.ui.indices.buffer);
+
+		VulkanTestReturnResult(CreateUiBuffers(), "Failed to recreate UI buffers!");
 	}
 
-	if (buffers.ui.quadCount > 0)
+	if (buffers.ui.objectCount > 0)
 	{
-		lunaWriteDataToBuffer(buffers.ui.vertexBuffer,
-							  buffers.ui.vertices,
-							  sizeof(UiVertex) * buffers.ui.quadCount * 4);
-		lunaWriteDataToBuffer(buffers.ui.indexBuffer, buffers.ui.indices, sizeof(uint32_t) * buffers.ui.quadCount * 6);
+		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed);
+		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed);
 	}
 
-	// VulkanTest(vkEndCommandBuffer(transferCommandBuffer),
+	// VulkanTestReturnResult(vkEndCommandBuffer(transferCommandBuffer),
 	// 		   "Failed to finish the recording of Vulkan transfer command buffer!");
 	//
 	// const VkSubmitInfo queueSubmitInfo = {
@@ -182,32 +187,28 @@ VkResult VK_FrameEnd()
 	// 	.pCommandBuffers = &transferCommandBuffer,
 	// };
 	//
-	// VulkanTest(vkQueueSubmit(transferQueue, 1, &queueSubmitInfo, transferBufferFence),
+	// VulkanTestReturnResult(vkQueueSubmit(transferQueue, 1, &queueSubmitInfo, transferBufferFence),
 	// 		   "Failed to submit Vulkan transfer command buffer to queue!");
 
 	lunaNextSubpass();
-	if (buffers.ui.quadCount > 0)
+	if (buffers.ui.objectCount > 0)
 	{
-		const LunaGraphicsPipelineBindInfo bindInfo = {
-			.descriptorSetCount = 1,
-			.descriptorSets = &descriptorSets[currentFrame],
-		};
-		VulkanTest(lunaDrawBufferIndexed(buffers.ui.vertexBuffer,
-										 buffers.ui.indexBuffer,
-										 0,
-										 VK_INDEX_TYPE_UINT32,
-										 pipelines.ui,
-										 &bindInfo,
-										 buffers.ui.quadCount * 6,
-										 1,
-										 0,
-										 0,
-										 0),
-				   "Failed to draw UI!");
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
+													 buffers.ui.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.ui,
+													 (LunaGraphicsPipelineBindInfo[]){0},
+													 buffers.ui.objectCount * 6,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw UI!");
 	}
 
 	lunaEndRenderPass();
-	lunaPresentSwapChain();
+	VulkanTestReturnResult(lunaPresentSwapChain(), "Failed to present swap chain!");
 
 	// const VkSubmitInfo submitInfo = {
 	// 	.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -263,85 +264,124 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 	pushConstants.yaw = camera->yaw + 1.5f * PIf;
 	UpdateTranslationMatrix(camera);
 
-	VulkanTestReturnResult(CopyBuffers(loadedLevel), "Failed to copy buffers!");
+	LoadActorWalls(loadedLevel);
+	LoadActorDrawInfo(loadedLevel);
+	UpdateActorData(loadedLevel);
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
 
-	if (buffers.walls.wallCount || buffers.walls.shadowCount)
+	if (buffers.walls.objectCount || buffers.shadows.objectCount)
 	{
-		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.walls);
-
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame],
-							   0,
-							   2,
-							   (VkBuffer[]){buffers.walls.bufferInfo->buffer, buffers.walls.bufferInfo->buffer},
-							   (VkDeviceSize[]){buffers.walls.shadowOffset, buffers.walls.vertexOffset});
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.shadows.vertices.buffer, buffers.walls.vertices.buffer},
+							  (VkDeviceSize[]){0, 0});
 	}
-	if (buffers.walls.wallCount)
+	if (buffers.walls.objectCount)
 	{
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.walls.bufferInfo->buffer,
-							 buffers.walls.indexOffset,
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame],
-						 6 + (loadedLevel->hasCeiling ? 6 : buffers.walls.skyIndexCount),
-						 1,
-						 0,
-						 0,
-						 0);
+		// TODO: This draws the floor, but uses the wall buffer
+		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
+													 buffers.walls.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 (LunaGraphicsPipelineBindInfo[]){0},
+													 6,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw floor!");
 	}
-	if (buffers.walls.shadowCount)
+	if (buffers.shadows.objectCount)
 	{
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.walls.bufferInfo->buffer,
-							 buffers.walls.shadowOffset + sizeof(ShadowVertex) * buffers.walls.shadowCount * 4,
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame],
-						 buffers.walls.shadowCount * 6,
-						 1,
-						 0,
-						 0,
-						 0x53484457); // 0x53484457 is "SHDW", to encode that we are drawing the shadows
+		// 0x53484457 is "SHDW", to encode that we are drawing the shadows
+		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
+													 buffers.shadows.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 (LunaGraphicsPipelineBindInfo[]){0},
+													 buffers.shadows.objectCount * 6,
+													 1,
+													 0,
+													 0,
+													 0x53484457),
+							   "Failed to draw shadows!");
 	}
-	if (buffers.walls.wallCount > loadedLevel->hasCeiling + 1)
+	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
 	{
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.walls.bufferInfo->buffer,
-							 buffers.walls.indexOffset +
-									 sizeof(uint32_t) *
-											 (6 + (loadedLevel->hasCeiling ? 6 : buffers.walls.skyIndexCount)),
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame],
-						 buffers.walls.wallCount * 6 - (loadedLevel->hasCeiling ? 12 : 6),
-						 1,
-						 0,
-						 0,
-						 0x57414C4C); // 0x57414C4C is "WALL", to encode that we are drawing the walls
+		// 0x57414C4C is "WALL", to encode that we are drawing the walls
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+													 buffers.walls.indices.buffer,
+													 sizeof(uint32_t) * 6,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 (LunaGraphicsPipelineBindInfo[]){0},
+													 (buffers.walls.objectCount - 1) * 6,
+													 1,
+													 0,
+													 0,
+													 0x57414C4C),
+							   "Failed to draw walls!");
 	}
 
-	if (buffers.actors.drawInfoSize)
+	lunaBindVertexBuffers(0,
+						  2,
+						  (LunaBuffer[]){buffers.roof.vertices.buffer, buffers.roof.vertices.buffer},
+						  (VkDeviceSize[]){0, 0});
+	VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
+												 buffers.roof.indices.buffer,
+												 0,
+												 VK_INDEX_TYPE_UINT32,
+												 pipelines.walls,
+												 (LunaGraphicsPipelineBindInfo[]){0},
+												 level->hasCeiling ? 6 : skyModel->indexCount,
+												 1,
+												 0,
+												 0,
+												 0),
+						   "Failed to draw roof!");
+
+	if (buffers.wallActors.count)
 	{
-		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.actors);
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.wallActors.vertices.buffer,
+											 buffers.wallActors.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
 
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame],
-							   0,
-							   2,
-							   (VkBuffer[]){buffers.actors.bufferInfo->buffer, buffers.actors.bufferInfo->buffer},
-							   (VkDeviceSize[]){buffers.actors.vertexOffset, buffers.actors.instanceDataOffset});
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.wallActors.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.actors,
+															 (LunaGraphicsPipelineBindInfo[]){0},
+															 buffers.wallActors.drawInfo.buffer,
+															 0,
+															 buffers.wallActors.count,
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw wall actors!");
+	}
+	if (buffers.modelActors.loadedModelIds.length)
+	{
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.modelActors.vertices.buffer,
+											 buffers.modelActors.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
 
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.actors.bufferInfo->buffer,
-							 buffers.actors.indexOffset,
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexedIndirect(commandBuffers[currentFrame],
-								 buffers.actors.bufferInfo->buffer,
-								 buffers.actors.drawInfoOffset,
-								 buffers.actors.models.loadedModelIds.length + buffers.actors.walls.count,
-								 sizeof(VkDrawIndexedIndirectCommand));
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.modelActors.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.actors,
+															 (LunaGraphicsPipelineBindInfo[]){0},
+															 buffers.modelActors.drawInfo.buffer,
+															 0,
+															 buffers.modelActors.loadedModelIds.length,
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw model actors!");
 	}
 
 	return VK_SUCCESS;
@@ -373,100 +413,6 @@ inline uint8_t VK_GetSampleCountFlags()
 
 bool VK_LoadLevelWalls(const Level *level)
 {
-	uint32_t skyVertexCount = 0;
-	const Model *_skyModel = !skyModel ? LoadModel(MODEL("model_sky")) : skyModel;
-	// if (level->hasCeiling)
-	// {
-	// 	buffers.walls.skyIndexCount = 0;
-	// 	buffers.walls.wallCount = level->walls.length + 2;
-	// } else
-	// {
-	// 	skyVertexCount = _skyModel->vertexCount;
-	// 	buffers.walls.skyIndexCount = _skyModel->indexCount;
-	// 	buffers.walls.wallCount = level->walls.length + 1;
-	// }
-	//
-	// if (buffers.walls.wallCount > buffers.walls.maxWallCount)
-	// {
-	// 	const VkDeviceSize wallVertexSize = sizeof(WallVertex) *
-	// 										(buffers.walls.maxWallCount * 4 + _skyModel->vertexCount);
-	// 	const VkDeviceSize wallIndexSize = sizeof(uint32_t) * (buffers.walls.maxWallCount * 6 + _skyModel->indexCount);
-	//
-	// 	buffers.walls.maxWallCount = buffers.walls.wallCount;
-	//
-	// 	if (buffers.walls.vertexOffset <= buffers.walls.indexOffset &&
-	// 		buffers.walls.indexOffset == buffers.walls.vertexOffset + wallVertexSize)
-	// 	{
-	// 		if (!ResizeBufferRegion(&buffers.local,
-	// 								buffers.walls.vertexOffset,
-	// 								wallVertexSize + wallIndexSize,
-	// 								sizeof(WallVertex) * buffers.walls.maxWallCount * 4 +
-	// 										sizeof(uint32_t) * buffers.walls.maxWallCount * 6 +
-	// 										sizeof(WallVertex) * _skyModel->vertexCount +
-	// 										sizeof(uint32_t) * _skyModel->indexCount,
-	// 								true))
-	// 		{
-	// 			return false;
-	// 		}
-	// 	} else if (buffers.walls.indexOffset < buffers.walls.vertexOffset &&
-	// 			   buffers.walls.vertexOffset == buffers.walls.indexOffset + wallIndexSize)
-	// 	{
-	// 		if (!ResizeBufferRegion(&buffers.local,
-	// 								buffers.walls.indexOffset,
-	// 								wallIndexSize + wallVertexSize,
-	// 								sizeof(WallVertex) * buffers.walls.maxWallCount * 4 +
-	// 										sizeof(uint32_t) * buffers.walls.maxWallCount * 6 +
-	// 										sizeof(WallVertex) * _skyModel->vertexCount +
-	// 										sizeof(uint32_t) * _skyModel->indexCount,
-	// 								true))
-	// 		{
-	// 			return false;
-	// 		}
-	// 	} else
-	// 	{
-	// 		if (!ResizeBufferRegion(&buffers.local,
-	// 								buffers.walls.vertexOffset,
-	// 								wallVertexSize,
-	// 								sizeof(WallVertex) * buffers.walls.maxWallCount * 4 +
-	// 										sizeof(WallVertex) * _skyModel->vertexCount,
-	// 								true))
-	// 		{
-	// 			return false;
-	// 		}
-	// 		if (!ResizeBufferRegion(&buffers.local,
-	// 								buffers.walls.indexOffset,
-	// 								wallIndexSize,
-	// 								sizeof(uint32_t) * buffers.walls.maxWallCount * 6 +
-	// 										sizeof(uint32_t) * _skyModel->indexCount,
-	// 								true))
-	// 		{
-	// 			return false;
-	// 		}
-	// 	}
-	//
-	// 	buffers.walls.shadowSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-	// 							   sizeof(uint32_t) * buffers.walls.shadowCount * 6;
-	//
-	// 	buffers.actors.instanceDataSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-	// 	if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
-	// 	{
-	// 		for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
-	// 		{
-	// 			buffers.actors.instanceDataSize += sizeof(ActorInstanceData) *
-	// 											   (size_t)ListGet(buffers.actors.models.modelCounts, i);
-	// 		}
-	// 	}
-	// 	buffers.actors.drawInfoSize = sizeof(VkDrawIndexedIndirectCommand) *
-	// 										  buffers.actors.models.loadedModelIds.length +
-	// 								  sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count;
-	//
-	// 	buffers.actors.models.vertexSize = sizeof(ActorVertex) * buffers.actors.models.vertexCount;
-	// 	buffers.actors.models.indexSize = sizeof(uint32_t) * buffers.actors.models.indexCount;
-	// 	buffers.actors.walls.vertexSize = sizeof(ActorVertex) * buffers.actors.walls.count * 4;
-	// 	buffers.actors.walls.indexSize = sizeof(uint32_t) * buffers.actors.walls.count * 6;
-	// 	SetLocalBufferAliasingInfo();
-	// }
-
 	if (level->hasCeiling)
 	{
 		pushConstants.skyVertexCount = 0;
@@ -481,52 +427,21 @@ bool VK_LoadLevelWalls(const Level *level)
 	pushConstants.fogEnd = (float)level->fogEnd;
 	pushConstants.fogColor = level->fogColor;
 
-	// WallVertex *wallVertices = calloc(buffers.walls.wallCount * 4 + skyVertexCount, sizeof(WallVertex));
-	// CheckAlloc(wallVertices);
-	// uint32_t *wallIndices = calloc(buffers.walls.wallCount * 6 + buffers.walls.skyIndexCount, sizeof(uint32_t));
-	// CheckAlloc(wallIndices);
-	//
-	// LoadWalls(level, _skyModel, wallVertices, wallIndices, skyVertexCount);
-	//
-	// const VkDeviceSize wallVertexSize = sizeof(WallVertex) * (buffers.walls.maxWallCount * 4 + _skyModel->vertexCount);
-	// const VkDeviceSize wallIndexSize = sizeof(uint32_t) * (buffers.walls.maxWallCount * 6 + _skyModel->indexCount);
-	//
-	// if (__builtin_expect(wallVertexSize + wallIndexSize > buffers.staging.size, false) &&
-	// 	!ResizeStagingBuffer(wallVertexSize + wallIndexSize))
-	// {
-	// 	return false;
-	// }
-	// void *data = buffers.staging.memoryAllocationInfo.memoryInfo->mappedMemory;
-	//
-	// memcpy(data, wallVertices, sizeof(WallVertex) * (buffers.walls.wallCount * 4 + skyVertexCount));
-	// memcpy(data + wallVertexSize,
-	// 	   wallIndices,
-	// 	   sizeof(uint32_t) * (buffers.walls.wallCount * 6 + buffers.walls.skyIndexCount));
-	//
-	// const VkBufferCopy regions[] = {
-	// 	{
-	// 		.srcOffset = 0,
-	// 		.dstOffset = buffers.walls.vertexOffset,
-	// 		.size = wallVertexSize,
-	// 	},
-	// 	{
-	// 		.srcOffset = wallVertexSize,
-	// 		.dstOffset = buffers.walls.indexOffset,
-	// 		.size = wallIndexSize,
-	// 	},
-	// };
-	// if (!CopyBuffer(buffers.staging.buffer, buffers.local.buffer, 2, regions))
-	// {
-	// 	return false;
-	// }
+	LoadRoof(level->hasCeiling);
+
+	buffers.walls.objectCount = level->walls.length + 1;
+	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.walls.objectCount;
+	buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.walls.objectCount;
+	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
+	LoadWalls(level);
 
 	loadedLevel = level;
 
 	// free(wallVertices);
 	// free(wallIndices);
 
-	// loadedActors = 0;
-	// return LoadActors(level);
+	loadedActors = 0;
+	VulkanTest(InitActors(level), "Failed to load actors!");
 	return true;
 }
 

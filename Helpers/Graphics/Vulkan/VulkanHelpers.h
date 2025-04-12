@@ -16,6 +16,8 @@
 #define MAX_FRAMES_IN_FLIGHT 1
 #define MAX_UI_QUADS_INIT 8192 // TODO: find best value
 #define MAX_WALLS_INIT 1024
+#define MAX_WALL_ACTORS_INIT 256
+#define MAX_MODEL_ACTOR_QUADS_INIT 4096
 /// This is an expected estimate for the largest that a texture will be. It is used to create an overallocation of
 /// texture memory with the formula @code MAX_TEXTURE_SIZE * MAX_TEXTURE_SIZE * 4 * textureCount@endcode
 #define MAX_TEXTURE_SIZE 384
@@ -65,6 +67,12 @@ typedef enum VendorIDs
 	NVIDIA = 0x10DE,
 	QUALCOMM = 0x5143,
 } VendorIDs;
+
+typedef enum RoofType
+{
+	ROOF_TYPE_CEILING = 1,
+	ROOF_TYPE_SKY = 2,
+} RoofType;
 
 /**
  * A struct to hold the indicies of the queue families for graphics, presentation, and transfer.
@@ -209,240 +217,59 @@ typedef struct WallVertex
 	float wallAngle;
 } WallVertex;
 
-/**
- * A structure holding data about a Vulkan buffer.
- *
- * This structure is used to keep track of the buffer handle, as well as the memory allocation information associated
- * with the given buffer.
- *
- * @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkBuffer.html
- */
-typedef struct Buffer
+typedef struct BufferRegion
 {
-	/// The actual Vulkan buffer handle
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkBuffer.html
-	VkBuffer buffer;
-	/// The size of the buffer allocation.
-	VkDeviceSize size;
-	/// Stores information about what memory contains the buffer as well as where the buffer is in the memory.
-	MemoryAllocationInfo memoryAllocationInfo;
-} Buffer;
+	LunaBuffer buffer;
+	VkDeviceSize bytesUsed;
+	VkDeviceSize allocatedSize;
+	void *data;
+} BufferRegion;
 
-/**
- * A structure holding data about a UI vertex buffer.
- *
- * This structure is used to keep track of not only the larger buffer that the vertex buffer is offset into, but also to
- * keep track of the host mapped memory and vertex count information.
- *
- * @note This is still C, so there are no actual guardrails preventing you from potentially causing a SEGFAULT by attempting to write to @c vertices[100] when @c maxQuads is only 5.
- */
-typedef struct UiBuffer
+typedef struct IndexedVertexBuffer
 {
-	/// A fallback pointer that can be used if it is necessary to write more than @code maxQuads * 4@endcode vertices to the buffer.
-	/// @note This pointer takes the form of @code UiVertex[fallbackMaxQuads * 4]@endcode.
-	/// @note This pointer is host only, meaning that there is no Vulkan memory backing it. This means that for the GPU to be able to access it the data must first be copied to a buffer.
-	UiVertex *vertices;
-	/// A fallback pointer that can be used if it is necessary to write more than @code maxQuads * 6@endcode indices to the buffer.
-	/// @note This pointer takes the form of @code uint32_t[fallbackMaxVertices * 6]@endcode.
-	/// @note This pointer is host only, meaning that there is no Vulkan memory backing it. This means that for the GPU to be able to access it the data must first be copied to a buffer.
-	uint32_t *indices;
-	/// The current number of quads that are stored in the buffer.
-	uint32_t quadCount;
-	/// The maximum number of quads that can be stored in the buffer with the currently allocated memory.
-	uint32_t maxQuads;
-
-	LunaBuffer vertexBuffer;
-	LunaBuffer indexBuffer;
-
+	BufferRegion vertices;
+	BufferRegion indices;
+	uint32_t objectCount;
 	bool shouldResize;
-} UiBuffer;
+} IndexedVertexBuffer;
 
-/**
- * A structure holding data about a wall vertex buffer.
- *
- * This structure is used to keep track of the larger buffer that the buffer is a part of, offset information,
- * and information about the number of walls.
- */
-typedef struct WallVertexBuffer
+typedef struct RoofBuffer
 {
-	/// The number of walls that are currently stored in the buffer, plus one for the floor and one for the ceiling.
-	uint32_t wallCount;
-	uint32_t shadowCount;
-	/// The number of indices required to draw the sky.
-	uint32_t skyIndexCount;
-	/// The maximum number of walls that can currently be stored in the buffer.
-	/// @note In order to determine how many walls can be used you must subtract either one or two from this number,
-	///  due to the inclusion of the floor as a wall. If the level uses a sky, then only the floor will be part of this
-	///  number, and so you will only need to subtract one, but if the level uses a ceiling you need to subtract two.
-	///  VK_LoadLevelWalls handles this by adding to the wall count accordingly, so that comparing the wall count and
-	///  the max wall count requires no additional arithmetic.
-	uint32_t maxWallCount;
+	BufferRegion vertices;
+	BufferRegion indices;
+} RoofBuffer;
 
-	/// The larger buffer within which the wall vertex buffer reside.
-	Buffer *bufferInfo;
-	/// The offset of the wall vertex buffer into the larger buffer allocation.
-	VkDeviceSize vertexOffset;
-	/// The offset of the index buffer for the wall vertex buffer into the larger buffer allocation.
-	VkDeviceSize indexOffset;
-	VkDeviceSize shadowOffset;
-	VkDeviceSize shadowSize;
-
-	Buffer *stagingBufferInfo;
-	VkDeviceSize shadowStagingOffset;
-	VkDeviceSize shadowStagingSize;
-	ShadowVertex *shadowVertexStaging;
-	ShadowVertex *shadowIndexStaging;
-} WallVertexBuffer;
-
-/// A struct that contains all the data needed to keep track of (but not to draw) all the actors in the current level
-/// that use models. This struct should be considered a fragment, and is intended for use as part of the @c ActorBuffer
-/// struct. As such, it is lacking the information required to instance and draw the actors.
-///
-/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-typedef struct ModelActorBuffer
+typedef struct WallActorsBuffer
 {
-	/// The total number of vertices across all models.
-	uint32_t vertexCount;
-	/// The total number of indices across all models.
-	uint32_t indexCount;
+	BufferRegion vertices;
+	BufferRegion indices;
+	BufferRegion instanceData;
+	BufferRegion drawInfo;
+	VkDeviceSize count;
+} WallActorsBuffer;
+
+typedef struct ModelActorsBuffer
+{
+	BufferRegion vertices;
+	BufferRegion indices;
+	BufferRegion instanceData;
+	BufferRegion drawInfo;
+
 	/// A list of the ids of all loaded actor models in the current level. This can be used in conjunction with
 	/// @c ListFind to get an index that can be used to index nearly every other array in this struct.
 	List loadedModelIds;
 	/// An array containing the number of instances of each model index in the level.
 	List modelCounts;
-
-	/// The that the vertices take up within the device-local buffer.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize vertexSize;
-	/// The that the indices take up within the device-local buffer.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize indexSize;
-} ModelActorBuffer;
-
-/// A struct that contains all the data needed to keep track of (but not to draw) all the actors in the current level
-/// that exclusively use a wall. This struct should be considered a fragment, and is intended for use as part of the
-/// @c ActorBuffer struct. As such, it is lacking the information required to instance and draw the actors.
-///
-/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-typedef struct WallActorBuffer
-{
-	/// The number of actors in the level that exclusively use a wall.
-	uint32_t count;
-
-	/// The offset into the device-local buffer at which the vertices are stored.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize vertexOffset;
-	/// The offset into the device-local buffer at which the indices are stored.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize indexOffset;
-	/// The that the vertices take up within the device-local buffer.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize vertexSize;
-	/// The that the indices take up within the device-local buffer.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize indexSize;
-
-	/// The offset into the shared memory buffer at which the vertices are stored.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize vertexStagingOffset;
-	/// The offset into the shared memory buffer at which the indices are stored.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize indexStagingOffset;
-	/// The that the vertices take up within the shared memory buffer.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize vertexStagingSize;
-	/// The that the indices take up within the shared memory buffer.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize indexStagingSize;
-	/// A pointer to the mapped memory of the shared memory buffer, offset to point to the region used for holding
-	/// the staging copy of the vertices.
-	ActorVertex *vertexStaging;
-	/// A pointer to the mapped memory of the shared memory buffer, offset to point to the region used for holding
-	/// the staging copy of the indices.
-	uint32_t *indexStaging;
-} WallActorBuffer;
-
-/// A struct that contains all the data needed to keep track of and draw all the actors in the current level. This
-/// struct contains information about both the actors that use models, and the actors that exclusively use a wall. It
-/// does this by containing both a @c ModelActorBuffer and a @c WallActorBuffer struct, in addition to information that
-/// pertains to the buffer as a whole. This means that any members of this struct that do not belong to either the
-/// @c models or the @c walls member should be considered to apply to the buffer as a whole, and not just to one type of
-/// actor.
-///
-/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDrawIndexedIndirectCommand.html
-typedef struct ActorBuffer
-{
-	/// A pointer to a struct containing information about the device-local buffer that the actor data is stored in.
-	Buffer *bufferInfo;
-	/// A struct containing information about the portion of the buffer that stores the actors that use models.
-	ModelActorBuffer models;
-	/// A struct containing information about the portion of the buffer that stores the actors that only use a wall.
-	WallActorBuffer walls;
-
-	/// The offset into the device-local buffer at which the instance data is stored. This is the offset for both
-	/// model and wall actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize instanceDataOffset;
-	/// The offset into the device-local buffer at which the drawing information is stored. This is the offset for both
-	/// model and wall actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize drawInfoOffset;
-	/// The offset into the device-local buffer at which the vertices are stored. This is the base offset for the
-	/// actors, and the model actors use this same offset, but the wall actors have a separate offset which allows them
-	/// to make changes without modifying the walls.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize vertexOffset;
-	/// The offset into the device-local buffer at which the indices are stored. This is the base offset for the actors,
-	/// and the model actors use this same offset, but the wall actors have a separate offset which allows them to
-	/// make changes without modifying the walls.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize indexOffset;
-	/// The size that the instance data takes up within the device-local buffer. This is the combined size of both the
-	/// wall actors and the model actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize instanceDataSize;
-	/// The size that the drawing information takes up within the device-local buffer. This is the combined size of both
-	/// the wall actors and the model actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize drawInfoSize;
-
-	/// A pointer to a struct containing information about the shared memory buffer that the actor data is staged in.
-	Buffer *stagingBufferInfo;
-	/// The offset into the shared memory buffer at which the instance data is stored. This is the offset for both
-	/// model and wall actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize instanceDataStagingOffset;
-	/// The offset into the shared memory buffer at which the drawing information is stored. This is the offset for both
-	/// model and wall actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize drawInfoStagingOffset;
-	/// The size that the instance data takes up within the shared memory buffer. This is the combined size of both the
-	/// wall actors and the model actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize instanceDataStagingSize;
-	/// The size that the drawing information takes up within the shared memory buffer. This is the combined size of
-	/// both the wall actors and the model actors.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceSize.html
-	VkDeviceSize drawInfoStagingSize;
-	/// A pointer to the mapped memory of the shared memory buffer, offset to point to the region used for holding
-	/// the staging copy of the instance data.
-	ActorInstanceData *instanceDataStaging;
-	/// A pointer to the mapped memory of the shared memory buffer, offset to point to the region used for holding
-	/// the staging copy of the drawing information.
-	/// @see https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDrawIndexedIndirectCommand.html
-	VkDrawIndexedIndirectCommand *drawInfoStaging;
-} ActorBuffer;
+} ModelActorsBuffer;
 
 typedef struct Buffers
 {
-	Buffer local;
-	Buffer shared;
-	Buffer staging;
-
-	UiBuffer ui;
-	WallVertexBuffer walls;
-	ActorBuffer actors;
+	IndexedVertexBuffer ui;
+	RoofBuffer roof;
+	IndexedVertexBuffer walls;
+	IndexedVertexBuffer shadows;
+	WallActorsBuffer wallActors;
+	ModelActorsBuffer modelActors;
 } Buffers;
 
 typedef struct Pipelines
@@ -563,7 +390,7 @@ extern VkFence transferBufferFence;
 #pragma endregion variables
 
 #pragma region helperFunctions
-bool LoadActors(const Level *level);
+VkResult InitActors(const Level *level);
 
 bool CreateImageView(VkImageView *imageView,
 					 VkImage image,
@@ -587,7 +414,7 @@ bool BeginCommandBuffer(const VkCommandBuffer *commandBuffer, VkCommandPool comm
 
 bool EndCommandBuffer(VkCommandBuffer commandBuffer, VkCommandPool commandPool, VkQueue queue);
 
-bool CreateBuffer(Buffer *buffer, bool newAllocation);
+// bool CreateBuffer(Buffer *buffer, bool newAllocation);
 
 bool CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferCopy *regions);
 
@@ -595,38 +422,19 @@ uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
 
-void CleanupSwapChain();
+void LoadRoof(bool hasCeiling);
 
-void CleanupColorImage();
+void LoadWalls(const Level *level);
 
-void CleanupDepthImage();
+void LoadActorModels(const Level *level);
 
-void CleanupPipeline();
+void LoadActorWalls(const Level *level);
 
-void CleanupSyncObjects();
+void UpdateActorData(const Level *level);
 
-bool RecreateSwapChain();
+void LoadActorDrawInfo(const Level *level);
 
-bool DestroyBuffer(Buffer *buffer);
-
-void LoadWalls(const Level *level,
-			   const Model *skyModel,
-			   WallVertex *vertices,
-			   uint32_t *indices,
-			   uint32_t skyVertexCount);
-
-void LoadActorModels(const Level *level, ActorVertex *vertices, uint32_t *indices);
-
-void LoadActorWalls(const Level *level, ActorVertex *vertices, uint32_t *indices);
-
-void LoadActorInstanceData(const Level *level,
-						   ActorInstanceData *instanceData,
-						   ShadowVertex *shadowVertices,
-						   uint32_t *shadowIndices);
-
-void LoadActorDrawInfo(const Level *level, VkDrawIndexedIndirectCommand *drawInfo);
-
-VkResult CopyBuffers(const Level *level);
+// VkResult CopyBuffers(const Level *level);
 #pragma endregion helperFunctions
 
 #pragma region drawingHelpers
