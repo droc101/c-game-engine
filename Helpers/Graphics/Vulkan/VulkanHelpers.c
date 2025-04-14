@@ -100,7 +100,7 @@ VkFence transferBufferFence = VK_NULL_HANDLE;
 
 VkResult InitActors(const Level *level)
 {
-	if (__builtin_expect(loadedActors == level->actors.length, true))
+	if (loadedActors == level->actors.length)
 	{
 		return VK_SUCCESS;
 	}
@@ -110,11 +110,10 @@ VkResult InitActors(const Level *level)
 	buffers.shadows.objectCount = 0;
 	memset(&buffers.wallActors, 0, sizeof(WallActorsBuffer));
 	memset(&buffers.modelActors, 0, sizeof(ModelActorsBuffer));
-	loadedActors = 0;
 	ListLock(level->actors);
-	for (size_t i = 0; i < level->actors.length; i++)
+	loadedActors = level->actors.length;
+	for (size_t i = 0; i < loadedActors; i++)
 	{
-		loadedActors++;
 		const Actor *actor = ListGet(level->actors, i);
 		if (!actor->actorModel)
 		{
@@ -132,9 +131,9 @@ VkResult InitActors(const Level *level)
 				ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
 				buffers.modelActors.vertices.bytesUsed += sizeof(ActorVertex) * actor->actorModel->vertexCount;
 				buffers.modelActors.indices.bytesUsed += sizeof(uint32_t) * actor->actorModel->indexCount;
-				buffers.modelActors.instanceData.bytesUsed += sizeof(ActorInstanceData);
 				buffers.modelActors.drawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
 			}
+			buffers.modelActors.instanceData.bytesUsed += sizeof(ActorInstanceData);
 			if (index < buffers.modelActors.modelCounts.length)
 			{
 				buffers.modelActors.modelCounts.data[index]++;
@@ -148,7 +147,6 @@ VkResult InitActors(const Level *level)
 			buffers.shadows.objectCount++;
 		}
 	}
-	ListUnlock(level->actors);
 	buffers.wallActors.vertices.bytesUsed = sizeof(ActorVertex) * 4 * buffers.wallActors.count;
 	buffers.wallActors.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.wallActors.count;
 	buffers.wallActors.instanceData.bytesUsed = sizeof(ActorInstanceData) * buffers.wallActors.count;
@@ -156,7 +154,9 @@ VkResult InitActors(const Level *level)
 
 	VulkanTestReturnResult(ResizeWallActorBuffers(), "Failed to resize wall actor buffers!");
 	VulkanTestReturnResult(ResizeModelActorBuffers(), "Failed to resize model actor buffers!");
-	LoadActorModels(level);
+	LoadModelActors(level);
+	LoadActorDrawInfo(level);
+	ListUnlock(level->actors);
 	return VK_SUCCESS;
 	// lunaWriteDataToBuffer();
 }
@@ -349,85 +349,6 @@ bool EndCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandPool command
 	return true;
 }
 
-// bool CreateBuffer(Buffer *buffer, const bool newAllocation)
-// {
-// 	uint32_t pQueueFamilyIndices[queueFamilyIndices.familyCount];
-// 	switch (queueFamilyIndices.familyCount)
-// 	{
-// 		case 1:
-// 			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
-// 			break;
-// 		case 2:
-// 			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
-// 			pQueueFamilyIndices[1] = queueFamilyIndices.families & QUEUE_FAMILY_TRANSFER
-// 											 ? queueFamilyIndices.transferFamily
-// 											 : queueFamilyIndices.presentFamily;
-// 			break;
-// 		case 3:
-// 			pQueueFamilyIndices[0] = queueFamilyIndices.graphicsFamily;
-// 			pQueueFamilyIndices[1] = queueFamilyIndices.presentFamily;
-// 			pQueueFamilyIndices[2] = queueFamilyIndices.transferFamily;
-// 			break;
-// 		default:
-// 			VulkanLogError("Failed to create VkSwapchainCreateInfoKHR due to invalid queueFamilyIndices!\n");
-// 			return false;
-// 	}
-//
-// 	const VkBufferCreateInfo bufferInfo = {
-// 		.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-// 		.pNext = NULL,
-// 		.flags = 0,
-// 		.size = buffer->size,
-// 		.usage = buffer->memoryAllocationInfo.usageFlags,
-// 		.sharingMode = queueFamilyIndices.families & QUEUE_FAMILY_PRESENTATION ? VK_SHARING_MODE_CONCURRENT
-// 																			   : VK_SHARING_MODE_EXCLUSIVE,
-// 		.queueFamilyIndexCount = queueFamilyIndices.familyCount,
-// 		.pQueueFamilyIndices = pQueueFamilyIndices,
-// 	};
-//
-// 	VulkanTest(vkCreateBuffer(device, &bufferInfo, NULL, &buffer->buffer), "Failed to create Vulkan buffer!");
-//
-// 	vkGetBufferMemoryRequirements(device, buffer->buffer, &buffer->memoryAllocationInfo.memoryRequirements);
-// 	const VkDeviceSize memorySize = buffer->memoryAllocationInfo.memoryRequirements.alignment *
-// 									(VkDeviceSize)
-// 											ceil((double)buffer->memoryAllocationInfo.memoryRequirements.size /
-// 												 (double)buffer->memoryAllocationInfo.memoryRequirements.alignment);
-//
-// 	buffer->memoryAllocationInfo.memoryInfo->size = memorySize;
-//
-// 	if (!newAllocation)
-// 	{
-// 		return true; // Allocation and binding will be handled elsewhere
-// 	}
-//
-// 	for (uint32_t i = 0; i < physicalDevice.memoryProperties.memoryTypeCount; i++)
-// 	{
-// 		if (buffer->memoryAllocationInfo.memoryRequirements.memoryTypeBits & 1 << i &&
-// 			(physicalDevice.memoryProperties.memoryTypes[i].propertyFlags &
-// 			 buffer->memoryAllocationInfo.memoryInfo->type) == buffer->memoryAllocationInfo.memoryInfo->type)
-// 		{
-// 			const VkMemoryAllocateInfo allocInfo = {
-// 				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-// 				.pNext = NULL,
-// 				.allocationSize = memorySize,
-// 				.memoryTypeIndex = i,
-// 			};
-//
-// 			VulkanTest(vkAllocateMemory(device, &allocInfo, NULL, &buffer->memoryAllocationInfo.memoryInfo->memory),
-// 					   "Failed to allocate Vulkan buffer memory!");
-//
-// 			VulkanTest(vkBindBufferMemory(device, buffer->buffer, buffer->memoryAllocationInfo.memoryInfo->memory, 0),
-// 					   "Failed to bind Vulkan buffer memory!");
-//
-// 			return true;
-// 		}
-// 	}
-//
-// 	VulkanLogError("Failed to find suitable memory type for buffer!\n");
-//
-// 	return false;
-// }
-
 bool CopyBuffer(const VkBuffer srcBuffer,
 				const VkBuffer dstBuffer,
 				const uint32_t regionCount,
@@ -614,27 +535,12 @@ void LoadWalls(const Level *level)
 	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed);
 }
 
-void LoadActorModels(const Level *level)
+void LoadModelActors(const Level *level)
 {
 	size_t vertexOffset = 0;
 	size_t indexOffset = 0;
 	ListClear(&buffers.modelActors.loadedModelIds);
 	ListLock(level->actors);
-	if (__builtin_expect(level->actors.length < loadedActors, false))
-	{
-		loadedActors = level->actors.length;
-	}
-	// // TODO: For this to be used the list must not be cleared at the start of this function
-	// for (size_t i = 0; i < buffers.modelActors.loadedModelIds.length; i++)
-	// {
-	// 	const Actor *actor = ListGet(level->actors, i);
-	// 	const size_t vertexSize = sizeof(ActorVertex) * actor->actorModel->vertexCount;
-	// 	const size_t indexSize = sizeof(uint32_t) * actor->actorModel->indexCount;
-	// 	memcpy(&buffers.modelActors.vertices.data[vertexOffset], actor->actorModel->vertexData, vertexSize);
-	// 	memcpy(&buffers.modelActors.indices.data[vertexOffset], actor->actorModel->indexData, indexSize);
-	// 	vertexOffset += vertexSize;
-	// 	indexOffset += indexSize;
-	// }
 	for (size_t i = 0; i < loadedActors; i++)
 	{
 		const Actor *actor = ListGet(level->actors, i);
@@ -642,8 +548,6 @@ void LoadActorModels(const Level *level)
 		{
 			continue;
 		}
-		// TODO: This list find could be replaced by looping through the list. This wouldn't be too hard,
-		//  but I don't want to do this before I can test just the Luna integration code. See implementation above
 		if (ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id) == -1)
 		{
 			ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
@@ -664,14 +568,14 @@ void LoadActorModels(const Level *level)
 						  buffers.modelActors.indices.bytesUsed);
 }
 
-void LoadActorWalls(const Level *level)
+VkResult LoadWallActors(const Level *level)
 {
 	ActorVertex *vertices = buffers.wallActors.vertices.data;
 	uint32_t *indices = buffers.wallActors.indices.data;
 	ListLock(level->actors);
-	if (__builtin_expect(level->actors.length < loadedActors, false))
+	if (__builtin_expect(loadedActors != level->actors.length, false))
 	{
-		loadedActors = level->actors.length;
+		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
 	}
 	for (size_t wallCount = 0; wallCount < loadedActors; wallCount++)
 	{
@@ -729,9 +633,11 @@ void LoadActorWalls(const Level *level)
 	lunaWriteDataToBuffer(buffers.wallActors.indices.buffer,
 						  buffers.wallActors.indices.data,
 						  buffers.wallActors.indices.bytesUsed);
+
+	return VK_SUCCESS;
 }
 
-void UpdateActorData(const Level *level)
+VkResult UpdateActorData(const Level *level)
 {
 	uint32_t wallCount = 0;
 	uint32_t shadowCount = 0;
@@ -745,9 +651,9 @@ void UpdateActorData(const Level *level)
 					 (size_t)ListGet(buffers.modelActors.modelCounts, i - 1) * sizeof(ActorInstanceData);
 	}
 	ListLock(level->actors);
-	if (__builtin_expect(level->actors.length < loadedActors, false)) // How would this be possible?
+	if (__builtin_expect(loadedActors != level->actors.length, false))
 	{
-		loadedActors = level->actors.length;
+		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
 	}
 	ActorInstanceData *wallActorInstanceData = buffers.wallActors.instanceData.data;
 	for (size_t i = 0; i < loadedActors; i++)
@@ -816,6 +722,8 @@ void UpdateActorData(const Level *level)
 	lunaWriteDataToBuffer(buffers.modelActors.instanceData.buffer,
 						  buffers.modelActors.instanceData.data,
 						  buffers.modelActors.instanceData.bytesUsed);
+
+	return VK_SUCCESS;
 }
 
 // TODO: This was being called every frame but I don't think it needs to be
@@ -833,10 +741,6 @@ void LoadActorDrawInfo(const Level *level)
 		modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
 	}
 	ListLock(level->actors);
-	if (__builtin_expect(level->actors.length < loadedActors, false))
-	{
-		loadedActors = level->actors.length;
-	}
 	for (size_t i = 0; i < loadedActors; i++)
 	{
 		const Actor *actor = ListGet(level->actors, i);

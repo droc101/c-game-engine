@@ -320,6 +320,7 @@ VkResult ResizeWallActorBuffers()
 		void *newInstanceData = realloc(buffers.wallActors.instanceData.data,
 										buffers.wallActors.instanceData.allocatedSize);
 		CheckAlloc(newInstanceData);
+		memset(newInstanceData, 0, buffers.wallActors.instanceData.allocatedSize);
 		buffers.wallActors.instanceData.data = newInstanceData;
 	}
 	if (buffers.wallActors.drawInfo.allocatedSize < buffers.wallActors.drawInfo.bytesUsed)
@@ -337,6 +338,7 @@ VkResult ResizeWallActorBuffers()
 							   "Failed to recreate wall actors draw info buffer!");
 		void *newDrawInfo = realloc(buffers.wallActors.drawInfo.data, buffers.wallActors.drawInfo.allocatedSize);
 		CheckAlloc(newDrawInfo);
+		memset(newDrawInfo, 0, buffers.wallActors.drawInfo.allocatedSize);
 		buffers.wallActors.drawInfo.data = newDrawInfo;
 	}
 
@@ -395,6 +397,7 @@ VkResult ResizeModelActorBuffers()
 		void *newInstanceData = realloc(buffers.modelActors.instanceData.data,
 										buffers.modelActors.instanceData.allocatedSize);
 		CheckAlloc(newInstanceData);
+		memset(newInstanceData, 0, buffers.modelActors.instanceData.allocatedSize);
 		buffers.modelActors.instanceData.data = newInstanceData;
 	}
 	if (buffers.modelActors.drawInfo.allocatedSize < buffers.modelActors.drawInfo.bytesUsed)
@@ -412,6 +415,7 @@ VkResult ResizeModelActorBuffers()
 							   "Failed to recreate model actors draw info buffer!");
 		void *newDrawInfo = realloc(buffers.modelActors.drawInfo.data, buffers.modelActors.drawInfo.allocatedSize);
 		CheckAlloc(newDrawInfo);
+		memset(newDrawInfo, 0, buffers.modelActors.drawInfo.allocatedSize);
 		buffers.modelActors.drawInfo.data = newDrawInfo;
 	}
 
