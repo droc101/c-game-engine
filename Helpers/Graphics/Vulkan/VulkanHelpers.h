@@ -426,11 +426,11 @@ void LoadRoof(bool hasCeiling);
 
 void LoadWalls(const Level *level);
 
-void LoadActorModels(const Level *level);
+void LoadModelActors(const Level *level);
 
-void LoadActorWalls(const Level *level);
+VkResult LoadWallActors(const Level *level);
 
-void UpdateActorData(const Level *level);
+VkResult UpdateActorData(const Level *level);
 
 void LoadActorDrawInfo(const Level *level);
 

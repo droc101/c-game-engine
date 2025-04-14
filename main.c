@@ -304,13 +304,13 @@ int main(const int argc, char *argv[])
 
 		ResetDPrintYPos();
 
-		// SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
-		// // warp the mouse to the center of the screen if we are in the main game state
-		// if (state->currentState == MAIN_STATE)
-		// {
-		// 	const Vector2 realWndSize = ActualWindowSize();
-		// 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
-		// }
+		SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
+		// warp the mouse to the center of the screen if we are in the main game state
+		if (state->currentState == MAIN_STATE)
+		{
+			const Vector2 realWndSize = ActualWindowSize();
+			SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
+		}
 
 		if (state->UpdateGame)
 		{

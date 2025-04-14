@@ -264,9 +264,9 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 	pushConstants.yaw = camera->yaw + 1.5f * PIf;
 	UpdateTranslationMatrix(camera);
 
-	LoadActorWalls(loadedLevel);
-	LoadActorDrawInfo(loadedLevel);
-	UpdateActorData(loadedLevel);
+	VulkanTestReturnResult(LoadWallActors(loadedLevel), "Failed to load wall actors!");
+	// LoadActorDrawInfo(loadedLevel);
+	VulkanTestReturnResult(UpdateActorData(loadedLevel), "Failed to update actor data!");
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
 
@@ -293,22 +293,22 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 													 0),
 							   "Failed to draw floor!");
 	}
-	if (buffers.shadows.objectCount)
-	{
-		// 0x53484457 is "SHDW", to encode that we are drawing the shadows
-		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
-													 buffers.shadows.indices.buffer,
-													 0,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.walls,
-													 (LunaGraphicsPipelineBindInfo[]){0},
-													 buffers.shadows.objectCount * 6,
-													 1,
-													 0,
-													 0,
-													 0x53484457),
-							   "Failed to draw shadows!");
-	}
+	// if (buffers.shadows.objectCount)
+	// {
+	// 	// 0x53484457 is "SHDW", to encode that we are drawing the shadows
+	// 	VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
+	// 												 buffers.shadows.indices.buffer,
+	// 												 0,
+	// 												 VK_INDEX_TYPE_UINT32,
+	// 												 pipelines.walls,
+	// 												 (LunaGraphicsPipelineBindInfo[]){0},
+	// 												 buffers.shadows.objectCount * 6,
+	// 												 1,
+	// 												 0,
+	// 												 0,
+	// 												 0x53484457),
+	// 						   "Failed to draw shadows!");
+	// }
 	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
 	{
 		// 0x57414C4C is "WALL", to encode that we are drawing the walls
