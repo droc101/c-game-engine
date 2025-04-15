@@ -155,6 +155,8 @@ VkResult InitActors(const Level *level)
 			buffers.shadows.objectCount++;
 		}
 	}
+	buffers.shadows.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.shadows.objectCount;
+	buffers.shadows.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.shadows.objectCount;
 	buffers.wallActors.vertices.bytesUsed = sizeof(ActorVertex) * 4 * buffers.wallActors.count;
 	buffers.wallActors.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.wallActors.count;
 	buffers.wallActors.instanceData.bytesUsed = sizeof(ActorInstanceData) * buffers.wallActors.count;
@@ -166,7 +168,6 @@ VkResult InitActors(const Level *level)
 	LoadActorDrawInfo(level);
 	ListUnlock(level->actors);
 	return VK_SUCCESS;
-	// lunaWriteDataToBuffer();
 }
 
 bool CreateImageView(VkImageView *imageView,
@@ -645,7 +646,7 @@ VkResult LoadWallActors(const Level *level)
 	return VK_SUCCESS;
 }
 
-VkResult UpdateActorData(const Level *level)
+VkResult UpdateActorInstanceDataAndShadows(const Level *level)
 {
 	uint32_t wallCount = 0;
 	uint32_t shadowCount = 0;
@@ -664,6 +665,8 @@ VkResult UpdateActorData(const Level *level)
 		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
 	}
 	ActorInstanceData *wallActorInstanceData = buffers.wallActors.instanceData.data;
+	ShadowVertex *shadowVertices = buffers.shadows.vertices.data;
+	uint32_t *shadowIndices = buffers.shadows.indices.data;
 	for (size_t i = 0; i < loadedActors; i++)
 	{
 		const Actor *actor = ListGet(level->actors, i);
@@ -691,33 +694,33 @@ VkResult UpdateActorData(const Level *level)
 
 			wallCount++;
 		}
-		// if (actor->showShadow)
-		// {
-		// 	shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
-		// 	shadowVertices[4 * shadowCount].y = -0.49f;
-		// 	shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
-		//
-		// 	shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
-		// 	shadowVertices[4 * shadowCount + 1].y = -0.49f;
-		// 	shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
-		//
-		// 	shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
-		// 	shadowVertices[4 * shadowCount + 2].y = -0.49f;
-		// 	shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
-		//
-		// 	shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
-		// 	shadowVertices[4 * shadowCount + 3].y = -0.49f;
-		// 	shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
-		//
-		// 	shadowIndices[6 * shadowCount] = shadowCount * 4;
-		// 	shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
-		// 	shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
-		// 	shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
-		// 	shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
-		// 	shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
-		//
-		// 	shadowCount++;
-		// }
+		if (actor->showShadow)
+		{
+			shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
+			shadowVertices[4 * shadowCount].y = -0.49f;
+			shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
+
+			shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
+			shadowVertices[4 * shadowCount + 1].y = -0.49f;
+			shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
+
+			shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
+			shadowVertices[4 * shadowCount + 2].y = -0.49f;
+			shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
+
+			shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
+			shadowVertices[4 * shadowCount + 3].y = -0.49f;
+			shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
+
+			shadowIndices[6 * shadowCount] = shadowCount * 4;
+			shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
+			shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
+			shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
+			shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
+			shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
+
+			shadowCount++;
+		}
 	}
 	ListUnlock(level->actors);
 	free(modelCounts);
@@ -728,6 +731,12 @@ VkResult UpdateActorData(const Level *level)
 	lunaWriteDataToBuffer(buffers.modelActors.instanceData.buffer,
 						  buffers.modelActors.instanceData.data,
 						  buffers.modelActors.instanceData.bytesUsed);
+	lunaWriteDataToBuffer(buffers.shadows.vertices.buffer,
+						  buffers.shadows.vertices.data,
+						  buffers.shadows.vertices.bytesUsed);
+	lunaWriteDataToBuffer(buffers.shadows.indices.buffer,
+						  buffers.shadows.indices.data,
+						  buffers.shadows.indices.bytesUsed);
 
 	return VK_SUCCESS;
 }
