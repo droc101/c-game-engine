@@ -57,9 +57,7 @@ bool CreateSurface()
 bool CreateLogicalDevice()
 {
 	const VkPhysicalDeviceFeatures vulkan10Features = {
-		.logicOp = VK_TRUE,
 		.multiDrawIndirect = VK_TRUE,
-		.samplerAnisotropy = VK_TRUE,
 		.drawIndirectFirstInstance = VK_TRUE,
 	};
 	VkPhysicalDeviceVulkan12Features vulkan12Features = {
@@ -306,7 +304,6 @@ bool CreateGraphicsPipelines()
 	};
 	const VkPipelineColorBlendStateCreateInfo colorBlending = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-		.logicOp = VK_LOGIC_OP_COPY,
 		.attachmentCount = 1,
 		.pAttachments = &colorBlendAttachment,
 	};

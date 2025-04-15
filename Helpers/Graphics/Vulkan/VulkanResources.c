@@ -283,9 +283,8 @@ VkResult ResizeWallActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.vertices.buffer),
 							   "Failed to recreate wall actors vertex buffer!");
-		void *newVertices = realloc(buffers.wallActors.vertices.data, buffers.wallActors.vertices.allocatedSize);
-		CheckAlloc(newVertices);
-		buffers.wallActors.vertices.data = newVertices;
+		buffers.wallActors.vertices.data = malloc(buffers.wallActors.vertices.allocatedSize);
+		CheckAlloc(buffers.wallActors.vertices.data);
 	}
 	if (buffers.wallActors.indices.allocatedSize < buffers.wallActors.indices.bytesUsed)
 	{
@@ -300,9 +299,8 @@ VkResult ResizeWallActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.indices.buffer),
 							   "Failed to recreate wall actors index buffer!");
-		void *newIndices = realloc(buffers.wallActors.indices.data, buffers.wallActors.indices.allocatedSize);
-		CheckAlloc(newIndices);
-		buffers.wallActors.indices.data = newIndices;
+		buffers.wallActors.indices.data = malloc(buffers.wallActors.indices.allocatedSize);
+		CheckAlloc(buffers.wallActors.indices.data);
 	}
 	if (buffers.wallActors.instanceData.allocatedSize < buffers.wallActors.instanceData.bytesUsed)
 	{
@@ -317,11 +315,8 @@ VkResult ResizeWallActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.instanceData.buffer),
 							   "Failed to recreate wall actors instance data buffer!");
-		void *newInstanceData = realloc(buffers.wallActors.instanceData.data,
-										buffers.wallActors.instanceData.allocatedSize);
-		CheckAlloc(newInstanceData);
-		memset(newInstanceData, 0, buffers.wallActors.instanceData.allocatedSize);
-		buffers.wallActors.instanceData.data = newInstanceData;
+		buffers.wallActors.instanceData.data = calloc(1, buffers.wallActors.instanceData.allocatedSize);
+		CheckAlloc(buffers.wallActors.instanceData.data);
 	}
 	if (buffers.wallActors.drawInfo.allocatedSize < buffers.wallActors.drawInfo.bytesUsed)
 	{
@@ -336,10 +331,8 @@ VkResult ResizeWallActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.wallActors.drawInfo.buffer),
 							   "Failed to recreate wall actors draw info buffer!");
-		void *newDrawInfo = realloc(buffers.wallActors.drawInfo.data, buffers.wallActors.drawInfo.allocatedSize);
-		CheckAlloc(newDrawInfo);
-		memset(newDrawInfo, 0, buffers.wallActors.drawInfo.allocatedSize);
-		buffers.wallActors.drawInfo.data = newDrawInfo;
+		buffers.wallActors.drawInfo.data = calloc(1, buffers.wallActors.drawInfo.allocatedSize);
+		CheckAlloc(buffers.wallActors.drawInfo.data);
 	}
 
 	return VK_SUCCESS;
@@ -360,9 +353,8 @@ VkResult ResizeModelActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.vertices.buffer),
 							   "Failed to recreate model actors vertex buffer!");
-		void *newVertices = realloc(buffers.modelActors.vertices.data, buffers.modelActors.vertices.allocatedSize);
-		CheckAlloc(newVertices);
-		buffers.modelActors.vertices.data = newVertices;
+		buffers.modelActors.vertices.data = malloc(buffers.modelActors.vertices.allocatedSize);
+		CheckAlloc(buffers.modelActors.vertices.data);
 	}
 	if (buffers.modelActors.indices.allocatedSize < buffers.modelActors.indices.bytesUsed)
 	{
@@ -377,9 +369,8 @@ VkResult ResizeModelActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.indices.buffer),
 							   "Failed to recreate model actors index buffer!");
-		void *newIndices = realloc(buffers.modelActors.indices.data, buffers.modelActors.indices.allocatedSize);
-		CheckAlloc(newIndices);
-		buffers.modelActors.indices.data = newIndices;
+		buffers.modelActors.indices.data = malloc(buffers.modelActors.indices.allocatedSize);
+		CheckAlloc(buffers.modelActors.indices.data);
 	}
 	if (buffers.modelActors.instanceData.allocatedSize < buffers.modelActors.instanceData.bytesUsed)
 	{
@@ -394,11 +385,8 @@ VkResult ResizeModelActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.instanceData.buffer),
 							   "Failed to recreate model actors instance data buffer!");
-		void *newInstanceData = realloc(buffers.modelActors.instanceData.data,
-										buffers.modelActors.instanceData.allocatedSize);
-		CheckAlloc(newInstanceData);
-		memset(newInstanceData, 0, buffers.modelActors.instanceData.allocatedSize);
-		buffers.modelActors.instanceData.data = newInstanceData;
+		buffers.modelActors.instanceData.data = calloc(1, buffers.modelActors.instanceData.allocatedSize);
+		CheckAlloc(buffers.modelActors.instanceData.data);
 	}
 	if (buffers.modelActors.drawInfo.allocatedSize < buffers.modelActors.drawInfo.bytesUsed)
 	{
@@ -413,10 +401,8 @@ VkResult ResizeModelActorBuffers()
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.modelActors.drawInfo.buffer),
 							   "Failed to recreate model actors draw info buffer!");
-		void *newDrawInfo = realloc(buffers.modelActors.drawInfo.data, buffers.modelActors.drawInfo.allocatedSize);
-		CheckAlloc(newDrawInfo);
-		memset(newDrawInfo, 0, buffers.modelActors.drawInfo.allocatedSize);
-		buffers.modelActors.drawInfo.data = newDrawInfo;
+		buffers.modelActors.drawInfo.data = calloc(1, buffers.modelActors.drawInfo.allocatedSize);
+		CheckAlloc(buffers.modelActors.drawInfo.data);
 	}
 
 	return VK_SUCCESS;
@@ -428,7 +414,7 @@ bool LoadTexture(const Image *image)
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.mipmapLevels = GetState()->options.mipmaps && false ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.mipmapLevels = GetState()->options.mipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.pixels = image->pixelData,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

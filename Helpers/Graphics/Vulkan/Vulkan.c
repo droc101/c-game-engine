@@ -390,6 +390,22 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 bool VK_Cleanup()
 {
 	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
+	free(buffers.ui.vertices.data);
+	free(buffers.ui.indices.data);
+	free(buffers.roof.vertices.data);
+	free(buffers.roof.indices.data);
+	free(buffers.walls.vertices.data);
+	free(buffers.walls.indices.data);
+	free(buffers.shadows.vertices.data);
+	free(buffers.shadows.indices.data);
+	free(buffers.wallActors.vertices.data);
+	free(buffers.wallActors.indices.data);
+	free(buffers.wallActors.instanceData.data);
+	free(buffers.wallActors.drawInfo.data);
+	free(buffers.modelActors.vertices.data);
+	free(buffers.modelActors.indices.data);
+	free(buffers.modelActors.instanceData.data);
+	free(buffers.modelActors.drawInfo.data);
 
 	return true;
 }
@@ -427,7 +443,7 @@ bool VK_LoadLevelWalls(const Level *level)
 	pushConstants.fogEnd = (float)level->fogEnd;
 	pushConstants.fogColor = level->fogColor;
 
-	LoadRoof(level->hasCeiling);
+	LoadRoof(level->hasCeiling, TextureIndex(level->ceilOrSkyTex));
 
 	buffers.walls.objectCount = level->walls.length + 1;
 	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.walls.objectCount;

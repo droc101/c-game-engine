@@ -422,7 +422,7 @@ uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
 
-void LoadRoof(bool hasCeiling);
+void LoadRoof(bool hasCeiling, uint32_t ceilingTextureIndex);
 
 void LoadWalls(const Level *level);
 
