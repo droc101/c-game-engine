@@ -430,7 +430,7 @@ void LoadModelActors(const Level *level);
 
 VkResult LoadWallActors(const Level *level);
 
-VkResult UpdateActorData(const Level *level);
+VkResult UpdateActorInstanceDataAndShadows(const Level *level);
 
 void LoadActorDrawInfo(const Level *level);
 
