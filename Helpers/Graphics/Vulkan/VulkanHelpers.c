@@ -108,6 +108,14 @@ VkResult InitActors(const Level *level)
 	ListClear(&buffers.modelActors.loadedModelIds);
 	ListClear(&buffers.modelActors.modelCounts);
 	buffers.shadows.objectCount = 0;
+	free(buffers.wallActors.vertices.data);
+	free(buffers.wallActors.indices.data);
+	free(buffers.wallActors.instanceData.data);
+	free(buffers.wallActors.drawInfo.data);
+	free(buffers.modelActors.vertices.data);
+	free(buffers.modelActors.indices.data);
+	free(buffers.modelActors.instanceData.data);
+	free(buffers.modelActors.drawInfo.data);
 	memset(&buffers.wallActors, 0, sizeof(WallActorsBuffer));
 	memset(&buffers.modelActors, 0, sizeof(ModelActorsBuffer));
 	ListLock(level->actors);
@@ -389,7 +397,7 @@ inline uint32_t ImageIndex(const Image *image)
 	return index;
 }
 
-void LoadRoof(const bool hasCeiling)
+void LoadRoof(const bool hasCeiling, const uint32_t ceilingTextureIndex)
 {
 	WallVertex *vertices = buffers.roof.vertices.data;
 	uint32_t *indices = buffers.roof.indices.data;
@@ -400,28 +408,28 @@ void LoadRoof(const bool hasCeiling)
 		vertices[0].z = -100;
 		vertices[0].u = -100;
 		vertices[0].v = -100;
-		vertices[0].textureIndex = pushConstants.skyTextureIndex;
+		vertices[0].textureIndex = ceilingTextureIndex;
 
 		vertices[1].x = 100;
 		vertices[1].y = 0.5f;
 		vertices[1].z = -100;
 		vertices[1].u = 100;
 		vertices[1].v = -100;
-		vertices[1].textureIndex = pushConstants.skyTextureIndex;
+		vertices[1].textureIndex = ceilingTextureIndex;
 
 		vertices[2].x = 100;
 		vertices[2].y = 0.5f;
 		vertices[2].z = 100;
 		vertices[2].u = 100;
 		vertices[2].v = 100;
-		vertices[2].textureIndex = pushConstants.skyTextureIndex;
+		vertices[2].textureIndex = ceilingTextureIndex;
 
 		vertices[3].x = -100;
 		vertices[3].y = 0.5f;
 		vertices[3].z = 100;
 		vertices[3].u = -100;
 		vertices[3].v = 100;
-		vertices[3].textureIndex = pushConstants.skyTextureIndex;
+		vertices[3].textureIndex = ceilingTextureIndex;
 
 		indices[0] = 0;
 		indices[1] = 1;
@@ -570,13 +578,13 @@ void LoadModelActors(const Level *level)
 
 VkResult LoadWallActors(const Level *level)
 {
-	ActorVertex *vertices = buffers.wallActors.vertices.data;
-	uint32_t *indices = buffers.wallActors.indices.data;
-	ListLock(level->actors);
 	if (__builtin_expect(loadedActors != level->actors.length, false))
 	{
 		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
 	}
+	ActorVertex *vertices = buffers.wallActors.vertices.data;
+	uint32_t *indices = buffers.wallActors.indices.data;
+	ListLock(level->actors);
 	for (size_t wallCount = 0; wallCount < loadedActors; wallCount++)
 	{
 		const Actor *actor = ListGet(level->actors, wallCount);
@@ -668,8 +676,6 @@ VkResult UpdateActorData(const Level *level)
 		{
 			mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
 			ActorTransformMatrix(actor, &transformMatrix);
-			// TODO: This list find could be replaced by looping through the list. This wouldn't be too hard,
-			//  but I don't want to do this before I can test just the Luna integration code
 			const size_t index = ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
 			ActorInstanceData *offsetInstanceData = buffers.modelActors.instanceData.data + offsets[index];
 			memcpy(offsetInstanceData[modelCounts[index]].transform, transformMatrix, sizeof(mat4));
@@ -726,7 +732,6 @@ VkResult UpdateActorData(const Level *level)
 	return VK_SUCCESS;
 }
 
-// TODO: This was being called every frame but I don't think it needs to be
 void LoadActorDrawInfo(const Level *level)
 {
 	VkDrawIndexedIndirectCommand *modelActorsDrawInfo = buffers.modelActors.drawInfo.data;
@@ -766,115 +771,6 @@ void LoadActorDrawInfo(const Level *level)
 						  buffers.modelActors.drawInfo.data,
 						  buffers.modelActors.drawInfo.bytesUsed);
 }
-
-// VkResult CopyBuffers(const Level *level)
-// {
-// 	if (buffers.modelActors.loadedModelIds.length ||
-// 		(buffers.wallActors.vertexStagingSize && buffers.wallActors.indexStagingSize))
-// 	{
-// 		ActorVertex *actorVertices = calloc(1, buffers.wallActors.vertexStagingSize);
-// 		CheckAlloc(actorVertices);
-// 		uint32_t *actorIndices = calloc(1, buffers.wallActors.indexStagingSize);
-// 		CheckAlloc(actorIndices);
-// 		LoadActorWalls(level, actorVertices, actorIndices);
-// 		memcpy(buffers.wallActors.vertexStaging, actorVertices, buffers.wallActors.vertexStagingSize);
-// 		memcpy(buffers.wallActors.indexStaging, actorIndices, buffers.wallActors.indexStagingSize);
-// 		free(actorVertices);
-// 		free(actorIndices);
-//
-// 		ActorInstanceData *actorInstanceData = calloc(1, buffers.actors.instanceDataStagingSize);
-// 		CheckAlloc(actorInstanceData);
-// 		ShadowVertex *shadowVertices = calloc(buffers.walls.shadowCount * 4, sizeof(ShadowVertex));
-// 		CheckAlloc(shadowVertices);
-// 		uint32_t *shadowIndices = calloc(buffers.walls.shadowCount * 6, sizeof(uint32_t));
-// 		CheckAlloc(shadowIndices);
-// 		LoadActorInstanceData(level, actorInstanceData, shadowVertices, shadowIndices);
-// 		memcpy(buffers.actors.instanceDataStaging, actorInstanceData, buffers.actors.instanceDataStagingSize);
-// 		memcpy(buffers.walls.shadowVertexStaging, shadowVertices, sizeof(ShadowVertex) * buffers.walls.shadowCount * 4);
-// 		memcpy(buffers.walls.shadowIndexStaging, shadowIndices, sizeof(uint32_t) * buffers.walls.shadowCount * 6);
-// 		free(actorInstanceData);
-// 		free(shadowVertices);
-// 		free(shadowIndices);
-//
-// 		VkDrawIndexedIndirectCommand *actorDrawInfo = calloc(1, buffers.actors.drawInfoStagingSize);
-// 		CheckAlloc(actorDrawInfo);
-// 		LoadActorDrawInfo(level, actorDrawInfo);
-// 		memcpy(buffers.actors.drawInfoStaging, actorDrawInfo, buffers.actors.drawInfoStagingSize);
-// 		free(actorDrawInfo);
-// 	}
-//
-// 	// TODO: The transfer command buffer should be left open and multiple commands should be submitted, that way it can
-// 	//  be handled according to if it should be or not. That will allow this function to be broken into multiple more
-// 	//  manageable functions, and if submission is done from multiple threads it could increase performance as well.
-// 	if (buffers.ui.quadCount > 0 ||
-// 		buffers.walls.shadowCount ||
-// 		(buffers.modelActors.loadedModelIds.length || (buffers.wallActors.vertexSize && buffers.wallActors.indexSize)))
-// 	{
-// 		if (buffers.walls.shadowCount)
-// 		{
-// 			vkCmdCopyBuffer(transferCommandBuffer,
-// 							buffers.walls.stagingBufferInfo->buffer,
-// 							buffers.walls.bufferInfo->buffer,
-// 							1,
-// 							(VkBufferCopy[]){
-// 								{
-// 									.srcOffset = buffers.walls.shadowStagingOffset,
-// 									.dstOffset = buffers.walls.shadowOffset,
-// 									.size = buffers.walls.shadowStagingSize,
-// 								},
-// 							});
-// 		}
-// 		if (buffers.wallActors.vertexSize && buffers.wallActors.indexSize)
-// 		{
-// 			vkCmdCopyBuffer(transferCommandBuffer,
-// 							buffers.actors.stagingBufferInfo->buffer,
-// 							buffers.actors.bufferInfo->buffer,
-// 							4,
-// 							(VkBufferCopy[]){
-// 								{
-// 									.srcOffset = buffers.wallActors.vertexStagingOffset,
-// 									.dstOffset = buffers.wallActors.vertexOffset,
-// 									.size = buffers.wallActors.vertexStagingSize,
-// 								},
-// 								{
-// 									.srcOffset = buffers.wallActors.indexStagingOffset,
-// 									.dstOffset = buffers.wallActors.indexOffset,
-// 									.size = buffers.wallActors.indexStagingSize,
-// 								},
-// 								{
-// 									.srcOffset = buffers.actors.instanceDataStagingOffset,
-// 									.dstOffset = buffers.actors.instanceDataOffset,
-// 									.size = buffers.actors.instanceDataStagingSize,
-// 								},
-// 								{
-// 									.srcOffset = buffers.actors.drawInfoStagingOffset,
-// 									.dstOffset = buffers.actors.drawInfoOffset,
-// 									.size = buffers.actors.drawInfoStagingSize,
-// 								},
-// 							});
-// 		} else if (buffers.modelActors.loadedModelIds.length)
-// 		{
-// 			vkCmdCopyBuffer(transferCommandBuffer,
-// 							buffers.actors.stagingBufferInfo->buffer,
-// 							buffers.actors.bufferInfo->buffer,
-// 							2,
-// 							(VkBufferCopy[]){
-// 								{
-// 									.srcOffset = buffers.actors.instanceDataStagingOffset,
-// 									.dstOffset = buffers.actors.instanceDataOffset,
-// 									.size = buffers.actors.instanceDataStagingSize,
-// 								},
-// 								{
-// 									.srcOffset = buffers.actors.drawInfoStagingOffset,
-// 									.dstOffset = buffers.actors.drawInfoOffset,
-// 									.size = buffers.actors.drawInfoStagingSize,
-// 								},
-// 							});
-// 		}
-// 	}
-//
-// 	return VK_SUCCESS;
-// }
 
 void UpdateTranslationMatrix(const Camera *camera)
 {
