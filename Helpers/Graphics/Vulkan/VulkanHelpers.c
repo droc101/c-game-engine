@@ -162,6 +162,7 @@ VkResult InitActors(const Level *level)
 	buffers.wallActors.instanceData.bytesUsed = sizeof(ActorInstanceData) * buffers.wallActors.count;
 	buffers.wallActors.drawInfo.bytesUsed = sizeof(VkDrawIndexedIndirectCommand) * buffers.wallActors.count;
 
+	VulkanTestReturnResult(ResizeShadowBuffers(), "Failed to resize shadow buffers!");
 	VulkanTestReturnResult(ResizeWallActorBuffers(), "Failed to resize wall actor buffers!");
 	VulkanTestReturnResult(ResizeModelActorBuffers(), "Failed to resize model actor buffers!");
 	LoadModelActors(level);
