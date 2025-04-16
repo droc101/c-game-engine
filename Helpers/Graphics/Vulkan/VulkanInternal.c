@@ -627,10 +627,7 @@ bool CreateTextureSamplers()
 		.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
 		.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
 		.mipLodBias = -1.5f,
-		.maxAnisotropy = 1,
-		.compareOp = VK_COMPARE_OP_ALWAYS,
 		.maxLod = VK_LOD_CLAMP_NONE,
-		.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
 	};
 	const LunaSamplerCreationInfo nearestRepeatSamplerCreateInfo = {
 		.magFilter = VK_FILTER_NEAREST,
@@ -640,10 +637,7 @@ bool CreateTextureSamplers()
 		.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
 		.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
 		.mipLodBias = -1.5f,
-		.maxAnisotropy = 1,
-		.compareOp = VK_COMPARE_OP_ALWAYS,
 		.maxLod = VK_LOD_CLAMP_NONE,
-		.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
 	};
 	const LunaSamplerCreationInfo linearNoRepeatSamplerCreateInfo = {
 		.magFilter = VK_FILTER_LINEAR,
@@ -653,10 +647,7 @@ bool CreateTextureSamplers()
 		.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.mipLodBias = -1.5f,
-		.maxAnisotropy = 1,
-		.compareOp = VK_COMPARE_OP_ALWAYS,
 		.maxLod = VK_LOD_CLAMP_NONE,
-		.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
 	};
 	const LunaSamplerCreationInfo nearestNoRepeatSamplerCreateInfo = {
 		.magFilter = VK_FILTER_NEAREST,
@@ -666,10 +657,7 @@ bool CreateTextureSamplers()
 		.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.mipLodBias = -1.5f,
-		.maxAnisotropy = 1,
-		.compareOp = VK_COMPARE_OP_ALWAYS,
 		.maxLod = VK_LOD_CLAMP_NONE,
-		.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
 	};
 
 	VulkanTest(lunaCreateSampler(&linearRepeatSamplerCreateInfo, &textureSamplers.linearRepeat),
