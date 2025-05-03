@@ -392,31 +392,7 @@ extern VkFence transferBufferFence;
 #pragma region helperFunctions
 VkResult InitActors(const Level *level);
 
-bool CreateImageView(VkImageView *imageView,
-					 VkImage image,
-					 VkFormat format,
-					 VkImageAspectFlagBits aspectMask,
-					 uint8_t mipmapLevels,
-					 const char *errorMessage);
-
 VkResult CreateShaderModule(const char *path, VkShaderModule *shaderModule);
-
-bool CreateImage(VkImage *image,
-				 VkDeviceMemory *imageMemory,
-				 VkFormat format,
-				 VkExtent3D extent,
-				 uint8_t mipmapLevels,
-				 VkSampleCountFlags samples,
-				 VkImageUsageFlags usageFlags,
-				 const char *imageType);
-
-bool BeginCommandBuffer(const VkCommandBuffer *commandBuffer, VkCommandPool commandPool);
-
-bool EndCommandBuffer(VkCommandBuffer commandBuffer, VkCommandPool commandPool, VkQueue queue);
-
-// bool CreateBuffer(Buffer *buffer, bool newAllocation);
-
-bool CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferCopy *regions);
 
 uint32_t TextureIndex(const char *texture);
 
