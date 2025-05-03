@@ -9,7 +9,7 @@ if (WIN32)
     endif ()
 
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/module")
-endif()
+endif ()
 
 #region Compile options
 
@@ -25,7 +25,7 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffun
 if (WIN32)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --static")
     set(CMAKE_AUTO_RCC ON)
-else()
+else ()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -rdynamic")
 endif ()
 
@@ -180,36 +180,19 @@ set(SDL2_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2/x86_64-w64-mingw32")
 set(SDL2_MIXER_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/x86_64-w64-mingw32")
 set(ZLIB_ROOT "${CMAKE_SOURCE_DIR}/lib/zlib")
 
-find_package(SDL2 REQUIRED) # Platform abstraction
-include_directories(${SDL2_INCLUDE_DIR})
-
-find_package(SDL2_mixer REQUIRED) # Audio
-include_directories(${SDL2_MIXER_INCLUDE_DIR})
-
+find_package(SDL2 CONFIG REQUIRED) # Platform abstraction
+find_package(SDL2_mixer CONFIG REQUIRED) # Audio
 find_package(ZLIB REQUIRED) # Decompression
-include_directories(${ZLIB_INCLUDE_DIRS})
-
 find_package(OpenGL REQUIRED) # Graphics
-include_directories(${OPENGL_INCLUDE_DIR})
-
 find_package(Vulkan REQUIRED) # 3d
-include_directories(${Vulkan_INCLUDE_DIRS})
-
-include_directories("${CMAKE_SOURCE_DIR}/lib/box2d/include")
-
-include_directories("${CMAKE_SOURCE_DIR}/lib/Luna/include")
 
 if (UNIX)
     find_package(GLEW REQUIRED) # OpenGL Extension Wrangler
-    include_directories(${GLEW_INCLUDE_DIRS})
 elseif (WIN32) # Thank you Windows, I hate you.
-    include_directories("${CMAKE_SOURCE_DIR}/lib/cglm/include") # C OpenGL Mathematics Library
-
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew") # OpenGL Extension Wrangler
     add_definitions(-DGLEW_STATIC)
     set(GLEW_LIBRARIES "${CMAKE_SOURCE_DIR}/lib/glew/lib/Release/x64/glew32s.lib")
     set(GLEW_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/lib/glew/include")
-    include_directories(${GLEW_INCLUDE_DIRS})
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
@@ -219,12 +202,14 @@ else ()
 endif ()
 
 if (UNIX)
-    target_link_libraries(game -lGL -lGLU ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a ${LUNA_PATH} m SDL2 SDL2_mixer z ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
+    target_link_libraries(game ${SDL2_LIBRARY} SDL2 ${SDL2_MIXER_LIBRARY} SDL2_mixer ${ZLIB_LIBRARIES} z ${OPENGL_gl_LIBRARY} -lGL ${GLEW_LIBRARIES} -lGLU ${Vulkan_LIBRARIES} ${LUNA_PATH} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a m) # extra l* flags are needed on Linux
 elseif (WIN32)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${ZLIB_LIBRARIES} ${OPENGL_gl_LIBRARY} opengl32 ${GLEW_LIBRARIES} ${Vulkan_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_include_directories(game PRIVATE ${CMAKE_SOURCE_DIR}/lib/cglm/include) # C OpenGL Mathematics Library
 endif ()
 
 set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(game PRIVATE ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/lib/Luna/include ${CMAKE_SOURCE_DIR}/lib/box2d/include)
 
 #endregion
 
@@ -253,5 +238,5 @@ if (WIN32)
 
     add_dependencies(game copydlls)
 
-endif()
+endif ()
 #endregion

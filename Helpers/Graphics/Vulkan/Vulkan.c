@@ -89,58 +89,10 @@ bool VK_Init(SDL_Window *window)
 
 VkResult VK_FrameStart()
 {
-	// VulkanTestReturnResult(InitActors(loadedLevel), "Failed to init actors!");
-
 	if (minimized)
 	{
 		return VK_NOT_READY;
 	}
-
-	// VulkanTestReturnResult(vkWaitForFences(device, MAX_FRAMES_IN_FLIGHT, inFlightFences, VK_TRUE, UINT64_MAX),
-	// 					   "Failed to wait for Vulkan fences!");
-	//
-	// VulkanTestReturnResult(vkResetFences(device, 1, &inFlightFences[currentFrame]), "Failed to reset Vulkan fences!");
-	//
-	// const VkResult acquireNextImageResult = vkAcquireNextImageKHR(device,
-	// 															  swapChain,
-	// 															  UINT64_MAX,
-	// 															  imageAvailableSemaphores[currentFrame],
-	// 															  VK_NULL_HANDLE,
-	// 															  &swapchainImageIndex);
-	// if (acquireNextImageResult == VK_ERROR_OUT_OF_DATE_KHR || acquireNextImageResult == VK_SUBOPTIMAL_KHR)
-	// {
-	// 	if (RecreateSwapChain())
-	// 	{
-	// 		return acquireNextImageResult;
-	// 	}
-	// }
-	// VulkanTestReturnResult(acquireNextImageResult, "Failed to acquire next Vulkan image index!");
-	//
-	// VulkanTestReturnResult(vkResetCommandBuffer(commandBuffers[currentFrame], 0),
-	// 					   "Failed to reset Vulkan command buffer!");
-	//
-	// VulkanTestReturnResult(BeginRenderPass(commandBuffers[currentFrame], swapchainImageIndex),
-	// 					   "Failed to begin render pass!");
-
-	// vkCmdBindDescriptorSets(commandBuffers[currentFrame],
-	// 						VK_PIPELINE_BIND_POINT_GRAPHICS,
-	// 						pipelineLayout,
-	// 						0,
-	// 						1,
-	// 						&descriptorSets[currentFrame],
-	// 						0,
-	// 						NULL);
-
-	// VulkanTestReturnResult(vkWaitForFences(device, 1, &transferBufferFence, VK_TRUE, UINT64_MAX),
-	// 					   "Failed to wait for Vulkan transfer buffer fence!");
-	// VulkanTestReturnResult(vkResetFences(device, 1, &transferBufferFence),
-	// 					   "Failed to reset Vulkan transfer buffer fence!");
-	// const VkCommandBufferBeginInfo commandBufferBeginInfo = {
-	// 	.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-	// 	.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-	// };
-	// VulkanTestReturnResult(vkBeginCommandBuffer(transferCommandBuffer, &commandBufferBeginInfo),
-	// 		   "Failed to start the recording of Vulkan transfer command buffer!");
 
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = swapChainExtent,
@@ -171,24 +123,11 @@ VkResult VK_FrameEnd()
 
 		VulkanTestReturnResult(CreateUiBuffers(), "Failed to recreate UI buffers!");
 	}
-
 	if (buffers.ui.objectCount > 0)
 	{
 		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed);
 		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed);
 	}
-
-	// VulkanTestReturnResult(vkEndCommandBuffer(transferCommandBuffer),
-	// 		   "Failed to finish the recording of Vulkan transfer command buffer!");
-	//
-	// const VkSubmitInfo queueSubmitInfo = {
-	// 	.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-	// 	.commandBufferCount = 1,
-	// 	.pCommandBuffers = &transferCommandBuffer,
-	// };
-	//
-	// VulkanTestReturnResult(vkQueueSubmit(transferQueue, 1, &queueSubmitInfo, transferBufferFence),
-	// 		   "Failed to submit Vulkan transfer command buffer to queue!");
 
 	lunaNextSubpass();
 	if (buffers.ui.objectCount > 0)
@@ -210,43 +149,6 @@ VkResult VK_FrameEnd()
 	lunaEndRenderPass();
 	VulkanTestReturnResult(lunaPresentSwapChain(), "Failed to present swap chain!");
 
-	// const VkSubmitInfo submitInfo = {
-	// 	.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-	// 	.pNext = NULL,
-	// 	.waitSemaphoreCount = 1,
-	// 	.pWaitSemaphores = &imageAvailableSemaphores[currentFrame],
-	// 	.pWaitDstStageMask = (VkPipelineStageFlags[]){VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
-	// 	.commandBufferCount = 1,
-	// 	.pCommandBuffers = &commandBuffers[currentFrame],
-	// 	.signalSemaphoreCount = 1,
-	// 	.pSignalSemaphores = &renderFinishedSemaphores[currentFrame],
-	// };
-	// VulkanTestReturnResult(vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]),
-	// 					   "Failed to submit Vulkan draw command buffer!");
-	//
-	// const VkSwapchainKHR swapChains[] = {swapChain};
-	// const VkPresentInfoKHR presentInfo = {
-	// 	.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-	// 	.pNext = NULL,
-	// 	.waitSemaphoreCount = 1,
-	// 	.pWaitSemaphores = &renderFinishedSemaphores[currentFrame],
-	// 	.swapchainCount = 1,
-	// 	.pSwapchains = swapChains,
-	// 	.pImageIndices = &swapchainImageIndex,
-	// 	.pResults = NULL,
-	// };
-	// const VkResult queuePresentResult = vkQueuePresentKHR(presentQueue, &presentInfo);
-	// if (queuePresentResult == VK_ERROR_OUT_OF_DATE_KHR || queuePresentResult == VK_SUBOPTIMAL_KHR)
-	// {
-	// 	if (RecreateSwapChain())
-	// 	{
-	// 		return queuePresentResult;
-	// 	}
-	// }
-	// VulkanTestReturnResult(queuePresentResult, "Failed to queue frame for presentation!");
-	//
-	// currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-
 	return VK_SUCCESS;
 }
 
@@ -265,7 +167,8 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 	UpdateTranslationMatrix(camera);
 
 	VulkanTestReturnResult(LoadWallActors(loadedLevel), "Failed to load wall actors!");
-	VulkanTestReturnResult(UpdateActorInstanceDataAndShadows(loadedLevel), "Failed to update actor instance data and shadows!");
+	VulkanTestReturnResult(UpdateActorInstanceDataAndShadows(loadedLevel),
+						   "Failed to update actor instance data and shadows!");
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
 
@@ -311,7 +214,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
 	{
 		// 0x57414C4C is "WALL", to encode that we are drawing the walls
-		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
 													 buffers.walls.indices.buffer,
 													 sizeof(uint32_t) * 6,
 													 VK_INDEX_TYPE_UINT32,
@@ -452,10 +355,6 @@ bool VK_LoadLevelWalls(const Level *level)
 
 	loadedLevel = level;
 
-	// free(wallVertices);
-	// free(wallIndices);
-
-	loadedActors = 0;
 	VulkanTest(InitActors(level), "Failed to load actors!");
 	return true;
 }
