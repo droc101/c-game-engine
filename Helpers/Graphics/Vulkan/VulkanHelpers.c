@@ -382,18 +382,69 @@ void LoadModelActors(const Level *level)
 						  buffers.modelActors.indices.bytesUsed);
 }
 
+void LoadActorDrawInfo(const Level *level)
+{
+	VkDrawIndexedIndirectCommand *modelActorsDrawInfo = buffers.modelActors.drawInfo.data;
+	VkDrawIndexedIndirectCommand *wallActorsDrawInfo = buffers.wallActors.drawInfo.data;
+	uint32_t wallCount = 0;
+	if (buffers.modelActors.loadedModelIds.length > 0)
+	{
+		modelActorsDrawInfo[0].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, 0))
+													->indexCount;
+		modelActorsDrawInfo[0].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, 0);
+		size_t modelCount = (size_t)ListGet(buffers.modelActors.modelCounts, 0);
+		for (size_t i = 1; i < buffers.modelActors.loadedModelIds.length; i++)
+		{
+			const Model *previousModel = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i - 1));
+			modelActorsDrawInfo[i].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i))
+														->indexCount;
+			modelActorsDrawInfo[i].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, i);
+			modelActorsDrawInfo[i].firstIndex = previousModel->indexCount;
+			modelActorsDrawInfo[i].vertexOffset = (int32_t)previousModel->vertexCount;
+			modelActorsDrawInfo[i].firstInstance = modelCount;
+			modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
+		}
+	}
+	ListLock(level->actors);
+	for (size_t i = 0; i < loadedActors; i++)
+	{
+		const Actor *actor = ListGet(level->actors, i);
+		if (!actor->actorWall || actor->actorModel)
+		{
+			continue;
+		}
+		if (actor->actorWall)
+		{
+			wallActorsDrawInfo[wallCount].indexCount = 6;
+			wallActorsDrawInfo[wallCount].instanceCount = 1;
+			wallActorsDrawInfo[wallCount].firstIndex = wallCount * 6;
+			wallActorsDrawInfo[wallCount].vertexOffset = 0;
+			wallActorsDrawInfo[wallCount].firstInstance = wallCount;
+			wallCount++;
+		}
+	}
+	ListUnlock(level->actors);
+	lunaWriteDataToBuffer(buffers.wallActors.drawInfo.buffer,
+						  buffers.wallActors.drawInfo.data,
+						  buffers.wallActors.drawInfo.bytesUsed);
+	lunaWriteDataToBuffer(buffers.modelActors.drawInfo.buffer,
+						  buffers.modelActors.drawInfo.data,
+						  buffers.modelActors.drawInfo.bytesUsed);
+}
+
 VkResult LoadWallActors(const Level *level)
 {
 	if (__builtin_expect(loadedActors != level->actors.length, false))
 	{
 		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
 	}
+	uint32_t wallCount = 0;
 	ActorVertex *vertices = buffers.wallActors.vertices.data;
 	uint32_t *indices = buffers.wallActors.indices.data;
 	ListLock(level->actors);
-	for (size_t wallCount = 0; wallCount < loadedActors; wallCount++)
+	for (size_t i = 0; i < loadedActors; i++)
 	{
-		const Actor *actor = ListGet(level->actors, wallCount);
+		const Actor *actor = ListGet(level->actors, i);
 		if (!actor->actorWall || actor->actorModel != NULL)
 		{
 			continue;
@@ -439,6 +490,8 @@ VkResult LoadWallActors(const Level *level)
 		indices[6 * wallCount + 3] = wallCount * 4;
 		indices[6 * wallCount + 4] = wallCount * 4 + 2;
 		indices[6 * wallCount + 5] = wallCount * 4 + 3;
+
+		wallCount++;
 	}
 	ListUnlock(level->actors);
 	lunaWriteDataToBuffer(buffers.wallActors.vertices.buffer,
@@ -544,46 +597,6 @@ VkResult UpdateActorInstanceDataAndShadows(const Level *level)
 						  buffers.shadows.indices.bytesUsed);
 
 	return VK_SUCCESS;
-}
-
-void LoadActorDrawInfo(const Level *level)
-{
-	VkDrawIndexedIndirectCommand *modelActorsDrawInfo = buffers.modelActors.drawInfo.data;
-	VkDrawIndexedIndirectCommand *wallActorsDrawInfo = buffers.wallActors.drawInfo.data;
-	uint32_t modelCount = 0;
-	int32_t wallCount = 0;
-	for (size_t i = 0; i < buffers.modelActors.loadedModelIds.length; i++)
-	{
-		modelActorsDrawInfo[i].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i))
-													->indexCount;
-		modelActorsDrawInfo[i].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, i);
-		modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
-	}
-	ListLock(level->actors);
-	for (size_t i = 0; i < loadedActors; i++)
-	{
-		const Actor *actor = ListGet(level->actors, i);
-		if (!actor->actorWall || actor->actorModel)
-		{
-			continue;
-		}
-		if (actor->actorWall)
-		{
-			wallActorsDrawInfo[wallCount].indexCount = 6;
-			wallActorsDrawInfo[wallCount].instanceCount = 1;
-			wallActorsDrawInfo[wallCount].firstIndex = wallCount * 6;
-			wallActorsDrawInfo[wallCount].vertexOffset = 0;
-			wallActorsDrawInfo[wallCount].firstInstance = wallCount;
-			wallCount++;
-		}
-	}
-	ListUnlock(level->actors);
-	lunaWriteDataToBuffer(buffers.wallActors.drawInfo.buffer,
-						  buffers.wallActors.drawInfo.data,
-						  buffers.wallActors.drawInfo.bytesUsed);
-	lunaWriteDataToBuffer(buffers.modelActors.drawInfo.buffer,
-						  buffers.modelActors.drawInfo.data,
-						  buffers.modelActors.drawInfo.bytesUsed);
 }
 
 void UpdateTranslationMatrix(const Camera *camera)

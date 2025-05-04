@@ -404,13 +404,11 @@ void LoadWalls(const Level *level);
 
 void LoadModelActors(const Level *level);
 
+void LoadActorDrawInfo(const Level *level);
+
 VkResult LoadWallActors(const Level *level);
 
 VkResult UpdateActorInstanceDataAndShadows(const Level *level);
-
-void LoadActorDrawInfo(const Level *level);
-
-// VkResult CopyBuffers(const Level *level);
 #pragma endregion helperFunctions
 
 #pragma region drawingHelpers
