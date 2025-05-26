@@ -179,34 +179,10 @@ bool CreateRenderPass()
 		}
 	}
 
-	const LunaSubpassCreationInfo subpassCreationInfos[] = {
-		{
-			.name = "Level",
-			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-			.useColorAttachment = true,
-			.useDepthAttachment = true,
-		},
-		{
-			.name = "UI",
-			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-			.useColorAttachment = true,
-		},
-	};
-	const VkSubpassDependency dependencies[] = {
-		{
-			.srcSubpass = VK_SUBPASS_EXTERNAL,
-			.dstSubpass = 0,
-			.srcStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-		},
-		{
-			.srcSubpass = 0,
-			.dstSubpass = 1,
-			.srcStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-		},
+	const LunaSubpassCreationInfo subpassCreationInfo = {
+		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+		.useColorAttachment = true,
+		.useDepthAttachment = true,
 	};
 	const LunaRenderPassCreationInfo renderPassCreationInfo = {
 		.samples = msaaSamples,
@@ -214,10 +190,8 @@ bool CreateRenderPass()
 		.colorAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_CLEAR,
 		.createDepthAttachment = true,
 		.depthAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_CLEAR,
-		.subpassCount = 2,
-		.subpasses = subpassCreationInfos,
-		.dependencyCount = 2,
-		.dependencies = dependencies,
+		.subpassCount = 1,
+		.subpasses = &subpassCreationInfo,
 		.extent = (VkExtent3D){.width = swapChainExtent.width, .height = swapChainExtent.height, .depth = 1},
 	};
 	VulkanTest(lunaCreateRenderPass(&renderPassCreationInfo, &renderPass), "Failed to create render pass!");
@@ -277,7 +251,7 @@ bool CreateGraphicsPipelines()
 		.minSampleShading = 1,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencil = {
+	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 		.depthTestEnable = VK_TRUE,
 		.depthWriteEnable = VK_TRUE,
@@ -408,10 +382,10 @@ bool CreateGraphicsPipelines()
 		.viewportState = &viewportState,
 		.rasterizationState = &rasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencil,
+		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
 		.layoutCreationInfo = &pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, "Level"),
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(&wallPipelineInfo, &pipelines.walls),
 			   "Failed to create wall graphics pipeline!");
@@ -526,10 +500,10 @@ bool CreateGraphicsPipelines()
 		.viewportState = &viewportState,
 		.rasterizationState = &rasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencil,
+		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
 		.layoutCreationInfo = &pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, "Level"),
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(&actorPipelineInfo, &pipelines.actors),
 			   "Failed to create actor graphics pipeline!");
@@ -595,6 +569,10 @@ bool CreateGraphicsPipelines()
 		.pVertexAttributeDescriptions = uiAttributeDescriptions,
 	};
 
+	const VkPipelineDepthStencilStateCreateInfo uiDepthStencilState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+	};
+
 	const LunaGraphicsPipelineCreationInfo uiPipelineInfo = {
 		.shaderStageCount = 2,
 		.shaderStages = uiShaderStages,
@@ -603,9 +581,10 @@ bool CreateGraphicsPipelines()
 		.viewportState = &viewportState,
 		.rasterizationState = &rasterizer,
 		.multisampleState = &multisampling,
+		.depthStencilState = &uiDepthStencilState,
 		.colorBlendState = &colorBlending,
 		.layoutCreationInfo = &pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, "UI"),
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(&uiPipelineInfo, &pipelines.ui), "Failed to create UI graphics pipeline!");
 #pragma endregion UI

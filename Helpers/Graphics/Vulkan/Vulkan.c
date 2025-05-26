@@ -120,7 +120,6 @@ VkResult VK_FrameEnd()
 		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed);
 	}
 
-	lunaNextSubpass();
 	if (buffers.ui.objectCount > 0)
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
