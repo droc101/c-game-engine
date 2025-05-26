@@ -7,6 +7,7 @@
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
 #include "Error.h"
+#include "Input.h"
 #include "Logging.h"
 #include "Timing.h"
 
@@ -41,6 +42,7 @@ int PhysicsThreadMain(void *)
 			SDL_UnlockMutex(PhysicsThreadMutex);
 			return 0;
 		}
+		InputPhysicsFrameBegin();
 		if (PhysicsThreadFunction == NULL)
 		{
 			SDL_UnlockMutex(PhysicsThreadMutex);

@@ -243,6 +243,8 @@ int main(const int argc, char *argv[])
 
 	InitSDL();
 
+	InputInit();
+
 	PhysicsThreadInit();
 	InitState();
 
@@ -355,6 +357,7 @@ int main(const int argc, char *argv[])
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
 	PhysicsThreadTerminate();
+	InputDestroy();
 	DestroyGlobalState();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);

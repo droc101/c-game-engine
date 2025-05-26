@@ -25,7 +25,6 @@
 #include "GPauseState.h"
 
 Actor *targetedEnemy = NULL;
-bool leafyGeneratorPolitelyRequestLeafyGenerationOnNextPhysicsTickPlease = false;
 
 void GMainStateUpdate(GlobalState *State)
 {
@@ -50,11 +49,6 @@ void GMainStateUpdate(GlobalState *State)
 	}
 
 	State->level->player.angle += GetMouseRel().x * (float)State->options.mouseSpeed / 120.0f;
-
-	if (IsKeyJustPressed(SDL_SCANCODE_L))
-	{
-		leafyGeneratorPolitelyRequestLeafyGenerationOnNextPhysicsTickPlease = true;
-	}
 
 	if (State->saveData->coins > 9999)
 	{
@@ -168,17 +162,21 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		a->Update(a, delta);
 	}
 
-	if (leafyGeneratorPolitelyRequestLeafyGenerationOnNextPhysicsTickPlease)
+	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
 		Actor *leaf = CreateActor(state->level->player.pos, 0, 1, 0, 0, 0, 0, state->level->worldId);
 		AddActor(leaf);
-		leafyGeneratorPolitelyRequestLeafyGenerationOnNextPhysicsTickPlease = false;
 	}
+	// if (IsKeyJustReleasedPhys(SDL_SCANCODE_L)) // CANNOT be else if because both of these can happen on the same tick
+	// {
+	// 	Actor *door = CreateActor(state->level->player.pos, 0, 4, 0, 0, 0, 0, state->level->worldId);
+	// 	AddActor(door);
+	// }
 
 	targetedEnemy = GetTargetedEnemy(10);
 	if (targetedEnemy)
 	{
-		if (IsMouseButtonPressed(SDL_BUTTON_LEFT) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_X))
+		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
 		{
 			RemoveActor(targetedEnemy);
 		}
