@@ -102,9 +102,9 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byt
  */
 #define COLOR(argb) \
 	(Color){((argb >> 16) & 0xFF) / 255.0f, \
-	 ((argb >> 8) & 0xFF) / 255.0f, \
-	 ((argb) & 0xFF) / 255.0f, \
-	 ((argb >> 24) & 0xFF) / 255.0f}
+			((argb >> 8) & 0xFF) / 255.0f, \
+			((argb) & 0xFF) / 255.0f, \
+			((argb >> 24) & 0xFF) / 255.0f}
 
 /**
  * Convert a byte to a float (0-1)
@@ -119,7 +119,7 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byt
  * @param color The color struct to convert
  * @return The color as an array of floats
  */
-#define COLOR_TO_ARR(color) (float*)&color
+#define COLOR_TO_ARR(color) (float *)&color
 
 #ifdef WIN32
 /// Make this symbol exported (in the symbol table)

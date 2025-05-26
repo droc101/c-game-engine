@@ -4,16 +4,9 @@
 
 #include "Vulkan.h"
 #include <luna/luna.h>
-#include <luna/lunaDrawing.h>
-#include <luna/lunaInstance.h>
-#include <string.h>
-
-#include "../../../Structs/GlobalState.h"
 #include "../../CommonAssets.h"
-#include "../../Core/Error.h"
-#include "../../Core/Logging.h"
 #include "../../Core/MathEx.h"
-#include "../../Core/Timing.h"
+#include "VulkanActors.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
 #include "VulkanResources.h"
@@ -22,18 +15,18 @@ static const Level *loadedLevel;
 
 bool VK_Init(SDL_Window *window)
 {
-	vk_window = window;
+	vulkanWindow = window;
 	// clang-format off
 	if (CreateInstance() && CreateSurface() && CreateLogicalDevice() && CreateSwapChain() &&
 		CreateRenderPass() && CreateDescriptorSetLayouts() &&
 		CreateGraphicsPipelines() && CreateTextureSamplers() &&
-		CreateBuffers() && CreateDescriptorPool() && CreateDescriptorSets())
+		CreateBuffers() && CreateDescriptorSets())
 	{
 		// clang-format on
 
-		char *vendor = calloc(32, sizeof(char));
-		CheckAlloc(vendor);
-		switch (physicalDevice.properties.vendorID)
+		const VkPhysicalDeviceProperties physicalDeviceProperties = lunaGetPhysicalDeviceProperties();
+		char vendor[32] = {};
+		switch (physicalDeviceProperties.vendorID)
 		{
 			case AMD:
 				strncpy(vendor, "AMD", 32);
@@ -68,13 +61,11 @@ bool VK_Init(SDL_Window *window)
 		}
 		LogInfo("Vulkan Initialized\n");
 		LogInfo("Vulkan Vendor: %s\n", vendor);
-		LogInfo("Vulkan Device: %s\n", physicalDevice.properties.deviceName);
+		LogInfo("Vulkan Device: %s\n", physicalDeviceProperties.deviceName);
 		LogInfo("Vulkan Version: %u.%u.%u\n",
-				VK_API_VERSION_MAJOR(physicalDevice.properties.apiVersion),
-				VK_API_VERSION_MINOR(physicalDevice.properties.apiVersion),
-				VK_API_VERSION_PATCH(physicalDevice.properties.apiVersion));
-
-		free(vendor);
+				VK_API_VERSION_MAJOR(physicalDeviceProperties.apiVersion),
+				VK_API_VERSION_MINOR(physicalDeviceProperties.apiVersion),
+				VK_API_VERSION_PATCH(physicalDeviceProperties.apiVersion));
 
 		return true;
 	}
@@ -148,6 +139,8 @@ VkResult VK_FrameEnd()
 
 	lunaEndRenderPass();
 	VulkanTestReturnResult(lunaPresentSwapChain(), "Failed to present swap chain!");
+
+	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return VK_SUCCESS;
 }
@@ -324,9 +317,7 @@ inline void VK_Restore()
 
 inline uint8_t VK_GetSampleCountFlags()
 {
-	return physicalDevice.properties.limits.framebufferColorSampleCounts &
-		   physicalDevice.properties.limits.framebufferDepthSampleCounts &
-		   0xF;
+	return physicalDeviceLimits.framebufferColorSampleCounts & physicalDeviceLimits.framebufferDepthSampleCounts & 0xF;
 }
 
 bool VK_LoadLevelWalls(const Level *level)

@@ -8,16 +8,8 @@
 
 #include <cglm/cglm.h>
 
-/**
- * This function will create the Vulkan instance, set up for SDL.
- * @see instance
- */
 bool CreateInstance();
 
-/**
- * Creates the Vulkan surface
- * @see surface
- */
 bool CreateSurface();
 
 bool CreateLogicalDevice();
@@ -30,20 +22,10 @@ bool CreateDescriptorSetLayouts();
 
 bool CreateGraphicsPipelines();
 
-bool InitTextures();
-
-// bool CreateTexturesImageView();
-
 bool CreateTextureSamplers();
 
 bool CreateBuffers();
 
-bool CreateDescriptorPool();
-
 bool CreateDescriptorSets();
-
-bool CreateCommandBuffers();
-
-bool CreateSyncObjects();
 
 #endif //VULKANINTERNAL_H

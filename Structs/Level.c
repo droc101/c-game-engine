@@ -7,7 +7,7 @@
 #include <string.h>
 #include "../defines.h"
 #include "../Helpers/Core/Error.h"
-#include "../Helpers/Graphics/RenderingHelpers.h"
+#include "../Helpers/Graphics/Drawing.h"
 #include "Actor.h"
 #include "GlobalState.h"
 #include "Vector2.h"
@@ -89,7 +89,7 @@ void RemoveActor(Actor *actor)
 	const size_t nameIdx = ListFind(l->namedActorPointers, actor);
 	if (nameIdx != -1)
 	{
-		char* name = ListGet(l->namedActorNames, nameIdx);
+		char *name = ListGet(l->namedActorNames, nameIdx);
 		free(name);
 		ListRemoveAt(&l->namedActorNames, nameIdx);
 		ListRemoveAt(&l->namedActorPointers, nameIdx);
@@ -111,7 +111,7 @@ void NameActor(Actor *actor, const char *name, Level *l)
 	ListAdd(&l->namedActorPointers, actor);
 }
 
-Actor* GetActorByName(const char *name, const Level *l)
+Actor *GetActorByName(const char *name, const Level *l)
 {
 	ListLock(l->namedActorNames);
 	for (int i = 0; i < l->namedActorNames.length; i++)
@@ -128,7 +128,7 @@ Actor* GetActorByName(const char *name, const Level *l)
 	return NULL;
 }
 
-List* GetActorsByName(const char *name, const Level *l)
+List *GetActorsByName(const char *name, const Level *l)
 {
 	List *actors = malloc(sizeof(List));
 	CheckAlloc(actors);

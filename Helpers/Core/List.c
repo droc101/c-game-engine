@@ -145,9 +145,10 @@ size_t ListFind(const List list, const void *data)
 
 void ListLock(const List list)
 {
+	// TODO: Explodes on arm64 when the quit button is pressed
 	if (SDL_LockMutex(list.mutex) < 0)
 	{
-		LogError("Failed to lock list mutex with error: %s", SDL_GetError());
+		LogError("Failed to lock list mutex with error: %s\n", SDL_GetError());
 		Error("Failed to lock list mutex!");
 	}
 }
@@ -156,7 +157,7 @@ void ListUnlock(const List list)
 {
 	if (SDL_UnlockMutex(list.mutex) < 0)
 	{
-		LogError("Failed to unlock list mutex with error: %s", SDL_GetError());
+		LogError("Failed to unlock list mutex with error: %s\n", SDL_GetError());
 		Error("Failed to unlock list mutex!");
 	}
 }

@@ -2,7 +2,6 @@
 #include <SDL_mixer.h>
 #include <stdio.h>
 #include <string.h>
-#include <vulkan/vulkan_core.h>
 #include "config.h"
 #include "Debug/DPrint.h"
 #include "Debug/FrameBenchmark.h"
@@ -283,7 +282,7 @@ int main(const int argc, char *argv[])
 		}
 		GlobalState *state = GetState();
 
-		if (FrameStart() != VK_SUCCESS)
+		if (!FrameStart())
 		{
 			if (state->UpdateGame)
 			{

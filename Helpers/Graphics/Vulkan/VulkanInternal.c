@@ -2,13 +2,10 @@
 //
 
 #include "VulkanInternal.h"
-#include <dirent.h>
 #include <luna/luna.h>
 #include <SDL_vulkan.h>
-#include <string.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../Core/Error.h"
-#include "../../Core/Logging.h"
 #include "../../Core/MathEx.h"
 #include "VulkanHelpers.h"
 #include "VulkanResources.h"
@@ -16,13 +13,13 @@
 bool CreateInstance()
 {
 	uint32_t extensionCount;
-	if (SDL_Vulkan_GetInstanceExtensions(vk_window, &extensionCount, NULL) == SDL_FALSE)
+	if (SDL_Vulkan_GetInstanceExtensions(vulkanWindow, &extensionCount, NULL) == SDL_FALSE)
 	{
 		VulkanLogError("Failed to acquire extensions required for SDL window!\n");
 		return false;
 	}
 	const char *extensionNames[extensionCount];
-	if (SDL_Vulkan_GetInstanceExtensions(vk_window, &extensionCount, extensionNames) == SDL_FALSE)
+	if (SDL_Vulkan_GetInstanceExtensions(vulkanWindow, &extensionCount, extensionNames) == SDL_FALSE)
 	{
 		VulkanLogError("Failed to acquire extensions required for SDL window!\n");
 		return false;
@@ -38,14 +35,13 @@ bool CreateInstance()
 #endif
 	};
 	VulkanTest(lunaCreateInstance(&instanceCreationInfo), "Failed to create instance!");
-	instance = lunaGetInstance();
 
 	return true;
 }
 
 bool CreateSurface()
 {
-	if (SDL_Vulkan_CreateSurface(vk_window, lunaGetInstance(), &surface) == SDL_FALSE)
+	if (SDL_Vulkan_CreateSurface(vulkanWindow, lunaGetInstance(), &surface) == SDL_FALSE)
 	{
 		VulkanLogError("Failed to create window surface\n");
 		return false;
@@ -78,7 +74,7 @@ bool CreateLogicalDevice()
 		.surface = surface,
 	};
 	VulkanTest(lunaAddNewDevice2(&deviceCreationInfo), "Failed to create logical device!");
-	physicalDevice.properties = lunaGetPhysicalDeviceProperties();
+	physicalDeviceLimits = lunaGetPhysicalDeviceProperties().limits;
 	return true;
 }
 
@@ -105,7 +101,7 @@ bool CreateSwapChain()
 	{
 		int32_t width;
 		int32_t height;
-		SDL_Vulkan_GetDrawableSize(vk_window, &width, &height);
+		SDL_Vulkan_GetDrawableSize(vulkanWindow, &width, &height);
 		swapChainExtent.width = clamp(width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
 		swapChainExtent.height = clamp(height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 	}
@@ -164,15 +160,15 @@ bool CreateRenderPass()
 			msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 			break;
 	}
-	if (!(physicalDevice.properties.limits.framebufferColorSampleCounts &
-		  physicalDevice.properties.limits.framebufferDepthSampleCounts &
+	if (!(physicalDeviceLimits.framebufferColorSampleCounts &
+		  physicalDeviceLimits.framebufferDepthSampleCounts &
 		  msaaSamples))
 	{
 		ShowWarning("Invalid Settings",
 					"Your GPU driver does not support the selected MSAA level!\n"
 					"A fallback has been set to avoid issues.");
-		while (!(physicalDevice.properties.limits.framebufferColorSampleCounts &
-				 physicalDevice.properties.limits.framebufferDepthSampleCounts &
+		while (!(physicalDeviceLimits.framebufferColorSampleCounts &
+				 physicalDeviceLimits.framebufferDepthSampleCounts &
 				 msaaSamples))
 		{
 			msaaSamples >>= 1;
@@ -308,7 +304,7 @@ bool CreateGraphicsPipelines()
 		.pAttachments = &colorBlendAttachment,
 	};
 
-	if (sizeof(PushConstants) > physicalDevice.properties.limits.maxPushConstantsSize)
+	if (sizeof(PushConstants) > physicalDeviceLimits.maxPushConstantsSize)
 	{
 		Error("Go support core 1.0 then get back to me. (Max push constant size exceeded)");
 	}
@@ -687,34 +683,27 @@ bool CreateBuffers()
 	return true;
 }
 
-bool CreateDescriptorPool()
+bool CreateDescriptorSets()
 {
-	const VkDescriptorPoolSize poolSizes[] = {
-		{
-			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES * MAX_FRAMES_IN_FLIGHT,
-		},
+	LunaDescriptorPool descriptorPool;
+	const VkDescriptorPoolSize poolSize = {
+		.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = MAX_TEXTURES * MAX_FRAMES_IN_FLIGHT,
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
 		.maxSets = MAX_FRAMES_IN_FLIGHT,
 		.poolSizeCount = 1,
-		.poolSizes = poolSizes,
+		.poolSizes = &poolSize,
 	};
 	VulkanTest(lunaCreateDescriptorPool(&descriptorPoolCreationInfo, &descriptorPool),
 			   "Failed to create descriptor pool!");
 
-	return true;
-}
-
-bool CreateDescriptorSets()
-{
 	LunaDescriptorSetLayout layouts[MAX_FRAMES_IN_FLIGHT];
 	for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		layouts[i] = descriptorSetLayout;
 	}
-
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,
 		.descriptorSetCount = MAX_FRAMES_IN_FLIGHT,
@@ -722,94 +711,5 @@ bool CreateDescriptorSets()
 	};
 	VulkanTest(lunaAllocateDescriptorSets(&allocationInfo, descriptorSets), "Failed to allocate descriptor sets!");
 
-	// VkDescriptorImageInfo imageInfo[textures.length];
-	// for (size_t textureIndex = 0; textureIndex < textures.length; textureIndex++)
-	// {
-	// 	imageInfo[textureIndex] = (VkDescriptorImageInfo){
-	// 		.sampler = textureSamplers.nearestRepeat,
-	// 		.imageView = ListGet(texturesImageView, textureIndex),
-	// 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-	// 	};
-	// }
-	// for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	// {
-	// 	if (textures.length == 0)
-	// 	{
-	// 		break;
-	// 	}
-	// 	const VkWriteDescriptorSet writeDescriptor = {
-	// 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-	// 		.pNext = NULL,
-	// 		.dstSet = descriptorSets[i],
-	// 		.dstBinding = 0,
-	// 		.dstArrayElement = 0,
-	// 		.descriptorCount = textures.length,
-	// 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-	// 		.pImageInfo = imageInfo,
-	// 		.pBufferInfo = NULL,
-	// 		.pTexelBufferView = NULL,
-	// 	};
-	// 	vkUpdateDescriptorSets(device, 1, &writeDescriptor, 0, NULL);
-	// }
-
 	return true;
 }
-/*
-bool CreateCommandBuffers()
-{
-	const VkCommandBufferAllocateInfo graphicsAllocateInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-		.commandPool = graphicsCommandPool,
-		.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-		.commandBufferCount = MAX_FRAMES_IN_FLIGHT,
-	};
-	VulkanTest(vkAllocateCommandBuffers(device, &graphicsAllocateInfo, commandBuffers),
-			   "Failed to allocate Vulkan graphics command buffers!");
-
-	const VkCommandBufferAllocateInfo transferAllocateInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-		.commandPool = transferCommandPool,
-		.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-		.commandBufferCount = 1,
-	};
-	VulkanTest(vkAllocateCommandBuffers(device, &transferAllocateInfo, &transferCommandBuffer),
-			   "Failed to allocate Vulkan transfer command buffer!");
-
-	const VkFenceCreateInfo fenceCreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-		.flags = VK_FENCE_CREATE_SIGNALED_BIT,
-	};
-	VulkanTest(vkCreateFence(device, &fenceCreateInfo, NULL, &transferBufferFence),
-			   "Failed to create Vulkan transfer buffer fence!");
-
-	return true;
-}
-
-bool CreateSyncObjects()
-{
-	const VkSemaphoreCreateInfo semaphoreInfo = {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-	};
-
-	const VkFenceCreateInfo fenceInfo = {
-		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-		.pNext = NULL,
-		.flags = VK_FENCE_CREATE_SIGNALED_BIT,
-	};
-
-	for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		VulkanTest(vkCreateSemaphore(device, &semaphoreInfo, NULL, &imageAvailableSemaphores[i]),
-				   "Failed to create Vulkan semaphores!");
-
-		VulkanTest(vkCreateSemaphore(device, &semaphoreInfo, NULL, &renderFinishedSemaphores[i]),
-				   "Failed to create Vulkan semaphores!");
-
-		VulkanTest(vkCreateFence(device, &fenceInfo, NULL, &inFlightFences[i]), "Failed to create Vulkan semaphores!");
-	}
-
-	return true;
-}
-*/

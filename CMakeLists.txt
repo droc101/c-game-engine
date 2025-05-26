@@ -170,6 +170,8 @@ add_executable(
         Actor/Physbox.h
         Actor/Laser.c
         Actor/Laser.h
+        Helpers/Graphics/Vulkan/VulkanActors.c
+        Helpers/Graphics/Vulkan/VulkanActors.h
 )
 
 #endregion

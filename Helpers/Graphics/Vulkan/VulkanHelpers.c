@@ -6,57 +6,23 @@
 #include <cglm/clipspace/persp_lh_zo.h>
 #include <cglm/clipspace/view_lh_zo.h>
 #include <luna/luna.h>
-
 #include "../../CommonAssets.h"
 #include "../../Core/Error.h"
-#include "../../Core/Logging.h"
-#include "../RenderingHelpers.h"
 #include "VulkanResources.h"
 
 #pragma region variables
-SDL_Window *vk_window = NULL;
+SDL_Window *vulkanWindow = NULL;
 bool minimized = false;
+bool shouldDropFrame = false;
 size_t loadedActors = 0;
 
-VkInstance instance = VK_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
-PhysicalDevice physicalDevice = {0};
-QueueFamilyIndices queueFamilyIndices = {0};
-VkDevice device = VK_NULL_HANDLE;
-VkQueue graphicsQueue = VK_NULL_HANDLE;
-VkQueue presentQueue = VK_NULL_HANDLE;
-VkQueue transferQueue = VK_NULL_HANDLE;
-VkSwapchainKHR swapChain = VK_NULL_HANDLE;
-VkImage *swapChainImages = NULL;
-uint32_t swapChainCount = 0;
-VkFormat swapChainImageFormat = VK_FORMAT_UNDEFINED;
+VkPhysicalDeviceLimits physicalDeviceLimits = {0};
 VkExtent2D swapChainExtent = {0};
-VkImageView *swapChainImageViews = NULL;
 LunaRenderPass renderPass = VK_NULL_HANDLE;
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
-VkPipelineCache pipelineCache = VK_NULL_HANDLE;
 Pipelines pipelines = {.walls = VK_NULL_HANDLE, .actors = VK_NULL_HANDLE, .ui = VK_NULL_HANDLE};
-VkFramebuffer *swapChainFramebuffers = NULL;
-VkCommandPool graphicsCommandPool = VK_NULL_HANDLE;
-VkCommandPool transferCommandPool = VK_NULL_HANDLE;
-VkCommandBuffer commandBuffers[MAX_FRAMES_IN_FLIGHT];
-VkSemaphore imageAvailableSemaphores[MAX_FRAMES_IN_FLIGHT];
-VkSemaphore renderFinishedSemaphores[MAX_FRAMES_IN_FLIGHT];
-VkFence inFlightFences[MAX_FRAMES_IN_FLIGHT];
-bool framebufferResized = false;
 uint8_t currentFrame = 0;
-uint32_t swapchainImageIndex = -1;
-MemoryPools memoryPools = {
-	{
-		.type = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-	},
-	{
-		.type = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-	},
-	{
-		.type = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-	},
-};
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
 	.ui.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_UI_QUADS_INIT,
@@ -73,7 +39,6 @@ Buffers buffers = {
 	.modelActors.instanceData.allocatedSize = sizeof(ActorInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.modelActors.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 };
-LunaDescriptorPool descriptorPool = LUNA_NULL_HANDLE;
 LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 List textures = {0};
 uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
@@ -83,93 +48,10 @@ TextureSamplers textureSamplers = {
 	.linearNoRepeat = VK_NULL_HANDLE,
 	.nearestNoRepeat = VK_NULL_HANDLE,
 };
-VkFormat depthImageFormat = VK_FORMAT_UNDEFINED;
-VkImage depthImage = VK_NULL_HANDLE;
-VkDeviceMemory depthImageMemory = VK_NULL_HANDLE;
-VkImageView depthImageView = VK_NULL_HANDLE;
-VkImage colorImage = VK_NULL_HANDLE;
-VkDeviceMemory colorImageMemory = VK_NULL_HANDLE;
-VkImageView colorImageView = VK_NULL_HANDLE;
 VkClearColorValue clearColor = {{0.0f, 0.0f, 0.0f, 1.0f}};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-uint16_t textureCount = 0;
 PushConstants pushConstants = {0};
-VkCommandBuffer transferCommandBuffer = VK_NULL_HANDLE;
-VkFence transferBufferFence = VK_NULL_HANDLE;
 #pragma endregion variables
-
-VkResult InitActors(const Level *level)
-{
-	if (loadedActors == level->actors.length)
-	{
-		return VK_SUCCESS;
-	}
-
-	ListClear(&buffers.modelActors.loadedModelIds);
-	ListClear(&buffers.modelActors.modelCounts);
-	buffers.shadows.objectCount = 0;
-	free(buffers.wallActors.vertices.data);
-	free(buffers.wallActors.indices.data);
-	free(buffers.wallActors.instanceData.data);
-	free(buffers.wallActors.drawInfo.data);
-	free(buffers.modelActors.vertices.data);
-	free(buffers.modelActors.indices.data);
-	free(buffers.modelActors.instanceData.data);
-	free(buffers.modelActors.drawInfo.data);
-	memset(&buffers.wallActors, 0, sizeof(WallActorsBuffer));
-	memset(&buffers.modelActors, 0, sizeof(ModelActorsBuffer));
-	ListLock(level->actors);
-	loadedActors = level->actors.length;
-	for (size_t i = 0; i < loadedActors; i++)
-	{
-		const Actor *actor = ListGet(level->actors, i);
-		if (!actor->actorModel)
-		{
-			if (!actor->actorWall)
-			{
-				continue;
-			}
-			buffers.wallActors.count++;
-		} else
-		{
-			size_t index = ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
-			if (index == -1)
-			{
-				index = buffers.modelActors.loadedModelIds.length;
-				ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
-				buffers.modelActors.vertices.bytesUsed += sizeof(ActorVertex) * actor->actorModel->vertexCount;
-				buffers.modelActors.indices.bytesUsed += sizeof(uint32_t) * actor->actorModel->indexCount;
-				buffers.modelActors.drawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
-			}
-			buffers.modelActors.instanceData.bytesUsed += sizeof(ActorInstanceData);
-			if (index < buffers.modelActors.modelCounts.length)
-			{
-				buffers.modelActors.modelCounts.data[index]++;
-			} else
-			{
-				ListAdd(&buffers.modelActors.modelCounts, (void *)1);
-			}
-		}
-		if (actor->showShadow)
-		{
-			buffers.shadows.objectCount++;
-		}
-	}
-	buffers.shadows.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.shadows.objectCount;
-	buffers.shadows.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.shadows.objectCount;
-	buffers.wallActors.vertices.bytesUsed = sizeof(ActorVertex) * 4 * buffers.wallActors.count;
-	buffers.wallActors.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.wallActors.count;
-	buffers.wallActors.instanceData.bytesUsed = sizeof(ActorInstanceData) * buffers.wallActors.count;
-	buffers.wallActors.drawInfo.bytesUsed = sizeof(VkDrawIndexedIndirectCommand) * buffers.wallActors.count;
-
-	VulkanTestReturnResult(ResizeShadowBuffers(), "Failed to resize shadow buffers!");
-	VulkanTestReturnResult(ResizeWallActorBuffers(), "Failed to resize wall actor buffers!");
-	VulkanTestReturnResult(ResizeModelActorBuffers(), "Failed to resize model actor buffers!");
-	LoadModelActors(level);
-	LoadActorDrawInfo(level);
-	ListUnlock(level->actors);
-	return VK_SUCCESS;
-}
 
 VkResult CreateShaderModule(const char *path, VkShaderModule *shaderModule)
 {
@@ -349,256 +231,6 @@ void LoadWalls(const Level *level)
 	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed);
 }
 
-void LoadModelActors(const Level *level)
-{
-	size_t vertexOffset = 0;
-	size_t indexOffset = 0;
-	ListClear(&buffers.modelActors.loadedModelIds);
-	ListLock(level->actors);
-	for (size_t i = 0; i < loadedActors; i++)
-	{
-		const Actor *actor = ListGet(level->actors, i);
-		if (!actor->actorModel)
-		{
-			continue;
-		}
-		if (ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id) == -1)
-		{
-			ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
-			const size_t vertexSize = sizeof(ActorVertex) * actor->actorModel->vertexCount;
-			const size_t indexSize = sizeof(uint32_t) * actor->actorModel->indexCount;
-			memcpy(buffers.modelActors.vertices.data + vertexOffset, actor->actorModel->vertexData, vertexSize);
-			memcpy(buffers.modelActors.indices.data + indexOffset, actor->actorModel->indexData, indexSize);
-			vertexOffset += vertexSize;
-			indexOffset += indexSize;
-		}
-	}
-	ListUnlock(level->actors);
-	lunaWriteDataToBuffer(buffers.modelActors.vertices.buffer,
-						  buffers.modelActors.vertices.data,
-						  buffers.modelActors.vertices.bytesUsed);
-	lunaWriteDataToBuffer(buffers.modelActors.indices.buffer,
-						  buffers.modelActors.indices.data,
-						  buffers.modelActors.indices.bytesUsed);
-}
-
-void LoadActorDrawInfo(const Level *level)
-{
-	VkDrawIndexedIndirectCommand *modelActorsDrawInfo = buffers.modelActors.drawInfo.data;
-	VkDrawIndexedIndirectCommand *wallActorsDrawInfo = buffers.wallActors.drawInfo.data;
-	uint32_t wallCount = 0;
-	if (buffers.modelActors.loadedModelIds.length > 0)
-	{
-		modelActorsDrawInfo[0].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, 0))
-													->indexCount;
-		modelActorsDrawInfo[0].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, 0);
-		size_t modelCount = (size_t)ListGet(buffers.modelActors.modelCounts, 0);
-		for (size_t i = 1; i < buffers.modelActors.loadedModelIds.length; i++)
-		{
-			const Model *previousModel = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i - 1));
-			modelActorsDrawInfo[i].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i))
-														->indexCount;
-			modelActorsDrawInfo[i].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, i);
-			modelActorsDrawInfo[i].firstIndex = previousModel->indexCount;
-			modelActorsDrawInfo[i].vertexOffset = (int32_t)previousModel->vertexCount;
-			modelActorsDrawInfo[i].firstInstance = modelCount;
-			modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
-		}
-	}
-	ListLock(level->actors);
-	for (size_t i = 0; i < loadedActors; i++)
-	{
-		const Actor *actor = ListGet(level->actors, i);
-		if (!actor->actorWall || actor->actorModel)
-		{
-			continue;
-		}
-		if (actor->actorWall)
-		{
-			wallActorsDrawInfo[wallCount].indexCount = 6;
-			wallActorsDrawInfo[wallCount].instanceCount = 1;
-			wallActorsDrawInfo[wallCount].firstIndex = wallCount * 6;
-			wallActorsDrawInfo[wallCount].vertexOffset = 0;
-			wallActorsDrawInfo[wallCount].firstInstance = wallCount;
-			wallCount++;
-		}
-	}
-	ListUnlock(level->actors);
-	lunaWriteDataToBuffer(buffers.wallActors.drawInfo.buffer,
-						  buffers.wallActors.drawInfo.data,
-						  buffers.wallActors.drawInfo.bytesUsed);
-	lunaWriteDataToBuffer(buffers.modelActors.drawInfo.buffer,
-						  buffers.modelActors.drawInfo.data,
-						  buffers.modelActors.drawInfo.bytesUsed);
-}
-
-VkResult LoadWallActors(const Level *level)
-{
-	if (__builtin_expect(loadedActors != level->actors.length, false))
-	{
-		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
-	}
-	uint32_t wallCount = 0;
-	ActorVertex *vertices = buffers.wallActors.vertices.data;
-	uint32_t *indices = buffers.wallActors.indices.data;
-	ListLock(level->actors);
-	for (size_t i = 0; i < loadedActors; i++)
-	{
-		const Actor *actor = ListGet(level->actors, i);
-		if (!actor->actorWall || actor->actorModel != NULL)
-		{
-			continue;
-		}
-		const Wall *wall = actor->actorWall;
-		const float halfHeight = wall->height / 2.0f;
-		const vec2 startVertex = {actor->position.x + wall->a.x, actor->position.y + wall->a.y};
-		const vec2 endVertex = {actor->position.x + wall->b.x, actor->position.y + wall->b.y};
-		const vec2 startUV = {wall->uvOffset, 0};
-		const vec2 endUV = {wall->uvScale * wall->length + wall->uvOffset, 1};
-
-		vertices[4 * wallCount].x = startVertex[0];
-		vertices[4 * wallCount].y = halfHeight + actor->yPosition;
-		vertices[4 * wallCount].z = startVertex[1];
-		vertices[4 * wallCount].u = startUV[0];
-		vertices[4 * wallCount].v = startUV[1];
-		vertices[4 * wallCount].nz = NAN;
-
-		vertices[4 * wallCount + 1].x = endVertex[0];
-		vertices[4 * wallCount + 1].y = halfHeight + actor->yPosition;
-		vertices[4 * wallCount + 1].z = endVertex[1];
-		vertices[4 * wallCount + 1].u = endUV[0];
-		vertices[4 * wallCount + 1].v = startUV[1];
-		vertices[4 * wallCount + 1].nz = NAN;
-
-		vertices[4 * wallCount + 2].x = endVertex[0];
-		vertices[4 * wallCount + 2].y = -halfHeight + actor->yPosition;
-		vertices[4 * wallCount + 2].z = endVertex[1];
-		vertices[4 * wallCount + 2].u = endUV[0];
-		vertices[4 * wallCount + 2].v = endUV[1];
-		vertices[4 * wallCount + 2].nz = NAN;
-
-		vertices[4 * wallCount + 3].x = startVertex[0];
-		vertices[4 * wallCount + 3].y = -halfHeight + actor->yPosition;
-		vertices[4 * wallCount + 3].z = startVertex[1];
-		vertices[4 * wallCount + 3].u = startUV[0];
-		vertices[4 * wallCount + 3].v = endUV[1];
-		vertices[4 * wallCount + 3].nz = NAN;
-
-		indices[6 * wallCount] = wallCount * 4;
-		indices[6 * wallCount + 1] = wallCount * 4 + 1;
-		indices[6 * wallCount + 2] = wallCount * 4 + 2;
-		indices[6 * wallCount + 3] = wallCount * 4;
-		indices[6 * wallCount + 4] = wallCount * 4 + 2;
-		indices[6 * wallCount + 5] = wallCount * 4 + 3;
-
-		wallCount++;
-	}
-	ListUnlock(level->actors);
-	lunaWriteDataToBuffer(buffers.wallActors.vertices.buffer,
-						  buffers.wallActors.vertices.data,
-						  buffers.wallActors.vertices.bytesUsed);
-	lunaWriteDataToBuffer(buffers.wallActors.indices.buffer,
-						  buffers.wallActors.indices.data,
-						  buffers.wallActors.indices.bytesUsed);
-
-	return VK_SUCCESS;
-}
-
-VkResult UpdateActorInstanceDataAndShadows(const Level *level)
-{
-	uint32_t wallCount = 0;
-	uint32_t shadowCount = 0;
-	uint16_t *modelCounts = calloc(buffers.modelActors.loadedModelIds.length, sizeof(uint16_t));
-	CheckAlloc(modelCounts);
-	uint32_t *offsets = calloc(buffers.modelActors.loadedModelIds.length + 1, sizeof(uint32_t));
-	CheckAlloc(offsets);
-	for (size_t i = 1; i <= buffers.modelActors.loadedModelIds.length; i++)
-	{
-		offsets[i] = offsets[i - 1] +
-					 (size_t)ListGet(buffers.modelActors.modelCounts, i - 1) * sizeof(ActorInstanceData);
-	}
-	ListLock(level->actors);
-	if (__builtin_expect(loadedActors != level->actors.length, false))
-	{
-		VulkanTestReturnResult(InitActors(level), "Failed to init actors!");
-	}
-	ActorInstanceData *wallActorInstanceData = buffers.wallActors.instanceData.data;
-	ShadowVertex *shadowVertices = buffers.shadows.vertices.data;
-	uint32_t *shadowIndices = buffers.shadows.indices.data;
-	for (size_t i = 0; i < loadedActors; i++)
-	{
-		const Actor *actor = ListGet(level->actors, i);
-		if (!actor->actorWall && !actor->actorModel)
-		{
-			continue;
-		}
-
-		if (actor->actorModel)
-		{
-			mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
-			ActorTransformMatrix(actor, &transformMatrix);
-			const size_t index = ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
-			ActorInstanceData *offsetInstanceData = buffers.modelActors.instanceData.data + offsets[index];
-			memcpy(offsetInstanceData[modelCounts[index]].transform, transformMatrix, sizeof(mat4));
-			offsetInstanceData[modelCounts[index]].textureIndex = TextureIndex(actor->actorModelTexture);
-
-			modelCounts[index]++;
-		} else if (actor->actorWall)
-		{
-			const Wall *wall = actor->actorWall;
-			memcpy(wallActorInstanceData[wallCount].transform, GLM_MAT4_IDENTITY, sizeof(mat4));
-			wallActorInstanceData[wallCount].textureIndex = TextureIndex(wall->tex);
-			wallActorInstanceData[wallCount].wallAngle = actor->actorWall->angle;
-
-			wallCount++;
-		}
-		if (actor->showShadow)
-		{
-			shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount].y = -0.49f;
-			shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 1].y = -0.49f;
-			shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 2].y = -0.49f;
-			shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 3].y = -0.49f;
-			shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowIndices[6 * shadowCount] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
-			shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
-
-			shadowCount++;
-		}
-	}
-	ListUnlock(level->actors);
-	free(modelCounts);
-	free(offsets);
-	lunaWriteDataToBuffer(buffers.wallActors.instanceData.buffer,
-						  buffers.wallActors.instanceData.data,
-						  buffers.wallActors.instanceData.bytesUsed);
-	lunaWriteDataToBuffer(buffers.modelActors.instanceData.buffer,
-						  buffers.modelActors.instanceData.data,
-						  buffers.modelActors.instanceData.bytesUsed);
-	lunaWriteDataToBuffer(buffers.shadows.vertices.buffer,
-						  buffers.shadows.vertices.data,
-						  buffers.shadows.vertices.bytesUsed);
-	lunaWriteDataToBuffer(buffers.shadows.indices.buffer,
-						  buffers.shadows.indices.data,
-						  buffers.shadows.indices.bytesUsed);
-
-	return VK_SUCCESS;
-}
-
 void UpdateTranslationMatrix(const Camera *camera)
 {
 	mat4 perspective;
@@ -621,50 +253,6 @@ void UpdateTranslationMatrix(const Camera *camera)
 	glm_lookat_lh_zo(cameraPosition, viewTarget, (vec3){0.0f, -1.0f, 0.0f}, view);
 
 	glm_mat4_mul(perspective, view, pushConstants.translationMatrix);
-}
-
-VkResult BeginRenderPass(const VkCommandBuffer commandBuffer, const uint32_t imageIndex)
-{
-	const VkCommandBufferBeginInfo beginInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.pNext = NULL,
-		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-		.pInheritanceInfo = NULL,
-	};
-
-	VulkanTestReturnResult(vkBeginCommandBuffer(commandBuffer, &beginInfo),
-						   "Failed to begin recording Vulkan command buffer!");
-
-	const VkRect2D renderArea = {
-		.offset = {0, 0},
-		.extent = swapChainExtent,
-	};
-	const VkClearValue clearValues[] = {
-		{.color = clearColor},
-		{.depthStencil = {1, 0}},
-	};
-	const VkRenderPassBeginInfo renderPassInfo = {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-		.pNext = NULL,
-		.renderPass = renderPass,
-		.framebuffer = swapChainFramebuffers[imageIndex],
-		.renderArea = renderArea,
-		.clearValueCount = 2,
-		.pClearValues = clearValues,
-	};
-
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-	return VK_SUCCESS;
-}
-
-VkResult EndRenderPass(const VkCommandBuffer commandBuffer)
-{
-	vkCmdEndRenderPass(commandBuffer);
-
-	VulkanTestReturnResult(vkEndCommandBuffer(commandBuffer), "Failed to record the Vulkan command buffer!");
-
-	return VK_SUCCESS;
 }
 
 void DrawRectInternal(const float ndcStartX,
