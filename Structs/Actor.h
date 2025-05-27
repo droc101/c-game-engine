@@ -11,6 +11,21 @@
 #define ACTOR_SPAWN_OUTPUT 1
 #define ACTOR_KILLED_OUTPUT 0
 
+typedef enum ActorType ActorType;
+
+enum ActorType
+{
+	EMPTY_ACTOR,
+	TEST_ACTOR,
+	COIN_ACTOR,
+	GOAL_ACTOR,
+	DOOR_ACTOR,
+	TRIGGER_ACTOR,
+	IO_PROXY_ACTOR,
+	PHYSBOX_ACTOR,
+	LASER_ACTOR
+};
+
 /**
  * Create an Actor
  * @param position Actor position

@@ -164,12 +164,12 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(state->level->player.pos, 0, 1, 0, 0, 0, 0, state->level->worldId);
+		Actor *leaf = CreateActor(state->level->player.pos, 0, TEST_ACTOR, 0, 0, 0, 0, state->level->worldId);
 		AddActor(leaf);
 	}
 	// if (IsKeyJustReleasedPhys(SDL_SCANCODE_L)) // CANNOT be else if because both of these can happen on the same tick
 	// {
-	// 	Actor *door = CreateActor(state->level->player.pos, 0, 4, 0, 0, 0, 0, state->level->worldId);
+	// 	Actor *door = CreateActor(state->level->player.pos, 0, DOOR_ACTOR, 0, 0, 0, 0, state->level->worldId);
 	// 	AddActor(door);
 	// }
 
