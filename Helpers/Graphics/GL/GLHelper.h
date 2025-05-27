@@ -117,13 +117,6 @@ void GL_DrawTextureRegionMod(Vector2 pos,
 							 Color color);
 
 /**
- * Set the clear color
- * @param color The color to clear the screen with
- * @note This does in fact clear the screen
- */
-void GL_ClearColor(Color color);
-
-/**
  * Draw a wall in 3D
  * @param w The wall to draw
  * @note This expects 3D mode to be enabled

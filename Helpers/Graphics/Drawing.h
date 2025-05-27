@@ -102,12 +102,6 @@ void DrawTextureRegionMod(Vector2 pos,
 						  Color color);
 
 /**
- * Clear the screen with a color
- * @param color The color to clear with
- */
-void ClearColor(Color color);
-
-/**
  * Clear the screen with the last used color
  */
 void ClearScreen();

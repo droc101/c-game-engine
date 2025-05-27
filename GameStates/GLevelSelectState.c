@@ -52,8 +52,6 @@ void GLevelSelectStateUpdate(GlobalState * /*State*/)
 
 void GLevelSelectStateRender(GlobalState * /*State*/)
 {
-	ClearColor(COLOR(0xFF123456));
-
 	RenderMenuBackground();
 
 	FontDrawString(v2(20, 20), GAME_TITLE, 128, COLOR_WHITE, largeFont);

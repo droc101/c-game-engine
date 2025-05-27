@@ -303,7 +303,7 @@ int main(const int argc, char *argv[])
 			continue;
 		}
 
-		ClearDepthOnly();
+		ClearScreen();
 
 		ResetDPrintYPos();
 

@@ -220,6 +220,8 @@ bool GL_Init(SDL_Window *wnd)
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), NULL, GL_STREAM_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+	glClearColor(0,0,0,1);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
@@ -337,13 +339,6 @@ void GL_DestroyBuffer(GL_Buffer *buffer)
 inline void GL_ClearScreen()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void GL_ClearColor(const Color color)
-{
-	glClearColor(color.r, color.g, color.b, color.a);
-
-	GL_ClearScreen();
 }
 
 inline void GL_ClearDepthOnly()

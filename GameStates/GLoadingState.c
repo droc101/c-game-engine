@@ -31,7 +31,6 @@ void GLoadingStateUpdate(GlobalState *state)
 
 void GLoadingStateRender(GlobalState *)
 {
-	ClearColor(COLOR_BLACK);
 	DrawTextAligned("LOADING",
 					16,
 					COLOR_WHITE,

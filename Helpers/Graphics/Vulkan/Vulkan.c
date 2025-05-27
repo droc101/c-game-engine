@@ -795,11 +795,6 @@ void VK_DrawRectOutline(const int32_t x,
 	VK_DrawLine(x, y + h, x, y, thickness, color);
 }
 
-void VK_ClearColor(const Color color)
-{
-	clearColor = (VkClearColorValue){{color.r, color.g, color.b, color.a}};
-}
-
 void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
 {
 	const uint32_t textureIndex = TextureIndex(texture);

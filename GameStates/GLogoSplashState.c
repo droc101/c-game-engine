@@ -39,7 +39,6 @@ void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void GLogoSplashStateRender(GlobalState *State)
 {
-	ClearColor(COLOR_BLACK);
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)
 	{
 		return;
