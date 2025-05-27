@@ -301,28 +301,24 @@ bool CreateGraphicsPipelines()
 #pragma endregion shared
 
 #pragma region walls
-	VkShaderModule wallVertShaderModule;
-	VkShaderModule wallFragShaderModule;
+	LunaShaderModule wallVertShaderModule;
+	LunaShaderModule wallFragShaderModule;
 	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_wall"), &wallVertShaderModule), "Failed to load wall vertex shader!");
 	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_wall"), &wallFragShaderModule),
 			   "Failed to load wall fragment shader!");
 
-	const VkPipelineShaderStageCreateInfo wallShaderStages[2] = {
+	const LunaPipelineShaderStageCreationInfo wallShaderStages[] = {
 		{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = wallVertShaderModule,
-			.pName = "main",
 		},
 		{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = wallFragShaderModule,
-			.pName = "main",
 		},
 	};
 
-	const VkVertexInputBindingDescription wallBindingDescriptions[2] = {
+	const VkVertexInputBindingDescription wallBindingDescriptions[] = {
 		{
 			.binding = 0,
 			.stride = sizeof(ShadowVertex),
@@ -334,7 +330,7 @@ bool CreateGraphicsPipelines()
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		},
 	};
-	const VkVertexInputAttributeDescription wallVertexDescriptions[5] = {
+	const VkVertexInputAttributeDescription wallVertexDescriptions[] = {
 		{
 			.location = 0,
 			.binding = 0,
@@ -368,14 +364,14 @@ bool CreateGraphicsPipelines()
 	};
 	const VkPipelineVertexInputStateCreateInfo wallVertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = 2,
+		.vertexBindingDescriptionCount = sizeof(wallBindingDescriptions) / sizeof(*wallBindingDescriptions),
 		.pVertexBindingDescriptions = wallBindingDescriptions,
-		.vertexAttributeDescriptionCount = 5,
+		.vertexAttributeDescriptionCount = sizeof(wallVertexDescriptions) / sizeof(*wallVertexDescriptions),
 		.pVertexAttributeDescriptions = wallVertexDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo wallPipelineInfo = {
-		.shaderStageCount = 2,
+		.shaderStageCount = sizeof(wallShaderStages) / sizeof(*wallShaderStages),
 		.shaderStages = wallShaderStages,
 		.vertexInputState = &wallVertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
@@ -384,7 +380,7 @@ bool CreateGraphicsPipelines()
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
-		.layoutCreationInfo = &pipelineLayoutCreationInfo,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(&wallPipelineInfo, &pipelines.walls),
@@ -392,31 +388,25 @@ bool CreateGraphicsPipelines()
 #pragma endregion walls
 
 #pragma region actors
-	VkShaderModule actorVertShaderModule;
-	VkShaderModule actorFragShaderModule;
+	LunaShaderModule actorVertShaderModule;
+	LunaShaderModule actorFragShaderModule;
 	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actor"), &actorVertShaderModule),
 			   "Failed to create actor vertex shader!");
 	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actor"), &actorFragShaderModule),
 			   "Failed to create actor fragment shader!");
 
-	const VkPipelineShaderStageCreateInfo actorShaderStages[2] = {
+	const LunaPipelineShaderStageCreationInfo actorShaderStages[] = {
 		{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = actorVertShaderModule,
-			.pName = "main",
-			.pSpecializationInfo = NULL,
 		},
 		{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = actorFragShaderModule,
-			.pName = "main",
-			.pSpecializationInfo = NULL,
 		},
 	};
 
-	const VkVertexInputBindingDescription actorBindingDescriptions[2] = {
+	const VkVertexInputBindingDescription actorBindingDescriptions[] = {
 		{
 			.binding = 0,
 			.stride = sizeof(ActorVertex),
@@ -428,7 +418,7 @@ bool CreateGraphicsPipelines()
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
-	const VkVertexInputAttributeDescription actorVertexDescriptions[9] = {
+	const VkVertexInputAttributeDescription actorVertexDescriptions[] = {
 		{
 			.location = 0,
 			.binding = 0,
@@ -486,14 +476,14 @@ bool CreateGraphicsPipelines()
 	};
 	const VkPipelineVertexInputStateCreateInfo actorVertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = 2,
+		.vertexBindingDescriptionCount = sizeof(actorBindingDescriptions) / sizeof(*actorBindingDescriptions),
 		.pVertexBindingDescriptions = actorBindingDescriptions,
-		.vertexAttributeDescriptionCount = 9,
+		.vertexAttributeDescriptionCount = sizeof(actorVertexDescriptions) / sizeof(*actorVertexDescriptions),
 		.pVertexAttributeDescriptions = actorVertexDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo actorPipelineInfo = {
-		.shaderStageCount = 2,
+		.shaderStageCount = sizeof(actorShaderStages) / sizeof(*actorShaderStages),
 		.shaderStages = actorShaderStages,
 		.vertexInputState = &actorVertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
@@ -502,7 +492,7 @@ bool CreateGraphicsPipelines()
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
-		.layoutCreationInfo = &pipelineLayoutCreationInfo,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(&actorPipelineInfo, &pipelines.actors),
@@ -510,23 +500,19 @@ bool CreateGraphicsPipelines()
 #pragma endregion actors
 
 #pragma region UI
-	VkShaderModule uiVertShaderModule;
-	VkShaderModule uiFragShaderModule;
+	LunaShaderModule uiVertShaderModule;
+	LunaShaderModule uiFragShaderModule;
 	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_ui"), &uiVertShaderModule), "Failed to load UI vertex shader!");
 	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_ui"), &uiFragShaderModule), "Failed to load UI fragment shader!");
 
-	const VkPipelineShaderStageCreateInfo uiShaderStages[2] = {
+	const LunaPipelineShaderStageCreationInfo uiShaderStages[] = {
 		{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = uiVertShaderModule,
-			.pName = "main",
 		},
 		{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = uiFragShaderModule,
-			.pName = "main",
 		},
 	};
 
@@ -535,7 +521,7 @@ bool CreateGraphicsPipelines()
 		.stride = sizeof(UiVertex),
 		.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 	};
-	const VkVertexInputAttributeDescription uiAttributeDescriptions[4] = {
+	const VkVertexInputAttributeDescription uiAttributeDescriptions[] = {
 		{
 			.location = 0,
 			.binding = 0,
@@ -565,7 +551,7 @@ bool CreateGraphicsPipelines()
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &uiBindingDescription,
-		.vertexAttributeDescriptionCount = 4,
+		.vertexAttributeDescriptionCount = sizeof(uiAttributeDescriptions) / sizeof(*uiAttributeDescriptions),
 		.pVertexAttributeDescriptions = uiAttributeDescriptions,
 	};
 
@@ -574,7 +560,7 @@ bool CreateGraphicsPipelines()
 	};
 
 	const LunaGraphicsPipelineCreationInfo uiPipelineInfo = {
-		.shaderStageCount = 2,
+		.shaderStageCount = sizeof(uiShaderStages) / sizeof(*uiShaderStages),
 		.shaderStages = uiShaderStages,
 		.vertexInputState = &uiVertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
@@ -583,7 +569,7 @@ bool CreateGraphicsPipelines()
 		.multisampleState = &multisampling,
 		.depthStencilState = &uiDepthStencilState,
 		.colorBlendState = &colorBlending,
-		.layoutCreationInfo = &pipelineLayoutCreationInfo,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(&uiPipelineInfo, &pipelines.ui), "Failed to create UI graphics pipeline!");

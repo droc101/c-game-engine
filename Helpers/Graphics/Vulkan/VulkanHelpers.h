@@ -231,7 +231,7 @@ extern PushConstants pushConstants;
 #pragma endregion variables
 
 #pragma region helperFunctions
-VkResult CreateShaderModule(const char *path, VkShaderModule *shaderModule);
+VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule);
 
 uint32_t TextureIndex(const char *texture);
 
