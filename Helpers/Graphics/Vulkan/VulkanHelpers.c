@@ -48,7 +48,6 @@ TextureSamplers textureSamplers = {
 	.linearNoRepeat = VK_NULL_HANDLE,
 	.nearestNoRepeat = VK_NULL_HANDLE,
 };
-VkClearColorValue clearColor = {{0.0f, 0.0f, 0.0f, 1.0f}};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 PushConstants pushConstants = {0};
 #pragma endregion variables

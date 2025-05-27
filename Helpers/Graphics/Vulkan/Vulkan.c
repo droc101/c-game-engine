@@ -87,7 +87,6 @@ VkResult VK_FrameStart()
 
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = swapChainExtent,
-		.colorAttachmentClearValue.color = clearColor,
 		.depthAttachmentClearValue.depthStencil.depth = 1,
 	};
 	VulkanTestReturnResult(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
@@ -545,11 +544,6 @@ void VK_DrawRectOutline(const int32_t x,
 	VK_DrawLine(x, y + h, x, y, thickness, color);
 }
 
-void VK_ClearColor(const Color color)
-{
-	clearColor = (VkClearColorValue){{color.r, color.g, color.b, color.a}};
-}
-
 void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
 {
 	const uint32_t textureIndex = TextureIndex(texture);
@@ -580,6 +574,6 @@ void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
 			.descriptorCount = 1,
 			.imageInfo = &imageInfo,
 		};
-		lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
 	}
+	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
 }

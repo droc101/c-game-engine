@@ -225,7 +225,6 @@ extern LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 extern List textures;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 extern TextureSamplers textureSamplers;
-extern VkClearColorValue clearColor;
 extern VkSampleCountFlagBits msaaSamples;
 extern PushConstants pushConstants;
 #pragma endregion variables

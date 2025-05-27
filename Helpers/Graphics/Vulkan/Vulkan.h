@@ -76,8 +76,6 @@ void VK_DrawLine(int startX, int startY, int endX, int endY, int thickness, Colo
 
 void VK_DrawRectOutline(int x, int y, int w, int h, int thickness, Color color);
 
-void VK_ClearColor(Color color);
-
 void VK_SetTexParams(const char *texture, bool linear, bool repeat);
 
 #endif //GAME_VULKAN_H

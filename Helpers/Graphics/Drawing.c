@@ -174,7 +174,6 @@ inline void ClearColor(const Color color)
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_ClearColor(color);
 			break;
 		case RENDERER_OPENGL:
 			GL_ClearColor(color);
