@@ -142,6 +142,11 @@ bool GL_PreInit()
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1),
 					"Failed to set OpenGL double buffer",
 					"Failed to start OpenGL");
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8), "Failed to set OpenGL green-size", "Failed to start OpenGL");
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8), "Failed to set OpenGL blue-size", "Failed to start OpenGL");
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8), "Failed to set OpenGL alpha-size", "Failed to start OpenGL");
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24), "Failed to set OpenGL depth buffer size", "Failed to start OpenGL");
 
 	memset(glAssetTextureMap, -1, MAX_TEXTURES * sizeof(int));
 	memset(glTextures, 0, sizeof(glTextures));
