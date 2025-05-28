@@ -19,9 +19,10 @@
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
 #include "../Helpers/Core/Logging.h"
+#include "../Helpers/Core/KVList.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/) {}
+void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, KvList * /*params*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
@@ -55,10 +56,7 @@ int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1};
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
 				   const int actorType,
-				   const byte paramA,
-				   const byte paramB,
-				   const byte paramC,
-				   const byte paramD,
+				   KvList *params,
 				   const b2WorldId worldId)
 {
 	Actor *actor = malloc(sizeof(Actor));
@@ -67,10 +65,6 @@ Actor *CreateActor(const Vector2 position,
 	actor->position = position;
 	actor->rotation = rotation;
 	actor->health = ActorHealths[actorType];
-	actor->paramA = paramA;
-	actor->paramB = paramB;
-	actor->paramC = paramC;
-	actor->paramD = paramD;
 	actor->yPosition = 0.0f;
 	actor->showShadow = true;
 	actor->shadowSize = 1.0f;
@@ -82,9 +76,10 @@ Actor *CreateActor(const Vector2 position,
 	actor->Init = ActorInitFuncs[actorType];
 	actor->Update = ActorUpdateFuncs[actorType];
 	actor->Destroy = ActorDestroyFuncs[actorType];
-	actor->Init(actor, worldId); // kindly allow the Actor to initialize itself
+	actor->Init(actor, worldId, params); // kindly allow the Actor to initialize itself
 	actor->actorType = actorType;
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
+	if (params) KvListDestroy(params);
 	return actor;
 }
 

@@ -8,7 +8,7 @@
 #include <box2d/box2d.h>
 #include "../defines.h"
 
-void LaserInit(Actor *this, b2WorldId worldId);
+void LaserInit(Actor *this, b2WorldId worldId, KvList *params);
 void LaserUpdate(Actor *this, double delta);
 void LaserDestroy(Actor *this);
 

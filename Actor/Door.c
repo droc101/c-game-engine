@@ -13,6 +13,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
+#include "../Helpers/Core/KVList.h"
 
 typedef enum
 {
@@ -37,6 +38,8 @@ typedef struct DoorData
 	double animationTime;
 	b2ShapeId sensorId;
 	Vector2 spawnPosition;
+	bool preventPlayerOpen;
+	bool stayOpen;
 } DoorData;
 
 void DoorSetState(const Actor *door, const DoorState state)
@@ -97,7 +100,7 @@ void CreateDoorSensor(Actor *this, const b2WorldId worldId)
 
 bool DoorSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param);
 
-void DoorInit(Actor *this, const b2WorldId worldId)
+void DoorInit(Actor *this, const b2WorldId worldId, KvList *params)
 {
 	const Vector2 wallEnd = Vector2Normalize(Vector2FromAngle(this->rotation));
 	this->actorWall = CreateWall((Vector2){0, 0}, wallEnd, TEXTURE("actor_door"), 1.0f, 0.0f);
@@ -112,6 +115,9 @@ void DoorInit(Actor *this, const b2WorldId worldId)
 	data->state = DOOR_CLOSED;
 	data->animationTime = 0;
 	data->spawnPosition = this->position;
+
+	data->preventPlayerOpen = KvGetTypeWithDefault(params, "preventPlayerOpen", PARAM_TYPE_BOOL, &(PARAM_BOOL(false)))->boolValue;
+	data->stayOpen = KvGetTypeWithDefault(params, "stayOpen", PARAM_TYPE_BOOL, &(PARAM_BOOL(false)))->boolValue;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -120,7 +126,7 @@ void DoorUpdate(Actor *this, const double delta)
 	this->position = b2Body_GetPosition(this->bodyId);
 	DoorData *data = this->extraData;
 	data->playerColliding = GetSensorState(GetState()->level->worldId, data->sensorId.index1, data->playerColliding);
-	if (this->paramA)
+	if (data->preventPlayerOpen)
 	{
 		data->playerColliding = false;
 	}
@@ -135,7 +141,7 @@ void DoorUpdate(Actor *this, const double delta)
 			}
 			break;
 		case DOOR_OPEN:
-			if (data->animationTime >= 1 && !data->playerColliding && !this->paramB)
+			if (data->animationTime >= 1 && !data->playerColliding && !data->stayOpen)
 			{
 				b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
 				DoorSetState(this, DOOR_CLOSING);

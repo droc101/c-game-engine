@@ -40,7 +40,7 @@ void CreateGoalSensor(Actor *this, const b2WorldId worldId)
 	*shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
-void GoalInit(Actor *this, const b2WorldId worldId)
+void GoalInit(Actor *this, const b2WorldId worldId, KvList *params)
 {
 	this->actorWall = CreateWall(v2(0, 0.5f), v2(0, -0.5f), TEXTURE("actor_goal0"), 1.0f, 0.0f);
 	WallBake(this->actorWall);

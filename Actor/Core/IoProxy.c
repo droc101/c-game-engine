@@ -23,7 +23,7 @@ bool IoProxySignalHandler(Actor *self, const Actor *sender, byte signal, const P
 	return false;
 }
 
-void IoProxyInit(Actor *this, const b2WorldId worldId)
+void IoProxyInit(Actor *this, const b2WorldId worldId, KvList *params)
 {
 	if (GetState()->level->ioProxy != NULL)
 	{

@@ -9,15 +9,33 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
+#include "../Helpers/Core/KVList.h"
 
-void LaserInit(Actor *this, b2WorldId)
+typedef enum LaserHeight
 {
+	FLOOR,
+	MID,
+	CEILING
+} LaserHeight;
+
+typedef struct LaserData
+{
+	LaserHeight height;
+} LaserData;
+
+void LaserInit(Actor *this, b2WorldId, KvList *params)
+{
+	this->extraData = calloc(1, sizeof(LaserData));
 	this->showShadow = false;
 	this->actorWall = CreateWall(v2s(0), v2s(0), TEXTURE("actor_laser"), 1.0f, 0.0f);
-	if (this->paramA == 0)
+
+	LaserData *data = this->extraData;
+	data->height = (LaserHeight)KvGetTypeWithDefault(params, "height", PARAM_TYPE_BYTE, &(PARAM_BYTE(MID)))->byteValue;
+
+	if (data->height == FLOOR)
 	{
 		this->yPosition = -0.3f;
-	} else if (this->paramA == 2)
+	} else if (data->height == CEILING)
 	{
 		this->yPosition = 0.3f;
 	} else
@@ -55,4 +73,5 @@ void LaserUpdate(Actor *this, double)
 void LaserDestroy(Actor *this)
 {
 	free(this->actorWall);
+	free(this->extraData);
 }

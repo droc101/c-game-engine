@@ -88,10 +88,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		Actor *a = CreateActor(v2(actorX, actorY),
 							   actorRotation,
 							   actorType,
-							   actorParamA,
-							   actorParamB,
-							   actorParamC,
-							   actorParamD,
+							   NULL,
 							   l->worldId);
 		for (int j = 0; j < connectionCount; j++)
 		{

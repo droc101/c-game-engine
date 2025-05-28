@@ -9,6 +9,10 @@
 
 void KvListCreate(KvList *list)
 {
+	if (!list)
+	{
+		return;
+	}
 	ListCreate(&list->keys);
 	ListCreate(&list->values);
 }
@@ -28,6 +32,10 @@ size_t KvIndexOf(const KvList *list, const char *key)
 
 void KvSet(KvList *list, const char *key, const Param value)
 {
+	if (!list || !key)
+	{
+		return;
+	}
 	const size_t index = KvIndexOf(list, key);
 	Param *p = (Param *)malloc(sizeof(Param));
 	CheckAlloc(p);
@@ -45,6 +53,10 @@ void KvSet(KvList *list, const char *key, const Param value)
 
 Param *KvGet(const KvList *list, const char *key)
 {
+	if (!list || !key)
+	{
+		return NULL;
+	}
 	const size_t index = KvIndexOf(list, key);
 	if (index != -1)
 	{
@@ -56,6 +68,10 @@ Param *KvGet(const KvList *list, const char *key)
 
 void KvDelete(KvList *list, const char *key)
 {
+	if (!list || !key)
+	{
+		return;
+	}
 	const size_t index = KvIndexOf(list, key);
 	if (index != -1)
 	{
@@ -77,4 +93,41 @@ void KvListDestroy(KvList *list)
 
 	ListAndContentsFree(&list->keys, false);
 	ListAndContentsFree(&list->values, false);
+}
+
+size_t KvListLength(const KvList *list)
+{
+	if (!list)
+	{
+		return 0;
+	}
+	return list->keys.length;
+}
+
+bool KvListHas(const KvList *list, const char *key)
+{
+	if (!list || !key)
+	{
+		return false;
+	}
+	const size_t index = KvIndexOf(list, key);
+	return index != -1;
+}
+
+Param* KvGetTypeWithDefault(const KvList *list, const char *key, const ParamType expectedType, Param *defaultValue)
+{
+	if (!defaultValue)
+	{
+		Error("Passed NULL defaultValue to KvGetTypeWithDefault");
+	}
+	if (!list || !key)
+	{
+		return defaultValue;
+	}
+	Param *p = KvGet(list, key);
+	if (!p || p->type != expectedType)
+	{
+		return defaultValue;
+	}
+	return p;
 }

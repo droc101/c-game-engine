@@ -12,7 +12,6 @@
 #include <SDL_mixer.h>
 #include <stdbool.h>
 #include <stdint.h>
-
 #include "config.h"
 #include "Helpers/Core/List.h"
 
@@ -53,6 +52,7 @@ typedef struct Param Param;
 typedef struct ModelDefinition ModelDefinition;
 typedef struct Material Material;
 typedef struct ModelLod ModelLod;
+typedef struct KvList KvList;
 
 // Function signatures
 typedef void (*FixedUpdateFunction)(GlobalState *state, double delta);
@@ -63,7 +63,7 @@ typedef void (*FrameRenderFunction)(GlobalState *state);
 
 typedef void (*TextBoxCloseFunction)(TextBox *textBox);
 
-typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId);
+typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId, KvList *params);
 
 typedef void (*ActorUpdateFunction)(Actor *self, double delta);
 
@@ -130,12 +130,13 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byt
 #define EXPORT_SYM __attribute__((visibility("default")))
 #endif
 
-#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, {.byteValue = x}})
-#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, {.intValue = x}})
-#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, {.floatValue = x}})
-#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, {.boolValue = x}})
-#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, {.stringValue = x}})
-#define PARAM_NONE ((Param){PARAM_TYPE_NONE, {}})
+#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = x})
+#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = x})
+#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = x})
+#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = x})
+#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = x})
+#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = x})
+#define PARAM_NONE ((Param){PARAM_TYPE_NONE})
 
 #pragma endregion
 
@@ -241,26 +242,18 @@ enum ParamType
 	PARAM_TYPE_FLOAT,
 	PARAM_TYPE_BOOL,
 	PARAM_TYPE_STRING,
-	PARAM_TYPE_NONE
+	PARAM_TYPE_NONE,
+	PARAM_TYPE_COLOR
 };
 
 #pragma endregion
 
 #pragma region Struct definitions
 
-union _ParamInternal
+struct KvList
 {
-	byte byteValue;
-	int intValue;
-	float floatValue;
-	bool boolValue;
-	char stringValue[64];
-};
-
-struct Param
-{
-	ParamType type;
-	union _ParamInternal value;
+	List keys;
+	List values;
 };
 
 struct Color
@@ -269,6 +262,20 @@ struct Color
 	float g;
 	float b;
 	float a;
+};
+
+struct Param
+{
+	ParamType type;
+	union
+	{
+		byte byteValue;
+		int intValue;
+		float floatValue;
+		bool boolValue;
+		char stringValue[64];
+		Color colorValue;
+	};
 };
 
 struct Camera
@@ -546,12 +553,6 @@ struct Actor
 	ActorSignalHandlerFunction SignalHandler;
 	/// List of I/O connections
 	List ioConnections;
-
-	// extra parameters for the actor. saved in level data, so can be used during Init
-	byte paramA;
-	byte paramB;
-	byte paramC;
-	byte paramD;
 
 	/// The actor's health
 	/// @note May be unused for some actors

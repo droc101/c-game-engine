@@ -15,14 +15,21 @@
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
+#include "../Helpers/Core/KVList.h"
 
 #define COIN_OUTPUT_COLLECTED 2
 
+typedef struct CoinData
+{
+	bool isBlue;
+	byte animFrame;
+	b2ShapeId shape;
+} CoinData;
+
 void CreateCoinSensor(Actor *this, const b2WorldId worldId)
 {
-	this->extraData = calloc(1, sizeof(b2ShapeId));
-	CheckAlloc(this->extraData);
-	b2ShapeId *shapeId = this->extraData;
+	CoinData *data = this->extraData;
+	b2ShapeId *shapeId = &data->shape;
 
 	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
 	sensorBodyDef.type = b2_staticBody;
@@ -39,18 +46,22 @@ void CreateCoinSensor(Actor *this, const b2WorldId worldId)
 	*shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
-void CoinInit(Actor *this, const b2WorldId worldId)
+void CoinInit(Actor *this, const b2WorldId worldId, KvList *params)
 {
+	CoinData *data = calloc(1, sizeof(CoinData));
+	CheckAlloc(data);
+	this->extraData = data;
+	data->isBlue = KvGetTypeWithDefault(params, "blue", PARAM_TYPE_BOOL, &(PARAM_BOOL(false)))->boolValue;
+
 	this->actorWall = CreateWall(v2(0, 0.125f),
 								 v2(0, -0.125f),
-								 this->paramB == 1 ? TEXTURE("actor_bluecoin") : TEXTURE("actor_coin"),
+								 data->isBlue ? TEXTURE("actor_bluecoin") : TEXTURE("actor_coin"),
 								 1.0f,
 								 0.0f);
 	WallBake(this->actorWall);
 
 	CreateCoinSensor(this, worldId);
 
-	this->paramA = 0;
 	this->actorWall->height = 0.25f;
 	this->yPosition = -0.25f;
 	this->shadowSize = 0.1f;
@@ -58,12 +69,13 @@ void CoinInit(Actor *this, const b2WorldId worldId)
 
 void CoinUpdate(Actor *this, double /*delta*/)
 {
+	CoinData *data = this->extraData;
 	if (GetState()->physicsFrame % 8 == 0)
 	{
-		this->paramA++;
-		this->paramA %= 4;
+		data->animFrame++;
+		data->animFrame %= 4;
 
-		const float uvo = 0.25f * (float)this->paramA;
+		const float uvo = 0.25f * (float)data->animFrame;
 		this->actorWall->uvOffset = uvo;
 	}
 
@@ -74,7 +86,7 @@ void CoinUpdate(Actor *this, double /*delta*/)
 
 	if (GetSensorState(GetState()->level->worldId, ((b2ShapeId *)this->extraData)->index1, false))
 	{
-		if (this->paramB == 0)
+		if (!data->isBlue)
 		{
 			GetState()->saveData->coins++;
 		} else

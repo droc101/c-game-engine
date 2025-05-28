@@ -21,7 +21,7 @@ void CreatePhysboxCollider(Actor *this, const b2WorldId worldId)
 	b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
 }
 
-void PhysboxInit(Actor *this, const b2WorldId worldId)
+void PhysboxInit(Actor *this, const b2WorldId worldId, KvList *params)
 {
 	CreatePhysboxCollider(this, worldId);
 
