@@ -182,6 +182,8 @@ add_executable(
         Actor/Physbox.h
         Actor/Laser.c
         Actor/Laser.h
+        Helpers/Core/KVList.c
+        Helpers/Core/KVList.h
 )
 
 #endregion
