@@ -3,7 +3,7 @@
 //
 
 #include "KVList.h"
-
+#include <string.h>
 #include "Error.h"
 #include "Logging.h"
 
