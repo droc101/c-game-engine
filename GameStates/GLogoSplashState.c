@@ -32,7 +32,7 @@ void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
 
 	if (State->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		GMenuStateSet();
+		GMenuStateSetWithFade();
 	}
 }
 
