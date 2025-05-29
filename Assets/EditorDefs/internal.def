@@ -28,19 +28,18 @@
             "name": "Trigger",
             "params": [
                 {
-                    "name": "X Size",
-                    "min": 1,
-                    "max": 200
+                    "name": "width",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 200.0,
+                    "default": 2.0
                 },
                 {
-                    "name": "Y Size",
-                    "min": 1,
-                    "max": 200
-                },
-                {
-                    "name": "Flags",
-                    "min": 0,
-                    "max": 255
+                    "name": "depth",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 200.0,
+                    "default": 2.0
                 }
             ],
             "render_type": "trigger",
@@ -86,6 +85,56 @@
                 },
                 {
                     "name": "first_tick",
+                    "paramType": "none"
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "name": "Static Model",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "model",
+                    "type": "string",
+                    "hint": "model",
+                    "default": "leafy"
+                },
+                {
+                    "name": "skin",
+                    "type": "int",
+                    "min": 0,
+                    "max": 255,
+                    "default": 0
+                },
+                {
+                    "name": "yPosition",
+                    "type": "float",
+                    "min": -1.0,
+                    "max": 1.0,
+                    "default": 0.0
+                },
+                {
+                    "name": "shadowSize",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 5.0,
+                    "default": 0.5
+                },
+                {
+                    "name": "showShadow",
+                    "type": "bool",
+                    "default": false
+                }
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
                     "paramType": "none"
                 }
             ]

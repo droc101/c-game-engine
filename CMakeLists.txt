@@ -184,6 +184,8 @@ add_executable(
         Actor/Laser.h
         Helpers/Core/KVList.c
         Helpers/Core/KVList.h
+        Actor/Core/StaticModel.c
+        Actor/Core/StaticModel.h
 )
 
 #endregion

@@ -12,14 +12,15 @@
 
 #include "../Actor/Coin.h"
 #include "../Actor/Core/IoProxy.h"
+#include "../Actor/Core/StaticModel.h"
 #include "../Actor/Core/Trigger.h"
 #include "../Actor/Door.h"
 #include "../Actor/Goal.h"
 #include "../Actor/Laser.h"
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
-#include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Logging.h"
 
 // Empty template functions
 void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, KvList * /*params*/) {}
@@ -29,7 +30,7 @@ void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 void ActorDestroy(Actor * /*this*/) {}
 
 ActorInitFunction ActorInitFuncs[] =
-		{ActorInit, TestActorInit, CoinInit, GoalInit, DoorInit, TriggerInit, IoProxyInit, PhysboxInit, LaserInit};
+		{ActorInit, TestActorInit, CoinInit, GoalInit, DoorInit, TriggerInit, IoProxyInit, PhysboxInit, LaserInit, StaticModelInit};
 
 ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
 										  TestActorUpdate,
@@ -39,7 +40,9 @@ ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
 										  TriggerUpdate,
 										  IoProxyUpdate,
 										  PhysboxUpdate,
-										  LaserUpdate};
+										  LaserUpdate,
+	  ActorUpdate
+};
 
 ActorDestroyFunction ActorDestroyFuncs[] = {ActorDestroy,
 											TestActorDestroy,
@@ -49,9 +52,10 @@ ActorDestroyFunction ActorDestroyFuncs[] = {ActorDestroy,
 											TriggerDestroy,
 											IoProxyDestroy,
 											PhysboxDestroy,
-											LaserDestroy};
+											LaserDestroy,
+ActorDestroy};
 
-int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1};
+int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
