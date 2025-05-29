@@ -116,8 +116,8 @@ void DoorInit(Actor *this, const b2WorldId worldId, KvList *params)
 	data->animationTime = 0;
 	data->spawnPosition = this->position;
 
-	data->preventPlayerOpen = KvGetTypeWithDefault(params, "preventPlayerOpen", PARAM_TYPE_BOOL, &(PARAM_BOOL(false)))->boolValue;
-	data->stayOpen = KvGetTypeWithDefault(params, "stayOpen", PARAM_TYPE_BOOL, &(PARAM_BOOL(false)))->boolValue;
+	data->preventPlayerOpen = KvGetBool(params, "preventPlayerOpen", false);
+	data->stayOpen = KvGetBool(params, "stayOpen", false);
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef

@@ -51,7 +51,7 @@ void CoinInit(Actor *this, const b2WorldId worldId, KvList *params)
 	CoinData *data = calloc(1, sizeof(CoinData));
 	CheckAlloc(data);
 	this->extraData = data;
-	data->isBlue = KvGetTypeWithDefault(params, "blue", PARAM_TYPE_BOOL, &(PARAM_BOOL(false)))->boolValue;
+	data->isBlue = KvGetBool(params, "isBlue", false);
 
 	this->actorWall = CreateWall(v2(0, 0.125f),
 								 v2(0, -0.125f),

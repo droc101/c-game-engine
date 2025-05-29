@@ -8,10 +8,10 @@
 
 #include "../../Helpers/Collision.h"
 #include "../../Helpers/Core/Error.h"
+#include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Level.h"
-#include "../../Helpers/Core/KVList.h"
 
 #define TRIGGER_INPUT_FORCE_TRIGGER 1
 #define TRIGGER_OUTPUT_TRIGGERED 2
@@ -44,10 +44,7 @@ void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rot
 	sensorBodyDef.type = b2_staticBody;
 	sensorBodyDef.position = position;
 	const b2BodyId bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	const b2Polygon sensorShape = b2MakeOffsetBox(data->width * 0.5f,
-												  data->depth * 0.5f,
-												  (Vector2){0, 0},
-												  rotation);
+	const b2Polygon sensorShape = b2MakeOffsetBox(data->width * 0.5f, data->depth * 0.5f, (Vector2){0, 0}, rotation);
 	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
 	sensorShapeDef.isSensor = true;
 	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
@@ -62,8 +59,8 @@ void TriggerInit(Actor *this, const b2WorldId worldId, KvList *params)
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
 	TriggerData *data = this->extraData;
-	data->width = KvGetTypeWithDefault(params, "width", PARAM_TYPE_FLOAT, &(PARAM_FLOAT(1.0f)))->floatValue;
-	data->depth = KvGetTypeWithDefault(params, "depth", PARAM_TYPE_FLOAT, &(PARAM_FLOAT(1.0f)))->floatValue;
+	data->width = KvGetFloat(params, "width", 1.0f);
+	data->depth = KvGetFloat(params, "depth", 1.0f);
 	this->SignalHandler = TriggerSignalHandler;
 	CheckAlloc(this->extraData);
 	CreateTriggerSensor(this, this->position, this->rotation, worldId);

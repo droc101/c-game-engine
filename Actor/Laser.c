@@ -30,7 +30,7 @@ void LaserInit(Actor *this, b2WorldId, KvList *params)
 	this->actorWall = CreateWall(v2s(0), v2s(0), TEXTURE("actor_laser"), 1.0f, 0.0f);
 
 	LaserData *data = this->extraData;
-	data->height = (LaserHeight)KvGetTypeWithDefault(params, "height", PARAM_TYPE_BYTE, &(PARAM_BYTE(MID)))->byteValue;
+	data->height = (LaserHeight)KvGetByte(params, "height", MID);
 
 	if (data->height == FLOOR)
 	{
