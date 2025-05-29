@@ -156,6 +156,14 @@ void KvSetString(KvList *list, const char *key, const char *value);
  */
 void KvSetColor(KvList *list, const char *key, Color value);
 
+/**
+ * Perform a type-unsafe set of a value in the key-value list.
+ * @param list The list to set the value in.
+ * @param key The key to set the value for.
+ * @param value The raw value to set.
+ */
+void KvSetUnsafe(KvList *list, const char *key, const Param value);
+
 #pragma endregion
 
 #endif //KVLIST_H

@@ -86,12 +86,12 @@
             "name": "Door",
             "params": [
             	{
-					"name": "Prevent Player Open",
+					"name": "preventPlayerOpen",
                     "type": "bool",
                     "default": false
 				},
 				{
-					"name": "Stay Open",
+					"name": "stayOpen",
 					"type": "bool",
                     "default": false
 				}
@@ -165,9 +165,11 @@
             "name": "Laser",
             "params": [
                 {
-					"name": "Height (0=ground 1=mid 2=ceiling)",
+					"name": "height",
 					"type": "byte",
-                    "default": 1
+                    "default": 1,
+                    "min": 0,
+                    "max": 2
 				}
             ],
             "render_type": "normal",

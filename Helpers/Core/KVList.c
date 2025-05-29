@@ -288,4 +288,9 @@ inline void KvSetColor(KvList *list, const char *key, const Color value)
 	KvSet(list, key, (Param){PARAM_TYPE_COLOR, .colorValue = value});
 }
 
+void KvSetUnsafe(KvList *list, const char *key, const Param value)
+{
+	KvSet(list, key, value);
+}
+
 #pragma endregion

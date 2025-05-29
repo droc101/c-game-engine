@@ -11,6 +11,7 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 #include "Core/DataReader.h"
+#include "Core/KVList.h"
 #include "Core/Logging.h"
 
 /**
@@ -76,20 +77,31 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		const float actorRotation = ReadFloat(data, &offset);
 		EXPECT_BYTES(sizeof(int) + sizeof(byte) * 4);
 		const int actorType = ReadInt(data, &offset);
-		const byte actorParamA = ReadByte(data, &offset);
-		const byte actorParamB = ReadByte(data, &offset);
-		const byte actorParamC = ReadByte(data, &offset);
-		const byte actorParamD = ReadByte(data, &offset);
 		const char actorName[64];
 		EXPECT_BYTES(64);
 		ReadString(data, &offset, (char *)&actorName, 64);
-		EXPECT_BYTES(sizeof(uint));
-		const uint connectionCount = ReadUint(data, &offset);
+
+		KvList params;
+		KvListCreate(&params);
+		const uint paramCount = ReadUint(data, &offset);
+		for (size_t j = 0; j < paramCount; j++)
+		{
+			char key[64];
+			Param param;
+			EXPECT_BYTES(64 + sizeof(Param));
+			ReadString(data, &offset, (char *)&key, 64);
+			ReadBytes(data, &offset, sizeof(Param), &param);
+			KvSetUnsafe(&params, key, param);
+		}
+
 		Actor *a = CreateActor(v2(actorX, actorY),
 							   actorRotation,
 							   actorType,
-							   NULL,
+							   &params,
 							   l->worldId);
+
+		EXPECT_BYTES(sizeof(uint));
+		const uint connectionCount = ReadUint(data, &offset);
 		for (int j = 0; j < connectionCount; j++)
 		{
 			ActorConnection *ac = malloc(sizeof(ActorConnection));
@@ -102,6 +114,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			ReadBytes(data, &offset, sizeof(Param), &ac->outParamOverride);
 			ListAdd(&a->ioConnections, ac);
 		}
+
 		ListAdd(&l->actors, a);
 		if (actorName[0] != '\0')
 		{

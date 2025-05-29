@@ -32,14 +32,16 @@
                     "type": "float",
                     "min": 1.0,
                     "max": 200.0,
-                    "default": 2.0
+                    "default": 2.0,
+                    "step": 0.1
                 },
                 {
                     "name": "depth",
                     "type": "float",
                     "min": 1.0,
                     "max": 200.0,
-                    "default": 2.0
+                    "default": 2.0,
+                    "step": 0.1
                 }
             ],
             "render_type": "trigger",
@@ -98,7 +100,7 @@
                     "name": "model",
                     "type": "string",
                     "hint": "model",
-                    "default": "leafy"
+                    "default": "model_quad"
                 },
                 {
                     "name": "skin",
@@ -112,14 +114,16 @@
                     "type": "float",
                     "min": -1.0,
                     "max": 1.0,
-                    "default": 0.0
+                    "default": 0.0,
+                    "step": 0.1
                 },
                 {
                     "name": "shadowSize",
                     "type": "float",
                     "min": 1.0,
                     "max": 5.0,
-                    "default": 0.5
+                    "default": 0.5,
+                    "step": 0.1
                 },
                 {
                     "name": "showShadow",
