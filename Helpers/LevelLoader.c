@@ -96,9 +96,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 
 		Actor *a = CreateActor(v2(actorX, actorY),
 							   actorRotation,
-							   actorType,
-							   &params,
-							   l->worldId);
+							   actorType, &params, l->worldId);
 
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);

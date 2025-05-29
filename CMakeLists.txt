@@ -186,6 +186,10 @@ add_executable(
         Helpers/Core/KVList.h
         Actor/Core/StaticModel.c
         Actor/Core/StaticModel.h
+        Actor/Core/SoundPlayer.c
+        Actor/Core/SoundPlayer.h
+        Actor/Core/Sprite.c
+        Actor/Core/Sprite.h
 )
 
 #endregion

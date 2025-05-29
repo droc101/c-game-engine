@@ -21,6 +21,8 @@
 #include "../Actor/TestActor.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
+#include "../Actor/Core/SoundPlayer.h"
+#include "../Actor/Core/Sprite.h"
 
 // Empty template functions
 void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, KvList * /*params*/) {}
@@ -38,7 +40,9 @@ ActorInitFunction ActorInitFuncs[] = {ActorInit,
 									  IoProxyInit,
 									  PhysboxInit,
 									  LaserInit,
-									  StaticModelInit};
+									  StaticModelInit,
+									  SoundPlayerInit,
+SpriteInit,};
 
 ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
 										  TestActorUpdate,
@@ -49,7 +53,9 @@ ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
 										  IoProxyUpdate,
 										  PhysboxUpdate,
 										  LaserUpdate,
-	  ActorUpdate
+	  ActorUpdate,
+	ActorUpdate,
+	ActorUpdate,
 };
 
 ActorDestroyFunction ActorDestroyFuncs[] = {ActorDestroy,
@@ -61,9 +67,11 @@ ActorDestroyFunction ActorDestroyFuncs[] = {ActorDestroy,
 											IoProxyDestroy,
 											PhysboxDestroy,
 											LaserDestroy,
-ActorDestroy};
+ActorDestroy,
+SoundPlayerDestroy,
+SpriteDestroy,};
 
-int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
