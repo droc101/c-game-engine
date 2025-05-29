@@ -29,8 +29,16 @@ void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorDestroy(Actor * /*this*/) {}
 
-ActorInitFunction ActorInitFuncs[] =
-		{ActorInit, TestActorInit, CoinInit, GoalInit, DoorInit, TriggerInit, IoProxyInit, PhysboxInit, LaserInit, StaticModelInit};
+ActorInitFunction ActorInitFuncs[] = {ActorInit,
+									  TestActorInit,
+									  CoinInit,
+									  GoalInit,
+									  DoorInit,
+									  TriggerInit,
+									  IoProxyInit,
+									  PhysboxInit,
+									  LaserInit,
+									  StaticModelInit};
 
 ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
 										  TestActorUpdate,
