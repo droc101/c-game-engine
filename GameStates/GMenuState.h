@@ -5,6 +5,8 @@
 #ifndef GAME_GMENUSTATE_H
 #define GAME_GMENUSTATE_H
 
+void GMenuStateSetWithFade();
+
 void GMenuStateSet();
 
 void GMenuStateDestroy();
