@@ -58,11 +58,25 @@
         {
             "id": 3,
             "name": "Goal",
-            "params": [],
+            "params": [
+                {
+					"name": "startEnabled",
+					"type": "bool",
+                    "default": true
+				}
+            ],
             "render_type": "normal",
             "inputs": [
                 {
                     "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "enable",
+                    "paramType": "none"
+                },
+                {
+                    "name": "disable",
                     "paramType": "none"
                 }
             ],
