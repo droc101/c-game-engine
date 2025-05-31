@@ -23,7 +23,8 @@ enum ActorType
 	TRIGGER_ACTOR,
 	IO_PROXY_ACTOR,
 	PHYSBOX_ACTOR,
-	LASER_ACTOR
+	LASER_ACTOR,
+	STATIC_MODEL_ACTOR
 };
 
 /**
@@ -31,20 +32,14 @@ enum ActorType
  * @param position Actor position
  * @param rotation Actor rotation
  * @param actorType Actor type
- * @param paramA Initial parameter A
- * @param paramB Initial parameter B
- * @param paramC Initial parameter C
- * @param paramD Initial parameter D
+ * @param params Parameters for the actor, can be NULL
  * @param worldId The Box2D world within which to create the actor
  * @return Initialized Actor struct
  */
 Actor *CreateActor(Vector2 position,
 				   float rotation,
 				   int actorType,
-				   byte paramA,
-				   byte paramB,
-				   byte paramC,
-				   byte paramD,
+				   KvList *params,
 				   b2WorldId worldId);
 
 /**

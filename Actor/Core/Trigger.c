@@ -8,12 +8,20 @@
 
 #include "../../Helpers/Collision.h"
 #include "../../Helpers/Core/Error.h"
+#include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Level.h"
 
 #define TRIGGER_INPUT_FORCE_TRIGGER 1
 #define TRIGGER_OUTPUT_TRIGGERED 2
+
+typedef struct TriggerData
+{
+	float width;
+	float depth;
+	b2ShapeId shape;
+} TriggerData;
 
 bool TriggerSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
 {
@@ -31,26 +39,28 @@ bool TriggerSignalHandler(Actor *self, const Actor *sender, byte signal, const P
 
 void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rotation, const b2WorldId worldId)
 {
+	TriggerData *data = trigger->extraData;
 	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
 	sensorBodyDef.type = b2_staticBody;
 	sensorBodyDef.position = position;
 	const b2BodyId bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	const b2Polygon sensorShape = b2MakeOffsetBox((float)trigger->paramA * 0.5f,
-												  (float)trigger->paramB * 0.5f,
-												  (Vector2){0, 0},
-												  rotation);
+	const b2Polygon sensorShape = b2MakeOffsetBox(data->width * 0.5f, data->depth * 0.5f, (Vector2){0, 0}, rotation);
 	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
 	sensorShapeDef.isSensor = true;
 	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
 	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	*(b2ShapeId *)(trigger->extraData) = b2CreatePolygonShape(bodyId, &sensorShapeDef, &sensorShape);
+	data->shape = b2CreatePolygonShape(bodyId, &sensorShapeDef, &sensorShape);
 	trigger->bodyId = bodyId;
 }
 
-void TriggerInit(Actor *this, const b2WorldId worldId)
+void TriggerInit(Actor *this, const b2WorldId worldId, KvList *params)
 {
 	this->showShadow = false;
-	this->extraData = malloc(sizeof(b2ShapeId));
+	this->extraData = malloc(sizeof(TriggerData));
+	CheckAlloc(this->extraData);
+	TriggerData *data = this->extraData;
+	data->width = KvGetFloat(params, "width", 1.0f);
+	data->depth = KvGetFloat(params, "depth", 1.0f);
 	this->SignalHandler = TriggerSignalHandler;
 	CheckAlloc(this->extraData);
 	CreateTriggerSensor(this, this->position, this->rotation, worldId);
