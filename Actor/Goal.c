@@ -70,7 +70,7 @@ void CreateGoalSensor(Actor *this, const b2WorldId worldId)
 	goalData->shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
-void GoalInit(Actor *this, const b2WorldId worldId, KvList *params)
+void GoalInit(Actor *this, const b2WorldId worldId, const KvList *params)
 {
 	this->SignalHandler = GoalSignalHandler;
 	this->extraData = calloc(1, sizeof(GoalData));

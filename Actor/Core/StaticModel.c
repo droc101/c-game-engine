@@ -7,7 +7,7 @@
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
 
-void StaticModelInit(Actor *this, const b2WorldId, KvList *params)
+void StaticModelInit(Actor *this, const b2WorldId, const KvList *params)
 {
 	char modelPath[64];
 	snprintf(modelPath, 64, "model/%s.gmdl", KvGetString(params, "model", "model_leafy"));

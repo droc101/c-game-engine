@@ -23,7 +23,7 @@ typedef struct LaserData
 	LaserHeight height;
 } LaserData;
 
-void LaserInit(Actor *this, b2WorldId, KvList *params)
+void LaserInit(Actor *this, b2WorldId, const KvList *params)
 {
 	this->extraData = calloc(1, sizeof(LaserData));
 	this->showShadow = false;

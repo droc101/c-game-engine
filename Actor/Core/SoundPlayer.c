@@ -3,11 +3,11 @@
 //
 
 #include "SoundPlayer.h"
+#include "../../Helpers/Core/Error.h"
+#include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
-#include "../../Helpers/Core/Error.h"
-#include "../../Helpers/Core/KVList.h"
 
 #define SOUNDPLAYER_INPUT_PLAY 1
 
@@ -16,7 +16,7 @@ typedef struct SoundPlayerData
 	const char asset[64]; // asset name of the sound effect to play
 } SoundPlayerData;
 
-bool SoundPlayerSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool SoundPlayerSignalHandler(Actor *self, const Actor *sender, const byte signal, const Param *param)
 {
 	if (DefaultSignalHandler(self, sender, signal, param))
 	{
@@ -31,7 +31,7 @@ bool SoundPlayerSignalHandler(Actor *self, const Actor *sender, byte signal, con
 	return false;
 }
 
-void SoundPlayerInit(Actor *this, const b2WorldId worldId, KvList *params)
+void SoundPlayerInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
 {
 	this->showShadow = false;
 	this->SignalHandler = SoundPlayerSignalHandler;

@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-void GoalInit(Actor *this, b2WorldId worldId, KvList *params);
+void GoalInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 void GoalUpdate(Actor *this, double /*delta*/);
 

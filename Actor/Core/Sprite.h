@@ -8,7 +8,7 @@
 #include <box2d/id.h>
 #include "../../defines.h"
 
-void SpriteInit(Actor *this, b2WorldId, KvList *params);
+void SpriteInit(Actor *this, b2WorldId, const KvList *params);
 
 void SpriteDestroy(Actor *this);
 

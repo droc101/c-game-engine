@@ -8,7 +8,7 @@
 #include "../../Structs/Wall.h"
 #include "../../Structs/Vector2.h"
 
-void SpriteInit(Actor *this, const b2WorldId, KvList *params)
+void SpriteInit(Actor *this, const b2WorldId, const KvList *params)
 {
 	char modelPath[64];
 	snprintf(modelPath, 64, "model/%s.gmdl", KvGetString(params, "texture", "model_leafy"));
@@ -25,7 +25,6 @@ void SpriteInit(Actor *this, const b2WorldId, KvList *params)
 	this->showShadow = KvGetBool(params, "showShadow", true);
 	this->yPosition = KvGetFloat(params, "yPosition", 0.0f);
 	WallBake(this->actorWall);
-	asm("nop");
 }
 
 void SpriteDestroy(Actor *this)

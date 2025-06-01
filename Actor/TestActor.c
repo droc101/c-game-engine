@@ -59,7 +59,7 @@ void CreateTestActorCollider(Actor *this, const b2WorldId worldId)
 	b2CreateCircleShape(this->bodyId, &hurtboxDef, &hurtbox);
 }
 
-void TestActorInit(Actor *this, const b2WorldId worldId, KvList *params)
+void TestActorInit(Actor *this, const b2WorldId worldId, const KvList * /*params*/)
 {
 	CreateTestActorCollider(this, worldId);
 

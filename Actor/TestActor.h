@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-void TestActorInit(Actor *this, b2WorldId worldId, KvList *params);
+void TestActorInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 void TestActorUpdate(Actor *this, double delta);
 

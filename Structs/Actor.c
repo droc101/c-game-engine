@@ -25,7 +25,7 @@
 #include "../Actor/Core/Sprite.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, KvList * /*params*/) {}
+void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 

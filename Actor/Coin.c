@@ -46,7 +46,7 @@ void CreateCoinSensor(Actor *this, const b2WorldId worldId)
 	*shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
-void CoinInit(Actor *this, const b2WorldId worldId, KvList *params)
+void CoinInit(Actor *this, const b2WorldId worldId, const KvList *params)
 {
 	CoinData *data = calloc(1, sizeof(CoinData));
 	CheckAlloc(data);

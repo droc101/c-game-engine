@@ -8,7 +8,7 @@
 #include <box2d/id.h>
 #include "../../defines.h"
 
-void SoundPlayerInit(Actor *this, b2WorldId worldId, KvList *params);
+void SoundPlayerInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 void SoundPlayerDestroy(Actor *this);
 

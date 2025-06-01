@@ -73,7 +73,7 @@ void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rot
 	trigger->bodyId = bodyId;
 }
 
-void TriggerInit(Actor *this, const b2WorldId worldId, KvList *params)
+void TriggerInit(Actor *this, const b2WorldId worldId, const KvList *params)
 {
 	this->showShadow = false;
 	this->extraData = malloc(sizeof(TriggerData));

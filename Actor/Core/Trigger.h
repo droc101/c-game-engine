@@ -7,7 +7,7 @@
 #include <box2d/id.h>
 #include "../../defines.h"
 
-void TriggerInit(Actor *this, b2WorldId worldId, KvList *params);
+void TriggerInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 void TriggerUpdate(Actor *this, double /*delta*/);
 

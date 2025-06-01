@@ -23,7 +23,8 @@ bool IoProxySignalHandler(Actor *self, const Actor *sender, byte signal, const P
 	return false;
 }
 
-void IoProxyInit(Actor *this, const b2WorldId worldId, KvList *params)
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*params*/)
 {
 	if (GetState()->level->ioProxy != NULL)
 	{

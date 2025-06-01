@@ -63,7 +63,7 @@ typedef void (*FrameRenderFunction)(GlobalState *state);
 
 typedef void (*TextBoxCloseFunction)(TextBox *textBox);
 
-typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId, KvList *params);
+typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId, const KvList *params);
 
 typedef void (*ActorUpdateFunction)(Actor *self, double delta);
 

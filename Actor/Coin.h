@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-void CoinInit(Actor *this, b2WorldId worldId, KvList *params);
+void CoinInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 void CoinUpdate(Actor *this, double /*delta*/);
 
