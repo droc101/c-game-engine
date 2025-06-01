@@ -121,30 +121,32 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	PhysicsThreadSetFunction(FixedUpdateGame);
 }
 
-void ChangeLevel(Level *l)
+void ChangeLevel(Level *level)
 {
-	if (!l)
+	if (!level)
 	{
 		LogError("Cannot change to a NULL level. Something might have gone wrong while loading it.\n");
 		return;
 	}
+	PhysicsThreadLockTickMutex();
 	if (state.level)
 	{
 		DestroyLevel(state.level);
 	}
-	state.level = l;
+	state.level = level;
 	state.textBoxActive = false;
-	if (strncmp(l->music, "none", 4) != 0)
+	if (strncmp(level->music, "none", 4) != 0)
 	{
 		char musicPath[92];
-		snprintf(musicPath, 92, "audio/%s.gmus", l->music);
+		snprintf(musicPath, 92, "audio/%s.gmus", level->music);
 		ChangeMusic(musicPath);
 	} else
 	{
 		StopMusic();
 	}
 
-	LoadLevelWalls(l);
+	LoadLevelWalls(level);
+	PhysicsThreadUnlockTickMutex();
 }
 
 void ChangeMusic(const char *asset)
@@ -290,7 +292,6 @@ bool ChangeLevelByName(const char *name)
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
-	Level *l = LoadLevel(levelData->data, levelData->size);
-	ChangeLevel(l);
+	ChangeLevel(LoadLevel(levelData->data, levelData->size));
 	return true;
 }

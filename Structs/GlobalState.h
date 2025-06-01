@@ -63,9 +63,9 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 
 /**
  * Change the current level
- * @param l Level to change to
+ * @param level Level to change to
  */
-void ChangeLevel(Level *l);
+void ChangeLevel(Level *level);
 
 /**
  * Change the bgm

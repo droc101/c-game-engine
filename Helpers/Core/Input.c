@@ -363,7 +363,7 @@ void InputDestroy()
 	free(physicsInputReadBuffer);
 }
 
-void InputPhysicsFrameBegin()
+void InputPhysicsTickBegin()
 {
 	PhysicsStateBuffer *temp = physicsInputWorkingBuffer;
 	physicsInputWorkingBuffer = physicsInputReadBuffer;

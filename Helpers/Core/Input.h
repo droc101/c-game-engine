@@ -240,7 +240,7 @@ void InputDestroy();
 /**
  * Swap input buffers for the physics thread
  */
-void InputPhysicsFrameBegin();
+void InputPhysicsTickBegin();
 
 /**
  * Check if a key was just pressed since the last physics tick
