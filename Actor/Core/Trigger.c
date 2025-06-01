@@ -27,7 +27,7 @@ typedef struct TriggerData
 	float depth;
 	bool oneShot;
 	bool enabled;
-	bool collidingOnLastTick;
+	bool playerIsColliding;
 	b2ShapeId shape;
 } TriggerData;
 
@@ -90,25 +90,25 @@ void TriggerInit(Actor *this, const b2WorldId worldId, KvList *params)
 void TriggerUpdate(Actor *this, double /*delta*/)
 {
 	TriggerData *data = this->extraData;
-	if (data->enabled && GetSensorState(GetState()->level->worldId, data->shape.index1, false))
+	if (data->enabled)
 	{
-		if (!data->collidingOnLastTick)
+		if (GetSensorState(GetState()->level->worldId, data->shape.index1, data->playerIsColliding))
 		{
-			ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
-		}
-		data->collidingOnLastTick = true;
-		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
-		if (data->oneShot)
-		{
-			RemoveActor(this);
-		}
-	} else
-	{
-		if (data->collidingOnLastTick)
+			if (!data->playerIsColliding)
+			{
+				ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
+				data->playerIsColliding = true;
+			}
+			ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+			if (data->oneShot)
+			{
+				RemoveActor(this);
+			}
+		} else if (data->playerIsColliding)
 		{
 			ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
+			data->playerIsColliding = false;
 		}
-		data->collidingOnLastTick = false;
 	}
 }
 
