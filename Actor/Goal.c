@@ -29,23 +29,23 @@ typedef struct GoalData
 	bool enabled;
 } GoalData;
 
-bool GoalSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
-	if (DefaultSignalHandler(self, sender, signal, param))
+	if (DefaultSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
-	GoalData *data = self->extraData;
+	GoalData *data = this->extraData;
 	if (signal == GOAL_INPUT_ENABLE && !data->enabled)
 	{
 		data->enabled = true;
-		strcpy(self->actorWall->tex, TEXTURE("actor_goal0"));
+		strcpy(this->actorWall->tex, TEXTURE("actor_goal0"));
 		return true;
 	}
 	if (signal == GOAL_INPUT_DISABLE && data->enabled)
 	{
 		data->enabled = false;
-		strcpy(self->actorWall->tex, TEXTURE("actor_goal1"));
+		strcpy(this->actorWall->tex, TEXTURE("actor_goal1"));
 		return true;
 	}
 	return false;

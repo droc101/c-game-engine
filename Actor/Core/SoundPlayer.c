@@ -5,7 +5,6 @@
 #include "SoundPlayer.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
-#include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
 
@@ -16,15 +15,15 @@ typedef struct SoundPlayerData
 	const char asset[64]; // asset name of the sound effect to play
 } SoundPlayerData;
 
-bool SoundPlayerSignalHandler(Actor *self, const Actor *sender, const byte signal, const Param *param)
+bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
-	if (DefaultSignalHandler(self, sender, signal, param))
+	if (DefaultSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
 	if (signal == SOUNDPLAYER_INPUT_PLAY)
 	{
-		const SoundPlayerData *data = self->extraData;
+		const SoundPlayerData *data = this->extraData;
 		PlaySoundEffect(data->asset);
 		return true;
 	}
@@ -41,6 +40,7 @@ void SoundPlayerInit(Actor *this, const b2WorldId /*worldId*/, const KvList *par
 	this->extraData = data;
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void SoundPlayerDestroy(Actor *this)
 {
 	free(this->extraData);

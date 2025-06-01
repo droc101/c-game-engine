@@ -13,9 +13,9 @@
 #include "../Structs/Actor.h"
 #include "../Structs/Vector2.h"
 
-bool TestActorSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
-	if (DefaultSignalHandler(self, sender, signal, param))
+	if (DefaultSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}

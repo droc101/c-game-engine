@@ -63,21 +63,21 @@ typedef void (*FrameRenderFunction)(GlobalState *state);
 
 typedef void (*TextBoxCloseFunction)(TextBox *textBox);
 
-typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId, const KvList *params);
+typedef void (*ActorInitFunction)(Actor *this, b2WorldId worldId, const KvList *params);
 
-typedef void (*ActorUpdateFunction)(Actor *self, double delta);
+typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
-typedef void (*ActorIdleFunction)(Actor *self, double delta);
+typedef void (*ActorIdleFunction)(Actor *this, double delta);
 
-typedef void (*ActorTargetReachedFunction)(Actor *self, double delta);
+typedef void (*ActorTargetReachedFunction)(Actor *this, double delta);
 
-typedef void (*ActorDestroyFunction)(Actor *self);
+typedef void (*ActorDestroyFunction)(Actor *this);
 
 /**
  * Signal handler function signature for actor
  * @return True if the signal was handled, false if not
  */
-typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byte signal, const Param *param);
+typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byte signal, const Param *param);
 
 #pragma endregion
 

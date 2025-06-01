@@ -57,7 +57,7 @@ void CreateActorWallCollider(Actor *this, b2WorldId worldId);
  * @param signal The signal to send
  * @param defaultParam The default parameter to send with the signal
  */
-void ActorFireOutput(const Actor *sender, const byte signal, Param defaultParam);
+void ActorFireOutput(const Actor *sender, byte signal, Param defaultParam);
 
 /**
  * Destroy an actor connection
@@ -69,6 +69,6 @@ void DestroyActorConnection(ActorConnection *connection);
  * Default signal handler for actors, handling global signals such as kill
  * @return Whether the signal was handled
  */
-bool DefaultSignalHandler(Actor *self, const Actor *, byte signal, const Param *param);
+bool DefaultSignalHandler(Actor *this, const Actor *sender, byte signal, const Param *param);
 
 #endif //GAME_ACTOR_H

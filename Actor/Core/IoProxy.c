@@ -9,14 +9,14 @@
 
 #define IOPROXY_OUTPUT_FIRST_TICK 2
 
-bool IoProxySignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool IoProxySignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
 	if (signal == ACTOR_KILL_INPUT)
 	{
 		LogError("IoProxy actor should not be killed! The kill input will be ignored!");
 		return false;
 	}
-	if (DefaultSignalHandler(self, sender, signal, param))
+	if (DefaultSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -37,6 +37,7 @@ void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*para
 	this->SignalHandler = IoProxySignalHandler;
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void IoProxyUpdate(Actor *this, double /*delta*/)
 {
 	if (GetState()->physicsFrame == 1)
@@ -44,6 +45,3 @@ void IoProxyUpdate(Actor *this, double /*delta*/)
 		ActorFireOutput(this, IOPROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
 	}
 }
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void IoProxyDestroy(Actor *this) {}

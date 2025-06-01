@@ -8,10 +8,8 @@
 #include <box2d/id.h>
 #include "../../defines.h"
 
-void IoProxyInit(Actor *this, const b2WorldId worldId, const KvList *params);
+void IoProxyInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 void IoProxyUpdate(Actor *this, double /*delta*/);
-
-void IoProxyDestroy(Actor *this);
 
 #endif //IOPROXY_H

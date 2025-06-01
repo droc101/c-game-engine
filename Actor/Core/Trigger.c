@@ -32,16 +32,16 @@ typedef struct TriggerData
 	b2ShapeId shape;
 } TriggerData;
 
-bool TriggerSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
-	TriggerData *data = (TriggerData *)self->extraData;
-	if (DefaultSignalHandler(self, sender, signal, param))
+	TriggerData *data = (TriggerData *)this->extraData;
+	if (DefaultSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
 	if (signal == TRIGGER_INPUT_FORCE_TRIGGER)
 	{
-		ActorFireOutput(self, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
 		return true;
 	}
 	if (signal == TRIGGER_INPUT_ENABLE && !data->enabled)

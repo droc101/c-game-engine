@@ -68,7 +68,7 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 	GoalDestroy,
 	DoorDestroy,
 	TriggerDestroy,
-	IoProxyDestroy,
+	ActorDestroy,
 	PhysboxDestroy,
 	LaserDestroy,
 	ActorDestroy,
@@ -203,11 +203,11 @@ void DestroyActorConnection(ActorConnection *connection)
 	free(connection);
 }
 
-bool DefaultSignalHandler(Actor *self, const Actor *, byte signal, const Param *)
+bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const byte signal, const Param * /*param*/)
 {
 	if (signal == ACTOR_KILL_INPUT)
 	{
-		RemoveActor(self);
+		RemoveActor(this);
 		return true;
 	}
 	return false;
