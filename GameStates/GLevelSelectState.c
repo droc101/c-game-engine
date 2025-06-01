@@ -28,7 +28,7 @@ void GLevelSelectStateUpdate(GlobalState * /*State*/)
 	{
 		GMenuStateSet();
 	}
-	if (levelList.length > 0)
+	if (levelList.length > 1)
 	{
 		if (IsKeyJustPressed(SDL_SCANCODE_DOWN) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
 		{
