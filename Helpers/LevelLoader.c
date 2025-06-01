@@ -41,19 +41,19 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 	l->courseNum = ReadShort(data, &offset);
 	l->hasCeiling = ReadByte(data, &offset);
 
-	char lDataCeilOrSkyTex[32];
-	char lDataFloorTex[32];
+	char lDataCeilOrSkyTex[64];
+	char lDataFloorTex[64];
+
+	EXPECT_BYTES(128);
+	ReadString(data, &offset, lDataCeilOrSkyTex, 64);
+	ReadString(data, &offset, lDataFloorTex, 64);
+
+
+	snprintf(l->ceilOrSkyTex, 80, "texture/%s.gtex", lDataCeilOrSkyTex);
+	snprintf(l->floorTex, 80, "texture/%s.gtex", lDataFloorTex);
 
 	EXPECT_BYTES(64);
-	ReadString(data, &offset, lDataCeilOrSkyTex, 32);
-	ReadString(data, &offset, lDataFloorTex, 32);
-
-
-	snprintf(l->ceilOrSkyTex, 48, "texture/%s.gtex", lDataCeilOrSkyTex);
-	snprintf(l->floorTex, 48, "texture/%s.gtex", lDataFloorTex);
-
-	EXPECT_BYTES(32);
-	ReadString(data, &offset, l->music, 32);
+	ReadString(data, &offset, l->music, 64);
 
 	EXPECT_BYTES(sizeof(uint) + sizeof(float) + sizeof(float));
 	l->fogColor = ReadUint(data, &offset);
@@ -129,11 +129,11 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		const float wallAY = ReadFloat(data, &offset);
 		const float wallBX = ReadFloat(data, &offset);
 		const float wallBY = ReadFloat(data, &offset);
-		char lDataWallTex[32];
-		EXPECT_BYTES(32);
-		ReadString(data, &offset, (char *)&lDataWallTex, 32);
-		const char wallTex[48];
-		snprintf(wallTex, 48, "texture/%s.gtex", lDataWallTex);
+		char lDataWallTex[64];
+		EXPECT_BYTES(64);
+		ReadString(data, &offset, (char *)&lDataWallTex, 64);
+		const char wallTex[80];
+		snprintf(wallTex, 80, "texture/%s.gtex", lDataWallTex);
 		EXPECT_BYTES(sizeof(float) * 2);
 		const float wallUVScale = ReadFloat(data, &offset);
 		const float wallUVOffset = ReadFloat(data, &offset);

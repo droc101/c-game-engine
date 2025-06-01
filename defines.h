@@ -316,7 +316,7 @@ struct Wall
 	/// The second point of the wall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	const char tex[48];
+	const char tex[80];
 	/// The length of the wall (Call @c WallBake to update)
 	float length;
 	/// The angle of the wall (Call @c WallBake to update)
@@ -351,12 +351,12 @@ struct Level
 	/// Indicates if the level has a ceiling. If false, the level will use a sky instead
 	bool hasCeiling;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	char ceilOrSkyTex[48];
+	char ceilOrSkyTex[80];
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	char floorTex[48];
+	char floorTex[80];
 
 	/// The music name, or "none" for no music
-	char music[32];
+	char music[80];
 
 	/// The color of the fog
 	uint fogColor;
