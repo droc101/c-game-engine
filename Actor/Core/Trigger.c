@@ -28,6 +28,7 @@ typedef struct TriggerData
 	bool oneShot;
 	bool enabled;
 	bool playerIsColliding;
+	bool oneShotHasBeenFired;
 	b2ShapeId shape;
 } TriggerData;
 
@@ -99,15 +100,19 @@ void TriggerUpdate(Actor *this, double /*delta*/)
 				ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
 				data->playerIsColliding = true;
 			}
-			ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
-			if (data->oneShot)
+			if (!data->oneShotHasBeenFired)
 			{
-				RemoveActor(this);
+				ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+				data->oneShotHasBeenFired = data->oneShot;
 			}
 		} else if (data->playerIsColliding)
 		{
 			ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
 			data->playerIsColliding = false;
+			if (data->oneShotHasBeenFired)
+			{
+				RemoveActor(this);
+			}
 		}
 	}
 }
