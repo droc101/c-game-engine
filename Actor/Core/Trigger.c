@@ -14,17 +14,26 @@
 #include "../../Structs/Level.h"
 
 #define TRIGGER_INPUT_FORCE_TRIGGER 1
+#define TRIGGER_INPUT_ENABLE 2
+#define TRIGGER_INPUT_DISABLE 3
+
 #define TRIGGER_OUTPUT_TRIGGERED 2
+#define TRIGGER_OUTPUT_ENTERED 3
+#define TRIGGER_OUTPUT_EXITED 4
 
 typedef struct TriggerData
 {
 	float width;
 	float depth;
+	bool oneShot;
+	bool enabled;
+	bool collidingOnLastTick;
 	b2ShapeId shape;
 } TriggerData;
 
 bool TriggerSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
 {
+	TriggerData *data = (TriggerData *)self->extraData;
 	if (DefaultSignalHandler(self, sender, signal, param))
 	{
 		return true;
@@ -32,6 +41,16 @@ bool TriggerSignalHandler(Actor *self, const Actor *sender, byte signal, const P
 	if (signal == TRIGGER_INPUT_FORCE_TRIGGER)
 	{
 		ActorFireOutput(self, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+		return true;
+	}
+	if (signal == TRIGGER_INPUT_ENABLE && !data->enabled)
+	{
+		data->enabled = true;
+		return true;
+	}
+	if (signal == TRIGGER_INPUT_DISABLE && data->enabled)
+	{
+		data->enabled = false;
 		return true;
 	}
 	return false;
@@ -61,6 +80,8 @@ void TriggerInit(Actor *this, const b2WorldId worldId, KvList *params)
 	TriggerData *data = this->extraData;
 	data->width = KvGetFloat(params, "width", 1.0f);
 	data->depth = KvGetFloat(params, "depth", 1.0f);
+	data->oneShot = KvGetBool(params, "oneShot", true);
+	data->enabled = KvGetBool(params, "startEnabled", true);
 	this->SignalHandler = TriggerSignalHandler;
 	CheckAlloc(this->extraData);
 	CreateTriggerSensor(this, this->position, this->rotation, worldId);
@@ -68,10 +89,26 @@ void TriggerInit(Actor *this, const b2WorldId worldId, KvList *params)
 
 void TriggerUpdate(Actor *this, double /*delta*/)
 {
-	if (GetSensorState(GetState()->level->worldId, ((b2ShapeId *)this->extraData)->index1, false))
+	TriggerData *data = this->extraData;
+	if (data->enabled && GetSensorState(GetState()->level->worldId, data->shape.index1, false))
 	{
-		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE); // 2 = trigger
-		RemoveActor(this); // for now they are ALL one shot
+		if (!data->collidingOnLastTick)
+		{
+			ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
+		}
+		data->collidingOnLastTick = true;
+		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+		if (data->oneShot)
+		{
+			RemoveActor(this);
+		}
+	} else
+	{
+		if (data->collidingOnLastTick)
+		{
+			ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
+		}
+		data->collidingOnLastTick = false;
 	}
 }
 

@@ -78,7 +78,11 @@ void GoalInit(Actor *this, const b2WorldId worldId, KvList *params)
 	GoalData *goalData = (GoalData *)this->extraData;
 	goalData->enabled = KvGetBool(params, "startEnabled", true);
 
-	this->actorWall = CreateWall(v2(0, 0.5f), v2(0, -0.5f), goalData->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"), 1.0f, 0.0f);
+	this->actorWall = CreateWall(v2(0, 0.5f),
+								 v2(0, -0.5f),
+								 goalData->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"),
+								 1.0f,
+								 0.0f);
 	WallBake(this->actorWall);
 
 	CreateGoalSensor(this, worldId);
