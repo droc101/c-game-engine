@@ -84,7 +84,7 @@ void CoinUpdate(Actor *this, double /*delta*/)
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
 
-	if (GetSensorState(GetState()->level->worldId, ((b2ShapeId *)this->extraData)->index1, false))
+	if (GetSensorState(GetState()->level->worldId, data->shape.index1, false))
 	{
 		if (!data->isBlue)
 		{
