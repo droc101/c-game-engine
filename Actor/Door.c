@@ -185,21 +185,29 @@ void DoorDestroy(Actor *this)
 	free(this->actorWall);
 }
 
-bool DoorSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool DoorSignalHandler(Actor *self, const Actor *sender, const byte signal, const Param *param)
 {
 	if (DefaultSignalHandler(self, sender, signal, param))
 	{
 		return true;
 	}
-	DoorData *data = self->extraData;
-	if (signal == DOOR_INPUT_OPEN && data->state == DOOR_CLOSED)
+	const DoorData *data = self->extraData;
+	if (signal == DOOR_INPUT_OPEN)
 	{
+		if (data->state != DOOR_CLOSED)
+		{
+			return true;
+		}
 		b2Body_SetLinearVelocity(self->bodyId, Vector2Normalize(Vector2Scale(Vector2FromAngle(self->rotation), -1)));
 		DoorSetState(self, DOOR_OPENING);
 		return true;
 	}
-	if (signal == DOOR_INPUT_CLOSE && data->state == DOOR_OPEN)
+	if (signal == DOOR_INPUT_CLOSE)
 	{
+		if (data->state != DOOR_OPEN)
+		{
+			return true;
+		}
 		b2Body_SetLinearVelocity(self->bodyId, Vector2Normalize(Vector2FromAngle(self->rotation)));
 		DoorSetState(self, DOOR_CLOSING);
 		return true;
