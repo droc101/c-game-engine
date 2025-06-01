@@ -94,9 +94,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			KvSetUnsafe(&params, key, param);
 		}
 
-		Actor *a = CreateActor(v2(actorX, actorY),
-							   actorRotation,
-							   actorType, &params, l->worldId);
+		Actor *a = CreateActor(v2(actorX, actorY), actorRotation, actorType, &params, l->worldId);
 
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);

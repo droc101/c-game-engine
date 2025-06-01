@@ -9,13 +9,13 @@
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
-#include "../Helpers/Core/KVList.h"
 
 #define COIN_OUTPUT_COLLECTED 2
 

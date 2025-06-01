@@ -41,7 +41,7 @@ void OpenOptions()
 
 void GMenuStateUpdate(GlobalState * /*State*/) {}
 
-void GMenuStateRender(GlobalState * State)
+void GMenuStateRender(GlobalState *State)
 {
 	RenderMenuBackground();
 
@@ -87,7 +87,7 @@ void GMenuStateRender(GlobalState * State)
 		const float alpha = 1.0f - ((float)(State->physicsFrame) / 20.0f);
 		Color color = COLOR_BLACK;
 		color.a = alpha;
-		DrawRect(0,0, WindowWidth(), WindowHeight(), color);
+		DrawRect(0, 0, WindowWidth(), WindowHeight(), color);
 
 		if (GetState()->physicsFrame >= 20)
 		{

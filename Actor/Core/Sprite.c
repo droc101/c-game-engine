@@ -5,8 +5,8 @@
 #include "Sprite.h"
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Wall.h"
 #include "../../Structs/Vector2.h"
+#include "../../Structs/Wall.h"
 
 void SpriteInit(Actor *this, const b2WorldId, const KvList *params)
 {

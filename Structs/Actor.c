@@ -12,6 +12,8 @@
 
 #include "../Actor/Coin.h"
 #include "../Actor/Core/IoProxy.h"
+#include "../Actor/Core/SoundPlayer.h"
+#include "../Actor/Core/Sprite.h"
 #include "../Actor/Core/StaticModel.h"
 #include "../Actor/Core/Trigger.h"
 #include "../Actor/Door.h"
@@ -21,8 +23,6 @@
 #include "../Actor/TestActor.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
-#include "../Actor/Core/SoundPlayer.h"
-#include "../Actor/Core/Sprite.h"
 
 // Empty template functions
 void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}
@@ -31,45 +31,50 @@ void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorDestroy(Actor * /*this*/) {}
 
-ActorInitFunction ActorInitFuncs[] = {ActorInit,
-									  TestActorInit,
-									  CoinInit,
-									  GoalInit,
-									  DoorInit,
-									  TriggerInit,
-									  IoProxyInit,
-									  PhysboxInit,
-									  LaserInit,
-									  StaticModelInit,
-									  SoundPlayerInit,
-SpriteInit,};
+ActorInitFunction ActorInitFuncs[] = {
+	ActorInit,
+	TestActorInit,
+	CoinInit,
+	GoalInit,
+	DoorInit,
+	TriggerInit,
+	IoProxyInit,
+	PhysboxInit,
+	LaserInit,
+	StaticModelInit,
+	SoundPlayerInit,
+	SpriteInit,
+};
 
-ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
-										  TestActorUpdate,
-										  CoinUpdate,
-										  GoalUpdate,
-										  DoorUpdate,
-										  TriggerUpdate,
-										  IoProxyUpdate,
-										  PhysboxUpdate,
-										  LaserUpdate,
-	  ActorUpdate,
+ActorUpdateFunction ActorUpdateFuncs[] = {
+	ActorUpdate,
+	TestActorUpdate,
+	CoinUpdate,
+	GoalUpdate,
+	DoorUpdate,
+	TriggerUpdate,
+	IoProxyUpdate,
+	PhysboxUpdate,
+	LaserUpdate,
+	ActorUpdate,
 	ActorUpdate,
 	ActorUpdate,
 };
 
-ActorDestroyFunction ActorDestroyFuncs[] = {ActorDestroy,
-											TestActorDestroy,
-											CoinDestroy,
-											GoalDestroy,
-											DoorDestroy,
-											TriggerDestroy,
-											IoProxyDestroy,
-											PhysboxDestroy,
-											LaserDestroy,
-ActorDestroy,
-SoundPlayerDestroy,
-SpriteDestroy,};
+ActorDestroyFunction ActorDestroyFuncs[] = {
+	ActorDestroy,
+	TestActorDestroy,
+	CoinDestroy,
+	GoalDestroy,
+	DoorDestroy,
+	TriggerDestroy,
+	IoProxyDestroy,
+	PhysboxDestroy,
+	LaserDestroy,
+	ActorDestroy,
+	SoundPlayerDestroy,
+	SpriteDestroy,
+};
 
 int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
@@ -99,7 +104,10 @@ Actor *CreateActor(const Vector2 position,
 	actor->Init(actor, worldId, params); // kindly allow the Actor to initialize itself
 	actor->actorType = actorType;
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
-	if (params) KvListDestroy(params);
+	if (params)
+	{
+		KvListDestroy(params);
+	}
 	return actor;
 }
 

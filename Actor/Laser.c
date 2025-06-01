@@ -6,10 +6,10 @@
 
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/KVList.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
-#include "../Helpers/Core/KVList.h"
 
 typedef enum LaserHeight
 {

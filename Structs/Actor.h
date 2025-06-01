@@ -36,11 +36,7 @@ enum ActorType
  * @param worldId The Box2D world within which to create the actor
  * @return Initialized Actor struct
  */
-Actor *CreateActor(Vector2 position,
-				   float rotation,
-				   int actorType,
-				   KvList *params,
-				   b2WorldId worldId);
+Actor *CreateActor(Vector2 position, float rotation, int actorType, KvList *params, b2WorldId worldId);
 
 /**
  * Destroy an Actor
