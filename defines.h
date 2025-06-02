@@ -12,7 +12,6 @@
 #include <SDL_mixer.h>
 #include <stdbool.h>
 #include <stdint.h>
-
 #include "config.h"
 #include "Helpers/Core/List.h"
 
@@ -53,6 +52,7 @@ typedef struct Param Param;
 typedef struct ModelDefinition ModelDefinition;
 typedef struct Material Material;
 typedef struct ModelLod ModelLod;
+typedef struct KvList KvList;
 
 // Function signatures
 typedef void (*FixedUpdateFunction)(GlobalState *state, double delta);
@@ -63,21 +63,21 @@ typedef void (*FrameRenderFunction)(GlobalState *state);
 
 typedef void (*TextBoxCloseFunction)(TextBox *textBox);
 
-typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId);
+typedef void (*ActorInitFunction)(Actor *this, b2WorldId worldId, const KvList *params);
 
-typedef void (*ActorUpdateFunction)(Actor *self, double delta);
+typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
-typedef void (*ActorIdleFunction)(Actor *self, double delta);
+typedef void (*ActorIdleFunction)(Actor *this, double delta);
 
-typedef void (*ActorTargetReachedFunction)(Actor *self, double delta);
+typedef void (*ActorTargetReachedFunction)(Actor *this, double delta);
 
-typedef void (*ActorDestroyFunction)(Actor *self);
+typedef void (*ActorDestroyFunction)(Actor *this);
 
 /**
  * Signal handler function signature for actor
  * @return True if the signal was handled, false if not
  */
-typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byte signal, const Param *param);
+typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byte signal, const Param *param);
 
 #pragma endregion
 
@@ -130,12 +130,13 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byt
 #define EXPORT_SYM __attribute__((visibility("default")))
 #endif
 
-#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, {.byteValue = x}})
-#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, {.intValue = x}})
-#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, {.floatValue = x}})
-#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, {.boolValue = x}})
-#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, {.stringValue = x}})
-#define PARAM_NONE ((Param){PARAM_TYPE_NONE, {}})
+#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = x})
+#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = x})
+#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = x})
+#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = x})
+#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = x})
+#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = x})
+#define PARAM_NONE ((Param){PARAM_TYPE_NONE})
 
 #pragma endregion
 
@@ -241,26 +242,18 @@ enum ParamType
 	PARAM_TYPE_FLOAT,
 	PARAM_TYPE_BOOL,
 	PARAM_TYPE_STRING,
-	PARAM_TYPE_NONE
+	PARAM_TYPE_NONE,
+	PARAM_TYPE_COLOR
 };
 
 #pragma endregion
 
 #pragma region Struct definitions
 
-union _ParamInternal
+struct KvList
 {
-	byte byteValue;
-	int intValue;
-	float floatValue;
-	bool boolValue;
-	char stringValue[64];
-};
-
-struct Param
-{
-	ParamType type;
-	union _ParamInternal value;
+	List keys;
+	List values;
 };
 
 struct Color
@@ -269,6 +262,20 @@ struct Color
 	float g;
 	float b;
 	float a;
+};
+
+struct Param
+{
+	ParamType type;
+	union
+	{
+		byte byteValue;
+		int intValue;
+		float floatValue;
+		bool boolValue;
+		char stringValue[64];
+		Color colorValue;
+	};
 };
 
 struct Camera
@@ -309,7 +316,7 @@ struct Wall
 	/// The second point of the wall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	const char tex[48];
+	const char tex[80];
 	/// The length of the wall (Call @c WallBake to update)
 	float length;
 	/// The angle of the wall (Call @c WallBake to update)
@@ -344,12 +351,12 @@ struct Level
 	/// Indicates if the level has a ceiling. If false, the level will use a sky instead
 	bool hasCeiling;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	char ceilOrSkyTex[48];
+	char ceilOrSkyTex[80];
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	char floorTex[48];
+	char floorTex[80];
 
 	/// The music name, or "none" for no music
-	char music[32];
+	char music[80];
 
 	/// The color of the fog
 	uint fogColor;
@@ -547,12 +554,6 @@ struct Actor
 	/// List of I/O connections
 	List ioConnections;
 
-	// extra parameters for the actor. saved in level data, so can be used during Init
-	byte paramA;
-	byte paramB;
-	byte paramC;
-	byte paramD;
-
 	/// The actor's health
 	/// @note May be unused for some actors
 	int health;
@@ -613,7 +614,7 @@ struct Font
 	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char texture[48];
+	char texture[80];
 	/// The index of the character in the texture
 	byte indices[128];
 	/// The width of each character, index directly by the character

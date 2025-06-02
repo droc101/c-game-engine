@@ -5,60 +5,82 @@
 #include "Actor.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Logging.h"
 #include "GlobalState.h"
 #include "Level.h"
 
 #include "../Actor/Coin.h"
 #include "../Actor/Core/IoProxy.h"
+#include "../Actor/Core/SoundPlayer.h"
+#include "../Actor/Core/Sprite.h"
+#include "../Actor/Core/StaticModel.h"
 #include "../Actor/Core/Trigger.h"
 #include "../Actor/Door.h"
 #include "../Actor/Goal.h"
 #include "../Actor/Laser.h"
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
-#include "../Helpers/Core/Logging.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/) {}
+void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorDestroy(Actor * /*this*/) {}
 
-ActorInitFunction ActorInitFuncs[] =
-		{ActorInit, TestActorInit, CoinInit, GoalInit, DoorInit, TriggerInit, IoProxyInit, PhysboxInit, LaserInit};
+ActorInitFunction ActorInitFuncs[] = {
+	ActorInit,
+	TestActorInit,
+	CoinInit,
+	GoalInit,
+	DoorInit,
+	TriggerInit,
+	IoProxyInit,
+	PhysboxInit,
+	LaserInit,
+	StaticModelInit,
+	SoundPlayerInit,
+	SpriteInit,
+};
 
-ActorUpdateFunction ActorUpdateFuncs[] = {ActorUpdate,
-										  TestActorUpdate,
-										  CoinUpdate,
-										  GoalUpdate,
-										  DoorUpdate,
-										  TriggerUpdate,
-										  IoProxyUpdate,
-										  PhysboxUpdate,
-										  LaserUpdate};
+ActorUpdateFunction ActorUpdateFuncs[] = {
+	ActorUpdate,
+	TestActorUpdate,
+	CoinUpdate,
+	GoalUpdate,
+	DoorUpdate,
+	TriggerUpdate,
+	IoProxyUpdate,
+	PhysboxUpdate,
+	LaserUpdate,
+	ActorUpdate,
+	ActorUpdate,
+	ActorUpdate,
+};
 
-ActorDestroyFunction ActorDestroyFuncs[] = {ActorDestroy,
-											TestActorDestroy,
-											CoinDestroy,
-											GoalDestroy,
-											DoorDestroy,
-											TriggerDestroy,
-											IoProxyDestroy,
-											PhysboxDestroy,
-											LaserDestroy};
+ActorDestroyFunction ActorDestroyFuncs[] = {
+	ActorDestroy,
+	TestActorDestroy,
+	CoinDestroy,
+	GoalDestroy,
+	DoorDestroy,
+	TriggerDestroy,
+	ActorDestroy,
+	PhysboxDestroy,
+	LaserDestroy,
+	ActorDestroy,
+	SoundPlayerDestroy,
+	SpriteDestroy,
+};
 
-int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1};
+int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
 				   const int actorType,
-				   const byte paramA,
-				   const byte paramB,
-				   const byte paramC,
-				   const byte paramD,
+				   KvList *params,
 				   const b2WorldId worldId)
 {
 	Actor *actor = malloc(sizeof(Actor));
@@ -67,10 +89,6 @@ Actor *CreateActor(const Vector2 position,
 	actor->position = position;
 	actor->rotation = rotation;
 	actor->health = ActorHealths[actorType];
-	actor->paramA = paramA;
-	actor->paramB = paramB;
-	actor->paramC = paramC;
-	actor->paramD = paramD;
 	actor->yPosition = 0.0f;
 	actor->showShadow = true;
 	actor->shadowSize = 1.0f;
@@ -82,9 +100,13 @@ Actor *CreateActor(const Vector2 position,
 	actor->Init = ActorInitFuncs[actorType];
 	actor->Update = ActorUpdateFuncs[actorType];
 	actor->Destroy = ActorDestroyFuncs[actorType];
-	actor->Init(actor, worldId); // kindly allow the Actor to initialize itself
+	actor->Init(actor, worldId, params); // kindly allow the Actor to initialize itself
 	actor->actorType = actorType;
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
+	if (params)
+	{
+		KvListDestroy(params);
+	}
 	return actor;
 }
 
@@ -180,11 +202,11 @@ void DestroyActorConnection(ActorConnection *connection)
 	free(connection);
 }
 
-bool DefaultSignalHandler(Actor *self, const Actor *, byte signal, const Param *)
+bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const byte signal, const Param * /*param*/)
 {
 	if (signal == ACTOR_KILL_INPUT)
 	{
-		RemoveActor(self);
+		RemoveActor(this);
 		return true;
 	}
 	return false;

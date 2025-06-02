@@ -24,4 +24,8 @@ void PhysicsThreadSetFunction(FixedUpdateFunction function);
  */
 void PhysicsThreadTerminate();
 
+void PhysicsThreadLockTickMutex();
+
+void PhysicsThreadUnlockTickMutex();
+
 #endif //PHYSICSTHREAD_H

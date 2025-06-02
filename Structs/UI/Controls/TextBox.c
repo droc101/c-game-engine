@@ -34,9 +34,9 @@ Control *CreateTextBoxControl(const char *placeholder,
 	data->maxLength = maxLength;
 	data->callback = callback;
 	data->text = calloc(1, maxLength + 1);
+	CheckAlloc(data->text);
 	data->input.userData = c;
 	data->input.TextInput = TextBoxTextInputCallback;
-	CheckAlloc(data->text);
 	strcpy(data->placeholder, placeholder); // up to caller to ensure placeholder is not too long
 
 

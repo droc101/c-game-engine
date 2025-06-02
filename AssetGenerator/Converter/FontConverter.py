@@ -28,8 +28,8 @@ def ConvertFont(path):
 	if len(widths) != 128:
 		print("Invalid number of characters in font, must be 128")
 		return
-	
-	texnam = util.CString(font["texture"], 48)
+
+	texnam = util.CString(font["texture"], 80)
 	# chars = util.CString(font["chars"], 128)
 
 	data = bytearray([])

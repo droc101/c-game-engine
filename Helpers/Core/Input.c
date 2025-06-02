@@ -3,7 +3,6 @@
 //
 
 #include "Input.h"
-
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Vector2.h"
 #include "Error.h"
@@ -363,7 +362,7 @@ void InputDestroy()
 	free(physicsInputReadBuffer);
 }
 
-void InputPhysicsFrameBegin()
+void InputPhysicsTickBegin()
 {
 	PhysicsStateBuffer *temp = physicsInputWorkingBuffer;
 	physicsInputWorkingBuffer = physicsInputReadBuffer;

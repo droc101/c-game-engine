@@ -6,7 +6,6 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "../GameStates/GLevelSelectState.h"
 #include "../GameStates/GMenuState.h"
 #include "../GameStates/GOptionsState.h"
@@ -50,6 +49,7 @@ void InitOptions()
 void InitState()
 {
 	state.saveData = calloc(1, sizeof(SaveData));
+	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
 	state.saveData->coins = 0;
 	state.saveData->blueCoins = 0;
@@ -121,30 +121,32 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	PhysicsThreadSetFunction(FixedUpdateGame);
 }
 
-void ChangeLevel(Level *l)
+void ChangeLevel(Level *level)
 {
-	if (!l)
+	if (!level)
 	{
 		LogError("Cannot change to a NULL level. Something might have gone wrong while loading it.\n");
 		return;
 	}
+	PhysicsThreadLockTickMutex();
 	if (state.level)
 	{
 		DestroyLevel(state.level);
 	}
-	state.level = l;
+	state.level = level;
 	state.textBoxActive = false;
-	if (strncmp(l->music, "none", 4) != 0)
+	if (strncmp(level->music, "none", 4) != 0)
 	{
-		char musicPath[48];
-		snprintf(musicPath, 48, "audio/%s.gmus", l->music);
+		char musicPath[92];
+		snprintf(musicPath, 92, "audio/%s.gmus", level->music);
 		ChangeMusic(musicPath);
 	} else
 	{
 		StopMusic();
 	}
 
-	LoadLevelWalls(l);
+	LoadLevelWalls(level);
+	PhysicsThreadUnlockTickMutex();
 }
 
 void ChangeMusic(const char *asset)
@@ -272,7 +274,7 @@ bool ChangeLevelByName(const char *name)
 {
 	LogInfo("Loading level \"%s\"\n", name);
 
-	const size_t maxPathLength = 48;
+	const size_t maxPathLength = 80;
 	char *levelPath = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(levelPath);
 
@@ -290,7 +292,6 @@ bool ChangeLevelByName(const char *name)
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
-	Level *l = LoadLevel(levelData->data, levelData->size);
-	ChangeLevel(l);
+	ChangeLevel(LoadLevel(levelData->data, levelData->size));
 	return true;
 }
