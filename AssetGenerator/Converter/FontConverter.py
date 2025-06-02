@@ -29,7 +29,7 @@ def ConvertFont(path):
 		print("Invalid number of characters in font, must be 128")
 		return
 
-    texnam = util.CString(font["texture"], 80)
+	texnam = util.CString(font["texture"], 80)
 	# chars = util.CString(font["chars"], 128)
 
 	data = bytearray([])
