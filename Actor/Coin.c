@@ -5,7 +5,6 @@
 #include "Coin.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -104,6 +103,9 @@ void CoinUpdate(Actor *this, double /*delta*/)
 void CoinDestroy(Actor *this)
 {
 	b2DestroyBody(this->bodyId);
+	((CoinData *)this->extraData)->shape = b2_nullShapeId;
 	free(this->actorWall);
+	this->actorWall = NULL;
 	free(this->extraData);
+	this->extraData = NULL;
 }

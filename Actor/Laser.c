@@ -3,9 +3,9 @@
 //
 
 #include "Laser.h"
-
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
@@ -25,28 +25,34 @@ typedef struct LaserData
 
 void LaserInit(Actor *this, b2WorldId, const KvList *params)
 {
-	this->extraData = calloc(1, sizeof(LaserData));
+	LaserData *data = calloc(1, sizeof(LaserData));
+	CheckAlloc(data);
+	this->extraData = data;
+
 	this->showShadow = false;
 	this->actorWall = CreateWall(v2s(0), v2s(0), TEXTURE("actor_laser"), 1.0f, 0.0f);
 
-	LaserData *data = this->extraData;
 	data->height = (LaserHeight)KvGetByte(params, "height", MID);
 
-	if (data->height == FLOOR)
+	switch (data->height)
 	{
-		this->yPosition = -0.3f;
-	} else if (data->height == CEILING)
-	{
-		this->yPosition = 0.3f;
-	} else
-	{
-		this->yPosition = 0.0f;
+		case FLOOR:
+			this->yPosition = -0.3f;
+			break;
+		case CEILING:
+			this->yPosition = 0.3f;
+			break;
+		case MID:
+		default:
+			this->yPosition = 0.0f;
+			break;
 	}
 	WallBake(this->actorWall);
 
 	// TODO: Make harmful - Depends on being able to take damage
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void LaserUpdate(Actor *this, double)
 {
 	Vector2 col;
@@ -66,12 +72,14 @@ void LaserUpdate(Actor *this, double)
 	}
 	if (GetState()->physicsFrame % 4 == 0)
 	{
-		this->actorWall->uvOffset = fmod(this->actorWall->uvOffset + 0.5f, 1.0f);
+		this->actorWall->uvOffset = fmodf(this->actorWall->uvOffset + 0.5f, 1.0f);
 	}
 }
 
 void LaserDestroy(Actor *this)
 {
 	free(this->actorWall);
+	this->actorWall = NULL;
 	free(this->extraData);
+	this->extraData = NULL;
 }

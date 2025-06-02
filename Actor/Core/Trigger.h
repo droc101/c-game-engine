@@ -4,6 +4,7 @@
 
 #ifndef TRIGGER_H
 #define TRIGGER_H
+
 #include <box2d/id.h>
 #include "../../defines.h"
 

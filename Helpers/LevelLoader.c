@@ -11,6 +11,7 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 #include "Core/DataReader.h"
+#include "Core/Error.h"
 #include "Core/KVList.h"
 #include "Core/Logging.h"
 
@@ -101,6 +102,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		for (int j = 0; j < connectionCount; j++)
 		{
 			ActorConnection *ac = malloc(sizeof(ActorConnection));
+			CheckAlloc(ac);
 			EXPECT_BYTES(1 + 64 + 1 + sizeof(Param));
 			ac->myOutput = ReadByte(data, &offset);
 			char outActorName[64];

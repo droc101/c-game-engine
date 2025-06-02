@@ -5,7 +5,6 @@
 #include "Goal.h"
 #include <box2d/box2d.h>
 #include <math.h>
-
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -18,10 +17,10 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
-#define GOAL_OUTPUT_COLLECTED 2
-
 #define GOAL_INPUT_ENABLE 1
 #define GOAL_INPUT_DISABLE 2
+
+#define GOAL_OUTPUT_COLLECTED 2
 
 typedef struct GoalData
 {
@@ -53,8 +52,6 @@ bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 
 void CreateGoalSensor(Actor *this, const b2WorldId worldId)
 {
-	GoalData *goalData = (GoalData *)this->extraData;
-
 	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
 	sensorBodyDef.type = b2_staticBody;
 	sensorBodyDef.position = this->position;
@@ -67,20 +64,20 @@ void CreateGoalSensor(Actor *this, const b2WorldId worldId)
 	sensorShapeDef.isSensor = true;
 	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
 	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	goalData->shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
+	((GoalData *)this->extraData)->shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
 void GoalInit(Actor *this, const b2WorldId worldId, const KvList *params)
 {
 	this->SignalHandler = GoalSignalHandler;
-	this->extraData = calloc(1, sizeof(GoalData));
-	CheckAlloc(this->extraData);
-	GoalData *goalData = (GoalData *)this->extraData;
-	goalData->enabled = KvGetBool(params, "startEnabled", true);
+	GoalData *data = calloc(1, sizeof(GoalData));
+	CheckAlloc(data);
+	this->extraData = data;
+	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	this->actorWall = CreateWall(v2(0, 0.5f),
 								 v2(0, -0.5f),
-								 goalData->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"),
+								 data->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"),
 								 1.0f,
 								 0.0f);
 	WallBake(this->actorWall);
@@ -90,7 +87,7 @@ void GoalInit(Actor *this, const b2WorldId worldId, const KvList *params)
 
 void GoalUpdate(Actor *this, double /*delta*/)
 {
-	const GoalData *goalData = (GoalData *)this->extraData;
+	const GoalData *goalData = this->extraData;
 
 	const Vector2 playerPosition = GetState()->level->player.pos;
 	const float rotation = atan2f(playerPosition.y - this->position.y, playerPosition.x - this->position.x) + PIf / 2;
@@ -120,6 +117,9 @@ void GoalUpdate(Actor *this, double /*delta*/)
 void GoalDestroy(Actor *this)
 {
 	b2DestroyBody(this->bodyId);
+	((GoalData *)this->extraData)->shapeId = b2_nullShapeId;
 	free(this->actorWall);
+	this->actorWall = NULL;
 	free(this->extraData);
+	this->extraData = NULL;
 }

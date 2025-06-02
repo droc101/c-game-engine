@@ -5,8 +5,9 @@
 #include "Actor.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Logging.h"
 #include "GlobalState.h"
 #include "Level.h"
 
@@ -21,8 +22,6 @@
 #include "../Actor/Laser.h"
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
-#include "../Helpers/Core/KVList.h"
-#include "../Helpers/Core/Logging.h"
 
 // Empty template functions
 void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}

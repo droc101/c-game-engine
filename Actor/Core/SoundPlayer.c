@@ -44,4 +44,5 @@ void SoundPlayerInit(Actor *this, const b2WorldId /*worldId*/, const KvList *par
 void SoundPlayerDestroy(Actor *this)
 {
 	free(this->extraData);
+	this->extraData = NULL;
 }

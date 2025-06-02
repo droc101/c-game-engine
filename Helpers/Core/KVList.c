@@ -18,13 +18,16 @@
  */
 size_t KvIndexOf(const KvList *list, const char *key)
 {
+	ListLock(list->keys);
 	for (size_t i = 0; i < list->keys.length; i++)
 	{
 		if (strcmp((const char *)ListGet(list->keys, i), key) == 0)
 		{
+			ListUnlock(list->keys);
 			return i;
 		}
 	}
+	ListUnlock(list->keys);
 	return -1; // Not found
 }
 
@@ -41,16 +44,18 @@ void KvSet(KvList *list, const char *key, const Param value)
 		return;
 	}
 	const size_t index = KvIndexOf(list, key);
-	Param *p = (Param *)malloc(sizeof(Param));
+	Param *p = malloc(sizeof(Param));
 	CheckAlloc(p);
 	*p = value;
-	char *k = strdup(key);
 	if (index != -1)
 	{
-		ListSet(&list->values, index, p);
+		ListLock(list->values);
+		free(ListGet(list->values, index));
+		ListGet(list->values, index) = p;
+		ListUnlock(list->values);
 	} else
 	{
-		ListAdd(&list->keys, k);
+		ListAdd(&list->keys, strdup(key));
 		ListAdd(&list->values, p);
 	}
 }
@@ -70,7 +75,7 @@ Param *KvGet(const KvList *list, const char *key)
 	const size_t index = KvIndexOf(list, key);
 	if (index != -1)
 	{
-		return (Param *)ListGet(list->values, index);
+		return ListGet(list->values, index);
 	}
 	LogWarning("Tried to get key '%s' from KvList, but it does not exist.", key);
 	return NULL; // Not found
@@ -149,6 +154,7 @@ size_t KvListLength(const KvList *list)
 	{
 		return 0;
 	}
+	assert(list->keys.length == list->values.length);
 	return list->keys.length;
 }
 
@@ -158,8 +164,7 @@ bool KvListHas(const KvList *list, const char *key)
 	{
 		return false;
 	}
-	const size_t index = KvIndexOf(list, key);
-	return index != -1;
+	return KvIndexOf(list, key) != -1;
 }
 
 ParamType KvGetType(const KvList *list, const char *key)
@@ -179,12 +184,9 @@ byte KvGetByte(const KvList *list, const char *key, const byte defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_BYTE,
-										  &(Param){PARAM_TYPE_BYTE, .byteValue = defaultValue});
-	if (p)
-	{
-		return p->byteValue;
-	}
-	return defaultValue;
+										  (Param[]){{PARAM_TYPE_BYTE, .byteValue = defaultValue}});
+	assert(p);
+	return p->byteValue;
 }
 
 int KvGetInt(const KvList *list, const char *key, const int defaultValue)
@@ -192,12 +194,9 @@ int KvGetInt(const KvList *list, const char *key, const int defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_INTEGER,
-										  &(Param){PARAM_TYPE_INTEGER, .intValue = defaultValue});
-	if (p)
-	{
-		return p->intValue;
-	}
-	return defaultValue;
+										  (Param[]){{PARAM_TYPE_INTEGER, .intValue = defaultValue}});
+	assert(p);
+	return p->intValue;
 }
 
 float KvGetFloat(const KvList *list, const char *key, const float defaultValue)
@@ -205,12 +204,9 @@ float KvGetFloat(const KvList *list, const char *key, const float defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_FLOAT,
-										  &(Param){PARAM_TYPE_FLOAT, .floatValue = defaultValue});
-	if (p)
-	{
-		return p->floatValue;
-	}
-	return defaultValue;
+										  (Param[]){{PARAM_TYPE_FLOAT, .floatValue = defaultValue}});
+	assert(p);
+	return p->floatValue;
 }
 
 bool KvGetBool(const KvList *list, const char *key, const bool defaultValue)
@@ -218,22 +214,19 @@ bool KvGetBool(const KvList *list, const char *key, const bool defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_BOOL,
-										  &(Param){PARAM_TYPE_BOOL, .boolValue = defaultValue});
-	if (p)
-	{
-		return p->boolValue;
-	}
-	return defaultValue;
+										  (Param[]){{PARAM_TYPE_BOOL, .boolValue = defaultValue}});
+	assert(p);
+	return p->boolValue;
 }
 
 const char *KvGetString(const KvList *list, const char *key, const char *defaultValue)
 {
-	const Param *p = KvGetTypeWithDefault(list, key, PARAM_TYPE_STRING, &(Param){PARAM_TYPE_STRING, .stringValue = ""});
-	if (p)
-	{
-		return p->stringValue[0] ? p->stringValue : defaultValue;
-	}
-	return defaultValue;
+	const Param *p = KvGetTypeWithDefault(list,
+										  key,
+										  PARAM_TYPE_STRING,
+										  (Param[]){{PARAM_TYPE_STRING, .stringValue = ""}});
+	assert(p);
+	return p->stringValue[0] ? p->stringValue : defaultValue;
 }
 
 Color KvGetColor(const KvList *list, const char *key, const Color defaultValue)
@@ -241,12 +234,9 @@ Color KvGetColor(const KvList *list, const char *key, const Color defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_COLOR,
-										  &(Param){PARAM_TYPE_COLOR, .colorValue = defaultValue});
-	if (p)
-	{
-		return p->colorValue;
-	}
-	return defaultValue;
+										  (Param[]){{PARAM_TYPE_COLOR, .colorValue = defaultValue}});
+	assert(p);
+	return p->colorValue;
 }
 
 #pragma endregion
@@ -278,6 +268,10 @@ void KvSetString(KvList *list, const char *key, const char *value)
 	if (!value)
 	{
 		value = "";
+	}
+	if (!list || !key)
+	{
+		return;
 	}
 	KvSet(list, key, (Param){PARAM_TYPE_STRING, .stringValue = ""});
 	strncpy(KvGet(list, key)->stringValue, value, sizeof(KvGet(list, key)->stringValue) - 1);

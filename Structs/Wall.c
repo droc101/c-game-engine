@@ -16,7 +16,7 @@ Wall *CreateWall(const Vector2 a, const Vector2 b, const char *texture, const fl
 	CheckAlloc(w);
 	w->a = a;
 	w->b = b;
-	strncpy(w->tex, texture, 32);
+	strncpy(w->tex, texture, 80);
 	w->uvScale = uvScale;
 	w->uvOffset = uvOffset;
 	w->height = 1.0f;

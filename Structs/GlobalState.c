@@ -6,7 +6,6 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "../GameStates/GLevelSelectState.h"
 #include "../GameStates/GMenuState.h"
 #include "../GameStates/GOptionsState.h"
@@ -50,6 +49,7 @@ void InitOptions()
 void InitState()
 {
 	state.saveData = calloc(1, sizeof(SaveData));
+	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
 	state.saveData->coins = 0;
 	state.saveData->blueCoins = 0;
@@ -274,7 +274,7 @@ bool ChangeLevelByName(const char *name)
 {
 	LogInfo("Loading level \"%s\"\n", name);
 
-	const size_t maxPathLength = 48;
+	const size_t maxPathLength = 80;
 	char *levelPath = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(levelPath);
 

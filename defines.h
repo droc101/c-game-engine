@@ -614,7 +614,7 @@ struct Font
 	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char texture[48];
+	char texture[80];
 	/// The index of the character in the texture
 	byte indices[128];
 	/// The width of each character, index directly by the character

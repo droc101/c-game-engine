@@ -5,7 +5,6 @@
 #include "Door.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -15,6 +14,14 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
+#define DOOR_INPUT_OPEN 1
+#define DOOR_INPUT_CLOSE 2
+
+#define DOOR_OUTPUT_CLOSING 2
+#define DOOR_OUTPUT_OPENING 3
+#define DOOR_OUTPUT_FULLY_CLOSED 4
+#define DOOR_OUTPUT_FULLY_OPEN 5
+
 typedef enum
 {
 	DOOR_CLOSED,
@@ -22,14 +29,6 @@ typedef enum
 	DOOR_OPEN,
 	DOOR_CLOSING
 } DoorState;
-
-#define DOOR_OUTPUT_CLOSING 2
-#define DOOR_OUTPUT_OPENING 3
-#define DOOR_OUTPUT_FULLY_CLOSED 4
-#define DOOR_OUTPUT_FULLY_OPEN 5
-
-#define DOOR_INPUT_OPEN 1
-#define DOOR_INPUT_CLOSE 2
 
 typedef struct DoorData
 {
@@ -93,7 +92,7 @@ void CreateDoorSensor(Actor *this, const b2WorldId worldId)
 	};
 	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
 	sensorShapeDef.isSensor = true;
-	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
+	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
 	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
 	data->sensorId = b2CreateCircleShape(sensorBody, &sensorShapeDef, &sensorShape);
 }
@@ -153,8 +152,6 @@ void DoorInit(Actor *this, const b2WorldId worldId, const KvList *params)
 	this->showShadow = false;
 
 	DoorData *data = this->extraData; // Allocated in CreateDoorSensor
-	data->state = DOOR_CLOSED;
-	data->animationTime = 0;
 	data->spawnPosition = this->position;
 
 	data->preventPlayerOpen = KvGetBool(params, "preventPlayerOpen", false);
@@ -221,7 +218,11 @@ void DoorUpdate(Actor *this, const double delta)
 void DoorDestroy(Actor *this)
 {
 	b2DestroyBody(this->bodyId);
-	b2DestroyBody(b2Shape_GetBody(((DoorData *)this->extraData)->sensorId));
+	b2ShapeId *sensorShapeId = &((DoorData *)this->extraData)->sensorId;
+	b2DestroyBody(b2Shape_GetBody(*sensorShapeId));
+	*sensorShapeId = b2_nullShapeId;
 	free(this->extraData);
+	this->extraData = NULL;
 	free(this->actorWall);
+	this->actorWall = NULL;
 }

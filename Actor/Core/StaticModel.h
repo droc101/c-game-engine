@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void StaticModelInit(Actor *this, b2WorldId, const KvList *params);
+void StaticModelInit(Actor *this, b2WorldId worldId, const KvList *params);
 
 #endif //STATICMODEL_H

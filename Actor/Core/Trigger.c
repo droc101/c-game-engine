@@ -5,7 +5,6 @@
 #include "Trigger.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
 #include "../../Helpers/Collision.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
@@ -83,9 +82,10 @@ void TriggerInit(Actor *this, const b2WorldId worldId, const KvList *params)
 	data->depth = KvGetFloat(params, "depth", 1.0f);
 	data->oneShot = KvGetBool(params, "oneShot", true);
 	data->enabled = KvGetBool(params, "startEnabled", true);
-	this->SignalHandler = TriggerSignalHandler;
-	CheckAlloc(this->extraData);
+	data->playerIsColliding = false;
+	data->oneShotHasBeenFired = false;
 	CreateTriggerSensor(this, this->position, this->rotation, worldId);
+	this->SignalHandler = TriggerSignalHandler;
 }
 
 void TriggerUpdate(Actor *this, double /*delta*/)
@@ -121,6 +121,7 @@ void TriggerUpdate(Actor *this, double /*delta*/)
 void TriggerDestroy(Actor *this)
 {
 	b2DestroyBody(this->bodyId);
-	free(this->actorWall);
+	((TriggerData *)this->extraData)->shape = b2_nullShapeId;
 	free(this->extraData);
+	this->extraData = NULL;
 }

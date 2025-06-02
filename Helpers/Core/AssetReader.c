@@ -123,7 +123,7 @@ Asset *DecompressAsset(const char *relPath)
 	// see if relPath is already in the cache
 	for (int i = 0; i < assetCacheNames.length; i++)
 	{
-		if (strncmp(ListGet(assetCacheNames, i), relPath, 48) == 0)
+		if (strncmp(ListGet(assetCacheNames, i), relPath, 80) == 0)
 		{
 			return ListGet(assetCacheData, i);
 		}
@@ -267,7 +267,7 @@ Image *LoadImage(const char *asset)
 		{
 			break;
 		}
-		if (strncmp(asset, img->name, 48) == 0)
+		if (strncmp(asset, img->name, 80) == 0)
 		{
 			return img;
 		}
@@ -311,7 +311,7 @@ ModelDefinition *LoadModel(const char *asset)
 		{
 			break;
 		}
-		if (strcmp(asset, model->name) == 0)
+		if (strncmp(asset, model->name, 80) == 0)
 		{
 			return model;
 		}
@@ -418,9 +418,9 @@ Font *LoadFont(const char *asset)
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
 	memcpy(font, assetData->data, sizeof(Font) - sizeof(Image *));
-	char temp[32];
-	strncpy(temp, font->texture, 32);
-	sprintf(font->texture, "texture/%s.gtex", temp);
+	char temp[64];
+	strncpy(temp, font->texture, 64);
+	snprintf(font->texture, 80, "texture/%s.gtex", temp);
 	font->image = LoadImage(font->texture);
 
 	return font;
