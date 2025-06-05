@@ -20,6 +20,7 @@
 #include "../Actor/Door.h"
 #include "../Actor/Goal.h"
 #include "../Actor/Laser.h"
+#include "../Actor/LaserEmitter.h"
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
 
@@ -43,6 +44,7 @@ ActorInitFunction ActorInitFuncs[] = {
 	StaticModelInit,
 	SoundPlayerInit,
 	SpriteInit,
+	LaserEmitterInit,
 };
 
 ActorUpdateFunction ActorUpdateFuncs[] = {
@@ -58,6 +60,7 @@ ActorUpdateFunction ActorUpdateFuncs[] = {
 	ActorUpdate,
 	ActorUpdate,
 	ActorUpdate,
+	LaserEmitterUpdate,
 };
 
 ActorDestroyFunction ActorDestroyFuncs[] = {
@@ -73,9 +76,8 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 	ActorDestroy,
 	SoundPlayerDestroy,
 	SpriteDestroy,
+	LaserDestroy,
 };
-
-int ActorHealths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
@@ -88,7 +90,7 @@ Actor *CreateActor(const Vector2 position,
 	actor->actorWall = NULL;
 	actor->position = position;
 	actor->rotation = rotation;
-	actor->health = ActorHealths[actorType];
+	actor->health = 1;
 	actor->yPosition = 0.0f;
 	actor->showShadow = true;
 	actor->shadowSize = 1.0f;
@@ -157,6 +159,22 @@ void CreateActorWallCollider(Actor *this, const b2WorldId worldId)
 	shapeDef.friction = 0;
 	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
 	b2CreatePolygonShape(this->actorWall->bodyId, &shapeDef, &shape);
+}
+
+void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param)
+{
+	LogInfo("Triggering input %d on actor %p from actor %p\n", signal, receiver, sender);
+	if (receiver->SignalHandler != NULL)
+	{
+		const bool handled = receiver->SignalHandler((Actor *)receiver, sender, signal, param);
+		if (!handled)
+		{
+			LogWarning("Signal %d was sent to actor %p but was not handled!", signal, receiver);
+		}
+	} else
+	{
+		LogWarning("Actor %p does not have a signal handler!", receiver);
+	}
 }
 
 void ActorFireOutput(const Actor *sender, const byte signal, const Param defaultParam)

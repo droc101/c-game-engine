@@ -25,7 +25,10 @@ enum ActorType
 	IO_PROXY_ACTOR,
 	PHYSBOX_ACTOR,
 	LASER_ACTOR,
-	STATIC_MODEL_ACTOR
+	STATIC_MODEL_ACTOR,
+	SOUND_PLAYER_ACTOR,
+	SPRITE_ACTOR,
+	LASER_EMITTER_ACTOR,
 };
 
 /**
@@ -51,6 +54,15 @@ void FreeActor(Actor *actor);
  * @param worldId The world within which to create the collider
  */
 void CreateActorWallCollider(Actor *this, b2WorldId worldId);
+
+/**
+ * Directly trigger an input on an actor
+ * @param sender The actor sending the signal
+ * @param receiver The actor receiving the signal
+ * @param signal The signal to send
+ * @param param The parameter to send with the signal
+ */
+void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param);
 
 /**
  * Fire signal from an actor

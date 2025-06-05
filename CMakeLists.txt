@@ -190,6 +190,8 @@ add_executable(
         Actor/Core/SoundPlayer.h
         Actor/Core/Sprite.c
         Actor/Core/Sprite.h
+        Actor/LaserEmitter.c
+        Actor/LaserEmitter.h
 )
 
 #endregion

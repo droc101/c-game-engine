@@ -7,21 +7,36 @@
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
-typedef enum LaserHeight
-{
-	FLOOR,
-	MID,
-	CEILING
-} LaserHeight;
-
 typedef struct LaserData
 {
 	LaserHeight height;
+	bool enabled;
 } LaserData;
+
+bool LaserSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+{
+	if (DefaultSignalHandler(self, sender, signal, param))
+	{
+		return true;
+	}
+	LaserData *data = self->extraData;
+	if (signal == LASER_INPUT_DISABLE)
+	{
+		data->enabled = false;
+		return true;
+	}
+	if (signal == LASER_INPUT_ENABLE)
+	{
+		data->enabled = true;
+		return true;
+	}
+	return false;
+}
 
 void LaserInit(Actor *this, b2WorldId, const KvList *params)
 {
@@ -29,20 +44,22 @@ void LaserInit(Actor *this, b2WorldId, const KvList *params)
 	CheckAlloc(data);
 	this->extraData = data;
 
+	this->SignalHandler = LaserSignalHandler;
 	this->showShadow = false;
 	this->actorWall = CreateWall(v2s(0), v2s(0), TEXTURE("actor_laser"), 1.0f, 0.0f);
 
-	data->height = (LaserHeight)KvGetByte(params, "height", MID);
+	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
+	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	switch (data->height)
 	{
-		case FLOOR:
+		case LASER_HEIGHT_FLOOR:
 			this->yPosition = -0.3f;
 			break;
-		case CEILING:
+		case LASER_HEIGHT_CEILING:
 			this->yPosition = 0.3f;
 			break;
-		case MID:
+		case LASER_HEIGHT_MIDDLE:
 		default:
 			this->yPosition = 0.0f;
 			break;
@@ -55,25 +72,34 @@ void LaserInit(Actor *this, b2WorldId, const KvList *params)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void LaserUpdate(Actor *this, double)
 {
-	Vector2 col;
-	Vector2 castStart = Vector2FromAngle(this->rotation);
-	castStart = Vector2Scale(castStart, 0.01);
-	castStart = Vector2Add(castStart, this->position);
-	const bool rc = PerformRaycast(castStart,
-								   this->rotation,
-								   50.0f,
-								   &col,
-								   COLLISION_GROUP_ACTOR,
-								   ~(COLLISION_GROUP_PLAYER | COLLISION_GROUP_HURTBOX | COLLISION_GROUP_TRIGGER));
-	if (rc)
+	const LaserData *data = this->extraData;
+	if (data->enabled)
 	{
-		this->actorWall->b = Vector2Sub(col, this->position);
+		Vector2 col;
+		Vector2 castStart = Vector2FromAngle(this->rotation);
+		castStart = Vector2Scale(castStart, 0.01);
+		castStart = Vector2Add(castStart, this->position);
+		const bool rc = PerformRaycast(castStart,
+									   this->rotation,
+									   50.0f,
+									   &col,
+									   COLLISION_GROUP_ACTOR,
+									   ~(COLLISION_GROUP_PLAYER | COLLISION_GROUP_HURTBOX | COLLISION_GROUP_TRIGGER));
+		if (rc)
+		{
+			this->actorWall->b = Vector2Sub(col, this->position);
+			WallBake(this->actorWall);
+		}
+		if (GetState()->physicsFrame % 4 == 0)
+		{
+			this->actorWall->uvOffset = fmod(this->actorWall->uvOffset + 0.5f, 1.0f);
+		}
+	} else
+	{
+		this->actorWall->b = v2(0.01, 0);
 		WallBake(this->actorWall);
 	}
-	if (GetState()->physicsFrame % 4 == 0)
-	{
-		this->actorWall->uvOffset = fmodf(this->actorWall->uvOffset + 0.5f, 1.0f);
-	}
+
 }
 
 void LaserDestroy(Actor *this)

@@ -1,0 +1,254 @@
+{
+  "materials": 5,
+  "skins": [
+    {
+      "frame": {
+        "texture": "actor_laseremitter",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      },
+      "emitterTop": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "emitterMiddle": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "emitterBottom": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "border": {
+        "texture": "actor_laseremitter_border",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      }
+    },
+    {
+      "frame": {
+        "texture": "actor_laseremitter",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      },
+      "emitterTop": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "emitterMiddle": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "emitterBottom": {
+        "texture": "actor_laseremitter_core",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "unshaded"
+      },
+      "border": {
+        "texture": "actor_laseremitter_border",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      }
+    },
+    {
+      "frame": {
+        "texture": "actor_laseremitter",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      },
+      "emitterTop": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "emitterMiddle": {
+        "texture": "actor_laseremitter_core",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "unshaded"
+      },
+      "emitterBottom": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "border": {
+        "texture": "actor_laseremitter_border",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      }
+    },
+    {
+      "frame": {
+        "texture": "actor_laseremitter",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      },
+      "emitterTop": {
+        "texture": "actor_laseremitter_core",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "unshaded"
+      },
+      "emitterMiddle": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "emitterBottom": {
+        "texture": "actor_laseremitter",
+        "color": [
+          0,
+          0,
+          0
+        ],
+        "shader": "shaded"
+      },
+      "border": {
+        "texture": "actor_laseremitter_border",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      }
+    },
+    {
+      "frame": {
+        "texture": "actor_laseremitter",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      },
+      "emitterTop": {
+        "texture": "actor_laseremitter_core",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "unshaded"
+      },
+      "emitterMiddle": {
+        "texture": "actor_laseremitter_core",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "unshaded"
+      },
+      "emitterBottom": {
+        "texture": "actor_laseremitter_core",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "unshaded"
+      },
+      "border": {
+        "texture": "actor_laseremitter_border",
+        "color": [
+          255,
+          255,
+          255
+        ],
+        "shader": "shaded"
+      }
+    }
+  ],
+  "lods": [
+    {
+      "distance": 0,
+      "model": "laseremitter/emitter.obj"
+    },
+    {
+      "distance": 5,
+      "model": "laseremitter/emitter.lod1.obj"
+    },
+    {
+      "distance": 10,
+      "model": "laseremitter/emitter.lod2.obj"
+    }
+  ]
+}

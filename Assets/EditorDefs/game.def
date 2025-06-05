@@ -60,10 +60,10 @@
             "name": "Goal",
             "params": [
                 {
-					"name": "startEnabled",
-					"type": "bool",
+                    "name": "startEnabled",
+                    "type": "bool",
                     "default": true
-				}
+                }
             ],
             "render_type": "normal",
             "inputs": [
@@ -99,17 +99,17 @@
             "id": 4,
             "name": "Door",
             "params": [
-            	{
-					"name": "preventPlayerOpen",
+                {
+                    "name": "preventPlayerOpen",
                     "type": "bool",
                     "default": false
-				},
-				{
-					"name": "stayOpen",
-					"type": "bool",
+                },
+                {
+                    "name": "stayOpen",
+                    "type": "bool",
                     "default": false
-				}
-			],
+                }
+            ],
             "render_type": "normal",
             "inputs": [
                 {
@@ -117,13 +117,13 @@
                     "paramType": "none"
                 },
                 {
-					"name": "open",
-					"paramType": "none"
-				},
+                    "name": "open",
+                    "paramType": "none"
+                },
                 {
-					"name": "close",
-					"paramType": "none"
-				}
+                    "name": "close",
+                    "paramType": "none"
+                }
             ],
             "outputs": [
                 {
@@ -143,13 +143,13 @@
                     "paramType": "none"
                 },
                 {
-					"name": "fully_opened",
-					"paramType": "none"
-				},
-				{
-					"name": "fully_closed",
-					"paramType": "none"
-				}
+                    "name": "fully_opened",
+                    "paramType": "none"
+                },
+                {
+                    "name": "fully_closed",
+                    "paramType": "none"
+                }
             ]
         },
         {
@@ -179,17 +179,60 @@
             "name": "Laser",
             "params": [
                 {
-					"name": "height",
-					"type": "byte",
+                    "name": "height",
+                    "type": "byte",
                     "default": 1,
                     "min": 0,
                     "max": 2
-				}
+                }
             ],
             "render_type": "normal",
             "inputs": [
                 {
                     "name": "kill",
+                    "paramType": "none"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "name": "Laser Emitter",
+            "params": [
+                {
+                    "name": "height",
+                    "type": "byte",
+                    "default": 1,
+                    "min": 0,
+                    "max": 2
+                },
+                {
+                    "name": "startEnabled",
+                    "type": "bool",
+                    "default": true
+                }
+            ],
+            "render_type": "normal",
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "enable",
+                    "paramType": "none"
+                },
+                {
+                    "name": "disable",
                     "paramType": "none"
                 }
             ],
