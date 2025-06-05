@@ -94,7 +94,11 @@ void LaserEmitterUpdate(Actor *this, double)
 		KvListCreate(&laserParams);
 		KvSetByte(&laserParams, "height", data->height);
 		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
-		data->laserActor = CreateActor(this->position, this->rotation, LASER_ACTOR, &laserParams, GetState()->level->worldId);
+		data->laserActor = CreateActor(this->position,
+									   this->rotation,
+									   LASER_ACTOR,
+									   &laserParams,
+									   GetState()->level->worldId);
 		AddActor(data->laserActor);
 		data->hasTicked = true;
 	}

@@ -183,7 +183,7 @@
                     "type": "byte",
                     "default": 1,
                     "min": 0,
-                    "max": 2
+                    "max": 3
                 }
             ],
             "render_type": "normal",
@@ -213,7 +213,7 @@
                     "type": "byte",
                     "default": 1,
                     "min": 0,
-                    "max": 2
+                    "max": 3
                 },
                 {
                     "name": "startEnabled",

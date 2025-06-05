@@ -200,7 +200,7 @@
         "shader": "shaded"
       },
       "emitterTop": {
-        "texture": "actor_laseremitter_core",
+        "texture": "actor_laseremitter_core_triple",
         "color": [
           255,
           255,
@@ -209,7 +209,7 @@
         "shader": "unshaded"
       },
       "emitterMiddle": {
-        "texture": "actor_laseremitter_core",
+        "texture": "actor_laseremitter_core_triple",
         "color": [
           255,
           255,
@@ -218,7 +218,7 @@
         "shader": "unshaded"
       },
       "emitterBottom": {
-        "texture": "actor_laseremitter_core",
+        "texture": "actor_laseremitter_core_triple",
         "color": [
           255,
           255,
