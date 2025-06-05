@@ -36,6 +36,25 @@
 	}
 #define VulkanTestReturnResult(function, ...) VulkanTestInternal(function, result, __VA_ARGS__)
 #define VulkanTest(function, ...) VulkanTestInternal(function, false, __VA_ARGS__)
+#define VulkanTestResizeSwapchain(function, ...) \
+	{ \
+		const VkResult resizeCheckResult = function; \
+		if (resizeCheckResult != VK_SUCCESS) \
+		{ \
+			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR || resizeCheckResult == VK_SUBOPTIMAL_KHR) \
+			{ \
+				const LunaRenderPassResizeInfo renderPassResizeInfo = { \
+					.renderPass = renderPass, \
+					.width = LUNA_RENDER_PASS_WIDTH_SWAPCHAIN_WIDTH, \
+					.height = LUNA_RENDER_PASS_HEIGHT_SWAPCHAIN_HEIGHT, \
+				}; \
+				VulkanTestReturnResult(lunaResizeSwapchain(1, &renderPassResizeInfo, &swapChainExtent), \
+									   "Failed to resize swapchain!"); \
+				return resizeCheckResult; \
+			} \
+			VulkanTestReturnResult(resizeCheckResult, __VA_ARGS__); \
+		} \
+	}
 #pragma endregion macros
 
 #pragma region typedefs

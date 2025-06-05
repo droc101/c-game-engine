@@ -52,6 +52,8 @@ VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 PushConstants pushConstants = {0};
 #pragma endregion variables
 
+
+
 VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
 {
 	const Asset *shader = DecompressAsset(path);

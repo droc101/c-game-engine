@@ -3,7 +3,9 @@
 //
 
 #include "Vulkan.h"
+
 #include <luna/luna.h>
+#include <SDL_vulkan.h>
 #include "../../CommonAssets.h"
 #include "../../Core/MathEx.h"
 #include "VulkanActors.h"
@@ -89,7 +91,8 @@ VkResult VK_FrameStart()
 		.renderArea.extent = swapChainExtent,
 		.depthAttachmentClearValue.depthStencil.depth = 1,
 	};
-	VulkanTestReturnResult(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
+
+	VulkanTestResizeSwapchain(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
 
 	const LunaGraphicsPipelineBindInfo bindInfo = {
 		.descriptorSetCount = 1,
@@ -121,12 +124,42 @@ VkResult VK_FrameEnd()
 
 	if (buffers.ui.objectCount > 0)
 	{
+		const VkViewport viewport = {
+			.width = (float)swapChainExtent.width,
+			.height = (float)swapChainExtent.height,
+			.maxDepth = 1,
+		};
+		const LunaViewportBindInfo viewportBindInfo = {
+			.viewportCount = 1,
+			.viewports = &viewport,
+		};
+		const VkRect2D scissor = {
+			.extent = swapChainExtent,
+		};
+		const LunaScissorBindInfo scissorBindInfo = {
+			.scissorCount = 1,
+			.scissors = &scissor,
+		};
+		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+			{
+				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+				.viewportBindInfo = &viewportBindInfo,
+			},
+			{
+				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+				.scissorBindInfo = &scissorBindInfo,
+			},
+		};
+		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+			.dynamicStates = dynamicStateBindInfos,
+		};
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
 													 buffers.ui.indices.buffer,
 													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.ui,
-													 (LunaGraphicsPipelineBindInfo[]){0},
+													 &pipelineBindInfo,
 													 buffers.ui.objectCount * 6,
 													 1,
 													 0,
@@ -136,8 +169,7 @@ VkResult VK_FrameEnd()
 	}
 
 	lunaEndRenderPass();
-	VulkanTestReturnResult(lunaPresentSwapChain(), "Failed to present swap chain!");
-
+	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return VK_SUCCESS;
@@ -163,6 +195,37 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
 
+	const VkViewport viewport = {
+		.width = (float)swapChainExtent.width,
+		.height = (float)swapChainExtent.height,
+		.maxDepth = 1,
+	};
+	const LunaViewportBindInfo viewportBindInfo = {
+		.viewportCount = 1,
+		.viewports = &viewport,
+	};
+	const VkRect2D scissor = {
+		.extent = swapChainExtent,
+	};
+	const LunaScissorBindInfo scissorBindInfo = {
+		.scissorCount = 1,
+		.scissors = &scissor,
+	};
+	const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+			.viewportBindInfo = &viewportBindInfo,
+		},
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+			.scissorBindInfo = &scissorBindInfo,
+		},
+	};
+	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+		.dynamicStates = dynamicStateBindInfos,
+	};
+
 	if (buffers.walls.objectCount || buffers.shadows.objectCount)
 	{
 		lunaBindVertexBuffers(0,
@@ -178,7 +241,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.walls,
-													 (LunaGraphicsPipelineBindInfo[]){0},
+													 &pipelineBindInfo,
 													 6,
 													 1,
 													 0,
@@ -194,7 +257,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.walls,
-													 (LunaGraphicsPipelineBindInfo[]){0},
+													 &pipelineBindInfo,
 													 buffers.shadows.objectCount * 6,
 													 1,
 													 0,
@@ -210,7 +273,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 													 sizeof(uint32_t) * 6,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.walls,
-													 (LunaGraphicsPipelineBindInfo[]){0},
+													 &pipelineBindInfo,
 													 (buffers.walls.objectCount - 1) * 6,
 													 1,
 													 0,
@@ -228,7 +291,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 												 0,
 												 VK_INDEX_TYPE_UINT32,
 												 pipelines.walls,
-												 (LunaGraphicsPipelineBindInfo[]){0},
+												 &pipelineBindInfo,
 												 level->hasCeiling ? 6 : skyModel->indexCount,
 												 1,
 												 0,
@@ -249,7 +312,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.actors,
-															 (LunaGraphicsPipelineBindInfo[]){0},
+															 &pipelineBindInfo,
 															 buffers.wallActors.drawInfo.buffer,
 															 0,
 															 buffers.wallActors.count,
@@ -269,7 +332,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.actors,
-															 (LunaGraphicsPipelineBindInfo[]){0},
+															 &pipelineBindInfo,
 															 buffers.modelActors.drawInfo.buffer,
 															 0,
 															 buffers.modelActors.loadedModelIds.length,

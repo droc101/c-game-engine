@@ -141,7 +141,8 @@ bool CreateSwapChain()
 
 bool CreateRenderPass()
 {
-	// TODO: Once Luna supports it, prefer using VK_FORMAT_D16_UNORM
+	// TODO: Once Luna supports it, prefer using VK_FORMAT_D32_SFLOAT
+	//  Also ensure that that is the best format for all drivers, not just for NVIDIA
 	lunaSetDepthImageFormat(2, (VkFormat[]){VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT_S8_UINT});
 
 	switch (GetState()->options.msaa)
@@ -184,6 +185,15 @@ bool CreateRenderPass()
 		.useColorAttachment = true,
 		.useDepthAttachment = true,
 	};
+	VkSubpassDependency dependency = {
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	};
+	SDL_Rect bounds;
+	SDL_GetDisplayBounds(SDL_GetWindowDisplayIndex(vulkanWindow), &bounds);
 	const LunaRenderPassCreationInfo renderPassCreationInfo = {
 		.samples = msaaSamples,
 		.createColorAttachment = true,
@@ -192,7 +202,10 @@ bool CreateRenderPass()
 		.depthAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_CLEAR,
 		.subpassCount = 1,
 		.subpasses = &subpassCreationInfo,
+		.dependencyCount = 1,
+		.dependencies = &dependency,
 		.extent = (VkExtent3D){.width = swapChainExtent.width, .height = swapChainExtent.height, .depth = 1},
+		.maxExtent = (VkExtent3D){.width = bounds.w, .height = bounds.h, .depth = 1},
 	};
 	VulkanTest(lunaCreateRenderPass(&renderPassCreationInfo, &renderPass), "Failed to create render pass!");
 	return true;
@@ -221,20 +234,10 @@ bool CreateDescriptorSetLayouts()
 bool CreateGraphicsPipelines()
 {
 #pragma region shared
-	const VkViewport viewport = {
-		.width = (float)swapChainExtent.width,
-		.height = (float)swapChainExtent.height,
-		.maxDepth = 1,
-	};
-	const VkRect2D scissor = {
-		.extent = swapChainExtent,
-	};
 	const VkPipelineViewportStateCreateInfo viewportState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 		.viewportCount = 1,
-		.pViewports = &viewport,
 		.scissorCount = 1,
-		.pScissors = &scissor,
 	};
 
 	const VkPipelineRasterizationStateCreateInfo rasterizer = {
@@ -297,6 +300,12 @@ bool CreateGraphicsPipelines()
 	const VkPipelineInputAssemblyStateCreateInfo inputAssembly = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+	};
+
+	const VkPipelineDynamicStateCreateInfo dynamicState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+		.dynamicStateCount = 2,
+		.pDynamicStates = (VkDynamicState[]){VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR},
 	};
 #pragma endregion shared
 
@@ -380,6 +389,7 @@ bool CreateGraphicsPipelines()
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -492,6 +502,7 @@ bool CreateGraphicsPipelines()
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -569,6 +580,7 @@ bool CreateGraphicsPipelines()
 		.multisampleState = &multisampling,
 		.depthStencilState = &uiDepthStencilState,
 		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
