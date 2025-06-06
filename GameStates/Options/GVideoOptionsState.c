@@ -46,6 +46,15 @@ char *SliderLabelMSAA(const Control *slider)
 	return buf;
 }
 
+char *SliderLabelLod(const Control *slider)
+{
+	const SliderData *data = (SliderData *)slider->ControlData;
+	char *buf = malloc(64);
+	CheckAlloc(buf);
+	sprintf(buf, "%s: %.1fx", data->label, data->value);
+	return buf;
+}
+
 void CbOptionsFullscreen(const bool value)
 {
 	GetState()->options.fullscreen = value;
@@ -90,6 +99,11 @@ void SldOptionsMsaa(const double value)
 	GetState()->options.msaa = value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
+}
+
+void SldOptionsLod(const double value)
+{
+	GetState()->options.lodMultiplier = value;
 }
 
 void GVideoOptionsStateUpdate(GlobalState * /*State*/)
@@ -196,6 +210,20 @@ void GVideoOptionsStateSet()
 										1,
 										1,
 										SliderLabelMSAA));
+
+		opY += opSpacing;
+		UiStackPush(videoOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"LOD Distance",
+										SldOptionsLod,
+										TOP_CENTER,
+										0.5,
+										2.0,
+										GetState()->options.lodMultiplier,
+										0.5,
+										1,
+										SliderLabelLod));
 #ifdef __LINUX__
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,

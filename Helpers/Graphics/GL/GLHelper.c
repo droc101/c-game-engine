@@ -1235,7 +1235,7 @@ void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, c
 
 		for (int i = model->lodCount - 1; i >= 0; i--)
 		{
-			if (distanceToCamera > model->lods[i]->distance)
+			if (distanceToCamera > model->lods[i]->distance * GetState()->options.lodMultiplier)
 			{
 				lod = i;
 				break;

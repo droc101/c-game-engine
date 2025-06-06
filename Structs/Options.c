@@ -15,6 +15,7 @@ void DefaultOptions(Options *options)
 	options->masterVolume = 1.0;
 	options->fullscreen = false;
 	options->vsync = false;
+	options->lodMultiplier = 1.0f;
 	options->mouseSpeed = 1;
 	options->controllerMode = false;
 	options->msaa = MSAA_4X;
