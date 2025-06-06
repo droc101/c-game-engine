@@ -59,11 +59,11 @@ def ConvertModelDefinition(path):
 				material.shader = model_shader_map.index(mat_data["shader"])
 				skin_data[mat] = material
 
-            if len(skin) != mdef.material_count:
+			if len(skin) != mdef.material_count:
 				raise ValueError(f"Skin {skin} has {len(skin)} materials, expected {mdef.material_count}")
 			mdef.skins.append(skin_data)
 
-        mdef.lods = []
+		mdef.lods = []
 		for lod in data["lods"]:
 			lod_obj = ModelLod()
 			lod_obj.distance = lod["distance"]
@@ -78,7 +78,7 @@ def ConvertModelDefinition(path):
 			lod_obj.model = ParseOBJ(obj_path)
 			mdef.lods.append(lod_obj)
 
-    mdef.lods.sort(key=lambda lod: lod.distance)
+	mdef.lods.sort(key=lambda lod: lod.distance)
 
 	if len(mdef.lods) == 0:
 		raise ValueError("Model has no LODs")
