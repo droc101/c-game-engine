@@ -3,8 +3,8 @@
 //
 
 #include "Physbox.h"
-#include "box2d/box2d.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "box2d/box2d.h"
 
 void CreatePhysboxCollider(Actor *this, const b2WorldId worldId)
 {
@@ -15,21 +15,17 @@ void CreatePhysboxCollider(Actor *this, const b2WorldId worldId)
 	bodyDef.fixedRotation = true;
 	this->bodyId = b2CreateBody(worldId, &bodyDef);
 
-	const b2Polygon sensorShape = b2MakeOffsetBox(0.2f,
-												  0.2f,
-												  (Vector2){0, 0},
-												  0);
+	const b2Polygon sensorShape = b2MakeOffsetBox(0.2f, 0.2f, (Vector2){0, 0}, 0);
 	b2ShapeDef shapeDef = b2DefaultShapeDef();
 	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
 	b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
 }
 
-void PhysboxInit(Actor *this, const b2WorldId worldId)
+void PhysboxInit(Actor *this, const b2WorldId worldId, const KvList * /*params*/)
 {
 	CreatePhysboxCollider(this, worldId);
 
 	this->actorModel = LoadModel(MODEL("model_cube"));
-	this->actorModelTexture = TEXTURE("actor_BLOB2");
 	this->yPosition = -0.3f;
 	this->showShadow = false;
 }
@@ -46,5 +42,3 @@ void PhysboxDestroy(Actor *this)
 {
 	b2DestroyBody(this->bodyId);
 }
-
-

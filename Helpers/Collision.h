@@ -37,6 +37,11 @@ bool GetSensorState(b2WorldId worldId, uint sensorShapeIdIndex, bool currentStat
  */
 Actor *GetTargetedEnemy(float maxDistance);
 
-bool PerformRaycast(Vector2 origin, float angle, float maxDistance, Vector2 *collisionPoint, uint64_t category, uint16_t mask);
+bool PerformRaycast(Vector2 origin,
+					float angle,
+					float maxDistance,
+					Vector2 *collisionPoint,
+					uint64_t category,
+					uint16_t mask);
 
 #endif //COLLISION_H

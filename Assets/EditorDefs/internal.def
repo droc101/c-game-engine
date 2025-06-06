@@ -28,19 +28,30 @@
             "name": "Trigger",
             "params": [
                 {
-                    "name": "X Size",
-                    "min": 1,
-                    "max": 200
+                    "name": "width",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 200.0,
+                    "default": 2.0,
+                    "step": 0.1
                 },
                 {
-                    "name": "Y Size",
-                    "min": 1,
-                    "max": 200
+                    "name": "depth",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 200.0,
+                    "default": 2.0,
+                    "step": 0.1
                 },
                 {
-                    "name": "Flags",
-                    "min": 0,
-                    "max": 255
+                    "name": "oneShot",
+                    "type": "bool",
+                    "default": true
+                },
+                {
+                    "name": "startEnabled",
+                    "type": "bool",
+                    "default": true
                 }
             ],
             "render_type": "trigger",
@@ -51,6 +62,14 @@
                 },
                 {
                     "name": "force_trigger",
+                    "paramType": "none"
+                },
+                {
+                    "name": "enable",
+                    "paramType": "none"
+                },
+                {
+                    "name": "disable",
                     "paramType": "none"
                 }
             ],
@@ -65,6 +84,14 @@
                 },
                 {
                     "name": "triggered",
+                    "paramType": "none"
+                },
+                {
+                    "name": "entered",
+                    "paramType": "none"
+                },
+                {
+                    "name": "exited",
                     "paramType": "none"
                 }
             ]
@@ -86,6 +113,157 @@
                 },
                 {
                     "name": "first_tick",
+                    "paramType": "none"
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "name": "Static Model",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "model",
+                    "type": "string",
+                    "hint": "model",
+                    "default": "model_quad"
+                },
+                {
+                    "name": "skin",
+                    "type": "int",
+                    "min": 0,
+                    "max": 255,
+                    "default": 0
+                },
+                {
+                    "name": "yPosition",
+                    "type": "float",
+                    "min": -1.0,
+                    "max": 1.0,
+                    "default": 0.0,
+                    "step": 0.1
+                },
+                {
+                    "name": "shadowSize",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 5.0,
+                    "default": 0.5,
+                    "step": 0.1
+                },
+                {
+                    "name": "showShadow",
+                    "type": "bool",
+                    "default": false
+                }
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "name": "Sound Player",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "sound",
+                    "type": "string",
+                    "hint": "sound",
+                    "default": "sfx_click"
+                }
+            ],
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "play",
+                    "paramType": "none"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "name": "Sprite",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "texture",
+                    "type": "string",
+                    "hint": "texture",
+                    "default": "level_uvtest"
+                },
+                {
+                    "name": "width",
+                    "type": "float",
+                    "min": 0.1,
+                    "max": 5.0,
+                    "default": 1.0,
+                    "step": 0.05
+                },
+                {
+                    "name": "height",
+                    "type": "float",
+                    "min": 0.1,
+                    "max": 1.0,
+                    "default": 1.0,
+                    "step": 0.05
+                },
+                {
+                    "name": "yPosition",
+                    "type": "float",
+                    "min": -1.0,
+                    "max": 1.0,
+                    "default": 0.0,
+                    "step": 0.1
+                },
+                {
+                    "name": "shadowSize",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 5.0,
+                    "default": 0.5,
+                    "step": 0.1
+                },
+                {
+                    "name": "showShadow",
+                    "type": "bool",
+                    "default": false
+                }
+            ],
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
                     "paramType": "none"
                 }
             ]

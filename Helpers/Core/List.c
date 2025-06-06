@@ -40,6 +40,24 @@ void ListAdd(List *list, void *data)
 	ListUnlock(*list);
 }
 
+void ListSet(List *list, const size_t index, void *data)
+{
+	if (!list)
+	{
+		Error("A NULL list must not be passed to ListSet!");
+	}
+	if (index >= list->length)
+	{
+		Error("Attempted to set an item past the end of a list!");
+	}
+
+	ListLock(*list);
+
+	list->data[index] = data;
+
+	ListUnlock(*list);
+}
+
 void ListAddBatched(List *list, const size_t count, ...)
 {
 	if (!list)

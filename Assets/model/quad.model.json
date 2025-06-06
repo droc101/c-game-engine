@@ -1,0 +1,23 @@
+{
+    "materials": 2,
+    "skins": [
+        {
+            "green": {
+                "texture": "item_eraser",
+                "color": [255, 255, 255],
+                "shader": "shaded"
+            },
+            "red": {
+                "texture": "actor_BLOB2",
+                "color": [255, 0, 0],
+                "shader": "shaded"
+            }
+        }
+    ],
+    "lods": [
+        {
+            "distance": 0,
+            "model": "quad/quad.obj"
+        }
+    ]
+}

@@ -49,7 +49,7 @@ void NameActor(Actor *actor, const char *name, Level *l);
  * @note This is slow. Use sparingly.
  * @note If there are multiple actors with the same name, whichever one was loaded first will be returned
  */
-Actor * GetActorByName(const char *name, const Level *l);
+Actor *GetActorByName(const char *name, const Level *l);
 
 /**
  * Get all actors with a given name
@@ -59,7 +59,7 @@ Actor * GetActorByName(const char *name, const Level *l);
  * @note You must free the list when you're done with it
  * @note This is extra slow. Use even more sparingly.
  */
-List * GetActorsByName(const char *name, const Level *l);
+List *GetActorsByName(const char *name, const Level *l);
 
 /**
  * Render the full level

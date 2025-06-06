@@ -29,14 +29,9 @@
             "render_type": "normal",
             "params": [
                 {
-                    "name": "Anim Frame",
-                    "min": 0,
-                    "max": 0
-                },
-                {
-                    "name": "Type (0=yellow 1=blue)",
-                    "min": 0,
-                    "max": 1
+                    "name": "isBlue",
+                    "type": "bool",
+                    "default": false
                 }
             ],
             "inputs": [
@@ -63,11 +58,25 @@
         {
             "id": 3,
             "name": "Goal",
-            "params": [],
+            "params": [
+                {
+                    "name": "startEnabled",
+                    "type": "bool",
+                    "default": true
+                }
+            ],
             "render_type": "normal",
             "inputs": [
                 {
                     "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "enable",
+                    "paramType": "none"
+                },
+                {
+                    "name": "disable",
                     "paramType": "none"
                 }
             ],
@@ -90,17 +99,17 @@
             "id": 4,
             "name": "Door",
             "params": [
-            	{
-					"name": "Prevent Player Open",
-					"min": 0,
-					"max": 1
-				},
-				{
-					"name": "Stay Open",
-					"min": 0,
-					"max": 1
-				}
-			],
+                {
+                    "name": "preventPlayerOpen",
+                    "type": "bool",
+                    "default": false
+                },
+                {
+                    "name": "stayOpen",
+                    "type": "bool",
+                    "default": false
+                }
+            ],
             "render_type": "normal",
             "inputs": [
                 {
@@ -108,13 +117,13 @@
                     "paramType": "none"
                 },
                 {
-					"name": "open",
-					"paramType": "none"
-				},
+                    "name": "open",
+                    "paramType": "none"
+                },
                 {
-					"name": "close",
-					"paramType": "none"
-				}
+                    "name": "close",
+                    "paramType": "none"
+                }
             ],
             "outputs": [
                 {
@@ -134,13 +143,13 @@
                     "paramType": "none"
                 },
                 {
-					"name": "fully_opened",
-					"paramType": "none"
-				},
-				{
-					"name": "fully_closed",
-					"paramType": "none"
-				}
+                    "name": "fully_opened",
+                    "paramType": "none"
+                },
+                {
+                    "name": "fully_closed",
+                    "paramType": "none"
+                }
             ]
         },
         {
@@ -170,15 +179,60 @@
             "name": "Laser",
             "params": [
                 {
-					"name": "Height (0=ground 1=mid 2=ceiling)",
-					"min": 0,
-					"max": 2
-				}
+                    "name": "height",
+                    "type": "byte",
+                    "default": 1,
+                    "min": 0,
+                    "max": 2
+                }
             ],
             "render_type": "normal",
             "inputs": [
                 {
                     "name": "kill",
+                    "paramType": "none"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "name": "Laser Emitter",
+            "params": [
+                {
+                    "name": "height",
+                    "type": "byte",
+                    "default": 1,
+                    "min": 0,
+                    "max": 2
+                },
+                {
+                    "name": "startEnabled",
+                    "type": "bool",
+                    "default": true
+                }
+            ],
+            "render_type": "normal",
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "enable",
+                    "paramType": "none"
+                },
+                {
+                    "name": "disable",
                     "paramType": "none"
                 }
             ],

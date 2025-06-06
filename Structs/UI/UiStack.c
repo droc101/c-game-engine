@@ -203,7 +203,7 @@ bool ProcessUiStack(UiStack *stack)
 			//stack->focusedControl = (int)stack->Controls.length - 1;
 		} else
 		{
-			SetFocusedControl(stack,(int)((stack->focusedControl - 1) % stack->Controls.length));
+			SetFocusedControl(stack, (int)((stack->focusedControl - 1) % stack->Controls.length));
 			//stack->focusedControl = (int)((stack->focusedControl - 1) % stack->Controls.length);
 		}
 		// ensure the index is positive
@@ -221,13 +221,22 @@ bool ProcessUiStack(UiStack *stack)
 
 void SetFocusedControl(UiStack *stack, const int index)
 {
-	if (stack->Controls.length == 0) return;
-	if (stack->focusedControl == index) return;
+	if (stack->Controls.length == 0)
+	{
+		return;
+	}
+	if (stack->focusedControl == index)
+	{
+		return;
+	}
 
 	if (stack->focusedControl != -1)
 	{
 		const Control *c = ListGet(stack->Controls, stack->focusedControl);
-		if (ControlUnfocusFuncs[c->type] != NULL) ControlUnfocusFuncs[c->type](c);
+		if (ControlUnfocusFuncs[c->type] != NULL)
+		{
+			ControlUnfocusFuncs[c->type](c);
+		}
 	}
 
 	stack->focusedControl = index;
@@ -235,7 +244,10 @@ void SetFocusedControl(UiStack *stack, const int index)
 	if (stack->focusedControl != -1)
 	{
 		const Control *c = ListGet(stack->Controls, stack->focusedControl);
-		if (ControlFocusFuncs[c->type] != NULL) ControlFocusFuncs[c->type](c);
+		if (ControlFocusFuncs[c->type] != NULL)
+		{
+			ControlFocusFuncs[c->type](c);
+		}
 	}
 }
 

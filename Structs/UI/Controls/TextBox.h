@@ -6,8 +6,8 @@
 #define TEXTBOX_H
 
 #include "../../../defines.h"
-#include "../UiStack.h"
 #include "../../../Helpers/TextInputSystem.h"
+#include "../UiStack.h"
 
 typedef struct TextBoxData TextBoxData;
 

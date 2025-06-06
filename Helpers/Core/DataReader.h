@@ -97,6 +97,6 @@ short ReadShort(const byte *data, size_t *offset);
  * @param dest The buffer to write the data into
  * @note It is up to the caller to prevent out of bounds access
  */
-void ReadBytes(const byte *data, size_t *offset, size_t len, void* dest);
+void ReadBytes(const byte *data, size_t *offset, size_t len, void *dest);
 
 #endif //GAME_DATAREADER_H

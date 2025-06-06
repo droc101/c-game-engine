@@ -6,7 +6,7 @@
 #include "Core/AssetReader.h"
 #include "Graphics/RenderingHelpers.h"
 
-Model *skyModel;
+ModelDefinition *skyModel;
 
 Font *smallFont;
 Font *largeFont;

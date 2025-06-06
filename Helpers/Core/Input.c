@@ -5,15 +5,30 @@
 #include "Input.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Vector2.h"
+#include "Error.h"
 #include "Logging.h"
 
 // every key is tracked, even if it's not used
 // this *could* be optimized, but it's not necessary
 // on modern systems where memory is not a concern
-byte keys[SDL_NUM_SCANCODES];
-byte controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
+InputState keys[SDL_NUM_SCANCODES];
+InputState controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
+InputState mouseButtons[4];
 
-byte mouseButtons[4];
+typedef struct PhysicsStateBuffer
+{
+	bool physKeysJustPressed[SDL_NUM_SCANCODES];
+	bool physKeysJustReleased[SDL_NUM_SCANCODES];
+	bool physControllerButtonsJustPressed[SDL_CONTROLLER_BUTTON_MAX];
+	bool physControllerButtonsJustReleased[SDL_CONTROLLER_BUTTON_MAX];
+	bool physMouseButtonsJustPressed[4];
+	bool physMouseButtonsJustReleased[4];
+} PhysicsStateBuffer;
+
+/// The buffer that is actively being written to by the render thread.
+PhysicsStateBuffer *physicsInputWorkingBuffer;
+/// The buffer that is for the physics thread to read from.
+PhysicsStateBuffer *physicsInputReadBuffer;
 
 int mouseX;
 int mouseY;
@@ -42,7 +57,8 @@ bool FindGameController()
 				haptic = SDL_HapticOpenFromJoystick(stick);
 				if (!haptic)
 				{
-					LogError("Failed to open haptic: %s\n", SDL_GetError()); // This should never happen (if it does, SDL lied to us)
+					LogError("Failed to open haptic: %s\n",
+							 SDL_GetError()); // This should never happen (if it does, SDL lied to us)
 					haptic = NULL;
 				} else if (SDL_HapticRumbleInit(haptic) != 0)
 				{
@@ -103,11 +119,13 @@ void HandleControllerConnect()
 void HandleControllerButtonUp(const SDL_GameControllerButton button)
 {
 	controllerButtons[button] = INP_JUST_RELEASED;
+	physicsInputWorkingBuffer->physControllerButtonsJustReleased[button] = true;
 }
 
 void HandleControllerButtonDown(const SDL_GameControllerButton button)
 {
 	controllerButtons[button] = INP_JUST_PRESSED;
+	physicsInputWorkingBuffer->physControllerButtonsJustPressed[button] = true;
 }
 
 void HandleControllerAxis(const SDL_GameControllerAxis axis, const Sint16 value)
@@ -149,21 +167,25 @@ void HandleMouseMotion(const int x, const int y, const int xRel, const int yRel)
 void HandleMouseDown(const int button)
 {
 	mouseButtons[button] = INP_JUST_PRESSED;
+	physicsInputWorkingBuffer->physMouseButtonsJustPressed[button] = true;
 }
 
 void HandleMouseUp(const int button)
 {
 	mouseButtons[button] = INP_JUST_RELEASED;
+	physicsInputWorkingBuffer->physMouseButtonsJustReleased[button] = true;
 }
 
 void HandleKeyDown(const int code)
 {
 	keys[code] = INP_JUST_PRESSED;
+	physicsInputWorkingBuffer->physKeysJustPressed[code] = true;
 }
 
 void HandleKeyUp(const int code)
 {
 	keys[code] = INP_JUST_RELEASED;
+	physicsInputWorkingBuffer->physKeysJustReleased[code] = true;
 }
 
 void UpdateInputStates()
@@ -324,4 +346,56 @@ const char *GetControllerName()
 		return NULL;
 	}
 	return SDL_GameControllerName(controller);
+}
+
+void InputInit()
+{
+	physicsInputReadBuffer = calloc(1, sizeof(PhysicsStateBuffer));
+	CheckAlloc(physicsInputReadBuffer);
+	physicsInputWorkingBuffer = calloc(1, sizeof(PhysicsStateBuffer));
+	CheckAlloc(physicsInputWorkingBuffer);
+}
+
+void InputDestroy()
+{
+	free(physicsInputWorkingBuffer);
+	free(physicsInputReadBuffer);
+}
+
+void InputPhysicsTickBegin()
+{
+	PhysicsStateBuffer *temp = physicsInputWorkingBuffer;
+	physicsInputWorkingBuffer = physicsInputReadBuffer;
+	physicsInputReadBuffer = temp;
+	memset(physicsInputWorkingBuffer, 0, sizeof(PhysicsStateBuffer));
+}
+
+bool IsKeyJustPressedPhys(const int code)
+{
+	return physicsInputReadBuffer->physKeysJustPressed[code];
+}
+
+bool IsKeyJustReleasedPhys(const int code)
+{
+	return physicsInputReadBuffer->physKeysJustReleased[code];
+}
+
+bool IsButtonJustPressedPhys(const int button)
+{
+	return physicsInputReadBuffer->physControllerButtonsJustPressed[button];
+}
+
+bool IsButtonJustReleasedPhys(const int button)
+{
+	return physicsInputReadBuffer->physControllerButtonsJustReleased[button];
+}
+
+bool IsMouseButtonJustPressedPhys(const int button)
+{
+	return physicsInputReadBuffer->physMouseButtonsJustPressed[button];
+}
+
+bool IsMouseButtonJustReleasedPhys(const int button)
+{
+	return physicsInputReadBuffer->physMouseButtonsJustReleased[button];
 }

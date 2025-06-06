@@ -18,7 +18,7 @@ struct BatchedQuadArray
 	/// uint[quad_count * 6] with indices
 	uint *indices;
 	/// Number of quads in the array
-	int quad_count;
+	int quadCount;
 };
 
 /**
@@ -80,32 +80,26 @@ void DrawTextureMod(Vector2 pos, Vector2 size, const char *texture, Color color)
  * @param pos The position of the rectangle
  * @param size The size of the rectangle
  * @param texture The texture name
- * @param region_start The start of the region (in pixels)
- * @param region_end The end of the region (in pixels)
+ * @param regionStart The start of the region (in pixels)
+ * @param regionEnd The end of the region (in pixels)
  */
-void DrawTextureRegion(Vector2 pos, Vector2 size, const char *texture, Vector2 region_start, Vector2 region_end);
+void DrawTextureRegion(Vector2 pos, Vector2 size, const char *texture, Vector2 regionStart, Vector2 regionEnd);
 
 /**
  * Draw a texture region on a rectangle with a color
  * @param pos The position of the rectangle
  * @param size The size of the rectangle
  * @param texture The texture name
- * @param region_start The start of the region (in pixels)
- * @param region_end The end of the region (in pixels)
+ * @param regionStart The start of the region (in pixels)
+ * @param regionEnd The end of the region (in pixels)
  * @param color The color to draw with
  */
 void DrawTextureRegionMod(Vector2 pos,
 						  Vector2 size,
 						  const char *texture,
-						  Vector2 region_start,
-						  Vector2 region_end,
+						  Vector2 regionStart,
+						  Vector2 regionEnd,
 						  Color color);
-
-/**
- * Clear the screen with a color
- * @param color The color to clear with
- */
-void ClearColor(Color color);
 
 /**
  * Clear the screen with the last used color
@@ -121,15 +115,15 @@ void ClearDepthOnly();
  * Draw a nine patch image to the screen
  * @param pos The position to draw at
  * @param size The size of the output
- * @param output_margins_px The 9patch margins of the output
- * @param texture_margins_px The 9patch margins of the texture
+ * @param outputMarginsPx The 9patch margins of the output
+ * @param textureMarginsPx The 9patch margins of the texture
  * @param texture The texture name
  * @warning This is nine draw calls.
  */
 void DrawNinePatchTexture(Vector2 pos,
 						  Vector2 size,
-						  float output_margins_px,
-						  float texture_margins_px,
+						  float outputMarginsPx,
+						  float textureMarginsPx,
 						  const char *texture);
 
 /**

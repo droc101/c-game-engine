@@ -1,0 +1,23 @@
+{
+    "materials": 2,
+    "skins": [
+        {
+            "BOX": {
+                "texture": "actor_BLOB2",
+                "color": [255, 255, 255],
+                "shader": "shaded"
+            },
+            "BOX_BORDER": {
+                "texture": "actor_BLOB2",
+                "color": [50, 50, 50],
+                "shader": "shaded"
+            }
+        }
+    ],
+    "lods": [
+        {
+            "distance": 0,
+            "model": "cube/cube.obj"
+        }
+    ]
+}

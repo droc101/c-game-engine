@@ -32,14 +32,13 @@ void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
 
 	if (State->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		GMenuStateSet();
+		GMenuStateSetWithFade();
 	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void GLogoSplashStateRender(GlobalState *State)
 {
-	ClearColor(COLOR_BLACK);
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)
 	{
 		return;

@@ -14,6 +14,7 @@
 
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
+typedef struct GL_ModelBuffers GL_ModelBuffers;
 
 struct GL_Shader
 {
@@ -33,6 +34,16 @@ struct GL_Buffer
 	GLuint vertexBufferObject;
 	/// The element buffer object
 	GLuint elementBufferObject;
+};
+
+struct GL_ModelBuffers
+{
+	/// The number of LODs in this buffer
+	size_t lodCount;
+	/// The number of materials in this buffer
+	size_t materialCount;
+	/// The buffers, indexed by LOD then material
+	GL_Buffer **buffers;
 };
 
 /**
@@ -118,16 +129,16 @@ int GL_RegisterTexture(const unsigned char *pixelData, int width, int height);
  * @param pos The position in pixels
  * @param size The size in pixels
  * @param texture The texture name
- * @param region_start The start of the region in pixels
- * @param region_end The end of the region in pixels
+ * @param regionStart The start of the region in pixels
+ * @param regionEnd The end of the region in pixels
  * @param color The modulate color
  */
 void GL_DrawTexture_Internal(Vector2 pos,
 							 Vector2 size,
 							 const char *texture,
 							 Color color,
-							 Vector2 region_start,
-							 Vector2 region_end);
+							 Vector2 regionStart,
+							 Vector2 regionEnd);
 
 /**
  * Set the level parameters for rendering

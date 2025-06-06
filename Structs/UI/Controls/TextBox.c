@@ -34,9 +34,9 @@ Control *CreateTextBoxControl(const char *placeholder,
 	data->maxLength = maxLength;
 	data->callback = callback;
 	data->text = calloc(1, maxLength + 1);
-	data->input.user_data = c;
-	data->input.TextInput = TextBoxTextInputCallback;
 	CheckAlloc(data->text);
+	data->input.userData = c;
+	data->input.TextInput = TextBoxTextInputCallback;
 	strcpy(data->placeholder, placeholder); // up to caller to ensure placeholder is not too long
 
 
@@ -143,7 +143,10 @@ void UpdateTextBox(UiStack *stack, Control *c, Vector2, const uint ctlIndex)
 					data->text + data->input.cursor,
 					strlen(data->text) - data->input.cursor + 1);
 			data->input.cursor -= 1;
-			if (data->callback != NULL) data->callback(data->text);
+			if (data->callback != NULL)
+			{
+				data->callback(data->text);
+			}
 		}
 	} else if (IsKeyJustPressed(SDL_SCANCODE_DELETE))
 	{
@@ -153,7 +156,10 @@ void UpdateTextBox(UiStack *stack, Control *c, Vector2, const uint ctlIndex)
 			memmove(data->text + data->input.cursor,
 					data->text + data->input.cursor + 1,
 					strlen(data->text) - data->input.cursor);
-			if (data->callback != NULL) data->callback(data->text);
+			if (data->callback != NULL)
+			{
+				data->callback(data->text);
+			}
 		}
 	}
 }
@@ -167,7 +173,7 @@ void DestroyTextBox(const Control *c)
 
 void FocusTextBox(const Control *c)
 {
-	SetTextInput(&((TextBoxData*)c->ControlData)->input); // very readable yes
+	SetTextInput(&((TextBoxData *)c->ControlData)->input); // very readable yes
 }
 
 void UnfocusTextBox(const Control *c)
@@ -177,23 +183,26 @@ void UnfocusTextBox(const Control *c)
 
 void TextBoxTextInputCallback(TextInput *data, SDL_TextInputEvent *event)
 {
-	const TextBoxData *textBoxData = (TextBoxData *)((Control*)data->user_data)->ControlData;
+	const TextBoxData *textBoxData = (TextBoxData *)((Control *)data->userData)->ControlData;
 	const size_t originalLen = strlen(textBoxData->text);
 
 	size_t insertLen = strlen(event->text);
 
 	// if the text is too long, truncate it
 	if (originalLen + insertLen > textBoxData->maxLength)
-    {
-        insertLen = textBoxData->maxLength - originalLen;
-    }
+	{
+		insertLen = textBoxData->maxLength - originalLen;
+	}
 
 	memmove(textBoxData->text + data->cursor + insertLen,
-            textBoxData->text + data->cursor,
-            originalLen - data->cursor + 1);
+			textBoxData->text + data->cursor,
+			originalLen - data->cursor + 1);
 
 	memccpy(textBoxData->text + data->cursor, event->text, 0, insertLen);
 
 	data->cursor += insertLen;
-	if (textBoxData->callback != NULL) textBoxData->callback(textBoxData->text);
+	if (textBoxData->callback != NULL)
+	{
+		textBoxData->callback(textBoxData->text);
+	}
 }

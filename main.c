@@ -12,15 +12,16 @@
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
+#include "Helpers/Core/KVList.h"
 #include "Helpers/Core/Logging.h"
 #include "Helpers/Core/PhysicsThread.h"
 #include "Helpers/Core/Timing.h"
 #include "Helpers/Graphics/Drawing.h"
 #include "Helpers/Graphics/RenderingHelpers.h"
 #include "Helpers/PlatformHelpers.h"
+#include "Helpers/TextInputSystem.h"
 #include "Structs/GlobalState.h"
 #include "Structs/Level.h"
-#include "Helpers/TextInputSystem.h"
 
 SDL_Surface *windowIcon;
 
@@ -108,17 +109,18 @@ void InitAudio()
  */
 void WindowAndRenderInit()
 {
-	const size_t title_len = strlen(GAME_TITLE) + strlen(" - Vulkan") + 1;
-	char title[title_len];
-	switch (currentRenderer) {
+	const size_t titleLen = strlen(GAME_TITLE) + strlen(" - Vulkan") + 1;
+	char title[titleLen];
+	switch (currentRenderer)
+	{
 		case RENDERER_OPENGL:
-			snprintf(title, title_len, "%s - OpenGL", GAME_TITLE);
+			snprintf(title, titleLen, "%s - OpenGL", GAME_TITLE);
 			break;
 		case RENDERER_VULKAN:
-			snprintf(title, title_len, "%s - Vulkan", GAME_TITLE);
+			snprintf(title, titleLen, "%s - Vulkan", GAME_TITLE);
 			break;
 		default:
-			snprintf(title, title_len, "%s", GAME_TITLE);
+			snprintf(title, titleLen, "%s", GAME_TITLE);
 			break;
 	}
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
@@ -241,6 +243,8 @@ int main(const int argc, char *argv[])
 
 	InitSDL();
 
+	InputInit();
+
 	PhysicsThreadInit();
 	InitState();
 
@@ -299,7 +303,7 @@ int main(const int argc, char *argv[])
 			continue;
 		}
 
-		ClearDepthOnly();
+		ClearScreen();
 
 		ResetDPrintYPos();
 
@@ -353,6 +357,7 @@ int main(const int argc, char *argv[])
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
 	PhysicsThreadTerminate();
+	InputDestroy();
 	DestroyGlobalState();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);

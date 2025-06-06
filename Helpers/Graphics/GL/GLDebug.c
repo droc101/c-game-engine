@@ -2,11 +2,14 @@
 // Created by droc101 on 10/2/2024.
 //
 
-#include "../../Core/Logging.h"
 #ifdef BUILDSTYLE_DEBUG
 
 #include <GL/glew.h>
+#include <signal.h>
+#include "../../Core/Logging.h"
 #include "GLInternal.h"
+
+#define BREAK_ON_ERROR
 
 void GL_DebugMessageCallback(const GLenum source,
 							 const GLenum type,
@@ -113,6 +116,10 @@ void GL_DebugMessageCallback(const GLenum source,
 	}
 
 	LogDebug("%d: %s of %s severity, raised from %s: %s\n", id, _type, _severity, _source, msg);
+
+#ifdef BREAK_ON_ERROR
+	raise(SIGABRT);
+#endif
 }
 
 #endif

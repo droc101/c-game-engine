@@ -7,8 +7,8 @@
 #include "../../../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Graphics/Drawing.h"
-#include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/Graphics/Font.h"
+#include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "GMainState.h"
@@ -31,7 +31,6 @@ void GLoadingStateUpdate(GlobalState *state)
 
 void GLoadingStateRender(GlobalState *)
 {
-	ClearColor(COLOR_BLACK);
 	DrawTextAligned("LOADING",
 					16,
 					COLOR_WHITE,

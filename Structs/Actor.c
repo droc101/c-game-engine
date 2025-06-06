@@ -5,23 +5,27 @@
 #include "Actor.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Logging.h"
 #include "GlobalState.h"
 #include "Level.h"
 
 #include "../Actor/Coin.h"
 #include "../Actor/Core/IoProxy.h"
+#include "../Actor/Core/SoundPlayer.h"
+#include "../Actor/Core/Sprite.h"
+#include "../Actor/Core/StaticModel.h"
 #include "../Actor/Core/Trigger.h"
 #include "../Actor/Door.h"
 #include "../Actor/Goal.h"
 #include "../Actor/Laser.h"
+#include "../Actor/LaserEmitter.h"
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
-#include "../Helpers/Core/Logging.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/) {}
+void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
@@ -36,7 +40,11 @@ ActorInitFunction ActorInitFuncs[] = {
 	TriggerInit,
 	IoProxyInit,
 	PhysboxInit,
-	LaserInit
+	LaserInit,
+	StaticModelInit,
+	SoundPlayerInit,
+	SpriteInit,
+	LaserEmitterInit,
 };
 
 ActorUpdateFunction ActorUpdateFuncs[] = {
@@ -48,7 +56,11 @@ ActorUpdateFunction ActorUpdateFuncs[] = {
 	TriggerUpdate,
 	IoProxyUpdate,
 	PhysboxUpdate,
-	LaserUpdate
+	LaserUpdate,
+	ActorUpdate,
+	ActorUpdate,
+	ActorUpdate,
+	LaserEmitterUpdate,
 };
 
 ActorDestroyFunction ActorDestroyFuncs[] = {
@@ -58,29 +70,19 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 	GoalDestroy,
 	DoorDestroy,
 	TriggerDestroy,
-	IoProxyDestroy,
+	ActorDestroy,
 	PhysboxDestroy,
-	LaserDestroy
-};
-
-int ActorHealths[] = {
-	1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	1,
-	1
+	LaserDestroy,
+	ActorDestroy,
+	SoundPlayerDestroy,
+	SpriteDestroy,
+	LaserDestroy,
 };
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
 				   const int actorType,
-				   const byte paramA,
-				   const byte paramB,
-				   const byte paramC,
-				   const byte paramD,
+				   KvList *params,
 				   const b2WorldId worldId)
 {
 	Actor *actor = malloc(sizeof(Actor));
@@ -88,25 +90,25 @@ Actor *CreateActor(const Vector2 position,
 	actor->actorWall = NULL;
 	actor->position = position;
 	actor->rotation = rotation;
-	actor->health = ActorHealths[actorType];
-	actor->paramA = paramA;
-	actor->paramB = paramB;
-	actor->paramC = paramC;
-	actor->paramD = paramD;
+	actor->health = 1;
 	actor->yPosition = 0.0f;
 	actor->showShadow = true;
 	actor->shadowSize = 1.0f;
 	actor->actorModel = NULL;
-	actor->actorModelTexture = NULL;
+	actor->actorModelSkin = 0;
 	actor->bodyId = b2_nullBodyId;
 	ListCreate(&actor->ioConnections);
 	actor->SignalHandler = DefaultSignalHandler;
 	actor->Init = ActorInitFuncs[actorType];
 	actor->Update = ActorUpdateFuncs[actorType];
 	actor->Destroy = ActorDestroyFuncs[actorType];
-	actor->Init(actor, worldId); // kindly allow the Actor to initialize itself
+	actor->Init(actor, worldId, params); // kindly allow the Actor to initialize itself
 	actor->actorType = actorType;
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
+	if (params)
+	{
+		KvListDestroy(params);
+	}
 	return actor;
 }
 
@@ -159,6 +161,22 @@ void CreateActorWallCollider(Actor *this, const b2WorldId worldId)
 	b2CreatePolygonShape(this->actorWall->bodyId, &shapeDef, &shape);
 }
 
+void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param)
+{
+	LogInfo("Triggering input %d on actor %p from actor %p\n", signal, receiver, sender);
+	if (receiver->SignalHandler != NULL)
+	{
+		const bool handled = receiver->SignalHandler((Actor *)receiver, sender, signal, param);
+		if (!handled)
+		{
+			LogWarning("Signal %d was sent to actor %p but was not handled!", signal, receiver);
+		}
+	} else
+	{
+		LogWarning("Actor %p does not have a signal handler!", receiver);
+	}
+}
+
 void ActorFireOutput(const Actor *sender, const byte signal, const Param defaultParam)
 {
 	//LogInfo("Firing signal %d from actor %p with param \"%s\"\n", signal, sender, defaultParam);
@@ -185,7 +203,10 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 						param = &connection->outParamOverride;
 					}
 					const bool handled = actor->SignalHandler(actor, sender, connection->targetInput, param);
-					if (!handled) LogWarning("Signal %d was sent to actor %p but was not handled!", signal, actor);
+					if (!handled)
+					{
+						LogWarning("Signal %d was sent to actor %p but was not handled!", signal, actor);
+					}
 				}
 			}
 			ListFree(actors, true);
@@ -199,11 +220,11 @@ void DestroyActorConnection(ActorConnection *connection)
 	free(connection);
 }
 
-bool DefaultSignalHandler(Actor *self, const Actor *, byte signal, const Param *)
+bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const byte signal, const Param * /*param*/)
 {
 	if (signal == ACTOR_KILL_INPUT)
 	{
-		RemoveActor(self);
+		RemoveActor(this);
 		return true;
 	}
 	return false;

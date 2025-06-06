@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-extern Model *skyModel;
+extern ModelDefinition *skyModel;
 extern Font *smallFont;
 extern Font *largeFont;
 

@@ -11,6 +11,8 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 #include "Core/DataReader.h"
+#include "Core/Error.h"
+#include "Core/KVList.h"
 #include "Core/Logging.h"
 
 /**
@@ -19,13 +21,14 @@
  * @note I apologize for this macro and am open to better ideas.
  * @warning This leaks memory if the level is invalid
  */
-#define EXPECT_BYTES(expected) {\
-	if (bytesRemaining < (expected)) \
+#define EXPECT_BYTES(expected) \
 	{ \
-		LogError("Not enough bytes remaining to read %zu bytes\n", (expected)); \
-		return NULL; \
-	} \
-	bytesRemaining -= (expected); \
+		if (bytesRemaining < (expected)) \
+		{ \
+			LogError("Not enough bytes remaining to read %zu bytes\n", (expected)); \
+			return NULL; \
+		} \
+		bytesRemaining -= (expected); \
 	}
 
 Level *LoadLevel(const byte *data, const size_t dataSize)
@@ -39,19 +42,19 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 	l->courseNum = ReadShort(data, &offset);
 	l->hasCeiling = ReadByte(data, &offset);
 
-	char lDataCeilOrSkyTex[32];
-	char lDataFloorTex[32];
+	char lDataCeilOrSkyTex[64];
+	char lDataFloorTex[64];
+
+	EXPECT_BYTES(128);
+	ReadString(data, &offset, lDataCeilOrSkyTex, 64);
+	ReadString(data, &offset, lDataFloorTex, 64);
+
+
+	snprintf(l->ceilOrSkyTex, 80, "texture/%s.gtex", lDataCeilOrSkyTex);
+	snprintf(l->floorTex, 80, "texture/%s.gtex", lDataFloorTex);
 
 	EXPECT_BYTES(64);
-	ReadString(data, &offset, lDataCeilOrSkyTex, 32);
-	ReadString(data, &offset, lDataFloorTex, 32);
-
-
-	snprintf(l->ceilOrSkyTex, 48, "texture/%s.gtex", lDataCeilOrSkyTex);
-	snprintf(l->floorTex, 48, "texture/%s.gtex", lDataFloorTex);
-
-	EXPECT_BYTES(32);
-	ReadString(data, &offset, l->music, 32);
+	ReadString(data, &offset, l->music, 64);
 
 	EXPECT_BYTES(sizeof(uint) + sizeof(float) + sizeof(float));
 	l->fogColor = ReadUint(data, &offset);
@@ -75,26 +78,31 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		const float actorRotation = ReadFloat(data, &offset);
 		EXPECT_BYTES(sizeof(int) + sizeof(byte) * 4);
 		const int actorType = ReadInt(data, &offset);
-		const byte actorParamA = ReadByte(data, &offset);
-		const byte actorParamB = ReadByte(data, &offset);
-		const byte actorParamC = ReadByte(data, &offset);
-		const byte actorParamD = ReadByte(data, &offset);
 		const char actorName[64];
 		EXPECT_BYTES(64);
 		ReadString(data, &offset, (char *)&actorName, 64);
+
+		KvList params;
+		KvListCreate(&params);
+		const uint paramCount = ReadUint(data, &offset);
+		for (size_t j = 0; j < paramCount; j++)
+		{
+			char key[64];
+			Param param;
+			EXPECT_BYTES(64 + sizeof(Param));
+			ReadString(data, &offset, (char *)&key, 64);
+			ReadBytes(data, &offset, sizeof(Param), &param);
+			KvSetUnsafe(&params, key, param);
+		}
+
+		Actor *a = CreateActor(v2(actorX, actorY), actorRotation, actorType, &params, l->worldId);
+
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);
-		Actor *a = CreateActor(v2(actorX, actorY),
-							   actorRotation,
-							   actorType,
-							   actorParamA,
-							   actorParamB,
-							   actorParamC,
-							   actorParamD,
-							   l->worldId);
 		for (int j = 0; j < connectionCount; j++)
 		{
 			ActorConnection *ac = malloc(sizeof(ActorConnection));
+			CheckAlloc(ac);
 			EXPECT_BYTES(1 + 64 + 1 + sizeof(Param));
 			ac->myOutput = ReadByte(data, &offset);
 			char outActorName[64];
@@ -104,6 +112,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			ReadBytes(data, &offset, sizeof(Param), &ac->outParamOverride);
 			ListAdd(&a->ioConnections, ac);
 		}
+
 		ListAdd(&l->actors, a);
 		if (actorName[0] != '\0')
 		{
@@ -120,11 +129,11 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		const float wallAY = ReadFloat(data, &offset);
 		const float wallBX = ReadFloat(data, &offset);
 		const float wallBY = ReadFloat(data, &offset);
-		char lDataWallTex[32];
-		EXPECT_BYTES(32);
-		ReadString(data, &offset, (char *)&lDataWallTex, 32);
-		const char wallTex[48];
-		snprintf(wallTex, 48, "texture/%s.gtex", lDataWallTex);
+		char lDataWallTex[64];
+		EXPECT_BYTES(64);
+		ReadString(data, &offset, (char *)&lDataWallTex, 64);
+		const char wallTex[80];
+		snprintf(wallTex, 80, "texture/%s.gtex", lDataWallTex);
 		EXPECT_BYTES(sizeof(float) * 2);
 		const float wallUVScale = ReadFloat(data, &offset);
 		const float wallUVOffset = ReadFloat(data, &offset);

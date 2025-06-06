@@ -25,24 +25,24 @@ Vector2 MeasureTextNChars(const char *str, const uint size, const Font *font, co
 	int textWidth = 0;
 	int textHeight = (int)size;
 	int tempWidth = 0;
-	const double sizeMultiplier = (double)size / font->default_size;
+	const double sizeMultiplier = (double)size / font->defaultSize;
 	for (int j = 0; j < n; j++)
 	{
-		const int fSize = (int)((font->char_widths[(int)str[j]] + font->char_spacing) * sizeMultiplier);
+		const int fSize = (int)((font->charWidths[(int)str[j]] + font->charSpacing) * sizeMultiplier);
 		tempWidth += fSize;
 		if (str[j] == ' ')
 		{
 			tempWidth -= fSize;
-			tempWidth += (int)((font->space_width + font->char_spacing) * sizeMultiplier);
+			tempWidth += (int)((font->spaceWidth + font->charSpacing) * sizeMultiplier);
 		} else if (str[j + 1] == '\0')
 		{
-			tempWidth -= (int)(font->char_spacing * sizeMultiplier); // fix extra spacing at the end of the string
+			tempWidth -= (int)(font->charSpacing * sizeMultiplier); // fix extra spacing at the end of the string
 		} else if (str[j] == '\n')
 		{
 			tempWidth -= fSize;
 			textWidth = max(textWidth, tempWidth);
 			tempWidth = 0;
-			textHeight += (int)((size + font->line_spacing) * sizeMultiplier);
+			textHeight += (int)((size + font->lineSpacing) * sizeMultiplier);
 		}
 	}
 
@@ -115,10 +115,10 @@ void TextGetLine(const char *str, const int line, char *out, size_t outBufferSiz
 void DrawTextAligned(const char *str,
 					 const uint size,
 					 const Color color,
-					 const Vector2 rect_pos,
-					 const Vector2 rect_size,
-					 const FontHorizontalAlign h_align,
-					 const FontVerticalAlign v_align,
+					 const Vector2 rectPos,
+					 const Vector2 rectSize,
+					 const FontHorizontalAlign hAlign,
+					 const FontVerticalAlign vAlign,
 					 const Font *font)
 {
 	const size_t stringLength = strlen(str);
@@ -127,21 +127,21 @@ void DrawTextAligned(const char *str,
 	uint *indices = calloc(stringLength, sizeof(uint[6]));
 	CheckAlloc(indices);
 
-	const double sizeMultiplier = (double)size / font->default_size;
+	const double sizeMultiplier = (double)size / font->defaultSize;
 	const int width = (int)(font->width * sizeMultiplier);
-	const int quadHeight = (int)(font->texture_height * sizeMultiplier);
+	const int quadHeight = (int)(font->textureHeight * sizeMultiplier);
 	const double uvPixel = 1.0 / font->image->width;
 	int c = 0;
 
 	const int lines = StringLineCount(str);
 	int x;
-	int y = (int)rect_pos.y;
-	if (v_align == FONT_VALIGN_MIDDLE)
+	int y = (int)rectPos.y;
+	if (vAlign == FONT_VALIGN_MIDDLE)
 	{
-		y += ((int)rect_size.y - lines * (int)size) / 2;
-	} else if (v_align == FONT_VALIGN_BOTTOM)
+		y += ((int)rectSize.y - lines * (int)size) / 2;
+	} else if (vAlign == FONT_VALIGN_BOTTOM)
 	{
-		y += (int)rect_size.y - lines * (int)size;
+		y += (int)rectSize.y - lines * (int)size;
 	}
 
 	for (int i = 0; i < lines; i++)
@@ -149,34 +149,34 @@ void DrawTextAligned(const char *str,
 		char line[256];
 		TextGetLine(str, i, line, 256);
 		const Vector2 textSize = MeasureText(line, size, font);
-		if (h_align == FONT_HALIGN_CENTER)
+		if (hAlign == FONT_HALIGN_CENTER)
 		{
-			x = (int)(rect_pos.x + (rect_size.x - textSize.x) / 2);
-		} else if (h_align == FONT_HALIGN_RIGHT)
+			x = (int)(rectPos.x + (rectSize.x - textSize.x) / 2);
+		} else if (hAlign == FONT_HALIGN_RIGHT)
 		{
-			x = (int)(rect_pos.x + rect_size.x - textSize.x);
+			x = (int)(rectPos.x + rectSize.x - textSize.x);
 		} else
 		{
-			x = (int)rect_pos.x;
+			x = (int)rectPos.x;
 		}
 		int lx = x;
 		const int ly = y;
 		int j = 0;
 		while (line[j] != '\0')
 		{
-			const int fSize = (int)((font->char_widths[(int)line[j]] + font->char_spacing) * sizeMultiplier);
+			const int fSize = (int)((font->charWidths[(int)line[j]] + font->charSpacing) * sizeMultiplier);
 
 			if (line[j] == ' ')
 			{
 				j++;
-				lx += (int)((font->space_width + font->char_spacing) * sizeMultiplier);
+				lx += (int)((font->spaceWidth + font->charSpacing) * sizeMultiplier);
 				continue;
 			}
 
 			const Vector2 ndcPos = v2(X_TO_NDC((float)lx), Y_TO_NDC((float)ly));
 			const Vector2 ndcPosEnd = v2(X_TO_NDC((float)(lx + width)), Y_TO_NDC((float)(ly + quadHeight)));
-			const double charUVStart = (double)font->indices[(int)line[j]] / font->char_count;
-			const double charUVEnd = (font->indices[(int)line[j]] + 1.0) / font->char_count - uvPixel;
+			const double charUVStart = (double)font->indices[(int)line[j]] / font->charCount;
+			const double charUVEnd = (font->indices[(int)line[j]] + 1.0) / font->charCount - uvPixel;
 
 			const mat4 quad = {
 				{(float)ndcPos.x, (float)ndcPos.y, (float)charUVStart, 0},
@@ -199,13 +199,13 @@ void DrawTextAligned(const char *str,
 			j++;
 		}
 		c += (int)strlen(line);
-		y += (int)(size + font->line_spacing);
+		y += (int)(size + font->lineSpacing);
 	}
 
 	BatchedQuadArray quads;
 	quads.verts = verts;
 	quads.indices = indices;
-	quads.quad_count = (int)stringLength;
+	quads.quadCount = (int)stringLength;
 	DrawBatchedQuadsTextured(&quads, font->texture, color);
 
 	free(verts);

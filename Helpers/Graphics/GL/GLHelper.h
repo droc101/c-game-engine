@@ -95,33 +95,26 @@ void GL_DrawTextureMod(Vector2 pos, Vector2 size, const char *texture, Color col
  * @param pos The position in pixels
  * @param size The size in pixels
  * @param texture The texture name
- * @param region_start The start of the region in pixels
- * @param region_end The end of the region in pixels
+ * @param regionStart The start of the region in pixels
+ * @param regionEnd The end of the region in pixels
  */
-void GL_DrawTextureRegion(Vector2 pos, Vector2 size, const char *texture, Vector2 region_start, Vector2 region_end);
+void GL_DrawTextureRegion(Vector2 pos, Vector2 size, const char *texture, Vector2 regionStart, Vector2 regionEnd);
 
 /**
  * Draw a texture region in 2D with a color mod
  * @param pos The position in pixels
  * @param size The size in pixels
  * @param texture The texture name
- * @param region_start The start of the region in pixels
- * @param region_end The end of the region in pixels
+ * @param regionStart The start of the region in pixels
+ * @param regionEnd The end of the region in pixels
  * @param color The modulate color
  */
 void GL_DrawTextureRegionMod(Vector2 pos,
 							 Vector2 size,
 							 const char *texture,
-							 Vector2 region_start,
-							 Vector2 region_end,
+							 Vector2 regionStart,
+							 Vector2 regionEnd,
 							 Color color);
-
-/**
- * Set the clear color
- * @param color The color to clear the screen with
- * @note This does in fact clear the screen
- */
-void GL_ClearColor(Color color);
 
 /**
  * Draw a wall in 3D
@@ -157,24 +150,20 @@ void GL_UpdateViewportSize();
  * Draw arrays using the ui_textured shader
  * @param vertices Vertex data [x, y, u, v] with UVs in NDC
  * @param indices Index data
- * @param quad_count The number of quads to draw
+ * @param quadCount The number of quads to draw
  * @param texture The texture name
  * @param color The modulate color
  */
-void GL_DrawTexturedArrays(const float *vertices,
-						   const uint *indices,
-						   int quad_count,
-						   const char *texture,
-						   Color color);
+void GL_DrawTexturedArrays(const float *vertices, const uint *indices, int quadCount, const char *texture, Color color);
 
 /**
  * Draw arrays using the ui_colored shader
  * @param vertices Vertex data [x, y] with positions in NDC
  * @param indices Index data
- * @param quad_count The number of quads to draw
+ * @param quadCount The number of quads to draw
  * @param color The color to draw
  */
-void GL_DrawColoredArrays(const float *vertices, const uint *indices, uint quad_count, Color color);
+void GL_DrawColoredArrays(const float *vertices, const uint *indices, uint quadCount, Color color);
 
 /**
  * Convert screen X to NDC
@@ -216,9 +205,8 @@ void GL_RenderLevel(const Level *l, const Camera *cam);
  * Render a 3D model
  * @param model The model to render
  * @param modelWorldMatrix The model -> world matrix
- * @param texture The texture name
- * @param shader The shader to use
+ * @param skin The skin to use
  */
-void GL_RenderModel(const Model *model, const mat4 modelWorldMatrix, const char *texture, ModelShader shader);
+void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, int skin);
 
 #endif //GAME_GLHELPER_H

@@ -63,14 +63,14 @@ double wrapd(double x, double min, double max);
 /**
  * Remap a number from one range to another
  * @param in Input number
- * @param in_min Input minimum
- * @param in_max Input maximum
- * @param out_min Output minimum
- * @param out_max Output maximum
+ * @param inMin Input minimum
+ * @param inMax Input maximum
+ * @param outMin Output minimum
+ * @param outMax Output maximum
  * @return Input value remapped to the output range
  */
-#define remap(in, in_min, in_max, out_min, out_max) \
-	(((in) - (in_min)) * ((out_max) - (out_min)) / ((in_max) - (in_min)) + (out_min))
+#define remap(in, inMin, inMax, outMin, outMax) \
+	(((in) - (inMin)) * ((outMax) - (outMin)) / ((inMax) - (inMin)) + (outMin))
 
 /**
  * Linear interpolation between two numbers

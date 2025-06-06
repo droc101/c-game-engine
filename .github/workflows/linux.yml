@@ -1,0 +1,36 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Packages
+      run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev libvulkan-dev python3-pil glslc
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: game.linux
+        path: |
+          build/game
+          build/assets/
+        retention-days: 90
+

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <zlib.h>
 #include "../../Structs/GlobalState.h"
+#include "../Graphics/RenderingHelpers.h"
 #include "DataReader.h"
 #include "Error.h"
 #include "Logging.h"
@@ -17,7 +18,7 @@ List assetCacheData;
 uint textureId;
 uint modelId;
 Image *images[MAX_TEXTURES];
-Model *models[MAX_MODELS];
+ModelDefinition *models[MAX_MODELS];
 
 FILE *OpenAssetFile(const char *relPath)
 {
@@ -52,16 +53,35 @@ FILE *OpenAssetFile(const char *relPath)
 	return file;
 }
 
-void FreeModel(Model *model)
+void FreeModel(ModelDefinition *model)
 {
 	if (model == NULL)
 	{
 		return;
 	}
+	for (int i = 0; i < model->skinCount; i++)
+	{
+		free(model->skins[i]);
+	}
+
+	for (int i = 0; i < model->lodCount; i++)
+	{
+		ModelLod *lod = model->lods[i];
+		free(lod->vertexData);
+		for (int j = 0; j < model->materialCount; j++)
+		{
+			free(lod->indexData[j]);
+		}
+		free(lod->indexData);
+		free(lod->indexCount);
+		free(lod);
+	}
+
 	free(model->name);
-	free(model->vertexData);
-	free(model->indexData);
+	free(model->skins);
+	free(model->lods);
 	free(model);
+
 	model = NULL;
 }
 
@@ -103,7 +123,7 @@ Asset *DecompressAsset(const char *relPath)
 	// see if relPath is already in the cache
 	for (int i = 0; i < assetCacheNames.length; i++)
 	{
-		if (strncmp(ListGet(assetCacheNames, i), relPath, 48) == 0)
+		if (strncmp(ListGet(assetCacheNames, i), relPath, 80) == 0)
 		{
 			return ListGet(assetCacheData, i);
 		}
@@ -247,7 +267,7 @@ Image *LoadImage(const char *asset)
 		{
 			break;
 		}
-		if (strncmp(asset, img->name, 48) == 0)
+		if (strncmp(asset, img->name, 80) == 0)
 		{
 			return img;
 		}
@@ -282,16 +302,16 @@ Image *LoadImage(const char *asset)
 	return img;
 }
 
-Model *LoadModel(const char *asset)
+ModelDefinition *LoadModel(const char *asset)
 {
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
-		Model *model = models[i];
+		ModelDefinition *model = models[i];
 		if (model == NULL)
 		{
 			break;
 		}
-		if (strcmp(asset, model->name) == 0)
+		if (strncmp(asset, model->name, 80) == 0)
 		{
 			return model;
 		}
@@ -303,28 +323,8 @@ Model *LoadModel(const char *asset)
 		LogError("Failed to load model from asset, asset was NULL!");
 		Error("Failed to load model!");
 	}
-	if (assetData->size < sizeof(ModelHeader))
-	{
-		LogError("Failed to load model from asset, size was too small!");
-		return NULL;
-	}
-	Model *model = malloc(sizeof(Model));
+	ModelDefinition *model = malloc(sizeof(ModelDefinition));
 	CheckAlloc(model);
-	memcpy(&model->header, assetData->data, sizeof(ModelHeader));
-
-	if (strncmp(model->header.sig, "MSH", 3) != 0)
-	{
-		LogError("Tried to load a model, but its first magic was incorrect (got %s)!", model->header.sig);
-		free(model);
-		return NULL;
-	}
-
-	if (strncmp(model->header.dataSig, "DAT", 3) != 0)
-	{
-		LogError("Tried to load a model, but its second magic was incorrect (got %s)!", model->header.dataSig);
-		free(model);
-		return NULL;
-	}
 
 	model->id = modelId;
 	models[modelId] = model;
@@ -335,25 +335,64 @@ Model *LoadModel(const char *asset)
 	CheckAlloc(model->name);
 	strncpy(model->name, asset, nameLength);
 
-	const size_t vertsSizeBytes = model->header.vertexCount * (sizeof(float) * 8);
-	const size_t indexSizeBytes = model->header.indexCount * sizeof(uint);
+	size_t offset = 0;
+	model->materialCount = ReadUint(assetData->data, &offset);
+	model->skinCount = ReadUint(assetData->data, &offset);
+	model->lodCount = ReadUint(assetData->data, &offset);
+	model->skins = malloc(sizeof(Material *) * model->skinCount);
+	CheckAlloc(model->skins);
 
-	model->vertexCount = model->header.vertexCount;
-	model->indexCount = model->header.indexCount;
+	const size_t skinSize = sizeof(Material) * model->materialCount;
+	for (int i = 0; i < model->skinCount; i++)
+	{
+		model->skins[i] = malloc(skinSize);
+		CheckAlloc(model->skins[i]);
+		Material *skin = model->skins[i];
+		for (int j = 0; j < model->materialCount; j++)
+		{
+			Material *mat = &skin[j];
+			ReadString(assetData->data, &offset, mat->texture, 64);
+			GetColor(ReadUint(assetData->data, &offset), &mat->color);
+			mat->shader = ReadUint(assetData->data, &offset);
+		}
+	}
 
-	model->vertexData = malloc(vertsSizeBytes);
-	CheckAlloc(model->vertexData);
-	model->indexData = malloc(indexSizeBytes);
-	CheckAlloc(model->indexData);
+	model->lods = malloc(sizeof(ModelLod *) * model->lodCount);
+	CheckAlloc(model->lods);
+	for (int i = 0; i < model->lodCount; i++)
+	{
+		model->lods[i] = malloc(sizeof(ModelLod));
+		CheckAlloc(model->lods[i]);
+		ModelLod *lod = model->lods[i];
 
-	// Copy the index data, then the vertex data
-	memcpy(model->indexData, assetData->data + sizeof(ModelHeader), indexSizeBytes);
-	memcpy(model->vertexData, assetData->data + sizeof(ModelHeader) + indexSizeBytes, vertsSizeBytes);
+		lod->distance = ReadFloat(assetData->data, &offset);
+		lod->vertexCount = ReadUint(assetData->data, &offset);
+
+		const size_t vertexDataSize = lod->vertexCount * sizeof(float) * 8;
+		lod->vertexData = malloc(vertexDataSize);
+		CheckAlloc(lod->vertexData);
+		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
+
+		const size_t indexCountSize = model->materialCount * sizeof(uint);
+		lod->indexCount = malloc(indexCountSize);
+		CheckAlloc(lod->indexCount);
+		ReadBytes(assetData->data, &offset, indexCountSize, lod->indexCount);
+
+		lod->indexData = malloc(sizeof(uint *) * model->materialCount);
+		CheckAlloc(lod->indexData);
+		for (int j = 0; j < model->materialCount; j++)
+		{
+			uint *indexData = malloc(lod->indexCount[j] * sizeof(uint));
+			CheckAlloc(indexData);
+			lod->indexData[j] = indexData;
+			ReadBytes(assetData->data, &offset, lod->indexCount[j] * sizeof(uint), indexData);
+		}
+	}
 
 	return model;
 }
 
-Model *GetModelFromId(const uint id)
+ModelDefinition *GetModelFromId(const uint id)
 {
 	if (id >= modelId)
 	{
@@ -378,10 +417,10 @@ Font *LoadFont(const char *asset)
 	}
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
-	memcpy(font, assetData->data, sizeof(Font) - sizeof(Image*));
-	char temp[32];
-	strncpy(temp, font->texture, 32);
-	sprintf(font->texture, "texture/%s.gtex", temp);
+	memcpy(font, assetData->data, sizeof(Font) - sizeof(Image *));
+	char temp[64];
+	strncpy(temp, font->texture, 64);
+	snprintf(font->texture, 80, "texture/%s.gtex", temp);
 	font->image = LoadImage(font->texture);
 
 	return font;

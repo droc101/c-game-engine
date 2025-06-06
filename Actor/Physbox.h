@@ -4,10 +4,11 @@
 
 #ifndef PHYSBOX_H
 #define PHYSBOX_H
-#include "box2d/id.h"
-#include "../defines.h"
 
-void PhysboxInit(Actor *this, b2WorldId worldId);
+#include "../defines.h"
+#include "box2d/id.h"
+
+void PhysboxInit(Actor *this, b2WorldId worldId, const KvList *params);
 void PhysboxUpdate(Actor *this, double delta);
 void PhysboxDestroy(Actor *this);
 

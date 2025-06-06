@@ -79,19 +79,19 @@ void TextGetLine(const char *str, int line, char *out, size_t outBufferSize);
  * @param str String to draw
  * @param size Font size
  * @param color Font color
- * @param rect_pos Top-left position of the rectangle
- * @param rect_size Size of the rectangle
- * @param h_align Horizontal alignment of text within the rectangle
- * @param v_align Vertical alignment of text within the rectangle
+ * @param rectPos Top-left position of the rectangle
+ * @param rectSize Size of the rectangle
+ * @param hAlign Horizontal alignment of text within the rectangle
+ * @param vAlign Vertical alignment of text within the rectangle
  * @param font The font to use
  */
 void DrawTextAligned(const char *str,
 					 uint size,
 					 Color color,
-					 Vector2 rect_pos,
-					 Vector2 rect_size,
-					 FontHorizontalAlign h_align,
-					 FontVerticalAlign v_align,
+					 Vector2 rectPos,
+					 Vector2 rectSize,
+					 FontHorizontalAlign hAlign,
+					 FontVerticalAlign vAlign,
 					 const Font *font);
 
 #endif //GAME_FONT_H

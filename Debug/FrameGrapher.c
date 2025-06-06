@@ -9,8 +9,8 @@
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Timing.h"
 #include "../Helpers/Graphics/Drawing.h"
-#include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/Graphics/Font.h"
+#include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Vector2.h"
 
 double framerates[FRAMEGRAPH_HISTORY_SIZE] = {0};
@@ -43,11 +43,7 @@ void FrameGraphDraw()
 #ifndef FRAMEGRAPH_FPS_ONLY
 	const int height = FRAMEGRAPH_THRESHOLD_GOOD * 2 * FRAMEGRAPH_V_SCALE + 20;
 	// Draw a background for the graph
-	DrawRect(0,
-			 WindowHeight() - height,
-			 FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10,
-			 height,
-			 COLOR(0x80000000));
+	DrawRect(0, WindowHeight() - height, FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10, height, COLOR(0x80000000));
 
 	// Draw a line at the bottom of the graph
 	DrawLine(v2(10, WindowHeightFloat() - 10),

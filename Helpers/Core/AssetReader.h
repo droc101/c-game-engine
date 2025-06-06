@@ -44,14 +44,14 @@ Image *LoadImage(const char *asset);
  * @param asset The asset to load the model from
  * @return The loaded model, or NULL if it failed
  */
-Model *LoadModel(const char *asset);
+ModelDefinition *LoadModel(const char *asset);
 
 /**
  * Fetch a cached model from an ID
  * @param id The model ID to fetch
  * @return The model with the given ID
  */
-Model *GetModelFromId(uint id);
+ModelDefinition *GetModelFromId(uint id);
 
 /**
  * Load a font from an asset

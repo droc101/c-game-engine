@@ -119,6 +119,6 @@
  */
 #define Vector2Div(vector, divisor) Vector2Scale(vector, (1 / (divisor)))
 
-#define Vector2RelativeAngle(a, b) atan2f((b).x * (a).x - (b).x * (a).y, (b).y * (a).x + (b).y * (a).y)
+#define Vector2RelativeAngle(a, b) atan2f((b).x *(a).x - (b).x * (a).y, (b).y * (a).x + (b).y * (a).y)
 
 #endif //GAME_VECTOR2_H

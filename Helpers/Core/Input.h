@@ -7,10 +7,19 @@
 
 #include "../../defines.h"
 
-#define INP_RELEASED 0
-#define INP_JUST_PRESSED 1
-#define INP_PRESSED 2
-#define INP_JUST_RELEASED 3
+typedef enum InputState InputState;
+
+enum InputState
+{
+	/// The input is not pressed
+	INP_RELEASED,
+	/// The input was just pressed on this frame
+	INP_JUST_PRESSED,
+	// / The input is currently pressed
+	INP_PRESSED,
+	/// The input was just released on this frame
+	INP_JUST_RELEASED
+};
 
 /**
  * Handles controller disconnect event
@@ -94,6 +103,7 @@ bool IsButtonPressed(int button);
  * Checks if a controller button is just pressed
  * @param button The button code
  * @return Whether the button is just pressed
+ * @warning Do not use this in the physics thread, use IsButtonJustPressedPhys instead
  */
 bool IsButtonJustPressed(int button);
 
@@ -101,6 +111,7 @@ bool IsButtonJustPressed(int button);
  * Checks if a controller button is just released
  * @param button The button code
  * @return Whether the button is just released
+ * @warning Do not use this in the physics thread, use IsButtonJustReleasedPhys instead
  */
 bool IsButtonJustReleased(int button);
 
@@ -115,6 +126,7 @@ bool IsKeyPressed(int code);
  * Checks if a key is just pressed
  * @param code Key code
  * @return Whether the key is just pressed
+ * @warning Do not use this in the physics thread, use IsKeyJustPressedPhys instead
  */
 bool IsKeyJustPressed(int code);
 
@@ -122,6 +134,7 @@ bool IsKeyJustPressed(int code);
  * Checks if a key is just released
  * @param code Key code
  * @return Whether the key is just released
+ * @warning Do not use this in the physics thread, use IsKeyJustReleasedPhys instead
  */
 bool IsKeyJustReleased(int code);
 
@@ -136,6 +149,7 @@ bool IsMouseButtonPressed(int button);
  * Checks if a mouse button is just pressed
  * @param button Button code
  * @return Whether the button is just pressed
+ * @warning Do not use this in the physics thread, use IsMouseButtonJustPressedPhys instead
  */
 bool IsMouseButtonJustPressed(int button);
 
@@ -143,6 +157,7 @@ bool IsMouseButtonJustPressed(int button);
  * Checks if a mouse button is just released
  * @param button Button code
  * @return Whether the button is just released
+ * @warning Do not use this in the physics thread, use IsMouseButtonJustReleasedPhys instead
  */
 bool IsMouseButtonJustReleased(int button);
 
@@ -211,5 +226,74 @@ void Rumble(float strength, uint time);
  * @return The name of the connected controller, or NULL if no controller is connected
  */
 const char *GetControllerName();
+
+/**
+ * Initializes the input system
+ */
+void InputInit();
+
+/**
+ * Destroys the input system
+ */
+void InputDestroy();
+
+/**
+ * Swap input buffers for the physics thread
+ */
+void InputPhysicsTickBegin();
+
+/**
+ * Check if a key was just pressed since the last physics tick
+ * @param code The key code to check
+ * @return Whether the key was just pressed
+ * @warning A key can be just pressed AND just released in the same tick, so check both if you need to
+ * @warning Do not use this outside of the physics thread, use IsKeyJustPressed instead
+ */
+bool IsKeyJustPressedPhys(int code);
+
+/**
+ * Check if a key was just released since the last physics tick
+ * @param code The key code to check
+ * @return Whether the key was just released
+ * @warning A key can be just pressed AND just released in the same tick, so check both if you need to
+ * @warning Do not use this outside of the physics thread, use IsKeyJustReleased instead
+ */
+bool IsKeyJustReleasedPhys(int code);
+
+/**
+ * Check if a controller button was just pressed since the last physics tick
+ * @param button The button code to check
+ * @return Whether the button was just pressed
+ * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
+ * @warning Do not use this outside of the physics thread, use IsButtonJustPressed instead
+ */
+bool IsButtonJustPressedPhys(int button);
+
+/**
+ * Check if a controller button was just released since the last physics tick
+ * @param button The button code to check
+ * @return Whether the button was just released
+ * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
+ * @warning Do not use this outside of the physics thread, use IsButtonJustReleased instead
+ */
+bool IsButtonJustReleasedPhys(int button);
+
+/**
+ * Check if a mouse button was just pressed since the last physics tick
+ * @param button The button code to check
+ * @return Whether the button was just pressed
+ * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
+ * @warning Do not use this outside of the physics thread, use IsMouseButtonJustPressed instead
+ */
+bool IsMouseButtonJustPressedPhys(int button);
+
+/**
+ * Check if a mouse button was just released since the last physics tick
+ * @param button The button code to check
+ * @return Whether the button was just released
+ * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
+ * @warning Do not use this outside of the physics thread, use IsMouseButtonJustReleased instead
+ */
+bool IsMouseButtonJustReleasedPhys(int button);
 
 #endif //GAME_INPUT_H

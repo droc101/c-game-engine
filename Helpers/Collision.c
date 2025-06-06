@@ -21,7 +21,7 @@ float RaycastCallback(const b2ShapeId shapeId, Vector2, Vector2, const float fra
 	return fraction;
 }
 
-float RaycastCallback_GetPosition(const b2ShapeId, Vector2 point, Vector2, const float fraction, void *raycastHit)
+float RaycastCallback_GetPosition(const b2ShapeId, const Vector2 point, Vector2, const float fraction, void *raycastHit)
 {
 	if (!raycastHit)
 	{
@@ -70,11 +70,11 @@ Actor *GetTargetedEnemy(const float maxDistance)
 					state->level->player.pos,
 					rayEnd,
 					(b2QueryFilter){.categoryBits = COLLISION_GROUP_PLAYER,
-									.maskBits = ~(COLLISION_GROUP_TRIGGER | COLLISION_GROUP_ACTOR_ENEMY)},
+									.maskBits = COLLISION_GROUP_HURTBOX},
 					RaycastCallback,
 					&raycastHit);
 
-	if (b2Shape_IsValid(raycastHit) && b2Shape_GetFilter(raycastHit).categoryBits & COLLISION_GROUP_HURTBOX)
+	if (b2Shape_IsValid(raycastHit))
 	{
 		ListLock(state->level->actors);
 		for (int i = 0; i < state->level->actors.length; i++)
@@ -91,7 +91,12 @@ Actor *GetTargetedEnemy(const float maxDistance)
 	return NULL;
 }
 
-bool PerformRaycast(const Vector2 origin, const float angle, const float maxDistance, Vector2 *collisionPoint, const uint64_t category, const uint16_t mask)
+bool PerformRaycast(const Vector2 origin,
+					const float angle,
+					const float maxDistance,
+					Vector2 *collisionPoint,
+					const uint64_t category,
+					const uint16_t mask)
 {
 	const GlobalState *state = GetState();
 	Vector2 rayEnd = Vector2FromAngle(angle);
@@ -100,8 +105,7 @@ bool PerformRaycast(const Vector2 origin, const float angle, const float maxDist
 	b2World_CastRay(state->level->worldId,
 					origin,
 					rayEnd,
-					(b2QueryFilter){.categoryBits = category,
-									.maskBits = mask},
+					(b2QueryFilter){.categoryBits = category, .maskBits = mask},
 					RaycastCallback_GetPosition,
 					&raycastHit);
 

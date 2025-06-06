@@ -20,6 +20,9 @@ layout(std140) uniform SharedUniforms
 
 void main() {
     UV = VERTEX_UV;
-    NORMAL = VERTEX_NORMAL;
     gl_Position = uniforms.worldViewMatrix * MODEL_WORLD_MATRIX * vec4(VERTEX, 1.0);
+
+    vec3 normal = normalize(VERTEX_NORMAL);
+    normal = normalize(vec3((MODEL_WORLD_MATRIX) * vec4(normal, 0.0)));
+    NORMAL = normal;
 }

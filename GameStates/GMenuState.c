@@ -18,6 +18,7 @@
 #include "GOptionsState.h"
 
 UiStack *menuStack = NULL;
+bool fadeIn = false;
 
 void StartGame()
 {
@@ -40,7 +41,7 @@ void OpenOptions()
 
 void GMenuStateUpdate(GlobalState * /*State*/) {}
 
-void GMenuStateRender(GlobalState * /*State*/)
+void GMenuStateRender(GlobalState *State)
 {
 	RenderMenuBackground();
 
@@ -80,10 +81,30 @@ void GMenuStateRender(GlobalState * /*State*/)
 
 	ProcessUiStack(menuStack);
 	DrawUiStack(menuStack);
+
+	if (fadeIn)
+	{
+		const float alpha = 1.0f - ((float)(State->physicsFrame) / 20.0f);
+		Color color = COLOR_BLACK;
+		color.a = alpha;
+		DrawRect(0, 0, WindowWidth(), WindowHeight(), color);
+
+		if (GetState()->physicsFrame >= 20)
+		{
+			fadeIn = false;
+		}
+	}
+}
+
+void GMenuStateSetWithFade()
+{
+	GMenuStateSet();
+	fadeIn = true;
 }
 
 void GMenuStateSet()
 {
+	fadeIn = false;
 	if (menuStack == NULL)
 	{
 		menuStack = CreateUiStack();

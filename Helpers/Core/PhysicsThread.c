@@ -7,11 +7,13 @@
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
 #include "Error.h"
+#include "Input.h"
 #include "Logging.h"
 #include "Timing.h"
 
 SDL_Thread *PhysicsThread;
 SDL_mutex *PhysicsThreadMutex;
+SDL_mutex *PhysicsTickMutex;
 
 /**
  * The function to run in the physics thread
@@ -31,19 +33,23 @@ bool PhysicsThreadPostQuit = false;
  */
 int PhysicsThreadMain(void *)
 {
-	double lastFrameTime = PHYSICS_TARGET_NS_D;
+	double lastTickTime = PHYSICS_TARGET_NS_D;
 	while (true)
 	{
 		const ulong timeStart = GetTimeNs();
 		SDL_LockMutex(PhysicsThreadMutex);
+		SDL_LockMutex(PhysicsTickMutex);
 		if (PhysicsThreadPostQuit)
 		{
 			SDL_UnlockMutex(PhysicsThreadMutex);
+			SDL_UnlockMutex(PhysicsTickMutex);
 			return 0;
 		}
+		InputPhysicsTickBegin();
 		if (PhysicsThreadFunction == NULL)
 		{
 			SDL_UnlockMutex(PhysicsThreadMutex);
+			SDL_UnlockMutex(PhysicsTickMutex);
 			SDL_Delay(PHYSICS_TARGET_MS); // pls no spin 🥺
 			GetState()->physicsFrame++;
 			continue;
@@ -52,22 +58,23 @@ int PhysicsThreadMain(void *)
 		const FixedUpdateFunction UpdateFunction = PhysicsThreadFunction;
 		SDL_UnlockMutex(PhysicsThreadMutex);
 
-		// delta is the portion of one "tick" that the last frame took (including idle time)
+		// delta is the portion of one "tick" that the last tick took (including idle time)
 		// ticks should be around 1/60th of a second
-		const double delta = lastFrameTime / PHYSICS_TARGET_NS_D;
+		const double delta = lastTickTime / PHYSICS_TARGET_NS_D;
 		UpdateFunction(GetState(), delta);
 		GetState()->physicsFrame++;
+		SDL_UnlockMutex(PhysicsTickMutex);
 
 		ulong timeEnd = GetTimeNs();
 		ulong timeElapsed = timeEnd - timeStart;
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
-			const ulong delay_ms = (PHYSICS_TARGET_NS - timeElapsed) / 1000000;
-			SDL_Delay(delay_ms);
+			const ulong delayMs = (PHYSICS_TARGET_NS - timeElapsed) / 1000000;
+			SDL_Delay(delayMs);
 		}
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
-		lastFrameTime = (double)timeElapsed;
+		lastTickTime = (double)timeElapsed;
 	}
 }
 
@@ -76,6 +83,7 @@ void PhysicsThreadInit()
 	PhysicsThreadFunction = NULL;
 	PhysicsThreadPostQuit = false;
 	PhysicsThreadMutex = SDL_CreateMutex();
+	PhysicsTickMutex = SDL_CreateMutex();
 	PhysicsThread = SDL_CreateThread(PhysicsThreadMain, "GamePhysics", NULL);
 	if (PhysicsThread == NULL)
 	{
@@ -99,4 +107,15 @@ void PhysicsThreadTerminate()
 	SDL_UnlockMutex(PhysicsThreadMutex);
 	SDL_WaitThread(PhysicsThread, NULL);
 	SDL_DestroyMutex(PhysicsThreadMutex);
+	SDL_DestroyMutex(PhysicsTickMutex);
+}
+
+void PhysicsThreadLockTickMutex()
+{
+	SDL_LockMutex(PhysicsTickMutex);
+}
+
+void PhysicsThreadUnlockTickMutex()
+{
+	SDL_UnlockMutex(PhysicsTickMutex);
 }

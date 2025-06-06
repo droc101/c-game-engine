@@ -1,0 +1,18 @@
+{
+    "materials": 1,
+    "skins": [
+        {
+            "Material.001": {
+                "texture": "level_sky_test",
+                "color": [255, 255, 255],
+                "shader": "sky"
+            }
+        }
+    ],
+    "lods": [
+        {
+            "distance": 0,
+            "model": "sky/sky.obj"
+        }
+    ]
+}

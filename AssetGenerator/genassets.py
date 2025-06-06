@@ -7,7 +7,7 @@ import util
 import Converter.TextureConverter
 import Converter.FileConverter
 import Converter.MP3Converter
-import Converter.OBJConverter
+import Converter.ModelConverter
 import Converter.VulkanShaderConverter
 import Converter.WAVConverter
 import Converter.GLShaderConverter
@@ -66,9 +66,10 @@ def RecursiveSearch(in_path, out_path):
 			elif file.endswith(".vert"):
 				print("Converting " + path_from_assets + file)
 				Converter.VulkanShaderConverter.ConvertVulkanVert(in_path + file)
-			elif file.endswith(".obj"):
+			elif file.endswith(".model.json"):
 				print("Converting " + path_from_assets + file)
-				Converter.OBJConverter.ConvertOBJ(in_path + file)
+				Converter.ModelConverter.ConvertModelDefinition(in_path + file)
+				# Converter.OBJConverter.ConvertOBJ(in_path + file)
 			elif file.endswith(".glsl"):
 				print("Converting " + path_from_assets + file)
 				Converter.GLShaderConverter.ConvertGLShader(in_path + file)
@@ -78,8 +79,6 @@ def RecursiveSearch(in_path, out_path):
 			elif file.endswith(".def"):
 				print("Copying " + path_from_assets + file)
 				shutil.copyfile(in_path + file, out_path + "defs/" + file)
-			else:
-				print("Unrecognized file type: " + file)
 
 SetupDirs(util.output_path)
 RecursiveSearch(util.input_path, util.output_path)

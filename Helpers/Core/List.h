@@ -42,6 +42,14 @@ void ListAdd(List *list, void *data);
 void ListAddBatched(List *list, size_t count, ...);
 
 /**
+ * Set an item in the list by index
+ * @param list List to set the item in
+ * @param index Index to set
+ * @param data Data to set at the index
+ */
+void ListSet(List *list, size_t index, void *data);
+
+/**
  * Remove an item from the list by index
  * @param list List to remove from
  * @param index Index to remove
