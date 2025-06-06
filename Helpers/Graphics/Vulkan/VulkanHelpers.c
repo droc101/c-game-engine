@@ -53,7 +53,6 @@ PushConstants pushConstants = {0};
 #pragma endregion variables
 
 
-
 VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
 {
 	const Asset *shader = DecompressAsset(path);
@@ -126,15 +125,23 @@ void LoadRoof(const bool hasCeiling, const uint32_t ceilingTextureIndex)
 		indices[3] = 0;
 		indices[4] = 2;
 		indices[5] = 3;
+		buffers.roof.indexCount = 6;
 	} else
 	{
-		for (uint32_t i = 0; i < skyModel->vertexCount; i++)
+		for (uint32_t i = 0; i < pushConstants.skyVertexCount; i++)
 		{
 			// Copy {x, y, z, u, v} and discard {nx, ny, nz}
-			memcpy(&vertices[i], &skyModel->vertexData[i * 8], sizeof(float) * 5);
+			memcpy(&vertices[i], &skyModel->lods[0]->vertexData[i * 8], sizeof(float) * 5);
 			vertices[i].textureIndex = pushConstants.skyTextureIndex;
 		}
-		memcpy(indices, skyModel->indexData, sizeof(uint32_t) * skyModel->indexCount);
+		buffers.roof.indexCount = 0;
+		for (uint32_t i = 0; i < skyModel->materialCount; i++)
+		{
+			const size_t indexCount = skyModel->lods[0]->indexCount[i];
+			memcpy(indices + buffers.roof.indexCount, skyModel->lods[0]->indexData[i], sizeof(uint32_t) * indexCount);
+			buffers.roof.indexCount += indexCount;
+		}
+		assert(buffers.roof.indexCount == skyModel->totalIndexCount);
 	}
 	lunaWriteDataToBuffer(buffers.roof.vertices.buffer, vertices, buffers.roof.vertices.allocatedSize);
 	lunaWriteDataToBuffer(buffers.roof.indices.buffer, indices, buffers.roof.indices.allocatedSize);

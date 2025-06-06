@@ -165,9 +165,13 @@ VkResult CreateModelActorBuffers()
 
 VkResult CreateRoofBuffers()
 {
-	const Model *skyModel = LoadModel(MODEL("model_sky"));
-	buffers.roof.vertices.allocatedSize = sizeof(WallVertex) * skyModel->vertexCount;
-	buffers.roof.indices.allocatedSize = sizeof(uint32_t) * skyModel->indexCount;
+	const ModelDefinition *skyModel = LoadModel(MODEL("model_sky"));
+	for (uint32_t i = 0; i < skyModel->materialCount; i++)
+	{
+		buffers.roof.indexCount += skyModel->lods[0]->indexCount[i];
+	}
+	buffers.roof.vertices.allocatedSize = sizeof(WallVertex) * skyModel->lods[0]->vertexCount;
+	buffers.roof.indices.allocatedSize = sizeof(uint32_t) * buffers.roof.indexCount;
 
 	const LunaBufferCreationInfo vertexBufferCreationInfo = {
 		.size = buffers.roof.vertices.allocatedSize,

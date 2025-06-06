@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
+#include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"
@@ -14,7 +15,6 @@
 #include "RenderingHelpers.h"
 #include "SDL.h"
 #include "Vulkan/Vulkan.h"
-#include "../../Structs/Level.h"
 
 
 SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
@@ -116,8 +116,8 @@ inline void DrawTextureMod(const Vector2 pos, const Vector2 size, const char *te
 inline void DrawTextureRegion(const Vector2 pos,
 							  const Vector2 size,
 							  const char *texture,
-							  const Vector2 region_start,
-							  const Vector2 region_end)
+							  const Vector2 regionStart,
+							  const Vector2 regionEnd)
 {
 	switch (currentRenderer)
 	{
@@ -126,14 +126,14 @@ inline void DrawTextureRegion(const Vector2 pos,
 									  (int)pos.y,
 									  (int)size.x,
 									  (int)size.y,
-									  (int)region_start.x,
-									  (int)region_start.y,
-									  (int)region_end.x,
-									  (int)region_end.y,
+									  (int)regionStart.x,
+									  (int)regionStart.y,
+									  (int)regionEnd.x,
+									  (int)regionEnd.y,
 									  texture);
 			break;
 		case RENDERER_OPENGL:
-			GL_DrawTextureRegion(pos, size, texture, region_start, region_end);
+			GL_DrawTextureRegion(pos, size, texture, regionStart, regionEnd);
 			break;
 		default:
 			break;
@@ -143,8 +143,8 @@ inline void DrawTextureRegion(const Vector2 pos,
 inline void DrawTextureRegionMod(const Vector2 pos,
 								 const Vector2 size,
 								 const char *texture,
-								 const Vector2 region_start,
-								 const Vector2 region_end,
+								 const Vector2 regionStart,
+								 const Vector2 regionEnd,
 								 const Color color)
 {
 	switch (currentRenderer)
@@ -154,29 +154,15 @@ inline void DrawTextureRegionMod(const Vector2 pos,
 										 (int)pos.y,
 										 (int)size.x,
 										 (int)size.y,
-										 (int)region_start.x,
-										 (int)region_start.y,
-										 (int)region_end.x,
-										 (int)region_end.y,
+										 (int)regionStart.x,
+										 (int)regionStart.y,
+										 (int)regionEnd.x,
+										 (int)regionEnd.y,
 										 texture,
 										 color);
 			break;
 		case RENDERER_OPENGL:
-			GL_DrawTextureRegionMod(pos, size, texture, region_start, region_end, color);
-			break;
-		default:
-			break;
-	}
-}
-
-inline void ClearColor(const Color color)
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			break;
-		case RENDERER_OPENGL:
-			GL_ClearColor(color);
+			GL_DrawTextureRegionMod(pos, size, texture, regionStart, regionEnd, color);
 			break;
 		default:
 			break;
@@ -230,56 +216,56 @@ inline void DrawRect(const int x, const int y, const int w, const int h, const C
 
 void DrawNinePatchTexture(const Vector2 pos,
 						  const Vector2 size,
-						  const float output_margins_px,
-						  const float texture_margins_px,
+						  const float outputMarginsPx,
+						  const float textureMarginsPx,
 						  const char *texture)
 {
 	const Vector2 textureSize = GetTextureSize(texture);
 
-	DrawTextureRegion(pos, v2s(output_margins_px), texture, v2s(0), v2s(texture_margins_px)); // top left
-	DrawTextureRegion(v2(pos.x, pos.y + output_margins_px),
-					  v2(output_margins_px, size.y - texture_margins_px * 2),
+	DrawTextureRegion(pos, v2s(outputMarginsPx), texture, v2s(0), v2s(textureMarginsPx)); // top left
+	DrawTextureRegion(v2(pos.x, pos.y + outputMarginsPx),
+					  v2(outputMarginsPx, size.y - textureMarginsPx * 2),
 					  texture,
-					  v2(0, texture_margins_px),
-					  v2(texture_margins_px, textureSize.y - texture_margins_px * 2)); // middle left
-	DrawTextureRegion(v2(pos.x, pos.y + size.y - output_margins_px),
-					  v2s(output_margins_px),
+					  v2(0, textureMarginsPx),
+					  v2(textureMarginsPx, textureSize.y - textureMarginsPx * 2)); // middle left
+	DrawTextureRegion(v2(pos.x, pos.y + size.y - outputMarginsPx),
+					  v2s(outputMarginsPx),
 					  texture,
-					  v2(0, textureSize.y - texture_margins_px),
-					  v2s(texture_margins_px)); // bottom left
+					  v2(0, textureSize.y - textureMarginsPx),
+					  v2s(textureMarginsPx)); // bottom left
 
-	DrawTextureRegion(v2(pos.x + output_margins_px, pos.y),
-					  v2(size.x - texture_margins_px * 2, output_margins_px),
+	DrawTextureRegion(v2(pos.x + outputMarginsPx, pos.y),
+					  v2(size.x - textureMarginsPx * 2, outputMarginsPx),
 					  texture,
-					  v2(texture_margins_px, 0),
-					  v2(textureSize.x - texture_margins_px * 2, texture_margins_px)); // top middle
-	DrawTextureRegion(v2(pos.x + output_margins_px, pos.y + output_margins_px),
-					  v2(size.x - texture_margins_px * 2, size.y - texture_margins_px * 2),
+					  v2(textureMarginsPx, 0),
+					  v2(textureSize.x - textureMarginsPx * 2, textureMarginsPx)); // top middle
+	DrawTextureRegion(v2(pos.x + outputMarginsPx, pos.y + outputMarginsPx),
+					  v2(size.x - textureMarginsPx * 2, size.y - textureMarginsPx * 2),
 					  texture,
-					  v2(texture_margins_px, texture_margins_px),
-					  v2(textureSize.x - texture_margins_px * 2,
-						 textureSize.y - texture_margins_px * 2)); // middle middle
-	DrawTextureRegion(v2(pos.x + output_margins_px, pos.y + (size.y - output_margins_px)),
-					  v2(size.x - texture_margins_px * 2, output_margins_px),
+					  v2(textureMarginsPx, textureMarginsPx),
+					  v2(textureSize.x - textureMarginsPx * 2,
+						 textureSize.y - textureMarginsPx * 2)); // middle middle
+	DrawTextureRegion(v2(pos.x + outputMarginsPx, pos.y + (size.y - outputMarginsPx)),
+					  v2(size.x - textureMarginsPx * 2, outputMarginsPx),
 					  texture,
-					  v2(texture_margins_px, textureSize.y - texture_margins_px),
-					  v2(textureSize.x - texture_margins_px * 2, texture_margins_px)); // bottom middle
+					  v2(textureMarginsPx, textureSize.y - textureMarginsPx),
+					  v2(textureSize.x - textureMarginsPx * 2, textureMarginsPx)); // bottom middle
 
-	DrawTextureRegion(v2(pos.x + (size.x - output_margins_px), pos.y),
-					  v2s(output_margins_px),
+	DrawTextureRegion(v2(pos.x + (size.x - outputMarginsPx), pos.y),
+					  v2s(outputMarginsPx),
 					  texture,
-					  v2(textureSize.x - texture_margins_px, 0),
-					  v2s(texture_margins_px)); // top right
-	DrawTextureRegion(v2(pos.x + (size.x - output_margins_px), pos.y + output_margins_px),
-					  v2(output_margins_px, size.y - texture_margins_px * 2),
+					  v2(textureSize.x - textureMarginsPx, 0),
+					  v2s(textureMarginsPx)); // top right
+	DrawTextureRegion(v2(pos.x + (size.x - outputMarginsPx), pos.y + outputMarginsPx),
+					  v2(outputMarginsPx, size.y - textureMarginsPx * 2),
 					  texture,
-					  v2(textureSize.x - texture_margins_px, texture_margins_px),
-					  v2(texture_margins_px, textureSize.y - texture_margins_px * 2)); // middle right
-	DrawTextureRegion(v2(pos.x + (size.x - output_margins_px), pos.y + (size.y - output_margins_px)),
-					  v2s(output_margins_px),
+					  v2(textureSize.x - textureMarginsPx, textureMarginsPx),
+					  v2(textureMarginsPx, textureSize.y - textureMarginsPx * 2)); // middle right
+	DrawTextureRegion(v2(pos.x + (size.x - outputMarginsPx), pos.y + (size.y - outputMarginsPx)),
+					  v2s(outputMarginsPx),
 					  texture,
-					  v2(textureSize.x - texture_margins_px, textureSize.y - texture_margins_px),
-					  v2s(texture_margins_px)); // bottom right
+					  v2(textureSize.x - textureMarginsPx, textureSize.y - textureMarginsPx),
+					  v2s(textureMarginsPx)); // bottom right
 }
 
 inline void DrawBatchedQuadsTextured(const BatchedQuadArray *batch, const char *texture, const Color color)
@@ -287,11 +273,11 @@ inline void DrawBatchedQuadsTextured(const BatchedQuadArray *batch, const char *
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_DrawTexturedQuadsBatched(batch->verts, batch->quad_count, texture, color);
-		break;
+			VK_DrawTexturedQuadsBatched(batch->verts, batch->quadCount, texture, color);
+			break;
 		case RENDERER_OPENGL:
-			GL_DrawTexturedArrays(batch->verts, batch->indices, batch->quad_count, texture, color);
-		break;
+			GL_DrawTexturedArrays(batch->verts, batch->indices, batch->quadCount, texture, color);
+			break;
 		default:
 			break;
 	}
@@ -302,11 +288,11 @@ inline void DrawBatchedQuadsColored(const BatchedQuadArray *batch, const Color c
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_DrawColoredQuadsBatched(batch->verts, batch->quad_count, color);
-		break;
+			VK_DrawColoredQuadsBatched(batch->verts, batch->quadCount, color);
+			break;
 		case RENDERER_OPENGL:
-			GL_DrawColoredArrays(batch->verts, batch->indices, batch->quad_count, color);
-		break;
+			GL_DrawColoredArrays(batch->verts, batch->indices, batch->quadCount, color);
+			break;
 		default:
 			break;
 	}
@@ -340,10 +326,10 @@ void RenderLevel3D(const Level *l, const Camera *cam)
 	{
 		case RENDERER_VULKAN:
 			VK_RenderLevel(l, cam);
-		break;
+			break;
 		case RENDERER_OPENGL:
 			GL_RenderLevel(l, cam);
-		break;
+			break;
 		default:
 			break;
 	}

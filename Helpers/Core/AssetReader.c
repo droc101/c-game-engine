@@ -339,6 +339,8 @@ ModelDefinition *LoadModel(const char *asset)
 	model->materialCount = ReadUint(assetData->data, &offset);
 	model->skinCount = ReadUint(assetData->data, &offset);
 	model->lodCount = ReadUint(assetData->data, &offset);
+	model->totalIndexCount = ReadUint(assetData->data, &offset);
+	model->totalVertexCount = ReadUint(assetData->data, &offset);
 	model->skins = malloc(sizeof(Material *) * model->skinCount);
 	CheckAlloc(model->skins);
 
@@ -372,6 +374,8 @@ ModelDefinition *LoadModel(const char *asset)
 		lod->vertexData = malloc(vertexDataSize);
 		CheckAlloc(lod->vertexData);
 		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
+
+		lod->totalIndexCount = ReadUint(assetData->data, &offset);
 
 		const size_t indexCountSize = model->materialCount * sizeof(uint);
 		lod->indexCount = malloc(indexCountSize);

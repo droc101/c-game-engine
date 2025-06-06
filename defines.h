@@ -12,7 +12,6 @@
 #include <SDL_mixer.h>
 #include <stdbool.h>
 #include <stdint.h>
-
 #include "config.h"
 #include "Helpers/Core/List.h"
 
@@ -41,9 +40,7 @@ typedef struct Player Player;
 typedef struct Wall Wall;
 typedef struct Level Level;
 typedef struct TextBox TextBox;
-typedef struct Model Model;
 typedef struct Actor Actor;
-typedef struct ModelHeader ModelHeader;
 typedef struct Options Options;
 typedef struct Asset Asset;
 typedef struct Image Image;
@@ -52,6 +49,10 @@ typedef struct SaveData SaveData;
 typedef struct Color Color;
 typedef struct ActorConnection ActorConnection;
 typedef struct Param Param;
+typedef struct ModelDefinition ModelDefinition;
+typedef struct Material Material;
+typedef struct ModelLod ModelLod;
+typedef struct KvList KvList;
 
 // Function signatures
 typedef void (*FixedUpdateFunction)(GlobalState *state, double delta);
@@ -62,21 +63,21 @@ typedef void (*FrameRenderFunction)(GlobalState *state);
 
 typedef void (*TextBoxCloseFunction)(TextBox *textBox);
 
-typedef void (*ActorInitFunction)(Actor *self, b2WorldId worldId);
+typedef void (*ActorInitFunction)(Actor *this, b2WorldId worldId, const KvList *params);
 
-typedef void (*ActorUpdateFunction)(Actor *self, double delta);
+typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
-typedef void (*ActorIdleFunction)(Actor *self, double delta);
+typedef void (*ActorIdleFunction)(Actor *this, double delta);
 
-typedef void (*ActorTargetReachedFunction)(Actor *self, double delta);
+typedef void (*ActorTargetReachedFunction)(Actor *this, double delta);
 
-typedef void (*ActorDestroyFunction)(Actor *self);
+typedef void (*ActorDestroyFunction)(Actor *this);
 
 /**
  * Signal handler function signature for actor
  * @return True if the signal was handled, false if not
  */
-typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byte signal, const Param *param);
+typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byte signal, const Param *param);
 
 #pragma endregion
 
@@ -119,7 +120,7 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byt
  * @param color The color struct to convert
  * @return The color as an array of floats
  */
-#define COLOR_TO_ARR(color) (float *)&color
+#define COLOR_TO_ARR(color) (float *)&(color)
 
 #ifdef WIN32
 /// Make this symbol exported (in the symbol table)
@@ -129,12 +130,13 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *self, const Actor *sender, byt
 #define EXPORT_SYM __attribute__((visibility("default")))
 #endif
 
-#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, {.byteValue = x}})
-#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, {.intValue = x}})
-#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, {.floatValue = x}})
-#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, {.boolValue = x}})
-#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, {.stringValue = x}})
-#define PARAM_NONE ((Param){PARAM_TYPE_NONE, {}})
+#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = x})
+#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = x})
+#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = x})
+#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = x})
+#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = x})
+#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = x})
+#define PARAM_NONE ((Param){PARAM_TYPE_NONE})
 
 #pragma endregion
 
@@ -240,26 +242,18 @@ enum ParamType
 	PARAM_TYPE_FLOAT,
 	PARAM_TYPE_BOOL,
 	PARAM_TYPE_STRING,
-	PARAM_TYPE_NONE
+	PARAM_TYPE_NONE,
+	PARAM_TYPE_COLOR
 };
 
 #pragma endregion
 
 #pragma region Struct definitions
 
-union _ParamInternal
+struct KvList
 {
-	byte byteValue;
-	int intValue;
-	float floatValue;
-	bool boolValue;
-	char stringValue[64];
-};
-
-struct Param
-{
-	ParamType type;
-	union _ParamInternal value;
+	List keys;
+	List values;
 };
 
 struct Color
@@ -268,6 +262,20 @@ struct Color
 	float g;
 	float b;
 	float a;
+};
+
+struct Param
+{
+	ParamType type;
+	union
+	{
+		byte byteValue;
+		int intValue;
+		float floatValue;
+		bool boolValue;
+		char stringValue[64];
+		Color colorValue;
+	};
 };
 
 struct Camera
@@ -308,7 +316,7 @@ struct Wall
 	/// The second point of the wall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	const char tex[48];
+	const char tex[80];
 	/// The length of the wall (Call @c WallBake to update)
 	float length;
 	/// The angle of the wall (Call @c WallBake to update)
@@ -343,12 +351,12 @@ struct Level
 	/// Indicates if the level has a ceiling. If false, the level will use a sky instead
 	bool hasCeiling;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	char ceilOrSkyTex[48];
+	char ceilOrSkyTex[80];
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	char floorTex[48];
+	char floorTex[80];
 
 	/// The music name, or "none" for no music
-	char music[32];
+	char music[80];
 
 	/// The color of the fog
 	uint fogColor;
@@ -441,34 +449,6 @@ struct Options
 	double masterVolume;
 } __attribute__((packed)); // This is packed because it is saved to disk
 
-struct ModelHeader
-{
-	/// The "magic" for the header, should be "MSH"
-	char sig[4];
-	/// The number of indices in the model
-	uint indexCount;
-	/// The number of vertices in the model
-	uint vertexCount;
-	/// The "magic" for the data, should be "DAT"
-	char dataSig[4];
-} __attribute__((packed));
-
-struct Model
-{
-	ModelHeader header;
-	size_t id;
-	char *name;
-
-	/// The number of vertices in the model
-	uint vertexCount;
-	/// The number of indices in the model
-	uint indexCount;
-	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
-	float *vertexData;
-	/// Index data
-	uint *indexData;
-};
-
 // Global state of the game
 struct GlobalState
 {
@@ -551,9 +531,8 @@ struct Actor
 	/// The size of the shadow
 	float shadowSize;
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
-	Model *actorModel;
-	/// Texture for the model
-	char *actorModelTexture;
+	ModelDefinition *actorModel;
+	int actorModelSkin;
 
 	/// The actor's wall, in global space
 	Wall *actorWall;
@@ -575,17 +554,11 @@ struct Actor
 	/// List of I/O connections
 	List ioConnections;
 
-	// extra parameters for the actor. saved in level data, so can be used during Init
-	byte paramA;
-	byte paramB;
-	byte paramC;
-	byte paramD;
-
 	/// The actor's health
 	/// @note May be unused for some actors
 	int health;
 	/// Extra data for the actor
-	void *extra_data;
+	void *extraData;
 
 	/// The actor's Box2D body ID
 	b2BodyId bodyId;
@@ -624,28 +597,28 @@ struct Font
 	/// The texture width of one character
 	uint width;
 	/// The texture height (including below baseline)
-	uint texture_height;
+	uint textureHeight;
 	/// The pixel coordinate of the baseline
 	uint baseline;
 	/// The pixels between characters
-	uint char_spacing;
+	uint charSpacing;
 	/// The pixels between lines
-	uint line_spacing;
+	uint lineSpacing;
 	/// The width of a space character
-	uint space_width;
+	uint spaceWidth;
 	/// The default size of the font, used for calculating scale
-	uint default_size;
+	uint defaultSize;
 	/// The number of characters in the font
-	uint char_count;
+	uint charCount;
 	/// Whether this font only contains uppercase characters
-	bool uppercase_only;
+	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char texture[48];
+	char texture[80];
 	/// The index of the character in the texture
 	byte indices[128];
 	/// The width of each character, index directly by the character
-	byte char_widths[128];
+	byte charWidths[128];
 
 	/// The image loaded from the texture
 	Image *image;
@@ -657,6 +630,57 @@ struct ActorConnection
 	byte myOutput;
 	char outActorName[64];
 	Param outParamOverride;
+};
+
+struct Material
+{
+	/// The texture name of the material
+	char texture[64];
+	/// The tint color of the material
+	Color color;
+	/// The shader to use for this material
+	ModelShader shader;
+};
+
+struct ModelLod
+{
+	/// How far away the camera must be before this LOD is used
+	float distance;
+
+	/// The number of vertices in the model
+	uint vertexCount;
+	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
+	float *vertexData;
+
+	/// The total number of indices in this lod
+	uint totalIndexCount;
+	/// The number of indices in each material
+	uint *indexCount;
+	/// Index data for each material
+	uint **indexData;
+};
+
+struct ModelDefinition
+{
+	/// The runtime-generated ID of this model
+	size_t id;
+	/// The asset name of this model
+	char *name;
+
+	/// The number of materials in the model
+	byte materialCount;
+	/// The number of skins in the model
+	byte skinCount;
+	/// The number of LODs in the model
+	byte lodCount;
+	/// The total number of indices in the model
+	uint totalIndexCount;
+	/// The total number of vertices in the model
+	uint totalVertexCount;
+	/// The skins for this model, each an array of materialCount materials
+	Material **skins;
+	/// The LODs for this model
+	ModelLod **lods;
 };
 
 #pragma endregion

@@ -292,7 +292,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 												 VK_INDEX_TYPE_UINT32,
 												 pipelines.walls,
 												 &pipelineBindInfo,
-												 level->hasCeiling ? 6 : skyModel->indexCount,
+												 buffers.roof.indexCount,
 												 1,
 												 0,
 												 0,
@@ -389,7 +389,7 @@ bool VK_LoadLevelWalls(const Level *level)
 		pushConstants.skyTextureIndex = MAX_TEXTURES;
 	} else
 	{
-		pushConstants.skyVertexCount = skyModel->vertexCount;
+		pushConstants.skyVertexCount = skyModel->lods[0]->vertexCount;
 		pushConstants.skyTextureIndex = TextureIndex(level->ceilOrSkyTex);
 	}
 	pushConstants.shadowTextureIndex = TextureIndex(TEXTURE("vfx_shadow"));

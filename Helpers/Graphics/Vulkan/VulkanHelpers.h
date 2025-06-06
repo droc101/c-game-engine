@@ -159,6 +159,7 @@ typedef struct RoofBuffer
 {
 	BufferRegion vertices;
 	BufferRegion indices;
+	uint32_t indexCount;
 } RoofBuffer;
 
 typedef struct WallActorsBuffer

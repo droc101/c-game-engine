@@ -67,6 +67,7 @@ class ObjModel:
 	# Final Data
 	verts : list[Vertex]
 	materials : dict[str, list[int]] # list of indices for each material
+	total_index_count : int
 
 	def __init__(self):
 		self.positions = []
@@ -75,7 +76,8 @@ class ObjModel:
 		self.verts = []
 		self.vertex_index_map = {}
 		self.materials = {}
-	
+		self.total_index_count = 0
+
 	def pack(self):
 		# Pack vertex data into a binary format
 		vtx_bin_data = bytearray()
@@ -98,6 +100,7 @@ class ObjModel:
 		bin_data = bytearray()
 		bin_data.extend(util.IntToBytes(len(self.verts)))
 		bin_data += vtx_bin_data
+		bin_data += util.IntToBytes(self.total_index_count)
 		bin_data += idx_count_data
 		bin_data += idx_bin_data
 		
@@ -175,7 +178,10 @@ def ParseOBJ(file_path):
 						obj.materials[mat].append(idx)
 					else:
 						obj.materials[mat] = [idx]
-	
+
+	for _, indices in obj.materials.items():
+		obj.total_index_count += len(indices)
+
 	# # Pack vertex data into a binary format
 	# vtx_bin_data = bytearray()
 	# for vertex in obj.verts:

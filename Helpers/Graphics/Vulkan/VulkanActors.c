@@ -47,8 +47,12 @@ VkResult InitActors(const Level *level)
 			{
 				index = buffers.modelActors.loadedModelIds.length;
 				ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
-				buffers.modelActors.vertices.bytesUsed += sizeof(ActorVertex) * actor->actorModel->vertexCount;
-				buffers.modelActors.indices.bytesUsed += sizeof(uint32_t) * actor->actorModel->indexCount;
+				for (uint32_t lodIndex = 0; lodIndex < actor->actorModel->lodCount; lodIndex++)
+				{
+					buffers.modelActors.vertices.bytesUsed += sizeof(ActorVertex) *
+															  actor->actorModel->lods[lodIndex]->vertexCount;
+				}
+				buffers.modelActors.indices.bytesUsed += sizeof(uint32_t) * actor->actorModel->totalIndexCount;
 				buffers.modelActors.drawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
 			}
 			buffers.modelActors.instanceData.bytesUsed += sizeof(ActorInstanceData);
@@ -97,12 +101,21 @@ void LoadModelActors(const Level *level)
 		if (ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id) == -1)
 		{
 			ListAdd(&buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
-			const size_t vertexSize = sizeof(ActorVertex) * actor->actorModel->vertexCount;
-			const size_t indexSize = sizeof(uint32_t) * actor->actorModel->indexCount;
-			memcpy(buffers.modelActors.vertices.data + vertexOffset, actor->actorModel->vertexData, vertexSize);
-			memcpy(buffers.modelActors.indices.data + indexOffset, actor->actorModel->indexData, indexSize);
-			vertexOffset += vertexSize;
-			indexOffset += indexSize;
+			for (uint32_t lodIndex = 0; lodIndex < actor->actorModel->lodCount; lodIndex++)
+			{
+				const ModelLod lod = *actor->actorModel->lods[lodIndex];
+				const size_t vertexSize = sizeof(ActorVertex) * lod.vertexCount;
+				memcpy(buffers.modelActors.vertices.data + vertexOffset, (void *)lod.vertexData, vertexSize);
+				vertexOffset += vertexSize;
+				for (uint32_t materialIndex = 0; materialIndex < actor->actorModel->materialCount; materialIndex++)
+				{
+					const size_t indexSize = sizeof(uint32_t) * lod.indexCount[materialIndex];
+					memcpy(buffers.modelActors.indices.data + indexOffset,
+						   (void *)lod.indexData[materialIndex],
+						   indexSize);
+					indexOffset += indexSize;
+				}
+			}
 		}
 	}
 	ListUnlock(level->actors);
@@ -119,23 +132,20 @@ void LoadActorDrawInfo(const Level *level)
 	VkDrawIndexedIndirectCommand *modelActorsDrawInfo = buffers.modelActors.drawInfo.data;
 	VkDrawIndexedIndirectCommand *wallActorsDrawInfo = buffers.wallActors.drawInfo.data;
 	uint32_t wallCount = 0;
-	if (buffers.modelActors.loadedModelIds.length > 0)
+	uint32_t modelCount = 0;
+	uint32_t indexOffset = 0;
+	uint32_t vertexOffset = 0;
+	for (size_t i = 0; i < buffers.modelActors.loadedModelIds.length; i++)
 	{
-		modelActorsDrawInfo[0].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, 0))
-													->indexCount;
-		modelActorsDrawInfo[0].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, 0);
-		size_t modelCount = (size_t)ListGet(buffers.modelActors.modelCounts, 0);
-		for (size_t i = 1; i < buffers.modelActors.loadedModelIds.length; i++)
-		{
-			const Model *previousModel = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i - 1));
-			modelActorsDrawInfo[i].indexCount = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i))
-														->indexCount;
-			modelActorsDrawInfo[i].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, i);
-			modelActorsDrawInfo[i].firstIndex = previousModel->indexCount;
-			modelActorsDrawInfo[i].vertexOffset = (int32_t)previousModel->vertexCount;
-			modelActorsDrawInfo[i].firstInstance = modelCount;
-			modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
-		}
+		const ModelDefinition *model = GetModelFromId((size_t)ListGet(buffers.modelActors.loadedModelIds, i));
+		modelActorsDrawInfo[i].indexCount = model->totalIndexCount;
+		modelActorsDrawInfo[i].instanceCount = (size_t)ListGet(buffers.modelActors.modelCounts, i);
+		modelActorsDrawInfo[i].firstIndex = indexOffset;
+		modelActorsDrawInfo[i].vertexOffset = (int32_t)vertexOffset;
+		modelActorsDrawInfo[i].firstInstance = modelCount;
+		modelCount += (size_t)ListGet(buffers.modelActors.modelCounts, i);
+		indexOffset += model->totalIndexCount;
+		vertexOffset += model->totalVertexCount;
 	}
 	ListLock(level->actors);
 	for (size_t i = 0; i < loadedActors; i++)
@@ -270,7 +280,8 @@ VkResult UpdateActorInstanceDataAndShadows(const Level *level)
 			const size_t index = ListFind(buffers.modelActors.loadedModelIds, (void *)actor->actorModel->id);
 			ActorInstanceData *offsetInstanceData = buffers.modelActors.instanceData.data + offsets[index];
 			memcpy(offsetInstanceData[modelCounts[index]].transform, transformMatrix, sizeof(mat4));
-			offsetInstanceData[modelCounts[index]].textureIndex = TextureIndex(actor->actorModelTexture);
+			const char *texture = actor->actorModel->skins[actor->actorModelSkin]->texture;
+			offsetInstanceData[modelCounts[index]].textureIndex = TextureIndex(texture);
 
 			modelCounts[index]++;
 		} else if (actor->actorWall)

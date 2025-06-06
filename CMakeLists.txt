@@ -41,6 +41,16 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDeb
     endif ()
 endif ()
 
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|ARM64|arm64)")
+    message(STATUS "Detected ARM64 architecture (no support will be provided)")
+    set(TARGET_ARCH "arm64")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)")
+    message(STATUS "Detected x86_64 architecture")
+    set(TARGET_ARCH "x86_64")
+else()
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
+endif()
+
 #endregion
 
 #region Game Executable
@@ -156,6 +166,8 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanHelpers.h
         Helpers/Graphics/Vulkan/VulkanResources.c
         Helpers/Graphics/Vulkan/VulkanResources.h
+        Helpers/Graphics/Vulkan/VulkanActors.c
+        Helpers/Graphics/Vulkan/VulkanActors.h
         Helpers/Navigation.c
         Helpers/Navigation.h
         Helpers/Collision.c
@@ -170,8 +182,16 @@ add_executable(
         Actor/Physbox.h
         Actor/Laser.c
         Actor/Laser.h
-        Helpers/Graphics/Vulkan/VulkanActors.c
-        Helpers/Graphics/Vulkan/VulkanActors.h
+        Helpers/Core/KVList.c
+        Helpers/Core/KVList.h
+        Actor/Core/StaticModel.c
+        Actor/Core/StaticModel.h
+        Actor/Core/SoundPlayer.c
+        Actor/Core/SoundPlayer.h
+        Actor/Core/Sprite.c
+        Actor/Core/Sprite.h
+        Actor/LaserEmitter.c
+        Actor/LaserEmitter.h
 )
 
 #endregion
@@ -180,7 +200,6 @@ add_executable(
 
 set(SDL2_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2/x86_64-w64-mingw32")
 set(SDL2_MIXER_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/x86_64-w64-mingw32")
-set(ZLIB_ROOT "${CMAKE_SOURCE_DIR}/lib/zlib")
 
 find_package(SDL2 CONFIG REQUIRED) # Platform abstraction
 find_package(SDL2_mixer CONFIG REQUIRED) # Audio
@@ -190,11 +209,17 @@ find_package(Vulkan REQUIRED) # 3d
 
 if (UNIX)
     find_package(GLEW REQUIRED) # OpenGL Extension Wrangler
+    if (TARGET_ARCH STREQUAL "arm64")
+        set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux_arm64.a")
+    else ()
+        set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a")
+    endif ()
 elseif (WIN32) # Thank you Windows, I hate you.
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew") # OpenGL Extension Wrangler
     add_definitions(-DGLEW_STATIC)
     set(GLEW_LIBRARIES "${CMAKE_SOURCE_DIR}/lib/glew/lib/Release/x64/glew32s.lib")
     set(GLEW_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/lib/glew/include")
+    set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a")
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
@@ -204,9 +229,9 @@ else ()
 endif ()
 
 if (UNIX)
-    target_link_libraries(game ${SDL2_LIBRARY} SDL2 ${SDL2_MIXER_LIBRARY} SDL2_mixer ${ZLIB_LIBRARIES} z ${OPENGL_gl_LIBRARY} -lGL ${GLEW_LIBRARIES} -lGLU ${Vulkan_LIBRARIES} ${LUNA_PATH} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a m) # extra l* flags are needed on Linux
+    target_link_libraries(game ${SDL2_LIBRARY} SDL2 ${SDL2_MIXER_LIBRARY} SDL2_mixer ${ZLIB_LIBRARIES} z ${OPENGL_gl_LIBRARY} -lGL ${GLEW_LIBRARIES} -lGLU ${Vulkan_LIBRARIES} ${LUNA_PATH} ${BOX2D_LIB} m) # extra l* flags are needed on Linux
 elseif (WIN32)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${ZLIB_LIBRARIES} ${OPENGL_gl_LIBRARY} opengl32 ${GLEW_LIBRARIES} ${Vulkan_LIBRARIES} ${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${ZLIB_LIBRARIES} ${OPENGL_gl_LIBRARY} opengl32 ${GLEW_LIBRARIES} ${Vulkan_LIBRARIES} ${BOX2D_LIB} dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
     target_include_directories(game PRIVATE ${CMAKE_SOURCE_DIR}/lib/cglm/include) # C OpenGL Mathematics Library
 endif ()
 
