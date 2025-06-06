@@ -20,9 +20,9 @@ if (len(sys.argv) != 3):
 util.input_path = sys.argv[1]
 util.output_path = sys.argv[2]
 
-# Recreate the assets folder and subfolders
+
+# Recreate asset folder structure
 def SetupDirs(out_path):
-	# Delete the old assets folder
 	if os.path.exists(out_path):
 		shutil.rmtree(out_path)
 	
@@ -69,7 +69,6 @@ def RecursiveSearch(in_path, out_path):
 			elif file.endswith(".model.json"):
 				print("Converting " + path_from_assets + file)
 				Converter.ModelConverter.ConvertModelDefinition(in_path + file)
-				# Converter.OBJConverter.ConvertOBJ(in_path + file)
 			elif file.endswith(".glsl"):
 				print("Converting " + path_from_assets + file)
 				Converter.GLShaderConverter.ConvertGLShader(in_path + file)

@@ -175,36 +175,5 @@ def ParseOBJ(file_path):
 						obj.materials[mat].append(idx)
 					else:
 						obj.materials[mat] = [idx]
-	
-	# # Pack vertex data into a binary format
-	# vtx_bin_data = bytearray()
-	# for vertex in obj.verts:
-	# 	vtx_bin_data += vertex.pack()
-	
-	# # Pack index data into a binary format
-	# idx_bin_data = bytearray()
-	# for idx in obj.inds:
-	# 	idx_bin_data += util.IntToBytes(idx)
- 
-	# # Make the header and add the data
-	# bin_data = bytearray()
-	# bin_data += struct.pack('4s', b'MSH\0')
-	# bin_data.extend(util.IntToBytes(len(obj.inds)))
-	# bin_data.extend(util.IntToBytes(len(obj.verts)))
-	# bin_data += struct.pack('4s', b'DAT\0')
-	# bin_data += idx_bin_data
-	# bin_data += vtx_bin_data
- 
-	# return bin_data
 
 	return obj
-
-# def ConvertOBJ(path):
-# 	data = list(ParseOBJ(path))
-
-# 	data += util.IntToBytes(len(data))
-# 	data += util.IntToBytes(0)
-# 	data += util.IntToBytes(0)
-# 	data += util.IntToBytes(0)
-
-# 	util.WriteAsset(path, "gmdl", "model", util.EncloseData(data, 7))

@@ -30,7 +30,6 @@ def ConvertFont(path):
 		return
 
 	texnam = util.CString(font["texture"], 80)
-	# chars = util.CString(font["chars"], 128)
 
 	data = bytearray([])
 	data += struct.pack("I", font["width"])
