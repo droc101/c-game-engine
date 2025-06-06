@@ -3,6 +3,7 @@
 //
 
 #include "VulkanHelpers.h"
+#include <assert.h>
 #include <cglm/clipspace/persp_lh_zo.h>
 #include <cglm/clipspace/view_lh_zo.h>
 #include <luna/luna.h>
