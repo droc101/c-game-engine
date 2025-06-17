@@ -171,6 +171,8 @@ void LoadLevelWalls(const Level *l)
 			VK_LoadLevelWalls(l);
 			break;
 		case RENDERER_OPENGL:
+			GL_LoadLevelWalls(l);
+			break;
 		default:
 			break;
 	}

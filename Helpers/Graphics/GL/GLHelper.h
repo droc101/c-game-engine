@@ -117,13 +117,6 @@ void GL_DrawTextureRegionMod(Vector2 pos,
 							 Color color);
 
 /**
- * Draw a wall in 3D
- * @param w The wall to draw
- * @note This expects 3D mode to be enabled
- */
-void GL_DrawWall(const Wall *w);
-
-/**
  * Draw the floor in 3D
  * @param vp1 The start of the floor
  * @param vp2 The end of the floor
@@ -208,5 +201,16 @@ void GL_RenderLevel(const Level *l, const Camera *cam);
  * @param skin The skin to use
  */
 void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, int skin);
+
+/**
+ * Render the level's static walls
+ */
+void GL_RenderLevelWalls();
+
+/**
+ * Load the level's static walls into buffers
+ * @param l The level to load walls from
+ */
+void GL_LoadLevelWalls(const Level *l);
 
 #endif //GAME_GLHELPER_H
