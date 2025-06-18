@@ -5,6 +5,7 @@ Congratulations! Linux is far easier to build on than Windows.
 - You will need to have `cmake`, `make`, and `gcc` installed.
 - You will need development packages as outlined in the libraries section.
 - You need Python 3 (as the command `python`) with PIL or Pillow installed to run the asset compression script (required to build)
+- You will need to compile Luna, then copy (or link) the `include` directory as well as the compiled binaries to `libLuna_debug.a` and `libLuna_release.a` in `lib/Luna`.
 
 ### Libraries
 
