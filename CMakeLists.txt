@@ -192,6 +192,8 @@ add_executable(
         Actor/Core/Sprite.h
         Actor/LaserEmitter.c
         Actor/LaserEmitter.h
+        Actor/Core/Logic.c
+        Actor/Core/Logic.h
 )
 
 #endregion
