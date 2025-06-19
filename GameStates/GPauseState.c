@@ -18,6 +18,10 @@
 #include "GMainState.h"
 #include "GOptionsState.h"
 
+#ifndef USE_LEVEL_SELECT
+#include "GMenuState.h"
+#endif
+
 UiStack *pauseStack = NULL;
 
 void GPauseStateUpdate(GlobalState * /*State*/)
@@ -106,7 +110,7 @@ void BtnPauseExit()
 #ifdef USE_LEVEL_SELECT
 	GLevelSelectStateSet();
 #else
-	ChangeLevelByName(PAUSE_EXIT_LEVEL);
+	GMenuStateSet();
 #endif
 }
 

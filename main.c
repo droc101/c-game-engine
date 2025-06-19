@@ -260,7 +260,10 @@ int main(const int argc, char *argv[])
 
 	InitCommonAssets();
 
-	ChangeLevel(CreateLevel());
+	if (!ChangeLevelByName(STARTING_LEVEL))
+	{
+		Error("Failed to load starting level!");
+	}
 
 	GLogoSplashStateSet();
 

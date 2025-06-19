@@ -12,10 +12,13 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
-#include "../Structs/UI/Controls/TextBox.h"
 #include "../Structs/UI/UiStack.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
+
+#ifndef USE_LEVEL_SELECT
+#include "GMainState.h"
+#endif
 
 UiStack *menuStack = NULL;
 bool fadeIn = false;
