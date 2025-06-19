@@ -26,7 +26,7 @@ GL_Shader *modelShadedShader;
 
 GL_Buffer *glBuffer;
 
-GLuint glTextures[GL_MAX_TEXTURE_SLOTS];
+GLuint glTextures[MAX_TEXTURES];
 int glNextFreeSlot = 0;
 int glAssetTextureMap[MAX_TEXTURES];
 char glLastError[512];

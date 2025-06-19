@@ -76,13 +76,6 @@ struct __attribute__((aligned(16))) GL_SharedUniforms
 #define GL_MAX_WALL_BUFFERS 128
 /// The maximum number of walls that can be in a single wall buffer (i.e. a single texture)
 #define GL_MAX_WALLS_PER_BUFFER 2048
-
-/// The maximum number of textures that can be loaded into OpenGL
-#define GL_MAX_TEXTURE_SLOTS 512
-#if GL_MAX_TEXTURE_SLOTS < MAX_TEXTURES
-#error "GL_MAX_TEXTURES must be at least as large as MAX_TEXTURES"
-#endif
-
 /**
  * Log an OpenGL error
  * @param error the error message
