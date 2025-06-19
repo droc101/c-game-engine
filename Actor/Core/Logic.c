@@ -2,12 +2,12 @@
 // Created by droc101 on 6/19/25.
 //
 
+#include "Logic.h"
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
-#include "Logic.h"
 
 typedef enum LogicOp
 {

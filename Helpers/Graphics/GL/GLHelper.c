@@ -114,34 +114,34 @@ bool GL_PreInit()
 			LogError("Failed to set MSAA samples attribute: %s\n", SDL_GetError());
 		}
 	}
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3),
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, GL_VERSION_MAJOR),
 					"Failed to set OpenGL major version",
-					"Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3),
+					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, GL_VERSION_MINOR),
 					"Failed to set OpenGL minor version",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1),
 					"Failed to set OpenGL accelerated visual",
-					"Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE),
+					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, GL_PROFILE),
 					"Failed to set OpenGL profile",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1),
 					"Failed to set OpenGL double buffer",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8),
 					"Failed to set OpenGL green-size",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8),
 					"Failed to set OpenGL blue-size",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8),
 					"Failed to set OpenGL alpha-size",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24),
 					"Failed to set OpenGL depth buffer size",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 
 	memset(glAssetTextureMap, -1, MAX_TEXTURES * sizeof(int));
 	memset(glTextures, 0, sizeof(glTextures));
@@ -170,15 +170,15 @@ bool GL_Init(SDL_Window *wnd)
 	if (err != GLEW_OK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error("Failed to start OpenGL. Your GPU or drivers may not support OpenGL 3.3.");
+		GL_Error(GL_INIT_FAIL_MSG);
 		return false;
 	}
 
 	// Ensure we have GL 3.3 or higher
-	if (!GLEW_VERSION_3_3)
+	if (!GL_VERSION_CHECK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error("Failed to start OpenGL. Your GPU or drivers may not support OpenGL 3.3.");
+		GL_Error(GL_INIT_FAIL_MSG);
 		return false;
 	}
 

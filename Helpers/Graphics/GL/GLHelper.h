@@ -9,6 +9,13 @@
 #include "../Drawing.h"
 #include "SDL.h"
 
+#define GL_VERSION_MAJOR 3
+#define GL_VERSION_MINOR 3
+#define GL_PROFILE SDL_GL_CONTEXT_PROFILE_CORE
+#define GL_VERSION_CHECK GL_VERSION_3_3
+#define GL_VERSION_STRING "OpenGL 3.3 Core Profile"
+#define GL_INIT_FAIL_MSG "Failed to start OpenGL. Your GPU or drivers may not support the " GL_VERSION_STRING "."
+
 /**
  * Set SDL_GL flags (this must be done before the SDL window is created)
  */
