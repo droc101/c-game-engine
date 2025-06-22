@@ -4,6 +4,7 @@
 
 #include "GLHelper.h"
 #include <cglm/cglm.h>
+#include <string.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Vector2.h"
 #include "../../CommonAssets.h"
@@ -130,10 +131,8 @@ bool GL_PreInit()
 					"Failed to set OpenGL double buffer",
 					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8),
-					"Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8),
-					"Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8), "Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8), "Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8),
 					"Failed to set OpenGL alpha-size",
 					GL_INIT_FAIL_MSG);
