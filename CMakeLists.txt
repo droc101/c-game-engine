@@ -194,6 +194,8 @@ add_executable(
         Actor/LaserEmitter.h
         Actor/Core/Logic.c
         Actor/Core/Logic.h
+        Helpers/Core/Arguments.c
+        Helpers/Core/Arguments.h
 )
 
 #endregion

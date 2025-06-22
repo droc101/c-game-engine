@@ -10,6 +10,7 @@
 #include "defines.h"
 #include "GameStates/GLogoSplashState.h"
 #include "Helpers/CommonAssets.h"
+#include "Helpers/Core/Arguments.h"
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
@@ -239,6 +240,20 @@ int main(const int argc, char *argv[])
 	ExecPathInit(argc, argv);
 
 	InitOptions();
+
+	if (HasCliArg(argc, argv, "--renderer"))
+	{
+		const char *renderer = GetCliArgStr(argc, argv, "--renderer", "gl");
+		if (strncmp(renderer, "gl", strlen("gl")) == 0)
+		{
+			LogInfo("Forcing OpenGL Renderer\n");
+			GetState()->options.renderer = RENDERER_OPENGL;
+		} else if (strncmp(renderer, "vulkan", strlen("vulkan")) == 0)
+		{
+			LogInfo("Forcing Vulkan Renderer\n");
+			GetState()->options.renderer = RENDERER_VULKAN;
+		}
+	}
 
 	AssetCacheInit();
 

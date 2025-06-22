@@ -131,11 +131,9 @@ bool GL_PreInit()
 					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8),
-					"Failed to set OpenGL green-size",
-					GL_INIT_FAIL_MSG);
+					"Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8),
-					"Failed to set OpenGL blue-size",
-					GL_INIT_FAIL_MSG);
+					"Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8),
 					"Failed to set OpenGL alpha-size",
 					GL_INIT_FAIL_MSG);
