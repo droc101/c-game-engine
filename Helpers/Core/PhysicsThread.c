@@ -4,6 +4,7 @@
 
 #include "PhysicsThread.h"
 #include <SDL_thread.h>
+#include "../../Debug/FrameGrapher.h"
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
 #include "Error.h"
@@ -74,6 +75,7 @@ int PhysicsThreadMain(void *)
 		}
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
+		TickGraphUpdate(timeElapsed);
 		lastTickTime = (double)timeElapsed;
 	}
 }

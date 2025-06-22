@@ -39,6 +39,7 @@
 
 // Enable or disable the frame graph (just the rendering)
 #define FRAMEGRAPH_ENABLE
+#define TICKGRAPH_ENABLE
 // See /Debug/FrameGrapher.h for additional frame grapher settings
 
 // Show debug print statements in the top left corner

@@ -354,6 +354,7 @@ int main(const int argc, char *argv[])
 		state->RenderGame(state);
 
 		FrameGraphDraw();
+		TickGraphDraw();
 
 		FrameEnd();
 
