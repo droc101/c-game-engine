@@ -1273,6 +1273,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const int skin)
 {
+	glEnable(GL_CULL_FACE);
 	int lod = 0;
 	if (model->lodCount > 1)
 	{
@@ -1297,6 +1298,7 @@ void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, c
 	{
 		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);
 	}
+	glDisable(GL_CULL_FACE);
 }
 
 void GL_RenderLevelWalls()
