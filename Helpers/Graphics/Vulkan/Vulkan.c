@@ -428,13 +428,6 @@ inline void VK_Restore()
 	minimized = false;
 }
 
-inline uint8_t VK_GetSampleCountFlags()
-{
-	return physicalDevice.properties.limits.framebufferColorSampleCounts &
-		   physicalDevice.properties.limits.framebufferDepthSampleCounts &
-		   0xF;
-}
-
 bool VK_LoadLevelWalls(const Level *level)
 {
 	uint32_t skyVertexCount = 0;

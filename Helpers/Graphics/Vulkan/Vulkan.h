@@ -38,8 +38,6 @@ void VK_Minimize();
 
 void VK_Restore();
 
-uint8_t VK_GetSampleCountFlags();
-
 bool VK_LoadLevelWalls(const Level *level);
 
 void VK_DrawColoredQuad(int x, int y, int w, int h, Color color);

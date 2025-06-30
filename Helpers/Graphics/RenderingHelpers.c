@@ -237,19 +237,6 @@ inline bool IsLowFPSModeEnabled()
 	return lowFPSMode && GetState()->options.limitFpsWhenUnfocused;
 }
 
-inline byte GetSampleCountFlags()
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			return VK_GetSampleCountFlags();
-		case RENDERER_OPENGL:
-			return 0b1111;
-		default:
-			return 1;
-	}
-}
-
 inline float X_TO_NDC(const float x)
 {
 	switch (currentRenderer)
