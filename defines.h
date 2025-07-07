@@ -530,9 +530,13 @@ struct Actor
 	bool showShadow;
 	/// The size of the shadow
 	float shadowSize;
+
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
-	int actorModelSkin;
+	/// The index of the active skin for the actor's model
+	int currentSkinIndex;
+	/// The current LOD level of the actor's model, re-calculated each physics tick
+	uint currentLod;
 
 	/// The actor's wall, in global space
 	Wall *actorWall;

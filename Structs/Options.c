@@ -9,7 +9,7 @@
 
 void DefaultOptions(Options *options)
 {
-	options->renderer = RENDERER_OPENGL; // RENDERER_VULKAN;
+	options->renderer = RENDERER_VULKAN;
 	options->musicVolume = 1.0;
 	options->sfxVolume = 1.0;
 	options->masterVolume = 1.0;

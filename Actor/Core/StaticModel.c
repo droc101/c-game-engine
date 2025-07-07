@@ -14,5 +14,5 @@ void StaticModelInit(Actor *this, const b2WorldId /*worldId*/, const KvList *par
 	this->shadowSize = KvGetFloat(params, "shadowSize", 1.0f);
 	this->showShadow = KvGetBool(params, "showShadow", true);
 	this->yPosition = KvGetFloat(params, "yPosition", 0.0f);
-	this->actorModelSkin = KvGetInt(params, "skin", 0);
+	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 }

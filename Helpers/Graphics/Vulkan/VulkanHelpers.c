@@ -57,6 +57,10 @@ PushConstants pushConstants = {0};
 VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
 {
 	const Asset *shader = DecompressAsset(path);
+	if (!shader)
+	{
+		return VK_ERROR_UNKNOWN;
+	}
 
 	// sizeof(uint32_t) * 4 is the asset header
 	VulkanTestReturnResult(lunaCreateShaderModule((uint32_t *)shader->data,
@@ -144,8 +148,8 @@ void LoadRoof(const bool hasCeiling, const uint32_t ceilingTextureIndex)
 		}
 		assert(buffers.roof.indexCount == skyModel->totalIndexCount);
 	}
-	lunaWriteDataToBuffer(buffers.roof.vertices.buffer, vertices, buffers.roof.vertices.allocatedSize);
-	lunaWriteDataToBuffer(buffers.roof.indices.buffer, indices, buffers.roof.indices.allocatedSize);
+	lunaWriteDataToBuffer(buffers.roof.vertices.buffer, vertices, buffers.roof.vertices.allocatedSize, 0);
+	lunaWriteDataToBuffer(buffers.roof.indices.buffer, indices, buffers.roof.indices.allocatedSize, 0);
 }
 
 void LoadWalls(const Level *level)
@@ -236,8 +240,8 @@ void LoadWalls(const Level *level)
 		indices[6 * i + 4] = i * 4 + 2;
 		indices[6 * i + 5] = i * 4 + 3;
 	}
-	lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed);
-	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed);
+	lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed, 0);
+	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed, 0);
 }
 
 void UpdateTranslationMatrix(const Camera *camera)

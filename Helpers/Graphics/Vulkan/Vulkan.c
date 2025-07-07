@@ -3,10 +3,11 @@
 //
 
 #include "Vulkan.h"
-
+#include <assert.h>
 #include <luna/luna.h>
 #include <SDL_vulkan.h>
 #include "../../CommonAssets.h"
+#include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
 #include "VulkanActors.h"
 #include "VulkanHelpers.h"
@@ -19,10 +20,9 @@ bool VK_Init(SDL_Window *window)
 {
 	vulkanWindow = window;
 	// clang-format off
-	if (CreateInstance() && CreateSurface() && CreateLogicalDevice() && CreateSwapChain() &&
-		CreateRenderPass() && CreateDescriptorSetLayouts() &&
-		CreateGraphicsPipelines() && CreateTextureSamplers() &&
-		CreateBuffers() && CreateDescriptorSets())
+	if (CreateInstance() && CreateSurface() && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
+		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() && CreateBuffers() &&
+		CreateDescriptorSets())
 	{
 		// clang-format on
 
@@ -87,18 +87,23 @@ VkResult VK_FrameStart()
 		return VK_NOT_READY;
 	}
 
+	if (LockLodThreadMutex() != 0)
+	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
+
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = swapChainExtent,
 		.depthAttachmentClearValue.depthStencil.depth = 1,
 	};
-
 	VulkanTestResizeSwapchain(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
 
-	const LunaGraphicsPipelineBindInfo bindInfo = {
-		.descriptorSetCount = 1,
-		.descriptorSets = &descriptorSets[currentFrame],
-	};
-	lunaBindDescriptorSets(pipelines.ui, &bindInfo);
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
 
 	buffers.ui.objectCount = 0;
 	buffers.ui.vertices.bytesUsed = 0;
@@ -118,8 +123,14 @@ VkResult VK_FrameEnd()
 	}
 	if (buffers.ui.objectCount > 0)
 	{
-		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed);
-		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed);
+		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed, 0);
+		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed, 0);
+	}
+
+	if (LockLodThreadMutex() != 0)
+	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
 	}
 
 	if (buffers.ui.objectCount > 0)
@@ -151,6 +162,8 @@ VkResult VK_FrameEnd()
 			},
 		};
 		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+			.descriptorSetCount = 1,
+			.descriptorSets = &descriptorSets[currentFrame],
 			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 			.dynamicStates = dynamicStateBindInfos,
 		};
@@ -169,6 +182,12 @@ VkResult VK_FrameEnd()
 	}
 
 	lunaEndRenderPass();
+
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
 	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
@@ -189,11 +208,21 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 	pushConstants.yaw = camera->yaw + 1.5f * PIf;
 	UpdateTranslationMatrix(camera);
 
-	VulkanTestReturnResult(LoadWallActors(loadedLevel), "Failed to load wall actors!");
-	VulkanTestReturnResult(UpdateActorInstanceDataAndShadows(loadedLevel),
-						   "Failed to update actor instance data and shadows!");
+	if (LockLodThreadMutex() != 0)
+	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
+
+	// TODO: Remove me!
+	ListLock(level->actors);
+	List empty;
+	ListCreate(&empty);
+	VK_UpdateActors(&level->actors, &empty);
+	ListFree(&empty, false);
+	ListUnlock(level->actors);
 
 	const VkViewport viewport = {
 		.width = (float)swapChainExtent.width,
@@ -222,6 +251,8 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 		},
 	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSets[currentFrame],
 		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
@@ -335,12 +366,45 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 															 &pipelineBindInfo,
 															 buffers.modelActors.drawInfo.buffer,
 															 0,
-															 buffers.modelActors.loadedModelIds.length,
+															 buffers.modelActors.drawInfo.bytesUsed /
+																	 sizeof(VkDrawIndexedIndirectCommand),
 															 sizeof(VkDrawIndexedIndirectCommand)),
 							   "Failed to draw model actors!");
 	}
 
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
+
 	return VK_SUCCESS;
+}
+
+bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices)
+{
+	VkDrawIndexedIndirectCommand *drawInfo = buffers.modelActors.drawInfo.data;
+	for (size_t i = 0; i < modifiedActorIndices->length; i++)
+	{
+		const size_t actorIndex = (size_t)ListGet(*modifiedActorIndices, i);
+		assert(actorIndex < actors->length);
+		const Actor *actor = (const Actor *)ListGet(*actors, actorIndex);
+		uint32_t indexOffset = 0;
+		assert(actor->actorModel);
+		for (size_t j = 0; j < actor->actorModel->materialCount; j++)
+		{
+			assert(drawInfo &&
+				   actor->actorModel->lods &&
+				   actor->actorModel->lods[actor->currentLod] &&
+				   actor->actorModel->lods[actor->currentLod]->indexCount);
+			drawInfo[actorIndex * j + j].indexCount = actor->actorModel->lods[actor->currentLod]->indexCount[j];
+			indexOffset += (uint32_t)ListGet(buffers.modelActors.indexOffsets, actorIndex);
+			drawInfo[actorIndex * j + j].firstIndex = indexOffset;
+		}
+	}
+	VulkanTest(LoadWallActors(actors), "Failed to load wall actors!");
+	VulkanTest(UpdateActorInstanceDataAndShadows(actors), "Failed to update actor instance data and shadows!");
+	return true;
 }
 
 bool VK_Cleanup()
@@ -405,9 +469,18 @@ bool VK_LoadLevelWalls(const Level *level)
 	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
 	LoadWalls(level);
 
+	if (LockLodThreadMutex() != 0)
+	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return false;
+	}
 	loadedLevel = level;
-
-	VulkanTest(InitActors(level), "Failed to load actors!");
+	VulkanTest(InitActors(&level->actors), "Failed to load actors!");
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return false;
+	}
 	return true;
 }
 

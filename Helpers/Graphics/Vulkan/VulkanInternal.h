@@ -14,7 +14,7 @@ bool CreateSurface();
 
 bool CreateLogicalDevice();
 
-bool CreateSwapChain();
+bool CreateSwapchain();
 
 bool CreateRenderPass();
 

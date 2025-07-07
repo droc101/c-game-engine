@@ -13,6 +13,7 @@
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
 #include "Helpers/Core/KVList.h"
+#include "Helpers/Core/LodThread.h"
 #include "Helpers/Core/Logging.h"
 #include "Helpers/Core/PhysicsThread.h"
 #include "Helpers/Core/Timing.h"
@@ -259,7 +260,7 @@ int main(const int argc, char *argv[])
 
 	InitCommonAssets();
 
-	ChangeLevel(CreateLevel());
+	// ChangeLevel(CreateLevel());
 
 	GLogoSplashStateSet();
 
@@ -307,13 +308,13 @@ int main(const int argc, char *argv[])
 
 		ResetDPrintYPos();
 
-		SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
-		// warp the mouse to the center of the screen if we are in the main game state
-		if (state->currentState == MAIN_STATE)
-		{
-			const Vector2 realWndSize = ActualWindowSize();
-			SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
-		}
+		// SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
+		// // warp the mouse to the center of the screen if we are in the main game state
+		// if (state->currentState == MAIN_STATE)
+		// {
+		// 	const Vector2 realWndSize = ActualWindowSize();
+		// 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
+		// }
 
 		if (state->UpdateGame)
 		{
@@ -349,14 +350,15 @@ int main(const int argc, char *argv[])
 		BenchFrameEnd();
 #endif
 
-		if (IsLowFPSModeEnabled())
-		{
-			SDL_Delay(33);
-		}
+		// if (IsLowFPSModeEnabled())
+		// {
+		// 	SDL_Delay(33);
+		// }
 		FrameGraphUpdate(GetTimeNs() - frameStart);
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
 	PhysicsThreadTerminate();
+	LodThreadDestroy();
 	InputDestroy();
 	DestroyGlobalState();
 	SDL_DestroyWindow(GetGameWindow());

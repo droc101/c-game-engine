@@ -426,6 +426,7 @@ bool LoadTexture(const Image *image)
 		.sampler = textureSamplers.nearestRepeat,
 		.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 	};
 	ListAdd(&textures, NULL);
 	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage *)&textures.data[textures.length - 1]),

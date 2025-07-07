@@ -78,7 +78,7 @@ bool CreateLogicalDevice()
 	return true;
 }
 
-bool CreateSwapChain()
+bool CreateSwapchain()
 {
 	if (minimized)
 	{
@@ -120,11 +120,10 @@ bool CreateSwapChain()
 					   VK_PRESENT_MODE_FIFO_KHR);
 	}
 
-	const LunaSwapChainCreationInfo swapChainCreationInfo = {
+	const LunaSwapchainCreationInfo swapChainCreationInfo = {
 		.surface = surface,
 		.width = swapChainExtent.width,
 		.height = swapChainExtent.height,
-		.minImageCount = capabilities.minImageCount + 1,
 		.formatCount = 2,
 		.formatPriorityList = (VkSurfaceFormatKHR[]){{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
 													 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}},
@@ -132,7 +131,7 @@ bool CreateSwapChain()
 		.presentModePriorityList = (const VkPresentModeKHR *)presentModes.data,
 	};
 
-	VulkanTest(lunaCreateSwapChain(&swapChainCreationInfo), "Failed to create swap chain!");
+	VulkanTest(lunaCreateSwapchain(&swapChainCreationInfo), "Failed to create swap chain!");
 
 	ListFree(&presentModes, false);
 

@@ -8,12 +8,14 @@
 #include <vulkan/vulkan.h>
 #include "../../../defines.h"
 
-VkResult InitActors(const Level *level);
+VkResult InitActors(const List *actors);
 
-void LoadModelActors(const Level *level);
+void LoadModelActors(const List *actors);
 
-void LoadActorDrawInfo(const Level *level);
+void LoadActorDrawInfo(const List *actors);
 
-VkResult LoadWallActors(const Level *level);
+VkResult LoadWallActors(const List *actors);
+
+VkResult UpdateActorInstanceDataAndShadows(const List *actors);
 
 #endif //VULKANACTORS_H

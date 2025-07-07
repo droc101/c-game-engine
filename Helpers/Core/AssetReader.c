@@ -396,7 +396,7 @@ ModelDefinition *LoadModel(const char *asset)
 	return model;
 }
 
-ModelDefinition *GetModelFromId(const uint id)
+inline ModelDefinition *GetModelFromId(const uint id)
 {
 	if (id >= modelId)
 	{

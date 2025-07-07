@@ -95,7 +95,8 @@ Actor *CreateActor(const Vector2 position,
 	actor->showShadow = true;
 	actor->shadowSize = 1.0f;
 	actor->actorModel = NULL;
-	actor->actorModelSkin = 0;
+	actor->currentSkinIndex = 0;
+	actor->currentLod = 0;
 	actor->bodyId = b2_nullBodyId;
 	ListCreate(&actor->ioConnections);
 	actor->SignalHandler = DefaultSignalHandler;

@@ -146,8 +146,3 @@ List *GetActorsByName(const char *name, const Level *l)
 	ListUnlock(l->namedActorNames);
 	return actors;
 }
-
-void RenderLevel(const GlobalState *g)
-{
-	RenderLevel3D(g->level, g->cam);
-}

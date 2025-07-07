@@ -48,7 +48,7 @@
 					.width = LUNA_RENDER_PASS_WIDTH_SWAPCHAIN_WIDTH, \
 					.height = LUNA_RENDER_PASS_HEIGHT_SWAPCHAIN_HEIGHT, \
 				}; \
-				VulkanTestReturnResult(lunaResizeSwapchain(1, &renderPassResizeInfo, &swapChainExtent), \
+				VulkanTestReturnResult(lunaResizeSwapchain(1, &renderPassResizeInfo, NULL, &swapChainExtent), \
 									   "Failed to resize swapchain!"); \
 				return resizeCheckResult; \
 			} \
@@ -178,6 +178,7 @@ typedef struct ModelActorsBuffer
 	BufferRegion instanceData;
 	BufferRegion drawInfo;
 
+	List indexOffsets;
 	/// A list of the ids of all loaded actor models in the current level. This can be used in conjunction with
 	/// @c ListFind to get an index that can be used to index nearly every other array in this struct.
 	List loadedModelIds;
@@ -259,8 +260,6 @@ uint32_t ImageIndex(const Image *image);
 void LoadRoof(bool hasCeiling, uint32_t ceilingTextureIndex);
 
 void LoadWalls(const Level *level);
-
-VkResult UpdateActorInstanceDataAndShadows(const Level *level);
 #pragma endregion helperFunctions
 
 #pragma region drawingHelpers

@@ -15,11 +15,11 @@ endif ()
 
 set(CMAKE_C_STANDARD 11)
 
-set(CMAKE_C_FLAGS "-Wall -Wno-discarded-qualifiers -fvisibility=hidden")
+set(CMAKE_C_FLAGS "-Wall -Wno-discarded-qualifiers")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG -fwhole-program")
 
 # Add --static flag when building on Windows to include libwinpthread-1.dll
 if (WIN32)
@@ -192,6 +192,8 @@ add_executable(
         Actor/Core/Sprite.h
         Actor/LaserEmitter.c
         Actor/LaserEmitter.h
+        Helpers/Core/LodThread.c
+        Helpers/Core/LodThread.h
 )
 
 #endregion

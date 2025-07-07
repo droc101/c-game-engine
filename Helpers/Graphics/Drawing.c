@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
-#include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"
@@ -15,7 +14,6 @@
 #include "RenderingHelpers.h"
 #include "SDL.h"
 #include "Vulkan/Vulkan.h"
-
 
 SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
 {
@@ -315,7 +313,8 @@ void RenderMenuBackground()
 
 void RenderInGameMenuBackground()
 {
-	RenderLevel(GetState());
+	const GlobalState *state = GetState();
+	RenderLevel3D(state->level, state->cam);
 
 	DrawRect(0, 0, WindowWidth(), WindowHeight(), COLOR(0xA0000000));
 }

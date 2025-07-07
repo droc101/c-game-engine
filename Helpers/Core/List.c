@@ -205,8 +205,11 @@ void ListFree(List *list, const bool freeListPointer)
 
 	ListLock(*list);
 	free(list->data);
+	list->data = NULL;
+	list->length = 0;
 	ListUnlock(*list);
 	SDL_DestroyMutex(list->mutex);
+	list->mutex = NULL;
 	if (freeListPointer)
 	{
 		free(list);

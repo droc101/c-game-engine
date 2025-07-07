@@ -63,7 +63,7 @@ void TestActorInit(Actor *this, const b2WorldId worldId, const KvList * /*params
 	CreateTestActorCollider(this, worldId);
 
 	this->actorModel = LoadModel(MODEL("model_leafy"));
-	this->actorModelSkin = 0;
+	this->currentSkinIndex = 0;
 	this->SignalHandler = TestActorSignalHandler;
 	this->extraData = calloc(1, sizeof(NavigationConfig));
 	CheckAlloc(this->extraData);

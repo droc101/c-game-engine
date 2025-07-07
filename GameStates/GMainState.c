@@ -13,10 +13,12 @@
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
+#include "../Helpers/Core/LodThread.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
+#include "../Helpers/Graphics/Vulkan/Vulkan.h"
 #include "../Helpers/TextBox.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
@@ -25,6 +27,7 @@
 #include "GPauseState.h"
 
 Actor *targetedEnemy = NULL;
+bool lodThreadInitDone = false;
 
 void GMainStateUpdate(GlobalState *State)
 {
@@ -177,29 +180,39 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 	}
 
+	if (SignalLodThreadCanStart() != 0)
+	{
+		Error("Failed to signal LOD thread start semaphore!");
+	}
+
 	b2World_Step(l->worldId, (float)delta / PHYSICS_TARGET_TPS, 4);
 	l->player.pos = b2Body_GetPosition(l->player.bodyId);
+
+	if (WaitForLodThreadToEnd() != 0)
+	{
+		Error("Failed to wait for LOD thread end semaphore!");
+	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GMainStateRender(GlobalState *State)
+void GMainStateRender(GlobalState *state)
 {
-	const Level *l = State->level;
+	const Level *level = state->level;
 
-	RenderLevel(State);
+	RenderLevel3D(level, state->cam);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
 	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface_hud_ycoin"));
 
 	char coinStr[16];
-	sprintf(coinStr, "%d", State->saveData->coins);
+	sprintf(coinStr, "%d", state->saveData->coins);
 	FontDrawString(v2(WindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, largeFont);
 
 	coinIconRect.y = 64;
 
-	for (int bc = 0; bc < State->saveData->blueCoins; bc++)
+	for (int blueCoinIndex = 0; blueCoinIndex < state->saveData->blueCoins; blueCoinIndex++)
 	{
-		coinIconRect.x = WindowWidth() - 260 + bc * 48;
+		coinIconRect.x = WindowWidth() - 260 + blueCoinIndex * 48;
 		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface_hud_bcoin"));
 	}
 
@@ -214,24 +227,29 @@ void GMainStateRender(GlobalState *State)
 				   TEXTURE("interface_crosshair"),
 				   crosshairColor);
 
-	if (State->textBoxActive)
+	if (state->textBoxActive)
 	{
-		TextBoxRender(&State->textBox, State->textBoxPage);
+		TextBoxRender(&state->textBox, state->textBoxPage);
 	}
 	DPrintF("Position: (%.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
 			COLOR_WHITE,
 			false,
-			l->player.pos.x,
-			l->player.pos.y,
-			fabsf(l->player.angle),
-			radToDeg(fabsf(l->player.angle)));
+			level->player.pos.x,
+			level->player.pos.y,
+			fabsf(level->player.angle),
+			radToDeg(fabsf(level->player.angle)));
 
-	DPrintF("Walls: %d", COLOR_WHITE, false, l->walls.length);
-	DPrintF("Actors: %d", COLOR_WHITE, false, l->actors.length);
+	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
+	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);
 	DPrintF("Targeted Actor: %p", COLOR_WHITE, false, targetedEnemy);
 }
 
 void GMainStateSet()
 {
+	if (!lodThreadInitDone)
+	{
+		LodThreadInit();
+		lodThreadInitDone = true;
+	}
 	SetStateCallbacks(GMainStateUpdate, GMainStateFixedUpdate, MAIN_STATE, GMainStateRender);
 }

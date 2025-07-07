@@ -1031,7 +1031,7 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 		GL_DrawFloor(floorStart, floorEnd, l->ceilOrSkyTex, 0.5f, 0.8f);
 	} else
 	{
-		GL_RenderModel(skyModel, skyModelWorldMatrix, 0);
+		GL_RenderModel(skyModel, skyModelWorldMatrix, 0, 0);
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
@@ -1072,7 +1072,7 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 			GL_DrawActorWall(actor);
 		} else
 		{
-			GL_RenderModel(actor->actorModel, actorXfm, actor->actorModelSkin);
+			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod);
 		}
 	}
 
@@ -1093,13 +1093,13 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	GL_RenderModel(LoadModel(MODEL("model_eraser")), GLM_MAT4_IDENTITY, 0);
+	GL_RenderModel(LoadModel(MODEL("model_eraser")), GLM_MAT4_IDENTITY, 0, 0);
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	GL_Disable3D();
 }
 
-void GL_LoadModel(const ModelDefinition *model, const int lod, const int material)
+void GL_LoadModel(const ModelDefinition *model, const uint lod, const int material)
 {
 	if (glModels[model->id] != NULL)
 	{
@@ -1151,7 +1151,7 @@ void GL_LoadModel(const ModelDefinition *model, const int lod, const int materia
 
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
-						const int lod,
+						const uint lod,
 						const int material,
 						const int skin)
 {
@@ -1221,28 +1221,8 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const int skin)
+void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const int skin, const uint lod)
 {
-	int lod = 0;
-	if (model->lodCount > 1)
-	{
-		const float distanceToCamera = glm_vec3_distance((vec3){modelWorldMatrix[3][0],
-																modelWorldMatrix[3][1],
-																modelWorldMatrix[3][2]},
-														 (vec3){GetState()->cam->x,
-																GetState()->cam->y,
-																GetState()->cam->z});
-
-		for (int i = model->lodCount - 1; i >= 0; i--)
-		{
-			if (distanceToCamera > model->lods[i]->distance)
-			{
-				lod = i;
-				break;
-			}
-		}
-	}
-
 	for (int m = 0; m < model->materialCount; m++)
 	{
 		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);
