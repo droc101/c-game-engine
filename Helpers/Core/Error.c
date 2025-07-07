@@ -13,6 +13,7 @@
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Options.h"
 #include "../Graphics/Drawing.h"
+#include "../Graphics/GL/GLHelper.h"
 #include "../Graphics/RenderingHelpers.h"
 #include "Logging.h"
 
@@ -177,8 +178,7 @@ _Noreturn void RenderInitError()
 	mb.title = "Failed to initialize renderer";
 	if (GetState()->options.renderer == RENDERER_OPENGL)
 	{
-		mb.message = "Failed to start the OpenGL renderer.\n"
-					 "Please make sure your graphics card and drivers support OpenGL 3.3";
+		mb.message = GL_INIT_FAIL_MSG;
 	} else if (GetState()->options.renderer == RENDERER_VULKAN)
 	{
 		mb.message = "Failed to start the Vulkan renderer.\n"

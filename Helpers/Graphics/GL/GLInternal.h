@@ -15,6 +15,8 @@
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
 typedef struct GL_ModelBuffers GL_ModelBuffers;
+typedef struct GL_WallBuffers GL_WallBuffers;
+typedef struct GL_SharedUniforms GL_SharedUniforms;
 
 struct GL_Shader
 {
@@ -46,14 +48,34 @@ struct GL_ModelBuffers
 	GL_Buffer **buffers;
 };
 
-/**
- * The maximum number of textures that can be loaded into OpenGL
- */
-#define GL_MAX_TEXTURE_SLOTS 512
-#if GL_MAX_TEXTURE_SLOTS < MAX_TEXTURES
-#error "GL_MAX_TEXTURES must be at least as large as MAX_TEXTURES"
-#endif
+struct GL_WallBuffers
+{
+	/// The number of walls in this buffer
+	size_t wallCount;
+	/// The texture name for this buffer
+	char texture[80];
+	/// The GPU buffer for the walls
+	GL_Buffer *buffer;
+};
 
+struct __attribute__((aligned(16))) GL_SharedUniforms
+{
+	/// The model -> screen matrix
+	mat4 worldViewMatrix;
+	/// The color of the fog
+	vec3 fogColor;
+	/// The distance from the camera at which the fog starts
+	float fogStart;
+	/// The distance from the camera at which the fog is fully opaque
+	float fogEnd;
+	/// The yaw of the camera
+	float cameraYaw;
+};
+
+/// The maximum number of different wall textures that can be used in a level
+#define GL_MAX_WALL_BUFFERS 128
+/// The maximum number of walls that can be in a single wall buffer (i.e. a single texture)
+#define GL_MAX_WALLS_PER_BUFFER 2048
 /**
  * Log an OpenGL error
  * @param error the error message
@@ -156,6 +178,55 @@ void GL_Enable3D();
  * Disable 3D mode
  */
 void GL_Disable3D();
+
+/**
+ * Destroy any existing wall buffers.
+ * This is OK to call if there are no buffers.
+ */
+void GL_DestroyWallBuffers();
+
+/**
+ * Load shader uniform locations
+ */
+void LoadShaderLocations();
+
+/**
+ * Destroy a GL_Shader struct
+ * @param shd The shader to destroy
+ */
+void GL_DestroyShader(GL_Shader *shd);
+
+/**
+ * Destroy a GL_Buffer struct
+ * @param buffer The buffer to destroy
+ */
+void GL_DestroyBuffer(GL_Buffer *buffer);
+
+/**
+ * Load a model into OpenGL
+ * @param model The model definition to load
+ * @param lod The LOD to load
+ * @param material The material to load
+ */
+void GL_LoadModel(const ModelDefinition *model, uint lod, int material);
+
+/**
+ * Get the wall buffer for a texture, or create it if it doesn't exist.
+ * @param texture The texture name
+ * @return The wall buffer for the texture
+ * @warning This will crash the game if there are no free slots left.
+ */
+GL_WallBuffers *GL_GetWallBuffer(const char *texture);
+
+/**
+ * Render a single material of a model
+ * @param model The model to render
+ * @param modelWorldMatrix The model -> world matrix
+ * @param lod The level of detail to render
+ * @param material The material to render
+ * @param skin The skin to use for the model
+ */
+void GL_RenderModelPart(const ModelDefinition *model, const mat4 modelWorldMatrix, uint lod, int material, int skin);
 
 
 #endif //GLINTERNAL_H

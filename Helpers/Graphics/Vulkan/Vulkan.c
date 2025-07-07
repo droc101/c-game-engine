@@ -398,7 +398,7 @@ bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices)
 				   actor->actorModel->lods[actor->currentLod] &&
 				   actor->actorModel->lods[actor->currentLod]->indexCount);
 			drawInfo[actorIndex * j + j].indexCount = actor->actorModel->lods[actor->currentLod]->indexCount[j];
-			indexOffset += (uint32_t)ListGet(buffers.modelActors.indexOffsets, actorIndex);
+			indexOffset += (size_t)ListGet(buffers.modelActors.indexOffsets, actorIndex);
 			drawInfo[actorIndex * j + j].firstIndex = indexOffset;
 		}
 	}
@@ -438,11 +438,6 @@ inline void VK_Minimize()
 inline void VK_Restore()
 {
 	minimized = false;
-}
-
-inline uint8_t VK_GetSampleCountFlags()
-{
-	return physicalDeviceLimits.framebufferColorSampleCounts & physicalDeviceLimits.framebufferDepthSampleCounts & 0xF;
 }
 
 bool VK_LoadLevelWalls(const Level *level)

@@ -135,12 +135,6 @@ void SetLowFPS(bool val);
 bool IsLowFPSModeEnabled();
 
 /**
- * Gets the supported MSAA levels
- * @return A bitmask of supported MSAA levels
- */
-byte GetSampleCountFlags();
-
-/**
  * Convert screen X to NDC
  * @param x X position in pixels
  * @return The NDC position

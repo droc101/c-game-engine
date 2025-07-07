@@ -267,6 +267,60 @@
                     "paramType": "none"
                 }
             ]
+        },
+        {
+            "id": 13,
+            "name": "Logic Operator",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "operation",
+                    "type": "byte",
+                    "min": 0,
+                    "max": 2,
+                    "default": 0
+                }
+            ],
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "operand_a",
+                    "paramType": "bool"
+                },
+                {
+                    "name": "operand_b",
+                    "paramType": "bool"
+                },
+                {
+                    "name": "execute",
+                    "paramType": "none"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_true",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_false",
+                    "paramType": "none"
+                },
+                {
+                    "name": "execution_result",
+                    "paramType": "bool"
+                },
+            ]
         }
     ]
 }

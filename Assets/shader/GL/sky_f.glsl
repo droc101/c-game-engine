@@ -7,5 +7,5 @@ out vec4 COLOR; // Output color of the fragment
 uniform sampler2D alb;
 
 void main() {
-    COLOR = texture(alb, UV).rgba;
+	COLOR = texture(alb, UV).rgba;
 }

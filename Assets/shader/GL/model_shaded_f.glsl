@@ -13,16 +13,16 @@ void main() {
 		discard; // Discard the fragment if the alpha is less than 0.5
 	}
 
-    COLOR.a = 1.0;
-    COLOR.rgb = texture(alb, UV).rgb * albColor.rgb;
+	COLOR.a = 1.0;
+	COLOR.rgb = texture(alb, UV).rgb * albColor.rgb;
 
-    // Calculate shading based on the normal, assuming a light direction of (0, 0, 1)
-    float shading = dot(NORMAL, vec3(0, 0, 1));
+	// Calculate shading based on the normal, assuming a light direction of (0, 0, 1)
+	float shading = dot(NORMAL, vec3(0, 0, 1));
 
-    // Apply easing to shading
-    shading = shading == 1 ? 1 : 1 - pow(2, -10 * shading);
+	// Apply easing to shading
+	shading = shading == 1 ? 1 : 1 - pow(2, -10 * shading);
 
-    shading = max(0.6, shading);
+	shading = max(0.6, shading);
 
-    COLOR.rgb *= vec3(shading);
+	COLOR.rgb *= vec3(shading);
 }

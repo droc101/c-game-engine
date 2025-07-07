@@ -45,6 +45,7 @@ int LodThreadMain(void *exit)
 		const Vector2 playerPosition = GetState()->level->player.pos;
 		const List actors = GetState()->level->actors;
 		const size_t actorCount = actors.length;
+		const float lodMultiplier = GetState()->options.lodMultiplier;
 		switch (currentRenderer)
 		{
 			case RENDERER_VULKAN:
@@ -59,13 +60,14 @@ int LodThreadMain(void *exit)
 						continue;
 					}
 					const float distance = Vector2Distance(actor->position, playerPosition);
-					while (actor->currentLod != 0 && actor->actorModel->lods[actor->currentLod]->distance > distance)
+					while (actor->currentLod != 0 &&
+						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
 					{
 						actor->currentLod--;
 						wasModified = true;
 					}
 					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-						   actor->actorModel->lods[actor->currentLod + 1]->distance <= distance)
+						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
 					{
 						actor->currentLod++;
 						wasModified = true;
@@ -90,12 +92,13 @@ int LodThreadMain(void *exit)
 						continue;
 					}
 					const float distance = Vector2Distance(actor->position, playerPosition);
-					while (actor->currentLod != 0 && actor->actorModel->lods[actor->currentLod]->distance > distance)
+					while (actor->currentLod != 0 &&
+						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
 					{
 						actor->currentLod--;
 					}
 					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-						   actor->actorModel->lods[actor->currentLod + 1]->distance <= distance)
+						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
 					{
 						actor->currentLod++;
 					}

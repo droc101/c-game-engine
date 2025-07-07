@@ -9,6 +9,13 @@
 #include "../Drawing.h"
 #include "SDL.h"
 
+#define GL_VERSION_MAJOR 3
+#define GL_VERSION_MINOR 3
+#define GL_PROFILE SDL_GL_CONTEXT_PROFILE_CORE
+#define GL_VERSION_CHECK GL_VERSION_3_3
+#define GL_VERSION_STRING "OpenGL 3.3 Core Profile"
+#define GL_INIT_FAIL_MSG "Failed to start OpenGL. Your GPU or drivers may not support the " GL_VERSION_STRING "."
+
 /**
  * Set SDL_GL flags (this must be done before the SDL window is created)
  */
@@ -117,13 +124,6 @@ void GL_DrawTextureRegionMod(Vector2 pos,
 							 Color color);
 
 /**
- * Draw a wall in 3D
- * @param w The wall to draw
- * @note This expects 3D mode to be enabled
- */
-void GL_DrawWall(const Wall *w);
-
-/**
  * Draw the floor in 3D
  * @param vp1 The start of the floor
  * @param vp2 The end of the floor
@@ -209,5 +209,16 @@ void GL_RenderLevel(const Level *l, const Camera *cam);
  * @param lod
  */
 void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, int skin, uint lod);
+
+/**
+ * Render the level's static walls
+ */
+void GL_RenderLevelWalls();
+
+/**
+ * Load the level's static walls into buffers
+ * @param l The level to load walls from
+ */
+void GL_LoadLevelWalls(const Level *l);
 
 #endif //GAME_GLHELPER_H

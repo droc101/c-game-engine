@@ -9,6 +9,7 @@
 #include "defines.h"
 #include "GameStates/GLogoSplashState.h"
 #include "Helpers/CommonAssets.h"
+#include "Helpers/Core/Arguments.h"
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
@@ -240,6 +241,20 @@ int main(const int argc, char *argv[])
 
 	InitOptions();
 
+	if (HasCliArg(argc, argv, "--renderer"))
+	{
+		const char *renderer = GetCliArgStr(argc, argv, "--renderer", "gl");
+		if (strncmp(renderer, "gl", strlen("gl")) == 0)
+		{
+			LogInfo("Forcing OpenGL Renderer\n");
+			GetState()->options.renderer = RENDERER_OPENGL;
+		} else if (strncmp(renderer, "vulkan", strlen("vulkan")) == 0)
+		{
+			LogInfo("Forcing Vulkan Renderer\n");
+			GetState()->options.renderer = RENDERER_VULKAN;
+		}
+	}
+
 	AssetCacheInit();
 
 	InitSDL();
@@ -260,7 +275,10 @@ int main(const int argc, char *argv[])
 
 	InitCommonAssets();
 
-	// ChangeLevel(CreateLevel());
+	if (!ChangeLevelByName(STARTING_LEVEL))
+	{
+		Error("Failed to load starting level!");
+	}
 
 	GLogoSplashStateSet();
 
@@ -308,13 +326,13 @@ int main(const int argc, char *argv[])
 
 		ResetDPrintYPos();
 
-		// SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
-		// // warp the mouse to the center of the screen if we are in the main game state
-		// if (state->currentState == MAIN_STATE)
-		// {
-		// 	const Vector2 realWndSize = ActualWindowSize();
-		// 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
-		// }
+		SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
+		// warp the mouse to the center of the screen if we are in the main game state
+		if (state->currentState == MAIN_STATE)
+		{
+			const Vector2 realWndSize = ActualWindowSize();
+			SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
+		}
 
 		if (state->UpdateGame)
 		{
@@ -336,6 +354,7 @@ int main(const int argc, char *argv[])
 		state->RenderGame(state);
 
 		FrameGraphDraw();
+		TickGraphDraw();
 
 		FrameEnd();
 
@@ -350,10 +369,10 @@ int main(const int argc, char *argv[])
 		BenchFrameEnd();
 #endif
 
-		// if (IsLowFPSModeEnabled())
-		// {
-		// 	SDL_Delay(33);
-		// }
+		if (IsLowFPSModeEnabled())
+		{
+			SDL_Delay(33);
+		}
 		FrameGraphUpdate(GetTimeNs() - frameStart);
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");

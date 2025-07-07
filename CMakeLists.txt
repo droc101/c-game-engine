@@ -194,6 +194,10 @@ add_executable(
         Actor/LaserEmitter.h
         Helpers/Core/LodThread.c
         Helpers/Core/LodThread.h
+        Actor/Core/Logic.c
+        Actor/Core/Logic.h
+        Helpers/Core/Arguments.c
+        Helpers/Core/Arguments.h
 )
 
 #endregion

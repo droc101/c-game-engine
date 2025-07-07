@@ -4,6 +4,7 @@
 
 #include "GLHelper.h"
 #include <cglm/cglm.h>
+#include <string.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Vector2.h"
 #include "../../CommonAssets.h"
@@ -12,15 +13,6 @@
 #include "../../Core/Logging.h"
 #include "../RenderingHelpers.h"
 #include "GLInternal.h"
-
-typedef struct __attribute__((aligned(16))) GL_SharedUniforms
-{
-	mat4 worldViewMatrix;
-	vec3 fogColor;
-	float fogStart;
-	float fogEnd;
-	float cameraYaw;
-} GL_SharedUniforms;
 
 SDL_GLContext ctx;
 
@@ -35,12 +27,13 @@ GL_Shader *modelShadedShader;
 
 GL_Buffer *glBuffer;
 
-GLuint glTextures[GL_MAX_TEXTURE_SLOTS];
+GLuint glTextures[MAX_TEXTURES];
 int glNextFreeSlot = 0;
 int glAssetTextureMap[MAX_TEXTURES];
 char glLastError[512];
 
 GL_ModelBuffers *glModels[MAX_MODELS];
+GL_WallBuffers *glWalls[GL_MAX_WALL_BUFFERS];
 
 GLuint sharedUniformBuffer;
 
@@ -63,10 +56,12 @@ GLint shadowSharedUniformsLoc;
 
 GLint wallTextureLoc;
 GLint wallModelWorldMatrixLoc;
-GLint wallAngleLoc;
 GLint wallSharedUniformsLoc;
 
 #pragma endregion
+
+
+#pragma region Init/Destroy
 
 void LoadShaderLocations()
 {
@@ -87,14 +82,7 @@ void LoadShaderLocations()
 
 	wallTextureLoc = glGetUniformLocation(wallShader->program, "alb");
 	wallModelWorldMatrixLoc = glGetUniformLocation(wallShader->program, "MODEL_WORLD_MATRIX");
-	wallAngleLoc = glGetUniformLocation(wallShader->program, "wall_angle");
 	wallSharedUniformsLoc = glGetUniformBlockIndex(wallShader->program, "SharedUniforms");
-}
-
-void GL_Error(const char *error)
-{
-	LogError("OpenGL Error: %s\n", error);
-	strcpy(glLastError, error);
 }
 
 bool GL_PreInit()
@@ -127,34 +115,30 @@ bool GL_PreInit()
 			LogError("Failed to set MSAA samples attribute: %s\n", SDL_GetError());
 		}
 	}
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3),
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, GL_VERSION_MAJOR),
 					"Failed to set OpenGL major version",
-					"Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3),
+					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, GL_VERSION_MINOR),
 					"Failed to set OpenGL minor version",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1),
 					"Failed to set OpenGL accelerated visual",
-					"Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE),
+					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, GL_PROFILE),
 					"Failed to set OpenGL profile",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1),
 					"Failed to set OpenGL double buffer",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8),
-					"Failed to set OpenGL green-size",
-					"Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8),
-					"Failed to set OpenGL blue-size",
-					"Failed to start OpenGL");
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8), "Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8), "Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8),
 					"Failed to set OpenGL alpha-size",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24),
 					"Failed to set OpenGL depth buffer size",
-					"Failed to start OpenGL");
+					GL_INIT_FAIL_MSG);
 
 	memset(glAssetTextureMap, -1, MAX_TEXTURES * sizeof(int));
 	memset(glTextures, 0, sizeof(glTextures));
@@ -183,15 +167,15 @@ bool GL_Init(SDL_Window *wnd)
 	if (err != GLEW_OK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error("Failed to start OpenGL. Your GPU or drivers may not support OpenGL 3.3.");
+		GL_Error(GL_INIT_FAIL_MSG);
 		return false;
 	}
 
 	// Ensure we have GL 3.3 or higher
-	if (!GLEW_VERSION_3_3)
+	if (!GL_VERSION_CHECK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error("Failed to start OpenGL. Your GPU or drivers may not support OpenGL 3.3.");
+		GL_Error(GL_INIT_FAIL_MSG);
 		return false;
 	}
 
@@ -257,6 +241,48 @@ bool GL_Init(SDL_Window *wnd)
 
 	return true;
 }
+
+void GL_DestroyGL()
+{
+	GL_DestroyShader(uiTexturedShader);
+	GL_DestroyShader(uiColoredShader);
+	GL_DestroyShader(wallShader);
+	GL_DestroyShader(floorAndCeilingShader);
+	GL_DestroyShader(shadowShader);
+	GL_DestroyShader(skyShader);
+	GL_DestroyShader(modelShadedShader);
+	GL_DestroyShader(modelUnshadedShader);
+	glUseProgram(0);
+	glDisableVertexAttribArray(0);
+	GL_DestroyBuffer(glBuffer);
+	glDeleteBuffers(1, &sharedUniformBuffer);
+	GL_DestroyWallBuffers();
+	for (int i = 0; i < MAX_TEXTURES; i++)
+	{
+		if (glTextures[i] != 0)
+		{
+			glDeleteTextures(1, &glTextures[i]);
+		}
+	}
+	for (int i = 0; i < MAX_MODELS; i++)
+	{
+		if (glModels[i] != NULL)
+		{
+			for (int j = 0; j < glModels[i]->lodCount; j++)
+			{
+				GL_DestroyBuffer(glModels[i]->buffers[j]);
+			}
+			free(glModels[i]->buffers);
+			free(glModels[i]);
+		}
+	}
+	SDL_GL_DeleteContext(ctx);
+}
+
+#pragma endregion
+
+
+#pragma region GL Objects
 
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
@@ -349,6 +375,195 @@ void GL_DestroyBuffer(GL_Buffer *buffer)
 	free(buffer);
 }
 
+void GL_LoadTextureFromAsset(const char *texture)
+{
+	const Image *image = LoadImage(texture);
+
+	// if the texture is already loaded, don't load it again
+	if (glAssetTextureMap[image->id] != -1)
+	{
+		if (glIsTexture(glTextures[glAssetTextureMap[image->id]]))
+		{
+			glBindTexture(GL_TEXTURE_2D, glTextures[glAssetTextureMap[image->id]]);
+			return;
+		}
+	}
+
+	const int slot = GL_RegisterTexture(image->pixelData, (int)image->width, (int)image->height);
+
+	glAssetTextureMap[image->id] = slot;
+}
+
+int GL_RegisterTexture(const byte *pixelData, const int width, const int height)
+{
+	const int slot = glNextFreeSlot;
+
+	glGenTextures(1, &glTextures[slot]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	if (GetState()->options.mipmaps)
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	} else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, pixelData);
+
+	glNextFreeSlot++;
+
+	return slot;
+}
+
+void GL_LoadModel(const ModelDefinition *model, const uint lod, const int material)
+{
+	if (glModels[model->id] != NULL)
+	{
+		const GL_ModelBuffers *modelBuffer = glModels[model->id];
+		const GL_Buffer *lodBuffer = modelBuffer->buffers[lod];
+		const GL_Buffer materialBuffer = lodBuffer[material];
+		glBindVertexArray(materialBuffer.vertexArrayObject);
+		glBindBuffer(GL_ARRAY_BUFFER, materialBuffer.vertexBufferObject);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, materialBuffer.elementBufferObject);
+		return;
+	}
+	GL_ModelBuffers *buf = malloc(sizeof(GL_ModelBuffers));
+	CheckAlloc(buf);
+	buf->lodCount = model->lodCount;
+	buf->materialCount = model->materialCount;
+	buf->buffers = malloc(sizeof(void *) * model->lodCount);
+	CheckAlloc(buf->buffers);
+
+	for (int l = 0; l < buf->lodCount; l++)
+	{
+		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialCount);
+		CheckAlloc(buf->buffers[l]);
+
+		for (int m = 0; m < buf->materialCount; m++)
+		{
+			GL_Buffer *modelBuffer = &buf->buffers[l][m];
+			glGenVertexArrays(1, &modelBuffer->vertexArrayObject);
+			glGenBuffers(1, &modelBuffer->vertexBufferObject);
+			glGenBuffers(1, &modelBuffer->elementBufferObject);
+
+			glBindVertexArray(modelBuffer->vertexArrayObject);
+
+			glBindBuffer(GL_ARRAY_BUFFER, modelBuffer->vertexBufferObject);
+			glBufferData(GL_ARRAY_BUFFER,
+						 (long)(model->lods[l]->vertexCount * sizeof(float) * 8),
+						 model->lods[l]->vertexData,
+						 GL_STATIC_DRAW);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelBuffer->elementBufferObject);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+						 (long)(model->lods[l]->indexCount[m] * sizeof(uint)),
+						 model->lods[l]->indexData[m],
+						 GL_STATIC_DRAW);
+		}
+	}
+
+	glModels[model->id] = buf;
+}
+
+void GL_DestroyWallBuffers()
+{
+	size_t i = 0;
+	while (glWalls[i] != NULL && i < GL_MAX_WALL_BUFFERS)
+	{
+		GL_WallBuffers *wallBuffer = glWalls[i];
+		GL_DestroyBuffer(wallBuffer->buffer);
+		free(wallBuffer);
+		glWalls[i] = NULL;
+		i++;
+	}
+}
+
+GL_WallBuffers *GL_GetWallBuffer(const char *texture)
+{
+	size_t i = 0;
+	while (glWalls[i] != NULL &&
+		   i < GL_MAX_WALL_BUFFERS) // TODO: maybe look into a faster lookup, but also this is level load sooooooo
+	{
+		if (strcmp(glWalls[i]->texture, texture) == 0)
+		{
+			return glWalls[i];
+		}
+		i++;
+	}
+	if (i >= GL_MAX_WALL_BUFFERS)
+	{
+		Error("Too many wall buffers allocated, increase GL_MAX_WALL_BUFFERS");
+	}
+	GL_WallBuffers *newBuffer = malloc(sizeof(GL_WallBuffers));
+	CheckAlloc(newBuffer);
+	newBuffer->buffer = GL_ConstructBuffer();
+	glBindBuffer(GL_ARRAY_BUFFER, newBuffer->buffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newBuffer->buffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * 6 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
+	strncpy(newBuffer->texture, texture, sizeof(newBuffer->texture) - 1);
+	newBuffer->wallCount = 0;
+	glWalls[i] = newBuffer;
+	return newBuffer;
+}
+
+void GL_LoadLevelWalls(const Level *l)
+{
+	GL_DestroyWallBuffers();
+	for (size_t i = 0; i < l->walls.length; i++)
+	{
+		const Wall *w = ListGet(l->walls, i);
+		GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
+
+		float vertices[4][6] = {
+			// X Y Z U V A
+			{(float)w->a.x, 0.5f * w->height, (float)w->a.y, 0.0f, 0.0f, w->angle},
+			{(float)w->b.x, 0.5f * w->height, (float)w->b.y, (float)w->length, 0.0f, w->angle},
+			{(float)w->b.x, -0.5f * w->height, (float)w->b.y, (float)w->length, 1.0f, w->angle},
+			{(float)w->a.x, -0.5f * w->height, (float)w->a.y, 0.0f, 1.0f, w->angle},
+		};
+
+		const float uvOffset = w->uvOffset;
+		const float uvScale = w->uvScale;
+		for (int j = 0; j < 4; j++)
+		{
+			vertices[j][3] = vertices[j][3] * uvScale + uvOffset;
+		}
+
+		uint indices[] = {0, 1, 2, 0, 2, 3};
+		for (int j = 0; j < 6; j++)
+		{
+			indices[j] += wallBuffer->wallCount * 4;
+		}
+
+		const GLintptr vertexOffset = (GLintptr)(sizeof(float) * 24 * wallBuffer->wallCount);
+		const GLintptr indexOffset = (GLintptr)(sizeof(uint) * 6 * wallBuffer->wallCount);
+
+		glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
+		glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(vertices), vertices);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wallBuffer->buffer->elementBufferObject);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, indexOffset, sizeof(indices), indices);
+
+		wallBuffer->wallCount++;
+	}
+}
+
+#pragma endregion
+
+
+#pragma region Frame Operations
+
 inline void GL_ClearScreen()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -364,41 +579,18 @@ inline void GL_Swap()
 	SDL_GL_SwapWindow(GetGameWindow());
 }
 
-void GL_DestroyGL()
+inline void GL_UpdateViewportSize()
 {
-	GL_DestroyShader(uiTexturedShader);
-	GL_DestroyShader(uiColoredShader);
-	GL_DestroyShader(wallShader);
-	GL_DestroyShader(floorAndCeilingShader);
-	GL_DestroyShader(shadowShader);
-	GL_DestroyShader(skyShader);
-	GL_DestroyShader(modelShadedShader);
-	GL_DestroyShader(modelUnshadedShader);
-	glUseProgram(0);
-	glDisableVertexAttribArray(0);
-	GL_DestroyBuffer(glBuffer);
-	glDeleteBuffers(1, &sharedUniformBuffer);
-	for (int i = 0; i < MAX_TEXTURES; i++)
-	{
-		if (glTextures[i] != 0)
-		{
-			glDeleteTextures(1, &glTextures[i]);
-		}
-	}
-	for (int i = 0; i < MAX_MODELS; i++)
-	{
-		if (glModels[i] != NULL)
-		{
-			for (int j = 0; j < glModels[i]->lodCount; j++)
-			{
-				GL_DestroyBuffer(glModels[i]->buffers[j]);
-			}
-			free(glModels[i]->buffers);
-			free(glModels[i]);
-		}
-	}
-	SDL_GL_DeleteContext(ctx);
+	int vpWidth;
+	int vpHeight;
+	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
+	glViewport(0, 0, vpWidth, vpHeight);
 }
+
+#pragma endregion
+
+
+#pragma region UI Drawing
 
 void GL_DrawRect(const Vector2 pos, const Vector2 size, const Color color)
 {
@@ -476,57 +668,6 @@ void GL_DrawRectOutline(const Vector2 pos, const Vector2 size, const Color color
 	glEnableVertexAttribArray(posAttrLoc);
 
 	glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, NULL);
-}
-
-void GL_LoadTextureFromAsset(const char *texture)
-{
-	const Image *image = LoadImage(texture);
-
-	// if the texture is already loaded, don't load it again
-	if (glAssetTextureMap[image->id] != -1)
-	{
-		if (glIsTexture(glTextures[glAssetTextureMap[image->id]]))
-		{
-			glBindTexture(GL_TEXTURE_2D, glTextures[glAssetTextureMap[image->id]]);
-			return;
-		}
-	}
-
-	const int slot = GL_RegisterTexture(image->pixelData, (int)image->width, (int)image->height);
-
-	glAssetTextureMap[image->id] = slot;
-}
-
-int GL_RegisterTexture(const byte *pixelData, const int width, const int height)
-{
-	const int slot = glNextFreeSlot;
-
-	glGenTextures(1, &glTextures[slot]);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	if (GetState()->options.mipmaps)
-	{
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	} else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
-
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, pixelData);
-
-	glNextFreeSlot++;
-
-	return slot;
 }
 
 void GL_SetTexParams(const char *texture, const bool linear, const bool repeat)
@@ -675,6 +816,65 @@ void GL_DrawLine(const Vector2 start, const Vector2 end, const Color color, cons
 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, NULL);
 }
 
+void GL_DrawColoredArrays(const float *vertices, const uint *indices, const uint quadCount, const Color color)
+{
+	glUseProgram(uiColoredShader->program);
+
+	glUniform4fv(hudColoredColorLoc, 1, COLOR_TO_ARR(color));
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint)), indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	glDrawElements(GL_TRIANGLES, (int)(quadCount * 6), GL_UNSIGNED_INT, NULL);
+}
+
+void GL_DrawTexturedArrays(const float *vertices,
+						   const uint *indices,
+						   const int quadCount,
+						   const char *texture,
+						   const Color color)
+{
+	glUseProgram(uiTexturedShader->program);
+
+	GL_LoadTextureFromAsset(texture);
+
+	glUniform4fv(hudTexturedColorLoc, 1, COLOR_TO_ARR(color));
+
+	glUniform4f(hudTexturedRegionLoc, -1, 0, 0, 0);
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint)), indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
+
+	glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, NULL);
+}
+
+#pragma endregion
+
+
+#pragma region World Utilities
+
 void GL_SetLevelParams(mat4 *mvp, const Level *l)
 {
 	GL_SharedUniforms uniforms;
@@ -692,51 +892,77 @@ void GL_SetLevelParams(mat4 *mvp, const Level *l)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void GL_DrawWall(const Wall *w)
+inline void GL_Enable3D()
 {
-	glUseProgram(wallShader->program);
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
-
-	GL_LoadTextureFromAsset(w->tex);
-
-	glUniform1f(wallAngleLoc, (float)w->angle);
-
-	float vertices[4][5] = {
-		// X Y Z U V
-		{(float)w->a.x, 0.5f * w->height, (float)w->a.y, 0.0f, 0.0f},
-		{(float)w->b.x, 0.5f * w->height, (float)w->b.y, (float)w->length, 0.0f},
-		{(float)w->b.x, -0.5f * w->height, (float)w->b.y, (float)w->length, 1.0f},
-		{(float)w->a.x, -0.5f * w->height, (float)w->a.y, 0.0f, 1.0f},
-	};
-
-	const float uvOffset = w->uvOffset;
-	const float uvScale = w->uvScale;
-	for (int i = 0; i < 4; i++)
-	{
-		vertices[i][3] = vertices[i][3] * uvScale + uvOffset;
-	}
-
-	const uint indices[] = {0, 1, 2, 0, 2, 3};
-
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
-
-	const GLint posAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
-
-	const GLint texAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
+	glClear(GL_DEPTH_BUFFER_BIT);
 }
+
+inline void GL_Disable3D()
+{
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_MULTISAMPLE);
+	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+mat4 *GL_GetMatrix(const Camera *cam)
+{
+	vec3 cameraPosition = {cam->x, cam->y, cam->z};
+	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
+
+	mat4 identityMatrix = GLM_MAT4_IDENTITY_INIT;
+	mat4 perspectiveMatrix = GLM_MAT4_ZERO_INIT;
+	glm_perspective(glm_rad(cam->fov), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
+
+	vec3 lookAtPosition = {cosf(cam->yaw), 0, sinf(cam->yaw)};
+	vec3 upVector = {0, 1, 0};
+
+	// TODO: roll and pitch are messed up
+
+	glm_vec3_rotate(lookAtPosition, cam->roll, (vec3){0, 0, 1}); // Roll
+	glm_vec3_rotate(lookAtPosition, cam->pitch, (vec3){1, 0, 0}); // Pitch
+
+	lookAtPosition[0] += cameraPosition[0];
+	lookAtPosition[1] += cameraPosition[1];
+	lookAtPosition[2] += cameraPosition[2];
+
+	mat4 viewMatrix = GLM_MAT4_ZERO_INIT;
+	glm_lookat(cameraPosition, lookAtPosition, upVector, viewMatrix);
+
+	mat4 modelViewMatrix = GLM_MAT4_ZERO_INIT;
+	glm_mat4_mul(viewMatrix, identityMatrix, modelViewMatrix);
+
+	mat4 *modelViewProjectionMatrix = malloc(sizeof(mat4));
+	CheckAlloc(modelViewProjectionMatrix);
+	glm_mat4_mul(perspectiveMatrix, modelViewMatrix, *modelViewProjectionMatrix);
+
+	return modelViewProjectionMatrix;
+}
+
+void GL_GetViewModelMatrix(mat4 *out)
+{
+	mat4 perspectiveMatrix = GLM_MAT4_ZERO_INIT;
+
+	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
+	glm_mat4_identity(perspectiveMatrix);
+	glm_perspective(glm_rad(70), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
+
+	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_translate(translationMatrix, (vec3){0.5f, -0.35f + ((float)GetState()->cameraY * 0.2f), 0});
+
+	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_rotate(rotationMatrix, glm_rad(5), (vec3){0, 1, 0});
+
+	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
+
+	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
+}
+
+#pragma endregion
+
+
+#pragma region World Drawing
 
 void GL_DrawActorWall(const Actor *actor)
 {
@@ -748,22 +974,20 @@ void GL_DrawActorWall(const Actor *actor)
 
 	GL_LoadTextureFromAsset(wall->tex);
 
-	glUniform1f(wallAngleLoc, wall->angle);
-
-
 	const float halfHeight = wall->height / 2.0f;
 	const Vector2 startVertex = v2(actor->position.x + wall->a.x, actor->position.y + wall->a.y);
 	const Vector2 endVertex = v2(actor->position.x + wall->b.x, actor->position.y + wall->b.y);
 	const Vector2 startUV = v2(wall->uvOffset, 0);
 	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
-	const float vertices[4][5] = {
-		// X Y Z U V
+	const float vertices[4][6] = {
+		// X Y Z U V A
 		{
 			startVertex.x,
 			actor->yPosition + halfHeight,
 			startVertex.y,
 			startUV.x,
 			startUV.y,
+			wall->angle,
 		},
 		{
 			endVertex.x,
@@ -771,6 +995,7 @@ void GL_DrawActorWall(const Actor *actor)
 			endVertex.y,
 			endUV.x,
 			startUV.y,
+			wall->angle,
 		},
 		{
 			endVertex.x,
@@ -778,6 +1003,7 @@ void GL_DrawActorWall(const Actor *actor)
 			endVertex.y,
 			endUV.x,
 			endUV.y,
+			wall->angle,
 		},
 		{
 			startVertex.x,
@@ -785,6 +1011,7 @@ void GL_DrawActorWall(const Actor *actor)
 			startVertex.y,
 			startUV.x,
 			endUV.y,
+			wall->angle,
 		},
 	};
 
@@ -799,12 +1026,16 @@ void GL_DrawActorWall(const Actor *actor)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
 	const GLint posAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(posAttrLoc);
 
 	const GLint texAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint angleAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_ANGLE");
+	glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(angleAttrLoc);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
@@ -881,135 +1112,6 @@ void GL_DrawShadow(const Vector2 vp1, const Vector2 vp2, const mat4 mdl)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
-inline void GL_Enable3D()
-{
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-	glClear(GL_DEPTH_BUFFER_BIT);
-}
-
-inline void GL_Disable3D()
-{
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_MULTISAMPLE);
-	glClear(GL_DEPTH_BUFFER_BIT);
-}
-
-inline void GL_UpdateViewportSize()
-{
-	int vpWidth;
-	int vpHeight;
-	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
-	glViewport(0, 0, vpWidth, vpHeight);
-}
-
-void GL_DrawColoredArrays(const float *vertices, const uint *indices, const uint quadCount, const Color color)
-{
-	glUseProgram(uiColoredShader->program);
-
-	glUniform4fv(hudColoredColorLoc, 1, COLOR_TO_ARR(color));
-
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint)), indices, GL_STREAM_DRAW);
-
-	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
-
-	glDrawElements(GL_TRIANGLES, (int)(quadCount * 6), GL_UNSIGNED_INT, NULL);
-}
-
-void GL_DrawTexturedArrays(const float *vertices,
-						   const uint *indices,
-						   const int quadCount,
-						   const char *texture,
-						   const Color color)
-{
-	glUseProgram(uiTexturedShader->program);
-
-	GL_LoadTextureFromAsset(texture);
-
-	glUniform4fv(hudTexturedColorLoc, 1, COLOR_TO_ARR(color));
-
-	glUniform4f(hudTexturedRegionLoc, -1, 0, 0, 0);
-
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint)), indices, GL_STREAM_DRAW);
-
-	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
-
-	const GLint texAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
-
-	glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, NULL);
-}
-
-mat4 *GL_GetMatrix(const Camera *cam)
-{
-	vec3 cameraPosition = {cam->x, cam->y, cam->z};
-	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
-
-	mat4 identityMatrix = GLM_MAT4_IDENTITY_INIT;
-	mat4 perspectiveMatrix = GLM_MAT4_ZERO_INIT;
-	glm_perspective(glm_rad(cam->fov), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
-
-	vec3 lookAtPosition = {cosf(cam->yaw), 0, sinf(cam->yaw)};
-	vec3 upVector = {0, 1, 0};
-
-	// TODO: roll and pitch are messed up
-
-	glm_vec3_rotate(lookAtPosition, cam->roll, (vec3){0, 0, 1}); // Roll
-	glm_vec3_rotate(lookAtPosition, cam->pitch, (vec3){1, 0, 0}); // Pitch
-
-	lookAtPosition[0] += cameraPosition[0];
-	lookAtPosition[1] += cameraPosition[1];
-	lookAtPosition[2] += cameraPosition[2];
-
-	mat4 viewMatrix = GLM_MAT4_ZERO_INIT;
-	glm_lookat(cameraPosition, lookAtPosition, upVector, viewMatrix);
-
-	mat4 modelViewMatrix = GLM_MAT4_ZERO_INIT;
-	glm_mat4_mul(viewMatrix, identityMatrix, modelViewMatrix);
-
-	mat4 *modelViewProjectionMatrix = malloc(sizeof(mat4));
-	CheckAlloc(modelViewProjectionMatrix);
-	glm_mat4_mul(perspectiveMatrix, modelViewMatrix, *modelViewProjectionMatrix);
-
-	return modelViewProjectionMatrix;
-}
-
-void GL_GetViewModelMatrix(mat4 *out)
-{
-	mat4 perspectiveMatrix = GLM_MAT4_ZERO_INIT;
-
-	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
-	glm_mat4_identity(perspectiveMatrix);
-	glm_perspective(glm_rad(70), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
-
-	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix, (vec3){0.5f, -0.35f + ((float)GetState()->cameraY * 0.2f), 0});
-
-	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_rotate(rotationMatrix, glm_rad(5), (vec3){0, 1, 0});
-
-	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
-
-	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
-}
-
 void GL_RenderLevel(const Level *l, const Camera *cam)
 {
 	GL_Enable3D();
@@ -1053,10 +1155,7 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 	}
 	glEnable(GL_DEPTH_TEST);
 
-	for (int i = 0; i < l->walls.length; i++)
-	{
-		GL_DrawWall(ListGet(l->walls, i));
-	}
+	GL_RenderLevelWalls();
 
 	for (int i = 0; i < l->actors.length; i++)
 	{
@@ -1099,55 +1198,6 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 	GL_Disable3D();
 }
 
-void GL_LoadModel(const ModelDefinition *model, const uint lod, const int material)
-{
-	if (glModels[model->id] != NULL)
-	{
-		const GL_ModelBuffers *modelBuffer = glModels[model->id];
-		const GL_Buffer *lodBuffer = modelBuffer->buffers[lod];
-		const GL_Buffer materialBuffer = lodBuffer[material];
-		glBindVertexArray(materialBuffer.vertexArrayObject);
-		glBindBuffer(GL_ARRAY_BUFFER, materialBuffer.vertexBufferObject);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, materialBuffer.elementBufferObject);
-		return;
-	}
-	GL_ModelBuffers *buf = malloc(sizeof(GL_ModelBuffers));
-	CheckAlloc(buf);
-	buf->lodCount = model->lodCount;
-	buf->materialCount = model->materialCount;
-	buf->buffers = malloc(sizeof(void *) * model->lodCount);
-	CheckAlloc(buf->buffers);
-
-	for (int l = 0; l < buf->lodCount; l++)
-	{
-		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialCount);
-		CheckAlloc(buf->buffers[l]);
-
-		for (int m = 0; m < buf->materialCount; m++)
-		{
-			GL_Buffer *modelBuffer = &buf->buffers[l][m];
-			glGenVertexArrays(1, &modelBuffer->vertexArrayObject);
-			glGenBuffers(1, &modelBuffer->vertexBufferObject);
-			glGenBuffers(1, &modelBuffer->elementBufferObject);
-
-			glBindVertexArray(modelBuffer->vertexArrayObject);
-
-			glBindBuffer(GL_ARRAY_BUFFER, modelBuffer->vertexBufferObject);
-			glBufferData(GL_ARRAY_BUFFER,
-						 (long)(model->lods[l]->vertexCount * sizeof(float) * 8),
-						 model->lods[l]->vertexData,
-						 GL_STATIC_DRAW);
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelBuffer->elementBufferObject);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-						 (long)(model->lods[l]->indexCount[m] * sizeof(uint)),
-						 model->lods[l]->indexData[m],
-						 GL_STATIC_DRAW);
-		}
-	}
-
-	glModels[model->id] = buf;
-}
 
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
@@ -1223,8 +1273,55 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const int skin, const uint lod)
 {
+	glEnable(GL_CULL_FACE);
 	for (int m = 0; m < model->materialCount; m++)
 	{
 		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);
 	}
+	glDisable(GL_CULL_FACE);
+}
+
+void GL_RenderLevelWalls()
+{
+	glUseProgram(wallShader->program);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
+
+	size_t i = 0;
+	while (glWalls[i] != NULL && i < GL_MAX_WALL_BUFFERS)
+	{
+		const GL_WallBuffers *wallBuffer = glWalls[i];
+
+		GL_LoadTextureFromAsset(wallBuffer->texture);
+
+		glBindVertexArray(wallBuffer->buffer->vertexArrayObject);
+
+		glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wallBuffer->buffer->elementBufferObject);
+
+		const GLint posAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX");
+		glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+		glEnableVertexAttribArray(posAttrLoc);
+
+		const GLint texAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_UV");
+		glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(texAttrLoc);
+
+		const GLint angleAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_ANGLE");
+		glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(angleAttrLoc);
+
+		glDrawElements(GL_TRIANGLES, (GLsizei)wallBuffer->wallCount * 6, GL_UNSIGNED_INT, NULL);
+
+		i++;
+	}
+}
+
+#pragma endregion
+
+void GL_Error(const char *error)
+{
+	LogError("OpenGL Error: %s\n", error);
+	strcpy(glLastError, error);
 }

@@ -118,6 +118,8 @@ void GL_DebugMessageCallback(const GLenum source,
 	LogDebug("%d: %s of %s severity, raised from %s: %s\n", id, _type, _severity, _source, msg);
 
 #ifdef BREAK_ON_ERROR
+	// If you hit this "breakpoint", an OpenGL error has been printed to the console,
+	// and the corresponding GL call should be on the call stack.
 	raise(SIGABRT);
 #endif
 }

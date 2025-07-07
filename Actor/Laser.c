@@ -43,13 +43,17 @@ void LaserInit(Actor *this, b2WorldId, const KvList *params)
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
 	this->extraData = data;
+	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
+	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	this->SignalHandler = LaserSignalHandler;
 	this->showShadow = false;
-	this->actorWall = CreateWall(v2s(0), v2s(0), TEXTURE("actor_laser"), 1.0f, 0.0f);
-
-	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
-	data->enabled = KvGetBool(params, "startEnabled", true);
+	this->actorWall = CreateWall(v2s(0),
+								 v2s(0),
+								 data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor_triplelaser")
+																	 : TEXTURE("actor_laser"),
+								 1.0f,
+								 0.0f);
 
 	switch (data->height)
 	{
@@ -79,12 +83,15 @@ void LaserUpdate(Actor *this, double)
 		Vector2 castStart = Vector2FromAngle(this->rotation);
 		castStart = Vector2Scale(castStart, 0.01);
 		castStart = Vector2Add(castStart, this->position);
+		uint16_t mask = ~(COLLISION_GROUP_PLAYER | COLLISION_GROUP_HURTBOX | COLLISION_GROUP_TRIGGER);
+		if (data->height == LASER_HEIGHT_TRIPLE)
+		{
+			mask &= ~COLLISION_GROUP_ACTOR; // Don't hit other lasers
+		}
 		const bool rc = PerformRaycast(castStart,
 									   this->rotation,
-									   50.0f,
-									   &col,
-									   COLLISION_GROUP_ACTOR,
-									   ~(COLLISION_GROUP_PLAYER | COLLISION_GROUP_HURTBOX | COLLISION_GROUP_TRIGGER));
+									   50.0f, &col, COLLISION_GROUP_ACTOR,
+									   mask);
 		if (rc)
 		{
 			this->actorWall->b = Vector2Sub(col, this->position);
@@ -99,7 +106,6 @@ void LaserUpdate(Actor *this, double)
 		this->actorWall->b = v2(0.01, 0);
 		WallBake(this->actorWall);
 	}
-
 }
 
 void LaserDestroy(Actor *this)
