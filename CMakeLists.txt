@@ -168,6 +168,7 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanResources.h
         Helpers/Graphics/Vulkan/VulkanActors.c
         Helpers/Graphics/Vulkan/VulkanActors.h
+        Helpers/Graphics/Vulkan/VulkanPipelines.c
         Helpers/Navigation.c
         Helpers/Navigation.h
         Helpers/Collision.c
