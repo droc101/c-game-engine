@@ -189,7 +189,11 @@ void TickGraphDraw()
 	const int height = TICKGRAPH_THRESHOLD_GOOD * 2 * TICKGRAPH_V_SCALE + 20;
 	const int start_x = WindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
 	// Draw a background for the graph
-	DrawRect(start_x - 10, WindowHeight() - height, TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10, height, COLOR(0x80000000));
+	DrawRect(start_x - 10,
+			 WindowHeight() - height,
+			 TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10,
+			 height,
+			 COLOR(0x80000000));
 
 	// Draw a line at the bottom of the graph
 	DrawLine(v2(start_x, WindowHeightFloat() - 10),
@@ -305,4 +309,3 @@ void TickGraphDraw()
 
 #endif
 }
-
