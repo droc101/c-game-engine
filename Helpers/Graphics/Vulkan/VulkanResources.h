@@ -12,8 +12,6 @@ VkResult CreateUiBuffers();
 
 VkResult CreateWallBuffers();
 
-VkResult CreateShadowBuffers();
-
 VkResult CreateActorWallBuffers();
 
 VkResult CreateActorModelBuffers();
@@ -21,8 +19,6 @@ VkResult CreateActorModelBuffers();
 VkResult CreateRoofBuffers();
 
 VkResult ResizeWallBuffers();
-
-VkResult ResizeShadowBuffers();
 
 VkResult ResizeActorWallBuffers();
 

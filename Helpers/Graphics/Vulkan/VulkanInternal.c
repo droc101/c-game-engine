@@ -292,7 +292,6 @@ bool CreateBuffers()
 {
 	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
 	VulkanTest(CreateWallBuffers(), "Failed to create wall buffers!");
-	VulkanTest(CreateShadowBuffers(), "Failed to create shadow buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create wall actor buffers!");
 	VulkanTest(CreateActorModelBuffers(), "Failed to create model actor buffers!");
 	VulkanTest(CreateRoofBuffers(), "Failed to create roof buffers!");

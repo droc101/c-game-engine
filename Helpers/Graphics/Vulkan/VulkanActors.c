@@ -31,7 +31,6 @@ VkResult InitActors(const List *actors)
 	ListClear(&buffers.actorModels.materialCounts);
 	ListClear(&buffers.actorModels.shadedMaterialIds);
 	ListClear(&buffers.actorModels.unshadedMaterialIds);
-	buffers.shadows.objectCount = 0;
 	buffers.actorWalls.count = 0;
 	buffers.actorModels.vertices.bytesUsed = 0;
 	buffers.actorModels.indices.bytesUsed = 0;
@@ -61,7 +60,7 @@ VkResult InitActors(const List *actors)
 			assert(lod);
 			size_t lodIndex = ListFind(loadedLodIds, (void *)lod->id);
 			if (lodIndex == -1 ||
-				ListFind(*(List *)ListGet(loadedSkins, lodIndex), (void *)actor->currentSkinIndex) == -1)
+				ListFind(*(List *)ListGet(loadedSkins, lodIndex), (void *)(size_t)actor->currentSkinIndex) == -1)
 			{
 				lodIndex = loadedLodIds.length;
 				ListAdd(&loadedLodIds, (void *)lod->id);
@@ -73,7 +72,7 @@ VkResult InitActors(const List *actors)
 					   shadedVertexSize);
 				shadedVertexDataOffset += shadedVertexSize;
 
-				ListAdd((List *)ListGet(loadedSkins, lodIndex), (void *)actor->currentSkinIndex);
+				ListAdd((List *)ListGet(loadedSkins, lodIndex), (void *)(size_t)actor->currentSkinIndex);
 				for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 				{
 					const size_t indexSize = sizeof(uint32_t) * lod->indexCount[j];
@@ -172,19 +171,12 @@ VkResult InitActors(const List *actors)
 			buffers.actorModels.instanceData.bytesUsed += sizeof(ActorModelInstanceData) *
 														  actor->actorModel->materialCount;
 		}
-		if (actor->showShadow)
-		{
-			buffers.shadows.objectCount++;
-		}
 	}
-	buffers.shadows.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.shadows.objectCount;
-	buffers.shadows.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.shadows.objectCount;
 	buffers.actorWalls.vertices.bytesUsed = sizeof(ActorVertex) * 4 * buffers.actorWalls.count;
 	buffers.actorWalls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.actorWalls.count;
 	buffers.actorWalls.instanceData.bytesUsed = sizeof(ActorWallInstanceData) * buffers.actorWalls.count;
 	buffers.actorWalls.drawInfo.bytesUsed = sizeof(VkDrawIndexedIndirectCommand) * buffers.actorWalls.count;
 
-	VulkanTestReturnResult(ResizeShadowBuffers(), "Failed to resize shadow buffers!");
 	VulkanTestReturnResult(ResizeActorWallBuffers(), "Failed to resize wall actor buffers!");
 	VulkanTestReturnResult(ResizeActorModelBuffers(), "Failed to resize model actor buffers!");
 	assert(loadedActors == actors->length);
@@ -310,11 +302,10 @@ VkResult LoadActorWalls(const List *actors)
 	return VK_SUCCESS;
 }
 
-VkResult UpdateActorInstanceDataAndShadows(const List *actors)
+VkResult UpdateActorInstanceData(const List *actors)
 {
 	assert(actors);
 	uint32_t wallCount = 0;
-	uint32_t shadowCount = 0;
 	size_t offsets[buffers.actorModels.materialCounts.length];
 	if (buffers.actorModels.materialCounts.length > 0)
 	{
@@ -332,8 +323,6 @@ VkResult UpdateActorInstanceDataAndShadows(const List *actors)
 		VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
 	}
 	ActorWallInstanceData *actorWallsInstanceData = buffers.actorWalls.instanceData.data;
-	ShadowVertex *shadowVertices = buffers.shadows.vertices.data;
-	uint32_t *shadowIndices = buffers.shadows.indices.data;
 	for (size_t i = 0; i < loadedActors; i++)
 	{
 		const Actor *actor = ListGet(*actors, i);
@@ -379,33 +368,6 @@ VkResult UpdateActorInstanceDataAndShadows(const List *actors)
 
 			wallCount++;
 		}
-		if (actor->showShadow)
-		{
-			shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount].y = -0.49f;
-			shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 1].y = -0.49f;
-			shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 2].y = -0.49f;
-			shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 3].y = -0.49f;
-			shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowIndices[6 * shadowCount] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
-			shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
-
-			shadowCount++;
-		}
 	}
 	lunaWriteDataToBuffer(buffers.actorWalls.instanceData.buffer,
 						  buffers.actorWalls.instanceData.data,
@@ -414,14 +376,6 @@ VkResult UpdateActorInstanceDataAndShadows(const List *actors)
 	lunaWriteDataToBuffer(buffers.actorModels.instanceData.buffer,
 						  buffers.actorModels.instanceData.data,
 						  buffers.actorModels.instanceData.bytesUsed,
-						  0);
-	lunaWriteDataToBuffer(buffers.shadows.vertices.buffer,
-						  buffers.shadows.vertices.data,
-						  buffers.shadows.vertices.bytesUsed,
-						  0);
-	lunaWriteDataToBuffer(buffers.shadows.indices.buffer,
-						  buffers.shadows.indices.data,
-						  buffers.shadows.indices.bytesUsed,
 						  0);
 
 	return VK_SUCCESS;

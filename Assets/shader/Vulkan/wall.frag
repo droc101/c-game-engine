@@ -9,8 +9,6 @@ layout (push_constant) uniform PushConstants {
 	uint skyVertexCount;
 	uint skyTextureIndex;
 
-	uint shadowTextureIndex;
-
 	float fogStart;
 	float fogEnd;
 	uint fogColor;
@@ -35,8 +33,4 @@ void main() {
 		return;
 	}
 	outColor.rgb = mix(outColor.rgb, inColor.rgb, clamp((gl_FragCoord.z / gl_FragCoord.w - pushConstants.fogStart) / (pushConstants.fogEnd - pushConstants.fogStart), 0.0, 1.0));
-	if (inTextureIndex == pushConstants.shadowTextureIndex) {
-		outColor.a = 0.5;
-		return;
-	}
 }

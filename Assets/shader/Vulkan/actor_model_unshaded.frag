@@ -9,8 +9,6 @@ layout (push_constant) uniform PushConstants {
 	uint skyVertexCount;
 	uint skyTextureIndex;
 
-	uint shadowTextureIndex;
-
 	float fogStart;
 	float fogEnd;
 	uint fogColor;

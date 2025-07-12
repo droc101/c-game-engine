@@ -142,13 +142,6 @@ typedef struct UiVertex
 	uint32_t textureIndex;
 } UiVertex;
 
-typedef struct ShadowVertex
-{
-	float x;
-	float y;
-	float z;
-} ShadowVertex;
-
 typedef struct WallVertex
 {
 	float x;
@@ -213,7 +206,6 @@ typedef struct Buffers
 	IndexedVertexBuffer ui;
 	RoofBuffer roof;
 	IndexedVertexBuffer walls;
-	IndexedVertexBuffer shadows;
 	ActorWallsBuffer actorWalls;
 	ActorModelsBuffer actorModels;
 } Buffers;
@@ -243,8 +235,6 @@ typedef struct PushConstants
 
 	uint32_t skyVertexCount;
 	uint32_t skyTextureIndex;
-
-	uint32_t shadowTextureIndex;
 
 	float fogStart;
 	float fogEnd;

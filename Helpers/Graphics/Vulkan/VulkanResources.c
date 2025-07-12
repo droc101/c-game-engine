@@ -55,29 +55,6 @@ VkResult CreateWallBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateShadowBuffers()
-{
-	const LunaBufferCreationInfo vertexBufferCreationInfo = {
-		.size = buffers.shadows.vertices.allocatedSize,
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.shadows.vertices.buffer),
-						   "Failed to create shadow vertex buffer!");
-	buffers.shadows.vertices.data = malloc(buffers.shadows.vertices.allocatedSize);
-	CheckAlloc(buffers.shadows.vertices.data);
-
-	const LunaBufferCreationInfo indexBufferCreationInfo = {
-		.size = buffers.shadows.indices.allocatedSize,
-		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.shadows.indices.buffer),
-						   "Failed to create shadow index buffer!");
-	buffers.shadows.indices.data = malloc(buffers.shadows.indices.allocatedSize);
-	CheckAlloc(buffers.shadows.indices.data);
-
-	return VK_SUCCESS;
-}
-
 VkResult CreateActorWallBuffers()
 {
 	const LunaBufferCreationInfo actorWallsVertexBufferCreationInfo = {
@@ -240,45 +217,6 @@ VkResult ResizeWallBuffers()
 		void *newIndices = realloc(buffers.walls.indices.data, buffers.walls.indices.allocatedSize);
 		CheckAlloc(newIndices);
 		buffers.walls.indices.data = newIndices;
-	}
-	return VK_SUCCESS;
-}
-
-VkResult ResizeShadowBuffers()
-{
-	if (buffers.shadows.vertices.allocatedSize < buffers.shadows.vertices.bytesUsed)
-	{
-		if (buffers.shadows.vertices.allocatedSize != 0)
-		{
-			lunaDestroyBuffer(buffers.shadows.vertices.buffer);
-		}
-		buffers.shadows.vertices.allocatedSize = buffers.shadows.vertices.bytesUsed;
-		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.shadows.vertices.allocatedSize,
-			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.shadows.vertices.buffer),
-							   "Failed to recreate shadow vertex buffer!");
-		void *newVertices = realloc(buffers.shadows.vertices.data, buffers.shadows.vertices.allocatedSize);
-		CheckAlloc(newVertices);
-		buffers.shadows.vertices.data = newVertices;
-	}
-	if (buffers.shadows.indices.allocatedSize < buffers.shadows.indices.bytesUsed)
-	{
-		if (buffers.shadows.indices.allocatedSize != 0)
-		{
-			lunaDestroyBuffer(buffers.shadows.indices.buffer);
-		}
-		buffers.shadows.indices.allocatedSize = buffers.shadows.indices.bytesUsed;
-		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.shadows.indices.allocatedSize,
-			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.shadows.indices.buffer),
-							   "Failed to recreate shadow index buffer!");
-		void *newIndices = realloc(buffers.shadows.indices.data, buffers.shadows.indices.allocatedSize);
-		CheckAlloc(newIndices);
-		buffers.shadows.indices.data = newIndices;
 	}
 	return VK_SUCCESS;
 }

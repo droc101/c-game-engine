@@ -99,11 +99,6 @@ bool CreateWallPipeline()
 	const VkVertexInputBindingDescription wallBindingDescriptions[] = {
 		{
 			.binding = 0,
-			.stride = sizeof(ShadowVertex),
-			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-		},
-		{
-			.binding = 1,
 			.stride = sizeof(WallVertex),
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		},
@@ -113,29 +108,23 @@ bool CreateWallPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ShadowVertex, x),
-		},
-		{
-			.location = 1,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(WallVertex, x),
 		},
 		{
-			.location = 2,
-			.binding = 1,
+			.location = 1,
+			.binding = 0,
 			.format = VK_FORMAT_R32G32_SFLOAT,
 			.offset = offsetof(WallVertex, u),
 		},
 		{
-			.location = 3,
-			.binding = 1,
+			.location = 2,
+			.binding = 0,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = offsetof(WallVertex, textureIndex),
 		},
 		{
-			.location = 4,
-			.binding = 1,
+			.location = 3,
+			.binding = 0,
 			.format = VK_FORMAT_R32_SFLOAT,
 			.offset = offsetof(WallVertex, wallAngle),
 		},

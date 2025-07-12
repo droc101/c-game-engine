@@ -16,6 +16,6 @@ void LoadActorDrawInfo(const List *actors);
 
 VkResult LoadActorWalls(const List *actors);
 
-VkResult UpdateActorInstanceDataAndShadows(const List *actors);
+VkResult UpdateActorInstanceData(const List *actors);
 
 #endif //VULKANACTORS_H

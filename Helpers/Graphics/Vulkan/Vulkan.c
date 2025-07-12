@@ -257,17 +257,10 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 		.dynamicStates = dynamicStateBindInfos,
 	};
 
-	if (buffers.walls.objectCount || buffers.shadows.objectCount)
-	{
-		lunaBindVertexBuffers(0,
-							  2,
-							  (LunaBuffer[]){buffers.shadows.vertices.buffer, buffers.walls.vertices.buffer},
-							  (VkDeviceSize[]){0, 0});
-	}
 	if (buffers.walls.objectCount)
 	{
 		// TODO: This draws the floor, but uses the wall buffer
-		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
 													 buffers.walls.indices.buffer,
 													 0,
 													 VK_INDEX_TYPE_UINT32,
@@ -279,22 +272,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 													 0,
 													 0),
 							   "Failed to draw floor!");
-	}
-	if (buffers.shadows.objectCount)
-	{
-		// 0x53484457 is "SHDW", to encode that we are drawing the shadows
-		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
-													 buffers.shadows.indices.buffer,
-													 0,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.walls,
-													 &pipelineBindInfo,
-													 buffers.shadows.objectCount * 6,
-													 1,
-													 0,
-													 0,
-													 0x53484457),
-							   "Failed to draw shadows!");
 	}
 	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
 	{
@@ -313,11 +290,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 							   "Failed to draw walls!");
 	}
 
-	lunaBindVertexBuffers(0,
-						  2,
-						  (LunaBuffer[]){buffers.roof.vertices.buffer, buffers.roof.vertices.buffer},
-						  (VkDeviceSize[]){0, 0});
-	VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
+	VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.roof.vertices.buffer,
 												 buffers.roof.indices.buffer,
 												 0,
 												 VK_INDEX_TYPE_UINT32,
@@ -424,7 +397,7 @@ bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices)
 	// 	}
 	// }
 	VulkanTest(LoadActorWalls(actors), "Failed to load wall actors!");
-	VulkanTest(UpdateActorInstanceDataAndShadows(actors), "Failed to update actor instance data and shadows!");
+	VulkanTest(UpdateActorInstanceData(actors), "Failed to update actor instance data!");
 	return true;
 }
 
@@ -437,8 +410,6 @@ bool VK_Cleanup()
 	free(buffers.roof.indices.data);
 	free(buffers.walls.vertices.data);
 	free(buffers.walls.indices.data);
-	free(buffers.shadows.vertices.data);
-	free(buffers.shadows.indices.data);
 	free(buffers.actorWalls.vertices.data);
 	free(buffers.actorWalls.indices.data);
 	free(buffers.actorWalls.instanceData.data);
@@ -473,7 +444,6 @@ bool VK_LoadLevelWalls(const Level *level)
 		pushConstants.skyVertexCount = skyModel->lods[0]->vertexCount;
 		pushConstants.skyTextureIndex = TextureIndex(level->ceilOrSkyTex);
 	}
-	pushConstants.shadowTextureIndex = TextureIndex(TEXTURE("vfx_shadow"));
 	pushConstants.fogStart = (float)level->fogStart;
 	pushConstants.fogEnd = (float)level->fogEnd;
 	pushConstants.fogColor = level->fogColor;
