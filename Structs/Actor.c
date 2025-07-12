@@ -96,8 +96,6 @@ Actor *CreateActor(const Vector2 position,
 	actor->rotation = rotation;
 	actor->health = 1;
 	actor->yPosition = 0.0f;
-	actor->showShadow = true;
-	actor->shadowSize = 1.0f;
 	actor->actorModel = NULL;
 	actor->actorModelSkin = 0;
 	actor->bodyId = b2_nullBodyId;

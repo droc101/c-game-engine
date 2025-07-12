@@ -20,7 +20,6 @@ GL_Shader *uiTexturedShader;
 GL_Shader *uiColoredShader;
 GL_Shader *wallShader;
 GL_Shader *floorAndCeilingShader;
-GL_Shader *shadowShader;
 GL_Shader *skyShader;
 GL_Shader *modelUnshadedShader;
 GL_Shader *modelShadedShader;
@@ -50,10 +49,6 @@ GLint hudTexturedTextureLoc; // TODO: confusing name -- location of the texture 
 GLint hudTexturedColorLoc;
 GLint hudTexturedRegionLoc;
 
-GLint shadowTextureLoc;
-GLint shadowModelViewMatrixLoc;
-GLint shadowSharedUniformsLoc;
-
 GLint wallTextureLoc;
 GLint wallModelWorldMatrixLoc;
 GLint wallSharedUniformsLoc;
@@ -75,10 +70,6 @@ void LoadShaderLocations()
 	hudTexturedTextureLoc = glGetUniformLocation(uiTexturedShader->program, "alb");
 	hudTexturedColorLoc = glGetUniformLocation(uiTexturedShader->program, "col");
 	hudTexturedRegionLoc = glGetUniformLocation(uiTexturedShader->program, "region");
-
-	shadowTextureLoc = glGetUniformLocation(shadowShader->program, "alb");
-	shadowModelViewMatrixLoc = glGetUniformLocation(shadowShader->program, "MODEL_WORLD_MATRIX");
-	shadowSharedUniformsLoc = glGetUniformBlockIndex(shadowShader->program, "SharedUniforms");
 
 	wallTextureLoc = glGetUniformLocation(wallShader->program, "alb");
 	wallModelWorldMatrixLoc = glGetUniformLocation(wallShader->program, "MODEL_WORLD_MATRIX");
@@ -189,7 +180,6 @@ bool GL_Init(SDL_Window *wnd)
 	uiColoredShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_hud_color_f"), OGL_SHADER("GL_hud_color_v"));
 	wallShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_wall_f"), OGL_SHADER("GL_wall_v"));
 	floorAndCeilingShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_floor_f"), OGL_SHADER("GL_floor_v"));
-	shadowShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_shadow_f"), OGL_SHADER("GL_shadow_v"));
 	skyShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_sky_f"), OGL_SHADER("GL_sky_v"));
 	modelShadedShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_model_shaded_f"), OGL_SHADER("GL_model_shaded_v"));
 	modelUnshadedShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_model_unshaded_f"),
@@ -199,7 +189,6 @@ bool GL_Init(SDL_Window *wnd)
 		!uiColoredShader ||
 		!wallShader ||
 		!floorAndCeilingShader ||
-		!shadowShader ||
 		!skyShader ||
 		!modelShadedShader ||
 		!modelUnshadedShader)
@@ -248,7 +237,6 @@ void GL_DestroyGL()
 	GL_DestroyShader(uiColoredShader);
 	GL_DestroyShader(wallShader);
 	GL_DestroyShader(floorAndCeilingShader);
-	GL_DestroyShader(shadowShader);
 	GL_DestroyShader(skyShader);
 	GL_DestroyShader(modelShadedShader);
 	GL_DestroyShader(modelUnshadedShader);
@@ -1076,42 +1064,6 @@ void GL_DrawFloor(const Vector2 vp1, const Vector2 vp2, const char *texture, con
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_DrawShadow(const Vector2 vp1, const Vector2 vp2, const mat4 mdl)
-{
-	glUseProgram(shadowShader->program);
-
-	GL_LoadTextureFromAsset(TEXTURE("vfx_shadow"));
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, shadowSharedUniformsLoc, sharedUniformBuffer);
-
-	// model -> world
-	glUniformMatrix4fv(shadowModelViewMatrixLoc, 1, GL_FALSE, mdl[0]);
-
-	const float vertices[4][2] = {
-		// X Z
-		{(float)vp1.x, (float)vp1.y},
-		{(float)vp2.x, (float)vp1.y},
-		{(float)vp2.x, (float)vp2.y},
-		{(float)vp1.x, (float)vp2.y},
-	};
-
-	const uint indices[] = {0, 1, 2, 0, 2, 3};
-
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
-
-	const GLint posAttrLoc = glGetAttribLocation(shadowShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-}
-
 void GL_RenderLevel(const Level *l, const Camera *cam)
 {
 	GL_Enable3D();
@@ -1138,22 +1090,6 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 	}
 
 	GL_DrawFloor(floorStart, floorEnd, l->floorTex, -0.5f, 1.0f);
-
-	glDisable(GL_DEPTH_TEST);
-	for (int i = 0; i < l->actors.length; i++)
-	{
-		const Actor *actor = ListGet(l->actors, i);
-		if (actor->showShadow)
-		{
-			mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
-			ActorTransformMatrix(actor, &actorXfm);
-			// remove the rotation and y position from the actor matrix so the shadow draws correctly
-			glm_rotate(actorXfm, (float)actor->rotation, (vec3){0, 1, 0});
-			glm_translate(actorXfm, (vec3){0, -actor->yPosition, 0});
-			GL_DrawShadow(v2s(-0.5f * actor->shadowSize), v2s(0.5f * actor->shadowSize), actorXfm);
-		}
-	}
-	glEnable(GL_DEPTH_TEST);
 
 	GL_RenderLevelWalls();
 

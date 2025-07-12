@@ -528,10 +528,6 @@ struct Actor
 	///  As such, an actor can be rendered floating, but will always collide as though it is on the same plane as
 	///  everything else.
 	float yPosition;
-	/// Should the actor cast a shadow?
-	bool showShadow;
-	/// The size of the shadow
-	float shadowSize;
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
 	int actorModelSkin;

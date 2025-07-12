@@ -78,7 +78,6 @@ void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
 
 	this->actorModel = LoadModel(MODEL("model_laseremitter"));
 	this->actorModelSkin = (int)data->height + 1;
-	this->showShadow = false;
 
 	CreateLaserEmitterCollider(this, worldId);
 

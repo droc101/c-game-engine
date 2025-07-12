@@ -85,7 +85,6 @@ bool LogicSignalHandler(Actor *this, const Actor *sender, const byte signal, con
 
 void LogicInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
 {
-	this->showShadow = false;
 	LogicBinaryData *data = malloc(sizeof(LogicBinaryData));
 	CheckAlloc(data);
 	data->operandA = false;

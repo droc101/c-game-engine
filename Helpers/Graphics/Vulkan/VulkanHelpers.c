@@ -129,7 +129,7 @@ bool LoadActors(const Level *level)
 				ListAdd(&buffers.actors.models.modelCounts, (void *)1);
 			}
 		}
-		if (actor->showShadow)
+		if (false)
 		{
 			buffers.walls.shadowCount++;
 		}
@@ -865,7 +865,6 @@ void LoadActorInstanceData(const Level *level,
 						   uint32_t *shadowIndices)
 {
 	uint32_t wallCount = 0;
-	uint32_t shadowCount = 0;
 	uint16_t *modelCounts = calloc(buffers.actors.models.loadedModelIds.length, sizeof(uint16_t));
 	CheckAlloc(modelCounts);
 	uint32_t *offsets = calloc(buffers.actors.models.loadedModelIds.length + 1, sizeof(uint32_t));
@@ -908,33 +907,6 @@ void LoadActorInstanceData(const Level *level,
 			offsetInstanceData[wallCount].wallAngle = actor->actorWall->angle;
 
 			wallCount++;
-		}
-		if (actor->showShadow)
-		{
-			shadowVertices[4 * shadowCount].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount].y = -0.49f;
-			shadowVertices[4 * shadowCount].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 1].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 1].y = -0.49f;
-			shadowVertices[4 * shadowCount + 1].z = actor->position.y - 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 2].x = actor->position.x + 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 2].y = -0.49f;
-			shadowVertices[4 * shadowCount + 2].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowVertices[4 * shadowCount + 3].x = actor->position.x - 0.5f * actor->shadowSize;
-			shadowVertices[4 * shadowCount + 3].y = -0.49f;
-			shadowVertices[4 * shadowCount + 3].z = actor->position.y + 0.5f * actor->shadowSize;
-
-			shadowIndices[6 * shadowCount] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 1] = shadowCount * 4 + 1;
-			shadowIndices[6 * shadowCount + 2] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 3] = shadowCount * 4;
-			shadowIndices[6 * shadowCount + 4] = shadowCount * 4 + 2;
-			shadowIndices[6 * shadowCount + 5] = shadowCount * 4 + 3;
-
-			shadowCount++;
 		}
 	}
 	ListUnlock(level->actors);

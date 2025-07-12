@@ -18,8 +18,6 @@ void SpriteInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
 	this->actorWall->a = v2(width * cosf(this->rotation), width * sinf(this->rotation));
 	this->actorWall->b = v2(-width * cosf(this->rotation), -width * sinf(this->rotation));
 	this->actorWall->height = height;
-	this->shadowSize = KvGetFloat(params, "shadowSize", 1.0f);
-	this->showShadow = KvGetBool(params, "showShadow", true);
 	this->yPosition = KvGetFloat(params, "yPosition", 0.0f);
 	WallBake(this->actorWall);
 }

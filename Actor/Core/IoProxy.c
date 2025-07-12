@@ -33,7 +33,6 @@ void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*para
 	{
 		GetState()->level->ioProxy = this;
 	}
-	this->showShadow = false;
 	this->SignalHandler = IoProxySignalHandler;
 }
 

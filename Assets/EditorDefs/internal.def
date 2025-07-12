@@ -142,19 +142,6 @@
                     "max": 1.0,
                     "default": 0.0,
                     "step": 0.1
-                },
-                {
-                    "name": "shadowSize",
-                    "type": "float",
-                    "min": 1.0,
-                    "max": 5.0,
-                    "default": 0.5,
-                    "step": 0.1
-                },
-                {
-                    "name": "showShadow",
-                    "type": "bool",
-                    "default": false
                 }
             ],
             "inputs": [],
@@ -236,19 +223,6 @@
                     "max": 1.0,
                     "default": 0.0,
                     "step": 0.1
-                },
-                {
-                    "name": "shadowSize",
-                    "type": "float",
-                    "min": 1.0,
-                    "max": 5.0,
-                    "default": 0.5,
-                    "step": 0.1
-                },
-                {
-                    "name": "showShadow",
-                    "type": "bool",
-                    "default": false
                 }
             ],
             "inputs": [

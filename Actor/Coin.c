@@ -63,7 +63,6 @@ void CoinInit(Actor *this, const b2WorldId worldId, const KvList *params)
 
 	this->actorWall->height = 0.25f;
 	this->yPosition = -0.25f;
-	this->shadowSize = 0.1f;
 }
 
 void CoinUpdate(Actor *this, double /*delta*/)

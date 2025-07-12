@@ -32,7 +32,6 @@ bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signa
 
 void SoundPlayerInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
 {
-	this->showShadow = false;
 	this->SignalHandler = SoundPlayerSignalHandler;
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);

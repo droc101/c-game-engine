@@ -11,8 +11,6 @@ void StaticModelInit(Actor *this, const b2WorldId /*worldId*/, const KvList *par
 	char modelPath[80];
 	snprintf(modelPath, 80, "model/%s.gmdl", KvGetString(params, "model", "model_leafy"));
 	this->actorModel = LoadModel(modelPath);
-	this->shadowSize = KvGetFloat(params, "shadowSize", 1.0f);
-	this->showShadow = KvGetBool(params, "showShadow", true);
 	this->yPosition = KvGetFloat(params, "yPosition", 0.0f);
 	this->actorModelSkin = KvGetInt(params, "skin", 0);
 }

@@ -27,7 +27,6 @@ void PhysboxInit(Actor *this, const b2WorldId worldId, const KvList * /*params*/
 
 	this->actorModel = LoadModel(MODEL("model_cube"));
 	this->yPosition = -0.3f;
-	this->showShadow = false;
 }
 
 void PhysboxUpdate(Actor *this, const double)

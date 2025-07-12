@@ -149,7 +149,6 @@ void DoorInit(Actor *this, const b2WorldId worldId, const KvList *params)
 	CreateDoorCollider(this, worldId, wallEnd);
 	CreateDoorSensor(this, worldId);
 	this->SignalHandler = DoorSignalHandler;
-	this->showShadow = false;
 
 	DoorData *data = this->extraData; // Allocated in CreateDoorSensor
 	data->spawnPosition = this->position;
