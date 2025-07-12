@@ -330,46 +330,67 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 												 0),
 						   "Failed to draw roof!");
 
-	if (buffers.wallActors.count)
+	if (buffers.actorWalls.count)
 	{
 		lunaBindVertexBuffers(0,
 							  2,
-							  (LunaBuffer[]){buffers.wallActors.vertices.buffer,
-											 buffers.wallActors.instanceData.buffer},
+							  (LunaBuffer[]){buffers.actorWalls.vertices.buffer,
+											 buffers.actorWalls.instanceData.buffer},
 							  (VkDeviceSize[]){0, 0});
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
-															 buffers.wallActors.indices.buffer,
+															 buffers.actorWalls.indices.buffer,
 															 0,
 															 VK_INDEX_TYPE_UINT32,
-															 pipelines.actors,
+															 pipelines.actorWalls,
 															 &pipelineBindInfo,
-															 buffers.wallActors.drawInfo.buffer,
+															 buffers.actorWalls.drawInfo.buffer,
 															 0,
-															 buffers.wallActors.count,
+															 buffers.actorWalls.count,
 															 sizeof(VkDrawIndexedIndirectCommand)),
 							   "Failed to draw wall actors!");
 	}
-	if (buffers.modelActors.loadedModelIds.length)
+	if (buffers.actorModels.shadedMaterialIds.length)
 	{
 		lunaBindVertexBuffers(0,
 							  2,
-							  (LunaBuffer[]){buffers.modelActors.vertices.buffer,
-											 buffers.modelActors.instanceData.buffer},
+							  (LunaBuffer[]){buffers.actorModels.vertices.buffer,
+											 buffers.actorModels.instanceData.buffer},
 							  (VkDeviceSize[]){0, 0});
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
-															 buffers.modelActors.indices.buffer,
+															 buffers.actorModels.indices.buffer,
 															 0,
 															 VK_INDEX_TYPE_UINT32,
-															 pipelines.actors,
+															 pipelines.shadedActorModels,
 															 &pipelineBindInfo,
-															 buffers.modelActors.drawInfo.buffer,
+															 buffers.actorModels.shadedDrawInfo.buffer,
 															 0,
-															 buffers.modelActors.drawInfo.bytesUsed /
+															 buffers.actorModels.shadedDrawInfo.bytesUsed /
 																	 sizeof(VkDrawIndexedIndirectCommand),
 															 sizeof(VkDrawIndexedIndirectCommand)),
-							   "Failed to draw model actors!");
+							   "Failed to draw shaded model actors!");
+	}
+	if (buffers.actorModels.unshadedMaterialIds.length)
+	{
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.actorModels.vertices.buffer,
+											 buffers.actorModels.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
+
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.actorModels.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.unshadedActorModels,
+															 &pipelineBindInfo,
+															 buffers.actorModels.unshadedDrawInfo.buffer,
+															 0,
+															 buffers.actorModels.unshadedDrawInfo.bytesUsed /
+																	 sizeof(VkDrawIndexedIndirectCommand),
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw unshaded model actors!");
 	}
 
 	if (UnlockLodThreadMutex() != 0)
@@ -383,26 +404,26 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 
 bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices)
 {
-	VkDrawIndexedIndirectCommand *drawInfo = buffers.modelActors.drawInfo.data;
-	for (size_t i = 0; i < modifiedActorIndices->length; i++)
-	{
-		const size_t actorIndex = (size_t)ListGet(*modifiedActorIndices, i);
-		assert(actorIndex < actors->length);
-		const Actor *actor = (const Actor *)ListGet(*actors, actorIndex);
-		uint32_t indexOffset = 0;
-		assert(actor->actorModel);
-		for (size_t j = 0; j < actor->actorModel->materialCount; j++)
-		{
-			assert(drawInfo &&
-				   actor->actorModel->lods &&
-				   actor->actorModel->lods[actor->currentLod] &&
-				   actor->actorModel->lods[actor->currentLod]->indexCount);
-			drawInfo[actorIndex * j + j].indexCount = actor->actorModel->lods[actor->currentLod]->indexCount[j];
-			indexOffset += (size_t)ListGet(buffers.modelActors.indexOffsets, actorIndex);
-			drawInfo[actorIndex * j + j].firstIndex = indexOffset;
-		}
-	}
-	VulkanTest(LoadWallActors(actors), "Failed to load wall actors!");
+	// VkDrawIndexedIndirectCommand *drawInfo = buffers.actorModels.drawInfo.data;
+	// for (size_t i = 0; i < modifiedActorIndices->length; i++)
+	// {
+	// 	const size_t actorIndex = (size_t)ListGet(*modifiedActorIndices, i);
+	// 	assert(actorIndex < actors->length);
+	// 	const Actor *actor = (const Actor *)ListGet(*actors, actorIndex);
+	// 	uint32_t indexOffset = 0;
+	// 	assert(actor->actorModel);
+	// 	for (size_t j = 0; j < actor->actorModel->materialCount; j++)
+	// 	{
+	// 		assert(drawInfo &&
+	// 			   actor->actorModel->lods &&
+	// 			   actor->actorModel->lods[actor->currentLod] &&
+	// 			   actor->actorModel->lods[actor->currentLod]->indexCount);
+	// 		drawInfo[actorIndex * j + j].indexCount = actor->actorModel->lods[actor->currentLod]->indexCount[j];
+	// 		indexOffset += (size_t)ListGet(buffers.actorModels.indexOffsets, actorIndex);
+	// 		drawInfo[actorIndex * j + j].firstIndex = indexOffset;
+	// 	}
+	// }
+	VulkanTest(LoadActorWalls(actors), "Failed to load wall actors!");
 	VulkanTest(UpdateActorInstanceDataAndShadows(actors), "Failed to update actor instance data and shadows!");
 	return true;
 }
@@ -418,14 +439,15 @@ bool VK_Cleanup()
 	free(buffers.walls.indices.data);
 	free(buffers.shadows.vertices.data);
 	free(buffers.shadows.indices.data);
-	free(buffers.wallActors.vertices.data);
-	free(buffers.wallActors.indices.data);
-	free(buffers.wallActors.instanceData.data);
-	free(buffers.wallActors.drawInfo.data);
-	free(buffers.modelActors.vertices.data);
-	free(buffers.modelActors.indices.data);
-	free(buffers.modelActors.instanceData.data);
-	free(buffers.modelActors.drawInfo.data);
+	free(buffers.actorWalls.vertices.data);
+	free(buffers.actorWalls.indices.data);
+	free(buffers.actorWalls.instanceData.data);
+	free(buffers.actorWalls.drawInfo.data);
+	free(buffers.actorModels.vertices.data);
+	free(buffers.actorModels.indices.data);
+	free(buffers.actorModels.instanceData.data);
+	free(buffers.actorModels.shadedDrawInfo.data);
+	free(buffers.actorModels.unshadedDrawInfo.data);
 
 	return true;
 }
@@ -679,7 +701,7 @@ void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
 {
 	const uint32_t textureIndex = TextureIndex(texture);
 	LunaDescriptorImageInfo imageInfo = {
-		.image = textures.data[textureIndex],
+		.image = ListGet(textures, textureIndex),
 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 	};
 	if (linear && repeat)

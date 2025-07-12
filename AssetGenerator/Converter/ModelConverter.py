@@ -43,8 +43,6 @@ model_shader_map = [
 ]
 
 def ConvertModelDefinition(path):
-	total_index_count = 0
-	total_vertex_count = 0
 	# Read the file as JSON
 	with open(path, 'r') as file:
 		data = json.load(file)
@@ -80,8 +78,6 @@ def ConvertModelDefinition(path):
 
 			lod_obj.model = ParseOBJ(obj_path)
 			mdef.lods.append(lod_obj)
-			total_index_count += lod_obj.model.total_index_count
-			total_vertex_count += len(lod_obj.model.verts)
 
 	mdef.lods.sort(key=lambda lod: lod.distance)
 
@@ -98,8 +94,6 @@ def ConvertModelDefinition(path):
 	bin_data.extend(util.IntToBytes(mdef.material_count))
 	bin_data.extend(util.IntToBytes(len(mdef.skins)))
 	bin_data.extend(util.IntToBytes(len(mdef.lods)))
-	bin_data.extend(util.IntToBytes(total_index_count))
-	bin_data.extend(util.IntToBytes(total_vertex_count))
 	for skin in mdef.skins:
 		for mat in skin:
 			mat_data = skin[mat]

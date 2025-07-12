@@ -168,27 +168,27 @@ bool CreateWallPipeline()
 	return true;
 }
 
-bool CreateActorPipeline()
+bool CreateActorWallPipeline()
 {
-	LunaShaderModule actorVertShaderModule;
-	LunaShaderModule actorFragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actor"), &actorVertShaderModule),
+	LunaShaderModule vertShaderModule;
+	LunaShaderModule fragShaderModule;
+	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actor_wall"), &vertShaderModule),
 			   "Failed to create actor vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actor"), &actorFragShaderModule),
+	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actor_wall"), &fragShaderModule),
 			   "Failed to create actor fragment shader!");
 
-	const LunaPipelineShaderStageCreationInfo actorShaderStages[] = {
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
-			.module = actorVertShaderModule,
+			.module = vertShaderModule,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = actorFragShaderModule,
+			.module = fragShaderModule,
 		},
 	};
 
-	const VkVertexInputBindingDescription actorBindingDescriptions[] = {
+	const VkVertexInputBindingDescription bindingDescriptions[] = {
 		{
 			.binding = 0,
 			.stride = sizeof(ActorVertex),
@@ -196,11 +196,11 @@ bool CreateActorPipeline()
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorInstanceData),
+			.stride = sizeof(ActorWallInstanceData),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
-	const VkVertexInputAttributeDescription actorVertexDescriptions[] = {
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
 		{
 			.location = 0,
 			.binding = 0,
@@ -215,59 +215,53 @@ bool CreateActorPipeline()
 		},
 		{
 			.location = 2,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorVertex, nx),
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorWallInstanceData, transform) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorInstanceData, transform) + sizeof(vec4) * 0,
+			.offset = offsetof(ActorWallInstanceData, transform) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorInstanceData, transform) + sizeof(vec4) * 1,
+			.offset = offsetof(ActorWallInstanceData, transform) + sizeof(vec4) * 2,
 		},
 		{
 			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorInstanceData, transform) + sizeof(vec4) * 2,
+			.offset = offsetof(ActorWallInstanceData, transform) + sizeof(vec4) * 3,
 		},
 		{
 			.location = 6,
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorInstanceData, transform) + sizeof(vec4) * 3,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ActorWallInstanceData, textureIndex),
 		},
 		{
 			.location = 7,
 			.binding = 1,
-			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorInstanceData, textureIndex),
-		},
-		{
-			.location = 8,
-			.binding = 1,
 			.format = VK_FORMAT_R32_SFLOAT,
-			.offset = offsetof(ActorInstanceData, wallAngle),
+			.offset = offsetof(ActorWallInstanceData, wallAngle),
 		},
 	};
-	const VkPipelineVertexInputStateCreateInfo actorVertexInputInfo = {
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(actorBindingDescriptions) / sizeof(*actorBindingDescriptions),
-		.pVertexBindingDescriptions = actorBindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(actorVertexDescriptions) / sizeof(*actorVertexDescriptions),
-		.pVertexAttributeDescriptions = actorVertexDescriptions,
+		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.pVertexBindingDescriptions = bindingDescriptions,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const LunaGraphicsPipelineCreationInfo actorPipelineInfo = {
-		.shaderStageCount = sizeof(actorShaderStages) / sizeof(*actorShaderStages),
-		.shaderStages = actorShaderStages,
-		.vertexInputState = &actorVertexInputInfo,
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
 		.rasterizationState = &rasterizer,
@@ -278,8 +272,222 @@ bool CreateActorPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&actorPipelineInfo, &pipelines.actors),
-			   "Failed to create actor graphics pipeline!");
+	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.actorWalls),
+			   "Failed to create actor walls pipeline!");
+
+	return true;
+}
+
+bool CreateActorModelShadedPipeline()
+{
+	LunaShaderModule vertShaderModule;
+	LunaShaderModule fragShaderModule;
+	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actor_model_shaded"), &vertShaderModule),
+			   "Failed to create actor vertex shader!");
+	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actor_model_shaded"), &fragShaderModule),
+			   "Failed to create actor fragment shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescriptions[] = {
+		{
+			.binding = 0,
+			.stride = sizeof(ActorModelVertex),
+			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+		},
+		{
+			.binding = 1,
+			.stride = sizeof(ActorModelInstanceData),
+			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
+		},
+	};
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ActorModelVertex, x),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ActorModelVertex, u),
+		},
+		{
+			.location = 2,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ActorModelVertex, nx),
+		},
+		{
+			.location = 3,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 0,
+		},
+		{
+			.location = 4,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 1,
+		},
+		{
+			.location = 5,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 2,
+		},
+		{
+			.location = 6,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 3,
+		},
+		{
+			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ActorModelInstanceData, textureIndex),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.pVertexBindingDescriptions = bindingDescriptions,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &inputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &rasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.shadedActorModels),
+			   "Failed to create shaded actor models pipeline!");
+
+	return true;
+}
+
+bool CreateActorModelUnshadedPipeline()
+{
+	LunaShaderModule vertShaderModule;
+	LunaShaderModule fragShaderModule;
+	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actor_model_unshaded"), &vertShaderModule),
+			   "Failed to create actor vertex shader!");
+	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actor_model_unshaded"), &fragShaderModule),
+			   "Failed to create actor fragment shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescriptions[] = {
+		{
+			.binding = 0,
+			.stride = sizeof(ActorModelVertex),
+			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+		},
+		{
+			.binding = 1,
+			.stride = sizeof(ActorModelInstanceData),
+			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
+		},
+	};
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ActorModelVertex, x),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ActorModelVertex, u),
+		},
+		{
+			.location = 2,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 0,
+		},
+		{
+			.location = 3,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 1,
+		},
+		{
+			.location = 4,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 2,
+		},
+		{
+			.location = 5,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 3,
+		},
+		{
+			.location = 6,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ActorModelInstanceData, textureIndex),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.pVertexBindingDescriptions = bindingDescriptions,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &inputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &rasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.unshadedActorModels),
+			   "Failed to create unshaded actor models pipeline!");
 
 	return true;
 }
@@ -369,5 +577,9 @@ bool CreateGraphicsPipelines()
 	assert(sizeof(PushConstants) <= physicalDeviceLimits.maxPushConstantsSize);
 	multisampling.rasterizationSamples = msaaSamples;
 
-	return CreateWallPipeline() && CreateActorPipeline() && CreateUIPipeline();
+	return CreateWallPipeline() &&
+		   CreateActorWallPipeline() &&
+		   CreateActorModelShadedPipeline() &&
+		   CreateActorModelUnshadedPipeline() &&
+		   CreateUIPipeline();
 }

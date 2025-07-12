@@ -14,9 +14,9 @@ VkResult CreateWallBuffers();
 
 VkResult CreateShadowBuffers();
 
-VkResult CreateWallActorBuffers();
+VkResult CreateActorWallBuffers();
 
-VkResult CreateModelActorBuffers();
+VkResult CreateActorModelBuffers();
 
 VkResult CreateRoofBuffers();
 
@@ -24,9 +24,9 @@ VkResult ResizeWallBuffers();
 
 VkResult ResizeShadowBuffers();
 
-VkResult ResizeWallActorBuffers();
+VkResult ResizeActorWallBuffers();
 
-VkResult ResizeModelActorBuffers();
+VkResult ResizeActorModelBuffers();
 
 bool LoadTexture(const Image *image);
 

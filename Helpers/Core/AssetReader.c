@@ -3,6 +3,8 @@
 //
 
 #include "AssetReader.h"
+
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +18,9 @@
 List assetCacheNames;
 List assetCacheData;
 uint textureId;
-uint modelId;
+size_t modelId;
+size_t lodId;
+size_t materialId;
 Image *images[MAX_TEXTURES];
 ModelDefinition *models[MAX_MODELS];
 
@@ -329,6 +333,7 @@ ModelDefinition *LoadModel(const char *asset)
 	model->id = modelId;
 	models[modelId] = model;
 	modelId++;
+	assert(modelId < MAX_MODELS);
 
 	const size_t nameLength = strlen(asset) + 1;
 	model->name = malloc(nameLength);
@@ -339,8 +344,6 @@ ModelDefinition *LoadModel(const char *asset)
 	model->materialCount = ReadUint(assetData->data, &offset);
 	model->skinCount = ReadUint(assetData->data, &offset);
 	model->lodCount = ReadUint(assetData->data, &offset);
-	model->totalIndexCount = ReadUint(assetData->data, &offset);
-	model->totalVertexCount = ReadUint(assetData->data, &offset);
 	model->skins = malloc(sizeof(Material *) * model->skinCount);
 	CheckAlloc(model->skins);
 
@@ -353,6 +356,10 @@ ModelDefinition *LoadModel(const char *asset)
 		for (int j = 0; j < model->materialCount; j++)
 		{
 			Material *mat = &skin[j];
+
+			mat->id = materialId;
+			materialId++;
+
 			ReadString(assetData->data, &offset, mat->texture, 64);
 			GetColor(ReadUint(assetData->data, &offset), &mat->color);
 			mat->shader = ReadUint(assetData->data, &offset);
@@ -367,6 +374,9 @@ ModelDefinition *LoadModel(const char *asset)
 		CheckAlloc(model->lods[i]);
 		ModelLod *lod = model->lods[i];
 
+		lod->id = lodId;
+		lodId++;
+
 		lod->distance = ReadFloat(assetData->data, &offset);
 		lod->vertexCount = ReadUint(assetData->data, &offset);
 
@@ -374,8 +384,6 @@ ModelDefinition *LoadModel(const char *asset)
 		lod->vertexData = malloc(vertexDataSize);
 		CheckAlloc(lod->vertexData);
 		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
-
-		lod->totalIndexCount = ReadUint(assetData->data, &offset);
 
 		const size_t indexCountSize = model->materialCount * sizeof(uint);
 		lod->indexCount = malloc(indexCountSize);

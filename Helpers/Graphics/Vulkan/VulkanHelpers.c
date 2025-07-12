@@ -20,9 +20,15 @@ size_t loadedActors = 0;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
 VkPhysicalDeviceLimits physicalDeviceLimits = {0};
 VkExtent2D swapChainExtent = {0};
-LunaRenderPass renderPass = VK_NULL_HANDLE;
+LunaRenderPass renderPass = LUNA_NULL_HANDLE;
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
-Pipelines pipelines = {.walls = VK_NULL_HANDLE, .actors = VK_NULL_HANDLE, .ui = VK_NULL_HANDLE};
+Pipelines pipelines = {
+	.walls = LUNA_NULL_HANDLE,
+	.actorWalls = LUNA_NULL_HANDLE,
+	.shadedActorModels = LUNA_NULL_HANDLE,
+	.unshadedActorModels = LUNA_NULL_HANDLE,
+	.ui = LUNA_NULL_HANDLE,
+};
 uint8_t currentFrame = 0;
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
@@ -31,26 +37,29 @@ Buffers buffers = {
 	.walls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALLS_INIT,
 	.shadows.vertices.allocatedSize = sizeof(WallVertex) * 4 * MAX_WALL_ACTORS_INIT,
 	.shadows.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
-	.wallActors.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_WALL_ACTORS_INIT,
-	.wallActors.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
-	.wallActors.instanceData.allocatedSize = sizeof(ActorInstanceData) * MAX_WALL_ACTORS_INIT,
-	.wallActors.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_WALL_ACTORS_INIT,
-	.modelActors.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_MODEL_ACTOR_QUADS_INIT,
-	.modelActors.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_MODEL_ACTOR_QUADS_INIT,
-	.modelActors.instanceData.allocatedSize = sizeof(ActorInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
-	.modelActors.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorWalls.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_WALL_ACTORS_INIT,
+	.actorWalls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
+	.actorWalls.instanceData.allocatedSize = sizeof(ActorWallInstanceData) * MAX_WALL_ACTORS_INIT,
+	.actorWalls.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_WALL_ACTORS_INIT,
+	.actorModels.vertices.allocatedSize = sizeof(ActorModelVertex) * 4 * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorModels.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorModels.instanceData.allocatedSize = sizeof(ActorModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 };
 LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 List textures = {0};
 uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 TextureSamplers textureSamplers = {
-	.linearRepeat = VK_NULL_HANDLE,
-	.nearestRepeat = VK_NULL_HANDLE,
-	.linearNoRepeat = VK_NULL_HANDLE,
-	.nearestNoRepeat = VK_NULL_HANDLE,
+	.linearRepeat = LUNA_NULL_HANDLE,
+	.nearestRepeat = LUNA_NULL_HANDLE,
+	.linearNoRepeat = LUNA_NULL_HANDLE,
+	.nearestNoRepeat = LUNA_NULL_HANDLE,
 };
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 PushConstants pushConstants = {0};
+List loadedLodIds = {0};
+List lodCounts = {0};
 #pragma endregion variables
 
 
@@ -146,7 +155,6 @@ void LoadRoof(const bool hasCeiling, const uint32_t ceilingTextureIndex)
 			memcpy(indices + buffers.roof.indexCount, skyModel->lods[0]->indexData[i], sizeof(uint32_t) * indexCount);
 			buffers.roof.indexCount += indexCount;
 		}
-		assert(buffers.roof.indexCount == skyModel->totalIndexCount);
 	}
 	lunaWriteDataToBuffer(buffers.roof.vertices.buffer, vertices, buffers.roof.vertices.allocatedSize, 0);
 	lunaWriteDataToBuffer(buffers.roof.indices.buffer, indices, buffers.roof.indices.allocatedSize, 0);

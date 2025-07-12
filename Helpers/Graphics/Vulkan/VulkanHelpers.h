@@ -84,6 +84,21 @@ typedef struct ActorVertex
 	float u;
 	/// The v component of the vertex's uv
 	float v;
+} ActorVertex;
+
+typedef struct ActorModelVertex
+{
+	/// The x component of the vertex's position, in model space
+	float x;
+	/// The y component of the vertex's position, in model space
+	float y;
+	/// The z component of the vertex's position, in model space
+	float z;
+
+	/// The u component of the vertex's uv
+	float u;
+	/// The v component of the vertex's uv
+	float v;
 
 	/// The x component of the vertex's normal vector, in model space
 	float nx;
@@ -91,17 +106,25 @@ typedef struct ActorVertex
 	float ny;
 	/// The z component of the vertex's normal vector, in model space
 	float nz;
-} ActorVertex;
+} ActorModelVertex;
 
-typedef struct ActorInstanceData
+typedef struct ActorWallInstanceData
 {
 	/// The instance's transformation matrix.
 	mat4 transform;
 	/// The instance's texture index.
 	uint32_t textureIndex;
-	/// The instance's rotation, if it is a wall, otherwise undefined.
+	/// The instance's rotation.
 	float wallAngle;
-} ActorInstanceData;
+} ActorWallInstanceData;
+
+typedef struct ActorModelInstanceData
+{
+	/// The instance's transformation matrix.
+	mat4 transform;
+	/// The instance's texture index.
+	uint32_t textureIndex;
+} ActorModelInstanceData;
 
 typedef struct UiVertex
 {
@@ -162,29 +185,28 @@ typedef struct RoofBuffer
 	uint32_t indexCount;
 } RoofBuffer;
 
-typedef struct WallActorsBuffer
+typedef struct ActorWallsBuffer
 {
 	BufferRegion vertices;
 	BufferRegion indices;
 	BufferRegion instanceData;
 	BufferRegion drawInfo;
 	VkDeviceSize count;
-} WallActorsBuffer;
+} ActorWallsBuffer;
 
-typedef struct ModelActorsBuffer
+typedef struct ActorModelsBuffer
 {
 	BufferRegion vertices;
 	BufferRegion indices;
 	BufferRegion instanceData;
-	BufferRegion drawInfo;
+	BufferRegion shadedDrawInfo;
+	BufferRegion unshadedDrawInfo;
 
-	List indexOffsets;
-	/// A list of the ids of all loaded actor models in the current level. This can be used in conjunction with
-	/// @c ListFind to get an index that can be used to index nearly every other array in this struct.
-	List loadedModelIds;
-	/// An array containing the number of instances of each model index in the level.
-	List modelCounts;
-} ModelActorsBuffer;
+	// TODO: Free these?
+	List materialCounts;
+	List shadedMaterialIds;
+	List unshadedMaterialIds;
+} ActorModelsBuffer;
 
 typedef struct Buffers
 {
@@ -192,14 +214,16 @@ typedef struct Buffers
 	RoofBuffer roof;
 	IndexedVertexBuffer walls;
 	IndexedVertexBuffer shadows;
-	WallActorsBuffer wallActors;
-	ModelActorsBuffer modelActors;
+	ActorWallsBuffer actorWalls;
+	ActorModelsBuffer actorModels;
 } Buffers;
 
 typedef struct Pipelines
 {
 	LunaGraphicsPipeline walls;
-	LunaGraphicsPipeline actors;
+	LunaGraphicsPipeline actorWalls;
+	LunaGraphicsPipeline shadedActorModels;
+	LunaGraphicsPipeline unshadedActorModels;
 	LunaGraphicsPipeline ui;
 } Pipelines;
 
@@ -229,6 +253,8 @@ typedef struct PushConstants
 #pragma endregion typedefs
 
 #pragma region variables
+// TODO: Reorganize these
+
 extern SDL_Window *vulkanWindow;
 extern bool minimized;
 extern bool shouldDropFrame;

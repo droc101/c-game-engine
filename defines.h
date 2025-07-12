@@ -640,6 +640,9 @@ struct ActorConnection
 
 struct Material
 {
+	/// The runtime-generated ID of this model
+	size_t id;
+
 	/// The texture name of the material
 	char texture[64];
 	/// The tint color of the material
@@ -650,6 +653,9 @@ struct Material
 
 struct ModelLod
 {
+	/// The runtime-generated ID of this model
+	size_t id;
+
 	/// How far away the camera must be before this LOD is used
 	float distance;
 
@@ -658,8 +664,6 @@ struct ModelLod
 	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
 	float *vertexData;
 
-	/// The total number of indices in this lod
-	uint totalIndexCount;
 	/// The number of indices in each material
 	uint *indexCount;
 	/// Index data for each material
@@ -679,10 +683,6 @@ struct ModelDefinition
 	byte skinCount;
 	/// The number of LODs in the model
 	byte lodCount;
-	/// The total number of indices in the model
-	uint totalIndexCount;
-	/// The total number of vertices in the model
-	uint totalVertexCount;
 	/// The skins for this model, each an array of materialCount materials
 	Material **skins;
 	/// The LODs for this model

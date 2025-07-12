@@ -10,11 +10,11 @@
 
 VkResult InitActors(const List *actors);
 
-void LoadModelActors(const List *actors);
+void LoadActorModels(const List *actors);
 
 void LoadActorDrawInfo(const List *actors);
 
-VkResult LoadWallActors(const List *actors);
+VkResult LoadActorWalls(const List *actors);
 
 VkResult UpdateActorInstanceDataAndShadows(const List *actors);
 
