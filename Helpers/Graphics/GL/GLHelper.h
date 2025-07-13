@@ -12,7 +12,7 @@
 #define GL_VERSION_MAJOR 3
 #define GL_VERSION_MINOR 3
 #define GL_PROFILE SDL_GL_CONTEXT_PROFILE_CORE
-#define GL_VERSION_CHECK GL_VERSION_3_3
+#define GL_VERSION_CHECK GLEW_VERSION_3_3
 #define GL_VERSION_STRING "OpenGL 3.3 Core Profile"
 #define GL_INIT_FAIL_MSG "Failed to start OpenGL. Your GPU or drivers may not support the " GL_VERSION_STRING "."
 
@@ -132,14 +132,6 @@ void GL_DrawTextureRegionMod(Vector2 pos,
  * @param shade The shade of the floor
  */
 void GL_DrawFloor(Vector2 vp1, Vector2 vp2, const char *texture, float height, float shade);
-
-/**
- * Draw a shadow sprite
- * @param vp1 The first vertex
- * @param vp2 The second vertex
- * @param mdl The model -> world matrix
- */
-void GL_DrawShadow(Vector2 vp1, Vector2 vp2, const mat4 mdl);
 
 /**
  * Update the viewport size

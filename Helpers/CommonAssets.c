@@ -29,7 +29,6 @@ void InitCommonAssets()
 	SetTexParams(TEXTURE("interface_radio_unchecked"), true, false);
 	SetTexParams(TEXTURE("interface_focus_rect"), true, false);
 	SetTexParams(TEXTURE("level_sky"), true, true);
-	SetTexParams(TEXTURE("vfx_shadow"), false, false);
 
 	skyModel = LoadModel(MODEL("model_sky"));
 

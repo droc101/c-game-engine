@@ -74,7 +74,6 @@ void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rot
 
 void TriggerInit(Actor *this, const b2WorldId worldId, const KvList *params)
 {
-	this->showShadow = false;
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
 	TriggerData *data = this->extraData;
