@@ -257,51 +257,43 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 		.dynamicStates = dynamicStateBindInfos,
 	};
 
-	if (buffers.walls.objectCount)
+	if (level->hasCeiling)
 	{
-		// TODO: This draws the floor, but uses the wall buffer
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
+							   "Failed to draw floor and ceiling!");
+	} else
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
+													 buffers.sky.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.sky,
+													 &pipelineBindInfo,
+													 buffers.sky.objectCount,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw sky!");
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 6, 1, 0, 0),
+							   "Failed to draw floor!");
+	}
+
+	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
+	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
 													 buffers.walls.indices.buffer,
 													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.walls,
 													 &pipelineBindInfo,
-													 6,
+													 buffers.walls.objectCount * 6,
 													 1,
 													 0,
 													 0,
 													 0),
-							   "Failed to draw floor!");
-	}
-	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
-	{
-		// 0x57414C4C is "WALL", to encode that we are drawing the walls
-		VulkanTestReturnResult(lunaDrawBufferIndexed(NULL,
-													 buffers.walls.indices.buffer,
-													 sizeof(uint32_t) * 6,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.walls,
-													 &pipelineBindInfo,
-													 (buffers.walls.objectCount - 1) * 6,
-													 1,
-													 0,
-													 0,
-													 0x57414C4C),
 							   "Failed to draw walls!");
 	}
-
-	VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.roof.vertices.buffer,
-												 buffers.roof.indices.buffer,
-												 0,
-												 VK_INDEX_TYPE_UINT32,
-												 pipelines.walls,
-												 &pipelineBindInfo,
-												 buffers.roof.indexCount,
-												 1,
-												 0,
-												 0,
-												 0),
-						   "Failed to draw roof!");
 
 	if (buffers.actorWalls.count)
 	{
@@ -406,8 +398,8 @@ bool VK_Cleanup()
 	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
 	free(buffers.ui.vertices.data);
 	free(buffers.ui.indices.data);
-	free(buffers.roof.vertices.data);
-	free(buffers.roof.indices.data);
+	free(buffers.sky.vertices.data);
+	free(buffers.sky.indices.data);
 	free(buffers.walls.vertices.data);
 	free(buffers.walls.indices.data);
 	free(buffers.actorWalls.vertices.data);
@@ -435,22 +427,19 @@ inline void VK_Restore()
 
 bool VK_LoadLevelWalls(const Level *level)
 {
-	if (level->hasCeiling)
+	if (!level->hasCeiling)
 	{
-		pushConstants.skyVertexCount = 0;
-		pushConstants.skyTextureIndex = MAX_TEXTURES;
-	} else
-	{
-		pushConstants.skyVertexCount = skyModel->lods[0]->vertexCount;
-		pushConstants.skyTextureIndex = TextureIndex(level->ceilOrSkyTex);
+		VulkanTest(LoadSky(LoadModel(MODEL("model_sky"))), "Failed to load sky!");
 	}
+
+	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
+	pushConstants.floorTextureIndex = TextureIndex(level->floorTex);
+
 	pushConstants.fogStart = (float)level->fogStart;
 	pushConstants.fogEnd = (float)level->fogEnd;
 	pushConstants.fogColor = level->fogColor;
 
-	LoadRoof(level->hasCeiling, TextureIndex(level->ceilOrSkyTex));
-
-	buffers.walls.objectCount = level->walls.length + 1;
+	buffers.walls.objectCount = level->walls.length;
 	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.walls.objectCount;
 	buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.walls.objectCount;
 	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");

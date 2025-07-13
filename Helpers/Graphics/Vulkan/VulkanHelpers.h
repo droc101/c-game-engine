@@ -142,6 +142,16 @@ typedef struct UiVertex
 	uint32_t textureIndex;
 } UiVertex;
 
+typedef struct SkyVertex
+{
+	float x;
+	float y;
+	float z;
+
+	float u;
+	float v;
+} SkyVertex;
+
 typedef struct WallVertex
 {
 	float x;
@@ -171,13 +181,6 @@ typedef struct IndexedVertexBuffer
 	bool shouldResize;
 } IndexedVertexBuffer;
 
-typedef struct RoofBuffer
-{
-	BufferRegion vertices;
-	BufferRegion indices;
-	uint32_t indexCount;
-} RoofBuffer;
-
 typedef struct ActorWallsBuffer
 {
 	BufferRegion vertices;
@@ -195,7 +198,6 @@ typedef struct ActorModelsBuffer
 	BufferRegion shadedDrawInfo;
 	BufferRegion unshadedDrawInfo;
 
-	// TODO: Free these?
 	List materialCounts;
 	List shadedMaterialIds;
 	List unshadedMaterialIds;
@@ -204,7 +206,7 @@ typedef struct ActorModelsBuffer
 typedef struct Buffers
 {
 	IndexedVertexBuffer ui;
-	RoofBuffer roof;
+	IndexedVertexBuffer sky;
 	IndexedVertexBuffer walls;
 	ActorWallsBuffer actorWalls;
 	ActorModelsBuffer actorModels;
@@ -212,11 +214,14 @@ typedef struct Buffers
 
 typedef struct Pipelines
 {
+	LunaGraphicsPipeline ui;
+	LunaGraphicsPipeline sky;
+	LunaGraphicsPipeline ceiling;
+	LunaGraphicsPipeline floorAndCeiling;
 	LunaGraphicsPipeline walls;
 	LunaGraphicsPipeline actorWalls;
 	LunaGraphicsPipeline shadedActorModels;
 	LunaGraphicsPipeline unshadedActorModels;
-	LunaGraphicsPipeline ui;
 } Pipelines;
 
 typedef struct TextureSamplers
@@ -233,12 +238,12 @@ typedef struct PushConstants
 	float yaw;
 	mat4 translationMatrix;
 
-	uint32_t skyVertexCount;
-	uint32_t skyTextureIndex;
+	uint32_t roofTextureIndex;
+	uint32_t floorTextureIndex;
 
 	float fogStart;
 	float fogEnd;
-	uint fogColor;
+	uint32_t fogColor;
 } PushConstants;
 #pragma endregion typedefs
 
@@ -273,7 +278,7 @@ uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
 
-void LoadRoof(bool hasCeiling, uint32_t ceilingTextureIndex);
+VkResult LoadSky(const ModelDefinition *skyModel);
 
 void LoadWalls(const Level *level);
 #pragma endregion helperFunctions

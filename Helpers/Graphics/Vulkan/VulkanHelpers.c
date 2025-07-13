@@ -23,16 +23,20 @@ VkExtent2D swapChainExtent = {0};
 LunaRenderPass renderPass = LUNA_NULL_HANDLE;
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
 Pipelines pipelines = {
+	.ui = LUNA_NULL_HANDLE,
+	.sky = LUNA_NULL_HANDLE,
+	.floorAndCeiling = LUNA_NULL_HANDLE,
 	.walls = LUNA_NULL_HANDLE,
 	.actorWalls = LUNA_NULL_HANDLE,
 	.shadedActorModels = LUNA_NULL_HANDLE,
 	.unshadedActorModels = LUNA_NULL_HANDLE,
-	.ui = LUNA_NULL_HANDLE,
 };
 uint8_t currentFrame = 0;
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
 	.ui.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_UI_QUADS_INIT,
+	.sky.vertices.allocatedSize = 0,
+	.sky.indices.allocatedSize = 0,
 	.walls.vertices.allocatedSize = sizeof(WallVertex) * 4 * MAX_WALLS_INIT,
 	.walls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALLS_INIT,
 	.actorWalls.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_WALL_ACTORS_INIT,
@@ -97,65 +101,84 @@ inline uint32_t ImageIndex(const Image *image)
 	return index;
 }
 
-void LoadRoof(const bool hasCeiling, const uint32_t ceilingTextureIndex)
+VkResult LoadSky(const ModelDefinition *skyModel)
 {
-	WallVertex *vertices = buffers.roof.vertices.data;
-	uint32_t *indices = buffers.roof.indices.data;
-	if (hasCeiling)
+	buffers.sky.vertices.bytesUsed = sizeof(SkyVertex) * skyModel->lods[0]->vertexCount;
+	buffers.sky.indices.bytesUsed = 0;
+	for (uint32_t i = 0; i < skyModel->materialCount; i++)
 	{
-		vertices[0].x = -100;
-		vertices[0].y = 0.5f;
-		vertices[0].z = -100;
-		vertices[0].u = -100;
-		vertices[0].v = -100;
-		vertices[0].textureIndex = ceilingTextureIndex;
-
-		vertices[1].x = 100;
-		vertices[1].y = 0.5f;
-		vertices[1].z = -100;
-		vertices[1].u = 100;
-		vertices[1].v = -100;
-		vertices[1].textureIndex = ceilingTextureIndex;
-
-		vertices[2].x = 100;
-		vertices[2].y = 0.5f;
-		vertices[2].z = 100;
-		vertices[2].u = 100;
-		vertices[2].v = 100;
-		vertices[2].textureIndex = ceilingTextureIndex;
-
-		vertices[3].x = -100;
-		vertices[3].y = 0.5f;
-		vertices[3].z = 100;
-		vertices[3].u = -100;
-		vertices[3].v = 100;
-		vertices[3].textureIndex = ceilingTextureIndex;
-
-		indices[0] = 0;
-		indices[1] = 1;
-		indices[2] = 2;
-		indices[3] = 0;
-		indices[4] = 2;
-		indices[5] = 3;
-		buffers.roof.indexCount = 6;
-	} else
-	{
-		for (uint32_t i = 0; i < pushConstants.skyVertexCount; i++)
-		{
-			// Copy {x, y, z, u, v} and discard {nx, ny, nz}
-			memcpy(&vertices[i], &skyModel->lods[0]->vertexData[i * 8], sizeof(float) * 5);
-			vertices[i].textureIndex = pushConstants.skyTextureIndex;
-		}
-		buffers.roof.indexCount = 0;
-		for (uint32_t i = 0; i < skyModel->materialCount; i++)
-		{
-			const size_t indexCount = skyModel->lods[0]->indexCount[i];
-			memcpy(indices + buffers.roof.indexCount, skyModel->lods[0]->indexData[i], sizeof(uint32_t) * indexCount);
-			buffers.roof.indexCount += indexCount;
-		}
+		buffers.sky.indices.bytesUsed += sizeof(uint32_t) * skyModel->lods[0]->indexCount[i];
 	}
-	lunaWriteDataToBuffer(buffers.roof.vertices.buffer, vertices, buffers.roof.vertices.allocatedSize, 0);
-	lunaWriteDataToBuffer(buffers.roof.indices.buffer, indices, buffers.roof.indices.allocatedSize, 0);
+	if (buffers.sky.vertices.allocatedSize == 0 || buffers.sky.indices.allocatedSize == 0)
+	{
+		assert(buffers.sky.vertices.allocatedSize == 0 && buffers.sky.indices.allocatedSize == 0);
+		const LunaBufferCreationInfo vertexBufferCreationInfo = {
+			.size = buffers.sky.vertices.bytesUsed,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.sky.vertices.buffer),
+							   "Failed to create sky vertex buffer!");
+		buffers.sky.vertices.data = malloc(buffers.sky.vertices.bytesUsed);
+		CheckAlloc(buffers.sky.vertices.data);
+		buffers.sky.vertices.allocatedSize = buffers.sky.vertices.bytesUsed;
+
+		const LunaBufferCreationInfo indexBufferCreationInfo = {
+			.size = buffers.sky.indices.bytesUsed,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.sky.indices.buffer),
+							   "Failed to create sky index buffer!");
+		buffers.sky.indices.data = malloc(buffers.sky.indices.bytesUsed);
+		CheckAlloc(buffers.sky.indices.data);
+		buffers.sky.indices.allocatedSize = buffers.sky.indices.bytesUsed;
+	} else if (buffers.sky.vertices.allocatedSize < buffers.sky.vertices.bytesUsed ||
+			   buffers.sky.indices.allocatedSize < buffers.sky.indices.bytesUsed)
+	{
+		lunaDestroyBuffer(buffers.sky.vertices.buffer);
+		const LunaBufferCreationInfo vertexBufferCreationInfo = {
+			.size = buffers.sky.vertices.bytesUsed,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.sky.vertices.buffer),
+							   "Failed to recreate sky vertex buffer!");
+		void *newVertices = realloc(buffers.sky.vertices.data, buffers.sky.vertices.bytesUsed);
+		CheckAlloc(newVertices);
+		buffers.sky.vertices.data = newVertices;
+		buffers.sky.vertices.allocatedSize = buffers.sky.vertices.bytesUsed;
+
+		lunaDestroyBuffer(buffers.sky.indices.buffer);
+		const LunaBufferCreationInfo indexBufferCreationInfo = {
+			.size = buffers.sky.indices.bytesUsed,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.sky.indices.buffer),
+							   "Failed to recreate sky index buffer!");
+		void *newIndices = realloc(buffers.sky.indices.data, buffers.sky.indices.bytesUsed);
+		CheckAlloc(newIndices);
+		buffers.sky.indices.data = newIndices;
+		buffers.sky.indices.allocatedSize = buffers.sky.indices.bytesUsed;
+	}
+
+
+	SkyVertex *vertices = buffers.sky.vertices.data;
+	uint32_t *indices = buffers.sky.indices.data;
+	for (uint32_t i = 0; i < skyModel->lods[0]->vertexCount; i++)
+	{
+		// Copy {x, y, z, u, v} and discard {nx, ny, nz}
+		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 8, sizeof(float) * 5);
+	}
+	buffers.sky.objectCount = 0;
+	for (uint32_t i = 0; i < skyModel->materialCount; i++)
+	{
+		memcpy(indices + buffers.sky.objectCount,
+			   skyModel->lods[0]->indexData[i],
+			   sizeof(uint32_t) * skyModel->lods[0]->indexCount[i]);
+		buffers.sky.objectCount += skyModel->lods[0]->indexCount[i];
+	}
+	lunaWriteDataToBuffer(buffers.sky.vertices.buffer, vertices, buffers.sky.vertices.bytesUsed, 0);
+	lunaWriteDataToBuffer(buffers.sky.indices.buffer, indices, buffers.sky.indices.bytesUsed, 0);
+
+	return VK_SUCCESS;
 }
 
 void LoadWalls(const Level *level)
@@ -163,44 +186,9 @@ void LoadWalls(const Level *level)
 	WallVertex *vertices = buffers.walls.vertices.data;
 	uint32_t *indices = buffers.walls.indices.data;
 
-	vertices[0].x = -100;
-	vertices[0].y = -0.5f;
-	vertices[0].z = -100;
-	vertices[0].u = -100;
-	vertices[0].v = -100;
-	vertices[0].textureIndex = TextureIndex(level->floorTex);
-
-	vertices[1].x = 100;
-	vertices[1].y = -0.5f;
-	vertices[1].z = -100;
-	vertices[1].u = 100;
-	vertices[1].v = -100;
-	vertices[1].textureIndex = TextureIndex(level->floorTex);
-
-	vertices[2].x = 100;
-	vertices[2].y = -0.5f;
-	vertices[2].z = 100;
-	vertices[2].u = 100;
-	vertices[2].v = 100;
-	vertices[2].textureIndex = TextureIndex(level->floorTex);
-
-	vertices[3].x = -100;
-	vertices[3].y = -0.5f;
-	vertices[3].z = 100;
-	vertices[3].u = -100;
-	vertices[3].v = 100;
-	vertices[3].textureIndex = TextureIndex(level->floorTex);
-
-	indices[0] = 0;
-	indices[1] = 1;
-	indices[2] = 2;
-	indices[3] = 0;
-	indices[4] = 2;
-	indices[5] = 3;
-
-	for (uint32_t i = 1; i < buffers.walls.objectCount; i++)
+	for (uint32_t i = 0; i < buffers.walls.objectCount; i++)
 	{
-		const Wall *wall = ListGet(level->walls, i - 1);
+		const Wall *wall = ListGet(level->walls, i);
 		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
 		const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};

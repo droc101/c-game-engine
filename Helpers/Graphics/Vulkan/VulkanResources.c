@@ -151,37 +151,6 @@ VkResult CreateActorModelBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateRoofBuffers()
-{
-	const ModelDefinition *skyModel = LoadModel(MODEL("model_sky"));
-	for (uint32_t i = 0; i < skyModel->materialCount; i++)
-	{
-		buffers.roof.indexCount += skyModel->lods[0]->indexCount[i];
-	}
-	buffers.roof.vertices.allocatedSize = sizeof(WallVertex) * skyModel->lods[0]->vertexCount;
-	buffers.roof.indices.allocatedSize = sizeof(uint32_t) * buffers.roof.indexCount;
-
-	const LunaBufferCreationInfo vertexBufferCreationInfo = {
-		.size = buffers.roof.vertices.allocatedSize,
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.roof.vertices.buffer),
-						   "Failed to create roof vertex buffer!");
-	buffers.roof.vertices.data = malloc(buffers.roof.vertices.allocatedSize);
-	CheckAlloc(buffers.roof.vertices.data);
-
-	const LunaBufferCreationInfo indexBufferCreationInfo = {
-		.size = buffers.roof.indices.allocatedSize,
-		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.roof.indices.buffer),
-						   "Failed to create roof index buffer!");
-	buffers.roof.indices.data = malloc(buffers.roof.indices.allocatedSize);
-	CheckAlloc(buffers.roof.indices.data);
-
-	return VK_SUCCESS;
-}
-
 VkResult ResizeWallBuffers()
 {
 	if (buffers.walls.vertices.allocatedSize < buffers.walls.vertices.bytesUsed)

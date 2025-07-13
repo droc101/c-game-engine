@@ -16,8 +16,6 @@ VkResult CreateActorWallBuffers();
 
 VkResult CreateActorModelBuffers();
 
-VkResult CreateRoofBuffers();
-
 VkResult ResizeWallBuffers();
 
 VkResult ResizeActorWallBuffers();
