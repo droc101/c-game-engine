@@ -274,10 +274,10 @@ void DrawRectInternal(const float ndcStartX,
 					  const uint32_t textureIndex)
 {
 	const mat4 matrix = {
-		{ndcStartX, ndcStartY, startU, startV},
 		{ndcEndX, ndcStartY, endU, startV},
-		{ndcEndX, ndcEndY, endU, endV},
+		{ndcStartX, ndcStartY, startU, startV},
 		{ndcStartX, ndcEndY, startU, endV},
+		{ndcEndX, ndcEndY, endU, endV},
 	};
 	DrawQuadInternal(matrix, color, textureIndex);
 }

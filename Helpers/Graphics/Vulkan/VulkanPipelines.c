@@ -14,11 +14,19 @@ static const VkPipelineViewportStateCreateInfo viewportState = {
 	.scissorCount = 1,
 };
 
-static const VkPipelineRasterizationStateCreateInfo rasterizer = {
+static const VkPipelineRasterizationStateCreateInfo cullingRasterizer = {
+	.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+	.polygonMode = VK_POLYGON_MODE_FILL,
+	.cullMode = VK_CULL_MODE_BACK_BIT,
+	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+	.lineWidth = 1,
+};
+
+static const VkPipelineRasterizationStateCreateInfo noncullingRasterizer = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 	.polygonMode = VK_POLYGON_MODE_FILL,
 	.cullMode = VK_CULL_MODE_NONE,
-	.frontFace = VK_FRONT_FACE_CLOCKWISE,
+	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 	.lineWidth = 1,
 };
 
@@ -144,7 +152,7 @@ bool CreateUIPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -212,7 +220,7 @@ bool CreateSkyPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -259,7 +267,7 @@ bool CreateFloorAndCeilingPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -336,7 +344,7 @@ bool CreateWallPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &noncullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -445,7 +453,7 @@ bool CreateActorWallPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &noncullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -555,7 +563,7 @@ bool CreateActorModelShadedPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -659,7 +667,7 @@ bool CreateActorModelUnshadedPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
