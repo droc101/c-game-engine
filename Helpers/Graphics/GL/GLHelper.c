@@ -211,6 +211,7 @@ bool GL_Init(SDL_Window *wnd)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 	glDisable(GL_SCISSOR_TEST);
 
 	char *vendor = (char *)glGetString(GL_VENDOR);
@@ -597,7 +598,7 @@ void GL_DrawRect(const Vector2 pos, const Vector2 size, const Color color)
 		{(float)ndcStartPos.x, (float)ncdEndPos.y},
 	};
 
-	const uint indices[] = {0, 1, 2, 0, 2, 3};
+	const uint indices[] = {0, 2, 1, 0, 3, 2};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -713,7 +714,7 @@ void GL_DrawTexture_Internal(const Vector2 pos,
 		{(float)ndcStartPos.x, (float)ndcEndPos.y, 0.0f, 1.0f},
 	};
 
-	const uint indices[] = {0, 1, 2, 0, 2, 3};
+	const uint indices[] = {0, 2, 1, 0, 3, 2};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -882,6 +883,7 @@ void GL_SetLevelParams(mat4 *mvp, const Level *l)
 
 inline void GL_Enable3D()
 {
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -889,6 +891,7 @@ inline void GL_Enable3D()
 
 inline void GL_Disable3D()
 {
+	glEnable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_MULTISAMPLE);
 	glClear(GL_DEPTH_BUFFER_BIT);
