@@ -937,13 +937,14 @@ void GL_GetViewModelMatrix(mat4 *out)
 
 	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
 	glm_mat4_identity(perspectiveMatrix);
-	glm_perspective(glm_rad(70), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
+	glm_perspective(glm_rad(VIEWMODEL_FOV), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix, (vec3){0.5f, -0.35f + ((float)GetState()->cameraY * 0.2f), 0});
+	glm_translate(translationMatrix, GetState()->viewmodel.translation);
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_rotate(rotationMatrix, glm_rad(5), (vec3){0, 1, 0});
+	// TODO rotation other than yaw
+	glm_rotate(rotationMatrix, GetState()->viewmodel.rotation[1], (vec3){0, 1, 0});
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 
@@ -1116,22 +1117,25 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 
 	free(worldViewMatrix);
 
-	glClear(GL_DEPTH_BUFFER_BIT);
+	if (GetState()->viewmodel.enabled)
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-	mat4 viewModelMatrix;
-	GL_GetViewModelMatrix(&viewModelMatrix);
+		mat4 viewModelMatrix;
+		GL_GetViewModelMatrix(&viewModelMatrix);
 
-	GL_SharedUniforms uniforms;
-	glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
-	uniforms.cameraYaw = 0;
-	uniforms.fogStart = (float)1000;
-	uniforms.fogEnd = (float)1001;
+		GL_SharedUniforms uniforms;
+		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
+		uniforms.cameraYaw = 0;
+		uniforms.fogStart = (float)1000;
+		uniforms.fogEnd = (float)1001;
 
-	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	GL_RenderModel(LoadModel(MODEL("model_eraser")), GLM_MAT4_IDENTITY, 0);
+		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0);
+	}
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	GL_Disable3D();

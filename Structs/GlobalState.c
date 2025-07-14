@@ -65,6 +65,15 @@ void InitState()
 	state.textBoxActive = false;
 	state.cam = CreateCamera();
 
+	state.viewmodel.enabled = true;
+	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
+	state.viewmodel.translation[0] = 0.5f;
+	state.viewmodel.translation[2] = 0.0f;
+	state.viewmodel.rotation[0] = 0.0f;
+	state.viewmodel.rotation[1] = 0.0872665f; // 5deg
+	state.viewmodel.rotation[2] = 0.0f;
+	state.viewmodel.modelSkin = 0;
+
 	UpdateVolume();
 
 	StopMusic();
