@@ -246,6 +246,12 @@ bool CreateViewModelPipeline()
 			.format = VK_FORMAT_R32_UINT,
 			.offset = offsetof(ModelInstanceData, textureIndex),
 		},
+		{
+			.location = 8,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, color),
+		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -662,6 +668,12 @@ bool CreateActorModelShadedPipeline()
 			.format = VK_FORMAT_R32_UINT,
 			.offset = offsetof(ModelInstanceData, textureIndex),
 		},
+		{
+			.location = 8,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, color),
+		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -765,6 +777,12 @@ bool CreateActorModelUnshadedPipeline()
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = offsetof(ModelInstanceData, textureIndex),
+		},
+		{
+			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, color),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {

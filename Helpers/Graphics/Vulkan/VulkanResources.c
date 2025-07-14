@@ -81,6 +81,7 @@ VkResult CreateViewModelBuffers()
 	memcpy(vertexData, model->lods[0]->vertexData, vertexSize);
 	for (uint8_t i = 0; i < model->materialCount; i++)
 	{
+		const Material *material = &model->skins[viewmodel->modelSkin][i];
 		memcpy(indexData + sizeof(uint32_t) * indexCount,
 			   model->lods[0]->indexData[i],
 			   sizeof(uint32_t) * model->lods[0]->indexCount[i]);
@@ -88,7 +89,8 @@ VkResult CreateViewModelBuffers()
 		buffers.viewModel.instanceDatas[i].transform[1][1] = 1;
 		buffers.viewModel.instanceDatas[i].transform[2][2] = 1;
 		buffers.viewModel.instanceDatas[i].transform[3][3] = 1;
-		buffers.viewModel.instanceDatas[i].textureIndex = TextureIndex(model->skins[viewmodel->modelSkin][i].texture);
+		buffers.viewModel.instanceDatas[i].textureIndex = TextureIndex(material->texture);
+		buffers.viewModel.instanceDatas[i].color = material->color;
 		drawInfos[i].indexCount = model->lods[0]->indexCount[i];
 		drawInfos[i].instanceCount = 1;
 		drawInfos[i].firstIndex = indexCount;

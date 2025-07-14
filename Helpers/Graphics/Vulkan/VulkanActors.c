@@ -337,7 +337,7 @@ VkResult UpdateActorInstanceData(const List *actors)
 			for (byte j = 0; j < actor->actorModel->materialCount; j++)
 			{
 				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
-				size_t index;
+				size_t index = 0;
 				switch (material.shader)
 				{
 					case SHADER_SHADED:
@@ -356,6 +356,7 @@ VkResult UpdateActorInstanceData(const List *actors)
 				ModelInstanceData *offsetInstanceData = buffers.actorModels.instanceData.data + offsets[index];
 				memcpy(offsetInstanceData->transform, transformMatrix, sizeof(mat4));
 				offsetInstanceData->textureIndex = TextureIndex(material.texture);
+				offsetInstanceData->color = material.color;
 				offsets[index] += sizeof(ModelInstanceData);
 			}
 		} else if (actor->actorWall)

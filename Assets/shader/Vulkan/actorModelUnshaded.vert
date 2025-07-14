@@ -17,13 +17,15 @@ layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec2 inUV;
 layout(location = 2) in mat4 inTransform;
 layout(location = 6) in uint inTextureIndex;
+layout(location = 7) in vec4 inColor;
 
 layout(location = 0) out vec2 outUV;
 layout(location = 1) flat out uint outTextureIndex;
-// layout (location = 2) out float outShading;
+layout(location = 2) out vec4 outColor;
 
 void main() {
-	gl_Position = pushConstants.translationMatrix * inTransform * vec4(inVertex, 1.0);
 	outUV = inUV;
 	outTextureIndex = inTextureIndex;
+	outColor = inColor;
+	gl_Position = pushConstants.translationMatrix * inTransform * vec4(inVertex, 1.0);
 }

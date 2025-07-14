@@ -263,6 +263,7 @@ void UpdateTranslationMatrix(const Camera *camera)
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, pushConstants.translationMatrix);
 }
 
+// TODO: This positions the model slightly differently than OpenGL does
 void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 {
 	mat4 perspectiveMatrix;

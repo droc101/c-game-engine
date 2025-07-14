@@ -115,6 +115,8 @@ typedef struct ModelInstanceData
 	mat4 transform;
 	/// The instance's texture index.
 	uint32_t textureIndex;
+	/// The tint color of the instance
+	Color color;
 } ModelInstanceData;
 
 typedef struct SkyVertex
