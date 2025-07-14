@@ -156,6 +156,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	const float velocity = Vector2Length(b2Body_GetLinearVelocity(l->player.bodyId));
 	const float bobHeight = remap(velocity, 0, MOVE_SPEED, 0, 0.003);
 	state->cameraY = 0.1 + sin((double)state->physicsFrame / 7.0) * bobHeight;
+	state->viewmodel.translation[1] = -0.35f + ((float)GetState()->cameraY * 0.2f);
 
 	l->player.angle = wrap(l->player.angle, 0, 2 * PI);
 

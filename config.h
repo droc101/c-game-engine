@@ -95,6 +95,7 @@
 
 /// Field of view
 #define FOV 90
+#define VIEWMODEL_FOV 70
 /// Near clipping plane
 #define NEAR_Z 0.01
 /// Far clipping plane

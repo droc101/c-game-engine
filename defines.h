@@ -33,6 +33,7 @@ typedef enum AssetType AssetType;
 typedef enum ParamType ParamType;
 
 // Struct forward declarations
+typedef struct Viewmodel Viewmodel;
 typedef struct GlobalState GlobalState;
 typedef b2Vec2 Vector2;
 typedef struct Camera Camera;
@@ -249,6 +250,15 @@ enum ParamType
 #pragma endregion
 
 #pragma region Struct definitions
+
+struct Viewmodel
+{
+	bool enabled;
+	ModelDefinition *model;
+	uint modelSkin;
+	vec3 translation;
+	vec3 rotation;
+};
 
 struct KvList
 {
@@ -482,6 +492,8 @@ struct GlobalState
 	double cameraY;
 	/// The scale of the UI.
 	double uiScale;
+
+	Viewmodel viewmodel;
 
 	/// Game options
 	Options options;
