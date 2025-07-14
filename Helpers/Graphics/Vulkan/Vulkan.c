@@ -21,8 +21,8 @@ bool VK_Init(SDL_Window *window)
 	vulkanWindow = window;
 	// clang-format off
 	if (CreateInstance() && CreateSurface() && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
-		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() && CreateBuffers() &&
-		CreateDescriptorSets())
+		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
+		CreateDescriptorSets() && CreateBuffers())
 	{
 		// clang-format on
 
@@ -194,7 +194,7 @@ VkResult VK_FrameEnd()
 	return VK_SUCCESS;
 }
 
-VkResult VK_RenderLevel(const Level *level, const Camera *camera)
+VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel)
 {
 	if (loadedLevel != level)
 	{
@@ -315,6 +315,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 															 sizeof(VkDrawIndexedIndirectCommand)),
 							   "Failed to draw wall actors!");
 	}
+
 	if (buffers.actorModels.shadedMaterialIds.length)
 	{
 		lunaBindVertexBuffers(0,
@@ -358,6 +359,26 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 							   "Failed to draw unshaded model actors!");
 	}
 
+	if (viewmodel->enabled)
+	{
+		UpdateViewModelMatrix(viewmodel);
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.viewModel.vertices, buffers.viewModel.instanceDataBuffer},
+							  (VkDeviceSize[]){0, 0});
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.viewModel.indices,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.viewModel,
+															 &pipelineBindInfo,
+															 buffers.viewModel.drawInfo,
+															 0,
+															 buffers.viewModel.drawCount,
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw view model!");
+	}
+
 	if (UnlockLodThreadMutex() != 0)
 	{
 		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
@@ -398,6 +419,7 @@ bool VK_Cleanup()
 	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
 	free(buffers.ui.vertices.data);
 	free(buffers.ui.indices.data);
+	free(buffers.viewModel.instanceDatas);
 	free(buffers.sky.vertices.data);
 	free(buffers.sky.indices.data);
 	free(buffers.walls.vertices.data);

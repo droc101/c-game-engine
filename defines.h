@@ -543,7 +543,7 @@ struct Actor
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
 	/// The index of the active skin for the actor's model
-	int currentSkinIndex;
+	uint currentSkinIndex;
 	/// The current LOD level of the actor's model, re-calculated each physics tick
 	uint currentLod;
 
@@ -552,7 +552,7 @@ struct Actor
 
 	/// The actor type index
 	/// @warning Do not change this after creation
-	int actorType;
+	uint actorType;
 	/// The function to call when the actor is initialized
 	/// @note This should only be called once, when the actor is created
 	ActorInitFunction Init;

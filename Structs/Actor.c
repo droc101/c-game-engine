@@ -85,7 +85,7 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
-				   const int actorType,
+				   const uint actorType,
 				   KvList *params,
 				   const b2WorldId worldId)
 {

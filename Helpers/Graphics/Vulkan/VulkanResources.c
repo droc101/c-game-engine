@@ -32,6 +32,89 @@ VkResult CreateUiBuffers()
 	return VK_SUCCESS;
 }
 
+VkResult CreateViewModelBuffers()
+{
+	const Viewmodel *viewmodel = &GetState()->viewmodel;
+	const ModelDefinition *model = viewmodel->model;
+	const size_t vertexSize = sizeof(ModelVertex) * model->lods[0]->vertexCount;
+	size_t indexSize = 0;
+
+	for (uint8_t i = 0; i < model->materialCount; i++)
+	{
+		indexSize += sizeof(uint32_t) * model->lods[0]->indexCount[i];
+	}
+
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = vertexSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.size = indexSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+	};
+	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
+		.size = sizeof(ModelInstanceData) * model->materialCount,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	const LunaBufferCreationInfo drawInfoBufferCreationInfo = {
+		.size = sizeof(VkDrawIndexedIndirectCommand) * model->materialCount,
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.viewModel.vertices),
+						   "Failed to create view model vertex buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.viewModel.indices),
+						   "Failed to create view model index buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(&instanceDataBufferCreationInfo, &buffers.viewModel.instanceDataBuffer),
+						   "Failed to create view model instance data buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(&drawInfoBufferCreationInfo, &buffers.viewModel.drawInfo),
+						   "Failed to create view model draw info buffer!");
+
+	uint32_t indexCount = 0;
+	void *vertexData = malloc(vertexSize);
+	CheckAlloc(vertexData);
+	void *indexData = malloc(indexSize);
+	CheckAlloc(indexData);
+	buffers.viewModel.instanceDatas = calloc(model->materialCount, sizeof(ModelInstanceData));
+	CheckAlloc(buffers.viewModel.instanceDatas);
+	VkDrawIndexedIndirectCommand *drawInfos = calloc(model->materialCount, sizeof(VkDrawIndexedIndirectCommand));
+	CheckAlloc(drawInfos);
+	memcpy(vertexData, model->lods[0]->vertexData, vertexSize);
+	for (uint8_t i = 0; i < model->materialCount; i++)
+	{
+		memcpy(indexData + sizeof(uint32_t) * indexCount,
+			   model->lods[0]->indexData[i],
+			   sizeof(uint32_t) * model->lods[0]->indexCount[i]);
+		buffers.viewModel.instanceDatas[i].transform[0][0] = 1;
+		buffers.viewModel.instanceDatas[i].transform[1][1] = 1;
+		buffers.viewModel.instanceDatas[i].transform[2][2] = 1;
+		buffers.viewModel.instanceDatas[i].transform[3][3] = 1;
+		buffers.viewModel.instanceDatas[i].textureIndex = TextureIndex(model->skins[viewmodel->modelSkin][i].texture);
+		drawInfos[i].indexCount = model->lods[0]->indexCount[i];
+		drawInfos[i].instanceCount = 1;
+		drawInfos[i].firstIndex = indexCount;
+		drawInfos[i].firstInstance = i;
+		indexCount += model->lods[0]->indexCount[i];
+	}
+
+	buffers.viewModel.drawCount = model->materialCount;
+	lunaWriteDataToBuffer(buffers.viewModel.vertices, vertexData, vertexSize, 0);
+	lunaWriteDataToBuffer(buffers.viewModel.indices, indexData, indexSize, 0);
+	lunaWriteDataToBuffer(buffers.viewModel.instanceDataBuffer,
+						  buffers.viewModel.instanceDatas,
+						  sizeof(ModelInstanceData) * model->materialCount,
+						  0);
+	lunaWriteDataToBuffer(buffers.viewModel.drawInfo,
+						  drawInfos,
+						  sizeof(VkDrawIndexedIndirectCommand) * model->materialCount,
+						  0);
+
+	free(vertexData);
+	free(indexData);
+	free(drawInfos);
+
+	return VK_SUCCESS;
+}
+
 VkResult CreateWallBuffers()
 {
 	const LunaBufferCreationInfo vertexBufferCreationInfo = {

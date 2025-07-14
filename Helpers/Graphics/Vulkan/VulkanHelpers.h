@@ -71,22 +71,23 @@ typedef enum VendorIDs
 	QUALCOMM = 0x5143,
 } VendorIDs;
 
-typedef struct ActorVertex
+typedef struct UiVertex
 {
-	/// The x component of the vertex's position, in model space
 	float x;
-	/// The y component of the vertex's position, in model space
 	float y;
-	/// The z component of the vertex's position, in model space
-	float z;
 
-	/// The u component of the vertex's uv
 	float u;
-	/// The v component of the vertex's uv
 	float v;
-} ActorVertex;
 
-typedef struct ActorModelVertex
+	float r;
+	float g;
+	float b;
+	float a;
+
+	uint32_t textureIndex;
+} UiVertex;
+
+typedef struct ModelVertex
 {
 	/// The x component of the vertex's position, in model space
 	float x;
@@ -106,41 +107,15 @@ typedef struct ActorModelVertex
 	float ny;
 	/// The z component of the vertex's normal vector, in model space
 	float nz;
-} ActorModelVertex;
+} ModelVertex;
 
-typedef struct ActorWallInstanceData
+typedef struct ModelInstanceData
 {
 	/// The instance's transformation matrix.
 	mat4 transform;
 	/// The instance's texture index.
 	uint32_t textureIndex;
-	/// The instance's rotation.
-	float wallAngle;
-} ActorWallInstanceData;
-
-typedef struct ActorModelInstanceData
-{
-	/// The instance's transformation matrix.
-	mat4 transform;
-	/// The instance's texture index.
-	uint32_t textureIndex;
-} ActorModelInstanceData;
-
-typedef struct UiVertex
-{
-	float x;
-	float y;
-
-	float u;
-	float v;
-
-	float r;
-	float g;
-	float b;
-	float a;
-
-	uint32_t textureIndex;
-} UiVertex;
+} ModelInstanceData;
 
 typedef struct SkyVertex
 {
@@ -165,6 +140,31 @@ typedef struct WallVertex
 	float wallAngle;
 } WallVertex;
 
+typedef struct ActorVertex
+{
+	/// The x component of the vertex's position, in model space
+	float x;
+	/// The y component of the vertex's position, in model space
+	float y;
+	/// The z component of the vertex's position, in model space
+	float z;
+
+	/// The u component of the vertex's uv
+	float u;
+	/// The v component of the vertex's uv
+	float v;
+} ActorVertex;
+
+typedef struct ActorWallInstanceData
+{
+	/// The instance's transformation matrix.
+	mat4 transform;
+	/// The instance's texture index.
+	uint32_t textureIndex;
+	/// The instance's rotation.
+	float wallAngle;
+} ActorWallInstanceData;
+
 typedef struct BufferRegion
 {
 	LunaBuffer buffer;
@@ -180,6 +180,16 @@ typedef struct IndexedVertexBuffer
 	uint32_t objectCount;
 	bool shouldResize;
 } IndexedVertexBuffer;
+
+typedef struct ViewModelBuffer
+{
+	LunaBuffer vertices;
+	LunaBuffer indices;
+	LunaBuffer instanceDataBuffer;
+	ModelInstanceData *instanceDatas;
+	LunaBuffer drawInfo;
+	uint32_t drawCount;
+} ViewModelBuffer;
 
 typedef struct ActorWallsBuffer
 {
@@ -206,6 +216,7 @@ typedef struct ActorModelsBuffer
 typedef struct Buffers
 {
 	IndexedVertexBuffer ui;
+	ViewModelBuffer viewModel;
 	IndexedVertexBuffer sky;
 	IndexedVertexBuffer walls;
 	ActorWallsBuffer actorWalls;
@@ -215,8 +226,8 @@ typedef struct Buffers
 typedef struct Pipelines
 {
 	LunaGraphicsPipeline ui;
+	LunaGraphicsPipeline viewModel;
 	LunaGraphicsPipeline sky;
-	LunaGraphicsPipeline ceiling;
 	LunaGraphicsPipeline floorAndCeiling;
 	LunaGraphicsPipeline walls;
 	LunaGraphicsPipeline actorWalls;
@@ -285,6 +296,8 @@ void LoadWalls(const Level *level);
 
 #pragma region drawingHelpers
 void UpdateTranslationMatrix(const Camera *camera);
+
+void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
 void DrawRectInternal(float ndcStartX,
 					  float ndcStartY,

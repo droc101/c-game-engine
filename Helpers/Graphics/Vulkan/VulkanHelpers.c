@@ -24,6 +24,7 @@ LunaRenderPass renderPass = LUNA_NULL_HANDLE;
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
 Pipelines pipelines = {
 	.ui = LUNA_NULL_HANDLE,
+	.viewModel = LUNA_NULL_HANDLE,
 	.sky = LUNA_NULL_HANDLE,
 	.floorAndCeiling = LUNA_NULL_HANDLE,
 	.walls = LUNA_NULL_HANDLE,
@@ -43,9 +44,9 @@ Buffers buffers = {
 	.actorWalls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
 	.actorWalls.instanceData.allocatedSize = sizeof(ActorWallInstanceData) * MAX_WALL_ACTORS_INIT,
 	.actorWalls.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_WALL_ACTORS_INIT,
-	.actorModels.vertices.allocatedSize = sizeof(ActorModelVertex) * 4 * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorModels.vertices.allocatedSize = sizeof(ModelVertex) * 4 * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_MODEL_ACTOR_QUADS_INIT,
-	.actorModels.instanceData.allocatedSize = sizeof(ActorModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
+	.actorModels.instanceData.allocatedSize = sizeof(ModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 };
@@ -240,12 +241,12 @@ void LoadWalls(const Level *level)
 
 void UpdateTranslationMatrix(const Camera *camera)
 {
-	mat4 perspective;
+	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(camera->fov),
 						  (float)swapChainExtent.width / (float)swapChainExtent.height,
 						  NEAR_Z,
 						  FAR_Z,
-						  perspective);
+						  perspectiveMatrix);
 
 	vec3 viewTarget = {cosf(camera->yaw), 0, sinf(camera->yaw)};
 
@@ -256,10 +257,41 @@ void UpdateTranslationMatrix(const Camera *camera)
 	vec3 cameraPosition = {camera->x, camera->y, camera->z};
 	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
 
-	mat4 view;
-	glm_lookat_lh_zo(cameraPosition, viewTarget, (vec3){0.0f, -1.0f, 0.0f}, view);
+	mat4 viewMatrix;
+	glm_lookat_lh_zo(cameraPosition, viewTarget, (vec3){0.0f, -1.0f, 0.0f}, viewMatrix);
 
-	glm_mat4_mul(perspective, view, pushConstants.translationMatrix);
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, pushConstants.translationMatrix);
+}
+
+void UpdateViewModelMatrix(const Viewmodel *viewmodel)
+{
+	mat4 perspectiveMatrix;
+	glm_perspective_lh_zo(glm_rad(VIEWMODEL_FOV),
+						  (float)swapChainExtent.width / (float)swapChainExtent.height,
+						  NEAR_Z,
+						  FAR_Z,
+						  perspectiveMatrix);
+
+	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_translate(translationMatrix,
+				  (vec3){viewmodel->translation[0], -viewmodel->translation[1], viewmodel->translation[2]});
+
+	// TODO rotation other than yaw
+	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_rotate(rotationMatrix, viewmodel->rotation[1], (vec3){0.0f, -1.0f, 0.0f});
+
+	mat4 viewModelMatrix;
+	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
+	glm_mat4_mul(perspectiveMatrix, translationMatrix, viewModelMatrix);
+
+	for (uint32_t i = 0; i < buffers.viewModel.drawCount; i++)
+	{
+		memcpy(buffers.viewModel.instanceDatas[i].transform, viewModelMatrix, sizeof(mat4));
+	}
+	lunaWriteDataToBuffer(buffers.viewModel.instanceDataBuffer,
+						  buffers.viewModel.instanceDatas,
+						  sizeof(ModelInstanceData) * buffers.viewModel.drawCount,
+						  0);
 }
 
 void DrawRectInternal(const float ndcStartX,

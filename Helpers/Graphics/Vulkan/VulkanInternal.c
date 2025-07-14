@@ -291,6 +291,7 @@ bool CreateTextureSamplers()
 bool CreateBuffers()
 {
 	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
+	VulkanTest(CreateViewModelBuffers(), "Failed to create view model buffers!");
 	VulkanTest(CreateWallBuffers(), "Failed to create wall buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create wall actor buffers!");
 	VulkanTest(CreateActorModelBuffers(), "Failed to create model actor buffers!");

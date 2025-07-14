@@ -66,7 +66,7 @@ VkResult InitActors(const List *actors)
 				ListAdd(&loadedLodIds, (void *)lod->id);
 				List *skins = calloc(1, sizeof(List));
 				ListAdd(&loadedSkins, skins);
-				const size_t shadedVertexSize = sizeof(ActorModelVertex) * lod->vertexCount;
+				const size_t shadedVertexSize = sizeof(ModelVertex) * lod->vertexCount;
 				memcpy(buffers.actorModels.vertices.data + shadedVertexDataOffset,
 					   (void *)lod->vertexData,
 					   shadedVertexSize);
@@ -101,7 +101,7 @@ VkResult InitActors(const List *actors)
 							shadedActorModelsDrawInfo[index].vertexOffset += vertexOffset;
 							indexOffset += indexCount;
 
-							buffers.actorModels.vertices.bytesUsed += sizeof(ActorModelVertex) * lod->vertexCount;
+							buffers.actorModels.vertices.bytesUsed += sizeof(ModelVertex) * lod->vertexCount;
 							buffers.actorModels.indices.bytesUsed += sizeof(uint32_t) * indexCount;
 							buffers.actorModels.shadedDrawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
 							break;
@@ -122,7 +122,7 @@ VkResult InitActors(const List *actors)
 							unshadedActorModelsDrawInfo[index].vertexOffset += vertexOffset;
 							indexOffset += indexCount;
 
-							buffers.actorModels.vertices.bytesUsed += sizeof(ActorModelVertex) * lod->vertexCount;
+							buffers.actorModels.vertices.bytesUsed += sizeof(ModelVertex) * lod->vertexCount;
 							buffers.actorModels.indices.bytesUsed += sizeof(uint32_t) * indexCount;
 							buffers.actorModels.unshadedDrawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
 							break;
@@ -168,8 +168,7 @@ VkResult InitActors(const List *actors)
 					}
 				}
 			}
-			buffers.actorModels.instanceData.bytesUsed += sizeof(ActorModelInstanceData) *
-														  actor->actorModel->materialCount;
+			buffers.actorModels.instanceData.bytesUsed += sizeof(ModelInstanceData) * actor->actorModel->materialCount;
 		}
 	}
 	buffers.actorWalls.vertices.bytesUsed = sizeof(ActorVertex) * 4 * buffers.actorWalls.count;
@@ -311,11 +310,11 @@ VkResult UpdateActorInstanceData(const List *actors)
 	{
 		size_t currentOffset = 0;
 		offsets[0] = currentOffset;
-		currentOffset += sizeof(ActorModelInstanceData) * (size_t)ListGet(buffers.actorModels.materialCounts, 0);
+		currentOffset += sizeof(ModelInstanceData) * (size_t)ListGet(buffers.actorModels.materialCounts, 0);
 		for (size_t i = 1; i < buffers.actorModels.materialCounts.length; i++)
 		{
 			offsets[i] = currentOffset;
-			currentOffset += sizeof(ActorModelInstanceData) * (size_t)ListGet(buffers.actorModels.materialCounts, i);
+			currentOffset += sizeof(ModelInstanceData) * (size_t)ListGet(buffers.actorModels.materialCounts, i);
 		}
 	}
 	if (__builtin_expect(loadedActors != actors->length, false))
@@ -354,10 +353,10 @@ VkResult UpdateActorInstanceData(const List *actors)
 					default:
 						assert(false && "Invalid material shader!");
 				}
-				ActorModelInstanceData *offsetInstanceData = buffers.actorModels.instanceData.data + offsets[index];
+				ModelInstanceData *offsetInstanceData = buffers.actorModels.instanceData.data + offsets[index];
 				memcpy(offsetInstanceData->transform, transformMatrix, sizeof(mat4));
 				offsetInstanceData->textureIndex = TextureIndex(material.texture);
-				offsets[index] += sizeof(ActorModelInstanceData);
+				offsets[index] += sizeof(ModelInstanceData);
 			}
 		} else if (actor->actorWall)
 		{

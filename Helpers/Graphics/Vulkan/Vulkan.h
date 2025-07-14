@@ -28,7 +28,7 @@ VkResult VK_FrameStart();
 VkResult VK_FrameEnd();
 
 //TODO document me
-VkResult VK_RenderLevel(const Level *level, const Camera *camera);
+VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel);
 
 bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices);
 

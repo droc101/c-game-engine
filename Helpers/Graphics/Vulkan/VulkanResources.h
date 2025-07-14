@@ -10,6 +10,8 @@
 
 VkResult CreateUiBuffers();
 
+VkResult CreateViewModelBuffers();
+
 VkResult CreateWallBuffers();
 
 VkResult CreateActorWallBuffers();

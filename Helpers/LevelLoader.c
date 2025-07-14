@@ -77,7 +77,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		const float actorY = ReadFloat(data, &offset);
 		const float actorRotation = ReadFloat(data, &offset);
 		EXPECT_BYTES(sizeof(int) + sizeof(byte) * 4);
-		const int actorType = ReadInt(data, &offset);
+		const uint actorType = ReadUint(data, &offset);
 		const char actorName[64];
 		EXPECT_BYTES(64);
 		ReadString(data, &offset, (char *)&actorName, 64);

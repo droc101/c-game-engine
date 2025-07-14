@@ -165,6 +165,120 @@ bool CreateUIPipeline()
 	return true;
 }
 
+bool CreateViewModelPipeline()
+{
+	LunaShaderModule vertShaderModule;
+	LunaShaderModule fragShaderModule;
+	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_viewModel"), &vertShaderModule),
+			   "Failed to load view model vertex shader!");
+	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_viewModel"), &fragShaderModule),
+			   "Failed to load view model fragment shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescriptions[] = {
+		{
+			.binding = 0,
+			.stride = sizeof(ModelVertex),
+			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+		},
+		{
+			.binding = 1,
+			.stride = sizeof(ModelInstanceData),
+			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
+		},
+	};
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ModelVertex, x),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ModelVertex, u),
+		},
+		{
+			.location = 2,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ModelVertex, nx),
+		},
+		{
+			.location = 3,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
+		},
+		{
+			.location = 4,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
+		},
+		{
+			.location = 5,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
+		},
+		{
+			.location = 6,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
+		},
+		{
+			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ModelInstanceData, textureIndex),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.pVertexBindingDescriptions = bindingDescriptions,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
+	};
+
+	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &inputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &cullingRasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.viewModel),
+			   "Failed to create view model graphics pipeline!");
+
+	return true;
+}
+
 bool CreateSkyPipeline()
 {
 	LunaShaderModule vertShaderModule;
@@ -490,12 +604,12 @@ bool CreateActorModelShadedPipeline()
 	const VkVertexInputBindingDescription bindingDescriptions[] = {
 		{
 			.binding = 0,
-			.stride = sizeof(ActorModelVertex),
+			.stride = sizeof(ModelVertex),
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorModelInstanceData),
+			.stride = sizeof(ModelInstanceData),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -504,49 +618,49 @@ bool CreateActorModelShadedPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorModelVertex, x),
+			.offset = offsetof(ModelVertex, x),
 		},
 		{
 			.location = 1,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorModelVertex, u),
+			.offset = offsetof(ModelVertex, u),
 		},
 		{
 			.location = 2,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorModelVertex, nx),
+			.offset = offsetof(ModelVertex, nx),
 		},
 		{
 			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 0,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 1,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 2,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
 		},
 		{
 			.location = 6,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 3,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
 		},
 		{
 			.location = 7,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorModelInstanceData, textureIndex),
+			.offset = offsetof(ModelInstanceData, textureIndex),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -600,12 +714,12 @@ bool CreateActorModelUnshadedPipeline()
 	const VkVertexInputBindingDescription bindingDescriptions[] = {
 		{
 			.binding = 0,
-			.stride = sizeof(ActorModelVertex),
+			.stride = sizeof(ModelVertex),
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorModelInstanceData),
+			.stride = sizeof(ModelInstanceData),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -614,43 +728,43 @@ bool CreateActorModelUnshadedPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorModelVertex, x),
+			.offset = offsetof(ModelVertex, x),
 		},
 		{
 			.location = 1,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorModelVertex, u),
+			.offset = offsetof(ModelVertex, u),
 		},
 		{
 			.location = 2,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 0,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 1,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 2,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
 		},
 		{
 			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transform) + sizeof(vec4) * 3,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
 		},
 		{
 			.location = 6,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorModelInstanceData, textureIndex),
+			.offset = offsetof(ModelInstanceData, textureIndex),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -687,7 +801,8 @@ bool CreateGraphicsPipelines()
 	multisampling.rasterizationSamples = msaaSamples;
 
 	// clang-format off
-	return CreateUIPipeline() && CreateSkyPipeline() && CreateFloorAndCeilingPipeline() && CreateWallPipeline() &&
-		   CreateActorWallPipeline() && CreateActorModelShadedPipeline() && CreateActorModelUnshadedPipeline();
+	return CreateUIPipeline() && CreateViewModelPipeline() && CreateSkyPipeline() && CreateFloorAndCeilingPipeline() &&
+		   CreateWallPipeline() && CreateActorWallPipeline() && CreateActorModelShadedPipeline() &&
+		   CreateActorModelUnshadedPipeline();
 	// clang-format on
 }

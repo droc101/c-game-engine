@@ -324,7 +324,7 @@ void RenderLevel3D(const Level *l, const Camera *cam)
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_RenderLevel(l, cam);
+			VK_RenderLevel(l, cam, &GetState()->viewmodel);
 			break;
 		case RENDERER_OPENGL:
 			GL_RenderLevel(l, cam);
