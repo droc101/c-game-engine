@@ -10,6 +10,12 @@
 
 #define IOPROXY_OUTPUT_FIRST_TICK 2
 
+typedef struct IoProxyData
+{
+	/// Tick counter for the whole level so it doesn't get reset when pausing
+	size_t tickCounter;
+} IoProxyData;
+
 bool IoProxySignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
 	if (signal == ACTOR_KILL_INPUT)
@@ -34,15 +40,23 @@ void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*para
 	{
 		GetState()->level->ioProxy = this;
 	}
+	this->extraData = calloc(sizeof(IoProxyData), 1);
 	this->SignalHandler = IoProxySignalHandler;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void IoProxyUpdate(Actor *this, double /*delta*/)
 {
-	if (GetState()->physicsFrame == 1)
+	IoProxyData *data = this->extraData;
+	if (data->tickCounter == 1)
 	{
 		ActorFireOutput(this, IOPROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
-		RemoveActor(this);
 	}
+	data->tickCounter++;
 }
+
+void IoProxyDestroy(Actor *this)
+{
+	free(this->extraData);
+}
+

@@ -73,7 +73,7 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 	GoalDestroy,
 	DoorDestroy,
 	TriggerDestroy,
-	ActorDestroy,
+	IoProxyDestroy,
 	PhysboxDestroy,
 	LaserDestroy,
 	ActorDestroy,
