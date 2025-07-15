@@ -59,4 +59,3 @@ void IoProxyDestroy(Actor *this)
 {
 	free(this->extraData);
 }
-

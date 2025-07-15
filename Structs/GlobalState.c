@@ -62,7 +62,6 @@ void InitState()
 		state.channels[i] = NULL;
 	}
 	state.cameraY = 0;
-	state.textBoxActive = false;
 	state.cam = CreateCamera();
 
 	state.viewmodel.enabled = true;
@@ -86,13 +85,6 @@ void UpdateVolume()
 	const double musicVol = state.options.musicVolume * state.options.masterVolume;
 	Mix_Volume(-1, (int)(sfxVol * MIX_MAX_VOLUME));
 	Mix_VolumeMusic((int)(musicVol * MIX_MAX_VOLUME));
-}
-
-void ShowTextBox(const TextBox tb)
-{
-	state.textBox = tb;
-	state.textBoxPage = 0;
-	state.textBoxActive = true;
 }
 
 inline GlobalState *GetState()
@@ -143,7 +135,6 @@ void ChangeLevel(Level *level)
 		DestroyLevel(state.level);
 	}
 	state.level = level;
-	state.textBoxActive = false;
 	if (strncmp(level->music, "none", 4) != 0)
 	{
 		char musicPath[92];

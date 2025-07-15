@@ -26,12 +26,6 @@ void InitState();
 void UpdateVolume();
 
 /**
- * Show a text box
- * @param tb Text box to show
- */
-void ShowTextBox(TextBox tb);
-
-/**
  * Get the global state
  * @return the global state
  */

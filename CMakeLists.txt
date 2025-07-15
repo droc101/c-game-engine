@@ -107,8 +107,6 @@ add_executable(
         Helpers/CommonAssets.h
         Actor/Coin.c
         Actor/Coin.h
-        Helpers/TextBox.c
-        Helpers/TextBox.h
         Actor/Goal.c
         Actor/Goal.h
         GameStates/GLogoSplashState.c
