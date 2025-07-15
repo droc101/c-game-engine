@@ -6,6 +6,7 @@
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
+#include "../../Structs/Level.h"
 
 #define IOPROXY_OUTPUT_FIRST_TICK 2
 
@@ -42,5 +43,6 @@ void IoProxyUpdate(Actor *this, double /*delta*/)
 	if (GetState()->physicsFrame == 1)
 	{
 		ActorFireOutput(this, IOPROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
+		RemoveActor(this);
 	}
 }
