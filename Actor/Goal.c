@@ -10,7 +10,6 @@
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/TextBox.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
@@ -98,15 +97,7 @@ void GoalUpdate(Actor *this, double /*delta*/)
 	{
 		if (GetSensorState(GetState()->level->worldId, goalData->shapeId.index1, false))
 		{
-			const TextBox tb = DEFINE_TEXT("Goal!",
-										   2,
-										   20,
-										   0,
-										   70,
-										   TEXT_BOX_H_ALIGN_CENTER,
-										   TEXT_BOX_V_ALIGN_TOP,
-										   TEXT_BOX_THEME_WHITE);
-			ShowTextBox(tb);
+			GetState()->saveData->coins += 10;
 			ActorFireOutput(this, GOAL_OUTPUT_COLLECTED, PARAM_NONE);
 			RemoveActor(this);
 		}

@@ -27,6 +27,7 @@ typedef uint64_t ulong;
 typedef enum CurrentState CurrentState;
 typedef enum Renderer Renderer;
 typedef enum OptionsMsaa OptionsMsaa;
+typedef enum OptionsMipmapLevels OptionsMipmapLevels;
 typedef enum ModelShader ModelShader;
 typedef enum ImageDataOffsets ImageDataOffsets;
 typedef enum AssetType AssetType;
@@ -40,7 +41,6 @@ typedef struct Camera Camera;
 typedef struct Player Player;
 typedef struct Wall Wall;
 typedef struct Level Level;
-typedef struct TextBox TextBox;
 typedef struct Actor Actor;
 typedef struct Options Options;
 typedef struct Asset Asset;
@@ -61,8 +61,6 @@ typedef void (*FixedUpdateFunction)(GlobalState *state, double delta);
 typedef void (*FrameUpdateFunction)(GlobalState *state);
 
 typedef void (*FrameRenderFunction)(GlobalState *state);
-
-typedef void (*TextBoxCloseFunction)(TextBox *textBox);
 
 typedef void (*ActorInitFunction)(Actor *this, b2WorldId worldId, const KvList *params);
 
@@ -211,6 +209,15 @@ enum OptionsMsaa
 	MSAA_2X = 1,
 	MSAA_4X = 2,
 	MSAA_8X = 3
+};
+
+enum OptionsMipmapLevels
+{
+	MIP_NONE = 0,
+	MIP_1 = 1,
+	MIP_2 = 2,
+	MIP_3 = 3,
+	MIP_4 = 4
 };
 
 /**
@@ -390,30 +397,6 @@ struct Level
 	Actor *ioProxy;
 };
 
-struct TextBox
-{
-	/// The text to display
-	char *text;
-	/// The number of rows per page
-	int rows;
-	/// The number of columns to display
-	int cols;
-	/// The X position of the text box
-	int x;
-	/// The Y position of the text box
-	int y;
-
-	/// The horizontal alignment of the text box
-	int hAlign;
-	/// The vertical alignment of the text box
-	int vAlign;
-	/// The text box theme
-	int theme;
-
-	/// The function to call when the text box is closed
-	TextBoxCloseFunction Close;
-};
-
 struct Options
 {
 	/// Checksum of the options struct (helps prevent corruption)
@@ -442,8 +425,8 @@ struct Options
 	bool vsync;
 	/// The MSAA level
 	OptionsMsaa msaa;
-	/// Whether to use mipmaps
-	bool mipmaps;
+	/// The mipmap level
+	OptionsMipmapLevels mipmaps;
 	/// Whether to prefer Wayland over X11
 	bool preferWayland;
 	/// Whether to drop to 30 fps when the window is not focused
@@ -475,13 +458,6 @@ struct GlobalState
 	CurrentState currentState;
 	/// The number of physics frames that have passed since the last game state change
 	ulong physicsFrame;
-
-	/// Whether the text box is active
-	bool textBoxActive;
-	/// The text box
-	TextBox textBox;
-	/// The current page of the text box
-	int textBoxPage;
 
 	/// The save data (persists between levels)
 	SaveData *saveData;

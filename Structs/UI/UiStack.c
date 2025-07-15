@@ -6,6 +6,7 @@
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/Input.h"
+#include "../../Helpers/Core/MathEx.h"
 #include "../../Helpers/Graphics/Drawing.h"
 #include "../../Helpers/Graphics/RenderingHelpers.h"
 #include "../GlobalState.h"
@@ -171,7 +172,6 @@ bool ProcessUiStack(UiStack *stack)
 					stack->ActiveControlState = ACTIVE;
 					// make this control the focused control
 					SetFocusedControl(stack, i);
-					//stack->focusedControl = i;
 				} else
 				{
 					stack->ActiveControlState = HOVER;
@@ -188,11 +188,9 @@ bool ProcessUiStack(UiStack *stack)
 		if (stack->focusedControl == -1)
 		{
 			SetFocusedControl(stack, 0);
-			//stack->focusedControl = 0;
 		} else
 		{
 			SetFocusedControl(stack, (int)((stack->focusedControl + 1) % stack->Controls.length));
-			//stack->focusedControl = (int)((stack->focusedControl + 1) % stack->Controls.length);
 		}
 	} else if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
 			   IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_UP))
@@ -200,17 +198,15 @@ bool ProcessUiStack(UiStack *stack)
 		if (stack->focusedControl == -1)
 		{
 			SetFocusedControl(stack, (int)stack->Controls.length - 1);
-			//stack->focusedControl = (int)stack->Controls.length - 1;
 		} else
 		{
-			SetFocusedControl(stack, (int)((stack->focusedControl - 1) % stack->Controls.length));
-			//stack->focusedControl = (int)((stack->focusedControl - 1) % stack->Controls.length);
+			const int fc = wrapi(stack->focusedControl - 1, 0, stack->Controls.length);
+			SetFocusedControl(stack, fc);
 		}
 		// ensure the index is positive
 		if (stack->focusedControl < 0)
 		{
 			SetFocusedControl(stack, stack->focusedControl + (int)stack->Controls.length);
-			//stack->focusedControl += (int)stack->Controls.length;
 		}
 	}
 
@@ -373,5 +369,4 @@ bool HasActivation(UiStack *stack, Control *Control)
 void UiStackResetFocus(UiStack *stack)
 {
 	SetFocusedControl(stack, UseController() ? 0 : -1);
-	//stack->focusedControl = UseController() ? 0 : -1;
 }

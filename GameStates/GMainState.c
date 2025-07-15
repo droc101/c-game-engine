@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include "../Debug/DPrint.h"
 #include "../Helpers/Collision.h"
-#include "../Helpers/CommandParser.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -18,8 +17,6 @@
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
-#include "../Helpers/Graphics/Vulkan/Vulkan.h"
-#include "../Helpers/TextBox.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
@@ -35,19 +32,6 @@ void GMainStateUpdate(GlobalState *State)
 	{
 		PlaySoundEffect(SOUND("sfx_popup"));
 		GPauseStateSet();
-		return;
-	}
-
-	if (State->textBoxActive)
-	{
-		if (IsKeyJustPressed(SDL_SCANCODE_SPACE) || IsButtonJustPressed(CONTROLLER_OK))
-		{
-			State->textBoxPage++;
-			if (State->textBoxPage >= StringLineCount(State->textBox.text) / State->textBox.rows)
-			{
-				State->textBoxActive = false;
-			}
-		}
 		return;
 	}
 
@@ -124,11 +108,6 @@ void CalculateMoveVec(const double delta, const Player *player, Vector2 *moveVec
 
 void GMainStateFixedUpdate(GlobalState *state, const double delta)
 {
-	if (state->textBoxActive)
-	{
-		return;
-	}
-
 	Level *l = state->level;
 
 	Vector2 moveVec;
@@ -228,10 +207,6 @@ void GMainStateRender(GlobalState *state)
 				   TEXTURE("interface_crosshair"),
 				   crosshairColor);
 
-	if (state->textBoxActive)
-	{
-		TextBoxRender(&state->textBox, state->textBoxPage);
-	}
 	DPrintF("Position: (%.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
 			COLOR_WHITE,
 			false,
