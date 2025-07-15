@@ -6,6 +6,7 @@
 #include <luna/luna.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../Core/Error.h"
+#include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
 #include "VulkanHelpers.h"
 
@@ -37,12 +38,7 @@ VkResult CreateViewModelBuffers()
 	const Viewmodel *viewmodel = &GetState()->viewmodel;
 	const ModelDefinition *model = viewmodel->model;
 	const size_t vertexSize = sizeof(ModelVertex) * model->lods[0]->vertexCount;
-	size_t indexSize = 0;
-
-	for (uint8_t i = 0; i < model->materialCount; i++)
-	{
-		indexSize += sizeof(uint32_t) * model->lods[0]->indexCount[i];
-	}
+	const size_t indexSize = sizeof(uint32_t) * model->lods[0]->totalIndexCount;
 
 	const LunaBufferCreationInfo vertexBufferCreationInfo = {
 		.size = vertexSize,
@@ -184,13 +180,13 @@ VkResult CreateActorWallBuffers()
 
 VkResult CreateActorModelBuffers()
 {
-	const LunaBufferCreationInfo actorModelsShadedVertexBufferCreationInfo = {
+	const LunaBufferCreationInfo actorModelsVertexBufferCreationInfo = {
 		.size = buffers.actorModels.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&actorModelsShadedVertexBufferCreationInfo,
+	VulkanTestReturnResult(lunaCreateBuffer(&actorModelsVertexBufferCreationInfo,
 											&buffers.actorModels.vertices.buffer),
-						   "Failed to create model actors shaded vertex buffer!");
+						   "Failed to create model actors vertex buffer!");
 	buffers.actorModels.vertices.data = malloc(buffers.actorModels.vertices.allocatedSize);
 	CheckAlloc(buffers.actorModels.vertices.data);
 
@@ -433,6 +429,7 @@ VkResult ResizeActorModelBuffers()
 
 bool LoadTexture(const Image *image)
 {
+	LockLodThreadMutex(); // TODO: This is not a great fix but it works ig
 	const LunaSampledImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
@@ -468,6 +465,7 @@ bool LoadTexture(const Image *image)
 		};
 	}
 	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
+	UnlockLodThreadMutex();
 
 	return true;
 }

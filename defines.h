@@ -671,6 +671,8 @@ struct ModelLod
 	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
 	float *vertexData;
 
+	/// The total number of indices across all materials
+	uint totalIndexCount;
 	/// The number of indices in each material
 	uint *indexCount;
 	/// Index data for each material

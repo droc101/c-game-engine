@@ -61,7 +61,7 @@ TextureSamplers textureSamplers = {
 };
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 PushConstants pushConstants = {0};
-List loadedLodIds = {0};
+List lodIdsLoadedForDraw = {0};
 List lodCounts = {0};
 #pragma endregion variables
 
@@ -105,11 +105,7 @@ inline uint32_t ImageIndex(const Image *image)
 VkResult LoadSky(const ModelDefinition *skyModel)
 {
 	buffers.sky.vertices.bytesUsed = sizeof(SkyVertex) * skyModel->lods[0]->vertexCount;
-	buffers.sky.indices.bytesUsed = 0;
-	for (uint32_t i = 0; i < skyModel->materialCount; i++)
-	{
-		buffers.sky.indices.bytesUsed += sizeof(uint32_t) * skyModel->lods[0]->indexCount[i];
-	}
+	buffers.sky.indices.bytesUsed = sizeof(uint32_t) * skyModel->lods[0]->totalIndexCount;
 	if (buffers.sky.vertices.allocatedSize == 0 || buffers.sky.indices.allocatedSize == 0)
 	{
 		assert(buffers.sky.vertices.allocatedSize == 0 && buffers.sky.indices.allocatedSize == 0);

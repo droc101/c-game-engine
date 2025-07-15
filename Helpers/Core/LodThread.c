@@ -20,7 +20,6 @@ int LodThreadMain(void *exit)
 {
 	while (!*(bool *)exit)
 	{
-		continue;
 		int waitResult = SDL_SemWaitTimeout(canStart, 16);
 		while (waitResult != 0)
 		{
@@ -49,11 +48,9 @@ int LodThreadMain(void *exit)
 		switch (currentRenderer)
 		{
 			case RENDERER_VULKAN:
-				List modifiedActorIndices;
-				ListCreate(&modifiedActorIndices);
+				bool shouldReloadActors = false;
 				for (size_t i = 0; i < actorCount; i++)
 				{
-					bool wasModified = false;
 					Actor *actor = ListGet(actors, i);
 					if (!actor->actorModel)
 					{
@@ -64,20 +61,16 @@ int LodThreadMain(void *exit)
 						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
 					{
 						actor->currentLod--;
-						wasModified = true;
+						shouldReloadActors = true;
 					}
 					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
 						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
 					{
 						actor->currentLod++;
-						wasModified = true;
-					}
-					if (wasModified)
-					{
-						ListAdd(&modifiedActorIndices, (void *)i);
+						shouldReloadActors = true;
 					}
 				}
-				if (!VK_UpdateActors(&actors, &modifiedActorIndices))
+				if (!VK_UpdateActors(&actors, shouldReloadActors))
 				{
 					Error("Failed to load actors!");
 				}
@@ -121,7 +114,6 @@ int LodThreadMain(void *exit)
 
 void LodThreadInit()
 {
-	return;
 	shouldExit = calloc(1, sizeof(bool));
 	CheckAlloc(shouldExit);
 	canStart = SDL_CreateSemaphore(0);
@@ -132,7 +124,6 @@ void LodThreadInit()
 
 void LodThreadDestroy()
 {
-	return;
 	if (!shouldExit)
 	{
 		return;
@@ -148,24 +139,20 @@ void LodThreadDestroy()
 
 int SignalLodThreadCanStart()
 {
-	return 0;
 	return SDL_SemPost(canStart);
 }
 
 int WaitForLodThreadToEnd()
 {
-	return 0;
 	return SDL_SemWait(hasEnded);
 }
 
 int LockLodThreadMutex()
 {
-	return 0;
 	return SDL_LockMutex(mutex);
 }
 
 int UnlockLodThreadMutex()
 {
-	return 0;
 	return SDL_UnlockMutex(mutex);
 }

@@ -30,7 +30,7 @@ VkResult VK_FrameEnd();
 //TODO document me
 VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel);
 
-bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices);
+bool VK_UpdateActors(const List *actors, bool shouldReloadActors);
 
 /// A function used to destroy the Vulkan objects when they are no longer needed.
 bool VK_Cleanup();

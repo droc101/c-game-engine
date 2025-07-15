@@ -14,7 +14,7 @@
 #define MAX_UI_QUADS_INIT 8192 // TODO: find best value
 #define MAX_WALLS_INIT 1024
 #define MAX_WALL_ACTORS_INIT 256
-#define MAX_MODEL_ACTOR_QUADS_INIT 4096
+#define MAX_MODEL_ACTOR_QUADS_INIT 8192 // TODO: fix bug 👎
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
 // TODO Use LogInternal
@@ -210,9 +210,7 @@ typedef struct ActorModelsBuffer
 	BufferRegion shadedDrawInfo;
 	BufferRegion unshadedDrawInfo;
 
-	List materialCounts;
-	List shadedMaterialIds;
-	List unshadedMaterialIds;
+	List loadedModelIds;
 } ActorModelsBuffer;
 
 typedef struct Buffers

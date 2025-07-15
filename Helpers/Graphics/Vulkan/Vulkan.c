@@ -9,6 +9,7 @@
 #include "../../CommonAssets.h"
 #include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
+#include "../../Core/Timing.h"
 #include "VulkanActors.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
@@ -216,14 +217,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
 
-	// TODO: Remove me!
-	ListLock(level->actors);
-	List empty;
-	ListCreate(&empty);
-	VK_UpdateActors(&level->actors, &empty);
-	ListFree(&empty, false);
-	ListUnlock(level->actors);
-
 	const VkViewport viewport = {
 		.width = (float)swapChainExtent.width,
 		.height = (float)swapChainExtent.height,
@@ -316,7 +309,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw wall actors!");
 	}
 
-	if (buffers.actorModels.shadedMaterialIds.length)
+	if (buffers.actorModels.shadedDrawInfo.bytesUsed)
 	{
 		lunaBindVertexBuffers(0,
 							  2,
@@ -337,7 +330,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 															 sizeof(VkDrawIndexedIndirectCommand)),
 							   "Failed to draw shaded model actors!");
 	}
-	if (buffers.actorModels.unshadedMaterialIds.length)
+	if (buffers.actorModels.unshadedDrawInfo.bytesUsed)
 	{
 		lunaBindVertexBuffers(0,
 							  2,
@@ -388,27 +381,12 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	return VK_SUCCESS;
 }
 
-bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices)
+bool VK_UpdateActors(const List *actors, const bool shouldReloadActors)
 {
-	// VkDrawIndexedIndirectCommand *drawInfo = buffers.actorModels.drawInfo.data;
-	// for (size_t i = 0; i < modifiedActorIndices->length; i++)
-	// {
-	// 	const size_t actorIndex = (size_t)ListGet(*modifiedActorIndices, i);
-	// 	assert(actorIndex < actors->length);
-	// 	const Actor *actor = (const Actor *)ListGet(*actors, actorIndex);
-	// 	uint32_t indexOffset = 0;
-	// 	assert(actor->actorModel);
-	// 	for (size_t j = 0; j < actor->actorModel->materialCount; j++)
-	// 	{
-	// 		assert(drawInfo &&
-	// 			   actor->actorModel->lods &&
-	// 			   actor->actorModel->lods[actor->currentLod] &&
-	// 			   actor->actorModel->lods[actor->currentLod]->indexCount);
-	// 		drawInfo[actorIndex * j + j].indexCount = actor->actorModel->lods[actor->currentLod]->indexCount[j];
-	// 		indexOffset += (size_t)ListGet(buffers.actorModels.indexOffsets, actorIndex);
-	// 		drawInfo[actorIndex * j + j].firstIndex = indexOffset;
-	// 	}
-	// }
+	if (shouldReloadActors)
+	{
+		VulkanTest(InitActors(actors), "Failed to reload actors");
+	}
 	VulkanTest(LoadActorWalls(actors), "Failed to load wall actors!");
 	VulkanTest(UpdateActorInstanceData(actors), "Failed to update actor instance data!");
 	return true;
@@ -417,6 +395,7 @@ bool VK_UpdateActors(const List *actors, const List *modifiedActorIndices)
 bool VK_Cleanup()
 {
 	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
+	DestroyActorMetadata();
 	free(buffers.ui.vertices.data);
 	free(buffers.ui.indices.data);
 	free(buffers.viewModel.instanceDatas);

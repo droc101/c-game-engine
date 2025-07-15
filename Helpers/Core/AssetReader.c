@@ -385,6 +385,7 @@ ModelDefinition *LoadModel(const char *asset)
 		CheckAlloc(lod->vertexData);
 		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
 
+		lod->totalIndexCount = ReadUint(assetData->data, &offset);
 		const size_t indexCountSize = model->materialCount * sizeof(uint);
 		lod->indexCount = malloc(indexCountSize);
 		CheckAlloc(lod->indexCount);

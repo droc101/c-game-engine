@@ -6,6 +6,15 @@
 #define GAME_TIMING_H
 
 #include "../../defines.h"
+#include "../Core/Logging.h"
+
+#define TIME(thingToTime) \
+	{ \
+		const long double startTime = GetTimeNs(); \
+		thingToTime; \
+		const long double endTime = GetTimeNs(); \
+		LogInfo("%Lf ms\n", (endTime - startTime) / 1000000); \
+	}
 
 /**
  * Initialize the timers to count from the start of the program
