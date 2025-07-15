@@ -240,9 +240,9 @@ elseif (WIN32) # Thank you Windows, I hate you.
 endif ()
 
 if (UNIX)
-    target_link_libraries(game -lGL -lGLU ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${BOX2D_LIB} m SDL2 SDL2_mixer z ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
+    target_link_libraries(game ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} SDL2_mixer ${Vulkan_LIBRARIES} ${BOX2D_LIB} m ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
 elseif (WIN32)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} ${BOX2D_LIB} opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${BOX2D_LIB} dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
 endif ()
 
 #endregion
