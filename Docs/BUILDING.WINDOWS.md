@@ -9,8 +9,7 @@ This is the far more complicated of the two platforms to build on.
 4. Inside MSYS2 MinGW 64-Bit, run the following commands inside the repository directory:
 ```sh
 pacman -Syu
-pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-requests mingw-w64-x86_64-python-regex mingw-w64-x86_64-python-pillow mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-shaderc mingw-w64-x86_64-vulkan-headers mingw-w64-x86_64-vulkan-loader mingw-w64-x86_64-zlib
-python setup-windows.py
+pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-requests mingw-w64-x86_64-python-regex mingw-w64-x86_64-python-pillow mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-shaderc mingw-w64-x86_64-vulkan-headers mingw-w64-x86_64-vulkan-loader mingw-w64-x86_64-zlib mingw-w64-x86_64-glew mingw-w64-x86_64-cglm mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL_mixer
 ```
 Notes:
 - This project uses GCC. No other compilers are guaranteed to work.

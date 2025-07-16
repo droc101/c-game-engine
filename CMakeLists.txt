@@ -1,16 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project(game C)
 
-# Adds the module folder to the CMake module path
-# This folder is populated by the setup-windows.py script
-if (WIN32)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/module")
-        message(FATAL_ERROR "The module folder is missing. Please run setup-windows.py to download the required dependencies.")
-    endif ()
-
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/module")
-endif()
-
 #region Compile options
 
 set(CMAKE_C_STANDARD 11)
@@ -21,10 +11,9 @@ set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG")
 
-# Add --static flag when building on Windows to include libwinpthread-1.dll
 if (WIN32)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --static")
     set(CMAKE_AUTO_RCC ON)
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mwindows") # Hides console window
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -rdynamic")
 endif ()
@@ -200,49 +189,40 @@ add_executable(
 
 #region Libraries
 
-set(SDL2_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2/x86_64-w64-mingw32")
-set(SDL2_MIXER_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/x86_64-w64-mingw32")
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
 
-find_package(SDL2 REQUIRED) # Platform abstraction
-include_directories(${SDL2_INCLUDE_DIR})
-
-find_package(SDL2_mixer REQUIRED) # Audio
+find_package(SDL2_mixer REQUIRED)
 include_directories(${SDL2_MIXER_INCLUDE_DIR})
 
-find_package(ZLIB REQUIRED) # Decompression
+find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
 
-find_package(OpenGL REQUIRED) # Graphics
+find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-find_package(Vulkan REQUIRED) # 3d
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+
+find_package(Vulkan REQUIRED)
 include_directories(${Vulkan_INCLUDE_DIRS})
 
 include_directories("${CMAKE_SOURCE_DIR}/lib/box2d/include")
 
 if (UNIX)
-    find_package(GLEW REQUIRED) # OpenGL Extension Wrangler
-    include_directories(${GLEW_INCLUDE_DIRS})
     if (TARGET_ARCH STREQUAL "arm64")
         set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux_arm64.a")
     else ()
         set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a")
     endif ()
-elseif (WIN32) # Thank you Windows, I hate you.
-    include_directories("${CMAKE_SOURCE_DIR}/lib/cglm/include") # C OpenGL Mathematics Library
-
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew") # OpenGL Extension Wrangler
-    add_definitions(-DGLEW_STATIC)
-    set(GLEW_LIBRARIES "${CMAKE_SOURCE_DIR}/lib/glew/lib/Release/x64/glew32s.lib")
-    set(GLEW_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/lib/glew/include")
-    include_directories(${GLEW_INCLUDE_DIRS})
+elseif (WIN32)
     set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a")
 endif ()
 
 if (UNIX)
-    target_link_libraries(game ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} SDL2_mixer ${Vulkan_LIBRARIES} ${BOX2D_LIB} m ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} SDL2_mixer ${Vulkan_LIBRARIES} ${BOX2D_LIB} m ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
 elseif (WIN32)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${Vulkan_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${BOX2D_LIB} opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} SDL2_mixer::SDL2_mixer ${Vulkan_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${BOX2D_LIB} opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
 endif ()
 
 #endregion
@@ -263,12 +243,40 @@ add_dependencies(game genassets)
 #region Windows DLLs
 if (WIN32)
 
-    add_custom_target( # Python script for generating assets code
-            copydlls ALL
-            COMMAND "python" ${CMAKE_CURRENT_SOURCE_DIR}/postbuild-windows.py ${CMAKE_CURRENT_BINARY_DIR}
-            COMMENT "Copying DLLs"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    execute_process(
+            COMMAND cygpath -w /mingw64
+            OUTPUT_VARIABLE MINGW_PATH
+            OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+
+    set(DLLS
+            SDL2.dll
+            SDL2_mixer.dll
+            glew32.dll
+            zlib1.dll
+            libmpg123-0.dll
+            libFLAC.dll
+            libopusfile-0.dll
+            libvorbisfile-3.dll
+            libwavpack-1.dll
+            libxmp.dll
+            libvorbis-0.dll
+            libogg-0.dll
+            libwinpthread-1.dll
+            libopus-0.dll
+    )
+
+    add_custom_target(copydlls ALL
+            COMMENT "Copying DLLs to build output directory"
+    )
+
+    foreach(dll IN LISTS DLLS)
+        add_custom_command(TARGET copydlls POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MINGW_PATH}\\bin\\${dll}"
+                "${CMAKE_BINARY_DIR}\\${dll}"
+        )
+    endforeach()
 
     add_dependencies(game copydlls)
 

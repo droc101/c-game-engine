@@ -23,8 +23,6 @@ jobs:
           install: >-
             mingw-w64-x86_64-toolchain
             mingw-w64-x86_64-python
-            mingw-w64-x86_64-python-requests
-            mingw-w64-x86_64-python-regex
             mingw-w64-x86_64-python-pillow
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
@@ -33,11 +31,11 @@ jobs:
             mingw-w64-x86_64-vulkan-headers
             mingw-w64-x86_64-vulkan-loader
             mingw-w64-x86_64-zlib
+            mingw-w64-x86_64-glew
+            mingw-w64-x86_64-cglm
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-SDL_mixer
           update: true
-
-    - name: Run setup-windows.py
-      shell: msys2 {0}
-      run: python setup-windows.py
 
     - name: Convert github.workspace to mingw path
       shell: msys2 {0}
@@ -59,6 +57,17 @@ jobs:
           build/game.exe
           build/SDL2.dll
           build/SDL2_mixer.dll
+          build/glew32.dll
           build/zlib1.dll
+          build/libmpg123-0.dll
+          build/libFLAC.dll
+          build/libopusfile-0.dll
+          build/libvorbisfile-3.dll
+          build/libwavpack-1.dll
+          build/libxmp.dll
+          build/libvorbis-0.dll
+          build/libogg-0.dll
+          build/libwinpthread-1.dll
+          build/libopus-0.dll 
           build/assets/
         retention-days: 90
