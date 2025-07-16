@@ -6,10 +6,10 @@
 #include <assert.h>
 #include <luna/luna.h>
 #include <SDL_vulkan.h>
+#include <string.h>
 #include "../../CommonAssets.h"
 #include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
-#include "../../Core/Timing.h"
 #include "VulkanActors.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
