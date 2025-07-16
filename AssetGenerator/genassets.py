@@ -59,7 +59,7 @@ def RecursiveSearch(in_path, out_path):
 				Converter.WAVConverter.ConvertWAV(in_path + file)
 			elif file.endswith(".bin"):
 				print("Converting " + path_from_assets + file)
-                Converter.FileConverter.ConvertFile(in_path + file, 3, "gmap", "level")
+				Converter.FileConverter.ConvertFile(in_path + file, 3, "gmap", "level")
 			elif file.endswith(".frag"):
 				print("Converting " + path_from_assets + file)
 				Converter.VulkanShaderConverter.ConvertVulkanFrag(in_path + file)
