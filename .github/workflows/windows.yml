@@ -17,6 +17,11 @@ jobs:
       matrix:
         build_type: [ Debug, Release ]
         zip_name: [ game.windows.debug, game.windows.release ]
+        exclude:
+          - build_type: Debug
+            zip_name: game.windows.release
+          - build_type: Release
+            zip_name: game.windows.debug
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
