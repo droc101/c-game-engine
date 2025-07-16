@@ -52,4 +52,8 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 		fflush(stdout);
 	}
 	va_end(args);
+	va_start(args, message);
+	fprintf(LogFile, "[%s] ", type);
+	vfprintf(LogFile, message, args);
+	va_end(args);
 }

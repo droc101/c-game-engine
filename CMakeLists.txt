@@ -206,8 +206,8 @@ add_executable(
 set(SDL2_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2/x86_64-w64-mingw32")
 set(SDL2_MIXER_PATH "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/x86_64-w64-mingw32")
 
-find_package(SDL2 CONFIG REQUIRED) # Platform abstraction
-find_package(SDL2_mixer CONFIG REQUIRED) # Audio
+find_package(SDL2 REQUIRED) # Platform abstraction
+find_package(SDL2_mixer REQUIRED) # Audio
 find_package(ZLIB REQUIRED) # Decompression
 find_package(OpenGL REQUIRED) # Graphics
 find_package(Vulkan REQUIRED) # 3d
@@ -234,9 +234,9 @@ else ()
 endif ()
 
 if (UNIX)
-    target_link_libraries(game ${SDL2_LIBRARY} SDL2 ${SDL2_MIXER_LIBRARY} SDL2_mixer ${ZLIB_LIBRARIES} z ${OPENGL_gl_LIBRARY} -lGL ${GLEW_LIBRARIES} -lGLU ${Vulkan_LIBRARIES} ${LUNA_PATH} ${BOX2D_LIB} m) # extra l* flags are needed on Linux
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${Vulkan_LIBRARIES} ${LUNA_PATH} ${BOX2D_LIB} SDL2_mixer m) # extra l* flags are needed on Linux
 elseif (WIN32)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${ZLIB_LIBRARIES} ${OPENGL_gl_LIBRARY} opengl32 ${GLEW_LIBRARIES} ${Vulkan_LIBRARIES} ${BOX2D_LIB} dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_link_libraries(game PRIVATE ${SDL2_LIBRARY} ${ZLIB_LIBRARIES} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${Vulkan_LIBRARIES} ${LUNA_PATH} ${BOX2D_LIB} opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
     target_include_directories(game PRIVATE ${CMAKE_SOURCE_DIR}/lib/cglm/include) # C OpenGL Mathematics Library
 endif ()
 
