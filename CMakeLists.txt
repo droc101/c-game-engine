@@ -215,10 +215,20 @@ elseif (WIN32)
     set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a")
 endif ()
 
+set(CROSS_PLATFORM_LIBRARIES
+        ${SDL2_LIBRARIES}
+        ${ZLIB_LIBRARIES}
+        SDL2_mixer::SDL2_mixer
+        ${Vulkan_LIBRARIES}
+        ${OPENGL_LIBRARIES}
+        ${GLEW_LIBRARIES}
+        ${BOX2D_LIB}
+)
+
 if (UNIX)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} SDL2_mixer ${Vulkan_LIBRARIES} ${BOX2D_LIB} m ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}) # extra l* flags are needed on Linux
+    target_link_libraries(game PRIVATE ${CROSS_PLATFORM_LIBRARIES} m)
 elseif (WIN32)
-    target_link_libraries(game PRIVATE ${SDL2_LIBRARIES} ${ZLIB_LIBRARIES} SDL2_mixer::SDL2_mixer ${Vulkan_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${BOX2D_LIB} opengl32 dwmapi) # Don't pass extra l* flags on Windows (it isn't happy with them)
+    target_link_libraries(game PRIVATE ${CROSS_PLATFORM_LIBRARIES} opengl32 dwmapi)
 endif ()
 
 #endregion
@@ -277,4 +287,5 @@ if (WIN32)
     add_dependencies(game copydlls)
 
 endif()
+
 #endregion
