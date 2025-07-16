@@ -34,7 +34,7 @@ jobs:
             mingw-w64-x86_64-glew
             mingw-w64-x86_64-cglm
             mingw-w64-x86_64-SDL2
-            mingw-w64-x86_64-SDL_mixer
+            mingw-w64-x86_64-SDL2_mixer
           update: true
 
     - name: Convert github.workspace to mingw path

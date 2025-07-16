@@ -190,24 +190,20 @@ add_executable(
 #region Libraries
 
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
-
 find_package(SDL2_mixer REQUIRED)
-include_directories(${SDL2_MIXER_INCLUDE_DIR})
-
 find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIRS})
-
 find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-
 find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-
 find_package(Vulkan REQUIRED)
-include_directories(${Vulkan_INCLUDE_DIRS})
 
-include_directories("${CMAKE_SOURCE_DIR}/lib/box2d/include")
+include_directories(
+        ${SDL2_INCLUDE_DIRS}
+        ${ZLIB_INCLUDE_DIRS}
+        ${OPENGL_INCLUDE_DIR}
+        ${GLEW_INCLUDE_DIRS}
+        ${Vulkan_INCLUDE_DIRS}
+        "${CMAKE_SOURCE_DIR}/lib/box2d/include"
+)
 
 if (UNIX)
     if (TARGET_ARCH STREQUAL "arm64")
