@@ -15,4 +15,4 @@ See [Docs/BUILDING.WINDOWS.md](Docs/BUILDING.WINDOWS.md) for Windows and [Docs/B
 ### Tested on
 - Windows 11
 - Arch Linux
-- Debian
+- Ubuntu

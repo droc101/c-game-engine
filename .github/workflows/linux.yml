@@ -13,6 +13,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        build_type: [ Debug, Release ]
+        zip_name: [ game.linux.debug, game.linux.release ]
+        exclude:
+          - build_type: Debug
+            zip_name: game.linux.release
+          - build_type: Release
+            zip_name: game.linux.debug
+
+    env:
+      BUILD_TYPE: ${{ matrix.build_type }}
+
     steps:
     - uses: actions/checkout@v4
 
@@ -20,17 +33,17 @@ jobs:
       run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev libvulkan-dev python3-pil glslc
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build-${{ matrix.build_type }} --config ${{ matrix.build_type }}
 
     - name: Upload results
       uses: actions/upload-artifact@v4
       with:
-        name: game.linux
+        name: ${{ matrix.zip_name }}
         path: |
-          build/game
-          build/assets/
+          build-${{ matrix.build_type }}/game
+          build-${{ matrix.build_type }}/assets/
         retention-days: 90
 
