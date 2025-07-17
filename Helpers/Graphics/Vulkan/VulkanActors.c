@@ -388,11 +388,19 @@ VkResult UpdateActorInstanceData(const List *actors)
 				{
 					case SHADER_SHADED:
 						index = ListFind(shadedMaterialIds, (void *)lodMaterialId);
-						assert(index != -1);
+						if (index == -1)
+						{
+							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
+							return VK_SUCCESS;
+						}
 						break;
 					case SHADER_UNSHADED:
-						assert(ListFind(unshadedMaterialIds, (void *)lodMaterialId) != -1);
 						index = ListFind(unshadedMaterialIds, (void *)lodMaterialId) + shadedMaterialIds.length;
+						if (index == -1)
+						{
+							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
+							return VK_SUCCESS;
+						}
 						break;
 					case SHADER_SKY:
 					default:
