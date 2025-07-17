@@ -1,4 +1,4 @@
-# Building - Windows (CURRENTLY UNSUPPORTED!)
+# Building - Windows
 This is the far more complicated of the two platforms to build on.
 
 ### Setup
