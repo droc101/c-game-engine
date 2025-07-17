@@ -56,7 +56,7 @@ jobs:
 
     - name: Configure CMake
       shell: msys2 {0}
-      run: cmake -B "$MINGW_WORKSPACE/build-${{ matrix.build_type }}" -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      run: cmake -B "$MINGW_WORKSPACE/build-${{ matrix.build_type }}" -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_C_COMPILER=Clang -DCMAKE_CXX_COMPILER=Clang++
 
     - name: Build
       shell: msys2 {0}
