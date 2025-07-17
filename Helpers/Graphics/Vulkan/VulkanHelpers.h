@@ -23,14 +23,12 @@
 		const VkResult result = function; \
 		if (result != VK_SUCCESS) \
 		{ \
-			printf("\033[31m"); \
-			printf(__VA_ARGS__); \
-			printf("\033[0m Error code %d\n", result); \
+			LogInternal("VULKAN", 31, false, __VA_ARGS__); \
+			LogInternal(NULL, 0, true, "Error code: %d\n", result); \
 			if (result == VK_ERROR_DEVICE_LOST) \
 			{ \
-				printf("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.webp for more information\n"); \
+				LogInfo("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.webp for more information\n"); \
 			} \
-			fflush(stdout); \
 			return returnValue; \
 		} \
 	}
