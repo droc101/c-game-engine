@@ -82,5 +82,7 @@ jobs:
           build-${{ matrix.build_type }}/libogg-0.dll
           build-${{ matrix.build_type }}/libwinpthread-1.dll
           build-${{ matrix.build_type }}/libopus-0.dll 
+          build-${{ matrix.build_type }}/libgcc_s_seh-1.dll
+          build-${{ matrix.build_type }}/libstdc++-6.dll
           build-${{ matrix.build_type }}/assets/
         retention-days: 90

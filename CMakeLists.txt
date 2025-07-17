@@ -282,6 +282,8 @@ if (WIN32)
             libogg-0.dll
             libwinpthread-1.dll
             libopus-0.dll
+            libgcc_s_seh-1.dll
+            libstdc++-6.dll
     )
 
     add_custom_target(copydlls ALL
