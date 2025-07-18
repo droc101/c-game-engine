@@ -272,7 +272,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw floor!");
 	}
 
-	if (buffers.walls.objectCount > loadedLevel->hasCeiling + 1)
+	if (buffers.walls.objectCount)
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
 													 buffers.walls.indices.buffer,
