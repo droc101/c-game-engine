@@ -9,6 +9,7 @@
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
 #include "GL/GLHelper.h"
+#include "Vulkan/Vulkan.h"
 
 Renderer currentRenderer;
 bool lowFPSMode;
@@ -136,15 +137,15 @@ void RenderDestroy()
 	}
 }
 
-VkResult FrameStart()
+bool FrameStart()
 {
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			return VK_FrameStart();
+			return VK_FrameStart() == VK_SUCCESS;
 		case RENDERER_OPENGL:
 		default:
-			return VK_SUCCESS;
+			return true;
 	}
 }
 

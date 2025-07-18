@@ -51,7 +51,7 @@ ModelDefinition *LoadModel(const char *asset);
  * @param id The model ID to fetch
  * @return The model with the given ID
  */
-ModelDefinition *GetModelFromId(uint id);
+extern ModelDefinition *GetModelFromId(uint id);
 
 /**
  * Load a font from an asset

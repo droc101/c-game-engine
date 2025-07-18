@@ -9,7 +9,7 @@
 /// The length of the longest value passed to the type argument of the LogInternal function (including the null) plus 7
 #define bufferLength 14
 
-FILE *LogFile = NULL;
+FILE *logFile = NULL;
 
 void LogInit()
 {
@@ -22,9 +22,9 @@ void LogInit()
 
 	SDL_free(folderPath);
 
-	LogFile = fopen(filePath, "w");
+	logFile = fopen(filePath, "w");
 	free(filePath);
-	if (LogFile == NULL)
+	if (logFile == NULL)
 	{
 		Error("Failed to open log file");
 	}
@@ -32,9 +32,9 @@ void LogInit()
 
 void LogDestroy()
 {
-	if (LogFile != NULL)
+	if (logFile != NULL)
 	{
-		fclose(LogFile);
+		fclose(logFile);
 	}
 }
 
@@ -43,17 +43,24 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	va_list args;
 	va_start(args, message);
 	char buf[bufferLength];
-	sprintf(buf, "\x1b[%02dm[%s]", color, type);
+	if (!type)
+	{
+		sprintf(buf, "\x1b[%02dm", color);
+	} else
+	{
+		sprintf(buf, "\x1b[%02dm[%s]", color, type);
+	}
 	printf("%-" TO_STR(bufferLength) "s", buf);
 	vprintf(message, args);
 	printf("\x1b[0m");
+	va_end(args);
+	va_start(args, message);
+	fprintf(logFile, "[%.*s] ", bufferLength - 8, type); // Minus 8 due to color, brackets, and null not included
+	vfprintf(logFile, message, args);
+	va_end(args);
 	if (flush)
 	{
 		fflush(stdout);
+		fflush(logFile);
 	}
-	va_end(args);
-	va_start(args, message);
-	fprintf(LogFile, "[%s] ", type);
-	vfprintf(LogFile, message, args);
-	va_end(args);
 }

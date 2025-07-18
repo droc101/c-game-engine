@@ -41,13 +41,13 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, byte signal, co
 	if (signal == LASER_EMITTER_INPUT_DISABLE)
 	{
 		ActorTriggerInput(this, data->laserActor, LASER_INPUT_DISABLE, NULL);
-		this->actorModelSkin = EMITTER_SKIN_OFF;
+		this->currentSkinIndex = EMITTER_SKIN_OFF;
 		return true;
 	}
 	if (signal == LASER_EMITTER_INPUT_ENABLE)
 	{
 		ActorTriggerInput(this, data->laserActor, LASER_INPUT_ENABLE, NULL);
-		this->actorModelSkin = (int)data->height + 1;
+		this->currentSkinIndex = data->height + 1;
 		return true;
 	}
 	return false;
@@ -77,7 +77,7 @@ void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
 	data->hasTicked = false;
 
 	this->actorModel = LoadModel(MODEL("model_laseremitter"));
-	this->actorModelSkin = (int)data->height + 1;
+	this->currentSkinIndex = data->height + 1;
 
 	CreateLaserEmitterCollider(this, worldId);
 

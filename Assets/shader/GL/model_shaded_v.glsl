@@ -5,7 +5,7 @@ in vec2 VERTEX_UV; // Vertex UV coordinates
 in vec3 VERTEX_NORMAL; // Vertex normal
 
 out vec2 UV; // Output UV coordinates for fragment shader
-out vec3 NORMAL; // Output normal for fragment shader
+out float NORMAL_Z; // Output z component of normal vector for fragment shader
 
 uniform mat4 MODEL_WORLD_MATRIX; // Model to world matrix
 
@@ -24,5 +24,6 @@ void main() {
 
 	vec3 normal = normalize(VERTEX_NORMAL);
 	normal = normalize(vec3((MODEL_WORLD_MATRIX) * vec4(normal, 0.0)));
-	NORMAL = normal;
+
+	NORMAL_Z = normal.z;
 }

@@ -124,9 +124,7 @@ bool GL_PreInit()
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8), "Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8), "Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8),
-					"Failed to set OpenGL alpha-size",
-					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8), "Failed to set OpenGL alpha-size", GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24),
 					"Failed to set OpenGL depth buffer size",
 					GL_INIT_FAIL_MSG);
@@ -417,7 +415,7 @@ int GL_RegisterTexture(const byte *pixelData, const int width, const int height)
 	return slot;
 }
 
-void GL_LoadModel(const ModelDefinition *model, const int lod, const int material)
+void GL_LoadModel(const ModelDefinition *model, const uint lod, const int material)
 {
 	if (glModels[model->id] != NULL)
 	{
@@ -866,17 +864,17 @@ void GL_DrawTexturedArrays(const float *vertices,
 
 #pragma region World Utilities
 
-void GL_SetLevelParams(mat4 *mvp, const Level *l)
+void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level)
 {
 	GL_SharedUniforms uniforms;
-	glm_mat4_copy(mvp[0], uniforms.worldViewMatrix);
-	glm_vec3_copy((vec3){(float)(l->fogColor >> 16 & 0xFF) / 255.0f,
-						 (float)(l->fogColor >> 8 & 0xFF) / 255.0f,
-						 (float)(l->fogColor & 0xFF) / 255.0f},
+	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
+	glm_vec3_copy((vec3){(float)(level->fogColor >> 16 & 0xFF) / 255.0f,
+						 (float)(level->fogColor >> 8 & 0xFF) / 255.0f,
+						 (float)(level->fogColor & 0xFF) / 255.0f},
 				  uniforms.fogColor);
 	uniforms.cameraYaw = GetState()->cam->yaw;
-	uniforms.fogStart = (float)l->fogStart;
-	uniforms.fogEnd = (float)l->fogEnd;
+	uniforms.fogStart = (float)level->fogStart;
+	uniforms.fogEnd = (float)level->fogEnd;
 
 	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
@@ -899,57 +897,43 @@ inline void GL_Disable3D()
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-mat4 *GL_GetMatrix(const Camera *cam)
+void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 {
-	vec3 cameraPosition = {cam->x, cam->y, cam->z};
-	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
+	mat4 perspectiveMatrix;
+	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
-	mat4 identityMatrix = GLM_MAT4_IDENTITY_INIT;
-	mat4 perspectiveMatrix = GLM_MAT4_ZERO_INIT;
-	glm_perspective(glm_rad(cam->fov), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
+	vec3 viewTarget = {cosf(camera->yaw), 0, sinf(camera->yaw)};
 
-	vec3 lookAtPosition = {cosf(cam->yaw), 0, sinf(cam->yaw)};
-	vec3 upVector = {0, 1, 0};
+	// TODO roll and pitch might be messed up (test and fix as needed)
+	glm_vec3_rotate(viewTarget, camera->roll, GLM_ZUP); // Roll
+	glm_vec3_rotate(viewTarget, camera->pitch, GLM_XUP); // Pitch
 
-	// TODO: roll and pitch are messed up
+	vec3 cameraPosition = {camera->x, camera->y, camera->z};
+	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
 
-	glm_vec3_rotate(lookAtPosition, cam->roll, (vec3){0, 0, 1}); // Roll
-	glm_vec3_rotate(lookAtPosition, cam->pitch, (vec3){1, 0, 0}); // Pitch
+	mat4 viewMatrix;
+	glm_lookat(cameraPosition, viewTarget, GLM_YUP, viewMatrix);
 
-	lookAtPosition[0] += cameraPosition[0];
-	lookAtPosition[1] += cameraPosition[1];
-	lookAtPosition[2] += cameraPosition[2];
-
-	mat4 viewMatrix = GLM_MAT4_ZERO_INIT;
-	glm_lookat(cameraPosition, lookAtPosition, upVector, viewMatrix);
-
-	mat4 modelViewMatrix = GLM_MAT4_ZERO_INIT;
-	glm_mat4_mul(viewMatrix, identityMatrix, modelViewMatrix);
-
-	mat4 *modelViewProjectionMatrix = malloc(sizeof(mat4));
-	CheckAlloc(modelViewProjectionMatrix);
-	glm_mat4_mul(perspectiveMatrix, modelViewMatrix, *modelViewProjectionMatrix);
-
-	return modelViewProjectionMatrix;
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
 
-void GL_GetViewModelMatrix(mat4 *out)
+void GL_GetViewmodelMatrix(mat4 *out)
 {
-	mat4 perspectiveMatrix = GLM_MAT4_ZERO_INIT;
-
-	const float aspectRatio = WindowWidthFloat() / WindowHeightFloat();
-	glm_mat4_identity(perspectiveMatrix);
-	glm_perspective(glm_rad(VIEWMODEL_FOV), aspectRatio, NEAR_Z, FAR_Z, perspectiveMatrix);
+	mat4 perspectiveMatrix;
+	glm_perspective(glm_rad(VIEWMODEL_FOV),
+					WindowWidthFloat() / WindowHeightFloat(),
+					NEAR_Z,
+					FAR_Z,
+					perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix, GetState()->viewmodel.translation);
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
-	glm_rotate(rotationMatrix, GetState()->viewmodel.rotation[1], (vec3){0, 1, 0});
+	glm_rotate(rotationMatrix, GetState()->viewmodel.rotation[1], GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
-
 	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
 }
 
@@ -1070,38 +1054,39 @@ void GL_DrawFloor(const Vector2 vp1, const Vector2 vp2, const char *texture, con
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderLevel(const Level *l, const Camera *cam)
+void GL_RenderLevel(const Level *level, const Camera *camera)
 {
 	GL_Enable3D();
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	//glLineWidth(2);
 
-	mat4 *worldViewMatrix = GL_GetMatrix(cam);
+	mat4 worldViewMatrix;
+	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translated(skyModelWorldMatrix, (vec3){(float)l->player.pos.x, 0, (float)l->player.pos.y});
+	glm_translated(skyModelWorldMatrix, (vec3){(float)level->player.pos.x, 0, (float)level->player.pos.y});
 
-	const Vector2 floorStart = v2(l->player.pos.x - 100, l->player.pos.y - 100);
-	const Vector2 floorEnd = v2(l->player.pos.x + 100, l->player.pos.y + 100);
+	const Vector2 floorStart = v2(level->player.pos.x - 100, level->player.pos.y - 100);
+	const Vector2 floorEnd = v2(level->player.pos.x + 100, level->player.pos.y + 100);
 
-	GL_SetLevelParams(worldViewMatrix, l);
+	GL_SetLevelParams(&worldViewMatrix, level);
 
-	if (l->hasCeiling)
+	if (level->hasCeiling)
 	{
-		GL_DrawFloor(floorStart, floorEnd, l->ceilOrSkyTex, 0.5f, 0.8f);
+		GL_DrawFloor(floorStart, floorEnd, level->ceilOrSkyTex, 0.5f, 0.8f);
 	} else
 	{
-		GL_RenderModel(skyModel, skyModelWorldMatrix, 0);
+		GL_RenderModel(skyModel, skyModelWorldMatrix, 0, 0);
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
-	GL_DrawFloor(floorStart, floorEnd, l->floorTex, -0.5f, 1.0f);
+	GL_DrawFloor(floorStart, floorEnd, level->floorTex, -0.5f, 1.0f);
 
 	GL_RenderLevelWalls();
 
-	for (int i = 0; i < l->actors.length; i++)
+	for (int i = 0; i < level->actors.length; i++)
 	{
-		const Actor *actor = ListGet(l->actors, i);
+		const Actor *actor = ListGet(level->actors, i);
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);
 		if (actor->actorModel == NULL)
@@ -1113,18 +1098,16 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 			GL_DrawActorWall(actor);
 		} else
 		{
-			GL_RenderModel(actor->actorModel, actorXfm, actor->actorModelSkin);
+			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod);
 		}
 	}
-
-	free(worldViewMatrix);
 
 	if (GetState()->viewmodel.enabled)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		mat4 viewModelMatrix;
-		GL_GetViewModelMatrix(&viewModelMatrix);
+		GL_GetViewmodelMatrix(&viewModelMatrix);
 
 		GL_SharedUniforms uniforms;
 		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
@@ -1136,7 +1119,7 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0);
+		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0);
 	}
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -1146,9 +1129,9 @@ void GL_RenderLevel(const Level *l, const Camera *cam)
 
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
-						const int lod,
+						const uint lod,
 						const int material,
-						const int skin)
+						const uint skin)
 {
 	Material *skinMats = model->skins[skin];
 
@@ -1216,29 +1199,9 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const int skin)
+void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const uint skin, const uint lod)
 {
 	glEnable(GL_CULL_FACE);
-	int lod = 0;
-	if (model->lodCount > 1)
-	{
-		const float distanceToCamera = glm_vec3_distance((vec3){modelWorldMatrix[3][0],
-																modelWorldMatrix[3][1],
-																modelWorldMatrix[3][2]},
-														 (vec3){GetState()->cam->x,
-																GetState()->cam->y,
-																GetState()->cam->z});
-
-		for (int i = model->lodCount - 1; i >= 0; i--)
-		{
-			if (distanceToCamera > model->lods[i]->distance * GetState()->options.lodMultiplier)
-			{
-				lod = i;
-				break;
-			}
-		}
-	}
-
 	for (int m = 0; m < model->materialCount; m++)
 	{
 		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);

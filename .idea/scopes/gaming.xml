@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="gaming" pattern="(file[raytracer-c]:Actor//*||file[raytracer-c]:Debug//*||file[raytracer-c]:Docs//*||file[raytracer-c]:GameStates//*||file[raytracer-c]:Helpers//*||file[raytracer-c]:Structs//*||file[raytracer-c]:Assets/*||file:Assets/AssetReader.c||file:Assets/AssetReader.h||file[raytracer-c]:Assets/shader//*||file:CMakeLists.txt||file:config.h||file:defines.h||file:game.rc||file:main.c||file:README.md)&amp;&amp;!file:Assets/genassets.py||file[untitled1]:Structs//*||file[untitled1]:Helpers//*||file[untitled1]:GameStates//*||file[untitled1]:Debug//*||file[untitled1]:Actor//*" />
-</component>

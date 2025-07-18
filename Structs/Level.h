@@ -61,10 +61,4 @@ Actor *GetActorByName(const char *name, const Level *l);
  */
 List *GetActorsByName(const char *name, const Level *l);
 
-/**
- * Render the full level
- * @param g The global state
- */
-void RenderLevel(const GlobalState *g);
-
 #endif //GAME_LEVEL_H

@@ -12,6 +12,18 @@
                 "color": [255, 0, 0],
                 "shader": "shaded"
             }
+        },
+        {
+            "whyIsThisCalledGreen": {
+                "texture": "actor_monster1",
+                "color": [0, 255, 0],
+                "shader": "shaded"
+            },
+            "whyIsThisCalledRed": {
+                "texture": "actor_monster2",
+                "color": [0, 0, 255],
+                "shader": "shaded"
+            }
         }
     ],
     "lods": [

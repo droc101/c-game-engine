@@ -2,7 +2,6 @@
 #include <SDL_mixer.h>
 #include <stdio.h>
 #include <string.h>
-#include <vulkan/vulkan_core.h>
 #include "config.h"
 #include "Debug/DPrint.h"
 #include "Debug/FrameBenchmark.h"
@@ -15,6 +14,7 @@
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
 #include "Helpers/Core/KVList.h"
+#include "Helpers/Core/LodThread.h"
 #include "Helpers/Core/Logging.h"
 #include "Helpers/Core/PhysicsThread.h"
 #include "Helpers/Core/Timing.h"
@@ -305,7 +305,7 @@ int main(const int argc, char *argv[])
 		}
 		GlobalState *state = GetState();
 
-		if (FrameStart() != VK_SUCCESS)
+		if (!FrameStart())
 		{
 			if (state->UpdateGame)
 			{
@@ -377,6 +377,7 @@ int main(const int argc, char *argv[])
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
 	PhysicsThreadTerminate();
+	LodThreadDestroy();
 	InputDestroy();
 	DestroyGlobalState();
 	SDL_DestroyWindow(GetGameWindow());

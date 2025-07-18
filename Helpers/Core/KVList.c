@@ -78,7 +78,7 @@ Param *KvGet(const KvList *list, const char *key)
 	{
 		return ListGet(list->values, index);
 	}
-	LogWarning("Tried to get key '%s' from KvList, but it does not exist.", key);
+	LogWarning("Tried to get key '%s' from KvList, but it does not exist.\n", key);
 	return NULL; // Not found
 }
 

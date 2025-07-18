@@ -164,10 +164,10 @@ void GL_DrawTexture_Internal(Vector2 pos,
 
 /**
  * Set the level parameters for rendering
- * @param mvp The model -> screen matrix
- * @param l The level
+ * @param modelViewProjection The model -> screen matrix
+ * @param level The level
  */
-void GL_SetLevelParams(mat4 *mvp, const Level *l);
+void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level);
 
 /**
  * Enable 3D mode
@@ -208,7 +208,7 @@ void GL_DestroyBuffer(GL_Buffer *buffer);
  * @param lod The LOD to load
  * @param material The material to load
  */
-void GL_LoadModel(const ModelDefinition *model, int lod, int material);
+void GL_LoadModel(const ModelDefinition *model, uint lod, int material);
 
 /**
  * Get the wall buffer for a texture, or create it if it doesn't exist.
@@ -226,7 +226,7 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture);
  * @param material The material to render
  * @param skin The skin to use for the model
  */
-void GL_RenderModelPart(const ModelDefinition *model, const mat4 modelWorldMatrix, int lod, int material, int skin);
+void GL_RenderModelPart(const ModelDefinition *model, const mat4 modelWorldMatrix, uint lod, int material, uint skin);
 
 
 #endif //GLINTERNAL_H

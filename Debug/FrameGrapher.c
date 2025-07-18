@@ -156,7 +156,7 @@ void FrameGraphDraw()
 #endif
 	}
 #else
-	uint lineColor;
+	Color lineColor;
 #endif
 	const double currentNs = framerates[FRAMEGRAPH_HISTORY_SIZE - 1];
 	const double currentF = 1000000000.0 / currentNs;

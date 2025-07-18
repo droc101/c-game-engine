@@ -6,7 +6,6 @@
 #define GAME_VULKAN_H
 
 #include <vulkan/vulkan.h>
-#include "../Drawing.h"
 #include "../RenderingHelpers.h"
 
 #define VK_X_TO_NDC(x) ((float)(x) / WindowWidth() * 2.0f - 1.0f)
@@ -29,7 +28,9 @@ VkResult VK_FrameStart();
 VkResult VK_FrameEnd();
 
 //TODO document me
-VkResult VK_RenderLevel(const Level *level, const Camera *camera);
+VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel);
+
+bool VK_UpdateActors(const List *actors, bool shouldReloadActors);
 
 /// A function used to destroy the Vulkan objects when they are no longer needed.
 bool VK_Cleanup();

@@ -8,8 +8,6 @@ layout (push_constant) uniform PushConstants {
 	uint skyVertexCount;
 	uint skyTextureIndex;
 
-	uint shadowTextureIndex;
-
 	float fogStart;
 	float fogEnd;
 	uint fogColor;
@@ -17,19 +15,17 @@ layout (push_constant) uniform PushConstants {
 
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec3 inNormal;
-layout(location = 3) in mat4 inTransform;
-layout(location = 7) in uint inTextureIndex;
-layout(location = 8) in float inWallAngle;
+layout(location = 2) in mat4 inTransform;
+layout(location = 6) in uint inTextureIndex;
+layout(location = 7) in vec4 inColor;
 
 layout(location = 0) out vec2 outUV;
 layout(location = 1) flat out uint outTextureIndex;
-layout (location = 2) out float outShading;
+layout(location = 2) out vec4 outColor;
 
 void main() {
-	gl_Position = pushConstants.translationMatrix * inTransform * vec4(inVertex, 1.0);
 	outUV = inUV;
 	outTextureIndex = inTextureIndex;
-
-	outShading = isnan(inNormal.z) ? max(0.6, min(1, abs(cos(pushConstants.yaw - inWallAngle)))) : max(0.6, 1 - pow(2, -10 * inNormal.z));
+	outColor = inColor;
+	gl_Position = pushConstants.translationMatrix * inTransform * vec4(inVertex, 1.0);
 }

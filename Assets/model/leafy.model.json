@@ -13,18 +13,6 @@
                 "shader": "unshaded"
             }
             
-        },
-        {
-            "LEAFY_MAIN": {
-                "texture": "level_floor",
-                "color": [255, 255, 255],
-                "shader": "shaded"
-            },
-            "LEAFY_EYES": {
-                "texture": "actor_leafyeyes",
-                "color": [255, 255, 255],
-                "shader": "unshaded"
-            }
         }
     ],
     "lods": [

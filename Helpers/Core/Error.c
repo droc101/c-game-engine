@@ -115,7 +115,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 			fflush(stdout);
 
 #ifdef WIN32
-			*(volatile int *)0 = 0; // die immediately
+			__debugbreak(); // SIGTRAP doesn't exist on Windows
 #else
 			// emit sigtrap to allow debugger to catch the error
 			raise(SIGTRAP);

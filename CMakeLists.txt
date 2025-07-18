@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(game C)
+project(game C CXX)
 
 #region Compile options
 
@@ -9,12 +9,12 @@ set(CMAKE_C_FLAGS "-Wall -Wno-discarded-qualifiers -fvisibility=hidden")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG -fwhole-program")
 
 if (WIN32)
     set(CMAKE_AUTO_RCC ON)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mwindows") # Hides console window
-else()
+else ()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -rdynamic")
 endif ()
 
@@ -30,15 +30,15 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDeb
     endif ()
 endif ()
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|ARM64|arm64)")
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|ARM64|arm64)")
     message(STATUS "Detected ARM64 architecture (no support will be provided)")
     set(TARGET_ARCH "arm64")
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)")
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)")
     message(STATUS "Detected x86_64 architecture")
     set(TARGET_ARCH "x86_64")
-else()
+else ()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
-endif()
+endif ()
 
 #endregion
 
@@ -151,10 +151,11 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanInternal.h
         Helpers/Graphics/Vulkan/VulkanHelpers.c
         Helpers/Graphics/Vulkan/VulkanHelpers.h
-        Helpers/Graphics/Vulkan/VulkanMemory.c
-        Helpers/Graphics/Vulkan/VulkanMemory.h
         Helpers/Graphics/Vulkan/VulkanResources.c
         Helpers/Graphics/Vulkan/VulkanResources.h
+        Helpers/Graphics/Vulkan/VulkanActors.c
+        Helpers/Graphics/Vulkan/VulkanActors.h
+        Helpers/Graphics/Vulkan/VulkanPipelines.c
         Helpers/Navigation.c
         Helpers/Navigation.h
         Helpers/Collision.c
@@ -179,6 +180,8 @@ add_executable(
         Actor/Core/Sprite.h
         Actor/LaserEmitter.c
         Actor/LaserEmitter.h
+        Helpers/Core/LodThread.c
+        Helpers/Core/LodThread.h
         Actor/Core/Logic.c
         Actor/Core/Logic.h
         Helpers/Core/Arguments.c
@@ -189,21 +192,31 @@ add_executable(
 
 #region Libraries
 
+include(FetchContent)
+find_package(Git 2.18 REQUIRED)
+if (WIN32)
+    execute_process(COMMAND powershell -command "((& '${GIT_EXECUTABLE}' -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort=version:refname --tags https://github.com/NBT22/Luna.git 'v0.1.*' | Select-Object -Last 1) -Split '/')[2]" OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE LATEST_RELEASE)
+else ()
+    execute_process(COMMAND ${GIT_EXECUTABLE} -c "versionsort.suffix=-" ls-remote --exit-code --refs --sort=version:refname --tags https://github.com/NBT22/Luna.git "v0.1.*" COMMAND tail --lines=1 COMMAND cut --delimiter=/ --fields=3 COMMAND tr -d "\n" OUTPUT_VARIABLE LATEST_RELEASE)
+endif ()
+
+FetchContent_Declare(
+        Luna
+        GIT_REPOSITORY https://github.com/NBT22/Luna.git
+        GIT_TAG ${LATEST_RELEASE}
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        EXCLUDE_FROM_ALL
+        SYSTEM
+        OVERRIDE_FIND_PACKAGE
+)
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Vulkan REQUIRED)
-
-include_directories(
-        ${SDL2_INCLUDE_DIRS}
-        ${ZLIB_INCLUDE_DIRS}
-        ${OPENGL_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIRS}
-        ${Vulkan_INCLUDE_DIRS}
-        "${CMAKE_SOURCE_DIR}/lib/box2d/include"
-)
+find_package(Luna REQUIRED)
 
 if (UNIX)
     if (TARGET_ARCH STREQUAL "arm64")
@@ -219,7 +232,7 @@ set(CROSS_PLATFORM_LIBRARIES
         ${SDL2_LIBRARIES}
         ${ZLIB_LIBRARIES}
         SDL2_mixer::SDL2_mixer
-        ${Vulkan_LIBRARIES}
+        Luna
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}
         ${BOX2D_LIB}
@@ -230,6 +243,15 @@ if (UNIX)
 elseif (WIN32)
     target_link_libraries(game PRIVATE ${CROSS_PLATFORM_LIBRARIES} opengl32 dwmapi)
 endif ()
+
+set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX)
+include_directories(game PRIVATE
+        ${SDL2_INCLUDE_DIRS}
+        ${ZLIB_INCLUDE_DIRS}
+        ${OPENGL_INCLUDE_DIR}
+        ${GLEW_INCLUDE_DIRS}
+        "${CMAKE_SOURCE_DIR}/lib/box2d/include"
+)
 
 #endregion
 
@@ -270,22 +292,23 @@ if (WIN32)
             libogg-0.dll
             libwinpthread-1.dll
             libopus-0.dll
+            libgcc_s_seh-1.dll
+            libstdc++-6.dll
     )
 
     add_custom_target(copydlls ALL
             COMMENT "Copying DLLs to build output directory"
     )
 
-    foreach(dll IN LISTS DLLS)
+    foreach (dll IN LISTS DLLS)
         add_custom_command(TARGET copydlls POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${MINGW_PATH}\\bin\\${dll}"
                 "${CMAKE_BINARY_DIR}\\${dll}"
         )
-    endforeach()
+    endforeach ()
 
     add_dependencies(game copydlls)
 
-endif()
-
+endif ()
 #endregion

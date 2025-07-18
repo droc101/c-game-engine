@@ -6,8 +6,6 @@
 #define GAME_RENDERINGHELPERS_H
 
 #include "../../defines.h"
-#include "cglm/cglm.h"
-#include "Vulkan/Vulkan.h"
 
 extern Renderer currentRenderer;
 
@@ -100,7 +98,7 @@ void RenderDestroy();
 /**
  * Run tasks that need to be run before any drawing can be done
  */
-VkResult FrameStart();
+bool FrameStart();
 
 /**
  * Run tasks needed to present the frame to the screen, as well as swapping the framebuffers
