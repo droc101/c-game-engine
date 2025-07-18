@@ -55,6 +55,7 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	printf("\x1b[0m");
 	va_end(args);
 	va_start(args, message);
+	fprintf(logFile, "[%.*s] ", bufferLength - 8, type); // Minus 8 due to color, brackets, and null not included
 	vfprintf(logFile, message, args);
 	va_end(args);
 	if (flush)
