@@ -3,7 +3,7 @@
 layout (push_constant) uniform PushConstants {
 	vec2 playerPosition;
 	float yaw;
-	mat4 translationMatrix;
+	mat4 transformMatrix;
 
 	uint skyVertexCount;
 	uint skyTextureIndex;
@@ -30,5 +30,5 @@ void main() {
 	outTextureIndex = inTextureIndex;
 	outTransformedNormalZ = (inTransform * vec4(inNormal, 0)).z;
 	outColor = inColor;
-	gl_Position = pushConstants.translationMatrix * inTransform * vec4(inVertex, 1.0);
+	gl_Position = pushConstants.transformMatrix * inTransform * vec4(inVertex, 1.0);
 }

@@ -21,7 +21,7 @@ layout(push_constant) uniform PushConstants
 {
 	vec2 playerPosition;
 	float yaw;
-	mat4 translationMatrix;
+	mat4 transformMatrix;
 
 	uint roofTextureIndex;
 	uint floorTextureIndex;
@@ -43,10 +43,10 @@ void main()
 	if (gl_VertexIndex < 6) {
 		outTextureIndex = pushConstants.floorTextureIndex;
 		outMultiplier = 1;
-		gl_Position = pushConstants.translationMatrix * vec4(vertex.x, -0.5, vertex.y, 1);
+		gl_Position = pushConstants.transformMatrix * vec4(vertex.x, -0.5, vertex.y, 1);
 	} else {
 		outTextureIndex = pushConstants.roofTextureIndex;
 		outMultiplier = 0.8;
-		gl_Position = pushConstants.translationMatrix * vec4(vertex.x, 0.5, vertex.y, 1);
+		gl_Position = pushConstants.transformMatrix * vec4(vertex.x, 0.5, vertex.y, 1);
 	}
 }

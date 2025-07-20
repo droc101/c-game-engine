@@ -7,8 +7,9 @@
 #define VULKANINTERNAL_H
 
 #include <cglm/cglm.h>
+#include <SDL_video.h>
 
-bool CreateInstance();
+bool CreateInstance(SDL_Window *window);
 
 bool CreateSurface();
 

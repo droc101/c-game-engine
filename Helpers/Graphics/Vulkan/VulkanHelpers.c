@@ -12,16 +12,21 @@
 #include "VulkanResources.h"
 
 #pragma region variables
-SDL_Window *vulkanWindow = NULL;
 bool minimized = false;
-bool shouldDropFrame = false;
-size_t loadedActors = 0;
-
-VkSurfaceKHR surface = VK_NULL_HANDLE;
-VkPhysicalDeviceLimits physicalDeviceLimits = {0};
 VkExtent2D swapChainExtent = {0};
-LunaRenderPass renderPass = LUNA_NULL_HANDLE;
+VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
+List textures = {0};
+uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
+LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
+TextureSamplers textureSamplers = {
+	.linearRepeat = LUNA_NULL_HANDLE,
+	.nearestRepeat = LUNA_NULL_HANDLE,
+	.linearNoRepeat = LUNA_NULL_HANDLE,
+	.nearestNoRepeat = LUNA_NULL_HANDLE,
+};
+PushConstants pushConstants = {0};
+LunaRenderPass renderPass = LUNA_NULL_HANDLE;
 Pipelines pipelines = {
 	.ui = LUNA_NULL_HANDLE,
 	.viewModel = LUNA_NULL_HANDLE,
@@ -32,7 +37,6 @@ Pipelines pipelines = {
 	.shadedActorModels = LUNA_NULL_HANDLE,
 	.unshadedActorModels = LUNA_NULL_HANDLE,
 };
-uint8_t currentFrame = 0;
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
 	.ui.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_UI_QUADS_INIT,
@@ -40,7 +44,7 @@ Buffers buffers = {
 	.sky.indices.allocatedSize = 0,
 	.walls.vertices.allocatedSize = sizeof(WallVertex) * 4 * MAX_WALLS_INIT,
 	.walls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALLS_INIT,
-	.actorWalls.vertices.allocatedSize = sizeof(ActorVertex) * 4 * MAX_WALL_ACTORS_INIT,
+	.actorWalls.vertices.allocatedSize = sizeof(ActorWallVertex) * 4 * MAX_WALL_ACTORS_INIT,
 	.actorWalls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
 	.actorWalls.instanceData.allocatedSize = sizeof(ActorWallInstanceData) * MAX_WALL_ACTORS_INIT,
 	.actorWalls.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_WALL_ACTORS_INIT,
@@ -50,21 +54,7 @@ Buffers buffers = {
 	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 };
-LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
-List textures = {0};
-uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
-TextureSamplers textureSamplers = {
-	.linearRepeat = LUNA_NULL_HANDLE,
-	.nearestRepeat = LUNA_NULL_HANDLE,
-	.linearNoRepeat = LUNA_NULL_HANDLE,
-	.nearestNoRepeat = LUNA_NULL_HANDLE,
-};
-VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-PushConstants pushConstants = {0};
-List lodIdsLoadedForDraw = {0};
-List lodCounts = {0};
 #pragma endregion variables
-
 
 VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
 {
@@ -95,6 +85,9 @@ inline uint32_t ImageIndex(const Image *image)
 	{
 		if (!LoadTexture(image))
 		{
+			// TODO: If loading a texture fails it can't fall back to OpenGL.
+			//  There is no easy way to fix this with the current system, since the return value of this function is not
+			//  checked but instead is just assumed to be valid. That rules out returning something like -1 on error.
 			Error("Failed to load texture!");
 		}
 		return imageAssetIdToIndexMap[image->id];
@@ -235,7 +228,7 @@ void LoadWalls(const Level *level)
 	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed, 0);
 }
 
-void UpdateTranslationMatrix(const Camera *camera)
+void UpdateTransformMatrix(const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(camera->fov),
@@ -256,7 +249,7 @@ void UpdateTranslationMatrix(const Camera *camera)
 	mat4 viewMatrix;
 	glm_lookat_lh_zo(cameraPosition, viewTarget, (vec3){0.0f, -1.0f, 0.0f}, viewMatrix);
 
-	glm_mat4_mul(perspectiveMatrix, viewMatrix, pushConstants.translationMatrix);
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, pushConstants.transformMatrix);
 }
 
 // TODO: This positions the model slightly differently than OpenGL does
@@ -302,13 +295,13 @@ void DrawRectInternal(const float ndcStartX,
 					  const Color color,
 					  const uint32_t textureIndex)
 {
-	const mat4 matrix = {
+	const mat4 vertices = {
 		{ndcEndX, ndcStartY, endU, startV},
 		{ndcStartX, ndcStartY, startU, startV},
 		{ndcStartX, ndcEndY, startU, endV},
 		{ndcEndX, ndcEndY, endU, endV},
 	};
-	DrawQuadInternal(matrix, color, textureIndex);
+	DrawQuadInternal(vertices, color, textureIndex);
 }
 
 void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const uint32_t textureIndex)

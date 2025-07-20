@@ -22,7 +22,7 @@ static const VkPipelineRasterizationStateCreateInfo cullingRasterizer = {
 	.lineWidth = 1,
 };
 
-static const VkPipelineRasterizationStateCreateInfo noncullingRasterizer = {
+static const VkPipelineRasterizationStateCreateInfo nonCullingRasterizer = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 	.polygonMode = VK_POLYGON_MODE_FILL,
 	.cullMode = VK_CULL_MODE_NONE,
@@ -464,7 +464,7 @@ bool CreateWallPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &noncullingRasterizer,
+		.rasterizationState = &nonCullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -500,7 +500,7 @@ bool CreateActorWallPipeline()
 	const VkVertexInputBindingDescription bindingDescriptions[] = {
 		{
 			.binding = 0,
-			.stride = sizeof(ActorVertex),
+			.stride = sizeof(ActorWallVertex),
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		},
 		{
@@ -514,13 +514,13 @@ bool CreateActorWallPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorVertex, x),
+			.offset = offsetof(ActorWallVertex, x),
 		},
 		{
 			.location = 1,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorVertex, u),
+			.offset = offsetof(ActorWallVertex, u),
 		},
 		{
 			.location = 2,
@@ -573,7 +573,7 @@ bool CreateActorWallPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &inputAssembly,
 		.viewportState = &viewportState,
-		.rasterizationState = &noncullingRasterizer,
+		.rasterizationState = &nonCullingRasterizer,
 		.multisampleState = &multisampling,
 		.depthStencilState = &depthStencilState,
 		.colorBlendState = &colorBlending,
@@ -815,7 +815,6 @@ bool CreateActorModelUnshadedPipeline()
 
 bool CreateGraphicsPipelines()
 {
-	assert(sizeof(PushConstants) <= physicalDeviceLimits.maxPushConstantsSize);
 	multisampling.rasterizationSamples = msaaSamples;
 
 	// clang-format off

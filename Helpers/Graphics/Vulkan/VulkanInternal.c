@@ -2,6 +2,7 @@
 //
 
 #include "VulkanInternal.h"
+#include <assert.h>
 #include <luna/luna.h>
 #include <SDL_vulkan.h>
 #include "../../../Structs/GlobalState.h"
@@ -10,8 +11,13 @@
 #include "VulkanHelpers.h"
 #include "VulkanResources.h"
 
-bool CreateInstance()
+static SDL_Window *vulkanWindow;
+static VkSurfaceKHR surface;
+static VkPhysicalDeviceLimits physicalDeviceLimits;
+
+bool CreateInstance(SDL_Window *window)
 {
+	vulkanWindow = window;
 	uint32_t extensionCount;
 	if (SDL_Vulkan_GetInstanceExtensions(vulkanWindow, &extensionCount, NULL) == SDL_FALSE)
 	{
@@ -75,6 +81,7 @@ bool CreateLogicalDevice()
 	};
 	VulkanTest(lunaAddNewDevice2(&deviceCreationInfo), "Failed to create logical device!");
 	physicalDeviceLimits = lunaGetPhysicalDeviceProperties().limits;
+	assert(sizeof(PushConstants) <= physicalDeviceLimits.maxPushConstantsSize);
 	return true;
 }
 
@@ -164,9 +171,6 @@ bool CreateRenderPass()
 		  physicalDeviceLimits.framebufferDepthSampleCounts &
 		  msaaSamples))
 	{
-		ShowWarning("Invalid Settings",
-					"Your GPU driver does not support the selected MSAA level!\n"
-					"A fallback has been set to avoid issues.");
 		while (!(physicalDeviceLimits.framebufferColorSampleCounts &
 				 physicalDeviceLimits.framebufferDepthSampleCounts &
 				 msaaSamples))
@@ -174,9 +178,13 @@ bool CreateRenderPass()
 			msaaSamples >>= 1;
 			if (msaaSamples == 0)
 			{
-				Error("Your graphics card cannot graphics please buy a new one.");
+				VulkanLogError("Found device does not support sampling the image even once.");
+				return false;
 			}
 		}
+		ShowWarning("Invalid Settings",
+					"Your GPU driver does not support the selected MSAA level!\n"
+					"A fallback has been set to avoid issues.");
 	}
 
 	const LunaSubpassCreationInfo subpassCreationInfo = {

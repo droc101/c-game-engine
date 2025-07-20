@@ -16,12 +16,12 @@
 #include "VulkanResources.h"
 
 static const Level *loadedLevel;
+static uint8_t currentFrame;
 
 bool VK_Init(SDL_Window *window)
 {
-	vulkanWindow = window;
 	// clang-format off
-	if (CreateInstance() && CreateSurface() && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
+	if (CreateInstance(window) && CreateSurface() && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
 		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
 		CreateDescriptorSets() && CreateBuffers())
 	{
@@ -120,7 +120,19 @@ VkResult VK_FrameEnd()
 		lunaDestroyBuffer(buffers.ui.vertices.buffer);
 		lunaDestroyBuffer(buffers.ui.indices.buffer);
 
-		VulkanTestReturnResult(CreateUiBuffers(), "Failed to recreate UI buffers!");
+		const LunaBufferCreationInfo vertexBufferCreationInfo = {
+			.size = buffers.ui.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.ui.vertices.buffer),
+							   "Failed to recreate UI vertex buffer!");
+
+		const LunaBufferCreationInfo indexBufferCreationInfo = {
+			.size = buffers.ui.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.ui.indices.buffer),
+							   "Failed to recreate UI index buffer!");
 	}
 	if (buffers.ui.objectCount > 0)
 	{
@@ -207,7 +219,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	pushConstants.position[0] = (float)loadedLevel->player.pos.x;
 	pushConstants.position[1] = (float)loadedLevel->player.pos.y;
 	pushConstants.yaw = camera->yaw + 1.5f * PIf;
-	UpdateTranslationMatrix(camera);
+	UpdateTransformMatrix(camera);
 
 	if (LockLodThreadMutex() != 0)
 	{

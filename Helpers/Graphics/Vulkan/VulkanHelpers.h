@@ -145,7 +145,7 @@ typedef struct WallVertex
 	float wallAngle;
 } WallVertex;
 
-typedef struct ActorVertex
+typedef struct ActorWallVertex
 {
 	/// The x component of the vertex's position, in model space
 	float x;
@@ -158,7 +158,7 @@ typedef struct ActorVertex
 	float u;
 	/// The v component of the vertex's uv
 	float v;
-} ActorVertex;
+} ActorWallVertex;
 
 typedef struct ActorWallInstanceData
 {
@@ -250,7 +250,7 @@ typedef struct PushConstants
 {
 	vec2 position;
 	float yaw;
-	mat4 translationMatrix;
+	mat4 transformMatrix;
 
 	uint32_t roofTextureIndex;
 	uint32_t floorTextureIndex;
@@ -262,30 +262,20 @@ typedef struct PushConstants
 #pragma endregion typedefs
 
 #pragma region variables
-// TODO: Reorganize these
-
-extern SDL_Window *vulkanWindow;
 extern bool minimized;
-extern bool shouldDropFrame;
-extern size_t loadedActors;
-
-extern VkSurfaceKHR surface;
-extern VkPhysicalDeviceLimits physicalDeviceLimits;
 extern VkExtent2D swapChainExtent;
-extern LunaRenderPass renderPass;
-extern LunaDescriptorSetLayout descriptorSetLayout;
-extern Pipelines pipelines;
-extern uint8_t currentFrame;
-extern Buffers buffers;
-extern LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
+extern VkSampleCountFlagBits msaaSamples;
 extern List textures;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
+extern LunaDescriptorSetLayout descriptorSetLayout;
+extern LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
 extern TextureSamplers textureSamplers;
-extern VkSampleCountFlagBits msaaSamples;
 extern PushConstants pushConstants;
+extern LunaRenderPass renderPass;
+extern Pipelines pipelines;
+extern Buffers buffers;
 #pragma endregion variables
 
-#pragma region helperFunctions
 VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule);
 
 uint32_t TextureIndex(const char *texture);
@@ -295,10 +285,8 @@ uint32_t ImageIndex(const Image *image);
 VkResult LoadSky(const ModelDefinition *skyModel);
 
 void LoadWalls(const Level *level);
-#pragma endregion helperFunctions
 
-#pragma region drawingHelpers
-void UpdateTranslationMatrix(const Camera *camera);
+void UpdateTransformMatrix(const Camera *camera);
 
 void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
@@ -314,6 +302,5 @@ void DrawRectInternal(float ndcStartX,
 					  uint32_t textureIndex);
 
 void DrawQuadInternal(const mat4 vertices_posXY_uvZW, Color color, uint32_t textureIndex);
-#pragma endregion drawingHelpers
 
 #endif //VULKANHELPERS_H

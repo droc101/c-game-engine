@@ -3,7 +3,7 @@
 layout (push_constant) uniform PushConstants {
 	vec2 playerPosition;
 	float yaw;
-	mat4 translationMatrix;
+	mat4 transformMatrix;
 
 	uint roofTextureIndex;
 	uint floorTextureIndex;
@@ -19,6 +19,6 @@ layout (location = 1) in vec2 inUV;
 layout (location = 0) out vec2 outUV;
 
 void main() {
-	gl_Position = pushConstants.translationMatrix * (vec4(inWallVertex, 1.0) + vec4(pushConstants.playerPosition.x, 0, pushConstants.playerPosition.y, 0));
+	gl_Position = pushConstants.transformMatrix * (vec4(inWallVertex, 1.0) + vec4(pushConstants.playerPosition.x, 0, pushConstants.playerPosition.y, 0));
 	outUV = inUV;
 }

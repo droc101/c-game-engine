@@ -9,21 +9,21 @@
 #include "../Graphics/Vulkan/Vulkan.h"
 #include "Error.h"
 
-bool *shouldExit = NULL;
-SDL_Thread *lodThread = NULL;
-SDL_sem *canStart = NULL;
-SDL_sem *hasEnded = NULL;
-SDL_mutex *mutex = NULL;
+static bool shouldExit;
+static SDL_Thread *lodThread;
+static SDL_sem *canStart;
+static SDL_sem *hasEnded;
+static SDL_mutex *mutex;
 
 // ReSharper disable once CppDFAConstantFunctionResult
-int LodThreadMain(void *exit)
+int LodThreadMain(void *)
 {
-	while (!*(bool *)exit)
+	while (!shouldExit)
 	{
 		int waitResult = SDL_SemWaitTimeout(canStart, 16);
 		while (waitResult != 0)
 		{
-			if (*(bool *)exit)
+			if (shouldExit)
 			{
 				return 0;
 			}
@@ -114,27 +114,23 @@ int LodThreadMain(void *exit)
 
 void LodThreadInit()
 {
-	shouldExit = calloc(1, sizeof(bool));
-	CheckAlloc(shouldExit);
 	canStart = SDL_CreateSemaphore(0);
 	hasEnded = SDL_CreateSemaphore(0);
 	mutex = SDL_CreateMutex();
-	lodThread = SDL_CreateThread(LodThreadMain, "LOD Thread", shouldExit);
+	lodThread = SDL_CreateThread(LodThreadMain, "LOD Thread", NULL);
 }
 
 void LodThreadDestroy()
 {
-	if (!shouldExit)
+	if (shouldExit)
 	{
 		return;
 	}
-	*shouldExit = true;
+	shouldExit = true;
 	SDL_WaitThread(lodThread, NULL);
 	SDL_DestroySemaphore(canStart);
 	SDL_DestroySemaphore(hasEnded);
 	SDL_DestroyMutex(mutex);
-	free(shouldExit);
-	shouldExit = NULL;
 }
 
 int SignalLodThreadCanStart()

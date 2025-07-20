@@ -4,7 +4,7 @@
 layout (push_constant) uniform PushConstants {
 	vec2 playerPosition;
 	float yaw;
-	mat4 translationMatrix;
+	mat4 transformMatrix;
 
 	uint skyVertexCount;
 	uint skyTextureIndex;
