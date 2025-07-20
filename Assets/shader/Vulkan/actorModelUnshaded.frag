@@ -4,12 +4,10 @@
 layout (push_constant) uniform PushConstants {
 	vec2 playerPosition;
 	float yaw;
-	mat4 translationMatrix;
+	mat4 transformMatrix;
 
 	uint skyVertexCount;
 	uint skyTextureIndex;
-
-	uint shadowTextureIndex;
 
 	float fogStart;
 	float fogEnd;
@@ -20,12 +18,14 @@ layout (binding = 0) uniform sampler2D textureSampler[];
 
 layout(location = 0) in vec2 inUV;
 layout(location = 1) flat in uint inTextureIndex;
-layout (location = 2) in float inShading;
+layout(location = 2) in vec4 inColor;
 
 layout(location = 0) out vec4 outColor;
 
 void main() {
-	outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV) * inShading;
+	outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
+	if (outColor.a < 0.5) discard;
+	outColor *= inColor;
 	if (outColor.a < 0.5) discard;
 	outColor.a = 1.0;
 	outColor.rgb = mix(outColor.rgb, unpackUnorm4x8(pushConstants.fogColor).bgr, clamp((gl_FragCoord.z / gl_FragCoord.w - pushConstants.fogStart) / (pushConstants.fogEnd - pushConstants.fogStart), 0.0, 1.0));

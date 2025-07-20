@@ -3,11 +3,11 @@
 //
 
 #include "Font.h"
-#include <ctype.h>
 #include <string.h>
 #include "../../Structs/Vector2.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
+#include "Drawing.h"
 #include "RenderingHelpers.h"
 
 inline void FontDrawString(const Vector2 pos, const char *str, const uint size, const Color color, const Font *font)

@@ -68,11 +68,6 @@
 #define VK_ENABLE_VALIDATION_LAYER
 #endif
 
-#if defined(__LINUX__) && defined(BUILDSTYLE_DEBUG)
-/// Adds an overlay with FPS information provided by the Mesa Vulkan driver in Linux
-// #define VK_ENABLE_MESA_FPS_OVERLAY
-#endif
-
 #pragma endregion
 
 // Program information
@@ -100,6 +95,7 @@
 
 /// Field of view
 #define FOV 90
+/// Field of view used for viewmodels
 #define VIEWMODEL_FOV 70
 /// Near clipping plane
 #define NEAR_Z 0.01

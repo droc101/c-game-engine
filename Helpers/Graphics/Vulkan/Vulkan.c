@@ -3,35 +3,33 @@
 //
 
 #include "Vulkan.h"
+#include <assert.h>
+#include <luna/luna.h>
+#include <SDL_vulkan.h>
 #include <string.h>
-#include "../../../Structs/GlobalState.h"
 #include "../../CommonAssets.h"
-#include "../../Core/Error.h"
-#include "../../Core/Logging.h"
+#include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
+#include "VulkanActors.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
-#include "VulkanMemory.h"
 #include "VulkanResources.h"
 
 static const Level *loadedLevel;
+static uint8_t currentFrame;
 
 bool VK_Init(SDL_Window *window)
 {
-	vulkanWindow = window;
 	// clang-format off
-	if (CreateInstance() && CreateSurface() && PickPhysicalDevice() && CreateLogicalDevice() && CreateSwapChain() &&
-		CreateImageViews() && CreateRenderPass() && CreateDescriptorSetLayouts() && CreateGraphicsPipelineCache() &&
-		CreateGraphicsPipelines() && CreateCommandPools() && CreateColorImage() && CreateDepthImage() &&
-		CreateFramebuffers() && InitTextures() && CreateTexturesImageView() && CreateTextureSampler() &&
-		CreateBuffers() && AllocateMemoryPools() && CreateDescriptorPool() && CreateDescriptorSets() &&
-		CreateCommandBuffers() && CreateSyncObjects())
+	if (CreateInstance(window) && CreateSurface() && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
+		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
+		CreateDescriptorSets() && CreateBuffers())
 	{
 		// clang-format on
 
-		char *vendor = calloc(32, sizeof(char));
-		CheckAlloc(vendor);
-		switch (physicalDevice.properties.vendorID)
+		const VkPhysicalDeviceProperties physicalDeviceProperties = lunaGetPhysicalDeviceProperties();
+		char vendor[32] = {};
+		switch (physicalDeviceProperties.vendorID)
 		{
 			case AMD:
 				strncpy(vendor, "AMD", 32);
@@ -66,13 +64,11 @@ bool VK_Init(SDL_Window *window)
 		}
 		LogInfo("Vulkan Initialized\n");
 		LogInfo("Vulkan Vendor: %s\n", vendor);
-		LogInfo("Vulkan Device: %s\n", physicalDevice.properties.deviceName);
+		LogInfo("Vulkan Device: %s\n", physicalDeviceProperties.deviceName);
 		LogInfo("Vulkan Version: %u.%u.%u\n",
-				VK_API_VERSION_MAJOR(physicalDevice.properties.apiVersion),
-				VK_API_VERSION_MINOR(physicalDevice.properties.apiVersion),
-				VK_API_VERSION_PATCH(physicalDevice.properties.apiVersion));
-
-		free(vendor);
+				VK_API_VERSION_MAJOR(physicalDeviceProperties.apiVersion),
+				VK_API_VERSION_MINOR(physicalDeviceProperties.apiVersion),
+				VK_API_VERSION_PATCH(physicalDeviceProperties.apiVersion));
 
 		return true;
 	}
@@ -87,63 +83,32 @@ bool VK_Init(SDL_Window *window)
 
 VkResult VK_FrameStart()
 {
-	if (!LoadActors(loadedLevel))
-	{
-		return VK_ERROR_UNKNOWN;
-	}
-
 	if (minimized)
 	{
 		return VK_NOT_READY;
 	}
 
-	VulkanTestReturnResult(vkWaitForFences(device, MAX_FRAMES_IN_FLIGHT, inFlightFences, VK_TRUE, UINT64_MAX),
-						   "Failed to wait for Vulkan fences!");
-
-	VulkanTestReturnResult(vkResetFences(device, 1, &inFlightFences[currentFrame]), "Failed to reset Vulkan fences!");
-
-	const VkResult acquireNextImageResult = vkAcquireNextImageKHR(device,
-																  swapChain,
-																  UINT64_MAX,
-																  imageAvailableSemaphores[currentFrame],
-																  VK_NULL_HANDLE,
-																  &swapchainImageIndex);
-	if (acquireNextImageResult == VK_ERROR_OUT_OF_DATE_KHR || acquireNextImageResult == VK_SUBOPTIMAL_KHR)
+	if (LockLodThreadMutex() != 0)
 	{
-		if (RecreateSwapChain())
-		{
-			return acquireNextImageResult;
-		}
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
 	}
-	VulkanTestReturnResult(acquireNextImageResult, "Failed to acquire next Vulkan image index!");
 
-	VulkanTestReturnResult(vkResetCommandBuffer(commandBuffers[currentFrame], 0),
-						   "Failed to reset Vulkan command buffer!");
-
-	VulkanTestReturnResult(BeginRenderPass(commandBuffers[currentFrame], swapchainImageIndex),
-						   "Failed to begin render pass!");
-
-	vkCmdBindDescriptorSets(commandBuffers[currentFrame],
-							VK_PIPELINE_BIND_POINT_GRAPHICS,
-							pipelineLayout,
-							0,
-							1,
-							&descriptorSets[currentFrame],
-							0,
-							NULL);
-
-	VulkanTestReturnResult(vkWaitForFences(device, 1, &transferBufferFence, VK_TRUE, UINT64_MAX),
-						   "Failed to wait for Vulkan transfer buffer fence!");
-	VulkanTestReturnResult(vkResetFences(device, 1, &transferBufferFence),
-						   "Failed to reset Vulkan transfer buffer fence!");
-	const VkCommandBufferBeginInfo commandBufferBeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+	const LunaRenderPassBeginInfo beginInfo = {
+		.renderArea.extent = swapChainExtent,
+		.depthAttachmentClearValue.depthStencil.depth = 1,
 	};
-	VulkanTest(vkBeginCommandBuffer(transferCommandBuffer, &commandBufferBeginInfo),
-			   "Failed to start the recording of Vulkan transfer command buffer!");
+	VulkanTestResizeSwapchain(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
 
-	buffers.ui.quadCount = 0;
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
+
+	buffers.ui.objectCount = 0;
+	buffers.ui.vertices.bytesUsed = 0;
+	buffers.ui.indices.bytesUsed = 0;
 
 	return VK_SUCCESS;
 }
@@ -152,106 +117,97 @@ VkResult VK_FrameEnd()
 {
 	if (buffers.ui.shouldResize)
 	{
-		VulkanTestReturnResult(ResizeUiBuffer(), "Failed to resize UI buffer!");
-		buffers.ui.shouldResize = false;
-	}
+		lunaDestroyBuffer(buffers.ui.vertices.buffer);
+		lunaDestroyBuffer(buffers.ui.indices.buffer);
 
-	if (buffers.ui.quadCount > 0)
+		const LunaBufferCreationInfo vertexBufferCreationInfo = {
+			.size = buffers.ui.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.ui.vertices.buffer),
+							   "Failed to recreate UI vertex buffer!");
+
+		const LunaBufferCreationInfo indexBufferCreationInfo = {
+			.size = buffers.ui.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.ui.indices.buffer),
+							   "Failed to recreate UI index buffer!");
+	}
+	if (buffers.ui.objectCount > 0)
 	{
-		memcpy(buffers.ui.vertexStaging, buffers.ui.vertices, sizeof(UiVertex) * buffers.ui.quadCount * 4);
-		memcpy(buffers.ui.indexStaging, buffers.ui.indices, sizeof(uint32_t) * buffers.ui.quadCount * 6);
-		vkCmdCopyBuffer(transferCommandBuffer,
-						buffers.ui.stagingBufferInfo->buffer,
-						buffers.ui.bufferInfo->buffer,
-						2,
-						(VkBufferCopy[]){
-							{
-								.srcOffset = buffers.ui.vertexStagingOffset,
-								.dstOffset = buffers.ui.vertexOffset,
-								.size = sizeof(UiVertex) * buffers.ui.quadCount * 4,
-							},
-							{
-								.srcOffset = buffers.ui.indexStagingOffset,
-								.dstOffset = buffers.ui.indexOffset,
-								.size = sizeof(uint32_t) * buffers.ui.quadCount * 6,
-							},
-						});
+		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed, 0);
+		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed, 0);
 	}
 
-	VulkanTest(vkEndCommandBuffer(transferCommandBuffer),
-			   "Failed to finish the recording of Vulkan transfer command buffer!");
-
-	const VkSubmitInfo queueSubmitInfo = {
-		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-		.commandBufferCount = 1,
-		.pCommandBuffers = &transferCommandBuffer,
-	};
-
-	VulkanTest(vkQueueSubmit(transferQueue, 1, &queueSubmitInfo, transferBufferFence),
-			   "Failed to submit Vulkan transfer command buffer to queue!");
-
-	vkCmdNextSubpass(commandBuffers[currentFrame], VK_SUBPASS_CONTENTS_INLINE);
-	if (buffers.ui.quadCount > 0)
+	if (LockLodThreadMutex() != 0)
 	{
-		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.ui);
-
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame],
-							   0,
-							   1,
-							   &buffers.ui.bufferInfo->buffer,
-							   &buffers.ui.vertexOffset);
-
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.ui.bufferInfo->buffer,
-							 buffers.ui.indexOffset,
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame], buffers.ui.quadCount * 6, 1, 0, 0, 0);
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
 	}
 
-	VulkanTestReturnResult(EndRenderPass(commandBuffers[currentFrame]), "Failed to end render pass!");
-
-	const VkSubmitInfo submitInfo = {
-		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-		.pNext = NULL,
-		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &imageAvailableSemaphores[currentFrame],
-		.pWaitDstStageMask = (VkPipelineStageFlags[]){VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
-		.commandBufferCount = 1,
-		.pCommandBuffers = &commandBuffers[currentFrame],
-		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &renderFinishedSemaphores[currentFrame],
-	};
-	VulkanTestReturnResult(vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]),
-						   "Failed to submit Vulkan draw command buffer!");
-
-	const VkSwapchainKHR swapChains[] = {swapChain};
-	const VkPresentInfoKHR presentInfo = {
-		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-		.pNext = NULL,
-		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &renderFinishedSemaphores[currentFrame],
-		.swapchainCount = 1,
-		.pSwapchains = swapChains,
-		.pImageIndices = &swapchainImageIndex,
-		.pResults = NULL,
-	};
-	const VkResult queuePresentResult = vkQueuePresentKHR(presentQueue, &presentInfo);
-	if (queuePresentResult == VK_ERROR_OUT_OF_DATE_KHR || queuePresentResult == VK_SUBOPTIMAL_KHR)
+	if (buffers.ui.objectCount > 0)
 	{
-		if (RecreateSwapChain())
-		{
-			return queuePresentResult;
-		}
+		const VkViewport viewport = {
+			.width = (float)swapChainExtent.width,
+			.height = (float)swapChainExtent.height,
+			.maxDepth = 1,
+		};
+		const LunaViewportBindInfo viewportBindInfo = {
+			.viewportCount = 1,
+			.viewports = &viewport,
+		};
+		const VkRect2D scissor = {
+			.extent = swapChainExtent,
+		};
+		const LunaScissorBindInfo scissorBindInfo = {
+			.scissorCount = 1,
+			.scissors = &scissor,
+		};
+		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+			{
+				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+				.viewportBindInfo = &viewportBindInfo,
+			},
+			{
+				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+				.scissorBindInfo = &scissorBindInfo,
+			},
+		};
+		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+			.descriptorSetCount = 1,
+			.descriptorSets = &descriptorSets[currentFrame],
+			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+			.dynamicStates = dynamicStateBindInfos,
+		};
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
+													 buffers.ui.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.ui,
+													 &pipelineBindInfo,
+													 buffers.ui.objectCount * 6,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw UI!");
 	}
-	VulkanTestReturnResult(queuePresentResult, "Failed to queue frame for presentation!");
 
+	lunaEndRenderPass();
+
+	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return VK_SUCCESS;
 }
 
-VkResult VK_RenderLevel(const Level *level, const Camera *camera)
+VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel)
 {
 	if (loadedLevel != level)
 	{
@@ -263,157 +219,211 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera)
 	pushConstants.position[0] = (float)loadedLevel->player.pos.x;
 	pushConstants.position[1] = (float)loadedLevel->player.pos.y;
 	pushConstants.yaw = camera->yaw + 1.5f * PIf;
-	UpdateTranslationMatrix(camera);
+	UpdateTransformMatrix(camera);
 
-	VulkanTestReturnResult(CopyBuffers(loadedLevel), "Failed to copy buffers!");
-
-	vkCmdPushConstants(commandBuffers[currentFrame],
-					   pipelineLayout,
-					   VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-					   0,
-					   sizeof(PushConstants),
-					   &pushConstants);
-
-	if (buffers.walls.wallCount || buffers.walls.shadowCount)
+	if (LockLodThreadMutex() != 0)
 	{
-		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.walls);
-
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame],
-							   0,
-							   2,
-							   (VkBuffer[]){buffers.walls.bufferInfo->buffer, buffers.walls.bufferInfo->buffer},
-							   (VkDeviceSize[]){buffers.walls.shadowOffset, buffers.walls.vertexOffset});
-	}
-	if (buffers.walls.wallCount)
-	{
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.walls.bufferInfo->buffer,
-							 buffers.walls.indexOffset,
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame],
-						 6 + (loadedLevel->hasCeiling ? 6 : buffers.walls.skyIndexCount),
-						 1,
-						 0,
-						 0,
-						 0);
-	}
-	if (buffers.walls.shadowCount)
-	{
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.walls.bufferInfo->buffer,
-							 buffers.walls.shadowOffset + sizeof(ShadowVertex) * buffers.walls.shadowCount * 4,
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame],
-						 buffers.walls.shadowCount * 6,
-						 1,
-						 0,
-						 0,
-						 0x53484457); // 0x53484457 is "SHDW", to encode that we are drawing the shadows
-	}
-	if (buffers.walls.wallCount > loadedLevel->hasCeiling + 1)
-	{
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.walls.bufferInfo->buffer,
-							 buffers.walls.indexOffset +
-									 sizeof(uint32_t) *
-											 (6 + (loadedLevel->hasCeiling ? 6 : buffers.walls.skyIndexCount)),
-							 VK_INDEX_TYPE_UINT32);
-
-		vkCmdDrawIndexed(commandBuffers[currentFrame],
-						 buffers.walls.wallCount * 6 - (loadedLevel->hasCeiling ? 12 : 6),
-						 1,
-						 0,
-						 0,
-						 0x57414C4C); // 0x57414C4C is "WALL", to encode that we are drawing the walls
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
 	}
 
-	if (buffers.actors.drawInfoSize)
+	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
+
+	const VkViewport viewport = {
+		.width = (float)swapChainExtent.width,
+		.height = (float)swapChainExtent.height,
+		.maxDepth = 1,
+	};
+	const LunaViewportBindInfo viewportBindInfo = {
+		.viewportCount = 1,
+		.viewports = &viewport,
+	};
+	const VkRect2D scissor = {
+		.extent = swapChainExtent,
+	};
+	const LunaScissorBindInfo scissorBindInfo = {
+		.scissorCount = 1,
+		.scissors = &scissor,
+	};
+	const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+			.viewportBindInfo = &viewportBindInfo,
+		},
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+			.scissorBindInfo = &scissorBindInfo,
+		},
+	};
+	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSets[currentFrame],
+		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+		.dynamicStates = dynamicStateBindInfos,
+	};
+
+	if (level->hasCeiling)
 	{
-		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.actors);
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
+							   "Failed to draw floor and ceiling!");
+	} else
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
+													 buffers.sky.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.sky,
+													 &pipelineBindInfo,
+													 buffers.sky.objectCount,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw sky!");
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 6, 1, 0, 0),
+							   "Failed to draw floor!");
+	}
 
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame],
-							   0,
-							   2,
-							   (VkBuffer[]){buffers.actors.bufferInfo->buffer, buffers.actors.bufferInfo->buffer},
-							   (VkDeviceSize[]){buffers.actors.vertexOffset, buffers.actors.instanceDataOffset});
+	if (buffers.walls.objectCount)
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+													 buffers.walls.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 &pipelineBindInfo,
+													 buffers.walls.objectCount * 6,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw walls!");
+	}
 
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame],
-							 buffers.actors.bufferInfo->buffer,
-							 buffers.actors.indexOffset,
-							 VK_INDEX_TYPE_UINT32);
+	if (buffers.actorWalls.count)
+	{
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.actorWalls.vertices.buffer,
+											 buffers.actorWalls.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
 
-		vkCmdDrawIndexedIndirect(commandBuffers[currentFrame],
-								 buffers.actors.bufferInfo->buffer,
-								 buffers.actors.drawInfoOffset,
-								 buffers.actors.models.loadedModelIds.length + buffers.actors.walls.count,
-								 sizeof(VkDrawIndexedIndirectCommand));
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.actorWalls.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.actorWalls,
+															 &pipelineBindInfo,
+															 buffers.actorWalls.drawInfo.buffer,
+															 0,
+															 buffers.actorWalls.count,
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw wall actors!");
+	}
+
+	if (buffers.actorModels.shadedDrawInfo.bytesUsed)
+	{
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.actorModels.vertices.buffer,
+											 buffers.actorModels.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
+
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.actorModels.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.shadedActorModels,
+															 &pipelineBindInfo,
+															 buffers.actorModels.shadedDrawInfo.buffer,
+															 0,
+															 buffers.actorModels.shadedDrawInfo.bytesUsed /
+																	 sizeof(VkDrawIndexedIndirectCommand),
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw shaded model actors!");
+	}
+	if (buffers.actorModels.unshadedDrawInfo.bytesUsed)
+	{
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.actorModels.vertices.buffer,
+											 buffers.actorModels.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
+
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.actorModels.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.unshadedActorModels,
+															 &pipelineBindInfo,
+															 buffers.actorModels.unshadedDrawInfo.buffer,
+															 0,
+															 buffers.actorModels.unshadedDrawInfo.bytesUsed /
+																	 sizeof(VkDrawIndexedIndirectCommand),
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw unshaded model actors!");
+	}
+
+	if (viewmodel->enabled)
+	{
+		UpdateViewModelMatrix(viewmodel);
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.viewModel.vertices, buffers.viewModel.instanceDataBuffer},
+							  (VkDeviceSize[]){0, 0});
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.viewModel.indices,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.viewModel,
+															 &pipelineBindInfo,
+															 buffers.viewModel.drawInfo,
+															 0,
+															 buffers.viewModel.drawCount,
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw view model!");
+	}
+
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
 	}
 
 	return VK_SUCCESS;
 }
 
+bool VK_UpdateActors(const List *actors, const bool shouldReloadActors)
+{
+	if (shouldReloadActors)
+	{
+		VulkanTest(InitActors(actors), "Failed to reload actors");
+	}
+	VulkanTest(LoadActorWalls(actors), "Failed to load wall actors!");
+	VulkanTest(UpdateActorInstanceData(actors), "Failed to update actor instance data!");
+	return true;
+}
+
 bool VK_Cleanup()
 {
-	if (device)
-	{
-		VulkanTest(vkDeviceWaitIdle(device), "Failed to wait for device to become idle!");
-
-		CleanupSwapChain();
-
-		vkDestroySampler(device, textureSamplers.linearRepeat, NULL);
-		vkDestroySampler(device, textureSamplers.nearestRepeat, NULL);
-		vkDestroySampler(device, textureSamplers.linearNoRepeat, NULL);
-		vkDestroySampler(device, textureSamplers.nearestNoRepeat, NULL);
-		for (size_t textureIndex = 0; textureIndex < textures.length; textureIndex++)
-		{
-			vkDestroyImageView(device, *(VkImageView *)ListGet(texturesImageView, textureIndex), NULL);
-			vkDestroyImage(device, ((Texture *)ListGet(textures, textureIndex))->image, NULL);
-		}
-		ListAndContentsFree(&texturesImageView, false);
-		ListAndContentsFree(&textures, false);
-		vkFreeMemory(device, textureMemory.memory, NULL);
-
-		CleanupColorImage();
-		CleanupDepthImage();
-
-		vkDestroyPipelineCache(device, pipelineCache, NULL);
-		CleanupPipeline();
-
-		vkDestroyRenderPass(device, renderPass, NULL);
-
-		vkDestroyDescriptorPool(device, descriptorPool, NULL);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, NULL);
-
-		if (!DestroyBuffer(&buffers.local))
-		{
-			return false;
-		}
-		if (!DestroyBuffer(&buffers.shared))
-		{
-			return false;
-		}
-		if (!DestroyBuffer(&buffers.staging))
-		{
-			return false;
-		}
-
-		CleanupSyncObjects();
-		vkDestroyFence(device, transferBufferFence, NULL);
-
-		vkDestroyCommandPool(device, graphicsCommandPool, NULL);
-		vkDestroyCommandPool(device, transferCommandPool, NULL);
-	}
-
-	vkDestroyDevice(device, NULL);
-
-	if (instance)
-	{
-		vkDestroySurfaceKHR(instance, surface, NULL);
-	}
-
-	vkDestroyInstance(instance, NULL);
+	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
+	DestroyActorMetadata();
+	free(buffers.ui.vertices.data);
+	free(buffers.ui.indices.data);
+	free(buffers.viewModel.instanceDatas);
+	free(buffers.sky.vertices.data);
+	free(buffers.sky.indices.data);
+	free(buffers.walls.vertices.data);
+	free(buffers.walls.indices.data);
+	free(buffers.actorWalls.vertices.data);
+	free(buffers.actorWalls.indices.data);
+	free(buffers.actorWalls.instanceData.data);
+	free(buffers.actorWalls.drawInfo.data);
+	free(buffers.actorModels.vertices.data);
+	free(buffers.actorModels.indices.data);
+	free(buffers.actorModels.instanceData.data);
+	free(buffers.actorModels.shadedDrawInfo.data);
+	free(buffers.actorModels.unshadedDrawInfo.data);
 
 	return true;
 }
@@ -430,166 +440,37 @@ inline void VK_Restore()
 
 bool VK_LoadLevelWalls(const Level *level)
 {
-	uint32_t skyVertexCount = 0;
-	const ModelDefinition *_skyModel = !skyModel ? LoadModel(MODEL("model_sky")) : skyModel;
-	if (level->hasCeiling)
+	if (!level->hasCeiling)
 	{
-		buffers.walls.skyIndexCount = 0;
-		buffers.walls.wallCount = level->walls.length + 2;
-	} else
-	{
-		skyVertexCount = 0; // _skyModel->vertexCount;
-		buffers.walls.skyIndexCount = 0; // _skyModel->indexCount;
-		buffers.walls.wallCount = level->walls.length + 1;
+		VulkanTest(LoadSky(LoadModel(MODEL("model_sky"))), "Failed to load sky!");
 	}
 
-	if (buffers.walls.wallCount > buffers.walls.maxWallCount)
-	{
-		const VkDeviceSize wallVertexSize = sizeof(WallVertex) *
-											(buffers.walls.maxWallCount * 4 + 0 /*_skyModel->vertexCount*/);
-		const VkDeviceSize wallIndexSize = sizeof(uint32_t) *
-										   (buffers.walls.maxWallCount * 6 + 0 /*_skyModel->indexCount*/);
+	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
+	pushConstants.floorTextureIndex = TextureIndex(level->floorTex);
 
-		buffers.walls.maxWallCount = buffers.walls.wallCount;
-
-		if (buffers.walls.vertexOffset <= buffers.walls.indexOffset &&
-			buffers.walls.indexOffset == buffers.walls.vertexOffset + wallVertexSize)
-		{
-			if (!ResizeBufferRegion(&buffers.local,
-									buffers.walls.vertexOffset,
-									wallVertexSize + wallIndexSize,
-									sizeof(WallVertex) * buffers.walls.maxWallCount * 4 +
-											sizeof(uint32_t) * buffers.walls.maxWallCount * 6 +
-											sizeof(WallVertex) * 0 /*_skyModel->vertexCount*/
-											+ sizeof(uint32_t) * 0 /*_skyModel->indexCount*/,
-									true))
-			{
-				return false;
-			}
-		} else if (buffers.walls.indexOffset < buffers.walls.vertexOffset &&
-				   buffers.walls.vertexOffset == buffers.walls.indexOffset + wallIndexSize)
-		{
-			if (!ResizeBufferRegion(&buffers.local,
-									buffers.walls.indexOffset,
-									wallIndexSize + wallVertexSize,
-									sizeof(WallVertex) * buffers.walls.maxWallCount * 4 +
-											sizeof(uint32_t) * buffers.walls.maxWallCount * 6 +
-											sizeof(WallVertex) * 0 /*_skyModel->vertexCount*/
-											+ sizeof(uint32_t) * 0 /*_skyModel->indexCount*/,
-									true))
-			{
-				return false;
-			}
-		} else
-		{
-			if (!ResizeBufferRegion(&buffers.local,
-									buffers.walls.vertexOffset,
-									wallVertexSize,
-									sizeof(WallVertex) * buffers.walls.maxWallCount * 4 +
-											sizeof(WallVertex) * 0 /*_skyModel->vertexCount*/,
-									true))
-			{
-				return false;
-			}
-			if (!ResizeBufferRegion(&buffers.local,
-									buffers.walls.indexOffset,
-									wallIndexSize,
-									sizeof(uint32_t) * buffers.walls.maxWallCount * 6 +
-											sizeof(uint32_t) * 0 /*_skyModel->indexCount*/,
-									true))
-			{
-				return false;
-			}
-		}
-
-		buffers.walls.shadowSize = sizeof(ShadowVertex) * buffers.walls.shadowCount * 4 +
-								   sizeof(uint32_t) * buffers.walls.shadowCount * 6;
-
-		buffers.ui.vertexSize = sizeof(UiVertex) * buffers.ui.maxQuads * 4;
-		buffers.ui.indexSize = sizeof(uint32_t) * buffers.ui.maxQuads * 6;
-
-		buffers.actors.instanceDataSize = sizeof(ActorInstanceData) * buffers.actors.walls.count;
-		if (buffers.actors.models.modelCounts.length && buffers.actors.models.loadedModelIds.length)
-		{
-			for (size_t i = 0; i < buffers.actors.models.loadedModelIds.length; i++)
-			{
-				buffers.actors.instanceDataSize += sizeof(ActorInstanceData) *
-												   (size_t)ListGet(buffers.actors.models.modelCounts, i);
-			}
-		}
-		buffers.actors.drawInfoSize = sizeof(VkDrawIndexedIndirectCommand) *
-											  buffers.actors.models.loadedModelIds.length +
-									  sizeof(VkDrawIndexedIndirectCommand) * buffers.actors.walls.count;
-
-		buffers.actors.models.vertexSize = sizeof(ActorVertex) * buffers.actors.models.vertexCount;
-		buffers.actors.models.indexSize = sizeof(uint32_t) * buffers.actors.models.indexCount;
-		buffers.actors.walls.vertexSize = sizeof(ActorVertex) * buffers.actors.walls.count * 4;
-		buffers.actors.walls.indexSize = sizeof(uint32_t) * buffers.actors.walls.count * 6;
-		SetLocalBufferAliasingInfo();
-	}
-
-	if (level->hasCeiling)
-	{
-		pushConstants.skyVertexCount = 0;
-		pushConstants.skyTextureIndex = MAX_TEXTURES;
-	} else
-	{
-		pushConstants.skyVertexCount = 0; //skyModel->vertexCount;
-		pushConstants.skyTextureIndex = TextureIndex(level->ceilOrSkyTex);
-	}
-	pushConstants.shadowTextureIndex = TextureIndex(TEXTURE("vfx_shadow"));
 	pushConstants.fogStart = (float)level->fogStart;
 	pushConstants.fogEnd = (float)level->fogEnd;
 	pushConstants.fogColor = level->fogColor;
 
-	WallVertex *wallVertices = calloc(buffers.walls.wallCount * 4 + skyVertexCount, sizeof(WallVertex));
-	CheckAlloc(wallVertices);
-	uint32_t *wallIndices = calloc(buffers.walls.wallCount * 6 + buffers.walls.skyIndexCount, sizeof(uint32_t));
-	CheckAlloc(wallIndices);
+	buffers.walls.objectCount = level->walls.length;
+	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.walls.objectCount;
+	buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.walls.objectCount;
+	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
+	LoadWalls(level);
 
-	LoadWalls(level, _skyModel, wallVertices, wallIndices, skyVertexCount);
-
-	const VkDeviceSize wallVertexSize = sizeof(WallVertex) *
-										(buffers.walls.maxWallCount * 4 + 0 /*_skyModel->vertexCount*/);
-	const VkDeviceSize wallIndexSize = sizeof(uint32_t) *
-									   (buffers.walls.maxWallCount * 6 + 0 /*_skyModel->indexCount*/);
-
-	if (__builtin_expect(wallVertexSize + wallIndexSize > buffers.staging.size, false) &&
-		!ResizeStagingBuffer(wallVertexSize + wallIndexSize))
+	if (LockLodThreadMutex() != 0)
 	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
 		return false;
 	}
-	void *data = buffers.staging.memoryAllocationInfo.memoryInfo->mappedMemory;
-
-	memcpy(data, wallVertices, sizeof(WallVertex) * (buffers.walls.wallCount * 4 + skyVertexCount));
-	memcpy(data + wallVertexSize,
-		   wallIndices,
-		   sizeof(uint32_t) * (buffers.walls.wallCount * 6 + buffers.walls.skyIndexCount));
-
-	const VkBufferCopy regions[] = {
-		{
-			.srcOffset = 0,
-			.dstOffset = buffers.walls.vertexOffset,
-			.size = wallVertexSize,
-		},
-		{
-			.srcOffset = wallVertexSize,
-			.dstOffset = buffers.walls.indexOffset,
-			.size = wallIndexSize,
-		},
-	};
-	if (!CopyBuffer(buffers.staging.buffer, buffers.local.buffer, 2, regions))
-	{
-		return false;
-	}
-
 	loadedLevel = level;
-
-	free(wallVertices);
-	free(wallIndices);
-
-	loadedActors = 0;
-	return LoadActors(level);
+	VulkanTest(InitActors(&level->actors), "Failed to load actors!");
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return false;
+	}
+	return true;
 }
 
 void VK_DrawColoredQuad(const int32_t x, const int32_t y, const int32_t w, const int32_t h, const Color color)
@@ -791,36 +672,33 @@ void VK_DrawRectOutline(const int32_t x,
 void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
 {
 	const uint32_t textureIndex = TextureIndex(texture);
+	LunaDescriptorImageInfo imageInfo = {
+		.image = ListGet(textures, textureIndex),
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+	};
+	if (linear && repeat)
+	{
+		imageInfo.sampler = textureSamplers.linearRepeat;
+	} else if (linear)
+	{
+		imageInfo.sampler = textureSamplers.linearNoRepeat;
+	} else if (repeat)
+	{
+		imageInfo.sampler = textureSamplers.nearestRepeat;
+	} else
+	{
+		imageInfo.sampler = textureSamplers.nearestNoRepeat;
+	}
+	LunaWriteDescriptorSet writeDescriptors[MAX_FRAMES_IN_FLIGHT];
 	for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		VkDescriptorImageInfo imageInfo = {
-			.sampler = textureSamplers.nearestNoRepeat,
-			.imageView = *(VkImageView *)ListGet(texturesImageView, textureIndex),
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		};
-		if (linear && repeat)
-		{
-			imageInfo.sampler = textureSamplers.linearRepeat;
-		} else if (linear)
-		{
-			imageInfo.sampler = textureSamplers.linearNoRepeat;
-		} else if (repeat)
-		{
-			imageInfo.sampler = textureSamplers.nearestRepeat;
-		}
-
-		const VkWriteDescriptorSet writeDescriptor = {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = NULL,
-			.dstSet = descriptorSets[i],
-			.dstBinding = 0,
-			.dstArrayElement = textureIndex,
+		writeDescriptors[i] = (LunaWriteDescriptorSet){
+			.descriptorSet = descriptorSets[i],
+			.bindingName = "Textures",
+			.descriptorArrayElement = textureIndex,
 			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.pImageInfo = &imageInfo,
-			.pBufferInfo = NULL,
-			.pTexelBufferView = NULL,
+			.imageInfo = &imageInfo,
 		};
-		vkUpdateDescriptorSets(device, 1, &writeDescriptor, 0, NULL);
 	}
+	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
 }

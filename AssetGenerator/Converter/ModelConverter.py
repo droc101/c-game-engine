@@ -43,6 +43,7 @@ model_shader_map = [
 ]
 
 def ConvertModelDefinition(path):
+	# Read the file as JSON
 	with open(path, 'r') as file:
 		data = json.load(file)
 		
@@ -71,7 +72,7 @@ def ConvertModelDefinition(path):
 			obj_path = util.input_path + "model/" + lod["model"]
 			if not obj_path.endswith(".obj"):
 				raise ValueError(f"Model {obj_path} is not an OBJ file")
-			
+
 			if not os.path.exists(obj_path):
 				raise FileNotFoundError(f"Model {obj_path} does not exist")
 

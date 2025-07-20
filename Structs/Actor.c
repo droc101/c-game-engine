@@ -85,7 +85,7 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 
 Actor *CreateActor(const Vector2 position,
 				   const float rotation,
-				   const int actorType,
+				   const uint actorType,
 				   KvList *params,
 				   const b2WorldId worldId)
 {
@@ -97,7 +97,8 @@ Actor *CreateActor(const Vector2 position,
 	actor->health = 1;
 	actor->yPosition = 0.0f;
 	actor->actorModel = NULL;
-	actor->actorModelSkin = 0;
+	actor->currentSkinIndex = 0;
+	actor->currentLod = 0;
 	actor->bodyId = b2_nullBodyId;
 	ListCreate(&actor->ioConnections);
 	actor->SignalHandler = DefaultSignalHandler;

@@ -518,14 +518,17 @@ struct Actor
 	float yPosition;
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
-	int actorModelSkin;
+	/// The index of the active skin for the actor's model
+	uint currentSkinIndex;
+	/// The current LOD level of the actor's model, re-calculated each physics tick
+	uint currentLod;
 
 	/// The actor's wall, in global space
 	Wall *actorWall;
 
 	/// The actor type index
 	/// @warning Do not change this after creation
-	int actorType;
+	uint actorType;
 	/// The function to call when the actor is initialized
 	/// @note This should only be called once, when the actor is created
 	ActorInitFunction Init;
@@ -620,6 +623,9 @@ struct ActorConnection
 
 struct Material
 {
+	/// The runtime-generated ID of this model
+	size_t id;
+
 	/// The texture name of the material
 	char texture[64];
 	/// The tint color of the material
@@ -630,6 +636,9 @@ struct Material
 
 struct ModelLod
 {
+	/// The runtime-generated ID of this model
+	size_t id;
+
 	/// How far away the camera must be before this LOD is used
 	float distance;
 
@@ -638,6 +647,8 @@ struct ModelLod
 	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
 	float *vertexData;
 
+	/// The total number of indices across all materials
+	uint totalIndexCount;
 	/// The number of indices in each material
 	uint *indexCount;
 	/// Index data for each material

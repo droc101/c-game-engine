@@ -173,33 +173,35 @@ void GL_DrawColoredArrays(const float *vertices, const uint *indices, uint quadC
 
 /**
  * Get the transformation matrix for a camera
- * @param cam The camera
+ * @param camera The camera
+ * @param modelViewProjectionMatrix
  * @return A mat4 MODEL_VIEW_PROJECTION matrix of the camera (World space to screen space)
  */
-mat4 *GL_GetMatrix(const Camera *cam);
+void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
 
 /**
  * Get the transform matrix for the viewmodel/held item
  * @param out The destination matrix
  */
-void GL_GetViewModelMatrix(mat4 *out);
+void GL_GetViewmodelMatrix(mat4 *out);
 
 /**
  * OpenGL code to render the 3D portion of a level
- * @param l The level to render
- * @param cam The camera to render with
+ * @param level The level to render
+ * @param camera The camera to render with
  * @note - This does not render the sky
  * @note - This destroys the contents of the depth buffer
  */
-void GL_RenderLevel(const Level *l, const Camera *cam);
+void GL_RenderLevel(const Level *level, const Camera *camera);
 
 /**
  * Render a 3D model
  * @param model The model to render
  * @param modelWorldMatrix The model -> world matrix
  * @param skin The skin to use
+ * @param lod The lod to use
  */
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, int skin);
+void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, uint skin, uint lod);
 
 /**
  * Render the level's static walls

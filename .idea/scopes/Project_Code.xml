@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Project Code" pattern="file[raytracer-c]:Debug//*||file[raytracer-c]:GameStates//*||file[raytracer-c]:Actor//*||file[raytracer-c]:Helpers//*||file[raytracer-c]:Structs//*||file:Assets/AssetReader.c||file:Assets/AssetReader.h||file:config.h||file:defines.h||file:main.c" />
+  <scope name="Project Code" pattern="(file:*.c||file:*.h)&amp;&amp;!(file:lib//*||file:.*//*||ext:*/)" />
 </component>
