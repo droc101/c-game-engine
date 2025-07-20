@@ -270,6 +270,7 @@ bool CreateTextureSamplers()
 		.mipLodBias = -1.5f,
 		.maxLod = VK_LOD_CLAMP_NONE,
 	};
+
 	const LunaSamplerCreationInfo nearestNoRepeatSamplerCreateInfo = {
 		.magFilter = VK_FILTER_NEAREST,
 		.minFilter = VK_FILTER_NEAREST,
@@ -280,7 +281,6 @@ bool CreateTextureSamplers()
 		.mipLodBias = -1.5f,
 		.maxLod = VK_LOD_CLAMP_NONE,
 	};
-
 	VulkanTest(lunaCreateSampler(&linearRepeatSamplerCreateInfo, &textureSamplers.linearRepeat),
 			   "Failed to create linear repeating texture sampler!");
 	VulkanTest(lunaCreateSampler(&nearestRepeatSamplerCreateInfo, &textureSamplers.nearestRepeat),

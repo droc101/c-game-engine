@@ -46,16 +46,6 @@ char *SliderLabelMSAA(const Control *slider)
 	return buf;
 }
 
-char *SliderLabelMipmaps(const Control *slider)
-{
-	char *labels[] = {"None", "1", "2", "3", "4"};
-	const SliderData *data = (SliderData *)slider->ControlData;
-	char *buf = malloc(64);
-	CheckAlloc(buf);
-	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
-	return buf;
-}
-
 char *SliderLabelLod(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->ControlData;
@@ -90,6 +80,13 @@ void CbOptionsLimitFpsWhenUnfocused(const bool value)
 	GetState()->options.limitFpsWhenUnfocused = value;
 }
 
+void CbOptionsMipmaps(const bool value)
+{
+	GetState()->options.mipmaps = value;
+	hasChangedVideoOptions = true;
+	// Mipmaps change will happen on next restart
+}
+
 void CbOptionsPreferWayland(const bool value)
 {
 	GetState()->options.preferWayland = value;
@@ -102,12 +99,6 @@ void SldOptionsMsaa(const double value)
 	GetState()->options.msaa = value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
-}
-
-void SldOptionsMipmaps(const double value)
-{
-	GetState()->options.mipmaps = value;
-	hasChangedVideoOptions = true;
 }
 
 void SldOptionsLod(const double value)
@@ -176,6 +167,14 @@ void GVideoOptionsStateSet()
 										  CbOptionsLimitFpsWhenUnfocused,
 										  TOP_CENTER,
 										  GetState()->options.limitFpsWhenUnfocused));
+		opY += opSpacing;
+		UiStackPush(videoOptionsStack,
+					CreateCheckboxControl(v2(0, opY),
+										  v2(480, 40),
+										  "Mipmaps",
+										  CbOptionsMipmaps,
+										  TOP_CENTER,
+										  GetState()->options.mipmaps));
 		opY += opSpacing * 1.5f;
 
 		UiStackPush(videoOptionsStack,
@@ -211,20 +210,6 @@ void GVideoOptionsStateSet()
 										1,
 										1,
 										SliderLabelMSAA));
-
-		opY += opSpacing;
-		UiStackPush(videoOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"Mipmaps",
-										SldOptionsMipmaps,
-										TOP_CENTER,
-										0.0,
-										4.0,
-										GetState()->options.mipmaps,
-										1,
-										1,
-										SliderLabelMipmaps));
 
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,

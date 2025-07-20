@@ -19,7 +19,7 @@ void DefaultOptions(Options *options)
 	options->mouseSpeed = 1;
 	options->controllerMode = false;
 	options->msaa = MSAA_4X;
-	options->mipmaps = MIP_3;
+	options->mipmaps = true;
 	options->rumbleStrength = 1.0f;
 	options->cameraInvertX = true;
 	options->controllerSwapOkCancel = false;

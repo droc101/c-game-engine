@@ -430,13 +430,12 @@ VkResult ResizeActorModelBuffers()
 bool LoadTexture(const Image *image)
 {
 	LockLodThreadMutex(); // TODO: This is not a great fix but it works ig
-	const OptionsMipmapLevels mipmapLevel = GetState()->options.mipmaps;
 	const LunaSampledImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.mipmapLevels = min((uint8_t)log2(max(image->width, image->height)), mipmapLevel) + 1,
-		.generateMipmaps = mipmapLevel != MIP_NONE,
+		.mipmapLevels = GetState()->options.mipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.generateMipmaps = GetState()->options.mipmaps,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.pixels = image->pixelData,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

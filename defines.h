@@ -27,7 +27,6 @@ typedef uint64_t ulong;
 typedef enum CurrentState CurrentState;
 typedef enum Renderer Renderer;
 typedef enum OptionsMsaa OptionsMsaa;
-typedef enum OptionsMipmapLevels OptionsMipmapLevels;
 typedef enum ModelShader ModelShader;
 typedef enum ImageDataOffsets ImageDataOffsets;
 typedef enum AssetType AssetType;
@@ -209,15 +208,6 @@ enum OptionsMsaa
 	MSAA_2X = 1,
 	MSAA_4X = 2,
 	MSAA_8X = 3
-};
-
-enum OptionsMipmapLevels
-{
-	MIP_NONE = 0,
-	MIP_1 = 1,
-	MIP_2 = 2,
-	MIP_3 = 3,
-	MIP_4 = 4
 };
 
 /**
@@ -425,8 +415,8 @@ struct Options
 	bool vsync;
 	/// The MSAA level
 	OptionsMsaa msaa;
-	/// The mipmap level
-	OptionsMipmapLevels mipmaps;
+	/// Whether to use mipmaps
+	bool mipmaps;
 	/// Whether to prefer Wayland over X11
 	bool preferWayland;
 	/// Whether to drop to 30 fps when the window is not focused
