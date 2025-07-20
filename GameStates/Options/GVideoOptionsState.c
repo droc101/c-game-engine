@@ -181,7 +181,7 @@ void GVideoOptionsStateSet()
 		UiStackPush(videoOptionsStack,
 					CreateRadioButtonControl(v2(0, opY),
 											 v2(480, 40),
-											 "Vulkan (WIP)",
+											 "Vulkan",
 											 RbOptionsRenderer,
 											 TOP_CENTER,
 											 GetState()->options.renderer == RENDERER_VULKAN,
