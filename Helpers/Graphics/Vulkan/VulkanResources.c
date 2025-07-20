@@ -435,7 +435,7 @@ bool LoadTexture(const Image *image)
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.mipmapLevels = mipmapLevel + 1,
+		.mipmapLevels = min((uint8_t)log2(max(image->width, image->height)), mipmapLevel) + 1,
 		.generateMipmaps = mipmapLevel != MIP_NONE,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.pixels = image->pixelData,
