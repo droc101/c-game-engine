@@ -48,6 +48,11 @@
 				}; \
 				VulkanTestReturnResult(lunaResizeSwapchain(1, &renderPassResizeInfo, NULL, &swapChainExtent), \
 									   "Failed to resize swapchain!"); \
+				if (UnlockLodThreadMutex() != 0) \
+				{ \
+					LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError()); \
+					return VK_ERROR_UNKNOWN; \
+				} \
 				return resizeCheckResult; \
 			} \
 			VulkanTestReturnResult(resizeCheckResult, __VA_ARGS__); \

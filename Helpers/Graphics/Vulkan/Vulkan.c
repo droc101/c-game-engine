@@ -184,12 +184,12 @@ VkResult VK_FrameEnd()
 
 	lunaEndRenderPass();
 
+	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
 	if (UnlockLodThreadMutex() != 0)
 	{
 		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
 		return VK_ERROR_UNKNOWN;
 	}
-	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return VK_SUCCESS;
