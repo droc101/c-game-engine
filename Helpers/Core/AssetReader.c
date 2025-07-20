@@ -277,6 +277,11 @@ Image *LoadImage(const char *asset)
 		}
 	}
 
+	if (textureId >= MAX_TEXTURES)
+	{
+		Error("Texture ID heap exhausted. Please increase MAX_TEXTURES");
+	}
+
 	Image *img = malloc(sizeof(Image));
 	CheckAlloc(img);
 
@@ -303,6 +308,11 @@ Image *LoadImage(const char *asset)
 
 	textureId++;
 
+	if (textureId >= MAX_TEXTURES - 10)
+	{
+		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
+	}
+
 	return img;
 }
 
@@ -321,6 +331,11 @@ ModelDefinition *LoadModel(const char *asset)
 		}
 	}
 
+	if (modelId >= MAX_MODELS)
+	{
+		Error("Model ID heap exhausted. Please increase MAX_MODELS");
+	}
+
 	const Asset *assetData = DecompressAsset(asset);
 	if (assetData == NULL)
 	{
@@ -333,7 +348,6 @@ ModelDefinition *LoadModel(const char *asset)
 	model->id = modelId;
 	models[modelId] = model;
 	modelId++;
-	assert(modelId < MAX_MODELS);
 
 	const size_t nameLength = strlen(asset) + 1;
 	model->name = malloc(nameLength);
@@ -400,6 +414,11 @@ ModelDefinition *LoadModel(const char *asset)
 			lod->indexData[j] = indexData;
 			ReadBytes(assetData->data, &offset, lod->indexCount[j] * sizeof(uint), indexData);
 		}
+	}
+
+	if (modelId >= MAX_MODELS - 10)
+	{
+		LogWarning("Model ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_MODELS - modelId);
 	}
 
 	return model;
