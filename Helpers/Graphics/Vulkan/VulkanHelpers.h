@@ -11,10 +11,10 @@
 
 #pragma region macros
 #define MAX_FRAMES_IN_FLIGHT 1
-#define MAX_UI_QUADS_INIT 8192 // TODO: find best value
+#define MAX_UI_QUADS_INIT 8192 // TODO: find best value (and a fix for resizing the buffer mid-frame)
 #define MAX_WALLS_INIT 1024
 #define MAX_WALL_ACTORS_INIT 256
-#define MAX_MODEL_ACTOR_QUADS_INIT 8192 // TODO: fix bug 👎
+#define MAX_MODEL_ACTOR_QUADS_INIT 4096
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
 // TODO Use LogInternal

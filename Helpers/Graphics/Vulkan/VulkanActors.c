@@ -90,7 +90,6 @@ void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 							 &buffers.actorModels.unshadedDrawInfo,
 							 indexCount);
 				break;
-			case SHADER_SKY:
 			default:
 				assert(false && "Invalid material shader!");
 		}
@@ -151,7 +150,6 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 					case SHADER_UNSHADED:
 						LoadMaterial(&unshadedMaterialIds, &unshadedMaterialCounts, lodMaterialId, NULL, 0);
 						break;
-					case SHADER_SKY:
 					default:
 						assert(false && "Invalid material shader!");
 				}
@@ -159,6 +157,61 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 		}
 		buffers.actorModels.instanceData.bytesUsed += sizeof(ModelInstanceData) * actor->actorModel->materialCount;
 	}
+}
+
+VkResult PreSizeActorBuffers(const List *actors)
+{
+	for (size_t i = 0; i < loadedActorCount; i++)
+	{
+		assert(loadedActorCount == actors->length);
+		const Actor *actor = ListGet(*actors, i);
+		if (!actor->actorModel)
+		{
+			if (!actor->actorWall)
+			{
+				continue;
+			}
+			buffers.actorWalls.count++;
+		} else
+		{
+			const ModelDefinition *model = actor->actorModel;
+			for (uint8_t j = 0; j < model->lodCount; j++)
+			{
+				const ModelLod *lod = model->lods[j];
+				buffers.actorModels.vertices.bytesUsed += sizeof(ModelVertex) * lod->vertexCount;
+				buffers.actorModels.indices.bytesUsed += sizeof(uint32_t) * lod->totalIndexCount;
+			}
+			for (uint8_t j = 0; j < model->materialCount; j++)
+			{
+				switch (model->skins[actor->currentSkinIndex][j].shader)
+				{
+					case SHADER_SHADED:
+						buffers.actorModels.shadedDrawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
+						break;
+					case SHADER_UNSHADED:
+						buffers.actorModels.unshadedDrawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
+						break;
+					default:
+						assert(false && "Invalid material shader!");
+				}
+			}
+			buffers.actorModels.instanceData.bytesUsed += sizeof(ModelInstanceData) * model->materialCount;
+		}
+	}
+	buffers.actorWalls.vertices.bytesUsed = sizeof(ActorWallVertex) * 4 * buffers.actorWalls.count;
+	buffers.actorWalls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.actorWalls.count;
+	buffers.actorWalls.instanceData.bytesUsed = sizeof(ActorWallInstanceData) * buffers.actorWalls.count;
+	buffers.actorWalls.drawInfo.bytesUsed = sizeof(VkDrawIndexedIndirectCommand) * buffers.actorWalls.count;
+	VulkanTestReturnResult(ResizeActorWallBuffers(), "Failed to resize wall actor buffers!");
+	VulkanTestReturnResult(ResizeActorModelBuffers(), "Failed to resize model actor buffers!");
+	buffers.actorWalls.count = 0;
+	buffers.actorModels.vertices.bytesUsed = 0;
+	buffers.actorModels.indices.bytesUsed = 0;
+	buffers.actorModels.instanceData.bytesUsed = 0;
+	buffers.actorModels.shadedDrawInfo.bytesUsed = 0;
+	buffers.actorModels.unshadedDrawInfo.bytesUsed = 0;
+
+	return VK_SUCCESS;
 }
 
 VkResult InitActors(const List *actors)
@@ -177,12 +230,9 @@ VkResult InitActors(const List *actors)
 	vertexOffset = 0;
 	indexDataOffset = 0;
 	vertexDataOffset = 0;
-	VkDrawIndexedIndirectCommand *shadedActorModelsDrawInfo = buffers.actorModels.shadedDrawInfo.data;
-	VkDrawIndexedIndirectCommand *unshadedActorModelsDrawInfo = buffers.actorModels.unshadedDrawInfo.data;
-	VkDrawIndexedIndirectCommand *actorWallsDrawInfo = buffers.actorWalls.drawInfo.data;
-	memset(actorWallsDrawInfo, 0, buffers.actorWalls.drawInfo.bytesUsed);
-	memset(shadedActorModelsDrawInfo, 0, buffers.actorModels.shadedDrawInfo.bytesUsed);
-	memset(unshadedActorModelsDrawInfo, 0, buffers.actorModels.unshadedDrawInfo.bytesUsed);
+	memset(buffers.actorModels.shadedDrawInfo.data, 0, buffers.actorModels.shadedDrawInfo.bytesUsed);
+	memset(buffers.actorModels.unshadedDrawInfo.data, 0, buffers.actorModels.unshadedDrawInfo.bytesUsed);
+	memset(buffers.actorWalls.drawInfo.data, 0, buffers.actorWalls.drawInfo.bytesUsed);
 	buffers.actorWalls.count = 0;
 	buffers.actorModels.vertices.bytesUsed = 0;
 	buffers.actorModels.indices.bytesUsed = 0;
@@ -191,8 +241,15 @@ VkResult InitActors(const List *actors)
 	buffers.actorModels.unshadedDrawInfo.bytesUsed = 0;
 	ListLock(*actors);
 	loadedActorCount = actors->length;
+
+	VulkanTestReturnResult(PreSizeActorBuffers(actors), "Failed to pre-size actor buffers!");
+
+	VkDrawIndexedIndirectCommand *shadedActorModelsDrawInfo = buffers.actorModels.shadedDrawInfo.data;
+	VkDrawIndexedIndirectCommand *unshadedActorModelsDrawInfo = buffers.actorModels.unshadedDrawInfo.data;
+	VkDrawIndexedIndirectCommand *actorWallsDrawInfo = buffers.actorWalls.drawInfo.data;
 	for (size_t i = 0; i < loadedActorCount; i++)
 	{
+		assert(loadedActorCount == actors->length);
 		const Actor *actor = ListGet(*actors, i);
 		if (!actor->actorModel)
 		{
@@ -216,14 +273,15 @@ VkResult InitActors(const List *actors)
 			}
 		}
 	}
-	buffers.actorWalls.vertices.bytesUsed = sizeof(ActorWallVertex) * 4 * buffers.actorWalls.count;
-	buffers.actorWalls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.actorWalls.count;
-	buffers.actorWalls.instanceData.bytesUsed = sizeof(ActorWallInstanceData) * buffers.actorWalls.count;
-	buffers.actorWalls.drawInfo.bytesUsed = sizeof(VkDrawIndexedIndirectCommand) * buffers.actorWalls.count;
-
-	VulkanTestReturnResult(ResizeActorWallBuffers(), "Failed to resize wall actor buffers!");
-	VulkanTestReturnResult(ResizeActorModelBuffers(), "Failed to resize model actor buffers!");
-	assert(loadedActorCount == actors->length);
+	assert(buffers.actorWalls.vertices.bytesUsed <= sizeof(ActorWallVertex) * 4 * buffers.actorWalls.count);
+	assert(buffers.actorWalls.indices.bytesUsed <= sizeof(uint32_t) * 6 * buffers.actorWalls.count);
+	assert(buffers.actorWalls.instanceData.bytesUsed <= sizeof(ActorWallInstanceData) * buffers.actorWalls.count);
+	assert(buffers.actorWalls.drawInfo.bytesUsed <= sizeof(VkDrawIndexedIndirectCommand) * buffers.actorWalls.count);
+	assert(buffers.actorModels.vertices.bytesUsed <= buffers.actorModels.vertices.allocatedSize);
+	assert(buffers.actorModels.indices.bytesUsed <= buffers.actorModels.indices.allocatedSize);
+	assert(buffers.actorModels.instanceData.bytesUsed <= buffers.actorModels.instanceData.allocatedSize);
+	assert(buffers.actorModels.shadedDrawInfo.bytesUsed <= buffers.actorModels.shadedDrawInfo.allocatedSize);
+	assert(buffers.actorModels.unshadedDrawInfo.bytesUsed <= buffers.actorModels.unshadedDrawInfo.allocatedSize);
 	ListUnlock(*actors);
 
 	size_t totalInstanceCount = 0;
