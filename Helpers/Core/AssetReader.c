@@ -233,6 +233,29 @@ Asset *DecompressAsset(const char *relPath)
 	return assetStruct;
 }
 
+void RemoveAssetFromCache(const char *relPath)
+{
+	int index = -1;
+	for (int i = 0; i < assetCacheNames.length; i++)
+	{
+		if (strncmp(ListGet(assetCacheNames, i), relPath, 80) == 0)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index != -1)
+	{
+		free(ListGet(assetCacheNames, index));
+		ListRemoveAt(&assetCacheNames, index);
+		free(ListGet(assetCacheData, index));
+		ListRemoveAt(&assetCacheData, index);
+	} else
+	{
+		LogWarning("Was told to remove \"%s\" from the asset cache, but it was not present.\n", relPath);
+	}
+}
+
 void GenFallbackImage(Image *src)
 {
 	src->width = 64;
@@ -312,6 +335,8 @@ Image *LoadImage(const char *asset)
 	{
 		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
 	}
+
+	RemoveAssetFromCache(asset);
 
 	return img;
 }
@@ -420,6 +445,8 @@ ModelDefinition *LoadModel(const char *asset)
 	{
 		LogWarning("Model ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_MODELS - modelId);
 	}
+
+	RemoveAssetFromCache(asset);
 
 	return model;
 }

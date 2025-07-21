@@ -33,6 +33,13 @@ void DestroyAssetCache();
 Asset *DecompressAsset(const char *relPath);
 
 /**
+ * Remove an asset from the cache
+ * @param relPath The asset to decompress
+ * @note Any pointers to this asset will become invalid.
+ */
+void RemoveAssetFromCache(const char *relPath);
+
+/**
  * Load an image from disk, falling back to a cached version if possible
  * @param asset The asset to load the image from
  * @return The loaded image, or a 64x64 fallback image if it failed
