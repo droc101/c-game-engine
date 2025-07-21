@@ -110,6 +110,7 @@ void DestroyAssetCache()
 		if (images[i] != NULL)
 		{
 			free(images[i]->name);
+			free(images[i]->pixelData);
 			free(images[i]);
 		}
 	}
@@ -246,6 +247,8 @@ void RemoveAssetFromCache(const char *relPath)
 	}
 	if (index != -1)
 	{
+		const Asset *asset = ListGetPointer(assetCacheData, index);
+		free(asset->data);
 		free(ListGetPointer(assetCacheNames, index));
 		ListRemoveAt(assetCacheNames, index);
 		free(ListGetPointer(assetCacheData, index));
@@ -317,7 +320,8 @@ Image *LoadImage(const char *asset)
 		img->pixelDataSize = ReadUintA(textureAsset->data, IMAGE_SIZE_OFFSET);
 		img->width = ReadUintA(textureAsset->data, IMAGE_WIDTH_OFFSET);
 		img->height = ReadUintA(textureAsset->data, IMAGE_HEIGHT_OFFSET);
-		img->pixelData = textureAsset->data + sizeof(uint) * 4;
+		img->pixelData = malloc(img->pixelDataSize);
+		memcpy(img->pixelData, textureAsset->data + sizeof(uint) * 4, img->pixelDataSize);
 	}
 
 	img->id = textureId;
