@@ -184,8 +184,7 @@ VkResult CreateActorModelBuffers()
 		.size = buffers.actorModels.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&actorModelsVertexBufferCreationInfo,
-											&buffers.actorModels.vertices.buffer),
+	VulkanTestReturnResult(lunaCreateBuffer(&actorModelsVertexBufferCreationInfo, &buffers.actorModels.vertices.buffer),
 						   "Failed to create model actors vertex buffer!");
 	buffers.actorModels.vertices.data = malloc(buffers.actorModels.vertices.allocatedSize);
 	CheckAlloc(buffers.actorModels.vertices.data);
@@ -444,13 +443,13 @@ bool LoadTexture(const Image *image)
 		.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 	};
-	ListAdd(&textures, NULL);
-	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage *)&ListGet(textures, textures.length - 1)),
+	ListAdd(textures, NULL);
+	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage *)&ListGetPointer(textures, textures.length - 1)),
 			   "Failed to create texture!");
 	imageAssetIdToIndexMap[image->id] = textures.length - 1;
 
 	const LunaDescriptorImageInfo imageInfo = {
-		.image = ListGet(textures, textures.length - 1),
+		.image = ListGetPointer(textures, textures.length - 1),
 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 	};
 	LunaWriteDescriptorSet writeDescriptors[MAX_FRAMES_IN_FLIGHT];

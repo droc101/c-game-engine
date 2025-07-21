@@ -110,10 +110,10 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			strcpy(ac->outActorName, outActorName);
 			ac->targetInput = ReadByte(data, &offset);
 			ReadBytes(data, &offset, sizeof(Param), &ac->outParamOverride);
-			ListAdd(&a->ioConnections, ac);
+			ListAdd(a->ioConnections, ac);
 		}
 
-		ListAdd(&l->actors, a);
+		ListAdd(l->actors, a);
 		if (actorName[0] != '\0')
 		{
 			NameActor(a, actorName, l);
@@ -140,7 +140,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		Wall *w = CreateWall(v2(wallAX, wallAY), v2(wallBX, wallBY), wallTex, wallUVScale, wallUVOffset);
 		WallBake(w);
 		CreateWallCollider(w, l->worldId);
-		ListAdd(&l->walls, w);
+		ListAdd(l->walls, w);
 	}
 
 	return l;

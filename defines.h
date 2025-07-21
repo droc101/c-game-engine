@@ -259,8 +259,8 @@ struct Viewmodel
 
 struct KvList
 {
-	List keys;
-	List values;
+	LockingList keys;
+	LockingList values;
 };
 
 struct Color
@@ -351,7 +351,7 @@ struct Level
 	short courseNum;
 
 	/// The list of actors in the level
-	List actors;
+	LockingList actors;
 	/// The list of walls in the level
 	List walls;
 
@@ -379,7 +379,7 @@ struct Level
 	Player player;
 
 	/// The map of named actors in the level (key portion)
-	List namedActorNames;
+	LockingList namedActorNames;
 	/// The map of named actors in the level (value portion)
 	List namedActorPointers;
 
@@ -531,7 +531,7 @@ struct Actor
 	/// The function to call when the actor receives a signal.
 	ActorSignalHandlerFunction SignalHandler;
 	/// List of I/O connections
-	List ioConnections;
+	LockingList ioConnections;
 
 	/// The actor's health
 	/// @note May be unused for some actors

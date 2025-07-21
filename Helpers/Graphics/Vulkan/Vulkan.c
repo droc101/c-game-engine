@@ -27,6 +27,8 @@ bool VK_Init(SDL_Window *window)
 	{
 		// clang-format on
 
+		VulkanActorsVariablesInit();
+
 		const VkPhysicalDeviceProperties physicalDeviceProperties = lunaGetPhysicalDeviceProperties();
 		char vendor[32] = {};
 		switch (physicalDeviceProperties.vendorID)
@@ -393,21 +395,10 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	return VK_SUCCESS;
 }
 
-bool VK_UpdateActors(const List *actors, const bool shouldReloadActors)
-{
-	if (shouldReloadActors)
-	{
-		VulkanTest(InitActors(actors), "Failed to reload actors");
-	}
-	VulkanTest(LoadActorWalls(actors), "Failed to load wall actors!");
-	VulkanTest(UpdateActorInstanceData(actors), "Failed to update actor instance data!");
-	return true;
-}
-
 bool VK_Cleanup()
 {
 	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
-	DestroyActorMetadata();
+	VulkanActorsVariablesCleanup();
 	free(buffers.ui.vertices.data);
 	free(buffers.ui.indices.data);
 	free(buffers.viewModel.instanceDatas);
@@ -673,7 +664,7 @@ void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
 {
 	const uint32_t textureIndex = TextureIndex(texture);
 	LunaDescriptorImageInfo imageInfo = {
-		.image = ListGet(textures, textureIndex),
+		.image = ListGetPointer(textures, textureIndex),
 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 	};
 	if (linear && repeat)

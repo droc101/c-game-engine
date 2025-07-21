@@ -91,19 +91,19 @@ void FreeModel(ModelDefinition *model)
 
 void AssetCacheInit()
 {
-	ListCreate(&assetCacheNames);
-	ListCreate(&assetCacheData);
+	ListInit(assetCacheNames);
+	ListInit(assetCacheData);
 }
 
 void DestroyAssetCache()
 {
 	for (int i = 0; i < assetCacheData.length; i++)
 	{
-		Asset *asset = ListGet(assetCacheData, i);
+		Asset *asset = ListGetPointer(assetCacheData, i);
 		free(asset->data);
 		free(asset);
 	}
-	free(assetCacheData.data);
+	ListFree(assetCacheData);
 
 	for (int i = 0; i < MAX_TEXTURES; i++)
 	{
@@ -119,7 +119,7 @@ void DestroyAssetCache()
 		FreeModel(models[i]);
 	}
 
-	ListAndContentsFree(&assetCacheNames, false);
+	ListAndContentsFree(assetCacheNames);
 }
 
 Asset *DecompressAsset(const char *relPath)
@@ -127,9 +127,9 @@ Asset *DecompressAsset(const char *relPath)
 	// see if relPath is already in the cache
 	for (int i = 0; i < assetCacheNames.length; i++)
 	{
-		if (strncmp(ListGet(assetCacheNames, i), relPath, 80) == 0)
+		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
 		{
-			return ListGet(assetCacheData, i);
+			return ListGetPointer(assetCacheData, i);
 		}
 	}
 
@@ -225,8 +225,8 @@ Asset *DecompressAsset(const char *relPath)
 	char *data = malloc(pathLength);
 	CheckAlloc(data);
 	strncpy(data, relPath, pathLength);
-	ListAdd(&assetCacheNames, data);
-	ListAdd(&assetCacheData, assetStruct);
+	ListAdd(assetCacheNames, data);
+	ListAdd(assetCacheData, assetStruct);
 
 	free(asset);
 
@@ -238,7 +238,7 @@ void RemoveAssetFromCache(const char *relPath)
 	int index = -1;
 	for (int i = 0; i < assetCacheNames.length; i++)
 	{
-		if (strncmp(ListGet(assetCacheNames, i), relPath, 80) == 0)
+		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
 		{
 			index = i;
 			break;
@@ -246,10 +246,10 @@ void RemoveAssetFromCache(const char *relPath)
 	}
 	if (index != -1)
 	{
-		free(ListGet(assetCacheNames, index));
-		ListRemoveAt(&assetCacheNames, index);
-		free(ListGet(assetCacheData, index));
-		ListRemoveAt(&assetCacheData, index);
+		free(ListGetPointer(assetCacheNames, index));
+		ListRemoveAt(assetCacheNames, index);
+		free(ListGetPointer(assetCacheData, index));
+		ListRemoveAt(assetCacheData, index);
 	} else
 	{
 		LogWarning("Was told to remove \"%s\" from the asset cache, but it was not present.\n", relPath);

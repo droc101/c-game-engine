@@ -6,16 +6,12 @@
 #define VULKANACTORS_H
 
 #include <vulkan/vulkan.h>
-#include "../../../defines.h"
+#include "../../../Helpers/Core/List.h"
 
-void LoadLod(const Actor *actor, uint32_t lodIndex);
+void VulkanActorsVariablesInit();
 
-VkResult InitActors(const List *actors);
+void VulkanActorsVariablesCleanup();
 
-VkResult LoadActorWalls(const List *actors);
-
-VkResult UpdateActorInstanceData(const List *actors);
-
-void DestroyActorMetadata();
+VkResult InitActors(const LockingList *actors);
 
 #endif //VULKANACTORS_H

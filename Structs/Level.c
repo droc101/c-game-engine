@@ -33,8 +33,8 @@ Level *CreateLevel()
 {
 	Level *l = malloc(sizeof(Level));
 	CheckAlloc(l);
-	ListCreate(&l->actors);
-	ListCreate(&l->walls);
+	ListInit(l->actors);
+	ListInit(l->walls);
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity.y = 0;
 	l->worldId = b2CreateWorld(&worldDef);
@@ -51,8 +51,8 @@ Level *CreateLevel()
 	strncpy(l->name, "Unnamed Level", 32);
 	l->courseNum = -1;
 	l->ioProxy = NULL;
-	ListCreate(&l->namedActorNames);
-	ListCreate(&l->namedActorPointers);
+	ListInit(l->namedActorNames);
+	ListInit(l->namedActorPointers);
 	return l;
 }
 
@@ -60,16 +60,16 @@ void DestroyLevel(Level *l)
 {
 	for (int i = 0; i < l->actors.length; i++)
 	{
-		Actor *a = ListGet(l->actors, i);
+		Actor *a = ListGetPointer(l->actors, i);
 		FreeActor(a);
 	}
 
 	b2DestroyWorld(l->worldId);
 
-	ListAndContentsFree(&l->walls, false);
-	ListAndContentsFree(&l->namedActorNames, false);
-	ListFree(&l->namedActorPointers, false);
-	ListFree(&l->actors, false);
+	ListAndContentsFree(l->walls);
+	ListAndContentsFree(l->namedActorNames);
+	ListFree(l->namedActorPointers);
+	ListFree(l->actors);
 	free(l);
 	l = NULL;
 }
@@ -77,7 +77,7 @@ void DestroyLevel(Level *l)
 void AddActor(Actor *actor)
 {
 	Level *l = GetState()->level;
-	ListAdd(&l->actors, actor);
+	ListAdd(l->actors, actor);
 }
 
 void RemoveActor(Actor *actor)
@@ -89,10 +89,10 @@ void RemoveActor(Actor *actor)
 	const size_t nameIdx = ListFind(l->namedActorPointers, actor);
 	if (nameIdx != -1)
 	{
-		char *name = ListGet(l->namedActorNames, nameIdx);
+		char *name = ListGetPointer(l->namedActorNames, nameIdx);
 		free(name);
-		ListRemoveAt(&l->namedActorNames, nameIdx);
-		ListRemoveAt(&l->namedActorPointers, nameIdx);
+		ListRemoveAt(l->namedActorNames, nameIdx);
+		ListRemoveAt(l->namedActorPointers, nameIdx);
 	}
 
 	const size_t idx = ListFind(l->actors, actor);
@@ -100,15 +100,15 @@ void RemoveActor(Actor *actor)
 	{
 		return;
 	}
-	ListRemoveAt(&l->actors, idx);
+	ListRemoveAt(l->actors, idx);
 	FreeActor(actor);
 }
 
 void NameActor(Actor *actor, const char *name, Level *l)
 {
 	char *nameCopy = strdup(name);
-	ListAdd(&l->namedActorNames, nameCopy);
-	ListAdd(&l->namedActorPointers, actor);
+	ListAdd(l->namedActorNames, nameCopy);
+	ListAdd(l->namedActorPointers, actor);
 }
 
 Actor *GetActorByName(const char *name, const Level *l)
@@ -116,10 +116,10 @@ Actor *GetActorByName(const char *name, const Level *l)
 	ListLock(l->namedActorNames);
 	for (int i = 0; i < l->namedActorNames.length; i++)
 	{
-		const char *actorName = ListGet(l->namedActorNames, i);
+		const char *actorName = ListGetPointer(l->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
 		{
-			Actor *a = ListGet(l->namedActorPointers, i);
+			Actor *a = ListGetPointer(l->namedActorPointers, i);
 			ListUnlock(l->namedActorNames);
 			return a;
 		}
@@ -128,21 +128,18 @@ Actor *GetActorByName(const char *name, const Level *l)
 	return NULL;
 }
 
-List *GetActorsByName(const char *name, const Level *l)
+void GetActorsByName(const char *name, const Level *l, List *actors)
 {
-	List *actors = malloc(sizeof(List));
-	CheckAlloc(actors);
-	ListCreate(actors);
+	ListInit(*actors);
 	ListLock(l->namedActorNames);
 	for (int i = 0; i < l->namedActorNames.length; i++)
 	{
-		const char *actorName = ListGet(l->namedActorNames, i);
+		const char *actorName = ListGetPointer(l->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
 		{
-			Actor *a = ListGet(l->namedActorPointers, i);
-			ListAdd(actors, a);
+			Actor *a = ListGetPointer(l->namedActorPointers, i);
+			ListAdd(*actors, a);
 		}
 	}
 	ListUnlock(l->namedActorNames);
-	return actors;
 }

@@ -42,7 +42,7 @@ void GLevelSelectStateUpdate(GlobalState * /*State*/)
 		{
 			ConsumeKey(SDL_SCANCODE_SPACE);
 			ConsumeButton(CONTROLLER_OK);
-			if (ChangeLevelByName(ListGet(levelList, selectedLevel)))
+			if (ChangeLevelByName(ListGetPointer(levelList, selectedLevel)))
 			{
 				GMainStateSet();
 			}
@@ -61,7 +61,7 @@ void GLevelSelectStateRender(GlobalState * /*State*/)
 
 	if (levelList.length > 0)
 	{
-		char *levelName = ListGet(levelList, selectedLevel);
+		char *levelName = ListGetPointer(levelList, selectedLevel);
 
 		sprintf(levelNameBuffer, "%02d %s", selectedLevel + 1, levelName);
 	} else
@@ -81,7 +81,7 @@ void GLevelSelectStateRender(GlobalState * /*State*/)
 
 void LoadLevelList()
 {
-	ListCreate(&levelList);
+	ListInit(levelList);
 	char levelDataPath[300];
 	sprintf(levelDataPath, "%sassets/level/", GetState()->executableFolder);
 
@@ -103,7 +103,7 @@ void LoadLevelList()
 			strcpy(levelName, ent->d_name);
 			// Remove the .gmap extension
 			levelName[strlen(levelName) - 5] = '\0';
-			ListAdd(&levelList, levelName);
+			ListAdd(levelList, levelName);
 		}
 	}
 	closedir(dir);

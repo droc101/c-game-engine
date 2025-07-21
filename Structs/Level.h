@@ -55,10 +55,9 @@ Actor *GetActorByName(const char *name, const Level *l);
  * Get all actors with a given name
  * @param name The name of the actors
  * @param l The level to search in
- * @return A list of actors with the given name.
- * @note You must free the list when you're done with it
+ * @param actors The list of actors with the given name.
  * @note This is extra slow. Use even more sparingly.
  */
-List *GetActorsByName(const char *name, const Level *l);
+void GetActorsByName(const char *name, const Level *l, List *actors);
 
 #endif //GAME_LEVEL_H

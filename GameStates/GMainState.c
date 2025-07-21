@@ -141,7 +141,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	for (int i = 0; i < l->actors.length; i++)
 	{
-		Actor *a = ListGet(l->actors, i);
+		Actor *a = ListGetPointer(l->actors, i);
 		a->Update(a, delta);
 	}
 

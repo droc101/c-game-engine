@@ -22,7 +22,7 @@ size_t KvIndexOf(const KvList *list, const char *key)
 	ListLock(list->keys);
 	for (size_t i = 0; i < list->keys.length; i++)
 	{
-		if (strcmp((const char *)ListGet(list->keys, i), key) == 0)
+		if (strcmp((const char *)ListGetPointer(list->keys, i), key) == 0)
 		{
 			ListUnlock(list->keys);
 			return i;
@@ -51,13 +51,13 @@ void KvSet(KvList *list, const char *key, const Param value)
 	if (index != -1)
 	{
 		ListLock(list->values);
-		free(ListGet(list->values, index));
-		ListGet(list->values, index) = p;
+		free(ListGetPointer(list->values, index));
+		ListSet(list->values, index, p);
 		ListUnlock(list->values);
 	} else
 	{
-		ListAdd(&list->keys, strdup(key));
-		ListAdd(&list->values, p);
+		ListAdd(list->keys, strdup(key));
+		ListAdd(list->values, p);
 	}
 }
 
@@ -76,7 +76,7 @@ Param *KvGet(const KvList *list, const char *key)
 	const size_t index = KvIndexOf(list, key);
 	if (index != -1)
 	{
-		return ListGet(list->values, index);
+		return ListGetPointer(list->values, index);
 	}
 	LogWarning("Tried to get key '%s' from KvList, but it does not exist.\n", key);
 	return NULL; // Not found
@@ -116,8 +116,8 @@ void KvListCreate(KvList *list)
 	{
 		return;
 	}
-	ListCreate(&list->keys);
-	ListCreate(&list->values);
+	ListInit(list->keys);
+	ListInit(list->values);
 }
 
 void KvListDestroy(KvList *list)
@@ -128,8 +128,8 @@ void KvListDestroy(KvList *list)
 		return;
 	}
 
-	ListAndContentsFree(&list->keys, false);
-	ListAndContentsFree(&list->values, false);
+	ListAndContentsFree(list->keys);
+	ListAndContentsFree(list->values);
 }
 
 void KvDelete(KvList *list, const char *key)
@@ -141,8 +141,8 @@ void KvDelete(KvList *list, const char *key)
 	const size_t index = KvIndexOf(list, key);
 	if (index != -1)
 	{
-		ListRemoveAt(&list->keys, index);
-		ListRemoveAt(&list->values, index);
+		ListRemoveAt(list->keys, index);
+		ListRemoveAt(list->values, index);
 	} else
 	{
 		LogWarning("Tried to delete key '%s' from KvList, but it does not exist.", key);

@@ -41,17 +41,18 @@ int LodThreadMain(void *)
 			Error("Failed to lock LOD thread mutex!");
 		}
 
-		const Vector2 playerPosition = GetState()->level->player.pos;
-		const List actors = GetState()->level->actors;
-		const size_t actorCount = actors.length;
-		const float lodMultiplier = GetState()->options.lodMultiplier;
+		const GlobalState *state = GetState();
+		const Vector2 playerPosition = state->level->player.pos;
+		const LockingList *actors = &state->level->actors;
+		const size_t actorCount = actors->length;
+		const float lodMultiplier = state->options.lodMultiplier;
 		switch (currentRenderer)
 		{
 			case RENDERER_VULKAN:
 				bool shouldReloadActors = false;
 				for (size_t i = 0; i < actorCount; i++)
 				{
-					Actor *actor = ListGet(actors, i);
+					Actor *actor = ListGetPointer(*actors, i);
 					if (!actor->actorModel)
 					{
 						continue;
@@ -70,7 +71,7 @@ int LodThreadMain(void *)
 						shouldReloadActors = true;
 					}
 				}
-				if (!VK_UpdateActors(&actors, shouldReloadActors))
+				if (!VK_UpdateActors(actors, shouldReloadActors))
 				{
 					Error("Failed to load actors!");
 				}
@@ -79,7 +80,7 @@ int LodThreadMain(void *)
 			default:
 				for (size_t i = 0; i < actorCount; i++)
 				{
-					Actor *actor = ListGet(actors, i);
+					Actor *actor = ListGetPointer(*actors, i);
 					if (!actor->actorModel)
 					{
 						continue;

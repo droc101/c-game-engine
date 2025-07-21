@@ -17,16 +17,16 @@ void ExecuteCommand(const char *command)
 	// no, passing it as non-const does not work
 	char *rwCommand = strdup(command);
 	List commandList;
-	ListCreate(&commandList);
+	ListInit(commandList);
 	const char *token = strtok(rwCommand, " ");
 	while (token != NULL)
 	{
-		ListAdd(&commandList, strdup(token));
+		ListAdd(commandList, strdup(token));
 		token = strtok(NULL, " ");
 	}
 	free(rwCommand);
 
-	char *commandName = ListGet(commandList, 0);
+	char *commandName = ListGetPointer(commandList, 0);
 	if (strcmp(commandName, "level") == 0)
 	{
 		if (commandList.length < 2)
@@ -34,7 +34,7 @@ void ExecuteCommand(const char *command)
 			printf("level command requires a level name\n");
 		} else
 		{
-			GLoadingStateSet(ListGet(commandList, 1));
+			GLoadingStateSet(ListGetPointer(commandList, 1));
 		}
 	}
 	// TODO: signal system and related commands
@@ -43,5 +43,5 @@ void ExecuteCommand(const char *command)
 		printf("Unknown command: %s\n", commandName);
 	}
 
-	ListAndContentsFree(&commandList, false);
+	ListAndContentsFree(commandList);
 }

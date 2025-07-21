@@ -100,7 +100,7 @@ Actor *CreateActor(const Vector2 position,
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	actor->bodyId = b2_nullBodyId;
-	ListCreate(&actor->ioConnections);
+	ListInit(actor->ioConnections);
 	actor->SignalHandler = DefaultSignalHandler;
 	actor->Init = ActorInitFuncs[actorType];
 	actor->Update = ActorUpdateFuncs[actorType];
@@ -120,10 +120,10 @@ void FreeActor(Actor *actor)
 	actor->Destroy(actor);
 	for (int i = 0; i < actor->ioConnections.length; i++)
 	{
-		ActorConnection *connection = ListGet(actor->ioConnections, i);
+		ActorConnection *connection = ListGetPointer(actor->ioConnections, i);
 		DestroyActorConnection(connection);
 	}
-	ListFree(&actor->ioConnections, false);
+	ListFree(actor->ioConnections);
 	free(actor);
 	actor = NULL;
 }
@@ -186,18 +186,19 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 	ListLock(sender->ioConnections);
 	for (int i = 0; i < sender->ioConnections.length; i++)
 	{
-		const ActorConnection *connection = ListGet(sender->ioConnections, i);
+		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
 		if (connection->myOutput == signal)
 		{
-			List *actors = GetActorsByName(connection->outActorName, GetState()->level);
-			if (actors == NULL)
+			List actors;
+			GetActorsByName(connection->outActorName, GetState()->level, &actors);
+			if (actors.length == 0)
 			{
 				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->outActorName);
 				continue;
 			}
-			for (int j = 0; j < actors->length; j++)
+			for (int j = 0; j < actors.length; j++)
 			{
-				Actor *actor = ListGet(*actors, j);
+				Actor *actor = ListGetPointer(actors, j);
 				if (actor->SignalHandler != NULL)
 				{
 					const Param *param = &defaultParam;
@@ -212,7 +213,7 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 					}
 				}
 			}
-			ListFree(actors, true);
+			ListFree(actors);
 		}
 	}
 	ListUnlock(sender->ioConnections);

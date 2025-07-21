@@ -510,7 +510,7 @@ void GL_LoadLevelWalls(const Level *l)
 	GL_DestroyWallBuffers();
 	for (size_t i = 0; i < l->walls.length; i++)
 	{
-		const Wall *w = ListGet(l->walls, i);
+		const Wall *w = ListGetPointer(l->walls, i);
 		GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
 
 		float vertices[4][6] = {
@@ -1084,7 +1084,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 
 	for (int i = 0; i < level->actors.length; i++)
 	{
-		const Actor *actor = ListGet(level->actors, i);
+		const Actor *actor = ListGetPointer(level->actors, i);
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);
 		if (actor->actorModel == NULL)

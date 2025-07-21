@@ -11,235 +11,517 @@
 #include "Error.h"
 #include "Logging.h"
 
-void ListCreate(List *list)
+void _ListInit(List *list, const enum _ListType listType)
 {
-	if (!list)
-	{
-		Error("A NULL list must not be passed to ListCreate!");
-	}
+	assert(list);
 
 	list->length = 0;
-	list->data = NULL;
+	list->data = malloc(sizeof(struct _ListData));
+	list->data->type = listType;
+	list->data->pointerData = NULL;
+}
+
+void _SortedListInit(SortedList *list, const enum _ListType listType)
+{
+	_ListInit((List *)list, listType);
+}
+
+void _LockingListInit(LockingList *list, const enum _ListType listType)
+{
+	assert(list);
+
+	_ListInit((List *)list, listType);
 	list->mutex = SDL_CreateMutex();
 }
 
-void ListAdd(List *list, void *data)
+void _LockingSortedListInit(LockingSortedList *list, const enum _ListType listType)
 {
-	if (!list)
+	_LockingListInit((LockingList *)list, listType);
+}
+
+
+void _ListAdd(List *list, void *data)
+{
+	assert(list);
+
+	switch (list->data->type)
 	{
-		Error("A NULL list must not be passed to ListAdd!");
+		case LIST_POINTER:
+			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length + 1, sizeof(void *));
+			CheckAlloc(list->data->pointerData);
+			list->data->pointerData[list->length] = data;
+			break;
+		case LIST_UINT64:
+			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length + 1, sizeof(size_t));
+			CheckAlloc(list->data->uint64Data);
+			list->data->uint64Data[list->length] = (size_t)data;
+			break;
+		case LIST_UINT32:
+			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length + 1, sizeof(uint32_t));
+			CheckAlloc(list->data->uint32Data);
+			list->data->uint32Data[list->length] = (uint32_t)(size_t)data;
+			break;
+		case LIST_INT32:
+			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length + 1, sizeof(int32_t));
+			CheckAlloc(list->data->int32Data);
+			list->data->int32Data[list->length] = (int32_t)(size_t)data;
+			break;
 	}
-
-	ListLock(*list);
-
-	list->data = GameReallocArray(list->data, list->length + 1, sizeof(void *));
-	CheckAlloc(list->data);
-	list->data[list->length] = data;
 	list->length++;
+}
 
+void _SortedListAdd(const SortedList *list, void *data)
+{
+	assert(list);
+
+	Error("Hah! you think I implemented this already? that's funny.");
+}
+
+void _LockingListAdd(LockingList *list, void *data)
+{
+	assert(list);
+
+	ListLock(*list);
+	_ListAdd((List *)list, data);
 	ListUnlock(*list);
 }
 
-void ListSet(List *list, const size_t index, void *data)
+void _LockingSortedListAdd(LockingSortedList *list, void *data)
 {
-	if (!list)
-	{
-		Error("A NULL list must not be passed to ListSet!");
-	}
-	if (index >= list->length)
-	{
-		Error("Attempted to set an item past the end of a list!");
-	}
+	assert(list);
 
 	ListLock(*list);
-
-	list->data[index] = data;
-
+	_SortedListAdd((SortedList *)list, data);
 	ListUnlock(*list);
 }
 
-void ListAddBatched(List *list, const size_t count, ...)
+
+void _ListSet(const List *list, const size_t index, void *data)
 {
-	if (!list)
+	assert(list);
+	assert(index <= list->length);
+
+	switch (list->data->type)
 	{
-		Error("A NULL list must not be passed to ListAddBatched!");
+		case LIST_POINTER:
+			list->data->pointerData[index] = data;
+			break;
+		case LIST_UINT64:
+			list->data->uint64Data[index] = (size_t)data;
+			break;
+		case LIST_UINT32:
+			list->data->uint32Data[index] = (uint32_t)(size_t)data;
+			break;
+		case LIST_INT32:
+			list->data->int32Data[index] = (int32_t)(size_t)data;
+			break;
 	}
+}
+
+void _LockingListSet(const LockingList *list, const size_t index, void *data)
+{
+	assert(list);
+	assert(index <= list->length);
 
 	ListLock(*list);
-
-	list->data = GameReallocArray(list->data, list->length + count, sizeof(void *));
-	CheckAlloc(list->data);
-
-	va_list args;
-	va_start(args, count);
-	for (size_t i = 0; i < count; i++)
-	{
-		list->data[list->length] = va_arg(args, void *);
-		list->length++;
-	}
-	va_end(args);
-
+	_ListSet((const List *)list, index, data);
 	ListUnlock(*list);
 }
 
-void ListRemoveAt(List *list, const size_t index)
-{
-	if (!list)
-	{
-		Error("A NULL list must not be passed to ListRemoveAt!");
-	}
-	if (!list->length || !list->data)
-	{
-		Error("Attempted to shrink empty list!");
-	}
-	if (index >= list->length)
-	{
-		Error("Attempted to remove an item past the end of a list!");
-	}
 
-	ListLock(*list);
+void ListRemoveAtHelper(const List *list, const size_t index)
+{
+	switch (list->data->type)
+	{
+		case LIST_POINTER:
+			memmove(&list->data->pointerData[index],
+					&list->data->pointerData[index + 1],
+					sizeof(void *) * (list->length - index));
+			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length, sizeof(void *));
+			CheckAlloc(list->data->pointerData);
+			break;
+		case LIST_UINT64:
+			memmove(&list->data->uint64Data[index],
+					&list->data->uint64Data[index + 1],
+					sizeof(size_t) * (list->length - index));
+			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length, sizeof(size_t));
+			CheckAlloc(list->data->uint64Data);
+			break;
+		case LIST_UINT32:
+			memmove(&list->data->uint32Data[index],
+					&list->data->uint32Data[index + 1],
+					sizeof(uint32_t) * (list->length - index));
+			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length, sizeof(uint32_t));
+			CheckAlloc(list->data->uint32Data);
+			break;
+		case LIST_INT32:
+			memmove(&list->data->int32Data[index],
+					&list->data->int32Data[index + 1],
+					sizeof(int32_t) * (list->length - index));
+			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
+			CheckAlloc(list->data->int32Data);
+			break;
+	}
+}
+
+void _ListRemoveAt(List *list, const size_t index)
+{
+	assert(list);
+	assert(index <= list->length);
+	assert(list->length && list->data);
 
 	list->length--;
 	if (list->length == 0)
 	{
-		free(list->data);
-		list->data = NULL;
+		free(list->data->pointerData);
+		list->data->pointerData = NULL;
+		return;
+	}
+	ListRemoveAtHelper(list, index);
+}
+
+void _SortedListRemoveAt(SortedList *list, const size_t index)
+{
+	_ListRemoveAt((List *)list, index);
+}
+
+void _LockingListRemoveAt(LockingList *list, const size_t index)
+{
+	assert(list);
+	assert(index <= list->length);
+	assert(list->length && list->data);
+
+	ListLock(*list);
+	list->length--;
+	if (list->length == 0)
+	{
+		free(list->data->pointerData);
+		list->data->pointerData = NULL;
 
 		ListUnlock(*list);
 		return;
 	}
-	memmove(&list->data[index], &list->data[index + 1], sizeof(void *) * (list->length - index));
-	list->data = GameReallocArray(list->data, list->length, sizeof(void *));
-	CheckAlloc(list->data);
-
+	ListRemoveAtHelper((List *)list, index);
 	ListUnlock(*list);
 }
 
-void ListInsertAfter(List *list, size_t index, void *data)
+void _LockingSortedListRemoveAt(LockingSortedList *list, const size_t index)
 {
-	if (!list)
-	{
-		Error("A NULL list must not be passed to ListInsertAfter!");
-	}
-	if (index >= list->length)
-	{
-		Error("Attempted to insert an item past the end of a list!");
-	}
+	_LockingListRemoveAt((LockingList *)list, index);
+}
 
-	ListLock(*list);
+
+void _ListInsertAfter(List *list, size_t index, void *data)
+{
+	assert(list);
+	assert(index <= list->length);
 
 	index++;
 	list->length++;
-	list->data = GameReallocArray(list->data, list->length, sizeof(void *));
-	CheckAlloc(list->data);
+	switch (list->data->type)
+	{
+		case LIST_POINTER:
+			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length, sizeof(void *));
+			CheckAlloc(list->data->pointerData);
+			memmove(&list->data->pointerData[index + 1],
+					&list->data->pointerData[index],
+					sizeof(void *) * (list->length - index - 1));
+			list->data->pointerData[index] = data;
+			break;
+		case LIST_UINT64:
+			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length, sizeof(size_t));
+			CheckAlloc(list->data->uint64Data);
+			memmove(&list->data->uint64Data[index + 1],
+					&list->data->uint64Data[index],
+					sizeof(size_t) * (list->length - index - 1));
+			list->data->uint64Data[index] = (size_t)data;
+			break;
+		case LIST_UINT32:
+			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length, sizeof(uint32_t));
+			CheckAlloc(list->data->uint32Data);
+			memmove(&list->data->uint32Data[index + 1],
+					&list->data->uint32Data[index],
+					sizeof(uint32_t) * (list->length - index - 1));
+			list->data->uint32Data[index] = (uint32_t)(size_t)data;
+			break;
+		case LIST_INT32:
+			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
+			CheckAlloc(list->data->int32Data);
+			memmove(&list->data->int32Data[index + 1],
+					&list->data->int32Data[index],
+					sizeof(int32_t) * (list->length - index - 1));
+			list->data->int32Data[index] = (int32_t)(size_t)data;
+			break;
+	}
+}
 
-	memmove(&list->data[index + 1], &list->data[index], sizeof(void *) * (list->length - index - 1));
-	list->data[index] = data;
+void _LockingListInsertAfter(LockingList *list, const size_t index, void *data)
+{
+	assert(list);
+	assert(index <= list->length);
 
+	ListLock(*list);
+	_ListInsertAfter((List *)list, index, data);
 	ListUnlock(*list);
 }
 
-size_t ListFind(const List list, const void *data)
+
+size_t _ListFind(const List *list, const void *data)
 {
-	if (!list.length || !list.data)
+	if (!list->length || !list->data)
 	{
 		return -1;
 	}
 
-	ListLock(list);
-
-	for (size_t i = 0; i < list.length; i++)
+	for (size_t i = 0; i < list->length; i++)
 	{
-		if (list.data[i] == data)
+		switch (list->data->type)
 		{
-			ListUnlock(list);
-			return i;
+			case LIST_POINTER:
+				if (list->data->pointerData[i] == data)
+				{
+					return i;
+				}
+				break;
+			case LIST_UINT64:
+				if (list->data->uint64Data[i] == (size_t)data)
+				{
+					return i;
+				}
+				break;
+			case LIST_UINT32:
+				if (list->data->uint32Data[i] == (uint32_t)(size_t)data)
+				{
+					return i;
+				}
+				break;
+			case LIST_INT32:
+				if (list->data->int32Data[i] == (int32_t)(size_t)data)
+				{
+					return i;
+				}
+				break;
 		}
 	}
-
-	ListUnlock(list);
 	return -1;
 }
 
-void ListLock(const List list)
+size_t _SortedListFind(const SortedList *list, const void *data)
 {
+	if (!list->length || !list->data)
+	{
+		return -1;
+	}
+
+	Error("Hah! you think I implemented this already? that's funny.");
+
+	return -1;
+}
+
+size_t _LockingListFind(LockingList *list, const void *data)
+{
+	if (!list->length || !list->data)
+	{
+		return -1;
+	}
+
+	ListLock(*list);
+	for (size_t i = 0; i < list->length; i++)
+	{
+		switch (list->data->type)
+		{
+			case LIST_POINTER:
+				if (list->data->pointerData[i] == data)
+				{
+					ListUnlock(*list);
+					return i;
+				}
+				break;
+			case LIST_UINT64:
+				if (list->data->uint64Data[i] == (size_t)data)
+				{
+					ListUnlock(*list);
+					return i;
+				}
+				break;
+			case LIST_UINT32:
+				if (list->data->uint32Data[i] == (uint32_t)(size_t)data)
+				{
+					ListUnlock(*list);
+					return i;
+				}
+				break;
+			case LIST_INT32:
+				if (list->data->int32Data[i] == (int32_t)(size_t)data)
+				{
+					ListUnlock(*list);
+					return i;
+				}
+				break;
+		}
+	}
+	ListUnlock(*list);
+	return -1;
+}
+
+size_t _LockingSortedListFind(LockingSortedList *list, const void *data)
+{
+	if (!list->length || !list->data)
+	{
+		return -1;
+	}
+
+	ListLock(*list);
+
+	Error("Hah! you think I implemented this already? that's funny.");
+
+	ListUnlock(*list);
+	return -1;
+}
+
+
+void _ListLock(const LockingList *list)
+{
+	assert(list);
 	// TODO: Explodes on arm64 when the quit button is pressed
-	if (SDL_LockMutex(list.mutex) < 0)
+	if (SDL_LockMutex(list->mutex) < 0)
 	{
 		LogError("Failed to lock list mutex with error: %s\n", SDL_GetError());
 		Error("Failed to lock list mutex!");
 	}
 }
 
-void ListUnlock(const List list)
+void _SortedListLock(LockingSortedList *list)
 {
-	if (SDL_UnlockMutex(list.mutex) < 0)
+	_ListLock((LockingList *)list);
+}
+
+
+void _ListUnlock(const LockingList *list)
+{
+	assert(list);
+	if (SDL_UnlockMutex(list->mutex) < 0)
 	{
 		LogError("Failed to unlock list mutex with error: %s\n", SDL_GetError());
 		Error("Failed to unlock list mutex!");
 	}
 }
 
-void ListClear(List *list)
+void _SortedListUnlock(LockingSortedList *list)
 {
-	if (!list)
-	{
-		Error("A NULL list must not be passed to ListClear!");
-	}
+	_ListUnlock((LockingList *)list);
+}
 
-	ListLock(*list);
+
+void _ListClear(List *list)
+{
+	assert(list);
 
 	list->length = 0;
-	free(list->data);
-	list->data = NULL;
+	free(list->data->pointerData);
+	list->data->pointerData = NULL;
+}
 
+void _SortedListClear(SortedList *list)
+{
+	_ListClear((List *)list);
+}
+
+void _LockingListClear(LockingList *list)
+{
+	assert(list);
+
+	ListLock(*list);
+	_ListClear((List *)list);
 	ListUnlock(*list);
 }
 
-void ListFree(List *list, const bool freeListPointer)
+void _LockingSortedListClear(LockingSortedList *list)
 {
-	if (!list)
-	{
-		Error("A NULL list must not be passed to ListFree!");
-	}
+	_LockingListClear((LockingList *)list);
+}
 
-	ListLock(*list);
+
+void _ListFree(List *list)
+{
+	assert(list);
+
+	free(list->data->pointerData);
+	list->data->pointerData = NULL;
 	free(list->data);
 	list->data = NULL;
 	list->length = 0;
+}
+
+void _SortedListFree(SortedList *list)
+{
+	_ListFree((List *)list);
+}
+
+void _LockingListFree(LockingList *list)
+{
+	assert(list);
+
+	ListLock(*list);
+	_ListFree((List *)list);
 	ListUnlock(*list);
 	SDL_DestroyMutex(list->mutex);
 	list->mutex = NULL;
-	if (freeListPointer)
-	{
-		free(list);
-	}
 }
 
-void ListFreeOnlyContents(const List list)
+void _LockingSortedListFree(LockingSortedList *list)
 {
-	ListLock(list);
-	if (list.length && list.data)
+	_LockingListFree((LockingList *)list);
+}
+
+
+void _ListFreeOnlyContents(const List *list)
+{
+	assert(list);
+	assert(!list->data || list->data->type == LIST_POINTER);
+
+	if (list->length && list->data)
 	{
-		for (size_t i = 0; i < list.length; i++)
+		for (size_t i = 0; i < list->length; i++)
 		{
-			free(list.data[i]);
+			free(list->data->pointerData[i]);
 		}
 	}
-	ListUnlock(list);
 }
 
-void ListAndContentsFree(List *list, const bool freeListPointer)
+void _LockingListFreeOnlyContents(const LockingList *list)
 {
-	if (!list)
+	assert(list);
+	assert(list->data->type == LIST_POINTER);
+
+	ListLock(*list);
+	if (list->length && list->data)
 	{
-		Error("A NULL list must not be passed to ListAndContentsFree!");
+		for (size_t i = 0; i < list->length; i++)
+		{
+			free(list->data->pointerData[i]);
+		}
 	}
-
-	ListFreeOnlyContents(*list);
-
-	ListFree(list, freeListPointer);
+	ListUnlock(*list);
 }
+
+
+void _ListAndContentsFree(List *list)
+{
+	assert(list);
+
+	_ListFreeOnlyContents(list);
+	_ListFree(list);
+}
+
+void _LockingListAndContentsFree(LockingList *list)
+{
+	assert(list);
+
+	_LockingListFreeOnlyContents(list);
+	_LockingListFree(list);
+}
+
 
 void *GameReallocArray(void *ptr, const size_t arrayLength, const size_t elementSize)
 {

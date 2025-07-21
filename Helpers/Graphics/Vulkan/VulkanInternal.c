@@ -113,18 +113,16 @@ bool CreateSwapchain()
 		swapChainExtent.height = clamp(height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 	}
 
-	List presentModes;
-	ListCreate(&presentModes);
-	if (GetState()->options.vsync)
+	const bool vsync = GetState()->options.vsync;
+	VkPresentModeKHR presentModes[3];
+	if (vsync)
 	{
-		ListAdd(&presentModes, (void *)VK_PRESENT_MODE_FIFO_KHR);
+		presentModes[0] = VK_PRESENT_MODE_FIFO_KHR;
 	} else
 	{
-		ListAddBatched(&presentModes,
-					   3,
-					   VK_PRESENT_MODE_MAILBOX_KHR,
-					   VK_PRESENT_MODE_IMMEDIATE_KHR,
-					   VK_PRESENT_MODE_FIFO_KHR);
+		presentModes[0] = VK_PRESENT_MODE_MAILBOX_KHR;
+		presentModes[1] = VK_PRESENT_MODE_IMMEDIATE_KHR;
+		presentModes[2] = VK_PRESENT_MODE_FIFO_KHR;
 	}
 
 	const LunaSwapchainCreationInfo swapChainCreationInfo = {
@@ -134,13 +132,11 @@ bool CreateSwapchain()
 		.formatCount = 2,
 		.formatPriorityList = (VkSurfaceFormatKHR[]){{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
 													 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}},
-		.presentModeCount = presentModes.length,
-		.presentModePriorityList = (const VkPresentModeKHR *)presentModes.data,
+		.presentModeCount = vsync ? 1 : 3,
+		.presentModePriorityList = presentModes,
 	};
 
 	VulkanTest(lunaCreateSwapchain(&swapChainCreationInfo), "Failed to create swap chain!");
-
-	ListFree(&presentModes, false);
 
 	return true;
 }
@@ -290,7 +286,7 @@ bool CreateTextureSamplers()
 	VulkanTest(lunaCreateSampler(&nearestNoRepeatSamplerCreateInfo, &textureSamplers.nearestNoRepeat),
 			   "Failed to create nearest non-repeating texture sampler!");
 
-	ListCreate(&textures);
+	ListInit(textures);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 
 	return true;

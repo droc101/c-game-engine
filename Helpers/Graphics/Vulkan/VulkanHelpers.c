@@ -178,7 +178,7 @@ void LoadWalls(const Level *level)
 
 	for (uint32_t i = 0; i < buffers.walls.objectCount; i++)
 	{
-		const Wall *wall = ListGet(level->walls, i);
+		const Wall *wall = ListGetPointer(level->walls, i);
 		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
 		const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};

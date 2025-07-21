@@ -79,7 +79,7 @@ Actor *GetTargetedEnemy(const float maxDistance)
 		ListLock(state->level->actors);
 		for (int i = 0; i < state->level->actors.length; i++)
 		{
-			Actor *actor = ListGet(state->level->actors, i);
+			Actor *actor = ListGetPointer(state->level->actors, i);
 			if (b2Shape_GetBody(raycastHit).index1 == actor->bodyId.index1)
 			{
 				ListUnlock(state->level->actors);
