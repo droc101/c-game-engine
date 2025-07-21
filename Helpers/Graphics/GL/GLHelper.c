@@ -273,13 +273,16 @@ void GL_DestroyGL()
 
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
-	const Asset *fragmentSource = DecompressAsset(fsh);
-	const Asset *vertexSource = DecompressAsset(vsh);
+	Asset *fragmentSource = DecompressAsset(fsh, false);
+	Asset *vertexSource = DecompressAsset(vsh, false);
 	if (fragmentSource == NULL || vertexSource == NULL)
 	{
 		Error("Failed to load shaders!");
 	}
-	return GL_ConstructShader((char *)fragmentSource->data, (char *)vertexSource->data);
+	GL_Shader *shd = GL_ConstructShader((char *)fragmentSource->data, (char *)vertexSource->data);
+	FreeAsset(fragmentSource);
+	FreeAsset(vertexSource);
+	return shd;
 }
 
 GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)

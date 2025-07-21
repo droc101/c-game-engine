@@ -157,7 +157,7 @@ void ChangeMusic(const char *asset)
 	}
 
 	StopMusic(); // stop the current music and free its data
-	const Asset *mp3 = DecompressAsset(asset);
+	const Asset *mp3 = DecompressAsset(asset, true);
 	if (mp3 == NULL)
 	{
 		LogError("Failed to load music asset.\n");
@@ -203,7 +203,7 @@ void PlaySoundEffect(const char *asset)
 		return;
 	}
 
-	const Asset *wav = DecompressAsset(asset);
+	const Asset *wav = DecompressAsset(asset, true);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");
@@ -284,7 +284,7 @@ bool ChangeLevelByName(const char *name)
 		free(levelPath);
 		return false;
 	}
-	const Asset *levelData = DecompressAsset(levelPath);
+	Asset *levelData = DecompressAsset(levelPath, false);
 	free(levelPath);
 	if (levelData == NULL)
 	{
@@ -293,5 +293,6 @@ bool ChangeLevelByName(const char *name)
 	}
 	GetState()->saveData->blueCoins = 0;
 	ChangeLevel(LoadLevel(levelData->data, levelData->size));
+	FreeAsset(levelData);
 	return true;
 }

@@ -58,7 +58,7 @@ Buffers buffers = {
 
 VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
 {
-	const Asset *shader = DecompressAsset(path);
+	Asset *shader = DecompressAsset(path, false);
 	if (!shader)
 	{
 		return VK_ERROR_UNKNOWN;
@@ -70,6 +70,7 @@ VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
 												  shaderModule),
 						   "Failed to create shader module!");
 
+	FreeAsset(shader);
 	return VK_SUCCESS;
 }
 

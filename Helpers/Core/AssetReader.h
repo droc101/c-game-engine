@@ -27,10 +27,12 @@ void DestroyAssetCache();
 /**
  * Decompress an asset and cache it
  * @param relPath The asset to decompress
+ * @param cache Whether the asset should be cached
  * @return Decompressed asset, including header
- * @note The asset is cached
+ * @warning If the asset is not cached, you will have to pass it to @c FreeAsset. Otherwise,
+ * it is kept around until program exit and automaitcally freed.
  */
-Asset *DecompressAsset(const char *relPath);
+Asset *DecompressAsset(const char *relPath, bool cache);
 
 /**
  * Remove an asset from the cache
@@ -67,6 +69,13 @@ extern ModelDefinition *GetModelFromId(uint id);
  * @note This pointer is not tracked and must be freed manually.
  */
 Font *LoadFont(const char *asset);
+
+/**
+ * Free an asset
+ * @param asset The asset to free
+ * @warning Only use this on assets that are NOT cached.
+ */
+void FreeAsset(Asset *asset);
 
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")
 #define MUSIC(assetName) ("audio/" assetName ".gmus")

@@ -123,7 +123,7 @@ void DestroyAssetCache()
 	ListAndContentsFree(assetCacheNames);
 }
 
-Asset *DecompressAsset(const char *relPath)
+Asset *DecompressAsset(const char *relPath, const bool cache)
 {
 	// see if relPath is already in the cache
 	for (int i = 0; i < assetCacheNames.length; i++)
@@ -221,13 +221,15 @@ Asset *DecompressAsset(const char *relPath)
 
 	assetStruct->data = decompressedData;
 
-	// Add the asset to the cache
-	const size_t pathLength = strlen(relPath) + 1;
-	char *data = malloc(pathLength);
-	CheckAlloc(data);
-	strncpy(data, relPath, pathLength);
-	ListAdd(assetCacheNames, data);
-	ListAdd(assetCacheData, assetStruct);
+	if (cache)
+	{
+		const size_t pathLength = strlen(relPath) + 1;
+		char *data = malloc(pathLength);
+		CheckAlloc(data);
+		strncpy(data, relPath, pathLength);
+		ListAdd(assetCacheNames, data);
+		ListAdd(assetCacheData, assetStruct);
+	}
 
 	free(asset);
 
@@ -311,7 +313,7 @@ Image *LoadImage(const char *asset)
 	Image *img = malloc(sizeof(Image));
 	CheckAlloc(img);
 
-	const Asset *textureAsset = DecompressAsset(asset);
+	Asset *textureAsset = DecompressAsset(asset, false);
 	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
 	{
 		GenFallbackImage(img);
@@ -340,7 +342,7 @@ Image *LoadImage(const char *asset)
 		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
 	}
 
-	RemoveAssetFromCache(asset);
+	FreeAsset(textureAsset);
 
 	return img;
 }
@@ -365,7 +367,7 @@ ModelDefinition *LoadModel(const char *asset)
 		Error("Model ID heap exhausted. Please increase MAX_MODELS");
 	}
 
-	const Asset *assetData = DecompressAsset(asset);
+	Asset *assetData = DecompressAsset(asset, false);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load model from asset, asset was NULL!");
@@ -450,7 +452,7 @@ ModelDefinition *LoadModel(const char *asset)
 		LogWarning("Model ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_MODELS - modelId);
 	}
 
-	RemoveAssetFromCache(asset);
+	FreeAsset(assetData);
 
 	return model;
 }
@@ -467,7 +469,7 @@ inline ModelDefinition *GetModelFromId(const uint id)
 
 Font *LoadFont(const char *asset)
 {
-	const Asset *assetData = DecompressAsset(asset);
+	const Asset *assetData = DecompressAsset(asset, false);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load font from asset, asset was NULL!");
@@ -485,6 +487,13 @@ Font *LoadFont(const char *asset)
 	strncpy(temp, font->texture, 64);
 	snprintf(font->texture, 80, "texture/%s.gtex", temp);
 	font->image = LoadImage(font->texture);
+	FreeAsset(assetData);
 
 	return font;
+}
+
+void FreeAsset(Asset *asset)
+{
+	free(asset->data);
+	free(asset);
 }
