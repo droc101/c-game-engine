@@ -116,8 +116,8 @@ void KvListCreate(KvList *list)
 	{
 		return;
 	}
-	ListInit(list->keys);
-	ListInit(list->values);
+	ListInit(list->keys, LIST_POINTER);
+	ListInit(list->values, LIST_POINTER);
 }
 
 void KvListDestroy(KvList *list)

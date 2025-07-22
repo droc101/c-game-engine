@@ -286,7 +286,7 @@ bool CreateTextureSamplers()
 	VulkanTest(lunaCreateSampler(&nearestNoRepeatSamplerCreateInfo, &textureSamplers.nearestNoRepeat),
 			   "Failed to create nearest non-repeating texture sampler!");
 
-	ListInit(textures);
+	ListInit(textures, LIST_POINTER);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 
 	return true;

@@ -26,19 +26,23 @@ static size_t vertexDataOffset;
 
 void VulkanActorsVariablesInit()
 {
-	ListInit(loadedSkins);
-	ListInit(lodIdsLoadedForDraw);
-	ListInit(loadedLodIds);
-	ListInit(shadedMaterialCounts);
-	ListInit(unshadedMaterialCounts);
-	ListInit(materialCounts);
-	ListInit(shadedMaterialIds);
-	ListInit(unshadedMaterialIds);
+	ListInit(loadedSkins, LIST_POINTER);
+	ListInit(lodIdsLoadedForDraw, LIST_POINTER);
+	ListInit(loadedLodIds, LIST_UINT64);
+	ListInit(shadedMaterialCounts, LIST_POINTER);
+	ListInit(unshadedMaterialCounts, LIST_POINTER);
+	ListInit(materialCounts, LIST_POINTER);
+	ListInit(shadedMaterialIds, LIST_POINTER);
+	ListInit(unshadedMaterialIds, LIST_POINTER);
 }
 
 void VulkanActorsVariablesCleanup()
 {
-	ListAndContentsFree(loadedSkins);
+	for (size_t i = 0; i < loadedSkins.length; i++)
+	{
+		ListFree(*(List *)ListGetPointer(loadedSkins, i));
+	}
+	ListFree(loadedSkins);
 	ListFree(lodIdsLoadedForDraw);
 	ListFree(loadedLodIds);
 	ListFree(shadedMaterialCounts);
@@ -86,10 +90,10 @@ void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 {
 	List *skins = calloc(1, sizeof(List));
 	CheckAlloc(skins);
-	ListInit(*skins);
+	ListInit(*skins, LIST_POINTER);
+	ListAdd(*skins, actor->currentSkinIndex);
 	ListAdd(loadedSkins, skins);
 
-	ListAdd(*(List *)ListGetPointer(loadedSkins, loadedSkins.length - 1), (void *)(size_t)actor->currentSkinIndex);
 	for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 	{
 		const size_t indexSize = sizeof(uint32_t) * lod->indexCount[j];
@@ -127,13 +131,13 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 	assert(lod);
 	if (lodIndex != actor->currentLod)
 	{
-		const size_t lodIdIndex = ListFind(loadedLodIds, (void *)lod->id);
-		if (lodIdIndex == -1)
+		const size_t lodIdIndex = ListFind(loadedLodIds, lod->id);
+		if (lodIdIndex == -1 || true)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
 			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, (void *)lod->vertexData, vertexSize);
 			vertexDataOffset += vertexSize;
-			ListAdd(loadedLodIds, (void *)lod->id);
+			ListAdd(loadedLodIds, lod->id);
 
 			for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 			{
@@ -151,7 +155,7 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 	{
 		const size_t lodIdIndex = ListFind(lodIdsLoadedForDraw, (void *)lod->id);
 		if (lodIdIndex == -1 ||
-			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), (void *)(size_t)actor->currentSkinIndex) == -1)
+			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), actor->currentSkinIndex) == -1)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
 			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, (void *)lod->vertexData, vertexSize);

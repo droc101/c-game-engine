@@ -81,7 +81,7 @@ void GLevelSelectStateRender(GlobalState * /*State*/)
 
 void LoadLevelList()
 {
-	ListInit(levelList);
+	ListInit(levelList, LIST_POINTER);
 	char levelDataPath[300];
 	sprintf(levelDataPath, "%sassets/level/", GetState()->executableFolder);
 

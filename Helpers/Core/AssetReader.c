@@ -91,8 +91,8 @@ void FreeModel(ModelDefinition *model)
 
 void AssetCacheInit()
 {
-	ListInit(assetCacheNames);
-	ListInit(assetCacheData);
+	ListInit(assetCacheNames, LIST_POINTER);
+	ListInit(assetCacheData, LIST_POINTER);
 }
 
 void DestroyAssetCache()

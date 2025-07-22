@@ -33,8 +33,8 @@ Level *CreateLevel()
 {
 	Level *l = malloc(sizeof(Level));
 	CheckAlloc(l);
-	ListInit(l->actors);
-	ListInit(l->walls);
+	ListInit(l->actors, LIST_POINTER);
+	ListInit(l->walls, LIST_POINTER);
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity.y = 0;
 	l->worldId = b2CreateWorld(&worldDef);
@@ -51,8 +51,8 @@ Level *CreateLevel()
 	strncpy(l->name, "Unnamed Level", 32);
 	l->courseNum = -1;
 	l->ioProxy = NULL;
-	ListInit(l->namedActorNames);
-	ListInit(l->namedActorPointers);
+	ListInit(l->namedActorNames, LIST_POINTER);
+	ListInit(l->namedActorPointers, LIST_POINTER);
 	return l;
 }
 
@@ -130,7 +130,7 @@ Actor *GetActorByName(const char *name, const Level *l)
 
 void GetActorsByName(const char *name, const Level *l, List *actors)
 {
-	ListInit(*actors);
+	ListInit(*actors, LIST_POINTER);
 	ListLock(l->namedActorNames);
 	for (int i = 0; i < l->namedActorNames.length; i++)
 	{

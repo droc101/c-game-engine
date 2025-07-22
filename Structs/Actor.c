@@ -100,7 +100,7 @@ Actor *CreateActor(const Vector2 position,
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	actor->bodyId = b2_nullBodyId;
-	ListInit(actor->ioConnections);
+	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->SignalHandler = DefaultSignalHandler;
 	actor->Init = ActorInitFuncs[actorType];
 	actor->Update = ActorUpdateFuncs[actorType];

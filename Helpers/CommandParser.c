@@ -17,7 +17,7 @@ void ExecuteCommand(const char *command)
 	// no, passing it as non-const does not work
 	char *rwCommand = strdup(command);
 	List commandList;
-	ListInit(commandList);
+	ListInit(commandList, LIST_POINTER);
 	const char *token = strtok(rwCommand, " ");
 	while (token != NULL)
 	{

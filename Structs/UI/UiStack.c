@@ -83,7 +83,7 @@ UiStack *CreateUiStack()
 {
 	UiStack *stack = malloc(sizeof(UiStack));
 	CheckAlloc(stack);
-	ListInit(stack->Controls);
+	ListInit(stack->Controls, LIST_POINTER);
 	stack->ActiveControl = -1;
 	stack->ActiveControlState = NORMAL;
 	stack->focusedControl = -1;

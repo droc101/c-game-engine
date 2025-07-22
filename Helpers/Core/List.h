@@ -9,9 +9,7 @@
 #include <SDL_mutex.h>
 
 typedef struct List List;
-typedef struct SortedList SortedList;
 typedef struct LockingList LockingList;
-typedef struct LockingSortedList LockingSortedList;
 
 enum _ListType
 {
@@ -28,21 +26,13 @@ struct _ListData
 	union
 	{
 		void **pointerData;
-		size_t *uint64Data;
+		uint64_t *uint64Data;
 		uint32_t *uint32Data;
 		int32_t *int32Data;
 	};
 };
 
 struct List
-{
-	/// The data that the list is storing
-	struct _ListData *data;
-	/// The number of slots that are actually in use
-	size_t length;
-};
-
-struct SortedList
 {
 	/// The data that the list is storing
 	struct _ListData *data;
@@ -60,58 +50,34 @@ struct LockingList
 	SDL_mutex *mutex;
 };
 
-struct LockingSortedList
-{
-	/// The data that the list is storing
-	struct _ListData *data;
-	/// The number of slots that are actually in use
-	size_t length;
-	/// The mutex used to ensure synchronization across threads
-	SDL_mutex *mutex;
-};
-
 
 void _ListInit(List *list, enum _ListType);
-void _SortedListInit(SortedList *list, enum _ListType);
 void _LockingListInit(LockingList *list, enum _ListType);
-void _LockingSortedListInit(LockingSortedList *list, enum _ListType);
 
 void _ListAdd(List *list, void *data);
-void _SortedListAdd(const SortedList *list, void *data);
 void _LockingListAdd(LockingList *list, void *data);
-void _LockingSortedListAdd(LockingSortedList *list, void *data);
 
 void _ListSet(const List *list, size_t index, void *data);
 void _LockingListSet(const LockingList *list, size_t index, void *data);
 
 void _ListRemoveAt(List *list, size_t index);
-void _SortedListRemoveAt(SortedList *list, size_t index);
 void _LockingListRemoveAt(LockingList *list, size_t index);
-void _LockingSortedListRemoveAt(LockingSortedList *list, size_t index);
 
 void _ListInsertAfter(List *list, size_t index, void *data);
 void _LockingListInsertAfter(LockingList *list, size_t index, void *data);
 
 size_t _ListFind(const List *list, const void *data);
-size_t _SortedListFind(const SortedList *list, const void *data);
 size_t _LockingListFind(LockingList *list, const void *data);
-size_t _LockingSortedListFind(LockingSortedList *list, const void *data);
 
 void _ListLock(const LockingList *list);
-void _SortedListLock(LockingSortedList *list);
 
 void _ListUnlock(const LockingList *list);
-void _SortedListUnlock(LockingSortedList *list);
 
 void _ListClear(List *list);
-void _SortedListClear(SortedList *list);
 void _LockingListClear(LockingList *list);
-void _LockingSortedListClear(LockingSortedList *list);
 
 void _ListFree(List *list);
-void _SortedListFree(SortedList *list);
 void _LockingListFree(LockingList *list);
-void _LockingSortedListFree(LockingSortedList *list);
 
 void _ListFreeOnlyContents(const List *list);
 void _LockingListFreeOnlyContents(const LockingList *list);
@@ -120,25 +86,12 @@ void _ListAndContentsFree(List *list);
 void _LockingListAndContentsFree(LockingList *list);
 
 
-#define _ListDataHelper(list) \
-	((list).data->type == LIST_POINTER \
-			 ? (list).data->pointerData \
-			 : ((list).data->type == LIST_UINT64 \
-						? (list).data->uint64Data \
-						: ((list).data->type == LIST_UINT32 \
-								   ? (list).data->uint32Data \
-								   : (assert((list).data->type == LIST_INT32), (list).data->int32Data))))
-
 /**
  * Create a new list of a given size, with zeroed data
  * @param list A pointer to the list object to initialize
+ * @param type A value indicating what type of data the list is storing
  */
-#define ListInit(list) \
-	_Generic((list), \
-			List: _ListInit, \
-			SortedList: _SortedListInit, \
-			LockingList: _LockingListInit, \
-			LockingSortedList: _LockingSortedListInit)(&(list), LIST_POINTER)
+#define ListInit(list, type) _Generic((list), List: _ListInit, LockingList: _LockingListInit)(&(list), type)
 
 /**
  * Append an item to the list
@@ -146,11 +99,7 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param data Data to append
  */
 #define ListAdd(list, data) \
-	_Generic((list), \
-			List: _ListAdd, \
-			SortedList: _SortedListAdd, \
-			LockingList: _LockingListAdd, \
-			LockingSortedList: _LockingSortedListAdd)(&(list), (void *)(size_t)(data))
+	_Generic((list), List: _ListAdd, LockingList: _LockingListAdd)(&(list), (void *)(uintptr_t)(data))
 
 /**
  * Remove an item from the list by index
@@ -158,11 +107,7 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param index Index to remove
  */
 #define ListRemoveAt(list, index) \
-	_Generic((list), \
-			List: _ListRemoveAt, \
-			SortedList: _SortedListRemoveAt, \
-			LockingList: _LockingListRemoveAt, \
-			LockingSortedList: _LockingSortedListRemoveAt)(&(list), (index))
+	_Generic((list), List: _ListRemoveAt, LockingList: _LockingListRemoveAt)(&(list), (index))
 
 /**
  * Insert an item after a node
@@ -173,7 +118,7 @@ void _LockingListAndContentsFree(LockingList *list);
 #define ListInsertAfter(list, index, data) \
 	_Generic((list), List: _ListInsertAfter, LockingList: _LockingListInsertAfter, )(&(list), \
 																					 (index), \
-																					 (void *)(size_t)(data))
+																					 (void *)(uintptr_t)(data))
 
 /**
 * Get an item of type @code void *@endcode from the list by index
@@ -193,9 +138,7 @@ void _LockingListAndContentsFree(LockingList *list);
 #define ListGetUint64(list, index) \
 	(_Generic((list), \
 			 List: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data), \
-			 SortedList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data), \
-			 LockingList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data), \
-			 LockingSortedList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data))[index])
+			 LockingList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data)))[index])
 
 /**
 * Get an item of type @c uint32_t from the list by index
@@ -205,9 +148,7 @@ void _LockingListAndContentsFree(LockingList *list);
 #define ListGetUint32(list, index) \
 	(_Generic((list), \
 			 List: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data), \
-			 SortedList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data), \
-			 LockingList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data), \
-			 LockingSortedList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data))[index])
+			 LockingList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data)))[index])
 
 /**
 * Get an item of type @c int32_t from the list by index
@@ -217,9 +158,7 @@ void _LockingListAndContentsFree(LockingList *list);
 #define ListGetInt32(list, index) \
 	(_Generic((list), \
 			 List: (assert((list).data->type == LIST_INT32), (list).data->int32Data), \
-			 SortedList: (assert((list).data->type == LIST_INT32), (list).data->int32Data), \
-			 LockingList: (assert((list).data->type == LIST_INT32), (list).data->int32Data), \
-			 LockingSortedList: (assert((list).data->type == LIST_INT32), (list).data->int32Data))[index])
+			 LockingList: (assert((list).data->type == LIST_INT32), (list).data->int32Data))[index])
 
 /**
  * Set an item in the list by index
@@ -228,7 +167,7 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param data Data to set at the index
  */
 #define ListSet(list, index, data) \
-	_Generic((list), List: _ListSet, LockingList: _LockingListSet)(&(list), (index), (data))
+	_Generic((list), List: _ListSet, LockingList: _LockingListSet)(&(list), (index), (void *)(uintptr_t)(data))
 
 /**
  * Find an item in the list
@@ -237,47 +176,33 @@ void _LockingListAndContentsFree(LockingList *list);
  * @return Index of the item in the list, -1 if not found
  */
 #define ListFind(list, data) \
-	_Generic((list), \
-			List: _ListFind, \
-			SortedList: _SortedListFind, \
-			LockingList: _LockingListFind, \
-			LockingSortedList: _LockingSortedListFind)(&(list), (data))
+	_Generic((list), List: _ListFind, LockingList: _LockingListFind)(&(list), (void *)(uintptr_t)(data))
 
 /**
  * Lock the mutex on a list
  * @param list The list to lock
  */
-#define ListLock(list) _Generic((list), LockingList: _ListLock, LockingSortedList: _SortedListLock)(&(list))
+#define ListLock(list) _Generic((list), LockingList: _ListLock)(&(list))
 
 /**
  * Unlock the mutex on a list
  * @param list The list to unlock
  */
-#define ListUnlock(list) _Generic((list), LockingList: _ListUnlock, LockingSortedList: _SortedListUnlock)(&(list))
+#define ListUnlock(list) _Generic((list), LockingList: _ListUnlock)(&(list))
 
 /**
  * Clear all items from the list
  * @param list List to clear
  * @warning This does not free the data in the list
  */
-#define ListClear(list) \
-	_Generic((list), \
-			List: _ListClear, \
-			SortedList: _SortedListClear, \
-			LockingList: _LockingListClear, \
-			LockingSortedList: _LockingSortedListClear)(&(list))
+#define ListClear(list) _Generic((list), List: _ListClear, LockingList: _LockingListClear)(&(list))
 
 /**
  * Free the list structure
  * @param list List to free
  * @warning This does not free the data in the list, but does free the data pointer
  */
-#define ListFree(list) \
-	_Generic((list), \
-			List: _ListFree, \
-			SortedList: _SortedListFree, \
-			LockingList: _LockingListFree, \
-			LockingSortedList: _LockingSortedListFree)(&(list))
+#define ListFree(list) _Generic((list), List: _ListFree, LockingList: _LockingListFree)(&(list))
 
 /**
  * Free the data stored in the list
