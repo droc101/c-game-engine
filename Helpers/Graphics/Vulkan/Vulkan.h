@@ -30,8 +30,6 @@ VkResult VK_FrameEnd();
 //TODO document me
 VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel);
 
-bool VK_UpdateActors(const LockingList *actors, bool shouldReloadActors);
-
 /// A function used to destroy the Vulkan objects when they are no longer needed.
 bool VK_Cleanup();
 
@@ -40,6 +38,8 @@ void VK_Minimize();
 void VK_Restore();
 
 bool VK_LoadLevelWalls(const Level *level);
+
+bool VK_UpdateActors(const LockingList *actors, bool shouldReloadActors);
 
 void VK_DrawColoredQuad(int x, int y, int w, int h, Color color);
 

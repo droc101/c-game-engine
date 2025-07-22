@@ -12,9 +12,10 @@
 #include "Logging.h"
 #include "Timing.h"
 
-SDL_Thread *PhysicsThread;
-SDL_mutex *PhysicsThreadMutex;
-SDL_mutex *PhysicsTickMutex;
+static SDL_Thread *physicsThread;
+static SDL_mutex *physicsThreadMutex;
+static SDL_mutex *physicsTickMutex;
+static SDL_sem *physicsTickHasEnded;
 
 /**
  * The function to run in the physics thread
@@ -26,7 +27,7 @@ FixedUpdateFunction PhysicsThreadFunction;
  * Whether to quit the physics thread on the next iteration
  * @warning Only touch this when you have a lock on the mutex
  */
-bool PhysicsThreadPostQuit = false;
+bool physicsThreadPostQuit = false;
 
 /**
  * The main function for the physics thread
@@ -38,33 +39,35 @@ int PhysicsThreadMain(void *)
 	while (true)
 	{
 		const ulong timeStart = GetTimeNs();
-		SDL_LockMutex(PhysicsThreadMutex);
-		SDL_LockMutex(PhysicsTickMutex);
-		if (PhysicsThreadPostQuit)
+		SDL_SemTryWait(physicsTickHasEnded);
+		SDL_LockMutex(physicsThreadMutex);
+		SDL_LockMutex(physicsTickMutex);
+		if (physicsThreadPostQuit)
 		{
-			SDL_UnlockMutex(PhysicsThreadMutex);
-			SDL_UnlockMutex(PhysicsTickMutex);
+			SDL_UnlockMutex(physicsThreadMutex);
+			SDL_UnlockMutex(physicsTickMutex);
 			return 0;
 		}
 		InputPhysicsTickBegin();
 		if (PhysicsThreadFunction == NULL)
 		{
-			SDL_UnlockMutex(PhysicsThreadMutex);
-			SDL_UnlockMutex(PhysicsTickMutex);
+			SDL_UnlockMutex(physicsThreadMutex);
+			SDL_UnlockMutex(physicsTickMutex);
 			SDL_Delay(PHYSICS_TARGET_MS); // pls no spin 🥺
 			GetState()->physicsFrame++;
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
 		const FixedUpdateFunction UpdateFunction = PhysicsThreadFunction;
-		SDL_UnlockMutex(PhysicsThreadMutex);
+		SDL_UnlockMutex(physicsThreadMutex);
 
 		// delta is the portion of one "tick" that the last tick took (including idle time)
 		// ticks should be around 1/60th of a second
 		const double delta = lastTickTime / PHYSICS_TARGET_NS_D;
 		UpdateFunction(GetState(), delta);
 		GetState()->physicsFrame++;
-		SDL_UnlockMutex(PhysicsTickMutex);
+		SDL_UnlockMutex(physicsTickMutex);
+		SDL_SemPost(physicsTickHasEnded);
 
 		ulong timeEnd = GetTimeNs();
 		ulong timeElapsed = timeEnd - timeStart;
@@ -83,11 +86,12 @@ int PhysicsThreadMain(void *)
 void PhysicsThreadInit()
 {
 	PhysicsThreadFunction = NULL;
-	PhysicsThreadPostQuit = false;
-	PhysicsThreadMutex = SDL_CreateMutex();
-	PhysicsTickMutex = SDL_CreateMutex();
-	PhysicsThread = SDL_CreateThread(PhysicsThreadMain, "GamePhysics", NULL);
-	if (PhysicsThread == NULL)
+	physicsThreadPostQuit = false;
+	physicsThreadMutex = SDL_CreateMutex();
+	physicsTickMutex = SDL_CreateMutex();
+	physicsTickHasEnded = SDL_CreateSemaphore(0);
+	physicsThread = SDL_CreateThread(PhysicsThreadMain, "GamePhysics", NULL);
+	if (physicsThread == NULL)
 	{
 		const char *error = SDL_GetError();
 		LogError("Failed to create physics thread: %s\n", error);
@@ -97,27 +101,35 @@ void PhysicsThreadInit()
 
 void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 {
-	SDL_LockMutex(PhysicsThreadMutex);
+	SDL_LockMutex(physicsThreadMutex);
 	PhysicsThreadFunction = function;
-	SDL_UnlockMutex(PhysicsThreadMutex);
+	SDL_UnlockMutex(physicsThreadMutex);
+	if (function)
+	{
+		if (SDL_SemTryWait(physicsTickHasEnded) == SDL_MUTEX_TIMEDOUT)
+		{
+			SDL_SemWait(physicsTickHasEnded);
+		}
+	}
 }
 
 void PhysicsThreadTerminate()
 {
-	SDL_LockMutex(PhysicsThreadMutex);
-	PhysicsThreadPostQuit = true;
-	SDL_UnlockMutex(PhysicsThreadMutex);
-	SDL_WaitThread(PhysicsThread, NULL);
-	SDL_DestroyMutex(PhysicsThreadMutex);
-	SDL_DestroyMutex(PhysicsTickMutex);
+	SDL_LockMutex(physicsThreadMutex);
+	physicsThreadPostQuit = true;
+	SDL_UnlockMutex(physicsThreadMutex);
+	SDL_WaitThread(physicsThread, NULL);
+	SDL_DestroyMutex(physicsThreadMutex);
+	SDL_DestroyMutex(physicsTickMutex);
+	SDL_DestroySemaphore(physicsTickHasEnded);
 }
 
 void PhysicsThreadLockTickMutex()
 {
-	SDL_LockMutex(PhysicsTickMutex);
+	SDL_LockMutex(physicsTickMutex);
 }
 
 void PhysicsThreadUnlockTickMutex()
 {
-	SDL_UnlockMutex(PhysicsTickMutex);
+	SDL_UnlockMutex(physicsTickMutex);
 }

@@ -455,7 +455,10 @@ bool VK_LoadLevelWalls(const Level *level)
 		return false;
 	}
 	loadedLevel = level;
-	VulkanTest(InitActors(&level->actors), "Failed to load actors!");
+	if (!VK_UpdateActors(&level->actors, true))
+	{
+		VulkanLogError("Failed to load actors!");
+	}
 	if (UnlockLodThreadMutex() != 0)
 	{
 		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());

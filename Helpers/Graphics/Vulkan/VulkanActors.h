@@ -12,6 +12,4 @@ void VulkanActorsVariablesInit();
 
 void VulkanActorsVariablesCleanup();
 
-VkResult InitActors(const LockingList *actors);
-
 #endif //VULKANACTORS_H
