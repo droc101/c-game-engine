@@ -35,17 +35,36 @@ void ChangeValue(const int change, LogicCounterData *data, const Actor *this)
 	data->counter += change;
 	if (data->clampToMax)
 	{
-		if (data->counter > data->max) data->counter = data->max;
-		if (prevValue < data->max && data->counter == data->max) ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_HIT_MAX, PARAM_NONE);
-		else if (prevValue == data->max && data->counter < data->max) ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_LEFT_MAX, PARAM_NONE);
+		if (data->counter > data->max)
+		{
+			data->counter = data->max;
+		}
+		if (prevValue < data->max && data->counter == data->max)
+		{
+			ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_HIT_MAX, PARAM_NONE);
+		} else if (prevValue == data->max && data->counter < data->max)
+		{
+			ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_LEFT_MAX, PARAM_NONE);
+		}
 	}
 	if (data->clampToMin)
 	{
-		if (data->counter < data->min) data->counter = data->min;
-		if (prevValue > data->min && data->counter == data->min) ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_HIT_MIN, PARAM_NONE);
-		else if (prevValue == data->min && data->counter > data->min) ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_LEFT_MIN, PARAM_NONE);
+		if (data->counter < data->min)
+		{
+			data->counter = data->min;
+		}
+		if (prevValue > data->min && data->counter == data->min)
+		{
+			ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_HIT_MIN, PARAM_NONE);
+		} else if (prevValue == data->min && data->counter > data->min)
+		{
+			ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_LEFT_MIN, PARAM_NONE);
+		}
 	}
-	if (prevValue != data->counter) ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_COUNTER_CHANGED, PARAM_INT(data->counter));
+	if (prevValue != data->counter)
+	{
+		ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_COUNTER_CHANGED, PARAM_INT(data->counter));
+	}
 }
 
 bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -98,4 +117,3 @@ void LogicCounterDestroy(Actor *this)
 {
 	free(this->extraData);
 }
-

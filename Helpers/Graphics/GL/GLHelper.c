@@ -921,11 +921,7 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 void GL_GetViewmodelMatrix(mat4 *out)
 {
 	mat4 perspectiveMatrix;
-	glm_perspective(glm_rad(VIEWMODEL_FOV),
-					WindowWidthFloat() / WindowHeightFloat(),
-					NEAR_Z,
-					FAR_Z,
-					perspectiveMatrix);
+	glm_perspective(glm_rad(VIEWMODEL_FOV), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix, GetState()->viewmodel.translation);

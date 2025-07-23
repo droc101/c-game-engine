@@ -445,8 +445,7 @@ bool LoadTexture(const Image *image)
 	};
 	LunaImage lunaImage = VK_NULL_HANDLE;
 	const size_t index = textures.length;
-	VulkanTest(lunaCreateImage(&imageCreationInfo, &lunaImage),
-			   "Failed to create texture!");
+	VulkanTest(lunaCreateImage(&imageCreationInfo, &lunaImage), "Failed to create texture!");
 	imageAssetIdToIndexMap[image->id] = index;
 	ListInsertAfter(textures, index - 1, lunaImage);
 

@@ -69,8 +69,7 @@ Actor *GetTargetedEnemy(const float maxDistance)
 	b2World_CastRay(state->level->worldId,
 					state->level->player.pos,
 					rayEnd,
-					(b2QueryFilter){.categoryBits = COLLISION_GROUP_PLAYER,
-									.maskBits = COLLISION_GROUP_HURTBOX},
+					(b2QueryFilter){.categoryBits = COLLISION_GROUP_PLAYER, .maskBits = COLLISION_GROUP_HURTBOX},
 					RaycastCallback,
 					&raycastHit);
 

@@ -87,10 +87,7 @@ void LaserUpdate(Actor *this, double)
 		{
 			mask &= ~COLLISION_GROUP_ACTOR; // Don't hit other lasers
 		}
-		const bool rc = PerformRaycast(castStart,
-									   this->rotation,
-									   50.0f, &col, COLLISION_GROUP_ACTOR,
-									   mask);
+		const bool rc = PerformRaycast(castStart, this->rotation, 50.0f, &col, COLLISION_GROUP_ACTOR, mask);
 		if (rc)
 		{
 			this->actorWall->b = Vector2Sub(col, this->position);
