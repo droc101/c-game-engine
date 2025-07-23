@@ -8,8 +8,8 @@
 #include <box2d/id.h>
 #include "../../defines.h"
 
-void LogicInit(Actor *this, b2WorldId worldId, const KvList *params);
+void LogicBinaryInit(Actor *this, b2WorldId worldId, const KvList *params);
 
-void LogicDestroy(Actor *this);
+void LogicBinaryDestroy(Actor *this);
 
 #endif //LOGICBINARY_H

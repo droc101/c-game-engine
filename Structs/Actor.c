@@ -13,7 +13,9 @@
 
 #include "../Actor/Coin.h"
 #include "../Actor/Core/IoProxy.h"
-#include "../Actor/Core/Logic.h"
+#include "../Actor/Core/LogicBinary.h"
+#include "../Actor/Core/LogicCounter.h"
+#include "../Actor/Core/LogicDecimal.h"
 #include "../Actor/Core/SoundPlayer.h"
 #include "../Actor/Core/Sprite.h"
 #include "../Actor/Core/StaticModel.h"
@@ -46,7 +48,9 @@ ActorInitFunction ActorInitFuncs[] = {
 	SoundPlayerInit,
 	SpriteInit,
 	LaserEmitterInit,
-	LogicInit,
+	LogicBinaryInit,
+	LogicDecimalInit,
+	LogicCounterInit,
 };
 
 ActorUpdateFunction ActorUpdateFuncs[] = {
@@ -64,6 +68,8 @@ ActorUpdateFunction ActorUpdateFuncs[] = {
 	ActorUpdate,
 	LaserEmitterUpdate,
 	ActorUpdate,
+	ActorUpdate,
+	ActorUpdate,
 };
 
 ActorDestroyFunction ActorDestroyFuncs[] = {
@@ -80,7 +86,9 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 	SoundPlayerDestroy,
 	SpriteDestroy,
 	LaserDestroy,
-	LogicDestroy,
+	LogicBinaryDestroy,
+	LogicDecimalDestroy,
+	LogicCounterDestroy,
 };
 
 Actor *CreateActor(const Vector2 position,

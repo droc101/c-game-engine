@@ -243,8 +243,76 @@
             ]
         },
         {
+            "id": 14,
+            "name": "Decimal Logic Operator",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "operation",
+                    "type": "byte",
+                    "min": 0,
+                    "max": 2,
+                    "default": 0
+                },
+                {
+                    "name": "operandA",
+                    "type": "float",
+                    "min": -10000,
+                    "max": 10000,
+                    "default": 0
+                },
+                {
+                    "name": "operandB",
+                    "type": "float",
+                    "min": -10000,
+                    "max": 10000,
+                    "default": 0
+                }
+            ],
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "operand_a",
+                    "paramType": "float"
+                },
+                {
+                    "name": "operand_b",
+                    "paramType": "float"
+                },
+                {
+                    "name": "execute",
+                    "paramType": "none"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_true",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_false",
+                    "paramType": "none"
+                },
+                {
+                    "name": "execution_result",
+                    "paramType": "bool"
+                }
+            ]
+        },
+        {
             "id": 13,
-            "name": "Logic Operator",
+            "name": "Binary Logic Operator",
             "render_type": "normal",
             "params": [
                 {
@@ -293,7 +361,97 @@
                 {
                     "name": "execution_result",
                     "paramType": "bool"
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "name": "Logic Counter",
+            "render_type": "normal",
+            "params": [
+                {
+                    "name": "min",
+                    "type": "integer",
+                    "min": -2147483648,
+                    "max": 2147483647,
+                    "default": 0
                 },
+                {
+                    "name": "max",
+                    "type": "integer",
+                    "min": -2147483648,
+                    "max": 2147483647,
+                    "default": 100
+                },
+                {
+                    "name": "counter",
+                    "type": "integer",
+                    "min": -2147483648,
+                    "max": 2147483647,
+                    "default": 0
+                },
+                {
+                    "name": "clampToMax",
+                    "type": "bool",
+                    "default": true
+                },
+                {
+                    "name": "clampToMin",
+                    "type": "bool",
+                    "default": true
+                }
+            ],
+            "inputs": [
+                {
+                    "name": "kill",
+                    "paramType": "none"
+                },
+                {
+                    "name": "increment",
+                    "paramType": "none"
+                },
+                {
+                    "name": "decrement",
+                    "paramType": "none"
+                },
+                {
+                    "name": "add",
+                    "paramType": "integer"
+                },
+                {
+                    "name": "subtract",
+                    "paramType": "integer"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "killed",
+                    "paramType": "none"
+                },
+                {
+                    "name": "spawned",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_hit_max",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_hit_min",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_left_max",
+                    "paramType": "none"
+                },
+                {
+                    "name": "on_left_min",
+                    "paramType": "none"
+                },
+                {
+                    "name": "counter_changed",
+                    "paramType": "integer"
+                }
             ]
         }
     ]
