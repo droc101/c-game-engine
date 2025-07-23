@@ -116,9 +116,9 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param data Data to insert
  */
 #define ListInsertAfter(list, index, data) \
-	_Generic((list), List: _ListInsertAfter, LockingList: _LockingListInsertAfter, )(&(list), \
-																					 (index), \
-																					 (void *)(uintptr_t)(data))
+	_Generic((list), List: _ListInsertAfter, LockingList: _LockingListInsertAfter)(&(list), \
+																				   (index), \
+																				   (void *)(uintptr_t)(data))
 
 /**
 * Get an item of type @code void *@endcode from the list by index
@@ -138,7 +138,7 @@ void _LockingListAndContentsFree(LockingList *list);
 #define ListGetUint64(list, index) \
 	(_Generic((list), \
 			 List: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data), \
-			 LockingList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data)))[index])
+			 LockingList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data))[index])
 
 /**
 * Get an item of type @c uint32_t from the list by index
@@ -148,7 +148,7 @@ void _LockingListAndContentsFree(LockingList *list);
 #define ListGetUint32(list, index) \
 	(_Generic((list), \
 			 List: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data), \
-			 LockingList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data)))[index])
+			 LockingList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data))[index])
 
 /**
 * Get an item of type @c int32_t from the list by index
@@ -164,10 +164,17 @@ void _LockingListAndContentsFree(LockingList *list);
  * Set an item in the list by index
  * @param list List to set the item in
  * @param index Index to set
- * @param data Data to set at the index
+ * @param value Value to set at the index
  */
-#define ListSet(list, index, data) \
-	_Generic((list), List: _ListSet, LockingList: _LockingListSet)(&(list), (index), (void *)(uintptr_t)(data))
+#define ListSet(list, index, value) \
+	((list).data->type == LIST_POINTER \
+			 ? (void)((list).data->pointerData[index] = (void *)(uintptr_t)(value)) \
+			 : ((list).data->type == LIST_UINT64 \
+						? (void)((list).data->uint64Data[index] = (uint64_t)(uintptr_t)(value)) \
+						: ((list).data->type == LIST_UINT32 \
+								   ? (void)((list).data->uint32Data[index] = (uint32_t)(uintptr_t)(value)) \
+								   : (void)(assert((list).data->type == LIST_INT32), \
+											(list).data->int32Data[index] = (int32_t)(uintptr_t)(value)))))
 
 /**
  * Find an item in the list

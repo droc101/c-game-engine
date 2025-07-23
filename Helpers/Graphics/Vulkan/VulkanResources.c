@@ -443,13 +443,15 @@ bool LoadTexture(const Image *image)
 		.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 	};
-	ListAdd(textures, NULL);
-	VulkanTest(lunaCreateImage(&imageCreationInfo, (LunaImage *)&ListGetPointer(textures, textures.length - 1)),
+	LunaImage lunaImage = VK_NULL_HANDLE;
+	const size_t index = textures.length;
+	VulkanTest(lunaCreateImage(&imageCreationInfo, &lunaImage),
 			   "Failed to create texture!");
-	imageAssetIdToIndexMap[image->id] = textures.length - 1;
+	imageAssetIdToIndexMap[image->id] = index;
+	ListInsertAfter(textures, index - 1, lunaImage);
 
 	const LunaDescriptorImageInfo imageInfo = {
-		.image = ListGetPointer(textures, textures.length - 1),
+		.image = lunaImage,
 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 	};
 	LunaWriteDescriptorSet writeDescriptors[MAX_FRAMES_IN_FLIGHT];
@@ -458,7 +460,7 @@ bool LoadTexture(const Image *image)
 		writeDescriptors[i] = (LunaWriteDescriptorSet){
 			.descriptorSet = descriptorSets[i],
 			.bindingName = "Textures",
-			.descriptorArrayElement = textures.length - 1,
+			.descriptorArrayElement = index,
 			.descriptorCount = 1,
 			.imageInfo = &imageInfo,
 		};

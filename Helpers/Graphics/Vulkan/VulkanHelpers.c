@@ -15,7 +15,7 @@
 bool minimized = false;
 VkExtent2D swapChainExtent = {0};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-List textures = {0};
+LockingList textures = {0};
 uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
 LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];

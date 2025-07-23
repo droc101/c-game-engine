@@ -223,10 +223,16 @@ void _ListInsertAfter(List *list, size_t index, void *data)
 void _LockingListInsertAfter(LockingList *list, const size_t index, void *data)
 {
 	assert(list);
-	assert(index <= list->length);
 
 	ListLock(*list);
-	_ListInsertAfter((List *)list, index, data);
+	if (list->length == 0)
+	{
+		_ListAdd((List *)list, data);
+	} else
+	{
+		assert(index <= list->length);
+		_ListInsertAfter((List *)list, index, data);
+	}
 	ListUnlock(*list);
 }
 

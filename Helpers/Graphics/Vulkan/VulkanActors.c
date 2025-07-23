@@ -27,13 +27,13 @@ static size_t vertexDataOffset;
 void VulkanActorsVariablesInit()
 {
 	ListInit(loadedSkins, LIST_POINTER);
-	ListInit(lodIdsLoadedForDraw, LIST_POINTER);
+	ListInit(lodIdsLoadedForDraw, LIST_UINT64);
 	ListInit(loadedLodIds, LIST_UINT64);
-	ListInit(shadedMaterialCounts, LIST_POINTER);
-	ListInit(unshadedMaterialCounts, LIST_POINTER);
-	ListInit(materialCounts, LIST_POINTER);
-	ListInit(shadedMaterialIds, LIST_POINTER);
-	ListInit(unshadedMaterialIds, LIST_POINTER);
+	ListInit(shadedMaterialCounts, LIST_UINT32);
+	ListInit(unshadedMaterialCounts, LIST_UINT32);
+	ListInit(materialCounts, LIST_UINT32);
+	ListInit(shadedMaterialIds, LIST_UINT64);
+	ListInit(unshadedMaterialIds, LIST_UINT64);
 }
 
 void VulkanActorsVariablesCleanup()
@@ -54,15 +54,15 @@ void VulkanActorsVariablesCleanup()
 
 void LoadMaterial(List *materialIds,
 				  List *materialCounts,
-				  const size_t lodMaterialId,
+				  const uint64_t lodMaterialId,
 				  BufferRegion *drawInfoBufferRegion,
 				  const uint32_t indexCount)
 {
-	size_t index = ListFind(*materialIds, (void *)lodMaterialId);
+	size_t index = ListFind(*materialIds, lodMaterialId);
 	if (index == -1)
 	{
-		ListAdd(*materialIds, (void *)lodMaterialId);
-		ListAdd(*materialCounts, (void *)1);
+		ListAdd(*materialIds, lodMaterialId);
+		ListAdd(*materialCounts, 1);
 		if (!drawInfoBufferRegion)
 		{
 			return;
@@ -70,7 +70,7 @@ void LoadMaterial(List *materialIds,
 		index = materialIds->length - 1;
 	} else
 	{
-		ListSet(*materialCounts, index, ListGetPointer(*materialCounts, index) + 1);
+		ListGetUint32(*materialCounts, index)++;
 		if (!drawInfoBufferRegion)
 		{
 			return;
@@ -90,19 +90,19 @@ void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 {
 	List *skins = calloc(1, sizeof(List));
 	CheckAlloc(skins);
-	ListInit(*skins, LIST_POINTER);
+	ListInit(*skins, LIST_UINT32);
 	ListAdd(*skins, actor->currentSkinIndex);
 	ListAdd(loadedSkins, skins);
 
 	for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 	{
 		const size_t indexSize = sizeof(uint32_t) * lod->indexCount[j];
-		memcpy(buffers.actorModels.indices.data + indexDataOffset, (void *)lod->indexData[j], indexSize);
+		memcpy(buffers.actorModels.indices.data + indexDataOffset, lod->indexData[j], indexSize);
 		indexDataOffset += indexSize;
 
 		const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
 		const uint32_t indexCount = lod->indexCount[j];
-		const size_t lodMaterialId = (lod->id << 32) | material.id;
+		const uint64_t lodMaterialId = (lod->id << 32) | material.id;
 		switch (material.shader)
 		{
 			case SHADER_SHADED:
@@ -131,18 +131,18 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 	assert(lod);
 	if (lodIndex != actor->currentLod)
 	{
-		const size_t lodIdIndex = ListFind(loadedLodIds, lod->id);
-		if (lodIdIndex == -1 || true)
+		const uint64_t lodIdIndex = ListFind(loadedLodIds, lod->id);
+		if (lodIdIndex == -1)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
-			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, (void *)lod->vertexData, vertexSize);
+			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, lod->vertexData, vertexSize);
 			vertexDataOffset += vertexSize;
 			ListAdd(loadedLodIds, lod->id);
 
 			for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 			{
 				const size_t indexSize = sizeof(uint32_t) * lod->indexCount[j];
-				memcpy(buffers.actorModels.indices.data + indexDataOffset, (void *)lod->indexData[j], indexSize);
+				memcpy(buffers.actorModels.indices.data + indexDataOffset, lod->indexData[j], indexSize);
 				indexDataOffset += indexSize;
 			}
 
@@ -153,14 +153,14 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 		}
 	} else
 	{
-		const size_t lodIdIndex = ListFind(lodIdsLoadedForDraw, (void *)lod->id);
+		const uint64_t lodIdIndex = ListFind(lodIdsLoadedForDraw, lod->id);
 		if (lodIdIndex == -1 ||
 			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), actor->currentSkinIndex) == -1)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
-			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, (void *)lod->vertexData, vertexSize);
+			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, lod->vertexData, vertexSize);
 			vertexDataOffset += vertexSize;
-			ListAdd(lodIdsLoadedForDraw, (void *)lod->id);
+			ListAdd(lodIdsLoadedForDraw, lod->id);
 			LoadLodForDraw(actor, lod);
 			buffers.actorModels.vertices.bytesUsed += sizeof(ModelVertex) * lod->vertexCount;
 			buffers.actorModels.indices.bytesUsed += sizeof(uint32_t) * lod->totalIndexCount;
@@ -170,7 +170,7 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 			for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 			{
 				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
-				const size_t lodMaterialId = (lod->id << 32) | material.id;
+				const uint64_t lodMaterialId = (lod->id << 32) | material.id;
 				switch (material.shader)
 				{
 					case SHADER_SHADED:
@@ -316,16 +316,16 @@ VkResult InitActors(const LockingList *actors)
 	size_t totalInstanceCount = 0;
 	for (size_t i = 0; i < shadedMaterialCounts.length; i++)
 	{
-		const size_t instanceCount = (size_t)ListGetPointer(shadedMaterialCounts, i);
-		ListAdd(materialCounts, (void *)instanceCount);
+		const uint32_t instanceCount = ListGetUint32(shadedMaterialCounts, i);
+		ListAdd(materialCounts, instanceCount);
 		shadedActorModelsDrawInfo[i].instanceCount = instanceCount;
 		shadedActorModelsDrawInfo[i].firstInstance = totalInstanceCount;
 		totalInstanceCount += instanceCount;
 	}
 	for (size_t i = 0; i < unshadedMaterialCounts.length; i++)
 	{
-		const size_t instanceCount = (size_t)ListGetPointer(unshadedMaterialCounts, i);
-		ListAdd(materialCounts, (void *)instanceCount);
+		const uint32_t instanceCount = ListGetUint32(unshadedMaterialCounts, i);
+		ListAdd(materialCounts, instanceCount);
 		unshadedActorModelsDrawInfo[i].instanceCount = instanceCount;
 		unshadedActorModelsDrawInfo[i].firstInstance = totalInstanceCount;
 		totalInstanceCount += instanceCount;
@@ -433,11 +433,11 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 	{
 		size_t currentOffset = 0;
 		offsets[0] = currentOffset;
-		currentOffset += sizeof(ModelInstanceData) * (size_t)ListGetPointer(materialCounts, 0);
+		currentOffset += sizeof(ModelInstanceData) * ListGetUint32(materialCounts, 0);
 		for (size_t i = 1; i < materialCounts.length; i++)
 		{
 			offsets[i] = currentOffset;
-			currentOffset += sizeof(ModelInstanceData) * (size_t)ListGetPointer(materialCounts, i);
+			currentOffset += sizeof(ModelInstanceData) * ListGetUint32(materialCounts, i);
 		}
 	}
 	if (__builtin_expect(loadedActorCount != actors->length, false))
@@ -461,11 +461,11 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 			{
 				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
 				size_t index = 0;
-				const size_t lodMaterialId = (actor->actorModel->lods[actor->currentLod]->id << 32) | material.id;
+				const uint64_t lodMaterialId = (actor->actorModel->lods[actor->currentLod]->id << 32) | material.id;
 				switch (material.shader)
 				{
 					case SHADER_SHADED:
-						index = ListFind(shadedMaterialIds, (void *)lodMaterialId);
+						index = ListFind(shadedMaterialIds, lodMaterialId);
 						if (index == -1)
 						{
 							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
@@ -473,7 +473,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 						}
 						break;
 					case SHADER_UNSHADED:
-						index = ListFind(unshadedMaterialIds, (void *)lodMaterialId) + shadedMaterialIds.length;
+						index = ListFind(unshadedMaterialIds, lodMaterialId) + shadedMaterialIds.length;
 						if (index == -1)
 						{
 							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");

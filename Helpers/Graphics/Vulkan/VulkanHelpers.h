@@ -265,7 +265,7 @@ typedef struct PushConstants
 extern bool minimized;
 extern VkExtent2D swapChainExtent;
 extern VkSampleCountFlagBits msaaSamples;
-extern List textures;
+extern LockingList textures;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 extern LunaDescriptorSetLayout descriptorSetLayout;
 extern LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
