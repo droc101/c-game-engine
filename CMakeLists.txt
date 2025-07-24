@@ -190,37 +190,42 @@ add_executable(
         Actor/Core/LogicDecimal.h
         Actor/Core/LogicCounter.c
         Actor/Core/LogicCounter.h
+        Debug/JoltDebugRenderer.c
+        Debug/JoltDebugRenderer.h
 )
 
 #endregion
 
 #region Libraries
 
-include(FetchContent)
-find_package(Git 2.18 REQUIRED)
-if (WIN32)
-    execute_process(COMMAND powershell -command "((& '${GIT_EXECUTABLE}' -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort=version:refname --tags https://github.com/NBT22/Luna.git 'v0.1.*' | Select-Object -Last 1) -Split '/')[2]" OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE LATEST_RELEASE)
-else ()
-    execute_process(COMMAND ${GIT_EXECUTABLE} -c "versionsort.suffix=-" ls-remote --exit-code --refs --sort=version:refname --tags https://github.com/NBT22/Luna.git "v0.1.*" COMMAND tail --lines=1 COMMAND cut --delimiter=/ --fields=3 COMMAND tr -d "\n" OUTPUT_VARIABLE LATEST_RELEASE)
-endif ()
-
-FetchContent_Declare(
-        Luna
-        GIT_REPOSITORY https://github.com/NBT22/Luna.git
-        GIT_TAG ${LATEST_RELEASE}
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        EXCLUDE_FROM_ALL
-        SYSTEM
-        OVERRIDE_FIND_PACKAGE
-)
+include(FetchPackage.cmake)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Luna REQUIRED)
+fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(OVERRIDE_CXX_FLAGS OFF)
+    set(GENERATE_DEBUG_SYMBOLS ON)
+endif ()
+set(DEBUG_RENDERER_IN_DEBUG_AND_RELEASE ON)
+set(DEBUG_RENDERER_IN_DISTRIBUTION OFF)
+set(PROFILER_IN_DEBUG_AND_RELEASE OFF)
+set(ENABLE_OBJECT_STREAM OFF)
+set(JPH_SAMPLES OFF)
+FetchContent_Declare(
+        joltc
+        GIT_REPOSITORY https://github.com/amerkoleci/joltc
+        GIT_TAG main
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        EXCLUDE_FROM_ALL
+        SYSTEM
+)
+FetchContent_MakeAvailable(joltc)
 
 if (UNIX)
     if (TARGET_ARCH STREQUAL "arm64")
@@ -240,6 +245,7 @@ set(CROSS_PLATFORM_LIBRARIES
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}
         ${BOX2D_LIB}
+        joltc
 )
 
 if (UNIX)

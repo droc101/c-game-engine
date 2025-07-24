@@ -18,11 +18,15 @@ VkResult CreateActorWallBuffers();
 
 VkResult CreateActorModelBuffers();
 
+VkResult CreateDebugDrawBuffers();
+
 VkResult ResizeWallBuffers();
 
 VkResult ResizeActorWallBuffers();
 
 VkResult ResizeActorModelBuffers();
+
+VkResult ResizeDebugDrawBuffers();
 
 bool LoadTexture(const Image *image);
 

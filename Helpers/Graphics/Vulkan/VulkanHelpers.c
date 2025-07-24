@@ -36,6 +36,7 @@ Pipelines pipelines = {
 	.actorWalls = LUNA_NULL_HANDLE,
 	.shadedActorModels = LUNA_NULL_HANDLE,
 	.unshadedActorModels = LUNA_NULL_HANDLE,
+	.debugDraw = LUNA_NULL_HANDLE,
 };
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
@@ -53,6 +54,7 @@ Buffers buffers = {
 	.actorModels.instanceData.allocatedSize = sizeof(ModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
+	.debugDraw.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
 };
 #pragma endregion variables
 
@@ -158,13 +160,13 @@ VkResult LoadSky(const ModelDefinition *skyModel)
 		// Copy {x, y, z, u, v} and discard {nx, ny, nz}
 		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 8, sizeof(float) * 5);
 	}
-	buffers.sky.objectCount = 0;
+	buffers.sky.indexCount = 0;
 	for (uint32_t i = 0; i < skyModel->materialCount; i++)
 	{
-		memcpy(indices + buffers.sky.objectCount,
+		memcpy(indices + buffers.sky.indexCount,
 			   skyModel->lods[0]->indexData[i],
 			   sizeof(uint32_t) * skyModel->lods[0]->indexCount[i]);
-		buffers.sky.objectCount += skyModel->lods[0]->indexCount[i];
+		buffers.sky.indexCount += skyModel->lods[0]->indexCount[i];
 	}
 	lunaWriteDataToBuffer(buffers.sky.vertices.buffer, vertices, buffers.sky.vertices.bytesUsed, 0);
 	lunaWriteDataToBuffer(buffers.sky.indices.buffer, indices, buffers.sky.indices.bytesUsed, 0);
@@ -177,7 +179,7 @@ void LoadWalls(const Level *level)
 	WallVertex *vertices = buffers.walls.vertices.data;
 	uint32_t *indices = buffers.walls.indices.data;
 
-	for (uint32_t i = 0; i < buffers.walls.objectCount; i++)
+	for (uint32_t i = 0; i < level->walls.length; i++)
 	{
 		const Wall *wall = ListGetPointer(level->walls, i);
 		const float halfHeight = wall->height / 2.0f;
@@ -323,10 +325,10 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		buffers.ui.indices.data = newIndices;
 	}
 
-	uint32_t *indices = buffers.ui.indices.data;
-	UiVertex *vertices = buffers.ui.vertices.data;
+	UiVertex *vertices = buffers.ui.vertices.data + buffers.ui.vertices.bytesUsed;
+	uint32_t *indices = buffers.ui.indices.data + buffers.ui.indices.bytesUsed;
 
-	vertices[4 * buffers.ui.objectCount] = (UiVertex){
+	vertices[0] = (UiVertex){
 		.x = vertices_posXY_uvZW[0][0],
 		.y = vertices_posXY_uvZW[0][1],
 		.u = vertices_posXY_uvZW[0][2],
@@ -337,7 +339,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	vertices[4 * buffers.ui.objectCount + 1] = (UiVertex){
+	vertices[1] = (UiVertex){
 		.x = vertices_posXY_uvZW[1][0],
 		.y = vertices_posXY_uvZW[1][1],
 		.u = vertices_posXY_uvZW[1][2],
@@ -348,7 +350,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	vertices[4 * buffers.ui.objectCount + 2] = (UiVertex){
+	vertices[2] = (UiVertex){
 		.x = vertices_posXY_uvZW[2][0],
 		.y = vertices_posXY_uvZW[2][1],
 		.u = vertices_posXY_uvZW[2][2],
@@ -359,7 +361,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	vertices[4 * buffers.ui.objectCount + 3] = (UiVertex){
+	vertices[3] = (UiVertex){
 		.x = vertices_posXY_uvZW[3][0],
 		.y = vertices_posXY_uvZW[3][1],
 		.u = vertices_posXY_uvZW[3][2],
@@ -371,14 +373,14 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.textureIndex = textureIndex,
 	};
 
-	indices[6 * buffers.ui.objectCount] = buffers.ui.objectCount * 4;
-	indices[6 * buffers.ui.objectCount + 1] = buffers.ui.objectCount * 4 + 1;
-	indices[6 * buffers.ui.objectCount + 2] = buffers.ui.objectCount * 4 + 2;
-	indices[6 * buffers.ui.objectCount + 3] = buffers.ui.objectCount * 4;
-	indices[6 * buffers.ui.objectCount + 4] = buffers.ui.objectCount * 4 + 2;
-	indices[6 * buffers.ui.objectCount + 5] = buffers.ui.objectCount * 4 + 3;
+	const size_t vertexOffset = buffers.ui.vertices.bytesUsed / sizeof(UiVertex);
+	indices[0] = vertexOffset;
+	indices[1] = vertexOffset + 1;
+	indices[2] = vertexOffset + 2;
+	indices[3] = vertexOffset;
+	indices[4] = vertexOffset + 2;
+	indices[5] = vertexOffset + 3;
 
-	buffers.ui.objectCount++;
 	buffers.ui.vertices.bytesUsed += sizeof(UiVertex) * 4;
 	buffers.ui.indices.bytesUsed += sizeof(uint32_t) * 6;
 }

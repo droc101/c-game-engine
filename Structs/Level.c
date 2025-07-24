@@ -11,6 +11,7 @@
 #include "Actor.h"
 #include "GlobalState.h"
 #include "Vector2.h"
+#include "Wall.h"
 
 void CreatePlayerCollider(Level *level)
 {
@@ -60,16 +61,28 @@ void DestroyLevel(Level *l)
 {
 	for (int i = 0; i < l->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(l->actors, i);
-		FreeActor(a);
+		Actor *actor = ListGetPointer(l->actors, i);
+		FreeActor(actor);
+	}
+	JPH_PhysicsSystem *physicsSystem = GetState()->physicsSystem;
+	assert(physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(physicsSystem);
+	for (int i = 0; i < l->walls.length; i++)
+	{
+		Wall *wall = ListGetPointer(l->walls, i);
+		if (JPH_BodyInterface_IsActive(bodyInterface, wall->bodyId))
+		{
+			asm("nop");
+		}
+		FreeWall(bodyInterface, wall);
 	}
 
 	b2DestroyWorld(l->worldId);
 
-	ListAndContentsFree(l->walls);
 	ListAndContentsFree(l->namedActorNames);
 	ListFree(l->namedActorPointers);
 	ListFree(l->actors);
+	ListFree(l->walls);
 	free(l);
 	l = NULL;
 }

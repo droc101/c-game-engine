@@ -231,6 +231,20 @@ VkResult CreateActorModelBuffers()
 	return VK_SUCCESS;
 }
 
+VkResult CreateDebugDrawBuffers()
+{
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = buffers.debugDraw.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.debugDraw.vertices.buffer),
+						   "Failed to create debug draw vertex buffer!");
+	buffers.debugDraw.vertices.data = malloc(buffers.debugDraw.vertices.allocatedSize);
+	CheckAlloc(buffers.debugDraw.vertices.data);
+
+	return VK_SUCCESS;
+}
+
 VkResult ResizeWallBuffers()
 {
 	if (buffers.walls.vertices.allocatedSize < buffers.walls.vertices.bytesUsed)
@@ -422,6 +436,22 @@ VkResult ResizeActorModelBuffers()
 		buffers.actorModels.unshadedDrawInfo.data = calloc(1, buffers.actorModels.unshadedDrawInfo.allocatedSize);
 		CheckAlloc(buffers.actorModels.unshadedDrawInfo.data);
 	}
+
+	return VK_SUCCESS;
+}
+
+VkResult ResizeDebugDrawBuffers()
+{
+	lunaDestroyBuffer(buffers.debugDraw.vertices.buffer);
+
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = buffers.debugDraw.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.debugDraw.vertices.buffer),
+						   "Failed to recreate debug draw vertex buffer!");
+
+	buffers.debugDraw.shouldResize = false;
 
 	return VK_SUCCESS;
 }

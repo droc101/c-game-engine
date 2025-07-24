@@ -162,14 +162,14 @@ void GL_DrawColoredArrays(const float *vertices, const uint *indices, uint quadC
  * @param x X position in pixels
  * @return The NDC position
  */
-#define GL_X_TO_NDC(x) ((float)(x) / WindowWidth() * 2.0f - 1.0f)
+#define GL_X_TO_NDC(x) ((float)(x) / WindowWidthFloat() * 2.0f - 1.0f)
 
 /**
  * Convert screen Y to NDC
  * @param y Y position in pixels
  * @return The NDC position
  */
-#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / WindowHeight() * 2.0f)
+#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / WindowHeightFloat() * 2.0f)
 
 /**
  * Get the transformation matrix for a camera

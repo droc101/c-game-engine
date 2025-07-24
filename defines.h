@@ -8,6 +8,7 @@
 #include <box2d/id.h>
 #include <box2d/math_functions.h>
 #include <cglm/cglm.h>
+#include <joltc.h>
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <stdbool.h>
@@ -36,6 +37,8 @@ typedef enum ParamType ParamType;
 typedef struct Viewmodel Viewmodel;
 typedef struct GlobalState GlobalState;
 typedef b2Vec2 Vector2;
+typedef JPH_Vec3 Vector3;
+typedef JPH_Vec4 Vector4;
 typedef struct Camera Camera;
 typedef struct Player Player;
 typedef struct Wall Wall;
@@ -223,6 +226,7 @@ enum ModelShader
 	SHADER_SHADED
 };
 
+/// For Box2d
 enum CollisionGroups
 {
 	COLLISION_GROUP_DEFAULT = 1 << 0,
@@ -231,6 +235,18 @@ enum CollisionGroups
 	COLLISION_GROUP_TRIGGER = 1 << 3,
 	COLLISION_GROUP_ACTOR_ENEMY = 1 << 4,
 	COLLISION_GROUP_HURTBOX = 1 << 5,
+};
+
+enum ObjectLayers
+{
+	OBJECT_LAYER_STATIC,
+	OBJECT_LAYER_DYNAMIC,
+};
+
+enum BroadphaseLayers
+{
+	BROADPHASE_LAYER_STATIC,
+	BROADPHASE_LAYER_DYNAMIC,
 };
 
 enum ParamType
@@ -339,7 +355,9 @@ struct Wall
 	/// height of the wall for rendering. Does not affect collision
 	float height;
 	/// The wall's Box2D body ID
-	b2BodyId bodyId;
+	b2BodyId box2dBodyId;
+	/// Jolt body ID
+	JPH_BodyID bodyId;
 };
 
 // Utility functions are in Structs/level.h
@@ -439,6 +457,9 @@ struct GlobalState
 {
 	/// Current level
 	Level *level;
+
+	JPH_JobSystem *jobSystem;
+	JPH_PhysicsSystem *physicsSystem;
 
 	/// State update function
 	FrameUpdateFunction UpdateGame;

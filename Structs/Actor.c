@@ -142,7 +142,7 @@ void CreateActorWallCollider(Actor *this, const b2WorldId worldId)
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position = this->actorWall->a;
 	this->bodyId = b2CreateBody(worldId, &bodyDef);
-	this->actorWall->bodyId = this->bodyId;
+	this->actorWall->box2dBodyId = this->bodyId;
 	const float dx = this->actorWall->dx;
 	const float dy = this->actorWall->dy;
 	const float invDistance = 1 / sqrtf(dx * dx + dy * dy);
@@ -169,7 +169,7 @@ void CreateActorWallCollider(Actor *this, const b2WorldId worldId)
 	b2ShapeDef shapeDef = b2DefaultShapeDef();
 	shapeDef.friction = 0;
 	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	b2CreatePolygonShape(this->actorWall->bodyId, &shapeDef, &shape);
+	b2CreatePolygonShape(this->actorWall->box2dBodyId, &shapeDef, &shape);
 }
 
 void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param)

@@ -67,7 +67,7 @@ void CreateDoorCollider(Actor *this, const b2WorldId worldId, const Vector2 wall
 	doorBodyDef.type = b2_kinematicBody;
 	doorBodyDef.position = this->position;
 	this->bodyId = b2CreateBody(worldId, &doorBodyDef);
-	this->actorWall->bodyId = this->bodyId;
+	this->actorWall->box2dBodyId = this->bodyId;
 	const b2Segment doorShape = {
 		.point2 = wallEnd,
 	};

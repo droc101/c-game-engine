@@ -813,6 +813,73 @@ bool CreateActorModelUnshadedPipeline()
 	return true;
 }
 
+bool CreateDebugDrawPipeline()
+{
+	LunaShaderModule vertShaderModule;
+	LunaShaderModule fragShaderModule;
+	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_debugDraw"), &vertShaderModule),
+			   "Failed to load debug draw vertex shader!");
+	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_debugDraw"), &fragShaderModule),
+			   "Failed to load debug draw fragment shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescription = {
+		.binding = 0,
+		.stride = sizeof(DebugDrawVertex),
+		.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+	};
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(DebugDrawVertex, position),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(DebugDrawVertex, color),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &bindingDescription,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &inputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &nonCullingRasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.debugDraw),
+			   "Failed to create debug draw graphics pipeline!");
+
+	return true;
+}
+
 bool CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
@@ -820,6 +887,6 @@ bool CreateGraphicsPipelines()
 	// clang-format off
 	return CreateUIPipeline() && CreateViewModelPipeline() && CreateSkyPipeline() && CreateFloorAndCeilingPipeline() &&
 		   CreateWallPipeline() && CreateActorWallPipeline() && CreateActorModelShadedPipeline() &&
-		   CreateActorModelUnshadedPipeline();
+		   CreateActorModelUnshadedPipeline() && CreateDebugDrawPipeline();
 	// clang-format on
 }

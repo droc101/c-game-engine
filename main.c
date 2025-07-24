@@ -13,7 +13,6 @@
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
-#include "Helpers/Core/KVList.h"
 #include "Helpers/Core/LodThread.h"
 #include "Helpers/Core/Logging.h"
 #include "Helpers/Core/PhysicsThread.h"
@@ -23,7 +22,6 @@
 #include "Helpers/PlatformHelpers.h"
 #include "Helpers/TextInputSystem.h"
 #include "Structs/GlobalState.h"
-#include "Structs/Level.h"
 
 SDL_Surface *windowIcon;
 
@@ -229,6 +227,7 @@ void HandleEvent(const SDL_Event event, bool *shouldQuit)
 	}
 }
 
+// TODO: Add cache to the github actions workflows
 int main(const int argc, char *argv[])
 {
 	ErrorHandlerInit();

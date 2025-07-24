@@ -8,6 +8,7 @@
 #include <SDL_vulkan.h>
 #include <string.h>
 #include "../../CommonAssets.h"
+#include "../../Core/Error.h"
 #include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
 #include "VulkanActors.h"
@@ -83,6 +84,43 @@ bool VK_Init(SDL_Window *window)
 	return false;
 }
 
+bool VK_LoadLevelWalls(const Level *level)
+{
+	if (!level->hasCeiling)
+	{
+		VulkanTest(LoadSky(LoadModel(MODEL("model_sky"))), "Failed to load sky!");
+	}
+
+	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
+	pushConstants.floorTextureIndex = TextureIndex(level->floorTex);
+
+	pushConstants.fogStart = (float)level->fogStart;
+	pushConstants.fogEnd = (float)level->fogEnd;
+	pushConstants.fogColor = level->fogColor;
+
+	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * level->walls.length;
+	buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * level->walls.length;
+	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
+	LoadWalls(level);
+
+	if (LockLodThreadMutex() != 0)
+	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return false;
+	}
+	loadedLevel = level;
+	if (!VK_UpdateActors(&level->actors, true))
+	{
+		VulkanLogError("Failed to load actors!");
+	}
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return false;
+	}
+	return true;
+}
+
 VkResult VK_FrameStart()
 {
 	if (minimized)
@@ -108,103 +146,10 @@ VkResult VK_FrameStart()
 		return VK_ERROR_UNKNOWN;
 	}
 
-	buffers.ui.objectCount = 0;
 	buffers.ui.vertices.bytesUsed = 0;
 	buffers.ui.indices.bytesUsed = 0;
-
-	return VK_SUCCESS;
-}
-
-VkResult VK_FrameEnd()
-{
-	if (buffers.ui.shouldResize)
-	{
-		lunaDestroyBuffer(buffers.ui.vertices.buffer);
-		lunaDestroyBuffer(buffers.ui.indices.buffer);
-
-		const LunaBufferCreationInfo vertexBufferCreationInfo = {
-			.size = buffers.ui.vertices.allocatedSize,
-			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.ui.vertices.buffer),
-							   "Failed to recreate UI vertex buffer!");
-
-		const LunaBufferCreationInfo indexBufferCreationInfo = {
-			.size = buffers.ui.indices.allocatedSize,
-			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.ui.indices.buffer),
-							   "Failed to recreate UI index buffer!");
-	}
-	if (buffers.ui.objectCount > 0)
-	{
-		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed, 0);
-		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed, 0);
-	}
-
-	if (LockLodThreadMutex() != 0)
-	{
-		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
-
-	if (buffers.ui.objectCount > 0)
-	{
-		const VkViewport viewport = {
-			.width = (float)swapChainExtent.width,
-			.height = (float)swapChainExtent.height,
-			.maxDepth = 1,
-		};
-		const LunaViewportBindInfo viewportBindInfo = {
-			.viewportCount = 1,
-			.viewports = &viewport,
-		};
-		const VkRect2D scissor = {
-			.extent = swapChainExtent,
-		};
-		const LunaScissorBindInfo scissorBindInfo = {
-			.scissorCount = 1,
-			.scissors = &scissor,
-		};
-		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
-			{
-				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
-				.viewportBindInfo = &viewportBindInfo,
-			},
-			{
-				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
-				.scissorBindInfo = &scissorBindInfo,
-			},
-		};
-		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetCount = 1,
-			.descriptorSets = &descriptorSets[currentFrame],
-			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
-			.dynamicStates = dynamicStateBindInfos,
-		};
-		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
-													 buffers.ui.indices.buffer,
-													 0,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.ui,
-													 &pipelineBindInfo,
-													 buffers.ui.objectCount * 6,
-													 1,
-													 0,
-													 0,
-													 0),
-							   "Failed to draw UI!");
-	}
-
-	lunaEndRenderPass();
-
-	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
-	if (UnlockLodThreadMutex() != 0)
-	{
-		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
-	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+	buffers.debugDraw.vertexCount = 0;
+	buffers.debugDraw.vertices.bytesUsed = 0;
 
 	return VK_SUCCESS;
 }
@@ -276,7 +221,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.sky,
 													 &pipelineBindInfo,
-													 buffers.sky.objectCount,
+													 buffers.sky.indexCount,
 													 1,
 													 0,
 													 0,
@@ -286,21 +231,21 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw floor!");
 	}
 
-	if (buffers.walls.objectCount)
-	{
-		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
-													 buffers.walls.indices.buffer,
-													 0,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.walls,
-													 &pipelineBindInfo,
-													 buffers.walls.objectCount * 6,
-													 1,
-													 0,
-													 0,
-													 0),
-							   "Failed to draw walls!");
-	}
+	// if (buffers.walls.indices.bytesUsed)
+	// {
+	// 	VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+	// 												 buffers.walls.indices.buffer,
+	// 												 0,
+	// 												 VK_INDEX_TYPE_UINT32,
+	// 												 pipelines.walls,
+	// 												 &pipelineBindInfo,
+	// 												 buffers.walls.indices.bytesUsed / sizeof(uint32_t),
+	// 												 1,
+	// 												 0,
+	// 												 0,
+	// 												 0),
+	// 						   "Failed to draw walls!");
+	// }
 
 	if (buffers.actorWalls.count)
 	{
@@ -366,6 +311,26 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw unshaded model actors!");
 	}
 
+	if (buffers.debugDraw.vertexCount)
+	{
+		if (buffers.debugDraw.shouldResize)
+		{
+			VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
+		}
+		lunaWriteDataToBuffer(buffers.debugDraw.vertices.buffer,
+							  buffers.debugDraw.vertices.data,
+							  buffers.debugDraw.vertices.bytesUsed,
+							  0);
+		VulkanTestReturnResult(lunaDrawBuffer(buffers.debugDraw.vertices.buffer,
+											  pipelines.debugDraw,
+											  &pipelineBindInfo,
+											  buffers.debugDraw.vertexCount,
+											  1,
+											  0,
+											  0),
+							   "Failed to draw Jolt debug objects!");
+	}
+
 	if (viewmodel->enabled)
 	{
 		UpdateViewModelMatrix(viewmodel);
@@ -391,6 +356,102 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
 		return VK_ERROR_UNKNOWN;
 	}
+
+	return VK_SUCCESS;
+}
+
+VkResult VK_FrameEnd()
+{
+	if (buffers.ui.shouldResize)
+	{
+		lunaDestroyBuffer(buffers.ui.vertices.buffer);
+		lunaDestroyBuffer(buffers.ui.indices.buffer);
+
+		const LunaBufferCreationInfo vertexBufferCreationInfo = {
+			.size = buffers.ui.vertices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.ui.vertices.buffer),
+							   "Failed to recreate UI vertex buffer!");
+
+		const LunaBufferCreationInfo indexBufferCreationInfo = {
+			.size = buffers.ui.indices.allocatedSize,
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.ui.indices.buffer),
+							   "Failed to recreate UI index buffer!");
+
+		buffers.ui.shouldResize = false;
+	}
+	if (buffers.ui.indices.bytesUsed > 0)
+	{
+		lunaWriteDataToBuffer(buffers.ui.vertices.buffer, buffers.ui.vertices.data, buffers.ui.vertices.bytesUsed, 0);
+		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed, 0);
+	}
+
+	if (LockLodThreadMutex() != 0)
+	{
+		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
+
+	if (buffers.ui.indices.bytesUsed > 0)
+	{
+		const VkViewport viewport = {
+			.width = (float)swapChainExtent.width,
+			.height = (float)swapChainExtent.height,
+			.maxDepth = 1,
+		};
+		const LunaViewportBindInfo viewportBindInfo = {
+			.viewportCount = 1,
+			.viewports = &viewport,
+		};
+		const VkRect2D scissor = {
+			.extent = swapChainExtent,
+		};
+		const LunaScissorBindInfo scissorBindInfo = {
+			.scissorCount = 1,
+			.scissors = &scissor,
+		};
+		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+			{
+				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+				.viewportBindInfo = &viewportBindInfo,
+			},
+			{
+				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+				.scissorBindInfo = &scissorBindInfo,
+			},
+		};
+		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+			.descriptorSetCount = 1,
+			.descriptorSets = &descriptorSets[currentFrame],
+			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+			.dynamicStates = dynamicStateBindInfos,
+		};
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
+													 buffers.ui.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.ui,
+													 &pipelineBindInfo,
+													 buffers.ui.indices.bytesUsed / sizeof(uint32_t),
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw UI!");
+	}
+
+	lunaEndRenderPass();
+
+	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
+	if (UnlockLodThreadMutex() != 0)
+	{
+		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
+		return VK_ERROR_UNKNOWN;
+	}
+	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return VK_SUCCESS;
 }
@@ -427,44 +488,6 @@ inline void VK_Minimize()
 inline void VK_Restore()
 {
 	minimized = false;
-}
-
-bool VK_LoadLevelWalls(const Level *level)
-{
-	if (!level->hasCeiling)
-	{
-		VulkanTest(LoadSky(LoadModel(MODEL("model_sky"))), "Failed to load sky!");
-	}
-
-	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
-	pushConstants.floorTextureIndex = TextureIndex(level->floorTex);
-
-	pushConstants.fogStart = (float)level->fogStart;
-	pushConstants.fogEnd = (float)level->fogEnd;
-	pushConstants.fogColor = level->fogColor;
-
-	buffers.walls.objectCount = level->walls.length;
-	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * buffers.walls.objectCount;
-	buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * buffers.walls.objectCount;
-	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
-	LoadWalls(level);
-
-	if (LockLodThreadMutex() != 0)
-	{
-		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
-		return false;
-	}
-	loadedLevel = level;
-	if (!VK_UpdateActors(&level->actors, true))
-	{
-		VulkanLogError("Failed to load actors!");
-	}
-	if (UnlockLodThreadMutex() != 0)
-	{
-		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
-		return false;
-	}
-	return true;
 }
 
 void VK_DrawColoredQuad(const int32_t x, const int32_t y, const int32_t w, const int32_t h, const Color color)
@@ -661,6 +684,49 @@ void VK_DrawRectOutline(const int32_t x,
 	VK_DrawLine(x + w, y, x + w, y + h, thickness, color);
 	VK_DrawLine(x + w, y + h, x, y + h, thickness, color);
 	VK_DrawLine(x, y + h, x, y, thickness, color);
+}
+
+void VK_DrawJoltDebugLine(const Vector3 *from, const Vector3 *to, const uint32_t color)
+{
+	// TODO: I could implement this using triangles, or I could add a whole second pipeline for drawing lines which
+	//  actually uses line primitives. That would make my life a lot easier, but would also mean another pipeline...
+}
+
+void VK_DrawJoltDebugTriangle(const Vector3 *vertices, const uint32_t color)
+{
+	if (buffers.debugDraw.vertices.allocatedSize < buffers.debugDraw.vertices.bytesUsed + sizeof(DebugDrawVertex) * 3)
+	{
+		buffers.debugDraw.vertices.allocatedSize += sizeof(DebugDrawVertex) * 3 * 16;
+		buffers.debugDraw.shouldResize = true;
+
+		DebugDrawVertex *newVertices = realloc(buffers.debugDraw.vertices.data,
+											   buffers.debugDraw.vertices.allocatedSize);
+		CheckAlloc(newVertices);
+		buffers.debugDraw.vertices.data = newVertices;
+	}
+
+	const float r = (float)(color >> 24 & 0xFF) / 255.0f;
+	const float g = (float)(color >> 16 & 0xFF) / 255.0f;
+	const float b = (float)(color >> 8 & 0xFF) / 255.0f;
+	const float a = 1;
+
+	DebugDrawVertex *bufferVertices = buffers.debugDraw.vertices.data + buffers.debugDraw.vertices.bytesUsed;
+
+	bufferVertices[0] = (DebugDrawVertex){
+		.position = vertices[0],
+		.color = {r, g, b, a},
+	};
+	bufferVertices[1] = (DebugDrawVertex){
+		.position = vertices[1],
+		.color = {r, g, b, a},
+	};
+	bufferVertices[2] = (DebugDrawVertex){
+		.position = vertices[2],
+		.color = {r, g, b, a},
+	};
+
+	buffers.debugDraw.vertexCount += 3;
+	buffers.debugDraw.vertices.bytesUsed += sizeof(DebugDrawVertex) * 3;
 }
 
 void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)

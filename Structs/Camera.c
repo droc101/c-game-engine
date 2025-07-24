@@ -12,14 +12,8 @@
  */
 Camera *CreateCamera()
 {
-	Camera *camera = malloc(sizeof(Camera));
+	Camera *camera = calloc(1, sizeof(Camera));
 	CheckAlloc(camera);
-	camera->x = 0;
-	camera->y = 0;
-	camera->z = 0;
-	camera->pitch = 0;
-	camera->yaw = 0;
-	camera->roll = 0;
 	camera->fov = FOV;
 	return camera;
 }

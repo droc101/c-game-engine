@@ -370,10 +370,13 @@ void _ListFree(List *list)
 {
 	assert(list);
 
-	free(list->data->pointerData);
-	list->data->pointerData = NULL;
-	free(list->data);
-	list->data = NULL;
+	if (list->data)
+	{
+		free(list->data->pointerData);
+		list->data->pointerData = NULL;
+		free(list->data);
+		list->data = NULL;
+	}
 	list->length = 0;
 }
 

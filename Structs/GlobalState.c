@@ -16,6 +16,7 @@
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
+#include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/PhysicsThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/LevelLoader.h"
@@ -23,7 +24,7 @@
 #include "Camera.h"
 #include "Options.h"
 
-GlobalState state;
+static GlobalState state;
 
 /**
  * callback for when a channel finishes playing (so we can free it)
@@ -51,27 +52,13 @@ void InitState()
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
-	state.saveData->coins = 0;
-	state.saveData->blueCoins = 0;
-	state.physicsFrame = 0;
 	state.level = CreateLevel(); // empty level so we don't segfault
-	state.requestExit = false;
-	state.music = NULL;
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
-	{
-		state.channels[i] = NULL;
-	}
-	state.cameraY = 0;
 	state.cam = CreateCamera();
 
 	state.viewmodel.enabled = true;
 	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
 	state.viewmodel.translation[0] = 0.5f;
-	state.viewmodel.translation[2] = 0.0f;
-	state.viewmodel.rotation[0] = 0.0f;
-	state.viewmodel.rotation[1] = 0.0872665f; // 5deg
-	state.viewmodel.rotation[2] = 0.0f;
-	state.viewmodel.modelSkin = 0;
+	state.viewmodel.rotation[1] = degToRad(5);
 
 	UpdateVolume();
 

@@ -457,7 +457,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 		{
 			mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
 			ActorTransformMatrix(actor, &transformMatrix);
-			for (byte j = 0; j < actor->actorModel->materialCount; j++)
+			for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 			{
 				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
 				size_t index = 0;

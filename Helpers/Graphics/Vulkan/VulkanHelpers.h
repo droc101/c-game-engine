@@ -15,6 +15,7 @@
 #define MAX_WALLS_INIT 1024
 #define MAX_WALL_ACTORS_INIT 256
 #define MAX_MODEL_ACTOR_QUADS_INIT 4096
+#define MAX_DEBUG_DRAW_VERTICES_INIT 1024
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
 // TODO Use LogInternal
@@ -170,6 +171,12 @@ typedef struct ActorWallInstanceData
 	float wallAngle;
 } ActorWallInstanceData;
 
+typedef struct DebugDrawVertex
+{
+	Vector3 position;
+	Vector4 color;
+} DebugDrawVertex;
+
 typedef struct BufferRegion
 {
 	LunaBuffer buffer;
@@ -178,13 +185,12 @@ typedef struct BufferRegion
 	void *data;
 } BufferRegion;
 
-typedef struct IndexedVertexBuffer
+typedef struct UiBuffer
 {
 	BufferRegion vertices;
 	BufferRegion indices;
-	uint32_t objectCount;
 	bool shouldResize;
-} IndexedVertexBuffer;
+} UiBuffer;
 
 typedef struct ViewModelBuffer
 {
@@ -195,6 +201,19 @@ typedef struct ViewModelBuffer
 	LunaBuffer drawInfo;
 	uint32_t drawCount;
 } ViewModelBuffer;
+
+typedef struct SkyBuffer
+{
+	BufferRegion vertices;
+	BufferRegion indices;
+	uint32_t indexCount;
+} SkyBuffer;
+
+typedef struct WallsBuffer
+{
+	BufferRegion vertices;
+	BufferRegion indices;
+} WallsBuffer;
 
 typedef struct ActorWallsBuffer
 {
@@ -216,14 +235,22 @@ typedef struct ActorModelsBuffer
 	List loadedModelIds;
 } ActorModelsBuffer;
 
+typedef struct DebugDrawBuffer
+{
+	BufferRegion vertices;
+	uint32_t vertexCount;
+	bool shouldResize;
+} DebugDrawBuffer;
+
 typedef struct Buffers
 {
-	IndexedVertexBuffer ui;
+	UiBuffer ui;
 	ViewModelBuffer viewModel;
-	IndexedVertexBuffer sky;
-	IndexedVertexBuffer walls;
+	SkyBuffer sky;
+	WallsBuffer walls;
 	ActorWallsBuffer actorWalls;
 	ActorModelsBuffer actorModels;
+	DebugDrawBuffer debugDraw;
 } Buffers;
 
 typedef struct Pipelines
@@ -236,6 +263,7 @@ typedef struct Pipelines
 	LunaGraphicsPipeline actorWalls;
 	LunaGraphicsPipeline shadedActorModels;
 	LunaGraphicsPipeline unshadedActorModels;
+	LunaGraphicsPipeline debugDraw;
 } Pipelines;
 
 typedef struct TextureSamplers

@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "../Debug/DPrint.h"
+#include "../Debug/JoltDebugRenderer.h"
 #include "../Helpers/Collision.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
@@ -179,6 +180,7 @@ void GMainStateRender(GlobalState *state)
 {
 	const Level *level = state->level;
 
+	JoltDebugRendererDrawBodies(state->physicsSystem);
 	RenderLevel3D(level, state->cam);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};

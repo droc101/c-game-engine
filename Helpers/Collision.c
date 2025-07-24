@@ -5,7 +5,7 @@
 #include "Collision.h"
 #include <box2d/box2d.h>
 #include <box2d/types.h>
-
+#include <joltc.h>
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "Core/Logging.h"

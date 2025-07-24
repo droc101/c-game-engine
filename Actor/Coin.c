@@ -34,7 +34,7 @@ void CreateCoinSensor(Actor *this, const b2WorldId worldId)
 	sensorBodyDef.type = b2_staticBody;
 	sensorBodyDef.position = this->position;
 	this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	this->actorWall->bodyId = this->bodyId;
+	this->actorWall->box2dBodyId = this->bodyId;
 	const b2Circle sensorShape = {
 		.radius = 0.5f,
 	};
