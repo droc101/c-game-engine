@@ -257,16 +257,18 @@
                 {
                     "name": "operandA",
                     "type": "float",
-                    "min": -10000,
-                    "max": 10000,
-                    "default": 0
+                    "min": -10000.0,
+                    "max": 10000.0,
+                    "default": 0.0,
+                    "step": 0.1
                 },
                 {
                     "name": "operandB",
                     "type": "float",
-                    "min": -10000,
-                    "max": 10000,
-                    "default": 0
+                    "min": -10000.0,
+                    "max": 10000.0,
+                    "default": 0.0,
+                    "step": 0.1
                 }
             ],
             "inputs": [
