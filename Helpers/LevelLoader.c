@@ -3,11 +3,9 @@
 //
 
 #include "LevelLoader.h"
-#include <box2d/box2d.h>
 #include <stdio.h>
 #include "../Helpers/CommonAssets.h"
 #include "../Structs/Actor.h"
-#include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
@@ -34,29 +32,10 @@
 
 Level *LoadLevel(const byte *data, const size_t dataSize)
 {
-	JPH_PhysicsSystem *physicsSystem = GetState()->physicsSystem;
-	assert(physicsSystem);
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(physicsSystem);
-
-	const JPH_Plane plane = {
-		.normal.y = 1,
-	};
-	const JPH_Shape *floorShape = (const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 50);
-
-	const JPH_Vec3 floorPosition = {0.0f, -0.5f, 0.0f};
-	JPH_BodyCreationSettings *floorSettings = JPH_BodyCreationSettings_Create3(
-			floorShape,
-			&floorPosition,
-			NULL, // Because joltc doesn't expose JPH::Quat::sIdentity() this is what we have to do to get the identity quaternion (which is [0, 0, 0, 1])
-			JPH_MotionType_Static,
-			OBJECT_LAYER_STATIC);
-
-	JPH_BodyInterface_CreateAndAddBody(bodyInterface, floorSettings, JPH_Activation_DontActivate);
-	JPH_BodyCreationSettings_Destroy(floorSettings);
-
 	Level *level = CreateLevel();
 	size_t offset = 0;
 	size_t bytesRemaining = dataSize;
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
 
 	EXPECT_BYTES(32 + sizeof(short) + 1);
 	ReadString(data, &offset, level->name, 32);
@@ -83,11 +62,12 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 	level->fogEnd = ReadFloat(data, &offset);
 
 	EXPECT_BYTES(sizeof(float) * 3);
-	level->player.pos.x = ReadFloat(data, &offset);
-	level->player.pos.y = ReadFloat(data, &offset);
+	level->player.position.x = ReadFloat(data, &offset);
+	level->player.position.y = ReadFloat(data, &offset);
 	level->player.angle = ReadFloat(data, &offset);
 
-	b2Body_SetTransform(level->player.bodyId, level->player.pos, b2MakeRot(level->player.angle));
+	const Vector3 position = {level->player.position.x, 0.0f, level->player.position.y};
+	JPH_Character_SetPosition(level->player.joltCharacter, &position, JPH_Activation_Activate, true);
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint actorCount = ReadUint(data, &offset);
@@ -116,7 +96,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			KvSetUnsafe(&params, key, param);
 		}
 
-		Actor *a = CreateActor(v2(actorX, actorY), actorRotation, actorType, &params, level->worldId);
+		Actor *a = CreateActor(v2(actorX, actorY), actorRotation, actorType, &params, bodyInterface);
 
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);
@@ -160,11 +140,11 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		const float wallUVOffset = ReadFloat(data, &offset);
 		Wall *w = CreateWall(v2(wallAX, wallAY), v2(wallBX, wallBY), wallTex, wallUVScale, wallUVOffset);
 		WallBake(w);
-		CreateWallCollider(w, level->worldId, bodyInterface);
+		CreateWallCollider(w, bodyInterface);
 		ListAdd(level->walls, w);
 	}
 
-	JPH_PhysicsSystem_OptimizeBroadPhase(physicsSystem);
+	JPH_PhysicsSystem_OptimizeBroadPhase(level->physicsSystem);
 
 	return level;
 }

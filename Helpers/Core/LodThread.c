@@ -42,7 +42,7 @@ int LodThreadMain(void *)
 		}
 
 		const GlobalState *state = GetState();
-		const Vector2 playerPosition = state->level->player.pos;
+		const Vector2 playerPosition = state->level->player.position;
 		const LockingList *actors = &state->level->actors;
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;

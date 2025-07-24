@@ -98,37 +98,6 @@ void PhysicsThreadInit()
 		LogError("Failed to create physics thread: %s\n", error);
 		Error("Failed to create physics thread");
 	}
-
-	if (!JPH_Init())
-	{
-		Error("Failed to initialize Jolt Physics!");
-	}
-
-	GlobalState *state = GetState();
-	state->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
-	JoltDebugRendererInit();
-
-	JPH_BroadPhaseLayerInterface *broadPhaseLayerInterface = JPH_BroadPhaseLayerInterfaceTable_Create(2, 2);
-	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
-																 OBJECT_LAYER_STATIC,
-																 BROADPHASE_LAYER_STATIC);
-	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
-																 OBJECT_LAYER_DYNAMIC,
-																 BROADPHASE_LAYER_DYNAMIC);
-
-	JPH_ObjectLayerPairFilter *objectLayerPairFilter = JPH_ObjectLayerPairFilterTable_Create(2);
-	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_STATIC);
-	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_DYNAMIC);
-
-	const JPH_PhysicsSystemSettings settings = {
-		.broadPhaseLayerInterface = broadPhaseLayerInterface,
-		.objectLayerPairFilter = objectLayerPairFilter,
-		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broadPhaseLayerInterface,
-																					   2,
-																					   objectLayerPairFilter,
-																					   2),
-	};
-	state->physicsSystem = JPH_PhysicsSystem_Create(&settings);
 }
 
 void PhysicsThreadSetFunction(const FixedUpdateFunction function)

@@ -163,8 +163,8 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 			return VK_ERROR_UNKNOWN;
 		}
 	}
-	pushConstants.position[0] = (float)loadedLevel->player.pos.x;
-	pushConstants.position[1] = (float)loadedLevel->player.pos.y;
+	pushConstants.position[0] = (float)loadedLevel->player.position.x;
+	pushConstants.position[1] = (float)loadedLevel->player.position.y;
 	pushConstants.yaw = camera->yaw + 1.5f * PIf;
 	UpdateTransformMatrix(camera);
 
@@ -231,21 +231,21 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw floor!");
 	}
 
-	// if (buffers.walls.indices.bytesUsed)
-	// {
-	// 	VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
-	// 												 buffers.walls.indices.buffer,
-	// 												 0,
-	// 												 VK_INDEX_TYPE_UINT32,
-	// 												 pipelines.walls,
-	// 												 &pipelineBindInfo,
-	// 												 buffers.walls.indices.bytesUsed / sizeof(uint32_t),
-	// 												 1,
-	// 												 0,
-	// 												 0,
-	// 												 0),
-	// 						   "Failed to draw walls!");
-	// }
+	if (buffers.walls.indices.bytesUsed)
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+													 buffers.walls.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 &pipelineBindInfo,
+													 buffers.walls.indices.bytesUsed / sizeof(uint32_t),
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw walls!");
+	}
 
 	if (buffers.actorWalls.count)
 	{
@@ -705,10 +705,10 @@ void VK_DrawJoltDebugTriangle(const Vector3 *vertices, const uint32_t color)
 		buffers.debugDraw.vertices.data = newVertices;
 	}
 
-	const float r = (float)(color >> 24 & 0xFF) / 255.0f;
-	const float g = (float)(color >> 16 & 0xFF) / 255.0f;
-	const float b = (float)(color >> 8 & 0xFF) / 255.0f;
 	const float a = 1;
+	const float r = (float)(color >> 16 & 0xFF) / 255.0f;
+	const float g = (float)(color >> 8 & 0xFF) / 255.0f;
+	const float b = (float)(color & 0xFF) / 255.0f;
 
 	DebugDrawVertex *bufferVertices = buffers.debugDraw.vertices.data + buffers.debugDraw.vertices.bytesUsed;
 

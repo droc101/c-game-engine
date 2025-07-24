@@ -21,11 +21,10 @@ Wall *CreateWall(Vector2 a, Vector2 b, const char *texture, float uvScale, float
 /**
  * Create a Box2D rigid body to serve as a wall's hitbox
  * @param wall The wall to create the hitbox for
- * @param worldId The Box2D world within which to create the hitbox
  * @param bodyInterface
  * @note This function expects the wall to be baked
  */
-void CreateWallCollider(Wall *wall, b2WorldId worldId, JPH_BodyInterface *bodyInterface);
+void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface);
 
 /**
  * Frees the wall's physics body as well as the wall itself

@@ -38,7 +38,7 @@ bool LaserSignalHandler(Actor *self, const Actor *sender, byte signal, const Par
 	return false;
 }
 
-void LaserInit(Actor *this, b2WorldId, const KvList *params)
+void LaserInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
 {
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
@@ -95,7 +95,7 @@ void LaserUpdate(Actor *this, double)
 		}
 		if (GetState()->physicsFrame % 4 == 0)
 		{
-			this->actorWall->uvOffset = fmod(this->actorWall->uvOffset + 0.5f, 1.0f);
+			this->actorWall->uvOffset = fmodf(this->actorWall->uvOffset + 0.5f, 1.0f);
 		}
 	} else
 	{

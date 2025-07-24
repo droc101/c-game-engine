@@ -3,7 +3,6 @@
 //
 
 #include "Navigation.h"
-#include <box2d/box2d.h>
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "Collision.h"
@@ -11,7 +10,7 @@
 
 float PlayerRelativeAngle(const Actor *actor)
 {
-	const Vector2 playerPosition = GetState()->level->player.pos;
+	const Vector2 playerPosition = GetState()->level->player.position;
 	const float actorPlayerAngleDifference = atan2f(playerPosition.y - actor->position.y,
 													playerPosition.x - actor->position.x);
 	return wrap(actorPlayerAngleDifference - actor->rotation, -PIf, PIf) + PIf / 2;
@@ -34,20 +33,22 @@ bool IsPlayerVisibleInternal(const Actor *actor,
 		return false;
 	}
 
-	b2ShapeId raycastHit = b2_nullShapeId;
-	b2World_CastRay(GetState()->level->worldId,
-					actor->position,
-					playerRelativePosition,
-					(b2QueryFilter){.categoryBits = COLLISION_GROUP_ACTOR, .maskBits = ~COLLISION_GROUP_TRIGGER},
-					RaycastCallback,
-					&raycastHit);
+	return false;
 
-	return b2Shape_IsValid(raycastHit) && b2Shape_GetFilter(raycastHit).categoryBits & COLLISION_GROUP_PLAYER;
+	// b2ShapeId raycastHit = b2_nullShapeId;
+	// b2World_CastRay(GetState()->level->worldId,
+	// 				actor->position,
+	// 				playerRelativePosition,
+	// 				(b2QueryFilter){.categoryBits = COLLISION_GROUP_ACTOR, .maskBits = ~COLLISION_GROUP_TRIGGER},
+	// 				RaycastCallback,
+	// 				&raycastHit);
+	//
+	// return b2Shape_IsValid(raycastHit) && b2Shape_GetFilter(raycastHit).categoryBits & COLLISION_GROUP_PLAYER;
 }
 
 bool IsPlayerVisible(const Actor *actor, const NavigationConfig navigationConfig)
 {
-	const Vector2 playerPosition = GetState()->level->player.pos;
+	const Vector2 playerPosition = GetState()->level->player.position;
 	const float actorPlayerAngleDifference = atan2f(playerPosition.y - actor->position.y,
 													playerPosition.x - actor->position.x);
 	const float relativeAngle = wrap(actorPlayerAngleDifference - actor->rotation, -PIf, PIf) + PIf / 2;
@@ -57,7 +58,7 @@ bool IsPlayerVisible(const Actor *actor, const NavigationConfig navigationConfig
 
 void NavigationStep(Actor *actor, NavigationConfig *navigationConfig, const double delta)
 {
-	const Vector2 playerPosition = GetState()->level->player.pos;
+	const Vector2 playerPosition = GetState()->level->player.position;
 	const float actorPlayerAngleDifference = atan2f(playerPosition.y - actor->position.y,
 													playerPosition.x - actor->position.x);
 	const float relativeAngle = wrap(actorPlayerAngleDifference - actor->rotation, -PIf, PIf) + PIf / 2;
@@ -118,5 +119,5 @@ move:
 	}
 	const Vector2 direction = Vector2Normalize(Vector2FromAngle(actorPlayerAngleDifference +
 																navigationConfig->directionModifier));
-	b2Body_ApplyLinearImpulseToCenter(actor->bodyId, Vector2Scale(direction, navigationConfig->speed * delta), true);
+	// b2Body_ApplyLinearImpulseToCenter(actor->bodyId, Vector2Scale(direction, navigationConfig->speed * delta), true);
 }

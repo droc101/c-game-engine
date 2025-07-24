@@ -6,7 +6,6 @@
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
-#include "../../Structs/Level.h"
 
 #define IOPROXY_OUTPUT_FIRST_TICK 2
 
@@ -31,7 +30,7 @@ bool IoProxySignalHandler(Actor *this, const Actor *sender, const byte signal, c
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*params*/)
+void IoProxyInit(Actor *this, const KvList * /*params*/, JPH_BodyInterface * /*bodyInterface*/)
 {
 	if (GetState()->level->ioProxy != NULL)
 	{

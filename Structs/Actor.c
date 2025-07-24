@@ -3,8 +3,6 @@
 //
 
 #include "Actor.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
@@ -28,7 +26,7 @@
 #include "../Actor/TestActor.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}
+void ActorInit(Actor * /*this*/, const KvList * /*params*/, JPH_BodyInterface * /*bodyInterface*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
@@ -95,7 +93,7 @@ Actor *CreateActor(const Vector2 position,
 				   const float rotation,
 				   const uint actorType,
 				   KvList *params,
-				   const b2WorldId worldId)
+				   JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
@@ -107,13 +105,12 @@ Actor *CreateActor(const Vector2 position,
 	actor->actorModel = NULL;
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
-	actor->bodyId = b2_nullBodyId;
 	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->SignalHandler = DefaultSignalHandler;
 	actor->Init = ActorInitFuncs[actorType];
 	actor->Update = ActorUpdateFuncs[actorType];
 	actor->Destroy = ActorDestroyFuncs[actorType];
-	actor->Init(actor, worldId, params); // kindly allow the Actor to initialize itself
+	actor->Init(actor, params, bodyInterface); // kindly allow the Actor to initialize itself
 	actor->actorType = actorType;
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
 	if (params)
@@ -134,42 +131,6 @@ void FreeActor(Actor *actor)
 	ListFree(actor->ioConnections);
 	free(actor);
 	actor = NULL;
-}
-
-void CreateActorWallCollider(Actor *this, const b2WorldId worldId)
-{
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position = this->actorWall->a;
-	this->bodyId = b2CreateBody(worldId, &bodyDef);
-	this->actorWall->box2dBodyId = this->bodyId;
-	const float dx = this->actorWall->dx;
-	const float dy = this->actorWall->dy;
-	const float invDistance = 1 / sqrtf(dx * dx + dy * dy);
-	const Vector2 points[4] = {
-		{
-			(dy - dx / 2) * 0.01f * invDistance,
-			(-dx - dy / 2) * 0.01f * invDistance,
-		},
-		{
-			(-dy - dx / 2) * 0.01f * invDistance,
-			(dx - dy / 2) * 0.01f * invDistance,
-		},
-		{
-			dx + (dy + dx / 2) * 0.01f * invDistance,
-			dy + (-dx + dy / 2) * 0.01f * invDistance,
-		},
-		{
-			dx + (-dy + dx / 2) * 0.01f * invDistance,
-			dy + (dx + dy / 2) * 0.01f * invDistance,
-		},
-	};
-	const b2Hull hull = b2ComputeHull(points, 4);
-	const b2Polygon shape = b2MakePolygon(&hull, 0);
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.friction = 0;
-	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	b2CreatePolygonShape(this->actorWall->box2dBodyId, &shapeDef, &shape);
 }
 
 void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param)

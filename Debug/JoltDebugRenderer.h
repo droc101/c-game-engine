@@ -9,6 +9,8 @@
 
 void JoltDebugRendererInit();
 
+void JoltDebugRendererDestroy();
+
 void JoltDebugRendererDrawBodies(JPH_PhysicsSystem *physicsSystem);
 
 #endif //JOLTDEBUGRENDERER_H

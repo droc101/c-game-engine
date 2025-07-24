@@ -3,8 +3,6 @@
 //
 
 #include "Wall.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
 #include <math.h>
 #include <string.h>
 #include "../defines.h"
@@ -24,70 +22,32 @@ Wall *CreateWall(const Vector2 a, const Vector2 b, const char *texture, const fl
 	return w;
 }
 
-void CreateWallCollider(Wall *wall, const b2WorldId worldId, JPH_BodyInterface *bodyInterface)
+void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 {
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_staticBody;
-	bodyDef.position = wall->a;
-	wall->box2dBodyId = b2CreateBody(worldId, &bodyDef);
-	if (wall->dx != 0 || wall->dy != 0)
-	{
-		const b2Segment shape = {
-			.point2 = {wall->dx, wall->dy},
-		};
-		b2ShapeDef shapeDef = b2DefaultShapeDef();
-		shapeDef.friction = 0;
-		b2CreateSegmentShape(wall->box2dBodyId, &shapeDef, &shape);
-	}
-
-
-	const float dx = wall->dx;
-	const float dy = wall->dy;
-	const float thickness = 0.01f;
-	const Vector3 points[8] = {
+	const Vector3 points[4] = {
 		{
-			(dy - dx / 2) * thickness / wall->length,
+			0,
 			-0.5f,
-			(-dx - dy / 2) * thickness / wall->length,
+			0,
 		},
 		{
-			(-dy - dx / 2) * thickness / wall->length,
+			wall->dx,
 			-0.5f,
-			(dx - dy / 2) * thickness / wall->length,
+			wall->dy,
 		},
 		{
-			dx + (dy + dx / 2) * thickness / wall->length,
-			-0.5f,
-			dy + (-dx + dy / 2) * thickness / wall->length,
-		},
-		{
-			dx + (-dy + dx / 2) * thickness / wall->length,
-			-0.5f,
-			dy + (dx + dy / 2) * thickness / wall->length,
-		},
-		{
-			(dy - dx / 2) * thickness / wall->length,
+			0,
 			0.5f,
-			(-dx - dy / 2) * thickness / wall->length,
+			0,
 		},
 		{
-			(-dy - dx / 2) * thickness / wall->length,
+			wall->dx,
 			0.5f,
-			(dx - dy / 2) * thickness / wall->length,
-		},
-		{
-			dx + (dy + dx / 2) * thickness / wall->length,
-			0.5f,
-			dy + (-dx + dy / 2) * thickness / wall->length,
-		},
-		{
-			dx + (-dy + dx / 2) * thickness / wall->length,
-			0.5f,
-			dy + (dx + dy / 2) * thickness / wall->length,
+			wall->dy,
 		},
 	};
 	const JPH_ConvexHullShapeSettings *shapeSettings = JPH_ConvexHullShapeSettings_Create(points,
-																						  8,
+																						  4,
 																						  JPH_DEFAULT_CONVEX_RADIUS);
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
 	const JPH_Vec3 position = {wall->a.x, 0, wall->a.y};

@@ -53,22 +53,22 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, byte signal, co
 	return false;
 }
 
-void CreateLaserEmitterCollider(Actor *this, const b2WorldId worldId)
+void CreateLaserEmitterCollider(Actor *this, JPH_BodyInterface *bodyInterface)
 {
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_staticBody;
-	bodyDef.position = this->position;
-	bodyDef.linearDamping = 10;
-	bodyDef.fixedRotation = true;
-	this->bodyId = b2CreateBody(worldId, &bodyDef);
-
-	const b2Polygon sensorShape = b2MakeOffsetBox(0.1f, 0.1f, (Vector2){0, 0}, 0);
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.filter.categoryBits = COLLISION_GROUP_DEFAULT | COLLISION_GROUP_ACTOR;
-	b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
+	// b2BodyDef bodyDef = b2DefaultBodyDef();
+	// bodyDef.type = b2_staticBody;
+	// bodyDef.position = this->position;
+	// bodyDef.linearDamping = 10;
+	// bodyDef.fixedRotation = true;
+	// this->bodyId = b2CreateBody(worldId, &bodyDef);
+	//
+	// const b2Polygon sensorShape = b2MakeOffsetBox(0.1f, 0.1f, (Vector2){0, 0}, 0);
+	// b2ShapeDef shapeDef = b2DefaultShapeDef();
+	// shapeDef.filter.categoryBits = COLLISION_GROUP_DEFAULT | COLLISION_GROUP_ACTOR;
+	// b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
 }
 
-void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
+void LaserEmitterInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	this->SignalHandler = LaserEmitterSignalHandler;
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
@@ -79,7 +79,7 @@ void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
 	this->actorModel = LoadModel(MODEL("model_laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
-	CreateLaserEmitterCollider(this, worldId);
+	CreateLaserEmitterCollider(this, bodyInterface);
 
 	data->startEnabled = KvGetBool(params, "startEnabled", true);
 }
@@ -97,7 +97,7 @@ void LaserEmitterUpdate(Actor *this, double)
 									   this->rotation,
 									   LASER_ACTOR,
 									   &laserParams,
-									   GetState()->level->worldId);
+									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
 		AddActor(data->laserActor);
 		data->hasTicked = true;
 	}
@@ -105,6 +105,6 @@ void LaserEmitterUpdate(Actor *this, double)
 
 void LaserEmitterDestroy(Actor *this)
 {
-	b2DestroyBody(this->bodyId);
+	// b2DestroyBody(this->bodyId);
 	free(this->extraData);
 }

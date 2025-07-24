@@ -3,8 +3,6 @@
 //
 
 #include "Door.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -35,7 +33,7 @@ typedef struct DoorData
 	DoorState state;
 	bool playerColliding;
 	double animationTime;
-	b2ShapeId sensorId;
+	// b2ShapeId sensorId;
 	Vector2 spawnPosition;
 	bool preventPlayerOpen;
 	bool stayOpen;
@@ -61,40 +59,38 @@ void DoorSetState(const Actor *door, const DoorState state)
 	}
 }
 
-void CreateDoorCollider(Actor *this, const b2WorldId worldId, const Vector2 wallEnd)
+void CreateDoorCollider(Actor *this, const Vector2 wallEnd, JPH_BodyInterface *bodyInterface)
 {
-	b2BodyDef doorBodyDef = b2DefaultBodyDef();
-	doorBodyDef.type = b2_kinematicBody;
-	doorBodyDef.position = this->position;
-	this->bodyId = b2CreateBody(worldId, &doorBodyDef);
-	this->actorWall->box2dBodyId = this->bodyId;
-	const b2Segment doorShape = {
-		.point2 = wallEnd,
-	};
-	b2ShapeDef doorShapeDef = b2DefaultShapeDef();
-	doorShapeDef.friction = 0;
-	doorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	b2CreateSegmentShape(this->bodyId, &doorShapeDef, &doorShape);
+	// b2BodyDef doorBodyDef = b2DefaultBodyDef();
+	// doorBodyDef.type = b2_kinematicBody;
+	// doorBodyDef.position = this->position;
+	// this->bodyId = b2CreateBody(worldId, &doorBodyDef);
+	// this->actorWall->box2dBodyId = this->bodyId;
+	// const b2Segment doorShape = {
+	// 	.point2 = wallEnd,
+	// };
+	// b2ShapeDef doorShapeDef = b2DefaultShapeDef();
+	// doorShapeDef.friction = 0;
+	// doorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
+	// b2CreateSegmentShape(this->bodyId, &doorShapeDef, &doorShape);
 }
 
-void CreateDoorSensor(Actor *this, const b2WorldId worldId)
+void CreateDoorSensor(Actor *this, JPH_BodyInterface *bodyInterface)
 {
-	this->extraData = calloc(1, sizeof(DoorData));
-	CheckAlloc(this->extraData);
-	DoorData *data = this->extraData;
-
-	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	sensorBodyDef.type = b2_staticBody;
-	sensorBodyDef.position = this->position;
-	const b2BodyId sensorBody = b2CreateBody(worldId, &sensorBodyDef);
-	const b2Circle sensorShape = {
-		.radius = 1,
-	};
-	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	sensorShapeDef.isSensor = true;
-	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
-	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	data->sensorId = b2CreateCircleShape(sensorBody, &sensorShapeDef, &sensorShape);
+	// DoorData *data = this->extraData;
+	//
+	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
+	// sensorBodyDef.type = b2_staticBody;
+	// sensorBodyDef.position = this->position;
+	// const b2BodyId sensorBody = b2CreateBody(worldId, &sensorBodyDef);
+	// const b2Circle sensorShape = {
+	// 	.radius = 1,
+	// };
+	// b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
+	// sensorShapeDef.isSensor = true;
+	// sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
+	// sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
+	// data->sensorId = b2CreateCircleShape(sensorBody, &sensorShapeDef, &sensorShape);
 }
 
 bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -103,54 +99,57 @@ bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	{
 		return true;
 	}
-	DoorData *data = this->extraData;
-	if (signal == DOOR_INPUT_OPEN)
-	{
-		if (data->state != DOOR_CLOSED)
-		{
-			if (data->state == DOOR_CLOSING)
-			{
-				b2Body_SetLinearVelocity(this->bodyId,
-										 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
-				data->state = DOOR_OPENING; // Set manually in order to not reset data->animationTime
-				data->animationTime = 1 - data->animationTime;
-			}
-			return true;
-		}
-		b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
-		DoorSetState(this, DOOR_OPENING);
-		return true;
-	}
-	if (signal == DOOR_INPUT_CLOSE)
-	{
-		if (data->state != DOOR_OPEN)
-		{
-			if (data->state == DOOR_OPENING)
-			{
-				b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
-				data->state = DOOR_CLOSING; // Set manually in order to not reset data->animationTime
-				data->animationTime = 1 - data->animationTime;
-			}
-			return true;
-		}
-		b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
-		DoorSetState(this, DOOR_CLOSING);
-		return true;
-	}
+	// DoorData *data = this->extraData;
+	// if (signal == DOOR_INPUT_OPEN)
+	// {
+	// 	if (data->state != DOOR_CLOSED)
+	// 	{
+	// 		if (data->state == DOOR_CLOSING)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId,
+	// 									 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
+	// 			data->state = DOOR_OPENING; // Set manually in order to not reset data->animationTime
+	// 			data->animationTime = 1 - data->animationTime;
+	// 		}
+	// 		return true;
+	// 	}
+	// 	b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
+	// 	DoorSetState(this, DOOR_OPENING);
+	// 	return true;
+	// }
+	// if (signal == DOOR_INPUT_CLOSE)
+	// {
+	// 	if (data->state != DOOR_OPEN)
+	// 	{
+	// 		if (data->state == DOOR_OPENING)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
+	// 			data->state = DOOR_CLOSING; // Set manually in order to not reset data->animationTime
+	// 			data->animationTime = 1 - data->animationTime;
+	// 		}
+	// 		return true;
+	// 	}
+	// 	b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
+	// 	DoorSetState(this, DOOR_CLOSING);
+	// 	return true;
+	// }
 	return false;
 }
 
-void DoorInit(Actor *this, const b2WorldId worldId, const KvList *params)
+void DoorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	const Vector2 wallEnd = Vector2Normalize(Vector2FromAngle(this->rotation));
 	this->actorWall = CreateWall((Vector2){0, 0}, wallEnd, TEXTURE("actor_door"), 1.0f, 0.0f);
 	WallBake(this->actorWall);
 
-	CreateDoorCollider(this, worldId, wallEnd);
-	CreateDoorSensor(this, worldId);
+	this->extraData = calloc(1, sizeof(DoorData));
+	CheckAlloc(this->extraData);
+	DoorData *data = this->extraData;
+
+	CreateDoorCollider(this, wallEnd, bodyInterface);
+	CreateDoorSensor(this, bodyInterface);
 	this->SignalHandler = DoorSignalHandler;
 
-	DoorData *data = this->extraData; // Allocated in CreateDoorSensor
 	data->spawnPosition = this->position;
 
 	data->preventPlayerOpen = KvGetBool(params, "preventPlayerOpen", false);
@@ -160,66 +159,66 @@ void DoorInit(Actor *this, const b2WorldId worldId, const KvList *params)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void DoorUpdate(Actor *this, const double delta)
 {
-	this->position = b2Body_GetPosition(this->bodyId);
-	DoorData *data = this->extraData;
-	data->playerColliding = GetSensorState(GetState()->level->worldId, data->sensorId.index1, data->playerColliding);
-	if (data->preventPlayerOpen)
-	{
-		data->playerColliding = false;
-	}
-	switch (data->state)
-	{
-		case DOOR_CLOSED:
-			if (data->playerColliding)
-			{
-				b2Body_SetLinearVelocity(this->bodyId,
-										 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
-				DoorSetState(this, DOOR_OPENING);
-			}
-			break;
-		case DOOR_OPEN:
-			if (data->animationTime >= 1 && !data->playerColliding && !data->stayOpen)
-			{
-				b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
-				DoorSetState(this, DOOR_CLOSING);
-			}
-			break;
-		case DOOR_OPENING:
-			if (data->animationTime >= 1)
-			{
-				b2Body_SetLinearVelocity(this->bodyId, v2s(0));
-				b2Body_SetTransform(this->bodyId, Vector2Sub(data->spawnPosition, this->actorWall->b), b2MakeRot(0));
-				DoorSetState(this, DOOR_OPEN);
-			}
-			break;
-		case DOOR_CLOSING:
-			if (data->playerColliding)
-			{
-				b2Body_SetLinearVelocity(this->bodyId,
-										 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
-				data->state = DOOR_OPENING; // Set manually in order to not reset data->animationTime
-				data->animationTime = 1 - data->animationTime;
-			} else if (data->animationTime >= 1)
-			{
-				b2Body_SetLinearVelocity(this->bodyId, v2s(0));
-				b2Body_SetTransform(this->bodyId, data->spawnPosition, b2MakeRot(0));
-				DoorSetState(this, DOOR_CLOSED);
-			}
-			break;
-		default:
-			LogWarning("Invalid door state: %d", data->state);
-			break;
-	}
-	data->animationTime += delta / PHYSICS_TARGET_TPS;
+	// this->position = b2Body_GetPosition(this->bodyId);
+	// DoorData *data = this->extraData;
+	// data->playerColliding = GetSensorState(GetState()->level->worldId, data->sensorId.index1, data->playerColliding);
+	// if (data->preventPlayerOpen)
+	// {
+	// 	data->playerColliding = false;
+	// }
+	// switch (data->state)
+	// {
+	// 	case DOOR_CLOSED:
+	// 		if (data->playerColliding)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId,
+	// 									 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
+	// 			DoorSetState(this, DOOR_OPENING);
+	// 		}
+	// 		break;
+	// 	case DOOR_OPEN:
+	// 		if (data->animationTime >= 1 && !data->playerColliding && !data->stayOpen)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
+	// 			DoorSetState(this, DOOR_CLOSING);
+	// 		}
+	// 		break;
+	// 	case DOOR_OPENING:
+	// 		if (data->animationTime >= 1)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId, v2s(0));
+	// 			b2Body_SetTransform(this->bodyId, Vector2Sub(data->spawnPosition, this->actorWall->b), b2MakeRot(0));
+	// 			DoorSetState(this, DOOR_OPEN);
+	// 		}
+	// 		break;
+	// 	case DOOR_CLOSING:
+	// 		if (data->playerColliding)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId,
+	// 									 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
+	// 			data->state = DOOR_OPENING; // Set manually in order to not reset data->animationTime
+	// 			data->animationTime = 1 - data->animationTime;
+	// 		} else if (data->animationTime >= 1)
+	// 		{
+	// 			b2Body_SetLinearVelocity(this->bodyId, v2s(0));
+	// 			b2Body_SetTransform(this->bodyId, data->spawnPosition, b2MakeRot(0));
+	// 			DoorSetState(this, DOOR_CLOSED);
+	// 		}
+	// 		break;
+	// 	default:
+	// 		LogWarning("Invalid door state: %d", data->state);
+	// 		break;
+	// }
+	// data->animationTime += delta / PHYSICS_TARGET_TPS;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void DoorDestroy(Actor *this)
 {
-	b2DestroyBody(this->bodyId);
-	b2ShapeId *sensorShapeId = &((DoorData *)this->extraData)->sensorId;
-	b2DestroyBody(b2Shape_GetBody(*sensorShapeId));
-	*sensorShapeId = b2_nullShapeId;
+	// b2DestroyBody(this->bodyId);
+	// b2ShapeId *sensorShapeId = &((DoorData *)this->extraData)->sensorId;
+	// b2DestroyBody(b2Shape_GetBody(*sensorShapeId));
+	// *sensorShapeId = b2_nullShapeId;
 	free(this->extraData);
 	this->extraData = NULL;
 	free(this->actorWall);

@@ -55,7 +55,11 @@
  * @param vector The vector
  * @return The unit vector, or the zero vector if @c vector cannot be turned into a unit vector.
  */
-#define Vector2Normalize(vector) b2Normalize(vector)
+#define Vector2Normalize(vector) \
+	({ \
+		const float length = Vector2Length(vector); \
+		v2((vector).x / length, (vector).y / length); \
+	})
 
 /**
  * Add two vectors

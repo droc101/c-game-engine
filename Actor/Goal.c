@@ -3,7 +3,6 @@
 //
 
 #include "Goal.h"
-#include <box2d/box2d.h>
 #include <math.h>
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
@@ -23,7 +22,7 @@
 
 typedef struct GoalData
 {
-	b2ShapeId shapeId;
+	// b2ShapeId shapeId;
 	bool enabled;
 } GoalData;
 
@@ -49,24 +48,24 @@ bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	return false;
 }
 
-void CreateGoalSensor(Actor *this, const b2WorldId worldId)
+void CreateGoalSensor(Actor *this, JPH_BodyInterface *bodyInterface)
 {
-	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	sensorBodyDef.type = b2_staticBody;
-	sensorBodyDef.position = this->position;
-	this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	this->actorWall->box2dBodyId = this->bodyId;
-	const b2Circle sensorShape = {
-		.radius = 0.5f,
-	};
-	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	sensorShapeDef.isSensor = true;
-	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	((GoalData *)this->extraData)->shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
+	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
+	// sensorBodyDef.type = b2_staticBody;
+	// sensorBodyDef.position = this->position;
+	// this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
+	// this->actorWall->box2dBodyId = this->bodyId;
+	// const b2Circle sensorShape = {
+	// 	.radius = 0.5f,
+	// };
+	// b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
+	// sensorShapeDef.isSensor = true;
+	// sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
+	// sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
+	// ((GoalData *)this->extraData)->shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
-void GoalInit(Actor *this, const b2WorldId worldId, const KvList *params)
+void GoalInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	this->SignalHandler = GoalSignalHandler;
 	GoalData *data = calloc(1, sizeof(GoalData));
@@ -81,34 +80,34 @@ void GoalInit(Actor *this, const b2WorldId worldId, const KvList *params)
 								 0.0f);
 	WallBake(this->actorWall);
 
-	CreateGoalSensor(this, worldId);
+	CreateGoalSensor(this, bodyInterface);
 }
 
 void GoalUpdate(Actor *this, double /*delta*/)
 {
 	const GoalData *goalData = this->extraData;
 
-	const Vector2 playerPosition = GetState()->level->player.pos;
+	const Vector2 playerPosition = GetState()->level->player.position;
 	const float rotation = atan2f(playerPosition.y - this->position.y, playerPosition.x - this->position.x) + PIf / 2;
 	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
 	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
 
 	if (goalData->enabled)
 	{
-		if (GetSensorState(GetState()->level->worldId, goalData->shapeId.index1, false))
-		{
-			GetState()->saveData->coins += 10;
-			ActorFireOutput(this, GOAL_OUTPUT_COLLECTED, PARAM_NONE);
-			RemoveActor(this);
-		}
+		// if (GetSensorState(GetState()->level->worldId, goalData->shapeId.index1, false))
+		// {
+		// 	GetState()->saveData->coins += 10;
+		// 	ActorFireOutput(this, GOAL_OUTPUT_COLLECTED, PARAM_NONE);
+		// 	RemoveActor(this);
+		// }
 	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void GoalDestroy(Actor *this)
 {
-	b2DestroyBody(this->bodyId);
-	((GoalData *)this->extraData)->shapeId = b2_nullShapeId;
+	// b2DestroyBody(this->bodyId);
+	// ((GoalData *)this->extraData)->shapeId = b2_nullShapeId;
 	free(this->actorWall);
 	this->actorWall = NULL;
 	free(this->extraData);

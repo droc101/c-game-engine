@@ -53,7 +53,7 @@ void FrameGraphUpdate(ulong ns);
  */
 void FrameGraphDraw();
 
-void TickGraphUpdate(const ulong ns);
+void TickGraphUpdate(ulong ns);
 
 void TickGraphDraw();
 

@@ -6,9 +6,8 @@
 #define PHYSBOX_H
 
 #include "../defines.h"
-#include "box2d/id.h"
 
-void PhysboxInit(Actor *this, b2WorldId worldId, const KvList *params);
+void PhysboxInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 void PhysboxUpdate(Actor *this, double delta);
 void PhysboxDestroy(Actor *this);
 

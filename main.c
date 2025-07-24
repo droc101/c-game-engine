@@ -345,9 +345,9 @@ int main(const int argc, char *argv[])
 		}
 #endif
 
-		state->cam->x = state->level->player.pos.x;
+		state->cam->x = state->level->player.position.x;
 		state->cam->y = (float)state->cameraY;
-		state->cam->z = state->level->player.pos.y;
+		state->cam->z = state->level->player.position.y;
 		state->cam->yaw = state->level->player.angle;
 
 		state->RenderGame(state);

@@ -18,7 +18,7 @@
  *
  * @see https://box2d.org/documentation/group__world.html#gad34f863cfebe93a7d6448c30e30f6a01
  */
-float RaycastCallback(b2ShapeId shapeId, Vector2 point, Vector2 normal, float fraction, void *raycastHit);
+float RaycastCallback(int shapeId, Vector2 point, Vector2 normal, float fraction, void *raycastHit);
 
 /**
  * Get the state of a sensor. The current state of the sensor must be passed into this function because Box2D sensors
@@ -28,7 +28,7 @@ float RaycastCallback(b2ShapeId shapeId, Vector2 point, Vector2 normal, float fr
  * @param currentState A boolean for the current state of the sensor
  * @return The new state of the sensor. True if something is colliding with it, false if nothing is colliding with it
  */
-bool GetSensorState(b2WorldId worldId, uint sensorShapeIdIndex, bool currentState);
+bool GetSensorState(int worldId, uint sensorShapeIdIndex, bool currentState);
 
 /**
  * Get the enemy that the player is targeting

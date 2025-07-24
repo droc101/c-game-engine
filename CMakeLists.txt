@@ -227,16 +227,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(joltc)
 
-if (UNIX)
-    if (TARGET_ARCH STREQUAL "arm64")
-        set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux_arm64.a")
-    else ()
-        set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a")
-    endif ()
-elseif (WIN32)
-    set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a")
-endif ()
-
 set(CROSS_PLATFORM_LIBRARIES
         ${SDL2_LIBRARIES}
         ${ZLIB_LIBRARIES}
@@ -244,7 +234,6 @@ set(CROSS_PLATFORM_LIBRARIES
         Luna
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}
-        ${BOX2D_LIB}
         joltc
 )
 
@@ -260,7 +249,6 @@ include_directories(game PRIVATE
         ${ZLIB_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
         ${GLEW_INCLUDE_DIRS}
-        "${CMAKE_SOURCE_DIR}/lib/box2d/include"
 )
 
 #endregion

@@ -5,10 +5,9 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include <box2d/id.h>
 #include "../../defines.h"
 
-void SpriteInit(Actor *this, b2WorldId worldId, const KvList *params);
+void SpriteInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 
 void SpriteDestroy(Actor *this);
 

@@ -7,7 +7,7 @@
 
 #include "../Structs/Actor.h"
 
-void DoorInit(Actor *this, b2WorldId worldId, const KvList *params);
+void DoorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 
 void DoorUpdate(Actor *this, double delta);
 

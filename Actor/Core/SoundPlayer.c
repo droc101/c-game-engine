@@ -30,7 +30,7 @@ bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signa
 	return false;
 }
 
-void SoundPlayerInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
+void SoundPlayerInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
 {
 	this->SignalHandler = SoundPlayerSignalHandler;
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));

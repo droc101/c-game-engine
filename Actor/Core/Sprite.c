@@ -8,7 +8,7 @@
 #include "../../Structs/Vector2.h"
 #include "../../Structs/Wall.h"
 
-void SpriteInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
+void SpriteInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
 {
 	const float width = KvGetFloat(params, "width", 1.0f) * 0.5f;
 	const float height = KvGetFloat(params, "height", 1.0f);

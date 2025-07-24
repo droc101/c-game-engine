@@ -3,9 +3,9 @@
 //
 
 #include "GlobalState.h"
-#include <box2d/box2d.h>
 #include <stdio.h>
 #include <string.h>
+#include "../Debug/JoltDebugRenderer.h"
 #include "../GameStates/GLevelSelectState.h"
 #include "../GameStates/GMenuState.h"
 #include "../GameStates/GOptionsState.h"
@@ -49,6 +49,13 @@ void InitOptions()
 
 void InitState()
 {
+	if (!JPH_Init())
+	{
+		Error("Failed to initialize Jolt Physics!");
+	}
+	state.jobSystem = JPH_JobSystemThreadPool_Create(NULL);
+	JoltDebugRendererInit();
+
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
@@ -255,6 +262,10 @@ void DestroyGlobalState()
 	GMenuStateDestroy();
 	GOptionsStateDestroy();
 	GPauseStateDestroy();
+
+	JoltDebugRendererDestroy();
+	JPH_JobSystem_Destroy(state.jobSystem);
+	JPH_Shutdown();
 }
 
 bool ChangeLevelByName(const char *name)

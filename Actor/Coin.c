@@ -3,8 +3,6 @@
 //
 
 #include "Coin.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
 #include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -22,30 +20,30 @@ typedef struct CoinData
 {
 	bool isBlue;
 	byte animFrame;
-	b2ShapeId shape;
+	// b2ShapeId shape;
 } CoinData;
 
-void CreateCoinSensor(Actor *this, const b2WorldId worldId)
+void CreateCoinSensor(Actor *this, JPH_BodyInterface *bodyInterface)
 {
-	CoinData *data = this->extraData;
-	b2ShapeId *shapeId = &data->shape;
-
-	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	sensorBodyDef.type = b2_staticBody;
-	sensorBodyDef.position = this->position;
-	this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	this->actorWall->box2dBodyId = this->bodyId;
-	const b2Circle sensorShape = {
-		.radius = 0.5f,
-	};
-	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	sensorShapeDef.isSensor = true;
-	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	*shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
+	// CoinData *data = this->extraData;
+	// b2ShapeId *shapeId = &data->shape;
+	//
+	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
+	// sensorBodyDef.type = b2_staticBody;
+	// sensorBodyDef.position = this->position;
+	// this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
+	// this->actorWall->box2dBodyId = this->bodyId;
+	// const b2Circle sensorShape = {
+	// 	.radius = 0.5f,
+	// };
+	// b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
+	// sensorShapeDef.isSensor = true;
+	// sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
+	// sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
+	// *shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
 }
 
-void CoinInit(Actor *this, const b2WorldId worldId, const KvList *params)
+void CoinInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	CoinData *data = calloc(1, sizeof(CoinData));
 	CheckAlloc(data);
@@ -59,7 +57,7 @@ void CoinInit(Actor *this, const b2WorldId worldId, const KvList *params)
 								 0.0f);
 	WallBake(this->actorWall);
 
-	CreateCoinSensor(this, worldId);
+	CreateCoinSensor(this, bodyInterface);
 
 	this->actorWall->height = 0.25f;
 	this->yPosition = -0.25f;
@@ -77,32 +75,32 @@ void CoinUpdate(Actor *this, double /*delta*/)
 		this->actorWall->uvOffset = uvo;
 	}
 
-	const Vector2 playerPosition = GetState()->level->player.pos;
+	const Vector2 playerPosition = GetState()->level->player.position;
 	const float rotation = atan2f(playerPosition.y - this->position.y, playerPosition.x - this->position.x) + PIf / 2;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
 
-	if (GetSensorState(GetState()->level->worldId, data->shape.index1, false))
-	{
-		if (!data->isBlue)
-		{
-			GetState()->saveData->coins++;
-		} else
-		{
-			GetState()->saveData->blueCoins++;
-			GetState()->saveData->coins += 5;
-		}
-		PlaySoundEffect(SOUND("sfx_coincling"));
-		ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE); // 2 = coin collected
-		RemoveActor(this);
-	}
+	// if (GetSensorState(GetState()->level->worldId, data->shape.index1, false))
+	// {
+	// 	if (!data->isBlue)
+	// 	{
+	// 		GetState()->saveData->coins++;
+	// 	} else
+	// 	{
+	// 		GetState()->saveData->blueCoins++;
+	// 		GetState()->saveData->coins += 5;
+	// 	}
+	// 	PlaySoundEffect(SOUND("sfx_coincling"));
+	// 	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE); // 2 = coin collected
+	// 	RemoveActor(this);
+	// }
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void CoinDestroy(Actor *this)
 {
-	b2DestroyBody(this->bodyId);
-	((CoinData *)this->extraData)->shape = b2_nullShapeId;
+	// b2DestroyBody(this->bodyId);
+	// ((CoinData *)this->extraData)->shape = b2_nullShapeId;
 	free(this->actorWall);
 	this->actorWall = NULL;
 	free(this->extraData);

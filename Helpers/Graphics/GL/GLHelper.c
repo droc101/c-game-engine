@@ -1061,10 +1061,10 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 	mat4 worldViewMatrix;
 	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translated(skyModelWorldMatrix, (vec3){(float)level->player.pos.x, 0, (float)level->player.pos.y});
+	glm_translated(skyModelWorldMatrix, (vec3){(float)level->player.position.x, 0, (float)level->player.position.y});
 
-	const Vector2 floorStart = v2(level->player.pos.x - 100, level->player.pos.y - 100);
-	const Vector2 floorEnd = v2(level->player.pos.x + 100, level->player.pos.y + 100);
+	const Vector2 floorStart = v2(level->player.position.x - 100, level->player.position.y - 100);
+	const Vector2 floorEnd = v2(level->player.position.x + 100, level->player.position.y + 100);
 
 	GL_SetLevelParams(&worldViewMatrix, level);
 

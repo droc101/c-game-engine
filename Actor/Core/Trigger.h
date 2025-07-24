@@ -5,10 +5,9 @@
 #ifndef TRIGGER_H
 #define TRIGGER_H
 
-#include <box2d/id.h>
 #include "../../defines.h"
 
-void TriggerInit(Actor *this, b2WorldId worldId, const KvList *params);
+void TriggerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 
 void TriggerUpdate(Actor *this, double /*delta*/);
 

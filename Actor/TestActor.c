@@ -3,7 +3,6 @@
 //
 
 #include "TestActor.h"
-#include <box2d/box2d.h>
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
@@ -26,8 +25,8 @@ void TestActorIdle(Actor *this, const double delta)
 {
 	const NavigationConfig *navigationConfig = this->extraData;
 	this->rotation += 0.01f;
-	const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
-	b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
+	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
+	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
 }
 
 void TestActorTargetReached(Actor *this, const double delta)
@@ -36,31 +35,31 @@ void TestActorTargetReached(Actor *this, const double delta)
 	this->rotation += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
-void CreateTestActorCollider(Actor *this, const b2WorldId worldId)
+void CreateTestActorCollider(Actor *this, JPH_BodyInterface *bodyInterface)
 {
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position = this->position;
-	bodyDef.fixedRotation = true;
-	bodyDef.linearDamping = 5;
-	this->bodyId = b2CreateBody(worldId, &bodyDef);
-	const b2Circle circle = {
-		.radius = 0.2867f,
-	};
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR_ENEMY;
-	b2CreateCircleShape(this->bodyId, &shapeDef, &circle);
-	const b2Circle hurtbox = {
-		.radius = 0.28f,
-	};
-	b2ShapeDef hurtboxDef = b2DefaultShapeDef();
-	hurtboxDef.filter.categoryBits = COLLISION_GROUP_HURTBOX;
-	b2CreateCircleShape(this->bodyId, &hurtboxDef, &hurtbox);
+	// b2BodyDef bodyDef = b2DefaultBodyDef();
+	// bodyDef.type = b2_dynamicBody;
+	// bodyDef.position = this->position;
+	// bodyDef.fixedRotation = true;
+	// bodyDef.linearDamping = 5;
+	// this->bodyId = b2CreateBody(worldId, &bodyDef);
+	// const b2Circle circle = {
+	// 	.radius = 0.2867f,
+	// };
+	// b2ShapeDef shapeDef = b2DefaultShapeDef();
+	// shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR_ENEMY;
+	// b2CreateCircleShape(this->bodyId, &shapeDef, &circle);
+	// const b2Circle hurtbox = {
+	// 	.radius = 0.28f,
+	// };
+	// b2ShapeDef hurtboxDef = b2DefaultShapeDef();
+	// hurtboxDef.filter.categoryBits = COLLISION_GROUP_HURTBOX;
+	// b2CreateCircleShape(this->bodyId, &hurtboxDef, &hurtbox);
 }
 
-void TestActorInit(Actor *this, const b2WorldId worldId, const KvList * /*params*/)
+void TestActorInit(Actor *this, const KvList * /*params*/, JPH_BodyInterface *bodyInterface)
 {
-	CreateTestActorCollider(this, worldId);
+	CreateTestActorCollider(this, bodyInterface);
 
 	this->actorModel = LoadModel(MODEL("model_leafy"));
 	this->currentSkinIndex = 0;
@@ -83,7 +82,7 @@ void TestActorInit(Actor *this, const b2WorldId worldId, const KvList * /*params
 
 void TestActorUpdate(Actor *this, const double delta)
 {
-	this->position = b2Body_GetPosition(this->bodyId);
+	// this->position = b2Body_GetPosition(this->bodyId);
 
 	NavigationStep(this, this->extraData, delta);
 }
@@ -92,5 +91,5 @@ void TestActorUpdate(Actor *this, const double delta)
 void TestActorDestroy(Actor *this)
 {
 	free(this->extraData);
-	b2DestroyBody(this->bodyId);
+	// b2DestroyBody(this->bodyId);
 }

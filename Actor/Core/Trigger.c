@@ -3,8 +3,6 @@
 //
 
 #include "Trigger.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
 #include "../../Helpers/Collision.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
@@ -28,7 +26,7 @@ typedef struct TriggerData
 	bool enabled;
 	bool playerIsColliding;
 	bool oneShotHasBeenFired;
-	b2ShapeId shape;
+	// b2ShapeId shape;
 } TriggerData;
 
 bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -56,23 +54,23 @@ bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, c
 	return false;
 }
 
-void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rotation, const b2WorldId worldId)
+void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rotation, JPH_BodyInterface *bodyInterface)
 {
-	TriggerData *data = trigger->extraData;
-	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	sensorBodyDef.type = b2_staticBody;
-	sensorBodyDef.position = position;
-	const b2BodyId bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	const b2Polygon sensorShape = b2MakeOffsetBox(data->width * 0.5f, data->depth * 0.5f, (Vector2){0, 0}, rotation);
-	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	sensorShapeDef.isSensor = true;
-	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
-	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	data->shape = b2CreatePolygonShape(bodyId, &sensorShapeDef, &sensorShape);
-	trigger->bodyId = bodyId;
+	// TriggerData *data = trigger->extraData;
+	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
+	// sensorBodyDef.type = b2_staticBody;
+	// sensorBodyDef.position = position;
+	// const b2BodyId bodyId = b2CreateBody(worldId, &sensorBodyDef);
+	// const b2Polygon sensorShape = b2MakeOffsetBox(data->width * 0.5f, data->depth * 0.5f, (Vector2){0, 0}, rotation);
+	// b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
+	// sensorShapeDef.isSensor = true;
+	// sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
+	// sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
+	// data->shape = b2CreatePolygonShape(bodyId, &sensorShapeDef, &sensorShape);
+	// trigger->bodyId = bodyId;
 }
 
-void TriggerInit(Actor *this, const b2WorldId worldId, const KvList *params)
+void TriggerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
@@ -83,7 +81,7 @@ void TriggerInit(Actor *this, const b2WorldId worldId, const KvList *params)
 	data->enabled = KvGetBool(params, "startEnabled", true);
 	data->playerIsColliding = false;
 	data->oneShotHasBeenFired = false;
-	CreateTriggerSensor(this, this->position, this->rotation, worldId);
+	CreateTriggerSensor(this, this->position, this->rotation, bodyInterface);
 	this->SignalHandler = TriggerSignalHandler;
 }
 
@@ -92,35 +90,35 @@ void TriggerUpdate(Actor *this, double /*delta*/)
 	TriggerData *data = this->extraData;
 	if (data->enabled)
 	{
-		if (GetSensorState(GetState()->level->worldId, data->shape.index1, data->playerIsColliding))
-		{
-			if (!data->playerIsColliding)
-			{
-				ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
-				data->playerIsColliding = true;
-			}
-			if (!data->oneShotHasBeenFired)
-			{
-				ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
-				data->oneShotHasBeenFired = data->oneShot;
-			}
-		} else if (data->playerIsColliding)
-		{
-			ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
-			data->playerIsColliding = false;
-			if (data->oneShotHasBeenFired)
-			{
-				RemoveActor(this);
-			}
-		}
+		// if (GetSensorState(GetState()->level->worldId, data->shape.index1, data->playerIsColliding))
+		// {
+		// 	if (!data->playerIsColliding)
+		// 	{
+		// 		ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
+		// 		data->playerIsColliding = true;
+		// 	}
+		// 	if (!data->oneShotHasBeenFired)
+		// 	{
+		// 		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+		// 		data->oneShotHasBeenFired = data->oneShot;
+		// 	}
+		// } else if (data->playerIsColliding)
+		// {
+		// 	ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
+		// 	data->playerIsColliding = false;
+		// 	if (data->oneShotHasBeenFired)
+		// 	{
+		// 		RemoveActor(this);
+		// 	}
+		// }
 	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void TriggerDestroy(Actor *this)
 {
-	b2DestroyBody(this->bodyId);
-	((TriggerData *)this->extraData)->shape = b2_nullShapeId;
+	// b2DestroyBody(this->bodyId);
+	// ((TriggerData *)this->extraData)->shape = b2_nullShapeId;
 	free(this->extraData);
 	this->extraData = NULL;
 }

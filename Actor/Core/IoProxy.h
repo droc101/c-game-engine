@@ -5,10 +5,9 @@
 #ifndef IOPROXY_H
 #define IOPROXY_H
 
-#include <box2d/id.h>
 #include "../../defines.h"
 
-void IoProxyInit(Actor *this, b2WorldId worldId, const KvList *params);
+void IoProxyInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 
 void IoProxyUpdate(Actor *this, double /*delta*/);
 

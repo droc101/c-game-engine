@@ -3,88 +3,130 @@
 //
 
 #include "Level.h"
-#include <box2d/box2d.h>
 #include <string.h>
+#include "../Debug/JoltDebugRenderer.h"
 #include "../defines.h"
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "Actor.h"
 #include "GlobalState.h"
 #include "Vector2.h"
 #include "Wall.h"
 
+void InitJolt(Level *level)
+{
+	JPH_BroadPhaseLayerInterface *broadPhaseLayerInterface = JPH_BroadPhaseLayerInterfaceTable_Create(2, 2);
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
+																 OBJECT_LAYER_STATIC,
+																 BROADPHASE_LAYER_STATIC);
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
+																 OBJECT_LAYER_DYNAMIC,
+																 BROADPHASE_LAYER_DYNAMIC);
+
+	JPH_ObjectLayerPairFilter *objectLayerPairFilter = JPH_ObjectLayerPairFilterTable_Create(2);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_STATIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_DYNAMIC);
+
+	const JPH_PhysicsSystemSettings physicsSystemSettings = {
+		.broadPhaseLayerInterface = broadPhaseLayerInterface,
+		.objectLayerPairFilter = objectLayerPairFilter,
+		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broadPhaseLayerInterface,
+																					   2,
+																					   objectLayerPairFilter,
+																					   2),
+	};
+	level->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
+
+	const JPH_Plane plane = {
+		.normal.y = 1,
+	};
+	JPH_BodyCreationSettings *floorSettings = JPH_BodyCreationSettings_Create3(
+			(const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 50),
+			(Vector3[]){{0.0f, -0.5f, 0.0f}},
+			NULL, // Because joltc doesn't expose JPH::Quat::sIdentity() this is what we have to do to get the identity quaternion (which is [0, 0, 0, 1])
+			JPH_MotionType_Static,
+			OBJECT_LAYER_STATIC);
+
+	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem),
+															floorSettings,
+															JPH_Activation_DontActivate);
+	JPH_BodyCreationSettings_Destroy(floorSettings);
+}
+
 void CreatePlayerCollider(Level *level)
 {
-	b2BodyDef playerBodyDef = b2DefaultBodyDef();
-	playerBodyDef.type = b2_dynamicBody;
-	playerBodyDef.position = level->player.pos;
-	playerBodyDef.fixedRotation = true;
-	playerBodyDef.linearDamping = 12;
-	level->player.bodyId = b2CreateBody(level->worldId, &playerBodyDef);
-	const b2Circle playerShape = {
-		.center = level->player.pos,
-		.radius = 0.25f,
+	const JPH_CharacterSettings characterSettings = {
+		.base.up = {0.0f, 1.0f, 0.0f},
+		.base.supportingVolume.normal.y = 1.0f,
+		.base.supportingVolume.distance = -1.0e10f, // Default value in Jolt
+		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
+		.base.enhancedInternalEdgeRemoval = true,
+		.base.shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f),
+		.layer = OBJECT_LAYER_DYNAMIC,
+		.mass = 80.0f,
+		.friction = 25.0f,
+		.gravityFactor = 1.0f,
+		.allowedDOFs = JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_TranslationZ,
 	};
-	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
-	playerShapeDef.filter.categoryBits = COLLISION_GROUP_PLAYER;
-	b2CreateCircleShape(level->player.bodyId, &playerShapeDef, &playerShape);
+	level->player.joltCharacter = JPH_Character_Create(&characterSettings,
+													   (Vector3[]){{0.0f, 0.0f, 0.0f}},
+													   NULL,
+													   0,
+													   level->physicsSystem);
+	JPH_Character_AddToPhysicsSystem(level->player.joltCharacter, JPH_Activation_DontActivate, false);
 }
 
-Level *CreateLevel()
+Level *CreateLevel(void)
 {
-	Level *l = malloc(sizeof(Level));
-	CheckAlloc(l);
-	ListInit(l->actors, LIST_POINTER);
-	ListInit(l->walls, LIST_POINTER);
-	b2WorldDef worldDef = b2DefaultWorldDef();
-	worldDef.gravity.y = 0;
-	l->worldId = b2CreateWorld(&worldDef);
-	l->player.pos = v2s(0);
-	l->player.angle = 0;
-	CreatePlayerCollider(l);
-	l->hasCeiling = false;
-	strncpy(l->ceilOrSkyTex, "texture/level_sky_test.gtex", 28);
-	strncpy(l->floorTex, "texture/level_floor_test.gtex", 30);
-	strncpy(l->music, "none", 5);
-	l->fogColor = 0xff000000;
-	l->fogStart = 10;
-	l->fogEnd = 30;
-	strncpy(l->name, "Unnamed Level", 32);
-	l->courseNum = -1;
-	l->ioProxy = NULL;
-	ListInit(l->namedActorNames, LIST_POINTER);
-	ListInit(l->namedActorPointers, LIST_POINTER);
-	return l;
+	Level *level = malloc(sizeof(Level));
+	CheckAlloc(level);
+	ListInit(level->actors, LIST_POINTER);
+	ListInit(level->walls, LIST_POINTER);
+	InitJolt(level);
+	level->player.position = v2s(0);
+	level->player.angle = 0;
+	CreatePlayerCollider(level);
+	level->hasCeiling = false;
+	strncpy(level->ceilOrSkyTex, "texture/level_sky_test.gtex", 28);
+	strncpy(level->floorTex, "texture/level_floor_test.gtex", 30);
+	strncpy(level->music, "none", 5);
+	level->fogColor = 0xff000000;
+	level->fogStart = 10;
+	level->fogEnd = 30;
+	strncpy(level->name, "Unnamed Level", 32);
+	level->courseNum = -1;
+	level->ioProxy = NULL;
+	ListInit(level->namedActorNames, LIST_POINTER);
+	ListInit(level->namedActorPointers, LIST_POINTER);
+	return level;
 }
 
-void DestroyLevel(Level *l)
+void DestroyLevel(Level *level)
 {
-	for (int i = 0; i < l->actors.length; i++)
+	for (int i = 0; i < level->actors.length; i++)
 	{
-		Actor *actor = ListGetPointer(l->actors, i);
+		Actor *actor = ListGetPointer(level->actors, i);
 		FreeActor(actor);
 	}
-	JPH_PhysicsSystem *physicsSystem = GetState()->physicsSystem;
-	assert(physicsSystem);
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(physicsSystem);
-	for (int i = 0; i < l->walls.length; i++)
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
+	for (int i = 0; i < level->walls.length; i++)
 	{
-		Wall *wall = ListGetPointer(l->walls, i);
-		if (JPH_BodyInterface_IsActive(bodyInterface, wall->bodyId))
-		{
-			asm("nop");
-		}
+		Wall *wall = ListGetPointer(level->walls, i);
 		FreeWall(bodyInterface, wall);
 	}
 
-	b2DestroyWorld(l->worldId);
+	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
+	JPH_Character_RemoveFromPhysicsSystem(level->player.joltCharacter, true);
 
-	ListAndContentsFree(l->namedActorNames);
-	ListFree(l->namedActorPointers);
-	ListFree(l->actors);
-	ListFree(l->walls);
-	free(l);
-	l = NULL;
+	JPH_PhysicsSystem_Destroy(level->physicsSystem);
+
+	ListAndContentsFree(level->namedActorNames);
+	ListFree(level->namedActorPointers);
+	ListFree(level->actors);
+	ListFree(level->walls);
+	free(level);
+	level = NULL;
 }
 
 void AddActor(Actor *actor)

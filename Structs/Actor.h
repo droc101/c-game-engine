@@ -40,23 +40,16 @@ enum ActorType
  * @param rotation Actor rotation
  * @param actorType Actor type
  * @param params Parameters for the actor, can be NULL
- * @param worldId The Box2D world within which to create the actor
+ * @param bodyInterface The Joly body interface within which to create the actor's rigid body
  * @return Initialized Actor struct
  */
-Actor *CreateActor(Vector2 position, float rotation, uint actorType, KvList *params, b2WorldId worldId);
+Actor *CreateActor(Vector2 position, float rotation, uint actorType, KvList *params, JPH_BodyInterface *bodyInterface);
 
 /**
  * Destroy an Actor
  * @param actor actor to destroy
  */
 void FreeActor(Actor *actor);
-
-/**
- * 
- * @param this The actor to create the collider for
- * @param worldId The world within which to create the collider
- */
-void CreateActorWallCollider(Actor *this, b2WorldId worldId);
 
 /**
  * Directly trigger an input on an actor

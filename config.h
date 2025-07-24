@@ -24,9 +24,12 @@
 #pragma region Movement
 
 /// Player movement speed
-#define MOVE_SPEED 0.237f
-/// Player movement speed when shift is held
-#define SLOW_MOVE_SPEED 0.0237f
+#define MOVE_SPEED 6.25f
+/// Player movement speed when ctrl is held
+#define SLOW_MOVE_SPEED 0.625f
+
+/// The maximum angle that the player can walk on, in degrees
+#define MAX_WALKABLE_SLOPE 50.0f
 
 #define STICK_DEADZONE 0.1
 

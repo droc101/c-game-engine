@@ -100,10 +100,11 @@ bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void LogicCounterInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
+void LogicCounterInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
 {
-	LogicCounterData *data = malloc(sizeof(LogicCounterData));
-	CheckAlloc(data);
+	this->extraData = malloc(sizeof(LogicCounterData));
+	CheckAlloc(this->extraData);
+	LogicCounterData *data = this->extraData;
 	data->min = KvGetInt(params, "min", 0);
 	data->max = KvGetInt(params, "max", 100);
 	data->counter = KvGetInt(params, "counter", 0);

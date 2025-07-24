@@ -3,7 +3,6 @@
 //
 
 #include "GMainState.h"
-#include <box2d/box2d.h>
 #include <math.h>
 #include <stdio.h>
 #include "../Debug/DPrint.h"
@@ -109,15 +108,15 @@ void CalculateMoveVec(const double delta, const Player *player, Vector2 *moveVec
 
 void GMainStateFixedUpdate(GlobalState *state, const double delta)
 {
-	Level *l = state->level;
+	Level *level = state->level;
 
 	Vector2 moveVec;
 	bool isMoving;
-	CalculateMoveVec(delta, &l->player, &moveVec, &isMoving);
+	CalculateMoveVec(delta, &level->player, &moveVec, &isMoving);
 
 	if (isMoving)
 	{
-		b2Body_ApplyLinearImpulseToCenter(l->player.bodyId, moveVec, true);
+		JPH_Character_SetLinearVelocity(level->player.joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}}, true);
 	}
 
 	if (UseController())
@@ -129,26 +128,31 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			l->player.angle += cx * (float)state->options.mouseSpeed / 11.25f;
+			level->player.angle += cx * (float)state->options.mouseSpeed / 11.25f;
 		}
 	}
 
-	const float velocity = Vector2Length(b2Body_GetLinearVelocity(l->player.bodyId));
-	const float bobHeight = remap(velocity, 0, MOVE_SPEED, 0, 0.003);
+	Vector3 velocity;
+	JPH_Character_GetLinearVelocity(level->player.joltCharacter, &velocity);
+	const float bobHeight = remap(JPH_Vec3_Length(&velocity), 0, MOVE_SPEED, 0, 0.03);
 	state->cameraY = 0.1 + sin((double)state->physicsFrame / 7.0) * bobHeight;
 	state->viewmodel.translation[1] = -0.35f + ((float)state->cameraY * 0.2f);
 
-	l->player.angle = wrap(l->player.angle, 0, 2 * PI);
+	level->player.angle = wrap(level->player.angle, 0, 2 * PI);
 
-	for (int i = 0; i < l->actors.length; i++)
+	for (int i = 0; i < level->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(l->actors, i);
+		Actor *a = ListGetPointer(level->actors, i);
 		a->Update(a, delta);
 	}
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(state->level->player.pos, 0, TEST_ACTOR, NULL, state->level->worldId);
+		Actor *leaf = CreateActor(level->player.position,
+								  0,
+								  TEST_ACTOR,
+								  NULL,
+								  JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem));
 		AddActor(leaf);
 	}
 
@@ -166,8 +170,13 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		Error("Failed to signal LOD thread start semaphore!");
 	}
 
-	b2World_Step(l->worldId, (float)delta / PHYSICS_TARGET_TPS, 4);
-	l->player.pos = b2Body_GetPosition(l->player.bodyId);
+	// b2World_Step(level->worldId, (float)delta / PHYSICS_TARGET_TPS, 4);
+	Vector3 position;
+	JPH_Character_GetPosition(level->player.joltCharacter, &position, true);
+	level->player.position.x = position.x;
+	level->player.position.y = position.z;
+
+	JPH_PhysicsSystem_Update(level->physicsSystem, (float)delta / PHYSICS_TARGET_TPS, 1, state->jobSystem);
 
 	if (WaitForLodThreadToEnd() != 0)
 	{
@@ -180,7 +189,7 @@ void GMainStateRender(GlobalState *state)
 {
 	const Level *level = state->level;
 
-	JoltDebugRendererDrawBodies(state->physicsSystem);
+	JoltDebugRendererDrawBodies(level->physicsSystem);
 	RenderLevel3D(level, state->cam);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
@@ -212,8 +221,8 @@ void GMainStateRender(GlobalState *state)
 	DPrintF("Position: (%.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
 			COLOR_WHITE,
 			false,
-			level->player.pos.x,
-			level->player.pos.y,
+			level->player.position.x,
+			level->player.position.y,
 			fabsf(level->player.angle),
 			radToDeg(fabsf(level->player.angle)));
 

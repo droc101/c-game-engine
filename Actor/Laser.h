@@ -5,7 +5,6 @@
 #ifndef LASER_H
 #define LASER_H
 
-#include <box2d/box2d.h>
 #include "../defines.h"
 
 #define LASER_INPUT_DISABLE 1
@@ -19,7 +18,7 @@ typedef enum LaserHeight
 	LASER_HEIGHT_TRIPLE
 } LaserHeight;
 
-void LaserInit(Actor *this, b2WorldId worldId, const KvList *params);
+void LaserInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 void LaserUpdate(Actor *this, double delta);
 void LaserDestroy(Actor *this);
 

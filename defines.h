@@ -5,8 +5,6 @@
 #ifndef GAME_DEFINES_H
 #define GAME_DEFINES_H
 
-#include <box2d/id.h>
-#include <box2d/math_functions.h>
 #include <cglm/cglm.h>
 #include <joltc.h>
 #include <SDL.h>
@@ -36,7 +34,7 @@ typedef enum ParamType ParamType;
 // Struct forward declarations
 typedef struct Viewmodel Viewmodel;
 typedef struct GlobalState GlobalState;
-typedef b2Vec2 Vector2;
+typedef struct Vector2 Vector2;
 typedef JPH_Vec3 Vector3;
 typedef JPH_Vec4 Vector4;
 typedef struct Camera Camera;
@@ -64,7 +62,7 @@ typedef void (*FrameUpdateFunction)(GlobalState *state);
 
 typedef void (*FrameRenderFunction)(GlobalState *state);
 
-typedef void (*ActorInitFunction)(Actor *this, b2WorldId worldId, const KvList *params);
+typedef void (*ActorInitFunction)(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
 
 typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
@@ -264,6 +262,12 @@ enum ParamType
 
 #pragma region Struct definitions
 
+struct Vector2
+{
+	float x;
+	float y;
+};
+
 struct Viewmodel
 {
 	bool enabled;
@@ -324,11 +328,11 @@ struct Camera
 struct Player
 {
 	/// The player's position
-	Vector2 pos;
+	Vector2 position;
 	/// The player's rotation
 	float angle;
-	/// The player's Box2D body ID
-	b2BodyId bodyId;
+	/// The Jolt character. Includes the rigid body as well as other useful abstractions
+	JPH_Character *joltCharacter;
 };
 
 // Utility functions are in Structs/wall.h
@@ -354,8 +358,6 @@ struct Wall
 	float uvOffset;
 	/// height of the wall for rendering. Does not affect collision
 	float height;
-	/// The wall's Box2D body ID
-	b2BodyId box2dBodyId;
 	/// Jolt body ID
 	JPH_BodyID bodyId;
 };
@@ -390,8 +392,8 @@ struct Level
 	/// The distance from the player at which the fog is fully opaque
 	float fogEnd;
 
-	/// The ID of the Box2D world
-	b2WorldId worldId;
+	JPH_PhysicsSystem *physicsSystem;
+	uint floorBodyId;
 
 	/// The player object
 	Player player;
@@ -459,7 +461,6 @@ struct GlobalState
 	Level *level;
 
 	JPH_JobSystem *jobSystem;
-	JPH_PhysicsSystem *physicsSystem;
 
 	/// State update function
 	FrameUpdateFunction UpdateGame;
@@ -559,9 +560,6 @@ struct Actor
 	int health;
 	/// Extra data for the actor
 	void *extraData;
-
-	/// The actor's Box2D body ID
-	b2BodyId bodyId;
 };
 
 struct Asset

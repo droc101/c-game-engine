@@ -11,13 +11,13 @@
  * Create a default empty level
  * @return Blank level
  */
-Level *CreateLevel();
+Level *CreateLevel(void);
 
 /**
  * Destroy a level and everything in it
- * @param l Level to destroy
+ * @param level Level to destroy
  */
-void DestroyLevel(Level *l);
+void DestroyLevel(Level *level);
 
 /**
  * Add an actor to the level
