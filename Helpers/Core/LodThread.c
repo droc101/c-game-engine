@@ -116,7 +116,7 @@ int LodThreadMain(void *)
 void LodThreadInit()
 {
 	canStart = SDL_CreateSemaphore(0);
-	hasEnded = SDL_CreateSemaphore(0);
+	hasEnded = SDL_CreateSemaphore(1);
 	mutex = SDL_CreateMutex();
 	lodThread = SDL_CreateThread(LodThreadMain, "GameLODThread", NULL);
 }

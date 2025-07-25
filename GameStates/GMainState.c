@@ -13,6 +13,7 @@
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Core/LodThread.h"
+#include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
@@ -26,7 +27,8 @@
 Actor *targetedEnemy = NULL;
 bool lodThreadInitDone = false;
 
-void GMainStateUpdate(GlobalState *State)
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+void GMainStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
@@ -35,90 +37,73 @@ void GMainStateUpdate(GlobalState *State)
 		return;
 	}
 
-	State->level->player.angle += GetMouseRel().x * (float)State->options.mouseSpeed / 120.0f;
+	state->level->player.angle += GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
 
-	if (State->saveData->coins > 9999)
+	if (state->saveData->coins > 9999)
 	{
-		State->saveData->coins = 9999;
+		state->saveData->coins = 9999;
 	}
-	if (State->saveData->blueCoins > 5)
+	if (state->saveData->blueCoins > 5)
 	{
-		State->saveData->blueCoins = 5;
+		state->saveData->blueCoins = 5;
 	}
 }
 
-void CalculateMoveVec(const double delta, const Player *player, Vector2 *moveVec, bool *isMoving)
+static void MovePlayer(const Player *player, float *distanceTraveled)
 {
-	*moveVec = v2s(0);
-	*isMoving = false;
+	Vector2 moveVec = v2s(0);
 
 	if (UseController())
 	{
-		moveVec->y = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
-		moveVec->x = -GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
-		if (fabsf(moveVec->x) < STICK_DEADZONE)
+		moveVec.y = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
+		moveVec.x = -GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
+		if (fabsf(moveVec.x) < STICK_DEADZONE)
 		{
-			moveVec->x = 0;
+			moveVec.x = 0;
 		}
-		if (fabsf(moveVec->y) < STICK_DEADZONE)
+		if (fabsf(moveVec.y) < STICK_DEADZONE)
 		{
-			moveVec->y = 0;
+			moveVec.y = 0;
 		}
-
 	} else
 	{
-		if (IsKeyPressed(SDL_SCANCODE_W) || GetAxis(SDL_CONTROLLER_AXIS_LEFTY) < -0.5)
+		if (IsKeyPressed(SDL_SCANCODE_W))
 		{
-			moveVec->x += 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_S) || GetAxis(SDL_CONTROLLER_AXIS_LEFTY) > 0.5)
+			moveVec.x += 1;
+		} else if (IsKeyPressed(SDL_SCANCODE_S))
 		{
-			moveVec->x -= 1;
+			moveVec.x -= 1;
 		}
 
-		if (IsKeyPressed(SDL_SCANCODE_A) || GetAxis(SDL_CONTROLLER_AXIS_LEFTX) < -0.5)
+		if (IsKeyPressed(SDL_SCANCODE_A))
 		{
-			moveVec->y -= 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_D) || GetAxis(SDL_CONTROLLER_AXIS_LEFTX) > 0.5)
+			moveVec.y -= 1;
+		} else if (IsKeyPressed(SDL_SCANCODE_D))
 		{
-			moveVec->y += 1;
+			moveVec.y += 1;
 		}
 	}
 
-
-	*isMoving = moveVec->x != 0 || moveVec->y != 0;
-
-	if (*isMoving && !UseController())
+	if (moveVec.x != 0 || moveVec.y != 0)
 	{
-		*moveVec = Vector2Normalize(*moveVec);
+		moveVec = Vector2Normalize(moveVec);
+		*distanceTraveled = MOVE_SPEED;
+		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0.5)
+		{
+			*distanceTraveled = SLOW_MOVE_SPEED;
+		}
+		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), player->angle);
+
+		JPH_Character_SetLinearVelocity(player->joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}}, true);
 	}
-
-
-	float speed = MOVE_SPEED;
-	if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0.5)
-	{
-		speed = SLOW_MOVE_SPEED;
-	}
-
-	speed *= (float)delta;
-
-	Vector2 rotScaled = Vector2Scale(*moveVec, speed);
-	rotScaled = Vector2Rotate(rotScaled, player->angle);
-	*moveVec = rotScaled;
 }
 
 void GMainStateFixedUpdate(GlobalState *state, const double delta)
 {
-	Level *level = state->level;
+	float distanceTraveled = 0;
+	MovePlayer(&state->level->player, &distanceTraveled);
 
-	Vector2 moveVec;
-	bool isMoving;
-	CalculateMoveVec(delta, &level->player, &moveVec, &isMoving);
-
-	if (isMoving)
-	{
-		JPH_Character_SetLinearVelocity(level->player.joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}}, true);
-	}
-
+	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
 	{
 		float cx = GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
@@ -128,31 +113,35 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			level->player.angle += cx * (float)state->options.mouseSpeed / 11.25f;
+			state->level->player.angle += cx * (float)state->options.mouseSpeed / 11.25f;
 		}
 	}
 
-	Vector3 velocity;
-	JPH_Character_GetLinearVelocity(level->player.joltCharacter, &velocity);
-	const float bobHeight = remap(JPH_Vec3_Length(&velocity), 0, MOVE_SPEED, 0, 0.03);
+	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED, 0, 0.03);
 	state->cameraY = 0.1 + sin((double)state->physicsFrame / 7.0) * bobHeight;
 	state->viewmodel.translation[1] = -0.35f + ((float)state->cameraY * 0.2f);
 
-	level->player.angle = wrap(level->player.angle, 0, 2 * PI);
+	state->level->player.angle = wrap(state->level->player.angle, 0, 2 * PI);
 
-	for (int i = 0; i < level->actors.length; i++)
+	if (WaitForLodThreadToEnd() != 0)
 	{
-		Actor *a = ListGetPointer(level->actors, i);
+		Error("Failed to wait for LOD thread end semaphore!");
+	}
+	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
+
+	for (int i = 0; i < state->level->actors.length; i++)
+	{
+		Actor *a = ListGetPointer(state->level->actors, i);
 		a->Update(a, delta);
 	}
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(level->player.position,
+		Actor *leaf = CreateActor(state->level->player.position,
 								  0,
 								  TEST_ACTOR,
 								  NULL,
-								  JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem));
+								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
 		AddActor(leaf);
 	}
 
@@ -165,22 +154,27 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 	}
 
+	// This should be before the LOD thread starts because the LOD thread uses player position (race conditions are bad)
+	Vector3 position;
+	JPH_Character_GetPosition(state->level->player.joltCharacter, &position, true);
+	state->level->player.position.x = position.x;
+	state->level->player.position.y = position.z;
+
+	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
 	if (SignalLodThreadCanStart() != 0)
 	{
 		Error("Failed to signal LOD thread start semaphore!");
 	}
 
-	// b2World_Step(level->worldId, (float)delta / PHYSICS_TARGET_TPS, 4);
-	Vector3 position;
-	JPH_Character_GetPosition(level->player.joltCharacter, &position, true);
-	level->player.position.x = position.x;
-	level->player.position.y = position.z;
-
-	JPH_PhysicsSystem_Update(level->physicsSystem, (float)delta / PHYSICS_TARGET_TPS, 1, state->jobSystem);
-
-	if (WaitForLodThreadToEnd() != 0)
+	// This is safe to be here because it does not modify the actors in any way.
+	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
+																   (float)delta / PHYSICS_TARGET_TPS,
+																   1,
+																   state->jobSystem);
+	if (result != JPH_PhysicsUpdateError_None)
 	{
-		Error("Failed to wait for LOD thread end semaphore!");
+		LogError("Failed to update Jolt physics system with error %d", result);
+		Error("Failed to update physics!");
 	}
 }
 
@@ -189,7 +183,7 @@ void GMainStateRender(GlobalState *state)
 {
 	const Level *level = state->level;
 
-	JoltDebugRendererDrawBodies(level->physicsSystem);
+	// JoltDebugRendererDrawBodies(level->physicsSystem);
 	RenderLevel3D(level, state->cam);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
