@@ -4,7 +4,6 @@
 
 #include "GMenuState.h"
 #include <stdio.h>
-#include "../../../Structs/Vector2.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Graphics/Drawing.h"
@@ -13,6 +12,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
+#include "../Structs/Vector2.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
 
