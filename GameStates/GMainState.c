@@ -182,7 +182,7 @@ void GMainStateRender(GlobalState *state)
 	RenderLevel3D(level, state->cam);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
-	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface_hud_ycoin"));
+	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface/hud_ycoin"));
 
 	char coinStr[16];
 	sprintf(coinStr, "%d", state->saveData->coins);
@@ -193,7 +193,7 @@ void GMainStateRender(GlobalState *state)
 	for (int blueCoinIndex = 0; blueCoinIndex < state->saveData->blueCoins; blueCoinIndex++)
 	{
 		coinIconRect.x = WindowWidth() - 260 + blueCoinIndex * 48;
-		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface_hud_bcoin"));
+		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface/hud_bcoin"));
 	}
 
 	Color crosshairColor = COLOR(0xFFFFCCCC);
@@ -204,7 +204,7 @@ void GMainStateRender(GlobalState *state)
 
 	DrawTextureMod(v2((WindowWidth() * 0.5) - 12, (WindowHeight() * 0.5) - 12),
 				   v2s(24),
-				   TEXTURE("interface_crosshair"),
+				   TEXTURE("interface/crosshair"),
 				   crosshairColor);
 
 	DPrintF("Position: (%.2f, %.2f)\nRotation: %.4f (%.2fdeg)",

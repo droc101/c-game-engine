@@ -49,8 +49,8 @@ void LaserInit(Actor *this, b2WorldId, const KvList *params)
 	this->SignalHandler = LaserSignalHandler;
 	this->actorWall = CreateWall(v2s(0),
 								 v2s(0),
-								 data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor_triplelaser")
-																	 : TEXTURE("actor_laser"),
+								 data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser")
+																	 : TEXTURE("actor/laser"),
 								 1.0f,
 								 0.0f);
 

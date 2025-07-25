@@ -37,13 +37,13 @@ bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	if (signal == GOAL_INPUT_ENABLE && !data->enabled)
 	{
 		data->enabled = true;
-		strcpy(this->actorWall->tex, TEXTURE("actor_goal0"));
+		strcpy(this->actorWall->tex, TEXTURE("actor/goal0"));
 		return true;
 	}
 	if (signal == GOAL_INPUT_DISABLE && data->enabled)
 	{
 		data->enabled = false;
-		strcpy(this->actorWall->tex, TEXTURE("actor_goal1"));
+		strcpy(this->actorWall->tex, TEXTURE("actor/goal1"));
 		return true;
 	}
 	return false;
@@ -76,7 +76,7 @@ void GoalInit(Actor *this, const b2WorldId worldId, const KvList *params)
 
 	this->actorWall = CreateWall(v2(0, 0.5f),
 								 v2(0, -0.5f),
-								 data->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"),
+								 data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"),
 								 1.0f,
 								 0.0f);
 	WallBake(this->actorWall);

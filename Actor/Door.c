@@ -143,7 +143,7 @@ bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 void DoorInit(Actor *this, const b2WorldId worldId, const KvList *params)
 {
 	const Vector2 wallEnd = Vector2Normalize(Vector2FromAngle(this->rotation));
-	this->actorWall = CreateWall((Vector2){0, 0}, wallEnd, TEXTURE("actor_door"), 1.0f, 0.0f);
+	this->actorWall = CreateWall((Vector2){0, 0}, wallEnd, TEXTURE("actor/door"), 1.0f, 0.0f);
 	WallBake(this->actorWall);
 
 	CreateDoorCollider(this, worldId, wallEnd);

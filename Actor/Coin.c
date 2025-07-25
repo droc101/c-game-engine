@@ -54,7 +54,7 @@ void CoinInit(Actor *this, const b2WorldId worldId, const KvList *params)
 
 	this->actorWall = CreateWall(v2(0, 0.125f),
 								 v2(0, -0.125f),
-								 data->isBlue ? TEXTURE("actor_bluecoin") : TEXTURE("actor_coin"),
+								 data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"),
 								 1.0f,
 								 0.0f);
 	WallBake(this->actorWall);
