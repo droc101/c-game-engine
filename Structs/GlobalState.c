@@ -20,6 +20,7 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/LevelLoader.h"
 #include "../Structs/Level.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "Camera.h"
 #include "Options.h"
 
@@ -157,21 +158,21 @@ void ChangeMusic(const char *asset)
 	}
 
 	StopMusic(); // stop the current music and free its data
-	const Asset *mp3 = DecompressAsset(asset, true);
-	if (mp3 == NULL)
+	const Asset *music = DecompressAsset(asset, true);
+	if (music == NULL)
 	{
 		LogError("Failed to load music asset.\n");
 		return;
 	}
 
-	if (mp3->type != ASSET_TYPE_MP3)
+	if (music->type != ASSET_TYPE_WAV)
 	{
 		LogWarning("ChangeMusic Error: Asset is not a music file.\n");
 		return;
 	}
 
-	const uint mp3Size = mp3->size;
-	Mix_Music *mus = Mix_LoadMUS_RW(SDL_RWFromConstMem(mp3->data, (int)mp3Size), 1);
+	const uint mp3Size = music->size;
+	Mix_Music *mus = Mix_LoadMUS_RW(SDL_RWFromConstMem(music->data, (int)mp3Size), 1);
 	if (mus == NULL)
 	{
 		printf("Mix_LoadMUS_RW Error: %s\n", Mix_GetError());

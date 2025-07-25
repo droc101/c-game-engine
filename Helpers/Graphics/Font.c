@@ -4,6 +4,7 @@
 
 #include "Font.h"
 #include <string.h>
+#include <ctype.h>
 #include "../../Structs/Vector2.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
@@ -83,7 +84,7 @@ int MeasureLine(const char *str, const int line)
 	return i;
 }
 
-void TextGetLine(const char *str, const int line, char *out, size_t outBufferSize)
+void TextGetLine(const char *str, const int line, char *out, const size_t outBufferSize, const bool convertToUppercase)
 {
 	int start = MeasureLine(str, line);
 
@@ -110,6 +111,14 @@ void TextGetLine(const char *str, const int line, char *out, size_t outBufferSiz
 
 	strncpy(out, str + start, copySize);
 	out[end - start] = '\0';
+
+	if (convertToUppercase)
+	{
+		for (int i = 0; i < copySize; i++)
+		{
+			out[i] = (char)toupper(out[i]);
+		}
+	}
 }
 
 void DrawTextAligned(const char *str,
@@ -147,7 +156,7 @@ void DrawTextAligned(const char *str,
 	for (int i = 0; i < lines; i++)
 	{
 		char line[256];
-		TextGetLine(str, i, line, 256);
+		TextGetLine(str, i, line, 256, font->uppercaseOnly);
 		const Vector2 textSize = MeasureText(line, size, font);
 		if (hAlign == FONT_HALIGN_CENTER)
 		{

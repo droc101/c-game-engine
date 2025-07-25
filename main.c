@@ -151,7 +151,7 @@ void WindowAndRenderInit()
 	SDL_SetWindowMinimumSize(window, MIN_WIDTH, MIN_HEIGHT);
 	SDL_SetWindowMaximumSize(window, MAX_WIDTH, MAX_HEIGHT);
 
-	windowIcon = ToSDLSurface(TEXTURE("interface_icon"), "1");
+	windowIcon = ToSDLSurface(TEXTURE("interface/icon"), "1");
 	SDL_SetWindowIcon(window, windowIcon);
 }
 
@@ -275,11 +275,6 @@ int main(const int argc, char *argv[])
 
 	InitCommonAssets();
 
-	if (!ChangeLevelByName(STARTING_LEVEL))
-	{
-		Error("Failed to load starting level!");
-	}
-
 	GLogoSplashStateSet();
 
 	InitTimers();
@@ -380,11 +375,11 @@ int main(const int argc, char *argv[])
 	LodThreadDestroy();
 	InputDestroy();
 	DestroyGlobalState();
+	RenderDestroy();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);
 	DestroyCommonAssets();
 	DestroyAssetCache(); // Free all assets
-	RenderDestroy();
 	Mix_CloseAudio();
 	Mix_Quit();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);

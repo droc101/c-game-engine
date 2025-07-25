@@ -139,12 +139,10 @@ void GL_DrawActorWall(const Actor *actor);
 
 /**
  * Register a texture from pixel data
- * @param pixelData The raw RGBA8 pixel data
- * @param width The width of the texture
- * @param height The height of the texture
+ * @param image The height of the texture
  * @return The slot the texture was registered in
  */
-int GL_RegisterTexture(const unsigned char *pixelData, int width, int height);
+int GL_RegisterTexture(const Image *image);
 
 /**
  * Draw a textured rectangle to the screen

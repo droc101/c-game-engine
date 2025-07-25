@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <luna/luna.h>
+#include "../../Core/AssetReader.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
 
@@ -89,8 +90,10 @@ bool CreateUIPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_ui"), &vertShaderModule), "Failed to load UI vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_ui"), &fragShaderModule), "Failed to load UI fragment shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/ui_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to load UI vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/ui_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+			   "Failed to load UI fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo uiShaderStages[] = {
 		{
@@ -169,9 +172,9 @@ bool CreateViewModelPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_viewModel"), &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/view_model_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load view model vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_viewModel"), &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/view_model_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load view model fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -289,8 +292,10 @@ bool CreateSkyPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_sky"), &vertShaderModule), "Failed to load sky vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_sky"), &fragShaderModule), "Failed to load sky fragment shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/sky_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to load sky vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/sky_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+			   "Failed to load sky fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -357,9 +362,9 @@ bool CreateFloorAndCeilingPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_floorAndCeiling"), &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/floor_and_ceiling_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load floor and ceiling vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_floorAndCeiling"), &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/floor_and_ceiling_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load floor and ceiling fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -405,8 +410,10 @@ bool CreateWallPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_wall"), &vertShaderModule), "Failed to load wall vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_wall"), &fragShaderModule), "Failed to load wall fragment shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/wall_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to load wall vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/wall_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+			   "Failed to load wall fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -481,9 +488,9 @@ bool CreateActorWallPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actorWall"), &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_wall_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to create actor vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actorWall"), &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_wall_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to create actor fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -591,9 +598,9 @@ bool CreateActorModelShadedPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actorModelShaded"), &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to create actor vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actorModelShaded"), &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to create actor fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -707,9 +714,9 @@ bool CreateActorModelUnshadedPipeline()
 {
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_actorModelUnshaded"), &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to create actor vertex shader!");
-	VulkanTest(CreateShaderModule(VK_FRAG("Vulkan_actorModelUnshaded"), &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to create actor fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {

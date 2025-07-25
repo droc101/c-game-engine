@@ -30,7 +30,7 @@ void GMainStateUpdate(GlobalState *State)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		PlaySoundEffect(SOUND("sfx_popup"));
+		PlaySoundEffect(SOUND("sfx/popup"));
 		GPauseStateSet();
 		return;
 	}

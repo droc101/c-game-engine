@@ -5,6 +5,7 @@
 #include "TestActor.h"
 #include <box2d/box2d.h>
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"

@@ -27,7 +27,7 @@ void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
 
 	if (State->physicsFrame == 20)
 	{
-		PlaySoundEffect(SOUND("sfx_coincling"));
+		PlaySoundEffect(SOUND("sfx/coincling"));
 	}
 
 	if (State->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))
@@ -60,7 +60,7 @@ void GLogoSplashStateRender(GlobalState *State)
 
 	DrawTextureMod(v2((float)destRect.x, (float)destRect.y),
 				   v2((float)destRect.w, (float)destRect.h),
-				   TEXTURE("interface_studio"),
+				   TEXTURE("interface/studio"),
 				   color);
 }
 

@@ -30,7 +30,7 @@ void GPauseStateUpdate(GlobalState * /*State*/)
 		IsButtonJustPressed(CONTROLLER_CANCEL) ||
 		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		PlaySoundEffect(SOUND("sfx_popdown"));
+		PlaySoundEffect(SOUND("sfx/popdown"));
 		GMainStateSet();
 	}
 }

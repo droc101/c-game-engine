@@ -77,3 +77,11 @@ void ReadBytes(const byte *data, size_t *offset, const size_t len, void *dest)
 	memcpy(dest, data + *offset, len);
 	*offset += len;
 }
+
+size_t ReadSizeT(const byte *data, size_t *offset)
+{
+	size_t i;
+	memcpy(&i, data + *offset, sizeof(size_t));
+	*offset += sizeof(size_t);
+	return i;
+}

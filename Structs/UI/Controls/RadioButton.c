@@ -57,7 +57,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 		}
 
 
-		PlaySoundEffect(SOUND("sfx_click"));
+		PlaySoundEffect(SOUND("sfx/click"));
 		data->checked = true;
 
 		// Find all radio buttons with the same group id and uncheck them
@@ -104,5 +104,5 @@ void DrawRadioButton(const Control *c, ControlState /*state*/, const Vector2 pos
 	const Vector2 boxPos = v2(position.x + 2, position.y + c->size.y / 2 - boxSize.y / 2);
 	DrawTexture(boxPos,
 				boxSize,
-				data->checked ? TEXTURE("interface_radio_checked") : TEXTURE("interface_radio_unchecked"));
+				data->checked ? TEXTURE("interface/radio_checked") : TEXTURE("interface/radio_unchecked"));
 }

@@ -56,7 +56,7 @@ void GMenuStateRender(GlobalState *State)
 	logoRect.h = 320;
 	DrawTexture(v2((float)logoRect.x, (float)logoRect.y),
 				v2((float)logoRect.w, (float)logoRect.h),
-				TEXTURE("interface_menu_logo"));
+				TEXTURE("interface/menu_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
 	FontDrawString(v2(20, 200), "DEBUG BUILD", 16, COLOR(0xFF00FF00), smallFont);

@@ -99,4 +99,6 @@ short ReadShort(const byte *data, size_t *offset);
  */
 void ReadBytes(const byte *data, size_t *offset, size_t len, void *dest);
 
+size_t ReadSizeT(const byte *data, size_t *offset);
+
 #endif //GAME_DATAREADER_H

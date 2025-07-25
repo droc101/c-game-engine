@@ -428,17 +428,34 @@ VkResult ResizeActorModelBuffers()
 
 bool LoadTexture(const Image *image)
 {
-	LockLodThreadMutex(); // TODO: This is not a great fix but it works ig
+	LunaSampler sampler = LUNA_NULL_HANDLE;
+	if (image->filter && image->repeat)
+	{
+		sampler = textureSamplers.linearRepeat;
+	}
+	if (image->filter && !image->repeat)
+	{
+		sampler = textureSamplers.linearNoRepeat;
+	}
+	if (!image->filter && image->repeat)
+	{
+		sampler = textureSamplers.nearestRepeat;
+	}
+	if (!image->filter && !image->repeat)
+	{
+		sampler = textureSamplers.nearestNoRepeat;
+	}
+	const bool generateMipmaps = GetState()->options.mipmaps && image->mipmaps;
 	const LunaSampledImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.mipmapLevels = GetState()->options.mipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
-		.generateMipmaps = GetState()->options.mipmaps,
+		.mipmapLevels = generateMipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.generateMipmaps = generateMipmaps,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.pixels = image->pixelData,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		.sampler = textureSamplers.nearestRepeat,
+		.sampler = sampler,
 		.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
@@ -465,7 +482,6 @@ bool LoadTexture(const Image *image)
 		};
 	}
 	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
-	UnlockLodThreadMutex();
 
 	return true;
 }

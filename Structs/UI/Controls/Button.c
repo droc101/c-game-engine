@@ -44,7 +44,7 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint /*
 	const ButtonData *data = (ButtonData *)c->ControlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
-		PlaySoundEffect(SOUND("sfx_click"));
+		PlaySoundEffect(SOUND("sfx/click"));
 		ConsumeMouseButton(SDL_BUTTON_LEFT);
 		ConsumeKey(SDL_SCANCODE_SPACE);
 		ConsumeButton(CONTROLLER_OK);
@@ -57,13 +57,13 @@ void DrawButton(const Control *c, const ControlState state, const Vector2 positi
 	switch (state)
 	{
 		case NORMAL:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface_button"));
+			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button"));
 			break;
 		case HOVER:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface_button_hover"));
+			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_hover"));
 			break;
 		case ACTIVE:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface_button_press"));
+			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_pressed"));
 			break;
 	}
 

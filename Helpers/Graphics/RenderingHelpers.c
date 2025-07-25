@@ -5,7 +5,8 @@
 #include "RenderingHelpers.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Vector2.h"
-#include "../Core/AssetReader.h"
+#include "../Core/AssetLoaders/TextureLoader.h"
+#include "../Core/AssetLoaders/ModelLoader.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
 #include "GL/GLHelper.h"
@@ -61,21 +62,6 @@ inline Vector2 ActualWindowSize()
 	int h;
 	SDL_GetWindowSize(window, &w, &h);
 	return v2((float)w, (float)h);
-}
-
-void SetTexParams(const char *texture, const bool linear, const bool repeat)
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_SetTexParams(texture, linear, repeat);
-			break;
-		case RENDERER_OPENGL:
-			GL_SetTexParams(texture, linear, repeat);
-			break;
-		default:
-			break;
-	}
 }
 
 Vector2 GetTextureSize(const char *texture)

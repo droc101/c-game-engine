@@ -77,14 +77,11 @@
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 0
 #define VERSION_PATCH 1
-#define VERSION_SUFFIX "-dev"
+#define VERSION_SUFFIX "-assets-v2"
 #define VERSION TO_STR(VERSION_MAJOR) "." TO_STR(VERSION_MINOR) "." TO_STR(VERSION_PATCH) VERSION_SUFFIX
 
 #define APPDATA_ORG_NAME "Droc101 Development"
 #define APPDATA_APP_NAME "Game"
-
-/// The level to start on when the game loads
-#define STARTING_LEVEL "leveldata_test"
 
 /// Number of sound effect channels
 /// (sound effects that can play at the same time)

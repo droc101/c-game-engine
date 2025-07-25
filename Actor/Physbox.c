@@ -4,6 +4,7 @@
 
 #include "Physbox.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "box2d/box2d.h"
 
 void CreatePhysboxCollider(Actor *this, const b2WorldId worldId)

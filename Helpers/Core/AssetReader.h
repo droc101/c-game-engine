@@ -7,11 +7,8 @@
 
 #include "../../defines.h"
 
-/// The maximum number of textures that can be loaded in any one execution of the game
-#define MAX_TEXTURES 512
-
-/// The maximum number of models that can be loaded in any one execution of the game
-#define MAX_MODELS 128
+#define ASSET_FORMAT_VERSION 2
+#define ASSET_FORMAT_MAGIC 0x454D4147
 
 /**
  * Initialize the asset cache
@@ -30,7 +27,7 @@ void DestroyAssetCache();
  * @param cache Whether the asset should be cached
  * @return Decompressed asset, including header
  * @warning If the asset is not cached, you will have to pass it to @c FreeAsset. Otherwise,
- * it is kept around until program exit and automaitcally freed.
+ * it is kept around until program exit and automatically freed.
  */
 Asset *DecompressAsset(const char *relPath, bool cache);
 
@@ -42,35 +39,6 @@ Asset *DecompressAsset(const char *relPath, bool cache);
 void RemoveAssetFromCache(const char *relPath);
 
 /**
- * Load an image from disk, falling back to a cached version if possible
- * @param asset The asset to load the image from
- * @return The loaded image, or a 64x64 fallback image if it failed
- */
-Image *LoadImage(const char *asset);
-
-/**
- * Load a model from an asset
- * @param asset The asset to load the model from
- * @return The loaded model, or NULL if it failed
- */
-ModelDefinition *LoadModel(const char *asset);
-
-/**
- * Fetch a cached model from an ID
- * @param id The model ID to fetch
- * @return The model with the given ID
- */
-extern ModelDefinition *GetModelFromId(uint id);
-
-/**
- * Load a font from an asset
- * @param asset The asset to load the font from
- * @return The loaded font, or NULL if it failed
- * @note This pointer is not tracked and must be freed manually.
- */
-Font *LoadFont(const char *asset);
-
-/**
  * Free an asset
  * @param asset The asset to free
  * @warning Only use this on assets that are NOT cached.
@@ -78,12 +46,9 @@ Font *LoadFont(const char *asset);
 void FreeAsset(Asset *asset);
 
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")
-#define MUSIC(assetName) ("audio/" assetName ".gmus")
-#define SOUND(assetName) ("audio/" assetName ".gsnd")
+#define SOUND(assetName) ("sound/" assetName ".gsnd")
 #define LEVEL(assetName) ("level/" assetName ".gmap")
-#define OGL_SHADER(assetName) ("glshader/" assetName ".gshd")
-#define VK_FRAG(assetName) ("vkshader/" assetName ".gfrg")
-#define VK_VERT(assetName) ("vkshader/" assetName ".gvrt")
+#define SHADER(assetName) ("shader/" assetName ".gshd")
 #define MODEL(assetName) ("model/" assetName ".gmdl")
 #define FONT(assetName) ("font/" assetName ".gfon")
 

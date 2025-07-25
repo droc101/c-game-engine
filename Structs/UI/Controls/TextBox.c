@@ -45,7 +45,7 @@ Control *CreateTextBoxControl(const char *placeholder,
 
 void DrawTextBox(const Control *c, ControlState state, Vector2 position)
 {
-	DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface_textbox"));
+	DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/textbox"));
 
 	const TextBoxData *data = (TextBoxData *)c->ControlData;
 

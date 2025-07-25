@@ -47,14 +47,6 @@ void GL_Swap();
 void GL_DestroyGL();
 
 /**
- * Set the filter/repeat parameters for a texture
- * @param texture The texture name
- * @param linear Whether to use linear filtering
- * @param repeat Whether to repeat the texture
- */
-void GL_SetTexParams(const char *texture, bool linear, bool repeat);
-
-/**
  * Draw a rectangle
  * @param pos The position in pixels
  * @param size The size in pixels

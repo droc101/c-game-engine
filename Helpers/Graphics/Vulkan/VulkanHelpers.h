@@ -6,7 +6,8 @@
 #define VULKANHELPERS_H
 
 #include <luna/lunaTypes.h>
-#include "../../Core/AssetReader.h"
+#include "../../Core/AssetLoaders/ShaderLoader.h"
+#include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/Logging.h"
 
 #pragma region macros
@@ -276,7 +277,7 @@ extern Pipelines pipelines;
 extern Buffers buffers;
 #pragma endregion variables
 
-VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule);
+VkResult CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
 
 uint32_t TextureIndex(const char *texture);
 

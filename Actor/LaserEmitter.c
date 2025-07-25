@@ -9,6 +9,7 @@
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "Laser.h"
 
 #define LASER_EMITTER_INPUT_DISABLE 2

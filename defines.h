@@ -150,14 +150,11 @@ typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byt
 enum AssetType
 {
 	ASSET_TYPE_TEXTURE = 0,
-	ASSET_TYPE_MP3 = 1,
-	ASSET_TYPE_WAV = 2,
-	ASSET_TYPE_LEVEL = 3,
-	ASSET_TYPE_GLSL = 4,
-	ASSET_TYPE_SPIRV_FRAG = 5,
-	ASSET_TYPE_SPIRV_VERT = 6,
-	ASSET_TYPE_MODEL = 7,
-	ASSET_TYPE_FONT = 8
+	ASSET_TYPE_WAV = 1,
+	ASSET_TYPE_LEVEL = 2,
+	ASSET_TYPE_SHADER = 3,
+	ASSET_TYPE_MODEL = 4,
+	ASSET_TYPE_FONT = 5
 };
 
 /**
@@ -551,20 +548,25 @@ struct Asset
 	uint size;
 	/// The type of the asset
 	AssetType type;
+	/// The version of the type
+	uint8_t typeVersion;
 	/// The data of the asset
 	byte *data;
 };
 
 struct Image
 {
-	/// The size of the pixel data (width * height * 4)
-	uint pixelDataSize;
 	/// The width of the image
-	uint width;
+	size_t width;
 	/// The height of the image
-	uint height;
+	size_t height;
 	/// The ID of the image. This is generated at runtime and not consistent between runs.
 	uint id;
+
+	bool filter;
+	bool repeat;
+	bool mipmaps;
+
 	/// The name of the image
 	char *name;
 	/// The pixel data of the image
@@ -574,30 +576,30 @@ struct Image
 struct Font
 {
 	/// The texture width of one character
-	uint width;
+	uint32_t width;
 	/// The texture height (including below baseline)
-	uint textureHeight;
+	uint32_t textureHeight;
 	/// The pixel coordinate of the baseline
-	uint baseline;
+	uint32_t baseline;
 	/// The pixels between characters
-	uint charSpacing;
+	uint32_t charSpacing;
 	/// The pixels between lines
-	uint lineSpacing;
+	uint32_t lineSpacing;
 	/// The width of a space character
-	uint spaceWidth;
+	uint32_t spaceWidth;
 	/// The default size of the font, used for calculating scale
-	uint defaultSize;
+	uint32_t defaultSize;
 	/// The number of characters in the font
-	uint charCount;
+	uint32_t charCount;
 	/// Whether this font only contains uppercase characters
 	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char texture[80];
+	char* texture;
 	/// The index of the character in the texture
-	byte indices[128];
+	uint8_t indices[255];
 	/// The width of each character, index directly by the character
-	byte charWidths[128];
+	uint8_t charWidths[255];
 
 	/// The image loaded from the texture
 	Image *image;

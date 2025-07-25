@@ -1,0 +1,40 @@
+//
+// Created by droc101 on 7/24/25.
+//
+
+#include "ShaderLoader.h"
+#include "../AssetReader.h"
+#include "../Error.h"
+#include "../Logging.h"
+#include "../DataReader.h"
+
+Shader* LoadShader(const char *asset)
+{
+	Asset *assetData = DecompressAsset(asset, false);
+	if (assetData == NULL)
+	{
+		LogError("Failed to load shader from asset, asset was NULL!\n");
+		return NULL;
+	}
+	Shader *shader = malloc(sizeof(Shader));
+	CheckAlloc(shader);
+	size_t offset = 0;
+	shader->platform = ReadByte(assetData->data, &offset);
+	shader->type = ReadByte(assetData->data, &offset);
+	shader->glslLength = ReadSizeT(assetData->data, &offset);
+	shader->glsl = calloc(shader->glslLength, sizeof(char));
+	ReadBytes(assetData->data, &offset, shader->glslLength * sizeof(char), shader->glsl);
+	shader->spirvLength = ReadSizeT(assetData->data, &offset);
+	shader->spirv = calloc(shader->spirvLength, sizeof(uint32_t));
+	ReadBytes(assetData->data, &offset, shader->spirvLength * sizeof(uint32_t), shader->spirv);
+	FreeAsset(assetData);
+
+	return shader;
+}
+
+void FreeShader(Shader *shader)
+{
+	free(shader->glsl);
+	free(shader->spirv);
+	free(shader);
+}

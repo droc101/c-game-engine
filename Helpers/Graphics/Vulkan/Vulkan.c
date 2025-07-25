@@ -8,6 +8,8 @@
 #include <SDL_vulkan.h>
 #include <string.h>
 #include "../../CommonAssets.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../../Core/AssetReader.h"
 #include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
 #include "VulkanActors.h"
@@ -661,38 +663,4 @@ void VK_DrawRectOutline(const int32_t x,
 	VK_DrawLine(x + w, y, x + w, y + h, thickness, color);
 	VK_DrawLine(x + w, y + h, x, y + h, thickness, color);
 	VK_DrawLine(x, y + h, x, y, thickness, color);
-}
-
-void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
-{
-	const uint32_t textureIndex = TextureIndex(texture);
-	LunaDescriptorImageInfo imageInfo = {
-		.image = ListGetPointer(textures, textureIndex),
-		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-	};
-	if (linear && repeat)
-	{
-		imageInfo.sampler = textureSamplers.linearRepeat;
-	} else if (linear)
-	{
-		imageInfo.sampler = textureSamplers.linearNoRepeat;
-	} else if (repeat)
-	{
-		imageInfo.sampler = textureSamplers.nearestRepeat;
-	} else
-	{
-		imageInfo.sampler = textureSamplers.nearestNoRepeat;
-	}
-	LunaWriteDescriptorSet writeDescriptors[MAX_FRAMES_IN_FLIGHT];
-	for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		writeDescriptors[i] = (LunaWriteDescriptorSet){
-			.descriptorSet = descriptorSets[i],
-			.bindingName = "Textures",
-			.descriptorArrayElement = textureIndex,
-			.descriptorCount = 1,
-			.imageInfo = &imageInfo,
-		};
-	}
-	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
 }
