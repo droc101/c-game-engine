@@ -62,12 +62,15 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 	level->fogEnd = ReadFloat(data, &offset);
 
 	EXPECT_BYTES(sizeof(float) * 3);
-	level->player.position.x = ReadFloat(data, &offset);
-	level->player.position.y = ReadFloat(data, &offset);
-	level->player.angle = ReadFloat(data, &offset);
+	level->player.transform.position.x = ReadFloat(data, &offset);
+	level->player.transform.position.z = ReadFloat(data, &offset);
 
-	const Vector3 position = {level->player.position.x, 0.0f, level->player.position.y};
-	JPH_Character_SetPosition(level->player.joltCharacter, &position, JPH_Activation_Activate, true);
+	level->player.transform.rotation.y = ReadFloat(data, &offset);
+
+	JPH_Character_SetPosition(level->player.joltCharacter,
+							  &level->player.transform.position,
+							  JPH_Activation_Activate,
+							  true);
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint actorCount = ReadUint(data, &offset);
@@ -75,7 +78,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 	{
 		EXPECT_BYTES(sizeof(float) * 3);
 		const float actorX = ReadFloat(data, &offset);
-		const float actorY = ReadFloat(data, &offset);
+		const float actorZ = ReadFloat(data, &offset);
 		const float actorRotation = ReadFloat(data, &offset);
 		EXPECT_BYTES(sizeof(int) + sizeof(byte) * 4);
 		const uint actorType = ReadUint(data, &offset);
@@ -96,7 +99,10 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			KvSetUnsafe(&params, key, param);
 		}
 
-		Actor *a = CreateActor(v2(actorX, actorY), actorRotation, actorType, &params, bodyInterface);
+		Actor *a = CreateActor((Transform[]){{{actorX, 0.0f, actorZ}, {0.0f, actorRotation, 0.0f}}},
+							   actorType,
+							   &params,
+							   bodyInterface);
 
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);

@@ -21,10 +21,10 @@ bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal,
 	return false;
 }
 
-void TestActorIdle(Actor *this, const double delta)
+void TestActorIdle(Actor *this, const double /*delta*/)
 {
 	const NavigationConfig *navigationConfig = this->extraData;
-	this->rotation += 0.01f;
+	this->transform.rotation.y += 0.01f;
 	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
 	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
 }
@@ -32,7 +32,7 @@ void TestActorIdle(Actor *this, const double delta)
 void TestActorTargetReached(Actor *this, const double delta)
 {
 	const NavigationConfig *navigationConfig = this->extraData;
-	this->rotation += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
+	this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
 void CreateTestActorCollider(Actor *this, JPH_BodyInterface *bodyInterface)
@@ -77,7 +77,8 @@ void TestActorInit(Actor *this, const KvList * /*params*/, JPH_BodyInterface *bo
 	navigationConfig->agroTicks = 120;
 	navigationConfig->IdleFunction = TestActorIdle;
 	navigationConfig->TargetReachedFunction = TestActorTargetReached;
-	navigationConfig->lastKnownTarget = this->position;
+	navigationConfig->lastKnownTarget.x = this->transform.position.x;
+	navigationConfig->lastKnownTarget.y = this->transform.position.z;
 }
 
 void TestActorUpdate(Actor *this, const double delta)

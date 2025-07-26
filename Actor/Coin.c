@@ -16,6 +16,9 @@
 
 #define COIN_OUTPUT_COLLECTED 2
 
+static bool animationControllerHasBeenSet;
+static byte animationFrame;
+
 typedef struct CoinData
 {
 	bool isBlue;
@@ -60,7 +63,7 @@ void CoinInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterfac
 	CreateCoinSensor(this, bodyInterface);
 
 	this->actorWall->height = 0.25f;
-	this->yPosition = -0.25f;
+	this->transform.position.y = -0.25f;
 }
 
 void CoinUpdate(Actor *this, double /*delta*/)
@@ -75,8 +78,9 @@ void CoinUpdate(Actor *this, double /*delta*/)
 		this->actorWall->uvOffset = uvo;
 	}
 
-	const Vector2 playerPosition = GetState()->level->player.position;
-	const float rotation = atan2f(playerPosition.y - this->position.y, playerPosition.x - this->position.x) + PIf / 2;
+	const float rotation = atan2f(GetState()->level->player.transform.position.z - this->transform.position.z,
+								  GetState()->level->player.transform.position.x - this->transform.position.x) +
+						   PIf / 2;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
 

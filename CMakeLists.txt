@@ -102,8 +102,6 @@ add_executable(
         GameStates/GLogoSplashState.h
         Helpers/Graphics/GL/GLHelper.c
         Helpers/Graphics/GL/GLHelper.h
-        Structs/Camera.c
-        Structs/Camera.h
         Helpers/Graphics/RenderingHelpers.c
         Helpers/Graphics/RenderingHelpers.h
         Helpers/Graphics/GL/GLDebug.c
@@ -211,14 +209,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebIn
     set(OVERRIDE_CXX_FLAGS OFF)
     set(GENERATE_DEBUG_SYMBOLS ON)
 endif ()
-set(DEBUG_RENDERER_IN_DEBUG_AND_RELEASE ON)
-set(DEBUG_RENDERER_IN_DISTRIBUTION OFF)
-set(PROFILER_IN_DEBUG_AND_RELEASE OFF)
-set(ENABLE_OBJECT_STREAM OFF)
-set(JPH_SAMPLES OFF)
+#set(DEBUG_RENDERER_IN_DEBUG_AND_RELEASE ON)
 FetchContent_Declare(
         joltc
-        GIT_REPOSITORY https://github.com/amerkoleci/joltc
+        SOURCE_DIR ../../joltc
         GIT_TAG main
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE

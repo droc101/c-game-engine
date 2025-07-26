@@ -5,9 +5,7 @@
 #include "Vulkan.h"
 #include <assert.h>
 #include <luna/luna.h>
-#include <SDL_vulkan.h>
 #include <string.h>
-#include "../../CommonAssets.h"
 #include "../../Core/Error.h"
 #include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
@@ -163,9 +161,9 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 			return VK_ERROR_UNKNOWN;
 		}
 	}
-	pushConstants.position[0] = (float)loadedLevel->player.position.x;
-	pushConstants.position[1] = (float)loadedLevel->player.position.y;
-	pushConstants.yaw = camera->yaw + 1.5f * PIf;
+	pushConstants.position[0] = (float)loadedLevel->player.transform.position.x;
+	pushConstants.position[1] = (float)loadedLevel->player.transform.position.z;
+	pushConstants.yaw = camera->transform.rotation.y + 1.5f * PIf;
 	UpdateTransformMatrix(camera);
 
 	if (LockLodThreadMutex() != 0)

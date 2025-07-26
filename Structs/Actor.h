@@ -36,14 +36,13 @@ enum ActorType
 
 /**
  * Create an Actor
- * @param position Actor position
- * @param rotation Actor rotation
+ * @param transform Actor position
  * @param actorType Actor type
  * @param params Parameters for the actor, can be NULL
  * @param bodyInterface The Joly body interface within which to create the actor's rigid body
  * @return Initialized Actor struct
  */
-Actor *CreateActor(Vector2 position, float rotation, uint actorType, KvList *params, JPH_BodyInterface *bodyInterface);
+Actor *CreateActor(const Transform *transform, uint actorType, KvList *params, JPH_BodyInterface *bodyInterface);
 
 /**
  * Destroy an Actor

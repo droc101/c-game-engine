@@ -11,6 +11,6 @@ void StaticModelInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bo
 	char modelPath[80];
 	snprintf(modelPath, 80, "model/%s.gmdl", KvGetString(params, "model", "model_leafy"));
 	this->actorModel = LoadModel(modelPath);
-	this->yPosition = KvGetFloat(params, "yPosition", 0.0f);
+	this->transform.position.y = KvGetFloat(params, "yPosition", 0.0f);
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 }

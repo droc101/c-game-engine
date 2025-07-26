@@ -24,8 +24,8 @@
 #include "../Structs/Vector2.h"
 #include "GPauseState.h"
 
-Actor *targetedEnemy = NULL;
-bool lodThreadInitDone = false;
+static Actor *targetedEnemy = NULL;
+static bool lodThreadInitDone = false;
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void GMainStateUpdate(GlobalState *state)
@@ -37,7 +37,7 @@ void GMainStateUpdate(GlobalState *state)
 		return;
 	}
 
-	state->level->player.angle += GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
+	state->level->player.transform.rotation.y += GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
 
 	if (state->saveData->coins > 9999)
 	{
@@ -92,7 +92,7 @@ static void MovePlayer(const Player *player, float *distanceTraveled)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
 		}
-		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), player->angle);
+		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), player->transform.rotation.y);
 
 		JPH_Character_SetLinearVelocity(player->joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}}, true);
 	}
@@ -113,15 +113,15 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			state->level->player.angle += cx * (float)state->options.mouseSpeed / 11.25f;
+			state->level->player.transform.rotation.y += cx * (float)state->options.mouseSpeed / 11.25f;
 		}
 	}
 
-	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED, 0, 0.03);
-	state->cameraY = 0.1 + sin((double)state->physicsFrame / 7.0) * bobHeight;
-	state->viewmodel.translation[1] = -0.35f + ((float)state->cameraY * 0.2f);
+	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
+	state->camera->transform.position.y = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
+	state->viewmodel.translation[1] = -0.35f + (state->camera->transform.position.y * 0.2f);
 
-	state->level->player.angle = wrap(state->level->player.angle, 0, 2 * PI);
+	state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
 
 	if (WaitForLodThreadToEnd() != 0)
 	{
@@ -137,8 +137,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(state->level->player.position,
-								  0,
+		Actor *leaf = CreateActor(&state->level->player.transform,
 								  TEST_ACTOR,
 								  NULL,
 								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
@@ -155,10 +154,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	// This should be before the LOD thread starts because the LOD thread uses player position (race conditions are bad)
-	Vector3 position;
-	JPH_Character_GetPosition(state->level->player.joltCharacter, &position, true);
-	state->level->player.position.x = position.x;
-	state->level->player.position.y = position.z;
+	JPH_Character_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position, true);
 
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
 	if (SignalLodThreadCanStart() != 0)
@@ -169,11 +165,11 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	// This is safe to be here because it does not modify the actors in any way.
 	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
 																   (float)delta / PHYSICS_TARGET_TPS,
-																   1,
+																   2,
 																   state->jobSystem);
 	if (result != JPH_PhysicsUpdateError_None)
 	{
-		LogError("Failed to update Jolt physics system with error %d", result);
+		LogError("Failed to update Jolt physics system with error %d\n", result);
 		Error("Failed to update physics!");
 	}
 }
@@ -184,7 +180,7 @@ void GMainStateRender(GlobalState *state)
 	const Level *level = state->level;
 
 	// JoltDebugRendererDrawBodies(level->physicsSystem);
-	RenderLevel3D(level, state->cam);
+	RenderLevel3D(level, state->camera);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
 	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface_hud_ycoin"));
@@ -212,13 +208,14 @@ void GMainStateRender(GlobalState *state)
 				   TEXTURE("interface_crosshair"),
 				   crosshairColor);
 
-	DPrintF("Position: (%.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
+	DPrintF("Position: (%.2f, %.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
 			COLOR_WHITE,
 			false,
-			level->player.position.x,
-			level->player.position.y,
-			fabsf(level->player.angle),
-			radToDeg(fabsf(level->player.angle)));
+			level->player.transform.position.x,
+			level->player.transform.position.y,
+			level->player.transform.position.z,
+			fabsf(level->player.transform.rotation.y),
+			radToDeg(fabsf(level->player.transform.rotation.y)));
 
 	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);

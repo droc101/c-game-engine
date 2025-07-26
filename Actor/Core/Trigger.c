@@ -54,7 +54,7 @@ bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, c
 	return false;
 }
 
-void CreateTriggerSensor(Actor *trigger, const Vector2 position, const float rotation, JPH_BodyInterface *bodyInterface)
+void CreateTriggerSensor(Actor *trigger, const Transform *transform, JPH_BodyInterface *bodyInterface)
 {
 	// TriggerData *data = trigger->extraData;
 	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
@@ -81,7 +81,7 @@ void TriggerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInter
 	data->enabled = KvGetBool(params, "startEnabled", true);
 	data->playerIsColliding = false;
 	data->oneShotHasBeenFired = false;
-	CreateTriggerSensor(this, this->position, this->rotation, bodyInterface);
+	CreateTriggerSensor(this, &this->transform, bodyInterface);
 	this->SignalHandler = TriggerSignalHandler;
 }
 

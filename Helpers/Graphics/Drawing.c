@@ -332,7 +332,7 @@ void RenderMenuBackground()
 void RenderInGameMenuBackground()
 {
 	const GlobalState *state = GetState();
-	RenderLevel3D(state->level, state->cam);
+	RenderLevel3D(state->level, state->camera);
 
 	DrawRect(0, 0, WindowWidth(), WindowHeight(), COLOR(0xA0000000));
 }

@@ -240,13 +240,13 @@ void UpdateTransformMatrix(const Camera *camera)
 						  FAR_Z,
 						  perspectiveMatrix);
 
-	vec3 viewTarget = {cosf(camera->yaw), 0, sinf(camera->yaw)};
+	vec3 viewTarget = {cosf(camera->transform.rotation.y), 0, sinf(camera->transform.rotation.y)};
 
 	// TODO roll and pitch might be messed up (test and fix as needed)
-	glm_vec3_rotate(viewTarget, camera->roll, GLM_ZUP); // Roll
-	glm_vec3_rotate(viewTarget, camera->pitch, GLM_XUP); // Pitch
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.x, GLM_XUP); // Pitch
 
-	vec3 cameraPosition = {camera->x, camera->y, camera->z};
+	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
 
 	mat4 viewMatrix;

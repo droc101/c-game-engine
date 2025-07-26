@@ -89,19 +89,13 @@ ActorDestroyFunction ActorDestroyFuncs[] = {
 	LogicCounterDestroy,
 };
 
-Actor *CreateActor(const Vector2 position,
-				   const float rotation,
-				   const uint actorType,
-				   KvList *params,
-				   JPH_BodyInterface *bodyInterface)
+Actor *CreateActor(const Transform *transform, const uint actorType, KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
 	actor->actorWall = NULL;
-	actor->position = position;
-	actor->rotation = rotation;
+	actor->transform = *transform;
 	actor->health = 1;
-	actor->yPosition = 0.0f;
 	actor->actorModel = NULL;
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;

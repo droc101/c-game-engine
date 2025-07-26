@@ -8,25 +8,28 @@
 #include "../defines.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Graphics/Drawing.h"
 #include "Actor.h"
 #include "GlobalState.h"
-#include "Vector2.h"
 #include "Wall.h"
 
-void InitJolt(Level *level)
+static void InitJolt(Level *level)
 {
-	JPH_BroadPhaseLayerInterface *broadPhaseLayerInterface = JPH_BroadPhaseLayerInterfaceTable_Create(2, 2);
+	JPH_BroadPhaseLayerInterface *broadPhaseLayerInterface = JPH_BroadPhaseLayerInterfaceTable_Create(3, 2);
 	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
 																 OBJECT_LAYER_STATIC,
 																 BROADPHASE_LAYER_STATIC);
 	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
 																 OBJECT_LAYER_DYNAMIC,
 																 BROADPHASE_LAYER_DYNAMIC);
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
+																 OBJECT_LAYER_PLAYER,
+																 BROADPHASE_LAYER_DYNAMIC);
 
-	JPH_ObjectLayerPairFilter *objectLayerPairFilter = JPH_ObjectLayerPairFilterTable_Create(2);
+	JPH_ObjectLayerPairFilter *objectLayerPairFilter = JPH_ObjectLayerPairFilterTable_Create(3);
 	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_STATIC);
 	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_DYNAMIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_STATIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_DYNAMIC);
 
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
 		.broadPhaseLayerInterface = broadPhaseLayerInterface,
@@ -34,7 +37,7 @@ void InitJolt(Level *level)
 		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broadPhaseLayerInterface,
 																					   2,
 																					   objectLayerPairFilter,
-																					   2),
+																					   3),
 	};
 	level->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 
@@ -42,7 +45,7 @@ void InitJolt(Level *level)
 		.normal.y = 1,
 	};
 	JPH_BodyCreationSettings *floorSettings = JPH_BodyCreationSettings_Create3(
-			(const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 50),
+			(const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100),
 			(Vector3[]){{0.0f, -0.5f, 0.0f}},
 			NULL, // Because joltc doesn't expose JPH::Quat::sIdentity() this is what we have to do to get the identity quaternion (which is [0, 0, 0, 1])
 			JPH_MotionType_Static,
@@ -63,14 +66,14 @@ void CreatePlayerCollider(Level *level)
 		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
 		.base.enhancedInternalEdgeRemoval = true,
 		.base.shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f),
-		.layer = OBJECT_LAYER_DYNAMIC,
+		.layer = OBJECT_LAYER_PLAYER,
 		.mass = 80.0f,
 		.friction = 25.0f,
 		.gravityFactor = 1.0f,
 		.allowedDOFs = JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_TranslationZ,
 	};
 	level->player.joltCharacter = JPH_Character_Create(&characterSettings,
-													   (Vector3[]){{0.0f, 0.0f, 0.0f}},
+													   &JPH_Vec3_Zero,
 													   NULL,
 													   0,
 													   level->physicsSystem);
@@ -79,15 +82,12 @@ void CreatePlayerCollider(Level *level)
 
 Level *CreateLevel(void)
 {
-	Level *level = malloc(sizeof(Level));
+	Level *level = calloc(1, sizeof(Level));
 	CheckAlloc(level);
 	ListInit(level->actors, LIST_POINTER);
 	ListInit(level->walls, LIST_POINTER);
 	InitJolt(level);
-	level->player.position = v2s(0);
-	level->player.angle = 0;
 	CreatePlayerCollider(level);
-	level->hasCeiling = false;
 	strncpy(level->ceilOrSkyTex, "texture/level_sky_test.gtex", 28);
 	strncpy(level->floorTex, "texture/level_floor_test.gtex", 30);
 	strncpy(level->music, "none", 5);
@@ -96,7 +96,6 @@ Level *CreateLevel(void)
 	level->fogEnd = 30;
 	strncpy(level->name, "Unnamed Level", 32);
 	level->courseNum = -1;
-	level->ioProxy = NULL;
 	ListInit(level->namedActorNames, LIST_POINTER);
 	ListInit(level->namedActorPointers, LIST_POINTER);
 	return level;

@@ -84,7 +84,7 @@ void LaserEmitterInit(Actor *this, const KvList *params, JPH_BodyInterface *body
 	data->startEnabled = KvGetBool(params, "startEnabled", true);
 }
 
-void LaserEmitterUpdate(Actor *this, double)
+void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 {
 	LaserEmitterData *data = this->extraData;
 	if (!data->hasTicked)
@@ -93,8 +93,7 @@ void LaserEmitterUpdate(Actor *this, double)
 		KvListCreate(&laserParams);
 		KvSetByte(&laserParams, "height", data->height);
 		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
-		data->laserActor = CreateActor(this->position,
-									   this->rotation,
+		data->laserActor = CreateActor(&this->transform,
 									   LASER_ACTOR,
 									   &laserParams,
 									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));

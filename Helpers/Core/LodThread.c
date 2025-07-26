@@ -42,7 +42,8 @@ int LodThreadMain(void *)
 		}
 
 		const GlobalState *state = GetState();
-		const Vector2 playerPosition = state->level->player.position;
+		const Vector2 playerPosition = {state->level->player.transform.position.x,
+										state->level->player.transform.position.z};
 		const LockingList *actors = &state->level->actors;
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
@@ -57,7 +58,8 @@ int LodThreadMain(void *)
 					{
 						continue;
 					}
-					const float distance = Vector2Distance(actor->position, playerPosition);
+					const Vector2 actorPosition = (Vector2){actor->transform.position.x, actor->transform.position.z};
+					const float distance = Vector2Distance(actorPosition, playerPosition);
 					while (actor->currentLod != 0 &&
 						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
 					{
@@ -85,7 +87,8 @@ int LodThreadMain(void *)
 					{
 						continue;
 					}
-					const float distance = Vector2Distance(actor->position, playerPosition);
+					const Vector2 actorPosition = (Vector2){actor->transform.position.x, actor->transform.position.z};
+					const float distance = Vector2Distance(actorPosition, playerPosition);
 					while (actor->currentLod != 0 &&
 						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
 					{

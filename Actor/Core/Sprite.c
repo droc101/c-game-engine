@@ -15,10 +15,10 @@ void SpriteInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInt
 	char texturePath[80];
 	snprintf(texturePath, 80, "texture/%s.gtex", KvGetString(params, "texture", "level_uvtest"));
 	this->actorWall = CreateWall(v2s(0.0f), v2s(0.0f), texturePath, 1.0f, 0.0f);
-	this->actorWall->a = v2(width * cosf(this->rotation), width * sinf(this->rotation));
-	this->actorWall->b = v2(-width * cosf(this->rotation), -width * sinf(this->rotation));
+	this->actorWall->a = v2(width * cosf(this->transform.rotation.y), width * sinf(this->transform.rotation.y));
+	this->actorWall->b = v2(-width * cosf(this->transform.rotation.y), -width * sinf(this->transform.rotation.y));
 	this->actorWall->height = height;
-	this->yPosition = KvGetFloat(params, "yPosition", 0.0f);
+	this->transform.position.y = KvGetFloat(params, "yPosition", 0.0f);
 	WallBake(this->actorWall);
 }
 

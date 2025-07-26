@@ -21,7 +21,6 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/LevelLoader.h"
 #include "../Structs/Level.h"
-#include "Camera.h"
 #include "Options.h"
 
 static GlobalState state;
@@ -47,7 +46,7 @@ void InitOptions()
 	LoadOptions(&state.options);
 }
 
-void InitState()
+static void InitJolt()
 {
 	if (!JPH_Init())
 	{
@@ -55,12 +54,18 @@ void InitState()
 	}
 	state.jobSystem = JPH_JobSystemThreadPool_Create(NULL);
 	JoltDebugRendererInit();
+}
 
+void InitState()
+{
+	InitJolt();
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
 	state.level = CreateLevel(); // empty level so we don't segfault
-	state.cam = CreateCamera();
+	state.camera = calloc(1, sizeof(Camera));
+	CheckAlloc(state.camera);
+	state.camera->fov = FOV;
 
 	state.viewmodel.enabled = true;
 	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
@@ -233,7 +238,7 @@ void DestroyGlobalState()
 	SaveOptions(&state.options);
 	DestroyLevel(state.level);
 	free(state.saveData);
-	free(state.cam);
+	free(state.camera);
 	if (state.music != NULL)
 	{
 		Mix_HaltMusic();

@@ -458,7 +458,6 @@ VkResult ResizeDebugDrawBuffers()
 
 bool LoadTexture(const Image *image)
 {
-	LockLodThreadMutex(); // TODO: This is not a great fix but it works ig
 	const LunaSampledImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
@@ -495,7 +494,6 @@ bool LoadTexture(const Image *image)
 		};
 	}
 	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
-	UnlockLodThreadMutex();
 
 	return true;
 }

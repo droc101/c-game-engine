@@ -23,10 +23,10 @@
 
 #pragma region Movement
 
-/// Player movement speed
-#define MOVE_SPEED 6.25f
+/// Player movement speed (in units per second)
+#define MOVE_SPEED 6.0f
 /// Player movement speed when ctrl is held
-#define SLOW_MOVE_SPEED 0.625f
+#define SLOW_MOVE_SPEED 0.6f
 
 /// The maximum angle that the player can walk on, in degrees
 #define MAX_WALKABLE_SLOPE 50.0f
@@ -80,7 +80,7 @@
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 0
 #define VERSION_PATCH 1
-#define VERSION_SUFFIX "-dev"
+#define VERSION_SUFFIX "-physics"
 #define VERSION TO_STR(VERSION_MAJOR) "." TO_STR(VERSION_MINOR) "." TO_STR(VERSION_PATCH) VERSION_SUFFIX
 
 #define APPDATA_ORG_NAME "Droc101 Development"

@@ -102,6 +102,8 @@ void InitAudio()
 		GetState()->isAudioStarted = false;
 		LogError("Mix_OpenAudio Error: %s\n", Mix_GetError());
 	}
+
+	UpdateVolume();
 }
 
 /**
@@ -240,6 +242,8 @@ int main(const int argc, char *argv[])
 
 	InitOptions();
 
+	InitTimers();
+
 	if (HasCliArg(argc, argv, "--renderer"))
 	{
 		const char *renderer = GetCliArgStr(argc, argv, "--renderer", "gl");
@@ -280,8 +284,6 @@ int main(const int argc, char *argv[])
 	}
 
 	GLogoSplashStateSet();
-
-	InitTimers();
 
 	LogInfo("Engine initialized, entering mainloop\n");
 
@@ -345,10 +347,9 @@ int main(const int argc, char *argv[])
 		}
 #endif
 
-		state->cam->x = state->level->player.position.x;
-		state->cam->y = (float)state->cameraY;
-		state->cam->z = state->level->player.position.y;
-		state->cam->yaw = state->level->player.angle;
+		state->camera->transform.position.x = state->level->player.transform.position.x;
+		state->camera->transform.position.z = state->level->player.transform.position.z;
+		state->camera->transform.rotation = state->level->player.transform.rotation;
 
 		state->RenderGame(state);
 
@@ -379,11 +380,11 @@ int main(const int argc, char *argv[])
 	LodThreadDestroy();
 	InputDestroy();
 	DestroyGlobalState();
+	RenderDestroy();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);
 	DestroyCommonAssets();
 	DestroyAssetCache(); // Free all assets
-	RenderDestroy();
 	Mix_CloseAudio();
 	Mix_Quit();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);

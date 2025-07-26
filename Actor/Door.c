@@ -138,7 +138,7 @@ bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 
 void DoorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
 {
-	const Vector2 wallEnd = Vector2Normalize(Vector2FromAngle(this->rotation));
+	const Vector2 wallEnd = Vector2Normalize(Vector2FromAngle(this->transform.rotation.y));
 	this->actorWall = CreateWall((Vector2){0, 0}, wallEnd, TEXTURE("actor_door"), 1.0f, 0.0f);
 	WallBake(this->actorWall);
 
@@ -150,7 +150,8 @@ void DoorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterfac
 	CreateDoorSensor(this, bodyInterface);
 	this->SignalHandler = DoorSignalHandler;
 
-	data->spawnPosition = this->position;
+	data->spawnPosition.x = this->transform.position.x;
+	data->spawnPosition.y = this->transform.position.z;
 
 	data->preventPlayerOpen = KvGetBool(params, "preventPlayerOpen", false);
 	data->stayOpen = KvGetBool(params, "stayOpen", false);

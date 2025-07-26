@@ -246,7 +246,10 @@ VkResult PreSizeActorBuffers(const LockingList *actors)
 VkResult InitActors(const LockingList *actors)
 {
 	assert(actors);
-	ListFreeOnlyContents(loadedSkins);
+	for (size_t i = 0; i < loadedSkins.length; i++)
+	{
+		ListFree(*(List *)ListGetPointer(loadedSkins, i));
+	}
 	ListClear(loadedSkins);
 	ListClear(loadedLodIds);
 	ListClear(lodIdsLoadedForDraw);
@@ -268,7 +271,6 @@ VkResult InitActors(const LockingList *actors)
 	buffers.actorModels.instanceData.bytesUsed = 0;
 	buffers.actorModels.shadedDrawInfo.bytesUsed = 0;
 	buffers.actorModels.unshadedDrawInfo.bytesUsed = 0;
-	ListLock(*actors);
 	loadedActorCount = actors->length;
 
 	VulkanTestReturnResult(PreSizeActorBuffers(actors), "Failed to pre-size actor buffers!");
@@ -311,7 +313,6 @@ VkResult InitActors(const LockingList *actors)
 	assert(buffers.actorModels.instanceData.bytesUsed <= buffers.actorModels.instanceData.allocatedSize);
 	assert(buffers.actorModels.shadedDrawInfo.bytesUsed <= buffers.actorModels.shadedDrawInfo.allocatedSize);
 	assert(buffers.actorModels.unshadedDrawInfo.bytesUsed <= buffers.actorModels.unshadedDrawInfo.allocatedSize);
-	ListUnlock(*actors);
 
 	size_t totalInstanceCount = 0;
 	for (size_t i = 0; i < shadedMaterialCounts.length; i++)
@@ -374,31 +375,31 @@ VkResult LoadActorWalls(const LockingList *actors)
 		}
 		const Wall *wall = actor->actorWall;
 		const float halfHeight = wall->height / 2.0f;
-		const vec2 startVertex = {actor->position.x + wall->a.x, actor->position.y + wall->a.y};
-		const vec2 endVertex = {actor->position.x + wall->b.x, actor->position.y + wall->b.y};
+		const vec2 startVertex = {actor->transform.position.x + wall->a.x, actor->transform.position.z + wall->a.y};
+		const vec2 endVertex = {actor->transform.position.x + wall->b.x, actor->transform.position.z + wall->b.y};
 		const vec2 startUV = {wall->uvOffset, 0};
 		const vec2 endUV = {wall->uvScale * wall->length + wall->uvOffset, 1};
 
 		vertices[4 * wallCount].x = startVertex[0];
-		vertices[4 * wallCount].y = halfHeight + actor->yPosition;
+		vertices[4 * wallCount].y = halfHeight + actor->transform.position.y;
 		vertices[4 * wallCount].z = startVertex[1];
 		vertices[4 * wallCount].u = startUV[0];
 		vertices[4 * wallCount].v = startUV[1];
 
 		vertices[4 * wallCount + 1].x = endVertex[0];
-		vertices[4 * wallCount + 1].y = halfHeight + actor->yPosition;
+		vertices[4 * wallCount + 1].y = halfHeight + actor->transform.position.y;
 		vertices[4 * wallCount + 1].z = endVertex[1];
 		vertices[4 * wallCount + 1].u = endUV[0];
 		vertices[4 * wallCount + 1].v = startUV[1];
 
 		vertices[4 * wallCount + 2].x = endVertex[0];
-		vertices[4 * wallCount + 2].y = -halfHeight + actor->yPosition;
+		vertices[4 * wallCount + 2].y = -halfHeight + actor->transform.position.y;
 		vertices[4 * wallCount + 2].z = endVertex[1];
 		vertices[4 * wallCount + 2].u = endUV[0];
 		vertices[4 * wallCount + 2].v = endUV[1];
 
 		vertices[4 * wallCount + 3].x = startVertex[0];
-		vertices[4 * wallCount + 3].y = -halfHeight + actor->yPosition;
+		vertices[4 * wallCount + 3].y = -halfHeight + actor->transform.position.y;
 		vertices[4 * wallCount + 3].z = startVertex[1];
 		vertices[4 * wallCount + 3].u = startUV[0];
 		vertices[4 * wallCount + 3].v = endUV[1];

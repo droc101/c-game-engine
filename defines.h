@@ -32,9 +32,10 @@ typedef enum AssetType AssetType;
 typedef enum ParamType ParamType;
 
 // Struct forward declarations
+typedef struct Vector2 Vector2;
+typedef struct Transform Transform;
 typedef struct Viewmodel Viewmodel;
 typedef struct GlobalState GlobalState;
-typedef struct Vector2 Vector2;
 typedef JPH_Vec3 Vector3;
 typedef JPH_Vec4 Vector4;
 typedef struct Camera Camera;
@@ -239,6 +240,7 @@ enum ObjectLayers
 {
 	OBJECT_LAYER_STATIC,
 	OBJECT_LAYER_DYNAMIC,
+	OBJECT_LAYER_PLAYER,
 };
 
 enum BroadphaseLayers
@@ -266,6 +268,12 @@ struct Vector2
 {
 	float x;
 	float y;
+};
+
+struct Transform
+{
+	Vector3 position;
+	Vector3 rotation;
 };
 
 struct Viewmodel
@@ -307,19 +315,8 @@ struct Param
 
 struct Camera
 {
-	/// The X position of the camera
-	float x;
-	/// The Y position of the camera
-	float y;
-	/// The Z position of the camera
-	float z;
-
-	/// The pitch of the camera
-	float pitch;
-	/// The yaw of the camera
-	float yaw;
-	/// The roll of the camera
-	float roll;
+	/// The 3d transform of the camera
+	Transform transform;
 
 	/// The field of view of the camera
 	float fov;
@@ -327,10 +324,8 @@ struct Camera
 
 struct Player
 {
-	/// The player's position
-	Vector2 position;
-	/// The player's rotation
-	float angle;
+	/// The player's 3d transform
+	Transform transform;
 	/// The Jolt character. Includes the rigid body as well as other useful abstractions
 	JPH_Character *joltCharacter;
 };
@@ -475,9 +470,7 @@ struct GlobalState
 	SaveData *saveData;
 
 	/// The camera
-	Camera *cam;
-	/// The Y position of the camera
-	double cameraY;
+	Camera *camera;
 	/// The scale of the UI.
 	double uiScale;
 
@@ -515,19 +508,10 @@ struct SaveData
 // Actor (interactable/moving wall) struct
 struct Actor
 {
-	/// The center position of the actor
-	/// @warning This is the visual position only, and synchronization between the visual position and the physics
-	///	 position must be explicitly done in the update function
-	Vector2 position;
-	/// The rotation of the actor
-	/// @warning This is the visual rotation only, and synchronization between the visual rotation and the physics
-	///	 rotation must be explicitly done in the update function
-	float rotation;
-	/// Y position for rendering
-	/// @note Because this game uses a 2d physics engine, this value is not considered in any physics calculations.
-	///  As such, an actor can be rendered floating, but will always collide as though it is on the same plane as
-	///  everything else.
-	float yPosition;
+	/// The 3d transform of the actor
+	/// @warning This is the visual transform only, and synchronization between the visual transform and the physics
+	///	 transform must be explicitly done in the update function
+	Transform transform;
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
 	/// The index of the active skin for the actor's model
@@ -560,6 +544,9 @@ struct Actor
 	int health;
 	/// Extra data for the actor
 	void *extraData;
+
+	JPH_BodyInterface *bodyInterface;
+	JPH_BodyID bodyId;
 };
 
 struct Asset

@@ -60,7 +60,7 @@ bool GetSensorState(const int worldId, const uint sensorShapeIdIndex, const bool
 Actor *GetTargetedEnemy(const float maxDistance)
 {
 	// const GlobalState *state = GetState();
-	// Vector2 rayEnd = Vector2FromAngle(state->level->player.angle);
+	// Vector2 rayEnd = Vector2FromAngle(state->level->player.transform.rotation.y);
 	// rayEnd = Vector2Scale(rayEnd, maxDistance);
 	// b2ShapeId raycastHit = b2_nullShapeId;
 	// b2World_CastRay(state->level->worldId,

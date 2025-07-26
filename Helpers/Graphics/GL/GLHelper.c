@@ -873,7 +873,7 @@ void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level)
 						 (float)(level->fogColor >> 8 & 0xFF) / 255.0f,
 						 (float)(level->fogColor & 0xFF) / 255.0f},
 				  uniforms.fogColor);
-	uniforms.cameraYaw = GetState()->cam->yaw;
+	uniforms.cameraYaw = GetState()->camera->transform.rotation.y;
 	uniforms.fogStart = (float)level->fogStart;
 	uniforms.fogEnd = (float)level->fogEnd;
 
@@ -903,13 +903,13 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
-	vec3 viewTarget = {cosf(camera->yaw), 0, sinf(camera->yaw)};
+	vec3 viewTarget = {cosf(camera->transform.rotation.y), 0, sinf(camera->transform.rotation.y)};
 
 	// TODO roll and pitch might be messed up (test and fix as needed)
-	glm_vec3_rotate(viewTarget, camera->roll, GLM_ZUP); // Roll
-	glm_vec3_rotate(viewTarget, camera->pitch, GLM_XUP); // Pitch
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.x, GLM_XUP); // Pitch
 
-	vec3 cameraPosition = {camera->x, camera->y, camera->z};
+	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
 
 	mat4 viewMatrix;
@@ -950,15 +950,15 @@ void GL_DrawActorWall(const Actor *actor)
 	GL_LoadTextureFromAsset(wall->tex);
 
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(actor->position.x + wall->a.x, actor->position.y + wall->a.y);
-	const Vector2 endVertex = v2(actor->position.x + wall->b.x, actor->position.y + wall->b.y);
+	const Vector2 startVertex = v2(actor->transform.position.x + wall->a.x, actor->transform.position.z + wall->a.y);
+	const Vector2 endVertex = v2(actor->transform.position.x + wall->b.x, actor->transform.position.z + wall->b.y);
 	const Vector2 startUV = v2(wall->uvOffset, 0);
 	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
 	const float vertices[4][6] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
-			actor->yPosition + halfHeight,
+			actor->transform.position.y + halfHeight,
 			startVertex.y,
 			startUV.x,
 			startUV.y,
@@ -966,7 +966,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			endVertex.x,
-			actor->yPosition + halfHeight,
+			actor->transform.position.y + halfHeight,
 			endVertex.y,
 			endUV.x,
 			startUV.y,
@@ -974,7 +974,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			endVertex.x,
-			actor->yPosition - halfHeight,
+			actor->transform.position.y - halfHeight,
 			endVertex.y,
 			endUV.x,
 			endUV.y,
@@ -982,7 +982,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			startVertex.x,
-			actor->yPosition - halfHeight,
+			actor->transform.position.y - halfHeight,
 			startVertex.y,
 			startUV.x,
 			endUV.y,
@@ -1061,10 +1061,11 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 	mat4 worldViewMatrix;
 	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translated(skyModelWorldMatrix, (vec3){(float)level->player.position.x, 0, (float)level->player.position.y});
+	glm_translated(skyModelWorldMatrix,
+				   (vec3){(float)level->player.transform.position.x, 0, (float)level->player.transform.position.z});
 
-	const Vector2 floorStart = v2(level->player.position.x - 100, level->player.position.y - 100);
-	const Vector2 floorEnd = v2(level->player.position.x + 100, level->player.position.y + 100);
+	const Vector2 floorStart = v2(level->player.transform.position.x - 100, level->player.transform.position.z - 100);
+	const Vector2 floorEnd = v2(level->player.transform.position.x + 100, level->player.transform.position.z + 100);
 
 	GL_SetLevelParams(&worldViewMatrix, level);
 
@@ -1134,7 +1135,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 	const ModelShader shader = skinMats[material].shader;
 
-	GL_Shader *glShader;
+	const GL_Shader *glShader = NULL;
 	switch (shader)
 	{
 		case SHADER_SKY:
