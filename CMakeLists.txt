@@ -212,7 +212,7 @@ endif ()
 #set(DEBUG_RENDERER_IN_DEBUG_AND_RELEASE ON)
 FetchContent_Declare(
         joltc
-        SOURCE_DIR ../../joltc
+        GIT_REPOSITORY https://github.com/NBT22/joltc
         GIT_TAG main
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
