@@ -161,8 +161,9 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 			return VK_ERROR_UNKNOWN;
 		}
 	}
-	pushConstants.position[0] = (float)loadedLevel->player.transform.position.x;
-	pushConstants.position[1] = (float)loadedLevel->player.transform.position.z;
+	pushConstants.cameraPosition.x = (float)camera->transform.position.x;
+	pushConstants.cameraPosition.y = (float)camera->transform.position.y;
+	pushConstants.cameraPosition.z = (float)camera->transform.position.z;
 	pushConstants.yaw = camera->transform.rotation.y + 1.5f * PIf;
 	UpdateTransformMatrix(camera);
 

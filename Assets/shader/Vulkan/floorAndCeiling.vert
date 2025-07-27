@@ -19,7 +19,7 @@ const vec2 VERTICES[12] = vec2[](
 
 layout(push_constant) uniform PushConstants
 {
-	vec2 playerPosition;
+	vec3 cameraPosition;
 	float yaw;
 	mat4 transformMatrix;
 
@@ -38,7 +38,7 @@ layout(location = 2) flat out float outMultiplier;
 
 void main()
 {
-	vec2 vertex = VERTICES[gl_VertexIndex] + pushConstants.playerPosition;
+	vec2 vertex = VERTICES[gl_VertexIndex] + pushConstants.cameraPosition.xz;
 	outUV = vertex;
 	if (gl_VertexIndex < 6) {
 		outTextureIndex = pushConstants.floorTextureIndex;

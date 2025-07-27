@@ -276,7 +276,7 @@ typedef struct TextureSamplers
 
 typedef struct PushConstants
 {
-	vec2 position;
+	Vector3 cameraPosition;
 	float yaw;
 	mat4 transformMatrix;
 

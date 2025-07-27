@@ -2,7 +2,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 
 layout (push_constant) uniform PushConstants {
-	vec2 playerPosition;
+	vec3 cameraPosition;
 	float yaw;
 	mat4 transformMatrix;
 
