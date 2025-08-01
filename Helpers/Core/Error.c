@@ -46,11 +46,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	}
 
 	char messageBuffer[256];
-#ifdef BUILDSTYLE_DEBUG
 	sprintf(messageBuffer, "%s\n \n%s:%d (%s)\n", error, file, line, function);
-#else
-	sprintf(messageBuffer, "%s", error);
-#endif
 
 	LogError(messageBuffer);
 

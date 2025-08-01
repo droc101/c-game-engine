@@ -7,6 +7,8 @@
 
 #include "../../../defines.h"
 
+#define TEXTURE_ASSET_VERSION 1
+
 /// The maximum number of textures that can be loaded in any one execution of the game
 #define MAX_TEXTURES 512
 
@@ -18,6 +20,8 @@ void GenFallbackImage(Image *src);
  * @return The loaded image, or a 64x64 fallback image if it failed
  */
 Image *LoadImage(const char *asset);
+
+Image *RegisterFallbackImage();
 
 void DestroyTextureLoader();
 

@@ -74,18 +74,25 @@ Image *LoadImage(const char *asset)
 		GenFallbackImage(img);
 	} else
 	{
-		img->width = ReadSizeT(textureAsset->data, &offset);
-		img->height = ReadSizeT(textureAsset->data, &offset);
-		img->filter = ReadByte(textureAsset->data, &offset) != 0;
-		img->repeat = ReadByte(textureAsset->data, &offset) != 0;
-		img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
-		const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
-		img->pixelData = malloc(pixelDataSize);
-		memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
-		uint32_t *pixels32 = (uint32_t*)img->pixelData;
-		for (size_t i = 0; i < img->width * img->height; i++)
+		if (textureAsset->typeVersion != TEXTURE_ASSET_VERSION)
 		{
-			pixels32[i] = SDL_SwapBE32(pixels32[i]);
+			LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)", textureAsset->typeVersion, TEXTURE_ASSET_VERSION);
+			GenFallbackImage(img);
+		} else
+		{
+			img->width = ReadSizeT(textureAsset->data, &offset);
+			img->height = ReadSizeT(textureAsset->data, &offset);
+			img->filter = ReadByte(textureAsset->data, &offset) != 0;
+			img->repeat = ReadByte(textureAsset->data, &offset) != 0;
+			img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
+			const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
+			img->pixelData = malloc(pixelDataSize);
+			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
+			uint32_t *pixels32 = (uint32_t*)img->pixelData;
+			for (size_t i = 0; i < img->width * img->height; i++)
+			{
+				pixels32[i] = SDL_SwapBE32(pixels32[i]); // endianness is SO fun
+			}
 		}
 	}
 
@@ -108,6 +115,50 @@ Image *LoadImage(const char *asset)
 	if (textureAsset)
 	{
 		FreeAsset(textureAsset);
+	}
+
+	return img;
+}
+
+Image *RegisterFallbackImage()
+{
+	const char *asset = "_generic_fallback";
+	for (int i = 0; i < MAX_TEXTURES; i++)
+	{
+		Image *img = images[i];
+		if (img == NULL)
+		{
+			break;
+		}
+		if (strncmp(asset, img->name, 80) == 0)
+		{
+			return img;
+		}
+	}
+
+	if (textureId >= MAX_TEXTURES)
+	{
+		Error("Texture ID heap exhausted. Please increase MAX_TEXTURES\n");
+	}
+
+	Image *img = malloc(sizeof(Image));
+	CheckAlloc(img);
+	GenFallbackImage(img);
+
+	img->id = textureId;
+
+	const size_t nameLength = strlen(asset) + 1;
+	img->name = malloc(nameLength);
+	CheckAlloc(img->name);
+	strncpy(img->name, asset, nameLength);
+
+	images[textureId] = img;
+
+	textureId++;
+
+	if (textureId >= MAX_TEXTURES - 10)
+	{
+		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
 	}
 
 	return img;

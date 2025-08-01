@@ -48,9 +48,6 @@
 // Shows a level select after main menu and pause exit course.
 #define USE_LEVEL_SELECT
 
-// Show error trace in release builds (function, source, and line #)
-#define ERROR_TRACE_IN_RELEASE
-
 // Enable or disable the frame benchmark system
 #define BENCHMARK_SYSTEM_ENABLE
 

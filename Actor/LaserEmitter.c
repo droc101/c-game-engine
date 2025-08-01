@@ -77,7 +77,7 @@ void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
 	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->hasTicked = false;
 
-	this->actorModel = LoadModel(MODEL("model_laseremitter"));
+	this->actorModel = LoadModel(MODEL("laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
 	CreateLaserEmitterCollider(this, worldId);

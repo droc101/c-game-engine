@@ -26,7 +26,7 @@ void PhysboxInit(Actor *this, const b2WorldId worldId, const KvList * /*params*/
 {
 	CreatePhysboxCollider(this, worldId);
 
-	this->actorModel = LoadModel(MODEL("model_cube"));
+	this->actorModel = LoadModel(MODEL("cube"));
 	this->yPosition = -0.3f;
 }
 

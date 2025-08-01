@@ -7,6 +7,8 @@
 
 #include "../../../defines.h"
 
+#define MODEL_ASSET_VERSION 1
+
 /// The maximum number of models that can be loaded in any one execution of the game
 #define MAX_MODELS 128
 

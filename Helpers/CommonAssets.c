@@ -17,8 +17,6 @@ void InitCommonAssets()
 
 void DestroyCommonAssets()
 {
-	free(smallFont->texture);
-	free(largeFont->texture);
-	free(smallFont);
-	free(largeFont);
+	FreeFont(smallFont);
+	FreeFont(largeFont);
 }

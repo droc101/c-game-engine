@@ -85,3 +85,22 @@ size_t ReadSizeT(const byte *data, size_t *offset)
 	*offset += sizeof(size_t);
 	return i;
 }
+
+char *ReadStringSafe(const byte *data, size_t *offset, const size_t totalBufferSize, size_t *outLength)
+{
+	size_t remainingSize = totalBufferSize - *offset;
+	if (remainingSize >= sizeof(size_t))
+	{
+		const size_t stringLength = ReadSizeT(data, offset);
+		remainingSize -= sizeof(size_t);
+		if (remainingSize >= sizeof(char) * stringLength)
+		{
+			char *string = calloc(stringLength, sizeof(char));
+			memcpy(string, data + *offset, stringLength);
+			*offset += stringLength * sizeof(char);
+			*outLength = stringLength;
+			return string;
+		}
+	}
+	return NULL;
+}

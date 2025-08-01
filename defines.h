@@ -342,11 +342,6 @@ struct Wall
 // Utility functions are in Structs/level.h
 struct Level
 {
-	/// The level's display name
-	char name[32];
-	/// The level's display course number, with -1 being none
-	short courseNum;
-
 	/// The list of actors in the level
 	LockingList actors;
 	/// The list of walls in the level
@@ -543,9 +538,9 @@ struct Actor
 struct Asset
 {
 	/// The compressed size of the asset, excluding the header
-	uint compressedSize;
+	size_t compressedSize;
 	/// The decompressed size of the asset
-	uint size;
+	size_t size;
 	/// The type of the asset
 	AssetType type;
 	/// The version of the type
@@ -576,21 +571,21 @@ struct Image
 struct Font
 {
 	/// The texture width of one character
-	uint32_t width;
+	uint8_t width;
 	/// The texture height (including below baseline)
-	uint32_t textureHeight;
+	uint8_t textureHeight;
 	/// The pixel coordinate of the baseline
-	uint32_t baseline;
+	uint8_t baseline;
 	/// The pixels between characters
-	uint32_t charSpacing;
+	uint8_t charSpacing;
 	/// The pixels between lines
-	uint32_t lineSpacing;
+	uint8_t lineSpacing;
 	/// The width of a space character
-	uint32_t spaceWidth;
+	uint8_t spaceWidth;
 	/// The default size of the font, used for calculating scale
-	uint32_t defaultSize;
+	uint8_t defaultSize;
 	/// The number of characters in the font
-	uint32_t charCount;
+	uint8_t charCount;
 	/// Whether this font only contains uppercase characters
 	bool uppercaseOnly;
 
@@ -619,7 +614,7 @@ struct Material
 	size_t id;
 
 	/// The texture name of the material
-	char texture[64];
+	char *texture;
 	/// The tint color of the material
 	Color color;
 	/// The shader to use for this material
@@ -635,8 +630,8 @@ struct ModelLod
 	float distance;
 
 	/// The number of vertices in the model
-	uint vertexCount;
-	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
+	size_t vertexCount;
+	/// Packed vertex data, (X Y Z) (U V) (R G B A) (NX NY NZ)
 	float *vertexData;
 
 	/// The total number of indices across all materials
@@ -655,13 +650,18 @@ struct ModelDefinition
 	char *name;
 
 	/// The number of materials in the model
-	byte materialCount;
+	size_t materialCount;
+
+	size_t materialsPerSkin;
+
 	/// The number of skins in the model
-	byte skinCount;
+	size_t skinCount;
 	/// The number of LODs in the model
-	byte lodCount;
-	/// The skins for this model, each an array of materialCount materials
-	Material **skins;
+	size_t lodCount;
+
+	Material *materials;
+	/// The skins for this model, each an array of materialsPerSkin indices into the materials array
+	size_t **skins;
 	/// The LODs for this model
 	ModelLod **lods;
 };

@@ -13,14 +13,14 @@
 #include "../GameStates/Options/GInputOptionsState.h"
 #include "../GameStates/Options/GSoundOptionsState.h"
 #include "../GameStates/Options/GVideoOptionsState.h"
+#include "../Helpers/Core/AssetLoaders/LevelLoader.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/PhysicsThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
-#include "../Helpers/LevelLoader.h"
 #include "../Structs/Level.h"
-#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "Camera.h"
 #include "Options.h"
 
@@ -66,7 +66,7 @@ void InitState()
 	state.cam = CreateCamera();
 
 	state.viewmodel.enabled = true;
-	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
+	state.viewmodel.model = LoadModel(MODEL("eraser"));
 	state.viewmodel.translation[0] = 0.5f;
 	state.viewmodel.translation[2] = 0.0f;
 	state.viewmodel.rotation[0] = 0.0f;

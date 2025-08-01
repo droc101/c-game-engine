@@ -160,8 +160,8 @@ void HandleMouseMotion(const int x, const int y, const int xRel, const int yRel)
 {
 	mouseX = x;
 	mouseY = y;
-	mouseRelativeX = xRel;
-	mouseRelativeY = yRel;
+	mouseRelativeX += xRel;
+	mouseRelativeY += yRel;
 }
 
 void HandleMouseDown(const int button)

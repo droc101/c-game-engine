@@ -28,6 +28,13 @@ ModelDefinition *LoadModelInternal(const char* asset)
 		LogError("Failed to load model from asset, asset was NULL!\n");
 		return NULL;
 	}
+	if (assetData->typeVersion != MODEL_ASSET_VERSION)
+	{
+		LogError("Failed to load model from asset due to version mismatch (got %d, expected %d)",
+				 assetData->typeVersion,
+				 MODEL_ASSET_VERSION);
+		return NULL;
+	}
 	ModelDefinition *model = malloc(sizeof(ModelDefinition));
 	CheckAlloc(model);
 
@@ -41,28 +48,38 @@ ModelDefinition *LoadModelInternal(const char* asset)
 	strncpy(model->name, asset, nameLength);
 
 	size_t offset = 0;
-	model->materialCount = ReadUint(assetData->data, &offset);
-	model->skinCount = ReadUint(assetData->data, &offset);
-	model->lodCount = ReadUint(assetData->data, &offset);
-	model->skins = malloc(sizeof(Material *) * model->skinCount);
+	model->materialCount = ReadSizeT(assetData->data, &offset);
+	model->materialsPerSkin = ReadSizeT(assetData->data, &offset);
+	model->skinCount = ReadSizeT(assetData->data, &offset);
+	model->lodCount = ReadSizeT(assetData->data, &offset);
+	offset += sizeof(uint8_t); // skip collision model type as it is currently unused
+
+	model->materials = malloc(sizeof(Material) * model->materialCount);
+	CheckAlloc(model->materials);
+	for (size_t i = 0; i < model->materialCount; i++)
+	{
+		Material *mat = &model->materials[i];
+		size_t l;
+		mat->texture = ReadStringSafe(assetData->data, &offset, assetData->size, &l);
+		mat->color.r = ReadFloat(assetData->data, &offset);
+		mat->color.g = ReadFloat(assetData->data, &offset);
+		mat->color.b = ReadFloat(assetData->data, &offset);
+		mat->color.a = ReadFloat(assetData->data, &offset);
+		mat->shader = ReadUint(assetData->data, &offset);
+	}
+
+	model->skins = malloc(sizeof(size_t) * model->skinCount);
 	CheckAlloc(model->skins);
 
-	const size_t skinSize = sizeof(Material) * model->materialCount;
+	const size_t skinSize = sizeof(size_t) * model->materialsPerSkin;
 	for (int i = 0; i < model->skinCount; i++)
 	{
 		model->skins[i] = malloc(skinSize);
 		CheckAlloc(model->skins[i]);
-		Material *skin = model->skins[i];
-		for (int j = 0; j < model->materialCount; j++)
+		size_t *skin = model->skins[i];
+		for (int j = 0; j < model->materialsPerSkin; j++)
 		{
-			Material *mat = &skin[j];
-
-			mat->id = materialId;
-			materialId++;
-
-			ReadString(assetData->data, &offset, mat->texture, 64);
-			GetColor(ReadUint(assetData->data, &offset), &mat->color);
-			mat->shader = ReadUint(assetData->data, &offset);
+			skin[j] = ReadSizeT(assetData->data, &offset);
 		}
 	}
 
@@ -78,22 +95,22 @@ ModelDefinition *LoadModelInternal(const char* asset)
 		lodId++;
 
 		lod->distance = ReadFloat(assetData->data, &offset);
-		lod->vertexCount = ReadUint(assetData->data, &offset);
+		lod->vertexCount = ReadSizeT(assetData->data, &offset);
 
-		const size_t vertexDataSize = lod->vertexCount * sizeof(float) * 8;
+		const size_t vertexDataSize = lod->vertexCount * sizeof(float) * 12;
 		lod->vertexData = malloc(vertexDataSize);
 		CheckAlloc(lod->vertexData);
 		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
 
 		lod->totalIndexCount = ReadUint(assetData->data, &offset);
-		const size_t indexCountSize = model->materialCount * sizeof(uint);
+		const size_t indexCountSize = model->materialsPerSkin * sizeof(uint);
 		lod->indexCount = malloc(indexCountSize);
 		CheckAlloc(lod->indexCount);
 		ReadBytes(assetData->data, &offset, indexCountSize, lod->indexCount);
 
-		lod->indexData = malloc(sizeof(uint *) * model->materialCount);
+		lod->indexData = malloc(sizeof(uint *) * model->materialsPerSkin);
 		CheckAlloc(lod->indexData);
-		for (int j = 0; j < model->materialCount; j++)
+		for (int j = 0; j < model->materialsPerSkin; j++)
 		{
 			uint *indexData = malloc(lod->indexCount[j] * sizeof(uint));
 			CheckAlloc(indexData);
@@ -181,9 +198,15 @@ void FreeModel(ModelDefinition *model)
 		free(lod);
 	}
 
+	for (int i = 0; i < model->materialCount; i++)
+	{
+		free(model->materials[i].texture);
+	}
+
 	free(model->name);
 	free(model->skins);
 	free(model->lods);
+	free(model->materials);
 	free(model);
 
 	model = NULL;

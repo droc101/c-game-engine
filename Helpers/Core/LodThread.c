@@ -46,58 +46,31 @@ int LodThreadMain(void *)
 		const LockingList *actors = &state->level->actors;
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
-		switch (currentRenderer)
+		bool shouldReloadActors = false;
+		for (size_t i = 0; i < actorCount; i++)
 		{
-			case RENDERER_VULKAN:
-				bool shouldReloadActors = false;
-				for (size_t i = 0; i < actorCount; i++)
-				{
-					Actor *actor = ListGetPointer(*actors, i);
-					if (!actor->actorModel)
-					{
-						continue;
-					}
-					const float distance = Vector2Distance(actor->position, playerPosition);
-					while (actor->currentLod != 0 &&
-						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
-					{
-						actor->currentLod--;
-						shouldReloadActors = true;
-					}
-					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
-					{
-						actor->currentLod++;
-						shouldReloadActors = true;
-					}
-				}
-				if (!VK_UpdateActors(actors, shouldReloadActors))
-				{
-					Error("Failed to load actors!");
-				}
-				break;
-			case RENDERER_OPENGL:
-			default:
-				for (size_t i = 0; i < actorCount; i++)
-				{
-					Actor *actor = ListGetPointer(*actors, i);
-					if (!actor->actorModel)
-					{
-						continue;
-					}
-					const float distance = Vector2Distance(actor->position, playerPosition);
-					while (actor->currentLod != 0 &&
-						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
-					{
-						actor->currentLod--;
-					}
-					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
-					{
-						actor->currentLod++;
-					}
-				}
-				break;
+			Actor *actor = ListGetPointer(*actors, i);
+			if (!actor->actorModel || actor->actorModel->lodCount == 1)
+			{
+				continue;
+			}
+			const float distance = Vector2Distance(actor->position, playerPosition);
+			while (actor->currentLod != 0 &&
+				   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
+			{
+				actor->currentLod--;
+				shouldReloadActors = true;
+			}
+			while (actor->actorModel->lodCount > actor->currentLod + 1 &&
+				   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
+			{
+				actor->currentLod++;
+				shouldReloadActors = true;
+			}
+		}
+		if (currentRenderer == RENDERER_VULKAN && !VK_UpdateActors(actors, shouldReloadActors))
+		{
+			Error("Failed to load actors!");
 		}
 
 		if (SDL_UnlockMutex(mutex) != 0)

@@ -100,7 +100,7 @@ void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 		memcpy(buffers.actorModels.indices.data + indexDataOffset, lod->indexData[j], indexSize);
 		indexDataOffset += indexSize;
 
-		const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
+		const Material material = actor->actorModel->materials[0];//actor->actorModel->skins[actor->currentSkinIndex][j];
 		const uint32_t indexCount = lod->indexCount[j];
 		const uint64_t lodMaterialId = (lod->id << 32) | material.id;
 		switch (material.shader)
@@ -169,7 +169,7 @@ void LoadLod(const Actor *actor, const uint32_t lodIndex)
 		{
 			for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 			{
-				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
+				const Material material = actor->actorModel->materials[0];//actor->actorModel->skins[actor->currentSkinIndex][j];
 				const uint64_t lodMaterialId = (lod->id << 32) | material.id;
 				switch (material.shader)
 				{
@@ -212,7 +212,7 @@ VkResult PreSizeActorBuffers(const LockingList *actors)
 			}
 			for (uint8_t j = 0; j < model->materialCount; j++)
 			{
-				switch (model->skins[actor->currentSkinIndex][j].shader)
+				switch (SHADER_SHADED/*model->skins[actor->currentSkinIndex][j].shader*/) // TODO vulkan can segfault here when an error model has been loaded on an actor requesting skin != 0
 				{
 					case SHADER_SHADED:
 						buffers.actorModels.shadedDrawInfo.bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
@@ -459,7 +459,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 			ActorTransformMatrix(actor, &transformMatrix);
 			for (byte j = 0; j < actor->actorModel->materialCount; j++)
 			{
-				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
+				const Material material = actor->actorModel->materials[0];//actor->actorModel->skins[actor->currentSkinIndex][j];
 				size_t index = 0;
 				const uint64_t lodMaterialId = (actor->actorModel->lods[actor->currentLod]->id << 32) | material.id;
 				switch (material.shader)

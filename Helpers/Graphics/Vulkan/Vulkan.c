@@ -435,7 +435,7 @@ bool VK_LoadLevelWalls(const Level *level)
 {
 	if (!level->hasCeiling)
 	{
-		VulkanTest(LoadSky(LoadModel(MODEL("model_sky"))), "Failed to load sky!");
+		VulkanTest(LoadSky(LoadModel(MODEL("sky"))), "Failed to load sky!");
 	}
 
 	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);

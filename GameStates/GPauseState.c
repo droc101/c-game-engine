@@ -40,56 +40,15 @@ void GPauseStateRender(GlobalState *State)
 {
 	RenderInGameMenuBackground();
 
-	DrawTextAligned("Game Paused",
-					32,
-					COLOR_WHITE,
-					v2s(0),
-					v2(WindowWidthFloat(), 250),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					largeFont);
-
-	const char *levelID = State->level->name;
-	const int cNum = State->level->courseNum;
-
-	if (cNum != -1)
-	{
-		char buf[64];
-		sprintf(buf, "Level %d", cNum);
-		DrawTextAligned(buf,
-						16,
-						COLOR_BLACK,
-						v2(4, 164),
-						v2(WindowWidthFloat(), 40),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
-		DrawTextAligned(buf,
-						16,
-						COLOR_WHITE,
-						v2(0, 160),
-						v2(WindowWidthFloat(), 40),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
-	}
-
-	DrawTextAligned(levelID,
-					32,
-					COLOR_BLACK,
-					v2(4, 204),
-					v2(WindowWidthFloat(), 40),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					smallFont);
-	DrawTextAligned(levelID,
-					32,
-					COLOR_WHITE,
-					v2(0, 200),
-					v2(WindowWidthFloat(), 40),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					smallFont);
+	Vector2 logoPosition;
+	Vector2 logoSize;
+	logoPosition.x = ((float)WindowWidth() - 360) / 2;
+	logoPosition.y = 32;
+	logoSize.x = 360;
+	logoSize.y = 240;
+	DrawTexture(logoPosition,
+				logoSize,
+				TEXTURE("interface/pause_logo"));
 
 	ProcessUiStack(pauseStack);
 	DrawUiStack(pauseStack);

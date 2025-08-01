@@ -7,19 +7,26 @@
 
 #include "../../../defines.h"
 
-typedef enum ShaderPlatform: uint8_t
+#define SHADER_ASSET_VERSION 1
+
+typedef enum ShaderPlatform ShaderPlatform;
+typedef enum ShaderType ShaderType;
+
+typedef struct Shader Shader;
+
+enum ShaderPlatform
 {
 	PLATFORM_OPENGL,
 	PLATFORM_VULKAN
-} ShaderPlatform;
+};
 
-typedef enum ShaderType: uint8_t
+enum ShaderType
 {
 	SHADER_TYPE_FRAG,
 	SHADER_TYPE_VERT
-} ShaderType;
+};
 
-typedef struct Shader
+struct Shader
 {
 	ShaderPlatform platform;
 	ShaderType type;
@@ -27,7 +34,7 @@ typedef struct Shader
 	char* glsl;
 	size_t spirvLength;
 	uint32_t *spirv;
-} Shader;
+};
 
 Shader *LoadShader(const char *asset);
 

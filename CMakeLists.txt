@@ -65,8 +65,8 @@ add_executable(
         Helpers/Graphics/Font.h
         Helpers/Core/Error.c
         Helpers/Core/Error.h
-        Helpers/LevelLoader.c
-        Helpers/LevelLoader.h
+        Helpers/Core/AssetLoaders/LevelLoader.c
+        Helpers/Core/AssetLoaders/LevelLoader.h
         Structs/GlobalState.c
         Structs/GlobalState.h
         GameStates/GMainState.c
@@ -272,7 +272,7 @@ include_directories(game PRIVATE
 add_custom_target(
         copy_assets
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/assets
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets/Compiled ${CMAKE_BINARY_DIR}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_BINARY_DIR}/assets
 )
 
 add_dependencies(game copy_assets)

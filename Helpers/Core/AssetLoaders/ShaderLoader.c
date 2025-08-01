@@ -16,6 +16,11 @@ Shader* LoadShader(const char *asset)
 		LogError("Failed to load shader from asset, asset was NULL!\n");
 		return NULL;
 	}
+	if (assetData->typeVersion != SHADER_ASSET_VERSION)
+	{
+		LogError("Failed to load shader from asset due to version mismatch (got %d, expected %d)\n", assetData->typeVersion, SHADER_ASSET_VERSION);
+		return NULL;
+	}
 	Shader *shader = malloc(sizeof(Shader));
 	CheckAlloc(shader);
 	size_t offset = 0;

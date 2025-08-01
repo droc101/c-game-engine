@@ -9,13 +9,50 @@
 #include "../Logging.h"
 #include "TextureLoader.h"
 
+Font *GenerateFallbackFont()
+{
+	Font *font = malloc(sizeof(Font));
+	CheckAlloc(font);
+	font->width = 16;
+	font->textureHeight = 16;
+	font->baseline = 16;
+	font->charSpacing = 1;
+	font->lineSpacing = 1;
+	font->spaceWidth = 8;
+	font->defaultSize = 16;
+	font->uppercaseOnly = false;
+	font->texture = calloc(strlen("_generic_fallback") + 1, sizeof(char));
+	strcpy(font->texture, "_generic_fallback");
+	font->image = RegisterFallbackImage();
+	font->charCount = 255;
+	memset(font->indices, 0, 255);
+	memset(font->charWidths, 0, 255);
+	for (int i = 0; i < font->charCount; i++)
+	{
+		font->indices[i] = i;
+		font->charWidths[i] = 16;
+	}
+	return font;
+}
+
 Font *LoadFont(const char *asset)
 {
 	Asset *assetData = DecompressAsset(asset, false);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load font from asset, asset was NULL!\n");
-		Error("Failed to load font!");
+		return GenerateFallbackFont();
+	}
+	if (assetData->typeVersion != FONT_ASSET_VERSION)
+	{
+		LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)\n", assetData->typeVersion, FONT_ASSET_VERSION);
+		return GenerateFallbackFont();
+	}
+	const size_t baseSize = (sizeof(uint8_t) * 8) + sizeof(bool);
+	if (assetData->size < baseSize)
+	{
+		LogError("Failed to load font from asset due to size mismatch (got %d bytes, expected at least %d bytes)\n", assetData->size, baseSize);
+		return GenerateFallbackFont();
 	}
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
@@ -28,11 +65,18 @@ Font *LoadFont(const char *asset)
 	font->spaceWidth = ReadByte(assetData->data, &offset);
 	font->defaultSize = ReadByte(assetData->data, &offset);
 	font->uppercaseOnly = ReadByte(assetData->data, &offset) != 0;
-	const size_t texturePathLength = ReadSizeT(assetData->data, &offset);
-	font->texture = calloc(texturePathLength + strlen("texture/.gtex"), sizeof(char));
-	snprintf(font->texture, 80, "texture/%s.gtex", (char*)assetData->data + offset);
+	size_t fontTextureLength;
+	char *fontTexture = ReadStringSafe(assetData->data, &offset, assetData->size, &fontTextureLength);
+	if (!fontTexture)
+	{
+		LogError("Failed to load font from asset (unable to read texture string)\n");
+		return GenerateFallbackFont();
+	}
+	fontTextureLength += strlen("texture/.gtex");
+	font->texture = calloc(fontTextureLength, sizeof(char));
+	snprintf(font->texture, fontTextureLength, "texture/%s.gtex", fontTexture);
+	free(fontTexture);
 	font->image = LoadImage(font->texture);
-	offset += texturePathLength;
 	font->charCount = ReadByte(assetData->data, &offset);
 	memset(font->indices, 0, 255);
 	memset(font->charWidths, 0, 255);
@@ -47,3 +91,10 @@ Font *LoadFont(const char *asset)
 
 	return font;
 }
+
+void FreeFont(Font *font)
+{
+	free(font->texture);
+	free(font);
+}
+

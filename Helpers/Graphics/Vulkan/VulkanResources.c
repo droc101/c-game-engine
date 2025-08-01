@@ -77,7 +77,7 @@ VkResult CreateViewModelBuffers()
 	memcpy(vertexData, model->lods[0]->vertexData, vertexSize);
 	for (uint8_t i = 0; i < model->materialCount; i++)
 	{
-		const Material *material = &model->skins[viewmodel->modelSkin][i];
+		const Material *material = &model->materials[0];//&model->skins[viewmodel->modelSkin][i];
 		memcpy(indexData + sizeof(uint32_t) * indexCount,
 			   model->lods[0]->indexData[i],
 			   sizeof(uint32_t) * model->lods[0]->indexCount[i]);

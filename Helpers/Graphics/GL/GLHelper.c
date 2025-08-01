@@ -441,13 +441,13 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 	GL_ModelBuffers *buf = malloc(sizeof(GL_ModelBuffers));
 	CheckAlloc(buf);
 	buf->lodCount = model->lodCount;
-	buf->materialCount = model->materialCount;
+	buf->materialCount = model->materialsPerSkin;
 	buf->buffers = malloc(sizeof(void *) * model->lodCount);
 	CheckAlloc(buf->buffers);
 
 	for (int l = 0; l < buf->lodCount; l++)
 	{
-		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialCount);
+		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialsPerSkin);
 		CheckAlloc(buf->buffers[l]);
 
 		for (int m = 0; m < buf->materialCount; m++)
@@ -461,7 +461,7 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 
 			glBindBuffer(GL_ARRAY_BUFFER, modelBuffer->vertexBufferObject);
 			glBufferData(GL_ARRAY_BUFFER,
-						 (long)(model->lods[l]->vertexCount * sizeof(float) * 8),
+						 (long)(model->lods[l]->vertexCount * sizeof(float) * 12),
 						 model->lods[l]->vertexData,
 						 GL_STATIC_DRAW);
 
@@ -1058,7 +1058,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 		GL_DrawFloor(floorStart, floorEnd, level->ceilOrSkyTex, 0.5f, 0.8f);
 	} else
 	{
-		GL_RenderModel(LoadModel(MODEL("model_sky")), skyModelWorldMatrix, 0, 0);
+		GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0);
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
@@ -1116,9 +1116,10 @@ void GL_RenderModelPart(const ModelDefinition *model,
 						const uint skin)
 {
 	const uint realSkin = clamp(skin, 0, model->skinCount - 1);
-	Material *skinMats = model->skins[realSkin];
+	const size_t *skinIndices = model->skins[realSkin];
+	const Material mat = model->materials[skinIndices[material]];
 
-	const ModelShader shader = skinMats[material].shader;
+	const ModelShader shader = mat.shader;
 
 	GL_Shader *glShader;
 	switch (shader)
@@ -1144,7 +1145,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 		GL_LoadTextureFromAsset(GetState()->level->ceilOrSkyTex);
 	} else
 	{
-		GL_LoadTextureFromAsset(skinMats[material].texture);
+		GL_LoadTextureFromAsset(mat.texture);
 	}
 
 
@@ -1160,24 +1161,28 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	GL_LoadModel(model, lod, material);
 
 	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)0);
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(posAttrLoc);
 
 	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
+	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(colAttrLoc);
 
 	if (shader == SHADER_SHADED) // other shaders do not take normals
 	{
 		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
-		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(normAttrLoc);
 	}
 
 	if (shader != SHADER_SKY)
 	{
 		const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
-		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(skinMats[material].color));
+		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(mat.color));
 	}
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
@@ -1186,7 +1191,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const uint skin, const uint lod)
 {
 	glEnable(GL_CULL_FACE);
-	for (int m = 0; m < model->materialCount; m++)
+	for (int m = 0; m < model->materialsPerSkin; m++)
 	{
 		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);
 	}
