@@ -373,21 +373,21 @@
             "params": [
                 {
                     "name": "min",
-                    "type": "integer",
+                    "type": "int",
                     "min": -2147483648,
                     "max": 2147483647,
                     "default": 0
                 },
                 {
                     "name": "max",
-                    "type": "integer",
+                    "type": "int",
                     "min": -2147483648,
                     "max": 2147483647,
                     "default": 100
                 },
                 {
                     "name": "counter",
-                    "type": "integer",
+                    "type": "int",
                     "min": -2147483648,
                     "max": 2147483647,
                     "default": 0
@@ -418,11 +418,11 @@
                 },
                 {
                     "name": "add",
-                    "paramType": "integer"
+                    "paramType": "int"
                 },
                 {
                     "name": "subtract",
-                    "paramType": "integer"
+                    "paramType": "int"
                 }
             ],
             "outputs": [
@@ -452,7 +452,7 @@
                 },
                 {
                     "name": "counter_changed",
-                    "paramType": "integer"
+                    "paramType": "int"
                 }
             ]
         }
