@@ -177,14 +177,14 @@ bool GL_Init(SDL_Window *wnd)
 	glDebugMessageCallback(GL_DebugMessageCallback, NULL);
 #endif
 
-	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_textured_f"), SHADER("gl/hud_textured_v"));
-	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_color_f"), SHADER("gl/hud_color_v"));
-	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/wall_f"), SHADER("gl/wall_v"));
-	floorAndCeilingShader = GL_ConstructShaderFromAssets(SHADER("gl/floor_f"), SHADER("gl/floor_v"));
-	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/sky_f"), SHADER("gl/sky_v"));
-	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
-	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"),
-													   SHADER("gl/model_unshaded_v"));
+	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/hud_textured_f"), SHADER("gl/hud/hud_textured_v"));
+	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/hud_color_f"), SHADER("gl/hud/hud_color_v"));
+	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/world/wall_f"), SHADER("gl/world/wall_v"));
+	floorAndCeilingShader = GL_ConstructShaderFromAssets(SHADER("gl/world/floor_f"), SHADER("gl/world/floor_v"));
+	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/world/sky_f"), SHADER("gl/world/sky_v"));
+	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_shaded_f"), SHADER("gl/model/model_shaded_v"));
+	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_unshaded_f"),
+													   SHADER("gl/model/model_unshaded_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
