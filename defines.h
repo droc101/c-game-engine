@@ -28,7 +28,6 @@ typedef enum CurrentState CurrentState;
 typedef enum Renderer Renderer;
 typedef enum OptionsMsaa OptionsMsaa;
 typedef enum ModelShader ModelShader;
-typedef enum ImageDataOffsets ImageDataOffsets;
 typedef enum AssetType AssetType;
 typedef enum ParamType ParamType;
 
@@ -155,17 +154,6 @@ enum AssetType
 	ASSET_TYPE_SHADER = 3,
 	ASSET_TYPE_MODEL = 4,
 	ASSET_TYPE_FONT = 5
-};
-
-/**
- * Use to get data from a decompressed image asset using @c ReadUintA
- */
-enum ImageDataOffsets
-{
-	IMAGE_SIZE_OFFSET = 0,
-	IMAGE_WIDTH_OFFSET = 4,
-	IMAGE_HEIGHT_OFFSET = 8,
-	IMAGE_ID_OFFSET = 12
 };
 
 /**

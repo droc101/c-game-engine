@@ -367,7 +367,7 @@
             ]
         },
         {
-            "id": 13,
+            "id": 15,
             "name": "Logic Counter",
             "render_type": "normal",
             "params": [

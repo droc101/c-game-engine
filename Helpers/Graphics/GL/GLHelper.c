@@ -182,7 +182,8 @@ bool GL_Init(SDL_Window *wnd)
 	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/world/wall_f"), SHADER("gl/world/wall_v"));
 	floorAndCeilingShader = GL_ConstructShaderFromAssets(SHADER("gl/world/floor_f"), SHADER("gl/world/floor_v"));
 	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/world/sky_f"), SHADER("gl/world/sky_v"));
-	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_shaded_f"), SHADER("gl/model/model_shaded_v"));
+	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_shaded_f"),
+													 SHADER("gl/model/model_shaded_v"));
 	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_unshaded_f"),
 													   SHADER("gl/model/model_unshaded_v"));
 
