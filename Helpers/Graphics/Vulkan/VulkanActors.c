@@ -52,7 +52,7 @@ void VulkanActorsVariablesCleanup()
 	ListFree(unshadedMaterialIds);
 }
 
-void LoadMaterial(List *materialIds,
+static inline bool LoadMaterial(List *materialIds,
 				  List *materialCounts,
 				  const uint64_t lodMaterialId,
 				  BufferRegion *drawInfoBufferRegion,
@@ -65,25 +65,21 @@ void LoadMaterial(List *materialIds,
 		ListAdd(*materialCounts, 1);
 		if (!drawInfoBufferRegion)
 		{
-			return;
+			return true;
 		}
+
 		index = materialIds->length - 1;
-	} else
-	{
-		ListGetUint32(*materialCounts, index)++;
-		if (!drawInfoBufferRegion)
-		{
-			return;
-		}
+
+		VkDrawIndexedIndirectCommand *drawInfo = drawInfoBufferRegion->data;
+		drawInfo[index].indexCount = indexCount;
+		drawInfo[index].firstIndex = indexOffset;
+		drawInfo[index].vertexOffset = vertexOffset;
+
+		drawInfoBufferRegion->bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
+		return true;
 	}
-
-	VkDrawIndexedIndirectCommand *drawInfo = drawInfoBufferRegion->data;
-	drawInfo[index].indexCount += indexCount;
-	drawInfo[index].firstIndex += indexOffset;
-	drawInfo[index].vertexOffset += vertexOffset;
-	indexOffset += indexCount;
-
-	drawInfoBufferRegion->bytesUsed += sizeof(VkDrawIndexedIndirectCommand);
+	ListGetUint32(*materialCounts, index)++;
+	return false;
 }
 
 void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
@@ -96,24 +92,21 @@ void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 
 	for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 	{
-		const size_t indexSize = sizeof(uint32_t) * lod->indexCount[j];
-		memcpy(buffers.actorModels.indices.data + indexDataOffset, lod->indexData[j], indexSize);
-		indexDataOffset += indexSize;
-
 		const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
 		const uint32_t indexCount = lod->indexCount[j];
 		const uint64_t lodMaterialId = (lod->id << 32) | material.id;
+		bool newlyLoaded = false;
 		switch (material.shader)
 		{
 			case SHADER_SHADED:
-				LoadMaterial(&shadedMaterialIds,
+				newlyLoaded = LoadMaterial(&shadedMaterialIds,
 							 &shadedMaterialCounts,
 							 lodMaterialId,
 							 &buffers.actorModels.shadedDrawInfo,
 							 indexCount);
 				break;
 			case SHADER_UNSHADED:
-				LoadMaterial(&unshadedMaterialIds,
+				newlyLoaded = LoadMaterial(&unshadedMaterialIds,
 							 &unshadedMaterialCounts,
 							 lodMaterialId,
 							 &buffers.actorModels.unshadedDrawInfo,
@@ -121,6 +114,13 @@ void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 				break;
 			default:
 				assert(false && "Invalid material shader!");
+		}
+		if (newlyLoaded)
+		{
+			const size_t indexSize = sizeof(uint32_t) * lod->indexCount[j];
+			memcpy(buffers.actorModels.indices.data + indexDataOffset, lod->indexData[j], indexSize);
+			indexDataOffset += indexSize;
+			indexOffset += indexCount;
 		}
 	}
 }
