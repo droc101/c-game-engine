@@ -485,6 +485,8 @@ struct Actor
 	uint currentSkinIndex;
 	/// The current LOD level of the actor's model, re-calculated each physics tick
 	uint currentLod;
+	/// The color modifier of the actor's model
+	Color modColor;
 
 	/// The actor's wall, in global space
 	Wall *actorWall;

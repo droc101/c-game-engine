@@ -192,8 +192,9 @@ void GL_RenderLevel(const Level *level, const Camera *camera);
  * @param modelWorldMatrix The model -> world matrix
  * @param skin The skin to use
  * @param lod The lod to use
+ * @param modColor
  */
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, uint skin, uint lod);
+void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, uint skin, uint lod, Color modColor);
 
 /**
  * Render the level's static walls

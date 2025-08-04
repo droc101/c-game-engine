@@ -1059,7 +1059,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 		GL_DrawFloor(floorStart, floorEnd, level->ceilOrSkyTex, 0.5f, 0.8f);
 	} else
 	{
-		GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0);
+		GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
@@ -1081,7 +1081,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 			GL_DrawActorWall(actor);
 		} else
 		{
-			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod);
+			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
 		}
 	}
 
@@ -1102,7 +1102,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0);
+		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
 	}
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -1114,7 +1114,8 @@ void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
 						const uint lod,
 						const int material,
-						const uint skin)
+						const uint skin,
+						Color modColor)
 {
 	const uint realSkin = clamp(skin, 0, model->skinCount - 1);
 	const size_t *skinIndices = model->skins[realSkin];
@@ -1184,17 +1185,24 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	{
 		const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
 		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(mat.color));
+
+		const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
+		glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(modColor));
 	}
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const uint skin, const uint lod)
+void GL_RenderModel(const ModelDefinition *model,
+					const mat4 modelWorldMatrix,
+					const uint skin,
+					const uint lod,
+					const Color modColor)
 {
 	glEnable(GL_CULL_FACE);
 	for (int m = 0; m < model->materialsPerSkin; m++)
 	{
-		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);
+		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin, modColor);
 	}
 	glDisable(GL_CULL_FACE);
 }

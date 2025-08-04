@@ -223,8 +223,14 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture);
  * @param lod The level of detail to render
  * @param material The material to render
  * @param skin The skin to use for the model
+ * @param modColor
  */
-void GL_RenderModelPart(const ModelDefinition *model, const mat4 modelWorldMatrix, uint lod, int material, uint skin);
+void GL_RenderModelPart(const ModelDefinition *model,
+						const mat4 modelWorldMatrix,
+						uint lod,
+						int material,
+						uint skin,
+						Color modColor);
 
 
 #endif //GLINTERNAL_H

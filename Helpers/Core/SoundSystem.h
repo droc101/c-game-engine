@@ -9,7 +9,7 @@
 /// (sound effects that can play at the same time)
 #define SFX_CHANNEL_COUNT 32
 
-typedef void(*SoundFinishedCallback)(void *data);
+typedef void (*SoundFinishedCallback)(void *data);
 
 typedef struct SoundSystem SoundSystem;
 typedef struct SoundEffect SoundEffect;

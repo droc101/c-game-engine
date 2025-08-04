@@ -4,13 +4,14 @@
 
 #include "TestActor.h"
 #include <box2d/box2d.h>
-#include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
+#include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Navigation.h"
 #include "../Structs/Actor.h"
+#include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 
 bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -87,6 +88,8 @@ void TestActorUpdate(Actor *this, const double delta)
 	this->position = b2Body_GetPosition(this->bodyId);
 
 	NavigationStep(this, this->extraData, delta);
+
+	this->modColor.r = sin(GetState()->physicsFrame / 10.0f) + 1.0f / 2.0f;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
