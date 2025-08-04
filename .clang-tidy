@@ -102,4 +102,5 @@ readability-*,
 -readability-reference-to-constructed-temporary'
 CheckOptions:
   bugprone-unused-return-value.CheckedFunctions: '[A-Z].+'
+  bugprone-unused-return-value.AllowCastToVoid: true
   readability-function-cognitive-complexity.IgnoreMacros: true

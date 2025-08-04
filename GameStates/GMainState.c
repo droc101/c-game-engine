@@ -21,6 +21,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GPauseState.h"
 
 Actor *targetedEnemy = NULL;
@@ -30,7 +31,7 @@ void GMainStateUpdate(GlobalState *State)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		PlaySoundEffect(SOUND("sfx/popup"));
+		(void)PlaySoundEffect(SOUND("sfx/popup"), 0, 1, NULL, NULL);
 		GPauseStateSet();
 		return;
 	}

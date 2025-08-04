@@ -13,6 +13,7 @@
 #include "../../Structs/UI/Controls/Button.h"
 #include "../../Structs/UI/Controls/Slider.h"
 #include "../../Structs/UI/UiStack.h"
+#include "../../Helpers/Core/SoundSystem.h"
 #include "../GOptionsState.h"
 
 UiStack *soundOptionsStack = NULL;

@@ -16,6 +16,7 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GMainState.h"
 #include "GMenuState.h"
 

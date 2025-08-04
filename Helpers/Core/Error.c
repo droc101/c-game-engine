@@ -4,6 +4,7 @@
 
 #include "Error.h"
 #include <errno.h>
+#include <SDL_mixer.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

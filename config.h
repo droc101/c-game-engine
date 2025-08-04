@@ -80,10 +80,6 @@
 #define APPDATA_ORG_NAME "Droc101 Development"
 #define APPDATA_APP_NAME "Game"
 
-/// Number of sound effect channels
-/// (sound effects that can play at the same time)
-#define SFX_CHANNEL_COUNT 16
-
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60
 

@@ -198,6 +198,8 @@ add_executable(
         Helpers/Core/AssetLoaders/FontLoader.h
         Helpers/Core/AssetLoaders/ShaderLoader.c
         Helpers/Core/AssetLoaders/ShaderLoader.h
+        Helpers/Core/SoundSystem.c
+        Helpers/Core/SoundSystem.h
 )
 
 #endregion

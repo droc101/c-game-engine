@@ -20,12 +20,6 @@ void InitOptions();
 void InitState();
 
 /**
- * Update the volume from the options
- * @note This function should be called whenever the options are changed
- */
-void UpdateVolume();
-
-/**
  * Get the global state
  * @return the global state
  */
@@ -62,24 +56,6 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 void ChangeLevel(Level *level);
 
 /**
- * Change the bgm
- * @param asset Asset to change to
- */
-void ChangeMusic(const char *asset);
-
-/**
- * Stop the bgm
- */
-void StopMusic();
-
-/**
- * Attempt to play a sound effect
- * @param asset Sound effect to play
- * @warning If there are no free channels, the sound effect will not play, and you will not be notified
- */
-void PlaySoundEffect(const char *asset);
-
-/**
  * Destroy the global state
  */
 void DestroyGlobalState();
@@ -90,11 +66,5 @@ void DestroyGlobalState();
  * @warning Don't use this from GMainState, use @c GLoadingSelectStateSet instead to avoid potential crashes
  */
 bool ChangeLevelByName(const char *name);
-
-/**
- * Remove a trigger from a level
- * @param index The trigger to remove
- */
-void RemoveTrigger(size_t index);
 
 #endif //GAME_GLOBALSTATE_H

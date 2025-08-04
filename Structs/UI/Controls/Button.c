@@ -9,6 +9,7 @@
 #include "../../../Helpers/Core/Input.h"
 #include "../../../Helpers/Graphics/Drawing.h"
 #include "../../../Helpers/Graphics/Font.h"
+#include "../../../Helpers/Core/SoundSystem.h"
 #include "../../GlobalState.h"
 
 Control *CreateButtonControl(const Vector2 position,
@@ -44,7 +45,7 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint /*
 	const ButtonData *data = (ButtonData *)c->ControlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
-		PlaySoundEffect(SOUND("sfx/click"));
+		(void)PlaySoundEffect(SOUND("sfx/click"), 0, 1, NULL, NULL);
 		ConsumeMouseButton(SDL_BUTTON_LEFT);
 		ConsumeKey(SDL_SCANCODE_SPACE);
 		ConsumeButton(CONTROLLER_OK);

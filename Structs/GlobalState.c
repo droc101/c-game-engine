@@ -21,26 +21,11 @@
 #include "../Helpers/Core/PhysicsThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Level.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "Camera.h"
 #include "Options.h"
 
 GlobalState state;
-
-/**
- * callback for when a channel finishes playing (so we can free it)
- * @param channel The channel that finished
- */
-void ChannelFinished(const int channel)
-{
-	if (state.channels[channel] != NULL)
-	{
-		Mix_FreeChunk(state.channels[channel]);
-		state.channels[channel] = NULL;
-	} else
-	{
-		LogWarning("A sound effect channel finished, but it was already NULL!\n");
-	}
-}
 
 void InitOptions()
 {
@@ -57,11 +42,6 @@ void InitState()
 	state.physicsFrame = 0;
 	state.level = CreateLevel(); // empty level so we don't segfault
 	state.requestExit = false;
-	state.music = NULL;
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
-	{
-		state.channels[i] = NULL;
-	}
 	state.cameraY = 0;
 	state.cam = CreateCamera();
 
@@ -73,19 +53,6 @@ void InitState()
 	state.viewmodel.rotation[1] = 0.0872665f; // 5deg
 	state.viewmodel.rotation[2] = 0.0f;
 	state.viewmodel.modelSkin = 0;
-
-	UpdateVolume();
-
-	StopMusic();
-	Mix_ChannelFinished(ChannelFinished);
-}
-
-void UpdateVolume()
-{
-	const double sfxVol = state.options.sfxVolume * state.options.masterVolume;
-	const double musicVol = state.options.musicVolume * state.options.masterVolume;
-	Mix_Volume(-1, (int)(sfxVol * MIX_MAX_VOLUME));
-	Mix_VolumeMusic((int)(musicVol * MIX_MAX_VOLUME));
 }
 
 inline GlobalState *GetState()
@@ -150,117 +117,12 @@ void ChangeLevel(Level *level)
 	PhysicsThreadUnlockTickMutex();
 }
 
-void ChangeMusic(const char *asset)
-{
-	if (!state.isAudioStarted)
-	{
-		return;
-	}
-
-	StopMusic(); // stop the current music and free its data
-	const Asset *music = DecompressAsset(asset, true);
-	if (music == NULL)
-	{
-		LogError("Failed to load music asset.\n");
-		return;
-	}
-
-	if (music->type != ASSET_TYPE_WAV)
-	{
-		LogWarning("ChangeMusic Error: Asset is not a music file.\n");
-		return;
-	}
-
-	const uint mp3Size = music->size;
-	Mix_Music *mus = Mix_LoadMUS_RW(SDL_RWFromConstMem(music->data, (int)mp3Size), 1);
-	if (mus == NULL)
-	{
-		printf("Mix_LoadMUS_RW Error: %s\n", Mix_GetError());
-		return;
-	}
-	state.music = mus;
-	Mix_FadeInMusic(mus, -1, 500);
-}
-
-void StopMusic()
-{
-	if (!state.isAudioStarted)
-	{
-		return;
-	}
-	if (state.music != NULL)
-	{
-		// stop and free the current music
-		Mix_HaltMusic();
-		Mix_FreeMusic(state.music);
-		state.music = NULL; // set to NULL, so we don't free it again if this function fails
-	}
-}
-
-void PlaySoundEffect(const char *asset)
-{
-	if (!state.isAudioStarted)
-	{
-		return;
-	}
-
-	const Asset *wav = DecompressAsset(asset, true);
-	if (wav == NULL)
-	{
-		LogError("Failed to load sound effect asset.\n");
-		return;
-	}
-	if (wav->type != ASSET_TYPE_WAV)
-	{
-		LogError("PlaySoundEffect Error: Asset is not a sound effect file.\n");
-		return;
-	}
-	const uint wavSize = wav->size;
-	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(wav->data, (int)wavSize), 1);
-	if (chunk == NULL)
-	{
-		LogError("Mix_LoadWAV_RW Error: %s\n", Mix_GetError());
-		return;
-	}
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
-	{
-		if (state.channels[i] == NULL)
-		{
-			state.channels[i] = chunk;
-			Mix_PlayChannel(i, chunk, 0);
-			return;
-		}
-	}
-	LogError("PlaySoundEffect Error: No available channels.\n");
-	Mix_FreeChunk(chunk);
-}
-
 void DestroyGlobalState()
 {
 	SaveOptions(&state.options);
 	DestroyLevel(state.level);
 	free(state.saveData);
 	free(state.cam);
-	if (state.music != NULL)
-	{
-		Mix_HaltMusic();
-		Mix_FreeMusic(state.music);
-	}
-
-	Mix_ChannelFinished(NULL);
-	Mix_HaltChannel(-1);
-
-	// free sound effects
-	if (state.isAudioStarted)
-	{
-		for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
-		{
-			if (state.channels[i] != NULL)
-			{
-				Mix_FreeChunk(state.channels[i]);
-			}
-		}
-	}
 
 	GInputOptionsStateDestroy();
 	GSoundOptionsStateDestroy();

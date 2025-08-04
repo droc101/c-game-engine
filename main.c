@@ -17,6 +17,7 @@
 #include "Helpers/Core/LodThread.h"
 #include "Helpers/Core/Logging.h"
 #include "Helpers/Core/PhysicsThread.h"
+#include "Helpers/Core/SoundSystem.h"
 #include "Helpers/Core/Timing.h"
 #include "Helpers/Graphics/Drawing.h"
 #include "Helpers/Graphics/RenderingHelpers.h"
@@ -87,23 +88,6 @@ void InitSDL()
 	LogInfo("SDL Video Driver: %s\n", SDL_GetCurrentVideoDriver());
 
 	SDL_StopTextInput(); // is enabled by default on desktop
-}
-
-/**
- * Initialize the audio system (SDL_mixer)
- */
-void InitAudio()
-{
-	Mix_AllocateChannels(SFX_CHANNEL_COUNT);
-
-	if (Mix_OpenAudio(48000, AUDIO_S16, 2, 2048) == 0)
-	{
-		GetState()->isAudioStarted = true;
-	} else
-	{
-		GetState()->isAudioStarted = false;
-		LogError("Mix_OpenAudio Error: %s\n", Mix_GetError());
-	}
 }
 
 /**
@@ -269,7 +253,7 @@ int main(const int argc, char *argv[])
 		RenderInitError();
 	}
 
-	InitAudio();
+	InitSoundSystem();
 
 	WindowAndRenderInit();
 
@@ -375,13 +359,12 @@ int main(const int argc, char *argv[])
 	LodThreadDestroy();
 	InputDestroy();
 	DestroyGlobalState();
+	DestroySoundSystem();
 	RenderDestroy();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);
 	DestroyCommonAssets();
 	DestroyAssetCache(); // Free all assets
-	Mix_CloseAudio();
-	Mix_Quit();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();
 	LogDestroy();

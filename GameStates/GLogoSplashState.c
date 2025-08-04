@@ -9,6 +9,7 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GMenuState.h"
 
 void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
@@ -27,7 +28,7 @@ void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
 
 	if (State->physicsFrame == 20)
 	{
-		PlaySoundEffect(SOUND("sfx/coincling"));
+		(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
 	}
 
 	if (State->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))

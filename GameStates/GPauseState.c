@@ -14,6 +14,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GLevelSelectState.h"
 #include "GMainState.h"
 #include "GOptionsState.h"
@@ -30,7 +31,7 @@ void GPauseStateUpdate(GlobalState * /*State*/)
 		IsButtonJustPressed(CONTROLLER_CANCEL) ||
 		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		PlaySoundEffect(SOUND("sfx/popdown"));
+		(void)PlaySoundEffect(SOUND("sfx/popdown"), 0, 1, NULL, NULL);
 		GMainStateSet();
 	}
 }

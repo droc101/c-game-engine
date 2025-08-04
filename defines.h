@@ -9,7 +9,6 @@
 #include <box2d/math_functions.h>
 #include <cglm/cglm.h>
 #include <SDL.h>
-#include <SDL_mixer.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "config.h"
@@ -407,11 +406,11 @@ struct Options
 	/* Audio */
 
 	/// The volume of the music
-	double musicVolume;
+	float musicVolume;
 	/// The volume of the sound effects
-	double sfxVolume;
+	float sfxVolume;
 	/// The master volume
-	double masterVolume;
+	float masterVolume;
 } __attribute__((packed)); // This is packed because it is saved to disk
 
 // Global state of the game
@@ -443,12 +442,6 @@ struct GlobalState
 
 	/// Game options
 	Options options;
-	/// Whether the audio system has been started successfully
-	bool isAudioStarted;
-	/// background music
-	Mix_Music *music;
-	/// sound effects
-	Mix_Chunk *channels[SFX_CHANNEL_COUNT];
 
 	/// The path to the executable
 	char executablePath[261];

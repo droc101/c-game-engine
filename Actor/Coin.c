@@ -15,6 +15,7 @@
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
+#include "../Helpers/Core/SoundSystem.h"
 
 #define COIN_OUTPUT_COLLECTED 2
 
@@ -92,7 +93,7 @@ void CoinUpdate(Actor *this, double /*delta*/)
 			GetState()->saveData->blueCoins++;
 			GetState()->saveData->coins += 5;
 		}
-		PlaySoundEffect(SOUND("sfx/coincling"));
+		(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
 		ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE); // 2 = coin collected
 		RemoveActor(this);
 	}

@@ -13,6 +13,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
 
