@@ -494,6 +494,9 @@ Font *LoadFont(const char *asset)
 
 void FreeAsset(Asset *asset)
 {
-	free(asset->data);
-	free(asset);
+	if (asset != NULL)
+	{
+		free(asset->data);
+		free(asset);
+	}
 }

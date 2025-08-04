@@ -26,13 +26,13 @@
 #include "../Actor/TestActor.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, const KvList * /*params*/, JPH_BodyInterface * /*bodyInterface*/) {}
+void ActorInit(Actor * /*this*/, const KvList * /*params*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorDestroy(Actor * /*this*/) {}
 
-ActorInitFunction ActorInitFuncs[] = {
+ActorInitFunction actorInitFunctions[] = {
 	ActorInit,
 	TestActorInit,
 	CoinInit,
@@ -51,13 +51,13 @@ ActorInitFunction ActorInitFuncs[] = {
 	LogicCounterInit,
 };
 
-ActorUpdateFunction ActorUpdateFuncs[] = {
+ActorUpdateFunction actorUpdateFunctions[] = {
 	ActorUpdate,
 	TestActorUpdate,
 	CoinUpdate,
 	GoalUpdate,
 	DoorUpdate,
-	TriggerUpdate,
+	ActorUpdate,
 	IoProxyUpdate,
 	PhysboxUpdate,
 	LaserUpdate,
@@ -70,42 +70,51 @@ ActorUpdateFunction ActorUpdateFuncs[] = {
 	ActorUpdate,
 };
 
-ActorDestroyFunction ActorDestroyFuncs[] = {
+ActorDestroyFunction actorDestroyFunctions[] = {
 	ActorDestroy,
-	TestActorDestroy,
-	CoinDestroy,
-	GoalDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
 	DoorDestroy,
-	TriggerDestroy,
-	IoProxyDestroy,
-	PhysboxDestroy,
-	LaserDestroy,
 	ActorDestroy,
-	SoundPlayerDestroy,
-	SpriteDestroy,
-	LaserDestroy,
-	LogicBinaryDestroy,
-	LogicDecimalDestroy,
-	LogicCounterDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
 };
 
-Actor *CreateActor(const Transform *transform, const uint actorType, KvList *params, JPH_BodyInterface *bodyInterface)
+Actor *CreateActor(const Transform *transform,
+				   const ActorType actorType,
+				   KvList *params,
+				   JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
 	actor->actorWall = NULL;
 	actor->transform = *transform;
 	actor->health = 1;
+	actor->actorType = actorType;
 	actor->actorModel = NULL;
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->SignalHandler = DefaultSignalHandler;
-	actor->Init = ActorInitFuncs[actorType];
-	actor->Update = ActorUpdateFuncs[actorType];
-	actor->Destroy = ActorDestroyFuncs[actorType];
-	actor->Init(actor, params, bodyInterface); // kindly allow the Actor to initialize itself
-	actor->actorType = actorType;
+	actor->Init = actorInitFunctions[actorType];
+	actor->Update = actorUpdateFunctions[actorType];
+	actor->Destroy = actorDestroyFunctions[actorType];
+	actor->OnPlayerContactAdded = NULL;
+	actor->OnPlayerContactPersisted = NULL;
+	actor->OnPlayerContactRemoved = NULL;
+	actor->extraData = NULL;
+	actor->bodyId = JPH_BodyId_InvalidBodyID;
+	actor->bodyInterface = bodyInterface;
+	actor->Init(actor, params); // kindly allow the Actor to initialize itself
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
 	if (params)
 	{
@@ -117,6 +126,14 @@ Actor *CreateActor(const Transform *transform, const uint actorType, KvList *par
 void FreeActor(Actor *actor)
 {
 	actor->Destroy(actor);
+	free(actor->actorWall);
+	actor->actorWall = NULL;
+	free(actor->extraData);
+	actor->extraData = NULL;
+	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
+	{
+		JPH_BodyInterface_RemoveAndDestroyBody(actor->bodyInterface, actor->bodyId);
+	}
 	for (int i = 0; i < actor->ioConnections.length; i++)
 	{
 		ActorConnection *connection = ListGetPointer(actor->ioConnections, i);

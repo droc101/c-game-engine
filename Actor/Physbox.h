@@ -7,8 +7,7 @@
 
 #include "../defines.h"
 
-void PhysboxInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
+void PhysboxInit(Actor *this, const KvList *params);
 void PhysboxUpdate(Actor *this, double delta);
-void PhysboxDestroy(Actor *this);
 
 #endif //PHYSBOX_H

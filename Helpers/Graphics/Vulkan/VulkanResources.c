@@ -233,14 +233,25 @@ VkResult CreateActorModelBuffers()
 
 VkResult CreateDebugDrawBuffers()
 {
-	const LunaBufferCreationInfo vertexBufferCreationInfo = {
-		.size = buffers.debugDraw.vertices.allocatedSize,
+#ifdef JPH_DEBUG_RENDERER
+	const LunaBufferCreationInfo linesBufferCreationInfo = {
+		.size = buffers.debugDrawLines.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.debugDraw.vertices.buffer),
-						   "Failed to create debug draw vertex buffer!");
-	buffers.debugDraw.vertices.data = malloc(buffers.debugDraw.vertices.allocatedSize);
-	CheckAlloc(buffers.debugDraw.vertices.data);
+	VulkanTestReturnResult(lunaCreateBuffer(&linesBufferCreationInfo, &buffers.debugDrawLines.vertices.buffer),
+						   "Failed to create debug draw lines buffer!");
+	buffers.debugDrawLines.vertices.data = malloc(buffers.debugDrawLines.vertices.allocatedSize);
+	CheckAlloc(buffers.debugDrawLines.vertices.data);
+
+	const LunaBufferCreationInfo trianglesBufferCreationInfo = {
+		.size = buffers.debugDrawTriangles.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&trianglesBufferCreationInfo, &buffers.debugDrawTriangles.vertices.buffer),
+						   "Failed to create debug draw triangles buffer!");
+	buffers.debugDrawTriangles.vertices.data = malloc(buffers.debugDrawTriangles.vertices.allocatedSize);
+	CheckAlloc(buffers.debugDrawTriangles.vertices.data);
+#endif
 
 	return VK_SUCCESS;
 }
@@ -442,16 +453,27 @@ VkResult ResizeActorModelBuffers()
 
 VkResult ResizeDebugDrawBuffers()
 {
-	lunaDestroyBuffer(buffers.debugDraw.vertices.buffer);
+#ifdef JPH_DEBUG_RENDERER
+	lunaDestroyBuffer(buffers.debugDrawLines.vertices.buffer);
+	lunaDestroyBuffer(buffers.debugDrawTriangles.vertices.buffer);
 
-	const LunaBufferCreationInfo vertexBufferCreationInfo = {
-		.size = buffers.debugDraw.vertices.allocatedSize,
+
+	const LunaBufferCreationInfo linesBufferCreationInfo = {
+		.size = buffers.debugDrawLines.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.debugDraw.vertices.buffer),
-						   "Failed to recreate debug draw vertex buffer!");
+	const LunaBufferCreationInfo trianglesBufferCreationInfo = {
+		.size = buffers.debugDrawTriangles.vertices.allocatedSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(&linesBufferCreationInfo, &buffers.debugDrawLines.vertices.buffer),
+						   "Failed to recreate debug draw lines buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(&trianglesBufferCreationInfo, &buffers.debugDrawTriangles.vertices.buffer),
+						   "Failed to recreate debug draw triangles buffer!");
 
-	buffers.debugDraw.shouldResize = false;
+	buffers.debugDrawLines.shouldResize = false;
+	buffers.debugDrawTriangles.shouldResize = false;
+#endif
 
 	return VK_SUCCESS;
 }

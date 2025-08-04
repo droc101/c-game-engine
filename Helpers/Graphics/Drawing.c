@@ -296,7 +296,23 @@ inline void DrawBatchedQuadsColored(const BatchedQuadArray *batch, const Color c
 	}
 }
 
-void DrawJoltDebugRendererTriangle(void * /*userData*/,
+void DrawJoltDebugRendererDrawLine(void * /*userData*/,
+								   const JPH_RVec3 *from,
+								   const JPH_RVec3 *to,
+								   const JPH_Color color)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_VULKAN:
+			VK_DrawJoltDebugRendererLine(from, to, color);
+			break;
+		default:
+		case RENDERER_OPENGL:
+			break;
+	}
+}
+
+void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 								   const JPH_RVec3 *v1,
 								   const JPH_RVec3 *v2,
 								   const JPH_RVec3 *v3,
@@ -306,7 +322,7 @@ void DrawJoltDebugRendererTriangle(void * /*userData*/,
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_DrawJoltDebugTriangle((Vector3[]){*v1, *v2, *v3}, color);
+			VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
 			break;
 		default:
 		case RENDERER_OPENGL:

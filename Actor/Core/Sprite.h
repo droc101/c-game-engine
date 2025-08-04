@@ -7,8 +7,6 @@
 
 #include "../../defines.h"
 
-void SpriteInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
-
-void SpriteDestroy(Actor *this);
+void SpriteInit(Actor *this, const KvList *params);
 
 #endif //SPRITE_H

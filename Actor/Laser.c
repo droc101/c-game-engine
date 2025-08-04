@@ -18,18 +18,18 @@ typedef struct LaserData
 	bool enabled;
 } LaserData;
 
-bool LaserSignalHandler(Actor *self, const Actor *sender, byte signal, const Param *param)
+bool LaserSignalHandler(Actor *this, const Actor *sender, byte signal, const Param *param)
 {
-	if (DefaultSignalHandler(self, sender, signal, param))
+	if (DefaultSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
-	LaserData *data = self->extraData;
+	LaserData *data = this->extraData;
 	if (signal == LASER_INPUT_DISABLE)
 	{
 		data->enabled = false;
-		self->actorWall->b = v2(0.01, 0);
-		WallBake(self->actorWall);
+		this->actorWall->b = v2(0.01, 0);
+		WallBake(this->actorWall);
 		return true;
 	}
 	if (signal == LASER_INPUT_ENABLE)
@@ -40,7 +40,7 @@ bool LaserSignalHandler(Actor *self, const Actor *sender, byte signal, const Par
 	return false;
 }
 
-void LaserInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
+void LaserInit(Actor *this, const KvList *params)
 {
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
@@ -106,12 +106,4 @@ void LaserUpdate(Actor *this, double /*delta*/)
 	// 		this->actorWall->uvOffset = fmodf(this->actorWall->uvOffset + 0.5f, 1.0f);
 	// 	}
 	// }
-}
-
-void LaserDestroy(Actor *this)
-{
-	free(this->actorWall);
-	this->actorWall = NULL;
-	free(this->extraData);
-	this->extraData = NULL;
 }

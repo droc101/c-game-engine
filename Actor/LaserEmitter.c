@@ -14,6 +14,8 @@
 #define LASER_EMITTER_INPUT_DISABLE 2
 #define LASER_EMITTER_INPUT_ENABLE 1
 
+static const JPH_Vec3 halfExtent = {0.2f, 0.48f, 0.05f};
+
 typedef enum LaserEmitterSkin
 {
 	EMITTER_SKIN_OFF,
@@ -31,7 +33,7 @@ typedef struct LaserEmitterData
 	bool hasTicked;
 } LaserEmitterData;
 
-bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, byte signal, const Param *param)
+bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
 	const LaserEmitterData *data = this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -53,22 +55,30 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, byte signal, co
 	return false;
 }
 
-void CreateLaserEmitterCollider(Actor *this, JPH_BodyInterface *bodyInterface)
+void CreateLaserEmitterCollider(Actor *this)
 {
-	// b2BodyDef bodyDef = b2DefaultBodyDef();
-	// bodyDef.type = b2_staticBody;
-	// bodyDef.position = this->position;
-	// bodyDef.linearDamping = 10;
-	// bodyDef.fixedRotation = true;
-	// this->bodyId = b2CreateBody(worldId, &bodyDef);
-	//
-	// const b2Polygon sensorShape = b2MakeOffsetBox(0.1f, 0.1f, (Vector2){0, 0}, 0);
-	// b2ShapeDef shapeDef = b2DefaultShapeDef();
-	// shapeDef.filter.categoryBits = COLLISION_GROUP_DEFAULT | COLLISION_GROUP_ACTOR;
-	// b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
+	JPH_Quat rotation = {};
+	JPH_Quat_FromEulerAngles(&this->transform.rotation, &rotation);
+	JPH_Vec3 forwardVector = {};
+	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
+	JPH_Vec3 offsetVector = {};
+	JPH_Vec3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
+	JPH_Vec3 position = {};
+	JPH_Vec3_Subtract(&this->transform.position, &offsetVector, &position);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
+			(const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS),
+			&position,
+			&rotation,
+			JPH_MotionType_Static,
+			OBJECT_LAYER_STATIC);
+	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
 }
 
-void LaserEmitterInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
+void LaserEmitterInit(Actor *this, const KvList *params)
 {
 	this->SignalHandler = LaserEmitterSignalHandler;
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
@@ -79,31 +89,20 @@ void LaserEmitterInit(Actor *this, const KvList *params, JPH_BodyInterface *body
 	this->actorModel = LoadModel(MODEL("model_laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
-	CreateLaserEmitterCollider(this, bodyInterface);
+	CreateLaserEmitterCollider(this);
 
 	data->startEnabled = KvGetBool(params, "startEnabled", true);
+
+	KvList laserParams;
+	KvListCreate(&laserParams);
+	KvSetByte(&laserParams, "height", data->height);
+	KvSetBool(&laserParams, "startEnabled", data->startEnabled);
+	data->laserActor = CreateActor(&this->transform,
+								   ACTOR_TYPE_LASER,
+								   &laserParams,
+								   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
+	AddActor(data->laserActor);
+	data->hasTicked = true;
 }
 
-void LaserEmitterUpdate(Actor *this, const double /*delta*/)
-{
-	LaserEmitterData *data = this->extraData;
-	if (!data->hasTicked)
-	{
-		KvList laserParams;
-		KvListCreate(&laserParams);
-		KvSetByte(&laserParams, "height", data->height);
-		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
-		data->laserActor = CreateActor(&this->transform,
-									   LASER_ACTOR,
-									   &laserParams,
-									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
-		AddActor(data->laserActor);
-		data->hasTicked = true;
-	}
-}
-
-void LaserEmitterDestroy(Actor *this)
-{
-	// b2DestroyBody(this->bodyId);
-	free(this->extraData);
-}
+void LaserEmitterUpdate(Actor *this, const double /*delta*/) {}

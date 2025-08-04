@@ -15,6 +15,7 @@
 #include "../Helpers/Core/LodThread.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Core/PhysicsThread.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
@@ -37,7 +38,7 @@ void GMainStateUpdate(GlobalState *state)
 		return;
 	}
 
-	state->level->player.transform.rotation.y += GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
+	state->level->player.transform.rotation.y -= GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
 
 	if (state->saveData->coins > 9999)
 	{
@@ -69,18 +70,18 @@ static void MovePlayer(const Player *player, float *distanceTraveled)
 	{
 		if (IsKeyPressed(SDL_SCANCODE_W))
 		{
-			moveVec.x += 1;
+			moveVec.y -= 1;
 		} else if (IsKeyPressed(SDL_SCANCODE_S))
 		{
-			moveVec.x -= 1;
+			moveVec.y += 1;
 		}
 
-		if (IsKeyPressed(SDL_SCANCODE_A))
+		if (IsKeyPressed(SDL_SCANCODE_D))
 		{
-			moveVec.y -= 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_D))
+			moveVec.x += 1;
+		} else if (IsKeyPressed(SDL_SCANCODE_A))
 		{
-			moveVec.y += 1;
+			moveVec.x -= 1;
 		}
 	}
 
@@ -92,10 +93,9 @@ static void MovePlayer(const Player *player, float *distanceTraveled)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
 		}
-		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), player->transform.rotation.y);
-
-		JPH_Character_SetLinearVelocity(player->joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}}, true);
+		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), -player->transform.rotation.y);
 	}
+	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}});
 }
 
 void GMainStateFixedUpdate(GlobalState *state, const double delta)
@@ -118,16 +118,21 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
-	state->camera->transform.position.y = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
-	state->viewmodel.translation[1] = -0.35f + (state->camera->transform.position.y * 0.2f);
+	state->camera->yOffset = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
 	state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
+
+	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
+
+	JPH_CharacterVirtual_Update(state->level->player.joltCharacter, deltaTime, OBJECT_LAYER_PLAYER, state->level->physicsSystem, JPH_BodyFilter_Create(NULL), JPH_ShapeFilter_Create(NULL));
 
 	if (WaitForLodThreadToEnd() != 0)
 	{
 		Error("Failed to wait for LOD thread end semaphore!");
 	}
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
+
+	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
 
 	for (int i = 0; i < state->level->actors.length; i++)
 	{
@@ -138,7 +143,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
 		Actor *leaf = CreateActor(&state->level->player.transform,
-								  TEST_ACTOR,
+								  ACTOR_TYPE_TEST,
 								  NULL,
 								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
 		AddActor(leaf);
@@ -153,9 +158,6 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 	}
 
-	// This should be before the LOD thread starts because the LOD thread uses player position (race conditions are bad)
-	JPH_Character_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position, true);
-
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
 	if (SignalLodThreadCanStart() != 0)
 	{
@@ -164,7 +166,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	// This is safe to be here because it does not modify the actors in any way.
 	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
-																   (float)delta / PHYSICS_TARGET_TPS,
+																   deltaTime,
 																   2,
 																   state->jobSystem);
 	if (result != JPH_PhysicsUpdateError_None)
@@ -179,7 +181,7 @@ void GMainStateRender(GlobalState *state)
 {
 	const Level *level = state->level;
 
-	// JoltDebugRendererDrawBodies(level->physicsSystem);
+	JoltDebugRendererDrawBodies(level->physicsSystem);
 	RenderLevel3D(level, state->camera);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};

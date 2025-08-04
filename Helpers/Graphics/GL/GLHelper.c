@@ -903,7 +903,7 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
-	vec3 viewTarget = {cosf(camera->transform.rotation.y), 0, sinf(camera->transform.rotation.y)};
+	vec3 viewTarget = {-sinf(camera->transform.rotation.y), 0, -cosf(camera->transform.rotation.y)};
 
 	// TODO roll and pitch might be messed up (test and fix as needed)
 	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
@@ -924,11 +924,14 @@ void GL_GetViewmodelMatrix(mat4 *out)
 	glm_perspective(glm_rad(VIEWMODEL_FOV), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix, GetState()->viewmodel.translation);
+	glm_translate(translationMatrix,
+				  (vec3){GetState()->viewmodel.transform.position.x,
+						 GetState()->viewmodel.transform.position.y,
+						 GetState()->viewmodel.transform.position.z});
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
-	glm_rotate(rotationMatrix, GetState()->viewmodel.rotation[1], GLM_YUP);
+	glm_rotate(rotationMatrix, GetState()->viewmodel.transform.rotation.y, GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
@@ -1062,7 +1065,9 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translated(skyModelWorldMatrix,
-				   (vec3){(float)camera->transform.position.x, (float)camera->transform.position.y, (float)camera->transform.position.z});
+				   (vec3){(float)camera->transform.position.x,
+						  (float)camera->transform.position.y,
+						  (float)camera->transform.position.z});
 
 	const Vector2 floorStart = v2(level->player.transform.position.x - 100, level->player.transform.position.z - 100);
 	const Vector2 floorEnd = v2(level->player.transform.position.x + 100, level->player.transform.position.z + 100);

@@ -24,12 +24,9 @@ typedef struct TriggerData
 	float depth;
 	bool oneShot;
 	bool enabled;
-	bool playerIsColliding;
-	bool oneShotHasBeenFired;
-	// b2ShapeId shape;
 } TriggerData;
 
-bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+static bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
 	TriggerData *data = (TriggerData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -54,23 +51,55 @@ bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, c
 	return false;
 }
 
-void CreateTriggerSensor(Actor *trigger, const Transform *transform, JPH_BodyInterface *bodyInterface)
+void TriggerOnPlayerContactAdded(Actor *this)
 {
-	// TriggerData *data = trigger->extraData;
-	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	// sensorBodyDef.type = b2_staticBody;
-	// sensorBodyDef.position = position;
-	// const b2BodyId bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	// const b2Polygon sensorShape = b2MakeOffsetBox(data->width * 0.5f, data->depth * 0.5f, (Vector2){0, 0}, rotation);
-	// b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	// sensorShapeDef.isSensor = true;
-	// sensorShapeDef.filter.categoryBits = COLLISION_GROUP_TRIGGER;
-	// sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	// data->shape = b2CreatePolygonShape(bodyId, &sensorShapeDef, &sensorShape);
-	// trigger->bodyId = bodyId;
+	const TriggerData *data = this->extraData;
+	if (data->enabled)
+	{
+		ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
+		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+	}
 }
 
-void TriggerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
+void TriggerOnPlayerContactPersisted(Actor *this)
+{
+	const TriggerData *data = this->extraData;
+	if (!data->oneShot && data->enabled)
+	{
+		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+	}
+}
+
+void TriggerOnPlayerContactRemoved(Actor *this)
+{
+	const TriggerData *data = this->extraData;
+	if (data->enabled)
+	{
+		ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
+		if (data->oneShot)
+		{
+			RemoveActor(this);
+		}
+	}
+}
+
+void CreateTriggerSensor(Actor *this, const TriggerData *data)
+{
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
+			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
+												   JPH_DEFAULT_CONVEX_RADIUS),
+			&this->transform.position,
+			NULL,
+			JPH_MotionType_Static,
+			OBJECT_LAYER_SENSOR);
+	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
+}
+
+void TriggerInit(Actor *this, const KvList *params)
 {
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
@@ -79,46 +108,9 @@ void TriggerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInter
 	data->depth = KvGetFloat(params, "depth", 1.0f);
 	data->oneShot = KvGetBool(params, "oneShot", true);
 	data->enabled = KvGetBool(params, "startEnabled", true);
-	data->playerIsColliding = false;
-	data->oneShotHasBeenFired = false;
-	CreateTriggerSensor(this, &this->transform, bodyInterface);
+	CreateTriggerSensor(this, data);
 	this->SignalHandler = TriggerSignalHandler;
-}
-
-void TriggerUpdate(Actor *this, double /*delta*/)
-{
-	TriggerData *data = this->extraData;
-	if (data->enabled)
-	{
-		// if (GetSensorState(GetState()->level->worldId, data->shape.index1, data->playerIsColliding))
-		// {
-		// 	if (!data->playerIsColliding)
-		// 	{
-		// 		ActorFireOutput(this, TRIGGER_OUTPUT_ENTERED, PARAM_NONE);
-		// 		data->playerIsColliding = true;
-		// 	}
-		// 	if (!data->oneShotHasBeenFired)
-		// 	{
-		// 		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
-		// 		data->oneShotHasBeenFired = data->oneShot;
-		// 	}
-		// } else if (data->playerIsColliding)
-		// {
-		// 	ActorFireOutput(this, TRIGGER_OUTPUT_EXITED, PARAM_NONE);
-		// 	data->playerIsColliding = false;
-		// 	if (data->oneShotHasBeenFired)
-		// 	{
-		// 		RemoveActor(this);
-		// 	}
-		// }
-	}
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void TriggerDestroy(Actor *this)
-{
-	// b2DestroyBody(this->bodyId);
-	// ((TriggerData *)this->extraData)->shape = b2_nullShapeId;
-	free(this->extraData);
-	this->extraData = NULL;
+	this->OnPlayerContactAdded = TriggerOnPlayerContactAdded;
+	this->OnPlayerContactPersisted = TriggerOnPlayerContactPersisted;
+	this->OnPlayerContactRemoved = TriggerOnPlayerContactRemoved;
 }

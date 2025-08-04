@@ -91,7 +91,7 @@ bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void LogicDecimalInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
+void LogicDecimalInit(Actor *this, const KvList *params)
 {
 	this->extraData = malloc(sizeof(LogicDecimalData));
 	CheckAlloc(this->extraData);
@@ -100,9 +100,4 @@ void LogicDecimalInit(Actor *this, const KvList *params, JPH_BodyInterface * /*b
 	data->operandB = KvGetFloat(params, "operandB", .0f);
 	data->operation = KvGetByte(params, "operation", DECIMAL_OP_EQUAL);
 	this->SignalHandler = LogicDecimalSignalHandler;
-}
-
-void LogicDecimalDestroy(Actor *this)
-{
-	free(this->extraData);
 }

@@ -100,7 +100,7 @@ bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void LogicCounterInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
+void LogicCounterInit(Actor *this, const KvList *params)
 {
 	this->extraData = malloc(sizeof(LogicCounterData));
 	CheckAlloc(this->extraData);
@@ -112,9 +112,4 @@ void LogicCounterInit(Actor *this, const KvList *params, JPH_BodyInterface * /*b
 	data->clampToMax = KvGetBool(params, "clampToMax", true);
 	data->clampToMin = KvGetBool(params, "clampToMin", true);
 	this->SignalHandler = LogicCounterSignalHandler;
-}
-
-void LogicCounterDestroy(Actor *this)
-{
-	free(this->extraData);
 }

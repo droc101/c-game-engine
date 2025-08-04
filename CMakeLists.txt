@@ -190,6 +190,8 @@ add_executable(
         Actor/Core/LogicCounter.h
         Debug/JoltDebugRenderer.c
         Debug/JoltDebugRenderer.h
+        Helpers/Player.c
+        Helpers/Player.h
 )
 
 #endregion
@@ -205,11 +207,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(OVERRIDE_CXX_FLAGS OFF)
-    set(GENERATE_DEBUG_SYMBOLS ON)
-endif ()
-#set(DEBUG_RENDERER_IN_DEBUG_AND_RELEASE ON)
+#add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
 FetchContent_Declare(
         joltc
         GIT_REPOSITORY https://github.com/NBT22/joltc

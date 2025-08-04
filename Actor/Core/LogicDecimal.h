@@ -7,8 +7,6 @@
 
 #include "../../defines.h"
 
-void LogicDecimalInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
-
-void LogicDecimalDestroy(Actor *this);
+void LogicDecimalInit(Actor *this, const KvList *params);
 
 #endif //LOGICDECIMAL_H

@@ -7,8 +7,6 @@
 
 #include "../../defines.h"
 
-void SoundPlayerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
-
-void SoundPlayerDestroy(Actor *this);
+void SoundPlayerInit(Actor *this, const KvList *params);
 
 #endif //SOUNDPLAYER_H

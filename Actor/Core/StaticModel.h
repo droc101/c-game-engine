@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void StaticModelInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
+void StaticModelInit(Actor *this, const KvList *params);
 
 #endif //STATICMODEL_H

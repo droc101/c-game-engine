@@ -30,18 +30,11 @@ bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signa
 	return false;
 }
 
-void SoundPlayerInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
+void SoundPlayerInit(Actor *this, const KvList *params)
 {
 	this->SignalHandler = SoundPlayerSignalHandler;
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
 	snprintf(data->asset, sizeof(data->asset), "audio/%s.gsnd", KvGetString(params, "sound", "sfx_click"));
 	this->extraData = data;
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void SoundPlayerDestroy(Actor *this)
-{
-	free(this->extraData);
-	this->extraData = NULL;
 }

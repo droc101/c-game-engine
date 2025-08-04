@@ -12,28 +12,6 @@
 #define ACTOR_SPAWN_OUTPUT 1
 #define ACTOR_KILLED_OUTPUT 0
 
-typedef enum ActorType ActorType;
-
-enum ActorType
-{
-	EMPTY_ACTOR,
-	TEST_ACTOR,
-	COIN_ACTOR,
-	GOAL_ACTOR,
-	DOOR_ACTOR,
-	TRIGGER_ACTOR,
-	IO_PROXY_ACTOR,
-	PHYSBOX_ACTOR,
-	LASER_ACTOR,
-	STATIC_MODEL_ACTOR,
-	SOUND_PLAYER_ACTOR,
-	SPRITE_ACTOR,
-	LASER_EMITTER_ACTOR,
-	LOGIC_BINARY_ACTOR,
-	LOGIC_DECIMAL_ACTOR,
-	LOGIC_COUNTER_ACTOR
-};
-
 /**
  * Create an Actor
  * @param transform Actor position
@@ -42,7 +20,7 @@ enum ActorType
  * @param bodyInterface The Joly body interface within which to create the actor's rigid body
  * @return Initialized Actor struct
  */
-Actor *CreateActor(const Transform *transform, uint actorType, KvList *params, JPH_BodyInterface *bodyInterface);
+Actor *CreateActor(const Transform *transform, ActorType actorType, KvList *params, JPH_BodyInterface *bodyInterface);
 
 /**
  * Destroy an Actor

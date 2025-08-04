@@ -22,7 +22,6 @@
 
 typedef struct GoalData
 {
-	// b2ShapeId shapeId;
 	bool enabled;
 } GoalData;
 
@@ -48,24 +47,33 @@ bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	return false;
 }
 
-void CreateGoalSensor(Actor *this, JPH_BodyInterface *bodyInterface)
+void CreateGoalSensor(Actor *this)
 {
-	// b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	// sensorBodyDef.type = b2_staticBody;
-	// sensorBodyDef.position = this->position;
-	// this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	// this->actorWall->box2dBodyId = this->bodyId;
-	// const b2Circle sensorShape = {
-	// 	.radius = 0.5f,
-	// };
-	// b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	// sensorShapeDef.isSensor = true;
-	// sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	// sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	// ((GoalData *)this->extraData)->shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_SphereShape_Create(0.5f);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
+																					  &this->transform.position,
+																					  NULL,
+																					  JPH_MotionType_Static,
+																					  OBJECT_LAYER_SENSOR);
+	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
 }
 
-void GoalInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
+void GoalOnPlayerContactAdded(Actor *this)
+{
+	const GoalData *data = this->extraData;
+	if (data->enabled)
+	{
+		GetState()->saveData->coins += 10;
+		ActorFireOutput(this, GOAL_OUTPUT_COLLECTED, PARAM_NONE);
+		RemoveActor(this);
+	}
+}
+
+void GoalInit(Actor *this, const KvList *params)
 {
 	this->SignalHandler = GoalSignalHandler;
 	GoalData *data = calloc(1, sizeof(GoalData));
@@ -80,37 +88,16 @@ void GoalInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterfac
 								 0.0f);
 	WallBake(this->actorWall);
 
-	CreateGoalSensor(this, bodyInterface);
+	this->OnPlayerContactAdded = GoalOnPlayerContactAdded;
+
+	CreateGoalSensor(this);
 }
 
 void GoalUpdate(Actor *this, double /*delta*/)
 {
-	const GoalData *goalData = this->extraData;
-
 	const float rotation = atan2f(GetState()->level->player.transform.position.z - this->transform.position.z,
 								  GetState()->level->player.transform.position.x - this->transform.position.x) +
 						   PIf / 2;
-	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
-	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
-
-	if (goalData->enabled)
-	{
-		// if (GetSensorState(GetState()->level->worldId, goalData->shapeId.index1, false))
-		// {
-		// 	GetState()->saveData->coins += 10;
-		// 	ActorFireOutput(this, GOAL_OUTPUT_COLLECTED, PARAM_NONE);
-		// 	RemoveActor(this);
-		// }
-	}
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GoalDestroy(Actor *this)
-{
-	// b2DestroyBody(this->bodyId);
-	// ((GoalData *)this->extraData)->shapeId = b2_nullShapeId;
-	free(this->actorWall);
-	this->actorWall = NULL;
-	free(this->extraData);
-	this->extraData = NULL;
+	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
+	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
 }

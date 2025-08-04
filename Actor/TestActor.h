@@ -7,10 +7,8 @@
 
 #include "../defines.h"
 
-void TestActorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
+void TestActorInit(Actor *this, const KvList *params);
 
 void TestActorUpdate(Actor *this, double delta);
-
-void TestActorDestroy(Actor *this);
 
 #endif //GAME_TESTACTOR_H

@@ -50,7 +50,7 @@ int LodThreadMain(void *)
 		switch (currentRenderer)
 		{
 			case RENDERER_VULKAN:
-				bool shouldReloadActors = false;
+				bool shouldReloadActors = true;
 				for (size_t i = 0; i < actorCount; i++)
 				{
 					Actor *actor = ListGetPointer(*actors, i);
@@ -58,20 +58,21 @@ int LodThreadMain(void *)
 					{
 						continue;
 					}
-					const Vector2 actorPosition = (Vector2){actor->transform.position.x, actor->transform.position.z};
-					const float distance = Vector2Distance(actorPosition, playerPosition);
-					while (actor->currentLod != 0 &&
-						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
-					{
-						actor->currentLod--;
-						shouldReloadActors = true;
-					}
-					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
-					{
-						actor->currentLod++;
-						shouldReloadActors = true;
-					}
+					actor->currentLod = 0;
+					// const Vector2 actorPosition = (Vector2){actor->transform.position.x, actor->transform.position.z};
+					// const float distance = Vector2Distance(actorPosition, playerPosition);
+					// while (actor->currentLod != 0 &&
+					// 	   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
+					// {
+					// 	actor->currentLod--;
+					// 	shouldReloadActors = true;
+					// }
+					// while (actor->actorModel->lodCount > actor->currentLod + 1 &&
+					// 	   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
+					// {
+					// 	actor->currentLod++;
+					// 	shouldReloadActors = true;
+					// }
 				}
 				if (!VK_UpdateActors(actors, shouldReloadActors))
 				{

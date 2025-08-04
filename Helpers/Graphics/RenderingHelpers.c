@@ -91,8 +91,16 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	{
 		Error("A NULL transformMatrix must not be passed to ActorTransformMatrix!");
 	}
-	glm_translate(*transformMatrix, (vec3){actor->transform.position.x, actor->transform.position.y, actor->transform.position.z});
-	glm_rotate(*transformMatrix, -actor->transform.rotation.y, (vec3){0, 1, 0});
+	if (actor->actorType == ACTOR_TYPE_PHYSBOX || actor->actorType == ACTOR_TYPE_TEST)
+	{
+		JPH_RMatrix4x4 matrix;
+		JPH_BodyInterface_GetCenterOfMassTransform(actor->bodyInterface, actor->bodyId, &matrix);
+		memcpy(*transformMatrix, &matrix, sizeof(mat4));
+	} else
+	{
+		glm_translate(*transformMatrix, (vec3){actor->transform.position.x, actor->transform.position.y, actor->transform.position.z});
+		glm_rotate(*transformMatrix, actor->transform.rotation.y, GLM_YUP);
+	}
 }
 
 bool RenderPreInit()

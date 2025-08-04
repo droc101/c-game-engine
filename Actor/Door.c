@@ -59,7 +59,7 @@ void DoorSetState(const Actor *door, const DoorState state)
 	}
 }
 
-void CreateDoorCollider(Actor *this, const Vector2 wallEnd, JPH_BodyInterface *bodyInterface)
+void CreateDoorCollider(Actor *this, const Vector2 wallEnd)
 {
 	// b2BodyDef doorBodyDef = b2DefaultBodyDef();
 	// doorBodyDef.type = b2_kinematicBody;
@@ -75,7 +75,7 @@ void CreateDoorCollider(Actor *this, const Vector2 wallEnd, JPH_BodyInterface *b
 	// b2CreateSegmentShape(this->bodyId, &doorShapeDef, &doorShape);
 }
 
-void CreateDoorSensor(Actor *this, JPH_BodyInterface *bodyInterface)
+void CreateDoorSensor(Actor *this)
 {
 	// DoorData *data = this->extraData;
 	//
@@ -136,7 +136,7 @@ bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	return false;
 }
 
-void DoorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface)
+void DoorInit(Actor *this, const KvList *params)
 {
 	const Vector2 wallEnd = Vector2Normalize(Vector2FromAngle(this->transform.rotation.y));
 	this->actorWall = CreateWall((Vector2){0, 0}, wallEnd, TEXTURE("actor_door"), 1.0f, 0.0f);
@@ -146,8 +146,8 @@ void DoorInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterfac
 	CheckAlloc(this->extraData);
 	DoorData *data = this->extraData;
 
-	CreateDoorCollider(this, wallEnd, bodyInterface);
-	CreateDoorSensor(this, bodyInterface);
+	CreateDoorCollider(this, wallEnd);
+	CreateDoorSensor(this);
 	this->SignalHandler = DoorSignalHandler;
 
 	data->spawnPosition.x = this->transform.position.x;
@@ -220,8 +220,4 @@ void DoorDestroy(Actor *this)
 	// b2ShapeId *sensorShapeId = &((DoorData *)this->extraData)->sensorId;
 	// b2DestroyBody(b2Shape_GetBody(*sensorShapeId));
 	// *sensorShapeId = b2_nullShapeId;
-	free(this->extraData);
-	this->extraData = NULL;
-	free(this->actorWall);
-	this->actorWall = NULL;
 }

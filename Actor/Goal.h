@@ -7,10 +7,8 @@
 
 #include "../defines.h"
 
-void GoalInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
+void GoalInit(Actor *this, const KvList *params);
 
 void GoalUpdate(Actor *this, double /*delta*/);
-
-void GoalDestroy(Actor *this);
 
 #endif //GAME_GOAL_H

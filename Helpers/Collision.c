@@ -4,7 +4,6 @@
 
 #include "Collision.h"
 #include "../Structs/GlobalState.h"
-#include "../Structs/Vector2.h"
 #include "Core/Logging.h"
 
 float RaycastCallback(const int shapeId, Vector2, Vector2, const float fraction, void *raycastHit)

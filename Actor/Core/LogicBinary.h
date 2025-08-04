@@ -7,8 +7,6 @@
 
 #include "../../defines.h"
 
-void LogicBinaryInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
-
-void LogicBinaryDestroy(Actor *this);
+void LogicBinaryInit(Actor *this, const KvList *params);
 
 #endif //LOGICBINARY_H

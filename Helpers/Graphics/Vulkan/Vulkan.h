@@ -77,7 +77,9 @@ void VK_DrawLine(int startX, int startY, int endX, int endY, int thickness, Colo
 
 void VK_DrawRectOutline(int x, int y, int w, int h, int thickness, Color color);
 
-void VK_DrawJoltDebugTriangle(const Vector3 *vertices, uint32_t color);
+void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, uint32_t color);
+
+void VK_DrawJoltDebugRendererTriangle(const Vector3 *vertices, uint32_t color);
 
 void VK_SetTexParams(const char *texture, bool linear, bool repeat);
 

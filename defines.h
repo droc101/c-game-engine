@@ -30,6 +30,7 @@ typedef enum ModelShader ModelShader;
 typedef enum ImageDataOffsets ImageDataOffsets;
 typedef enum AssetType AssetType;
 typedef enum ParamType ParamType;
+typedef enum ActorType ActorType;
 
 // Struct forward declarations
 typedef struct Vector2 Vector2;
@@ -63,7 +64,7 @@ typedef void (*FrameUpdateFunction)(GlobalState *state);
 
 typedef void (*FrameRenderFunction)(GlobalState *state);
 
-typedef void (*ActorInitFunction)(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
+typedef void (*ActorInitFunction)(Actor *this, const KvList *params);
 
 typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
@@ -78,6 +79,12 @@ typedef void (*ActorDestroyFunction)(Actor *this);
  * @return True if the signal was handled, false if not
  */
 typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byte signal, const Param *param);
+
+typedef void (*ActorPlayerContactAddedFunction)(Actor *this);
+
+typedef void (*ActorPlayerContactPersistedFunction)(Actor *this);
+
+typedef void (*ActorPlayerContactRemovedFunction)(Actor *this);
 
 #pragma endregion
 
@@ -241,12 +248,19 @@ enum ObjectLayers
 	OBJECT_LAYER_STATIC,
 	OBJECT_LAYER_DYNAMIC,
 	OBJECT_LAYER_PLAYER,
+	OBJECT_LAYER_SENSOR,
+
+	/// @warning Used for checking the number of object layers, and as such is not a valid layer index
+	OBJECT_LAYER_MAX,
 };
 
 enum BroadphaseLayers
 {
 	BROADPHASE_LAYER_STATIC,
 	BROADPHASE_LAYER_DYNAMIC,
+
+	/// @warning Used for checking the number of broadphase layers, and as such is not a valid layer index
+	BROADPHASE_LAYER_MAX,
 };
 
 enum ParamType
@@ -259,6 +273,27 @@ enum ParamType
 	PARAM_TYPE_NONE,
 	PARAM_TYPE_COLOR
 };
+
+enum ActorType
+{
+	ACTOR_TYPE_EMPTY,
+	ACTOR_TYPE_TEST,
+	ACTOR_TYPE_COIN,
+	ACTOR_TYPE_GOAL,
+	ACTOR_TYPE_DOOR,
+	ACTOR_TYPE_TRIGGER,
+	ACTOR_TYPE_IO_PROXY,
+	ACTOR_TYPE_PHYSBOX,
+	ACTOR_TYPE_LASER,
+	ACTOR_TYPE_STATIC_MODEL,
+	ACTOR_TYPE_SOUND_PLAYER,
+	ACTOR_TYPE_SPRITE,
+	ACTOR_TYPE_LASER_EMITTER,
+	ACTOR_TYPE_LOGIC_BINARY,
+	ACTOR_TYPE_LOGIC_DECIMAL,
+	ACTOR_TYPE_LOGIC_COUNTER
+};
+
 
 #pragma endregion
 
@@ -281,8 +316,7 @@ struct Viewmodel
 	bool enabled;
 	ModelDefinition *model;
 	uint modelSkin;
-	vec3 translation;
-	vec3 rotation;
+	Transform transform;
 };
 
 struct KvList
@@ -317,6 +351,8 @@ struct Camera
 {
 	/// The 3d transform of the camera
 	Transform transform;
+	/// The y-offset, used for view bobbing
+	float yOffset;
 
 	/// The field of view of the camera
 	float fov;
@@ -327,7 +363,7 @@ struct Player
 	/// The player's 3d transform
 	Transform transform;
 	/// The Jolt character. Includes the rigid body as well as other useful abstractions
-	JPH_Character *joltCharacter;
+	JPH_CharacterVirtual *joltCharacter;
 };
 
 // Utility functions are in Structs/wall.h
@@ -354,7 +390,7 @@ struct Wall
 	/// height of the wall for rendering. Does not affect collision
 	float height;
 	/// Jolt body ID
-	JPH_BodyID bodyId;
+	JPH_BodyId bodyId;
 };
 
 // Utility functions are in Structs/level.h
@@ -524,7 +560,7 @@ struct Actor
 
 	/// The actor type index
 	/// @warning Do not change this after creation
-	uint actorType;
+	ActorType actorType;
 	/// The function to call when the actor is initialized
 	/// @note This should only be called once, when the actor is created
 	ActorInitFunction Init;
@@ -536,6 +572,9 @@ struct Actor
 	ActorDestroyFunction Destroy;
 	/// The function to call when the actor receives a signal.
 	ActorSignalHandlerFunction SignalHandler;
+	ActorPlayerContactAddedFunction OnPlayerContactAdded;
+	ActorPlayerContactPersistedFunction OnPlayerContactPersisted;
+	ActorPlayerContactRemovedFunction OnPlayerContactRemoved;
 	/// List of I/O connections
 	LockingList ioConnections;
 
@@ -546,7 +585,7 @@ struct Actor
 	void *extraData;
 
 	JPH_BodyInterface *bodyInterface;
-	JPH_BodyID bodyId;
+	JPH_BodyId bodyId;
 };
 
 struct Asset

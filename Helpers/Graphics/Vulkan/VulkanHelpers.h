@@ -250,7 +250,10 @@ typedef struct Buffers
 	WallsBuffer walls;
 	ActorWallsBuffer actorWalls;
 	ActorModelsBuffer actorModels;
-	DebugDrawBuffer debugDraw;
+#ifdef JPH_DEBUG_RENDERER
+	DebugDrawBuffer debugDrawLines;
+	DebugDrawBuffer debugDrawTriangles;
+#endif
 } Buffers;
 
 typedef struct Pipelines
@@ -263,7 +266,10 @@ typedef struct Pipelines
 	LunaGraphicsPipeline actorWalls;
 	LunaGraphicsPipeline shadedActorModels;
 	LunaGraphicsPipeline unshadedActorModels;
-	LunaGraphicsPipeline debugDraw;
+#ifdef JPH_DEBUG_RENDERER
+	LunaGraphicsPipeline debugDrawLines;
+	LunaGraphicsPipeline debugDrawTriangles;
+#endif
 } Pipelines;
 
 typedef struct TextureSamplers
@@ -316,7 +322,7 @@ void LoadWalls(const Level *level);
 
 void UpdateTransformMatrix(const Camera *camera);
 
-void UpdateViewModelMatrix(const Viewmodel *viewmodel);
+void UpdateViewModelMatrix(const Viewmodel *viewmodel, const Camera *camera);
 
 void DrawRectInternal(float ndcStartX,
 					  float ndcStartY,

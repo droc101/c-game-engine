@@ -83,7 +83,7 @@ bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const byte signa
 	return false;
 }
 
-void LogicBinaryInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
+void LogicBinaryInit(Actor *this, const KvList *params)
 {
 	this->extraData = malloc(sizeof(LogicBinaryData));
 	CheckAlloc(this->extraData);
@@ -92,9 +92,4 @@ void LogicBinaryInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bo
 	data->operandB = false;
 	data->operation = KvGetByte(params, "operation", BINARY_OP_AND);
 	this->SignalHandler = LogicBinarySignalHandler;
-}
-
-void LogicBinaryDestroy(Actor *this)
-{
-	free(this->extraData);
 }

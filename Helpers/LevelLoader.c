@@ -67,10 +67,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 
 	level->player.transform.rotation.y = ReadFloat(data, &offset);
 
-	JPH_Character_SetPosition(level->player.joltCharacter,
-							  &level->player.transform.position,
-							  JPH_Activation_Activate,
-							  true);
+	JPH_CharacterVirtual_SetPosition(level->player.joltCharacter, &level->player.transform.position);
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint actorCount = ReadUint(data, &offset);

@@ -7,8 +7,7 @@
 
 #include "../defines.h"
 
-void LaserEmitterInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
+void LaserEmitterInit(Actor *this, const KvList *params);
 void LaserEmitterUpdate(Actor *this, double /*delta*/);
-void LaserEmitterDestroy(Actor *this);
 
 #endif //LASEREMITTER_H

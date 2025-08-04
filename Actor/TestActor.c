@@ -9,6 +9,7 @@
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Navigation.h"
 #include "../Structs/Actor.h"
+#include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 
 bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -35,31 +36,32 @@ void TestActorTargetReached(Actor *this, const double delta)
 	this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
-void CreateTestActorCollider(Actor *this, JPH_BodyInterface *bodyInterface)
+void CreateTestActorCollider(Actor *this)
 {
-	// b2BodyDef bodyDef = b2DefaultBodyDef();
-	// bodyDef.type = b2_dynamicBody;
-	// bodyDef.position = this->position;
-	// bodyDef.fixedRotation = true;
-	// bodyDef.linearDamping = 5;
-	// this->bodyId = b2CreateBody(worldId, &bodyDef);
-	// const b2Circle circle = {
-	// 	.radius = 0.2867f,
-	// };
-	// b2ShapeDef shapeDef = b2DefaultShapeDef();
-	// shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR_ENEMY;
-	// b2CreateCircleShape(this->bodyId, &shapeDef, &circle);
-	// const b2Circle hurtbox = {
-	// 	.radius = 0.28f,
-	// };
-	// b2ShapeDef hurtboxDef = b2DefaultShapeDef();
-	// hurtboxDef.filter.categoryBits = COLLISION_GROUP_HURTBOX;
-	// b2CreateCircleShape(this->bodyId, &hurtboxDef, &hurtbox);
+	// clang-format off
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
+			(const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.2867f),
+			&this->transform.position,
+			NULL,
+			JPH_MotionType_Dynamic,
+			OBJECT_LAYER_DYNAMIC);
+	//clang-format on
+	const JPH_MassProperties massProperties = {
+		.mass = 20.0f,
+	};
+	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
+	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
+													   JPH_OverrideMassProperties_CalculateInertia);
+	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
+	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
+	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings, JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_TranslationZ | JPH_AllowedDOFs_RotationY);
+	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface, bodyCreationSettings, JPH_Activation_Activate);
 }
 
-void TestActorInit(Actor *this, const KvList * /*params*/, JPH_BodyInterface *bodyInterface)
+void TestActorInit(Actor *this, const KvList * /*params*/)
 {
-	CreateTestActorCollider(this, bodyInterface);
+	CreateTestActorCollider(this);
 
 	this->actorModel = LoadModel(MODEL("model_leafy"));
 	this->currentSkinIndex = 0;
@@ -83,14 +85,9 @@ void TestActorInit(Actor *this, const KvList * /*params*/, JPH_BodyInterface *bo
 
 void TestActorUpdate(Actor *this, const double delta)
 {
-	// this->position = b2Body_GetPosition(this->bodyId);
-
-	NavigationStep(this, this->extraData, delta);
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void TestActorDestroy(Actor *this)
-{
-	free(this->extraData);
-	// b2DestroyBody(this->bodyId);
+	// JPH_Quat rotation;
+	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
+	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
+	//
+	// NavigationStep(this, this->extraData, delta);
 }

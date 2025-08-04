@@ -7,10 +7,6 @@
 
 #include "../../defines.h"
 
-void TriggerInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
-
-void TriggerUpdate(Actor *this, double /*delta*/);
-
-void TriggerDestroy(Actor *this);
+void TriggerInit(Actor *this, const KvList *params);
 
 #endif //TRIGGER_H

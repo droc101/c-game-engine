@@ -5,7 +5,7 @@
 #include "Physbox.h"
 #include "../Helpers/Core/AssetReader.h"
 
-void CreatePhysboxCollider(Actor *this, JPH_BodyInterface *bodyInterface)
+void CreatePhysboxCollider(Actor *this)
 {
 	// b2BodyDef bodyDef = b2DefaultBodyDef();
 	// bodyDef.type = b2_dynamicBody;
@@ -25,29 +25,31 @@ void CreatePhysboxCollider(Actor *this, JPH_BodyInterface *bodyInterface)
 			NULL,
 			JPH_MotionType_Dynamic,
 			OBJECT_LAYER_DYNAMIC);
-	JPH_MassProperties massProperties;
-	JPH_MassProperties_ScaleToMass(&massProperties, 25.0f);
+	const JPH_MassProperties massProperties = {
+		.mass = 2.0f,
+	};
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
 	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
 													   JPH_OverrideMassProperties_CalculateInertia);
-	this->bodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, bodyCreationSettings, JPH_Activation_Activate);
+	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
+	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
+	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
 }
 
-void PhysboxInit(Actor *this, const KvList * /*params*/, JPH_BodyInterface *bodyInterface)
+void PhysboxInit(Actor *this, const KvList * /*params*/)
 {
 	this->actorModel = LoadModel(MODEL("model_cube"));
 	this->transform.position.y = -0.3f;
 
-	CreatePhysboxCollider(this, bodyInterface);
+	CreatePhysboxCollider(this);
 }
 
 void PhysboxUpdate(Actor *this, const double /*delta*/)
 {
-	// = this->transform = ;
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void PhysboxDestroy(Actor *this)
-{
-	// b2DestroyBody(this->bodyId);
+	JPH_Quat rotation;
+	JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
+	JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
 }

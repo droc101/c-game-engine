@@ -43,6 +43,10 @@ static const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
 	.maxDepthBounds = 1,
 };
 
+static const VkPipelineDepthStencilStateCreateInfo depthStencilStateUnused = {
+	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+};
+
 static const VkPipelineColorBlendAttachmentState colorBlendAttachment = {
 	.blendEnable = VK_TRUE,
 	.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
@@ -142,10 +146,6 @@ bool CreateUIPipeline()
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(uiShaderStages) / sizeof(*uiShaderStages),
 		.shaderStages = uiShaderStages,
@@ -154,7 +154,7 @@ bool CreateUIPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -261,10 +261,6 @@ bool CreateViewModelPipeline()
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
@@ -273,7 +269,7 @@ bool CreateViewModelPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -330,10 +326,6 @@ bool CreateSkyPipeline()
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
@@ -342,7 +334,7 @@ bool CreateSkyPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -377,10 +369,6 @@ bool CreateFloorAndCeilingPipeline()
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
@@ -389,7 +377,7 @@ bool CreateFloorAndCeilingPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -815,6 +803,7 @@ bool CreateActorModelUnshadedPipeline()
 
 bool CreateDebugDrawPipeline()
 {
+#ifdef JPH_DEBUG_RENDERER
 	LunaShaderModule vertShaderModule;
 	LunaShaderModule fragShaderModule;
 	VulkanTest(CreateShaderModule(VK_VERT("Vulkan_debugDraw"), &vertShaderModule),
@@ -860,7 +849,28 @@ bool CreateDebugDrawPipeline()
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+	const VkPipelineInputAssemblyStateCreateInfo linesInputAssembly = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+		.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	};
+	const LunaGraphicsPipelineCreationInfo linesPipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &linesInputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &nonCullingRasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&linesPipelineInfo, &pipelines.debugDrawLines),
+			   "Failed to create graphics pipeline for Jolt debug renderer lines!");
+
+	const LunaGraphicsPipelineCreationInfo trianglesPipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
@@ -874,8 +884,9 @@ bool CreateDebugDrawPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.debugDraw),
-			   "Failed to create debug draw graphics pipeline!");
+	VulkanTest(lunaCreateGraphicsPipeline(&trianglesPipelineInfo, &pipelines.debugDrawTriangles),
+			   "Failed to create graphics pipeline for Jolt debug renderer triangles!");
+#endif
 
 	return true;
 }

@@ -20,6 +20,7 @@
 #include "../Helpers/Core/PhysicsThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/LevelLoader.h"
+#include "../Helpers/Player.h"
 #include "../Structs/Level.h"
 #include "Options.h"
 
@@ -54,6 +55,7 @@ static void InitJolt()
 	}
 	state.jobSystem = JPH_JobSystemThreadPool_Create(NULL);
 	JoltDebugRendererInit();
+	PlayerContactListenerInit();
 }
 
 void InitState()
@@ -69,8 +71,8 @@ void InitState()
 
 	state.viewmodel.enabled = true;
 	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
-	state.viewmodel.translation[0] = 0.5f;
-	state.viewmodel.rotation[1] = degToRad(5);
+	state.viewmodel.transform.position.x = 0.5f;
+	state.viewmodel.transform.rotation.y = degToRad(5);
 
 	UpdateVolume();
 
@@ -269,6 +271,7 @@ void DestroyGlobalState()
 	GPauseStateDestroy();
 
 	JoltDebugRendererDestroy();
+	PlayerContactListenerDestroy();
 	JPH_JobSystem_Destroy(state.jobSystem);
 	JPH_Shutdown();
 }

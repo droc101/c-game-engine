@@ -28,7 +28,7 @@
  * @param angle The angle (in radians)
  * @return The unit vector
  */
-#define Vector2FromAngle(angle) v2(cosf(angle), sinf(angle))
+#define Vector2FromAngle(angle) v2(-sinf(angle), -cosf(angle))
 
 /**
  * Get the distance between two vectors

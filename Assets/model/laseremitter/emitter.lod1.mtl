@@ -1,7 +1,7 @@
-# Blender 4.4.3 MTL File: 'None'
+# Blender 4.5.1 LTS MTL File: 'None'
 # www.blender.org
 
-newmtl border.003
+newmtl border.019
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
@@ -9,19 +9,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd /home/droc101/CLionProjects/raytracer-c/Assets/actor/laseremitter_border.png
+map_Kd home/droc101/CLionProjects/raytracer-c/Assets/actor/laseremitter_border.png
 
-newmtl emitterBottom.003
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800197 0.056483 0.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 2
-
-newmtl emitterMiddle.003
+newmtl emitterBottom.019
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800197 0.056483 0.000000
@@ -31,7 +21,7 @@ Ni 1.500000
 d 1.000000
 illum 2
 
-newmtl emitterTop.003
+newmtl emitterMiddle.019
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800197 0.056483 0.000000
@@ -41,7 +31,17 @@ Ni 1.500000
 d 1.000000
 illum 2
 
-newmtl frame.003
+newmtl emitterTop.019
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800197 0.056483 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl frame.019
 Ns 0.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
@@ -49,4 +49,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd /home/droc101/CLionProjects/raytracer-c/Assets/actor/laseremitter.png
+map_Kd home/droc101/CLionProjects/raytracer-c/Assets/actor/laseremitter.png

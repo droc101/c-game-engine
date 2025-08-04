@@ -8,7 +8,7 @@
 #include "../../Structs/Vector2.h"
 #include "../../Structs/Wall.h"
 
-void SpriteInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInterface*/)
+void SpriteInit(Actor *this, const KvList *params)
 {
 	const float width = KvGetFloat(params, "width", 1.0f) * 0.5f;
 	const float height = KvGetFloat(params, "height", 1.0f);
@@ -20,13 +20,4 @@ void SpriteInit(Actor *this, const KvList *params, JPH_BodyInterface * /*bodyInt
 	this->actorWall->height = height;
 	this->transform.position.y = KvGetFloat(params, "yPosition", 0.0f);
 	WallBake(this->actorWall);
-}
-
-void SpriteDestroy(Actor *this)
-{
-	if (this->actorWall != NULL)
-	{
-		free(this->actorWall);
-		this->actorWall = NULL;
-	}
 }

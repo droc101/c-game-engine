@@ -8,39 +8,47 @@
 #include "../defines.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Player.h"
 #include "Actor.h"
 #include "GlobalState.h"
 #include "Wall.h"
 
 static void InitJolt(Level *level)
 {
-	JPH_BroadPhaseLayerInterface *broadPhaseLayerInterface = JPH_BroadPhaseLayerInterfaceTable_Create(3, 2);
-	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
+	JPH_BroadPhaseLayerInterface *layerInterface = JPH_BroadPhaseLayerInterfaceTable_Create(OBJECT_LAYER_MAX,
+																							BROADPHASE_LAYER_MAX);
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(layerInterface,
 																 OBJECT_LAYER_STATIC,
 																 BROADPHASE_LAYER_STATIC);
-	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(layerInterface,
+																 OBJECT_LAYER_SENSOR,
+																 BROADPHASE_LAYER_STATIC);
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(layerInterface,
 																 OBJECT_LAYER_DYNAMIC,
 																 BROADPHASE_LAYER_DYNAMIC);
-	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(broadPhaseLayerInterface,
+	JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(layerInterface,
 																 OBJECT_LAYER_PLAYER,
 																 BROADPHASE_LAYER_DYNAMIC);
 
-	JPH_ObjectLayerPairFilter *objectLayerPairFilter = JPH_ObjectLayerPairFilterTable_Create(3);
-	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_STATIC);
-	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_DYNAMIC);
-	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_STATIC);
-	JPH_ObjectLayerPairFilterTable_EnableCollision(objectLayerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_DYNAMIC);
+	JPH_ObjectLayerPairFilter *layerPairFilter = JPH_ObjectLayerPairFilterTable_Create(OBJECT_LAYER_MAX);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(layerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_STATIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(layerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_DYNAMIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(layerPairFilter, OBJECT_LAYER_DYNAMIC, OBJECT_LAYER_SENSOR);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(layerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_STATIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(layerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_DYNAMIC);
+	JPH_ObjectLayerPairFilterTable_EnableCollision(layerPairFilter, OBJECT_LAYER_PLAYER, OBJECT_LAYER_SENSOR);
 
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
-		.broadPhaseLayerInterface = broadPhaseLayerInterface,
-		.objectLayerPairFilter = objectLayerPairFilter,
-		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broadPhaseLayerInterface,
-																					   2,
-																					   objectLayerPairFilter,
-																					   3),
+		.broadPhaseLayerInterface = layerInterface,
+		.objectLayerPairFilter = layerPairFilter,
+		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilterTable_Create(layerInterface,
+																					   BROADPHASE_LAYER_MAX,
+																					   layerPairFilter,
+																					   OBJECT_LAYER_MAX),
 	};
 	level->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
 	const JPH_Plane plane = {
 		.normal.y = 1,
 	};
@@ -51,33 +59,8 @@ static void InitJolt(Level *level)
 			JPH_MotionType_Static,
 			OBJECT_LAYER_STATIC);
 
-	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem),
-															floorSettings,
-															JPH_Activation_DontActivate);
+	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, floorSettings, JPH_Activation_DontActivate);
 	JPH_BodyCreationSettings_Destroy(floorSettings);
-}
-
-void CreatePlayerCollider(Level *level)
-{
-	const JPH_CharacterSettings characterSettings = {
-		.base.up = {0.0f, 1.0f, 0.0f},
-		.base.supportingVolume.normal.y = 1.0f,
-		.base.supportingVolume.distance = -1.0e10f, // Default value in Jolt
-		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
-		.base.enhancedInternalEdgeRemoval = true,
-		.base.shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f),
-		.layer = OBJECT_LAYER_PLAYER,
-		.mass = 80.0f,
-		.friction = 25.0f,
-		.gravityFactor = 1.0f,
-		.allowedDOFs = JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_TranslationZ,
-	};
-	level->player.joltCharacter = JPH_Character_Create(&characterSettings,
-													   &JPH_Vec3_Zero,
-													   NULL,
-													   0,
-													   level->physicsSystem);
-	JPH_Character_AddToPhysicsSystem(level->player.joltCharacter, JPH_Activation_DontActivate, false);
 }
 
 Level *CreateLevel(void)
@@ -116,7 +99,6 @@ void DestroyLevel(Level *level)
 	}
 
 	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
-	JPH_Character_RemoveFromPhysicsSystem(level->player.joltCharacter, true);
 
 	JPH_PhysicsSystem_Destroy(level->physicsSystem);
 

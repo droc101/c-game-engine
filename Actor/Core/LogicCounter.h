@@ -7,8 +7,6 @@
 
 #include "../../defines.h"
 
-void LogicCounterInit(Actor *this, const KvList *params, JPH_BodyInterface *bodyInterface);
-
-void LogicCounterDestroy(Actor *this);
+void LogicCounterInit(Actor *this, const KvList *params);
 
 #endif //LOGICCOUNTER_H

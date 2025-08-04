@@ -36,7 +36,10 @@ Pipelines pipelines = {
 	.actorWalls = LUNA_NULL_HANDLE,
 	.shadedActorModels = LUNA_NULL_HANDLE,
 	.unshadedActorModels = LUNA_NULL_HANDLE,
-	.debugDraw = LUNA_NULL_HANDLE,
+#ifdef JPH_DEBUG_RENDERER
+	.debugDrawLines = LUNA_NULL_HANDLE,
+	.debugDrawTriangles = LUNA_NULL_HANDLE,
+#endif
 };
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
@@ -54,7 +57,10 @@ Buffers buffers = {
 	.actorModels.instanceData.allocatedSize = sizeof(ModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
-	.debugDraw.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
+#ifdef JPH_DEBUG_RENDERER
+	.debugDrawLines.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
+	.debugDrawTriangles.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
+#endif
 };
 #pragma endregion variables
 
@@ -240,7 +246,7 @@ void UpdateTransformMatrix(const Camera *camera)
 						  FAR_Z,
 						  perspectiveMatrix);
 
-	vec3 viewTarget = {cosf(camera->transform.rotation.y), 0, sinf(camera->transform.rotation.y)};
+	vec3 viewTarget = {-sinf(camera->transform.rotation.y), 0, -cosf(camera->transform.rotation.y)};
 
 	// TODO roll and pitch might be messed up (test and fix as needed)
 	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
@@ -256,7 +262,7 @@ void UpdateTransformMatrix(const Camera *camera)
 }
 
 // TODO: This positions the model slightly differently than OpenGL does
-void UpdateViewModelMatrix(const Viewmodel *viewmodel)
+void UpdateViewModelMatrix(const Viewmodel *viewmodel, const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(VIEWMODEL_FOV),
@@ -267,11 +273,13 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix,
-				  (vec3){viewmodel->translation[0], -viewmodel->translation[1], viewmodel->translation[2]});
+				  (vec3){viewmodel->transform.position.x,
+						 -viewmodel->transform.position.y,
+						 viewmodel->transform.position.z});
 
 	// TODO rotation other than yaw
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_rotate(rotationMatrix, viewmodel->rotation[1], (vec3){0.0f, -1.0f, 0.0f});
+	glm_rotate(rotationMatrix, viewmodel->transform.rotation.y, (vec3){0.0f, -1.0f, 0.0f});
 
 	mat4 viewModelMatrix;
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
