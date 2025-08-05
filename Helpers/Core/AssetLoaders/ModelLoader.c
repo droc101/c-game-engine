@@ -94,7 +94,8 @@ ModelDefinition *LoadModelInternal(const char* asset)
 		lod->id = lodId;
 		lodId++;
 
-		lod->distance = ReadFloat(assetData->data, &offset);
+		offset += sizeof(float); // skip non-squared lod distance
+		lod->distanceSquared = ReadFloat(assetData->data, &offset);
 		lod->vertexCount = ReadSizeT(assetData->data, &offset);
 
 		const size_t vertexDataSize = lod->vertexCount * sizeof(float) * 12;

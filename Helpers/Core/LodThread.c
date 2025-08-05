@@ -54,15 +54,16 @@ int LodThreadMain(void *)
 			{
 				continue;
 			}
-			const float distance = Vector2Distance(actor->position, playerPosition);
+			float distance = Vector2Distance(actor->position, playerPosition);
+			distance *= distance;
 			while (actor->currentLod != 0 &&
-				   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
+				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distance)
 			{
 				actor->currentLod--;
 				shouldReloadActors = true;
 			}
 			while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-				   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
+				   actor->actorModel->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distance)
 			{
 				actor->currentLod++;
 				shouldReloadActors = true;

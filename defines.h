@@ -609,8 +609,8 @@ struct ModelLod
 	/// The runtime-generated ID of this model
 	size_t id;
 
-	/// How far away the camera must be before this LOD is used
-	float distance;
+	/// How far away the camera must be before this LOD is used (units squared)
+	float distanceSquared;
 
 	/// The number of vertices in the model
 	size_t vertexCount;
