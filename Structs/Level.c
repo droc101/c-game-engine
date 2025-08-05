@@ -55,7 +55,7 @@ static void InitJolt(Level *level)
 	JPH_BodyCreationSettings *floorSettings = JPH_BodyCreationSettings_Create3(
 			(const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100),
 			(Vector3[]){{0.0f, -0.5f, 0.0f}},
-			NULL, // Because joltc doesn't expose JPH::Quat::sIdentity() this is what we have to do to get the identity quaternion (which is [0, 0, 0, 1])
+			&JPH_Quat_Identity,
 			JPH_MotionType_Static,
 			OBJECT_LAYER_STATIC);
 

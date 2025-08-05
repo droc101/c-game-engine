@@ -18,7 +18,7 @@ typedef enum LaserHeight
 	LASER_HEIGHT_TRIPLE
 } LaserHeight;
 
-void LaserInit(Actor *this, const KvList *params);
+void LaserInit(Actor *this, const KvList *params, Transform *transform);
 void LaserUpdate(Actor *this, double delta);
 
 #endif //LASER_H

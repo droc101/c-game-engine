@@ -100,7 +100,7 @@ bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void LogicCounterInit(Actor *this, const KvList *params)
+void LogicCounterInit(Actor *this, const KvList *params, Transform *)
 {
 	this->extraData = malloc(sizeof(LogicCounterData));
 	CheckAlloc(this->extraData);

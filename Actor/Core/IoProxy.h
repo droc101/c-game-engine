@@ -7,7 +7,7 @@
 
 #include "../../defines.h"
 
-void IoProxyInit(Actor *this, const KvList *params);
+void IoProxyInit(Actor *this, const KvList *params, Transform *);
 
 void IoProxyUpdate(Actor *this, double /*delta*/);
 

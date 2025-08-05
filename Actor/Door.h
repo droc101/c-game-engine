@@ -7,7 +7,7 @@
 
 #include "../Structs/Actor.h"
 
-void DoorInit(Actor *this, const KvList *params);
+void DoorInit(Actor *this, const KvList *params, Transform *transform);
 
 void DoorUpdate(Actor *this, double delta);
 

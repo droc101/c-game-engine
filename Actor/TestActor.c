@@ -9,8 +9,6 @@
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Navigation.h"
 #include "../Structs/Actor.h"
-#include "../Structs/GlobalState.h"
-#include "../Structs/Vector2.h"
 
 bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
@@ -24,28 +22,26 @@ bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal,
 
 void TestActorIdle(Actor *this, const double /*delta*/)
 {
-	const NavigationConfig *navigationConfig = this->extraData;
-	this->transform.rotation.y += 0.01f;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += 0.01f;
 	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
 	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
 }
 
 void TestActorTargetReached(Actor *this, const double delta)
 {
-	const NavigationConfig *navigationConfig = this->extraData;
-	this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
-void CreateTestActorCollider(Actor *this)
+void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
-	// clang-format off
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
-			(const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.2867f),
-			&this->transform.position,
-			NULL,
-			JPH_MotionType_Dynamic,
-			OBJECT_LAYER_DYNAMIC);
-	//clang-format on
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.2867f);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
+																					  &transform->position,
+																					  &JPH_Quat_Identity,
+																					  JPH_MotionType_Dynamic,
+																					  OBJECT_LAYER_DYNAMIC);
 	const JPH_MassProperties massProperties = {
 		.mass = 20.0f,
 	};
@@ -54,14 +50,21 @@ void CreateTestActorCollider(Actor *this)
 													   JPH_OverrideMassProperties_CalculateInertia);
 	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
 	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
-	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings, JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_TranslationZ | JPH_AllowedDOFs_RotationY);
+	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings,
+											JPH_AllowedDOFs_TranslationX |
+													JPH_AllowedDOFs_TranslationY |
+													JPH_AllowedDOFs_TranslationZ |
+													JPH_AllowedDOFs_RotationY);
 	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
-	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface, bodyCreationSettings, JPH_Activation_Activate);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void TestActorInit(Actor *this, const KvList * /*params*/)
+void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
-	CreateTestActorCollider(this);
+	CreateTestActorCollider(this, transform);
 
 	this->actorModel = LoadModel(MODEL("model_leafy"));
 	this->currentSkinIndex = 0;
@@ -79,8 +82,8 @@ void TestActorInit(Actor *this, const KvList * /*params*/)
 	navigationConfig->agroTicks = 120;
 	navigationConfig->IdleFunction = TestActorIdle;
 	navigationConfig->TargetReachedFunction = TestActorTargetReached;
-	navigationConfig->lastKnownTarget.x = this->transform.position.x;
-	navigationConfig->lastKnownTarget.y = this->transform.position.z;
+	navigationConfig->lastKnownTarget.x = transform->position.x;
+	navigationConfig->lastKnownTarget.y = transform->position.z;
 }
 
 void TestActorUpdate(Actor *this, const double delta)

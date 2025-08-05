@@ -83,7 +83,7 @@ bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const byte signa
 	return false;
 }
 
-void LogicBinaryInit(Actor *this, const KvList *params)
+void LogicBinaryInit(Actor *this, const KvList *params, Transform *)
 {
 	this->extraData = malloc(sizeof(LogicBinaryData));
 	CheckAlloc(this->extraData);

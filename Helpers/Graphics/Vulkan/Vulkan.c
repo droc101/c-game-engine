@@ -247,6 +247,28 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 											  0),
 							   "Failed to draw Jolt debug renderer triangles!");
 	}
+
+	// if (buffers.actorWalls.count)
+	// {
+	// 	lunaBindVertexBuffers(0,
+	// 						  2,
+	// 						  (LunaBuffer[]){buffers.actorWalls.vertices.buffer,
+	// 										 buffers.actorWalls.instanceData.buffer},
+	// 						  (VkDeviceSize[]){0, 0});
+	//
+	// 	VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+	// 														 buffers.actorWalls.indices.buffer,
+	// 														 0,
+	// 														 VK_INDEX_TYPE_UINT32,
+	// 														 pipelines.actorWalls,
+	// 														 &pipelineBindInfo,
+	// 														 buffers.actorWalls.drawInfo.buffer,
+	// 														 0,
+	// 														 buffers.actorWalls.count,
+	// 														 sizeof(VkDrawIndexedIndirectCommand)),
+	// 						   "Failed to draw wall actors!");
+	// }
+
 	if (buffers.actorModels.shadedDrawInfo.bytesUsed)
 	{
 		lunaBindVertexBuffers(0,
@@ -394,7 +416,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 	if (viewmodel->enabled)
 	{
-		UpdateViewModelMatrix(viewmodel, camera);
+		UpdateViewModelMatrix(viewmodel);
 		lunaBindVertexBuffers(0,
 							  2,
 							  (LunaBuffer[]){buffers.viewModel.vertices, buffers.viewModel.instanceDataBuffer},

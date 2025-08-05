@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void LogicBinaryInit(Actor *this, const KvList *params);
+void LogicBinaryInit(Actor *this, const KvList *params, Transform *);
 
 #endif //LOGICBINARY_H

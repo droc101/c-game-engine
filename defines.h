@@ -42,6 +42,7 @@ typedef JPH_Vec4 Vector4;
 typedef struct Camera Camera;
 typedef struct Player Player;
 typedef struct Wall Wall;
+typedef struct ActorWall ActorWall;
 typedef struct Level Level;
 typedef struct Actor Actor;
 typedef struct Options Options;
@@ -64,7 +65,7 @@ typedef void (*FrameUpdateFunction)(GlobalState *state);
 
 typedef void (*FrameRenderFunction)(GlobalState *state);
 
-typedef void (*ActorInitFunction)(Actor *this, const KvList *params);
+typedef void (*ActorInitFunction)(Actor *this, const KvList *params, Transform *transform);
 
 typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
@@ -80,11 +81,11 @@ typedef void (*ActorDestroyFunction)(Actor *this);
  */
 typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byte signal, const Param *param);
 
-typedef void (*ActorPlayerContactAddedFunction)(Actor *this);
+typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyId bodyId);
 
-typedef void (*ActorPlayerContactPersistedFunction)(Actor *this);
+typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyId bodyId);
 
-typedef void (*ActorPlayerContactRemovedFunction)(Actor *this);
+typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId);
 
 #pragma endregion
 
@@ -387,10 +388,28 @@ struct Wall
 	float uvScale;
 	/// The X offset of the texture
 	float uvOffset;
-	/// height of the wall for rendering. Does not affect collision
-	float height;
 	/// Jolt body ID
 	JPH_BodyId bodyId;
+};
+
+struct ActorWall
+{
+	/// The first point of the wall
+	Vector2 a;
+	/// The second point of the wall
+	Vector2 b;
+	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	const char tex[80];
+	/// The X scale of the texture
+	float uvScale;
+	/// The X offset of the texture
+	float uvOffset;
+	/// height of the wall for rendering. Does not affect collision
+	float height;
+	/// The length of the wall (Call @c WallBake to update)
+	float length;
+	/// The angle of the wall (Call @c WallBake to update)
+	float angle;
 };
 
 // Utility functions are in Structs/level.h
@@ -544,10 +563,6 @@ struct SaveData
 // Actor (interactable/moving wall) struct
 struct Actor
 {
-	/// The 3d transform of the actor
-	/// @warning This is the visual transform only, and synchronization between the visual transform and the physics
-	///	 transform must be explicitly done in the update function
-	Transform transform;
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
 	/// The index of the active skin for the actor's model
@@ -556,7 +571,7 @@ struct Actor
 	uint currentLod;
 
 	/// The actor's wall, in global space
-	Wall *actorWall;
+	ActorWall *actorWall;
 
 	/// The actor type index
 	/// @warning Do not change this after creation

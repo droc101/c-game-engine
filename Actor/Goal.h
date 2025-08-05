@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-void GoalInit(Actor *this, const KvList *params);
+void GoalInit(Actor *this, const KvList *params, Transform *transform);
 
 void GoalUpdate(Actor *this, double /*delta*/);
 

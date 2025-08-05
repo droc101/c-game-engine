@@ -7,6 +7,7 @@
 #include "../../Structs/Vector2.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"
+#include "../Core/Logging.h"
 #include "../Core/MathEx.h"
 #include "GL/GLHelper.h"
 #include "Vulkan/Vulkan.h"
@@ -91,15 +92,15 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	{
 		Error("A NULL transformMatrix must not be passed to ActorTransformMatrix!");
 	}
-	if (actor->actorType == ACTOR_TYPE_PHYSBOX || actor->actorType == ACTOR_TYPE_TEST)
+	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
 	{
 		JPH_RMatrix4x4 matrix;
 		JPH_BodyInterface_GetCenterOfMassTransform(actor->bodyInterface, actor->bodyId, &matrix);
 		memcpy(*transformMatrix, &matrix, sizeof(mat4));
 	} else
 	{
-		glm_translate(*transformMatrix, (vec3){actor->transform.position.x, actor->transform.position.y, actor->transform.position.z});
-		glm_rotate(*transformMatrix, actor->transform.rotation.y, GLM_YUP);
+		LogWarning("ActorTransformMatrix called on actor which has no body!\n");
+		glm_mat4_identity(*transformMatrix);
 	}
 }
 

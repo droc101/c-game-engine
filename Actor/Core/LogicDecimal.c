@@ -91,7 +91,7 @@ bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void LogicDecimalInit(Actor *this, const KvList *params)
+void LogicDecimalInit(Actor *this, const KvList *params, Transform *)
 {
 	this->extraData = malloc(sizeof(LogicDecimalData));
 	CheckAlloc(this->extraData);

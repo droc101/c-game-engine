@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void SpriteInit(Actor *this, const KvList *params);
+void SpriteInit(Actor *this, const KvList *params, Transform *transform);
 
 #endif //SPRITE_H

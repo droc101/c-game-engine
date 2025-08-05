@@ -10,9 +10,10 @@
 
 float PlayerRelativeAngle(const Actor *actor)
 {
-	const float actorPlayerAngleDifference = atan2f(GetState()->level->player.transform.position.z - actor->transform.position.z,
-													GetState()->level->player.transform.position.x - actor->transform.position.x);
-	return wrap(actorPlayerAngleDifference - actor->transform.rotation.y, -PIf, PIf) + PIf / 2;
+	// const float actorPlayerAngleDifference = atan2f(GetState()->level->player.transform.position.z - actor->transform.position.z,
+	// 												GetState()->level->player.transform.position.x - actor->transform.position.x);
+	// return wrap(actorPlayerAngleDifference - actor->transform.rotation.y, -PIf, PIf) + PIf / 2;
+	return 0.0f;
 }
 
 bool IsPlayerVisibleInternal(const Actor *actor,

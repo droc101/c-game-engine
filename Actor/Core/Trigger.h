@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void TriggerInit(Actor *this, const KvList *params);
+void TriggerInit(Actor *this, const KvList *params, Transform *transform);
 
 #endif //TRIGGER_H

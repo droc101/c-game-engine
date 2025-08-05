@@ -57,4 +57,10 @@ void DestroyActorConnection(ActorConnection *connection);
  */
 bool DefaultSignalHandler(Actor *this, const Actor *sender, byte signal, const Param *param);
 
+/**
+ * Bake an actor wall's information
+ * @param this ActorWall to bake
+ */
+void ActorWallBake(const Actor *this);
+
 #endif //GAME_ACTOR_H

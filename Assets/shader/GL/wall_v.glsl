@@ -16,11 +16,13 @@ layout (std140) uniform SharedUniforms
 	float cameraYaw;
 } uniforms;
 
+uniform mat4 transformMatrix;
+
 const float PI = 3.14159265359; // yummy
 
 void main() {
 	UV = VERTEX_UV;
-	gl_Position = uniforms.worldViewMatrix * vec4(VERTEX, 1.0);
+	gl_Position = uniforms.worldViewMatrix * transformMatrix * vec4(VERTEX, 1.0);
 
 	SHADE = abs(cos((uniforms.cameraYaw + (1.5 * PI)) - VERTEX_ANGLE));
 	SHADE = max(0.6, min(1, SHADE));

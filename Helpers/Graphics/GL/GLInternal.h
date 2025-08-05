@@ -133,9 +133,10 @@ void GL_LoadTextureFromAsset(const char *texture);
 /**
  * Draw an actor wall in 3D
  * @param actor The actor to draw
+ * @param actorXfm
  * @note This expects 3D mode to be enabled
  */
-void GL_DrawActorWall(const Actor *actor);
+void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm);
 
 /**
  * Register a texture from pixel data

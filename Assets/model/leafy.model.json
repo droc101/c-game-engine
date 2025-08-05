@@ -21,11 +21,11 @@
             "model": "leafy/leafy.obj"
         },
         {
-            "distance": 5,
+          "distance": 25,
             "model": "leafy/leafy.lod1.obj"
         },
         {
-            "distance": 10,
+          "distance": 100,
             "model": "leafy/leafy.lod2.obj"
         }
     ]

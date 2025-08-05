@@ -5,7 +5,7 @@
 #include "Physbox.h"
 #include "../Helpers/Core/AssetReader.h"
 
-void CreatePhysboxCollider(Actor *this)
+void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
 	// b2BodyDef bodyDef = b2DefaultBodyDef();
 	// bodyDef.type = b2_dynamicBody;
@@ -21,8 +21,8 @@ void CreatePhysboxCollider(Actor *this)
 
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
 			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.2f, 0.2f, 0.2f}}, JPH_DEFAULT_CONVEX_RADIUS),
-			&this->transform.position,
-			NULL,
+			&transform->position,
+			&JPH_Quat_Identity,
 			JPH_MotionType_Dynamic,
 			OBJECT_LAYER_DYNAMIC);
 	const JPH_MassProperties massProperties = {
@@ -37,19 +37,20 @@ void CreatePhysboxCollider(Actor *this)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void PhysboxInit(Actor *this, const KvList * /*params*/)
+void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
 	this->actorModel = LoadModel(MODEL("model_cube"));
-	this->transform.position.y = -0.3f;
+	transform->position.y = -0.3f;
 
-	CreatePhysboxCollider(this);
+	CreatePhysboxCollider(this, transform);
 }
 
 void PhysboxUpdate(Actor *this, const double /*delta*/)
 {
-	JPH_Quat rotation;
-	JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
-	JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
+	// JPH_Quat rotation;
+	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
+	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
 }

@@ -188,14 +188,13 @@ void LoadWalls(const Level *level)
 	for (uint32_t i = 0; i < level->walls.length; i++)
 	{
 		const Wall *wall = ListGetPointer(level->walls, i);
-		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
 		const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};
 		const vec2 startUV = {wall->uvOffset, 0};
 		const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
 
 		vertices[4 * i].x = startVertex[0];
-		vertices[4 * i].y = halfHeight;
+		vertices[4 * i].y = 0.5f;
 		vertices[4 * i].z = startVertex[1];
 		vertices[4 * i].u = startUV[0];
 		vertices[4 * i].v = startUV[1];
@@ -203,7 +202,7 @@ void LoadWalls(const Level *level)
 		vertices[4 * i].wallAngle = (float)wall->angle;
 
 		vertices[4 * i + 1].x = endVertex[0];
-		vertices[4 * i + 1].y = halfHeight;
+		vertices[4 * i + 1].y = 0.5f;
 		vertices[4 * i + 1].z = endVertex[1];
 		vertices[4 * i + 1].u = endUV[0];
 		vertices[4 * i + 1].v = startUV[1];
@@ -211,7 +210,7 @@ void LoadWalls(const Level *level)
 		vertices[4 * i + 1].wallAngle = (float)wall->angle;
 
 		vertices[4 * i + 2].x = endVertex[0];
-		vertices[4 * i + 2].y = -halfHeight;
+		vertices[4 * i + 2].y = -0.5f;
 		vertices[4 * i + 2].z = endVertex[1];
 		vertices[4 * i + 2].u = endUV[0];
 		vertices[4 * i + 2].v = endUV[1];
@@ -219,7 +218,7 @@ void LoadWalls(const Level *level)
 		vertices[4 * i + 2].wallAngle = (float)wall->angle;
 
 		vertices[4 * i + 3].x = startVertex[0];
-		vertices[4 * i + 3].y = -halfHeight;
+		vertices[4 * i + 3].y = -0.5f;
 		vertices[4 * i + 3].z = startVertex[1];
 		vertices[4 * i + 3].u = startUV[0];
 		vertices[4 * i + 3].v = endUV[1];
@@ -262,7 +261,7 @@ void UpdateTransformMatrix(const Camera *camera)
 }
 
 // TODO: This positions the model slightly differently than OpenGL does
-void UpdateViewModelMatrix(const Viewmodel *viewmodel, const Camera *camera)
+void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(VIEWMODEL_FOV),

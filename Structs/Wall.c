@@ -17,7 +17,6 @@ Wall *CreateWall(const Vector2 a, const Vector2 b, const char *texture, const fl
 	strncpy(w->tex, texture, 80);
 	w->uvScale = uvScale;
 	w->uvOffset = uvOffset;
-	w->height = 1.0f;
 	w->bodyId = -1;
 	return w;
 }
@@ -50,11 +49,11 @@ void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 																						  4,
 																						  JPH_DEFAULT_CONVEX_RADIUS);
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
-	const JPH_Vec3 position = {wall->a.x, 0, wall->a.y};
+	const Vector3 position = {wall->a.x, 0, wall->a.y};
 	JPH_BodyCreationSettings *settings = JPH_BodyCreationSettings_Create3(
 			shape,
 			&position,
-			NULL, // Because joltc doesn't expose JPH::Quat::sIdentity() this is what we have to do to get the identity quaternion (which is [0, 0, 0, 1])
+			&JPH_Quat_Identity,
 			JPH_MotionType_Static,
 			OBJECT_LAYER_STATIC);
 
@@ -73,5 +72,5 @@ void WallBake(Wall *w)
 	w->dx = w->b.x - w->a.x;
 	w->dy = w->b.y - w->a.y;
 	w->length = sqrtf(w->dx * w->dx + w->dy * w->dy);
-	w->angle = atan2f(w->b.y - w->a.y, w->b.x - w->a.x);
+	w->angle = atan2f(w->b.x - w->a.x, w->b.y - w->a.y);
 }

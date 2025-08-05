@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-void TestActorInit(Actor *this, const KvList *params);
+void TestActorInit(Actor *this, const KvList *params, Transform *transform);
 
 void TestActorUpdate(Actor *this, double delta);
 

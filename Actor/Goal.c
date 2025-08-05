@@ -47,12 +47,13 @@ bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	return false;
 }
 
-void CreateGoalSensor(Actor *this)
+void CreateGoalSensor(Actor *this, const Transform *transform)
 {
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_SphereShape_Create(0.5f);
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
+																	JPH_DEFAULT_CONVEX_RADIUS);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  &this->transform.position,
-																					  NULL,
+																					  &transform->position,
+																					  &JPH_Quat_Identity,
 																					  JPH_MotionType_Static,
 																					  OBJECT_LAYER_SENSOR);
 	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
@@ -60,9 +61,10 @@ void CreateGoalSensor(Actor *this)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void GoalOnPlayerContactAdded(Actor *this)
+void GoalOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const GoalData *data = this->extraData;
 	if (data->enabled)
@@ -73,7 +75,7 @@ void GoalOnPlayerContactAdded(Actor *this)
 	}
 }
 
-void GoalInit(Actor *this, const KvList *params)
+void GoalInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->SignalHandler = GoalSignalHandler;
 	GoalData *data = calloc(1, sizeof(GoalData));
@@ -81,23 +83,25 @@ void GoalInit(Actor *this, const KvList *params)
 	this->extraData = data;
 	data->enabled = KvGetBool(params, "startEnabled", true);
 
-	this->actorWall = CreateWall(v2(0, 0.5f),
-								 v2(0, -0.5f),
-								 data->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"),
-								 1.0f,
-								 0.0f);
-	WallBake(this->actorWall);
+	this->actorWall = malloc(sizeof(ActorWall));
+	this->actorWall->a = v2(0, 0.5f);
+	this->actorWall->b = v2(0, -0.5f);
+	strncpy(this->actorWall->tex, data->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"), 80);
+	this->actorWall->uvScale = 1.0f;
+	this->actorWall->uvOffset = 0.0f;
+	this->actorWall->height = 1.0f;
+	ActorWallBake(this);
 
 	this->OnPlayerContactAdded = GoalOnPlayerContactAdded;
 
-	CreateGoalSensor(this);
+	CreateGoalSensor(this, transform);
 }
 
 void GoalUpdate(Actor *this, double /*delta*/)
 {
-	const float rotation = atan2f(GetState()->level->player.transform.position.z - this->transform.position.z,
-								  GetState()->level->player.transform.position.x - this->transform.position.x) +
-						   PIf / 2;
-	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
-	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
+	// const float rotation = atan2f(GetState()->level->player.transform.position.z - this->transform.position.z,
+	// 							  GetState()->level->player.transform.position.x - this->transform.position.x) +
+	// 					   PIf / 2;
+	// this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
+	// this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
 }

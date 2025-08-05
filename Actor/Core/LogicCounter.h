@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void LogicCounterInit(Actor *this, const KvList *params);
+void LogicCounterInit(Actor *this, const KvList *params, Transform *);
 
 #endif //LOGICCOUNTER_H

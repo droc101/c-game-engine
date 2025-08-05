@@ -243,11 +243,11 @@
       "model": "laseremitter/emitter.obj"
     },
     {
-      "distance": 5,
+      "distance": 25,
       "model": "laseremitter/emitter.lod1.obj"
     },
     {
-      "distance": 10,
+      "distance": 100,
       "model": "laseremitter/emitter.lod2.obj"
     }
   ]

@@ -7,7 +7,7 @@
 
 #include "../defines.h"
 
-void PhysboxInit(Actor *this, const KvList *params);
+void PhysboxInit(Actor *this, const KvList *params, Transform *transform);
 void PhysboxUpdate(Actor *this, double delta);
 
 #endif //PHYSBOX_H

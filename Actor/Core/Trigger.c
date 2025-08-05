@@ -51,7 +51,7 @@ static bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte si
 	return false;
 }
 
-void TriggerOnPlayerContactAdded(Actor *this)
+void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (data->enabled)
@@ -61,7 +61,7 @@ void TriggerOnPlayerContactAdded(Actor *this)
 	}
 }
 
-void TriggerOnPlayerContactPersisted(Actor *this)
+void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (!data->oneShot && data->enabled)
@@ -70,7 +70,7 @@ void TriggerOnPlayerContactPersisted(Actor *this)
 	}
 }
 
-void TriggerOnPlayerContactRemoved(Actor *this)
+void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (data->enabled)
@@ -83,13 +83,14 @@ void TriggerOnPlayerContactRemoved(Actor *this)
 	}
 }
 
-void CreateTriggerSensor(Actor *this, const TriggerData *data)
+void CreateTriggerSensor(Actor *this, const Transform *transform)
 {
+	const TriggerData *data = this->extraData;
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
 			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
 												   JPH_DEFAULT_CONVEX_RADIUS),
-			&this->transform.position,
-			NULL,
+			&transform->position,
+			&JPH_Quat_Identity,
 			JPH_MotionType_Static,
 			OBJECT_LAYER_SENSOR);
 	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
@@ -99,7 +100,7 @@ void CreateTriggerSensor(Actor *this, const TriggerData *data)
 													  JPH_Activation_Activate);
 }
 
-void TriggerInit(Actor *this, const KvList *params)
+void TriggerInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
@@ -108,7 +109,9 @@ void TriggerInit(Actor *this, const KvList *params)
 	data->depth = KvGetFloat(params, "depth", 1.0f);
 	data->oneShot = KvGetBool(params, "oneShot", true);
 	data->enabled = KvGetBool(params, "startEnabled", true);
-	CreateTriggerSensor(this, data);
+
+	CreateTriggerSensor(this, transform);
+
 	this->SignalHandler = TriggerSignalHandler;
 	this->OnPlayerContactAdded = TriggerOnPlayerContactAdded;
 	this->OnPlayerContactPersisted = TriggerOnPlayerContactPersisted;

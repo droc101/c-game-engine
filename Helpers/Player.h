@@ -13,4 +13,6 @@ void PlayerContactListenerDestroy();
 
 void CreatePlayerCollider(Level *level);
 
+void MovePlayer(const Player *player, float *distanceTraveled);
+
 #endif //PLAYER_H

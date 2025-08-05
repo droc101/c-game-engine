@@ -14,7 +14,7 @@
 #define LASER_EMITTER_INPUT_DISABLE 2
 #define LASER_EMITTER_INPUT_ENABLE 1
 
-static const JPH_Vec3 halfExtent = {0.2f, 0.48f, 0.05f};
+static const Vector3 halfExtent = {0.2f, 0.48f, 0.05f};
 
 typedef enum LaserEmitterSkin
 {
@@ -55,16 +55,16 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void CreateLaserEmitterCollider(Actor *this)
+void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
 	JPH_Quat rotation = {};
-	JPH_Quat_FromEulerAngles(&this->transform.rotation, &rotation);
-	JPH_Vec3 forwardVector = {};
+	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
+	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
-	JPH_Vec3 offsetVector = {};
+	Vector3 offsetVector = {};
 	JPH_Vec3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
-	JPH_Vec3 position = {};
-	JPH_Vec3_Subtract(&this->transform.position, &offsetVector, &position);
+	Vector3 position = {};
+	JPH_Vec3_Subtract(&transform->position, &offsetVector, &position);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
 			(const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS),
 			&position,
@@ -72,13 +72,13 @@ void CreateLaserEmitterCollider(Actor *this)
 			JPH_MotionType_Static,
 			OBJECT_LAYER_STATIC);
 	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
-	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void LaserEmitterInit(Actor *this, const KvList *params)
+void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->SignalHandler = LaserEmitterSignalHandler;
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
@@ -89,7 +89,7 @@ void LaserEmitterInit(Actor *this, const KvList *params)
 	this->actorModel = LoadModel(MODEL("model_laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
-	CreateLaserEmitterCollider(this);
+	CreateLaserEmitterCollider(this, transform);
 
 	data->startEnabled = KvGetBool(params, "startEnabled", true);
 
@@ -97,7 +97,7 @@ void LaserEmitterInit(Actor *this, const KvList *params)
 	KvListCreate(&laserParams);
 	KvSetByte(&laserParams, "height", data->height);
 	KvSetBool(&laserParams, "startEnabled", data->startEnabled);
-	data->laserActor = CreateActor(&this->transform,
+	data->laserActor = CreateActor(transform,
 								   ACTOR_TYPE_LASER,
 								   &laserParams,
 								   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));

@@ -52,6 +52,7 @@ GLint hudTexturedRegionLoc;
 GLint wallTextureLoc;
 GLint wallModelWorldMatrixLoc;
 GLint wallSharedUniformsLoc;
+GLint wallTransformMatrixLoc;
 
 #pragma endregion
 
@@ -74,6 +75,7 @@ void LoadShaderLocations()
 	wallTextureLoc = glGetUniformLocation(wallShader->program, "alb");
 	wallModelWorldMatrixLoc = glGetUniformLocation(wallShader->program, "MODEL_WORLD_MATRIX");
 	wallSharedUniformsLoc = glGetUniformBlockIndex(wallShader->program, "SharedUniforms");
+	wallTransformMatrixLoc = glGetUniformLocation(wallShader->program, "transformMatrix");
 }
 
 bool GL_PreInit()
@@ -518,10 +520,10 @@ void GL_LoadLevelWalls(const Level *l)
 
 		float vertices[4][6] = {
 			// X Y Z U V A
-			{(float)w->a.x, 0.5f * w->height, (float)w->a.y, 0.0f, 0.0f, w->angle},
-			{(float)w->b.x, 0.5f * w->height, (float)w->b.y, (float)w->length, 0.0f, w->angle},
-			{(float)w->b.x, -0.5f * w->height, (float)w->b.y, (float)w->length, 1.0f, w->angle},
-			{(float)w->a.x, -0.5f * w->height, (float)w->a.y, 0.0f, 1.0f, w->angle},
+			{(float)w->a.x, 0.5f, (float)w->a.y, 0.0f, 0.0f, w->angle},
+			{(float)w->b.x, 0.5f, (float)w->b.y, (float)w->length, 0.0f, w->angle},
+			{(float)w->b.x, -0.5f, (float)w->b.y, (float)w->length, 1.0f, w->angle},
+			{(float)w->a.x, -0.5f, (float)w->a.y, 0.0f, 1.0f, w->angle},
 		};
 
 		const float uvOffset = w->uvOffset;
@@ -942,26 +944,28 @@ void GL_GetViewmodelMatrix(mat4 *out)
 
 #pragma region World Drawing
 
-void GL_DrawActorWall(const Actor *actor)
+void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 {
-	const Wall *wall = actor->actorWall;
+	const ActorWall *wall = actor->actorWall;
 
 	glUseProgram(wallShader->program);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
 
+	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
 	GL_LoadTextureFromAsset(wall->tex);
 
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(actor->transform.position.x + wall->a.x, actor->transform.position.z + wall->a.y);
-	const Vector2 endVertex = v2(actor->transform.position.x + wall->b.x, actor->transform.position.z + wall->b.y);
+	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
+	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
 	const Vector2 startUV = v2(wall->uvOffset, 0);
 	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
 	const float vertices[4][6] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
-			actor->transform.position.y + halfHeight,
+			halfHeight,
 			startVertex.y,
 			startUV.x,
 			startUV.y,
@@ -969,7 +973,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			endVertex.x,
-			actor->transform.position.y + halfHeight,
+			halfHeight,
 			endVertex.y,
 			endUV.x,
 			startUV.y,
@@ -977,7 +981,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			endVertex.x,
-			actor->transform.position.y - halfHeight,
+			-halfHeight,
 			endVertex.y,
 			endUV.x,
 			endUV.y,
@@ -985,7 +989,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			startVertex.x,
-			actor->transform.position.y - halfHeight,
+			-halfHeight,
 			startVertex.y,
 			startUV.x,
 			endUV.y,
@@ -1090,6 +1094,11 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 	for (int i = 0; i < level->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(level->actors, i);
+		if (!actor->actorWall && !actor->actorModel)
+		{
+			continue;
+		}
+
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);
 		if (actor->actorModel == NULL)
@@ -1098,7 +1107,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 			{
 				continue;
 			}
-			GL_DrawActorWall(actor);
+			GL_DrawActorWall(actor, actorXfm);
 		} else
 		{
 			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod);
@@ -1174,7 +1183,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
 					   1,
 					   GL_FALSE,
-					   modelWorldMatrix[0]); // model -> world
+					   *modelWorldMatrix); // model -> world
 
 	GL_LoadModel(model, lod, material);
 
@@ -1217,6 +1226,8 @@ void GL_RenderLevelWalls()
 	glUseProgram(wallShader->program);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *GLM_MAT4_IDENTITY);
 
 	size_t i = 0;
 	while (glWalls[i] != NULL && i < GL_MAX_WALL_BUFFERS)

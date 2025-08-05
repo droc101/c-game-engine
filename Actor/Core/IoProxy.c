@@ -30,7 +30,7 @@ bool IoProxySignalHandler(Actor *this, const Actor *sender, const byte signal, c
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void IoProxyInit(Actor *this, const KvList * /*params*/)
+void IoProxyInit(Actor *this, const KvList * /*params*/, Transform *)
 {
 	if (GetState()->level->ioProxy != NULL)
 	{

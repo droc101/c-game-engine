@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void LogicDecimalInit(Actor *this, const KvList *params);
+void LogicDecimalInit(Actor *this, const KvList *params, Transform *);
 
 #endif //LOGICDECIMAL_H

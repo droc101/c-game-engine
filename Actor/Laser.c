@@ -29,7 +29,7 @@ bool LaserSignalHandler(Actor *this, const Actor *sender, byte signal, const Par
 	{
 		data->enabled = false;
 		this->actorWall->b = v2(0.01, 0);
-		WallBake(this->actorWall);
+		ActorWallBake(this);
 		return true;
 	}
 	if (signal == LASER_INPUT_ENABLE)
@@ -40,7 +40,7 @@ bool LaserSignalHandler(Actor *this, const Actor *sender, byte signal, const Par
 	return false;
 }
 
-void LaserInit(Actor *this, const KvList *params)
+void LaserInit(Actor *this, const KvList *params, Transform *transform)
 {
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
@@ -49,33 +49,36 @@ void LaserInit(Actor *this, const KvList *params)
 	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	this->SignalHandler = LaserSignalHandler;
-	this->actorWall = CreateWall(v2s(0),
-								 v2s(0),
-								 data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor_triplelaser")
-																	 : TEXTURE("actor_laser"),
-								 1.0f,
-								 0.0f);
+	this->actorWall = malloc(sizeof(ActorWall));
+	this->actorWall->a = v2s(0);
+	this->actorWall->b = v2s(0);
+	strncpy(this->actorWall->tex,
+			data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor_triplelaser") : TEXTURE("actor_laser"),
+			80);
+	this->actorWall->uvScale = 1.0f;
+	this->actorWall->uvOffset = 0.0f;
+	this->actorWall->height = 1.0f;
 
 	if (!data->enabled)
 	{
 		this->actorWall->b = v2(0.01, 0);
-		WallBake(this->actorWall);
+		ActorWallBake(this);
 	}
 
 	switch (data->height)
 	{
 		case LASER_HEIGHT_FLOOR:
-			this->transform.position.y = -0.3f;
+			transform->position.y = -0.3f;
 			break;
 		case LASER_HEIGHT_CEILING:
-			this->transform.position.y = 0.3f;
+			transform->position.y = 0.3f;
 			break;
 		case LASER_HEIGHT_MIDDLE:
 		default:
-			this->transform.position.y = 0.0f;
+			transform->position.y = 0.0f;
 			break;
 	}
-	WallBake(this->actorWall);
+	ActorWallBake(this);
 
 	// TODO: Make harmful - Depends on being able to take damage
 }

@@ -7,6 +7,6 @@
 
 #include "../../defines.h"
 
-void SoundPlayerInit(Actor *this, const KvList *params);
+void SoundPlayerInit(Actor *this, const KvList *params, Transform *);
 
 #endif //SOUNDPLAYER_H

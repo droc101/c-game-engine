@@ -373,33 +373,33 @@ VkResult LoadActorWalls(const LockingList *actors)
 		{
 			continue;
 		}
-		const Wall *wall = actor->actorWall;
+		const ActorWall *wall = actor->actorWall;
 		const float halfHeight = wall->height / 2.0f;
-		const vec2 startVertex = {actor->transform.position.x + wall->a.x, actor->transform.position.z + wall->a.y};
-		const vec2 endVertex = {actor->transform.position.x + wall->b.x, actor->transform.position.z + wall->b.y};
+		const vec2 startVertex = {wall->a.x, wall->a.y};
+		const vec2 endVertex = {wall->b.x, wall->b.y};
 		const vec2 startUV = {wall->uvOffset, 0};
 		const vec2 endUV = {wall->uvScale * wall->length + wall->uvOffset, 1};
 
 		vertices[4 * wallCount].x = startVertex[0];
-		vertices[4 * wallCount].y = halfHeight + actor->transform.position.y;
+		vertices[4 * wallCount].y = halfHeight;
 		vertices[4 * wallCount].z = startVertex[1];
 		vertices[4 * wallCount].u = startUV[0];
 		vertices[4 * wallCount].v = startUV[1];
 
 		vertices[4 * wallCount + 1].x = endVertex[0];
-		vertices[4 * wallCount + 1].y = halfHeight + actor->transform.position.y;
+		vertices[4 * wallCount + 1].y = halfHeight;
 		vertices[4 * wallCount + 1].z = endVertex[1];
 		vertices[4 * wallCount + 1].u = endUV[0];
 		vertices[4 * wallCount + 1].v = startUV[1];
 
 		vertices[4 * wallCount + 2].x = endVertex[0];
-		vertices[4 * wallCount + 2].y = -halfHeight + actor->transform.position.y;
+		vertices[4 * wallCount + 2].y = -halfHeight;
 		vertices[4 * wallCount + 2].z = endVertex[1];
 		vertices[4 * wallCount + 2].u = endUV[0];
 		vertices[4 * wallCount + 2].v = endUV[1];
 
 		vertices[4 * wallCount + 3].x = startVertex[0];
-		vertices[4 * wallCount + 3].y = -halfHeight + actor->transform.position.y;
+		vertices[4 * wallCount + 3].y = -halfHeight;
 		vertices[4 * wallCount + 3].z = startVertex[1];
 		vertices[4 * wallCount + 3].u = startUV[0];
 		vertices[4 * wallCount + 3].v = endUV[1];
@@ -454,10 +454,10 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 			continue;
 		}
 
+		mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
+		ActorTransformMatrix(actor, &transformMatrix);
 		if (actor->actorModel)
 		{
-			mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
-			ActorTransformMatrix(actor, &transformMatrix);
 			for (uint8_t j = 0; j < actor->actorModel->materialCount; j++)
 			{
 				const Material material = actor->actorModel->skins[actor->currentSkinIndex][j];
@@ -493,8 +493,8 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 			}
 		} else if (actor->actorWall)
 		{
-			const Wall *wall = actor->actorWall;
-			memcpy(actorWallsInstanceData[wallCount].transform, GLM_MAT4_IDENTITY, sizeof(mat4));
+			const ActorWall *wall = actor->actorWall;
+			memcpy(actorWallsInstanceData[wallCount].transform, transformMatrix, sizeof(mat4));
 			actorWallsInstanceData[wallCount].textureIndex = TextureIndex(wall->tex);
 			actorWallsInstanceData[wallCount].wallAngle = actor->actorWall->angle;
 

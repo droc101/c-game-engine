@@ -322,7 +322,7 @@ void LoadWalls(const Level *level);
 
 void UpdateTransformMatrix(const Camera *camera);
 
-void UpdateViewModelMatrix(const Viewmodel *viewmodel, const Camera *camera);
+void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
 void DrawRectInternal(float ndcStartX,
 					  float ndcStartY,

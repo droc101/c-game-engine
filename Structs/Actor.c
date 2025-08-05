@@ -26,7 +26,7 @@
 #include "../Actor/TestActor.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, const KvList * /*params*/) {}
+void ActorInit(Actor * /*this*/, const KvList * /*params*/, Transform */*transform*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
@@ -97,7 +97,6 @@ Actor *CreateActor(const Transform *transform,
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
 	actor->actorWall = NULL;
-	actor->transform = *transform;
 	actor->health = 1;
 	actor->actorType = actorType;
 	actor->actorModel = NULL;
@@ -114,7 +113,7 @@ Actor *CreateActor(const Transform *transform,
 	actor->extraData = NULL;
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
 	actor->bodyInterface = bodyInterface;
-	actor->Init(actor, params); // kindly allow the Actor to initialize itself
+	actor->Init(actor, params, transform); // kindly allow the Actor to initialize itself
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
 	if (params)
 	{
@@ -212,4 +211,23 @@ bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const byte sign
 		return true;
 	}
 	return false;
+}
+
+void ActorWallBake(const Actor *this)
+{
+	const float dx = this->actorWall->b.x - this->actorWall->a.x;
+	const float dy = this->actorWall->b.y - this->actorWall->a.y;
+	this->actorWall->length = sqrtf(dx * dx + dy * dy);
+	if (this->bodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
+	{
+		JPH_Quat rotation = {};
+		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
+		Vector3 eulerAngles = {};
+		JPH_Quat_GetEulerAngles(&rotation, &eulerAngles);
+		this->actorWall->angle = eulerAngles.y;
+	} else
+	{
+		this->actorWall->angle = atan2f(this->actorWall->b.x - this->actorWall->a.x,
+										this->actorWall->b.y - this->actorWall->a.y);
+	}
 }

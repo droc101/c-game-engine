@@ -5,7 +5,6 @@
 #include "LodThread.h"
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
-#include "../../Structs/Vector2.h"
 #include "../Graphics/Vulkan/Vulkan.h"
 #include "Error.h"
 
@@ -16,7 +15,7 @@ static SDL_sem *hasEnded;
 static SDL_mutex *mutex;
 
 // ReSharper disable once CppDFAConstantFunctionResult
-int LodThreadMain(void *)
+int LodThreadMain(void * /*data*/)
 {
 	while (!shouldExit)
 	{
@@ -42,66 +41,38 @@ int LodThreadMain(void *)
 		}
 
 		const GlobalState *state = GetState();
-		const Vector2 playerPosition = {state->level->player.transform.position.x,
-										state->level->player.transform.position.z};
 		const LockingList *actors = &state->level->actors;
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
-		switch (currentRenderer)
+		bool shouldReloadActors = false;
+		Vector3 actorPosition = {};
+		Vector3 positionSum = {};
+		for (size_t i = 0; i < actorCount; i++)
 		{
-			case RENDERER_VULKAN:
-				bool shouldReloadActors = true;
-				for (size_t i = 0; i < actorCount; i++)
-				{
-					Actor *actor = ListGetPointer(*actors, i);
-					if (!actor->actorModel)
-					{
-						continue;
-					}
-					actor->currentLod = 0;
-					// const Vector2 actorPosition = (Vector2){actor->transform.position.x, actor->transform.position.z};
-					// const float distance = Vector2Distance(actorPosition, playerPosition);
-					// while (actor->currentLod != 0 &&
-					// 	   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
-					// {
-					// 	actor->currentLod--;
-					// 	shouldReloadActors = true;
-					// }
-					// while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-					// 	   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
-					// {
-					// 	actor->currentLod++;
-					// 	shouldReloadActors = true;
-					// }
-				}
-				if (!VK_UpdateActors(actors, shouldReloadActors))
-				{
-					Error("Failed to load actors!");
-				}
-				break;
-			case RENDERER_OPENGL:
-			default:
-				for (size_t i = 0; i < actorCount; i++)
-				{
-					Actor *actor = ListGetPointer(*actors, i);
-					if (!actor->actorModel)
-					{
-						continue;
-					}
-					const Vector2 actorPosition = (Vector2){actor->transform.position.x, actor->transform.position.z};
-					const float distance = Vector2Distance(actorPosition, playerPosition);
-					while (actor->currentLod != 0 &&
-						   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distance)
-					{
-						actor->currentLod--;
-					}
-					while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-						   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distance)
-					{
-						actor->currentLod++;
-					}
-				}
-				break;
+			Actor *actor = ListGetPointer(*actors, i);
+			if (!actor->actorModel || actor->actorModel->lodCount == 1)
+			{
+				continue;
+			}
+			JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
+			JPH_Vec3_Add(&state->level->player.transform.position, &actorPosition, &positionSum);
+			const float distanceSquared = JPH_Vec3_LengthSquared(&positionSum);
+			while (actor->currentLod != 0 &&
+				   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distanceSquared)
+			{
+				actor->currentLod--;
+				shouldReloadActors = true;
+			}
+			while (actor->actorModel->lodCount > actor->currentLod + 1 &&
+				   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distanceSquared)
+			{
+				actor->currentLod++;
+				shouldReloadActors = true;
+			}
+		}
+		if (currentRenderer == RENDERER_VULKAN && !VK_UpdateActors(actors, shouldReloadActors))
+		{
+			Error("Failed to load actors!");
 		}
 
 		if (SDL_UnlockMutex(mutex) != 0)
