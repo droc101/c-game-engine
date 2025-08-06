@@ -7,12 +7,14 @@
 
 #include "../../../defines.h"
 
-void PlayerContactListenerInit();
+void PlayerPersistentStateInit();
 
-void PlayerContactListenerDestroy();
+void PlayerPersistentStateDestroy();
 
 void CreatePlayerCollider(Level *level);
 
 void MovePlayer(const Player *player, float *distanceTraveled);
+
+void Update(const Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime);
 
 #endif //PLAYER_H

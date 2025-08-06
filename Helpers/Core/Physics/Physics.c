@@ -26,7 +26,7 @@ static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 
 static bool ObjectLayerShouldCollide(const JPH_ObjectLayer inLayer1, const JPH_ObjectLayer inLayer2)
 {
-	if (inLayer1 == OBJECT_LAYER_DYNAMIC || inLayer1 == OBJECT_LAYER_PLAYER)
+	if (inLayer1 == OBJECT_LAYER_DYNAMIC)// || inLayer1 == OBJECT_LAYER_PLAYER)
 	{
 		switch (inLayer2)
 		{
@@ -70,14 +70,14 @@ void PhysicsInitGlobal(GlobalState *state)
 	state->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
 	RayCastInit();
 	JoltDebugRendererInit();
-	PlayerContactListenerInit();
+	PlayerPersistentStateInit();
 }
 
 void PhysicsDestroyGlobal(const GlobalState *state)
 {
 	RayCastDestroy();
 	JoltDebugRendererDestroy();
-	PlayerContactListenerDestroy();
+	PlayerPersistentStateDestroy();
 	JPH_JobSystem_Destroy(state->jobSystem);
 	JPH_Shutdown();
 }

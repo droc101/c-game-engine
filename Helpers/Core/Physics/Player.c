@@ -68,16 +68,21 @@ static JPH_CharacterContactListener_Impl contactListenerImpl = {
 	.OnContactPersisted = OnContactPersisted,
 	.OnContactRemoved = OnContactRemoved,
 };
+static JPH_BodyFilter *bodyFilter;
+static JPH_ShapeFilter *shapeFilter;
 
-void PlayerContactListenerInit()
+void PlayerPersistentStateInit()
 {
-	contactListener = JPH_CharacterContactListener_Create();
-	JPH_CharacterContactListener_SetImpl(contactListener, &contactListenerImpl);
+	contactListener = JPH_CharacterContactListener_Create(&contactListenerImpl);
+	bodyFilter = JPH_BodyFilter_Create(NULL);
+	shapeFilter = JPH_ShapeFilter_Create(NULL);
 }
 
-void PlayerContactListenerDestroy()
+void PlayerPersistentStateDestroy()
 {
 	JPH_CharacterContactListener_Destroy(contactListener);
+	JPH_BodyFilter_Destroy(bodyFilter);
+	JPH_ShapeFilter_Destroy(shapeFilter);
 }
 
 void CreatePlayerCollider(Level *level)
@@ -143,4 +148,14 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), -player->transform.rotation.y);
 	}
 	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}});
+}
+
+void Update(const Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime)
+{
+	JPH_CharacterVirtual_Update(player->joltCharacter,
+								deltaTime,
+								OBJECT_LAYER_PLAYER,
+								physicsSystem,
+								bodyFilter,
+								shapeFilter);
 }

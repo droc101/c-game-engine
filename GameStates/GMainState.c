@@ -76,12 +76,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
-	JPH_CharacterVirtual_Update(state->level->player.joltCharacter,
-								deltaTime,
-								OBJECT_LAYER_PLAYER,
-								state->level->physicsSystem,
-								JPH_BodyFilter_Create(NULL, NULL),
-								JPH_ShapeFilter_Create(NULL, NULL));
+	Update(&state->level->player, state->level->physicsSystem, deltaTime);
 
 	if (WaitForLodThreadToEnd() != 0)
 	{
