@@ -10,7 +10,8 @@ and [zlib](https://www.zlib.net/) for compression.
 Runs on x86_64 Windows and Linux.
 
 ### Building
-See [Docs/BUILDING.WINDOWS.md](Docs/BUILDING.WINDOWS.md) for Windows and [Docs/BUILDING.LINUX.md](Docs/BUILDING.LINUX.md) for Linux.
+
+See the [wiki page](https://wiki.droc101.dev/index.php/Building_GAME) for instructions on building.
 
 ### Tested on
 - Windows 11
