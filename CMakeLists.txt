@@ -212,7 +212,10 @@ fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 #add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
 FetchContent_Declare(
         joltc
-        SOURCE_DIR ../../joltc
+        GIT_REPOSITORY https://github.com/NBT22/joltc
+        GIT_TAG main
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
         EXCLUDE_FROM_ALL
         SYSTEM
 )
