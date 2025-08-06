@@ -10,16 +10,16 @@
 
 void SpriteCreateBody(Actor *this, const Transform *transform)
 {
-	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&JPH_Vec3_Zero);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2(shapeSettings,
-																					  &transform->position,
-																					  &JPH_Quat_Identity,
-																					  JPH_MotionType_Static,
-																					  OBJECT_LAYER_STATIC);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
+																						  transform,
+																						  JPH_MotionType_Static,
+																						  OBJECT_LAYER_STATIC,
+																						  this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_DontActivate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
 void SpriteInit(Actor *this, const KvList *params, Transform *transform)
@@ -30,8 +30,8 @@ void SpriteInit(Actor *this, const KvList *params, Transform *transform)
 	SpriteCreateBody(this, transform);
 
 	this->actorWall = malloc(sizeof(ActorWall));
-	this->actorWall->a = v2(0.0f, -halfWidth);
-	this->actorWall->b = v2(0.0f, halfWidth);
+	this->actorWall->a = v2(halfWidth, 0.0f);
+	this->actorWall->b = v2(-halfWidth, 0.0f);
 	snprintf(this->actorWall->tex, 80, "texture/%s.gtex", KvGetString(params, "texture", "level_uvtest"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;

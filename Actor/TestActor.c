@@ -40,11 +40,11 @@ void TestActorTargetReached(Actor *this, const double delta)
 void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.2867f);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  &transform->position,
-																					  &JPH_Quat_Identity,
-																					  JPH_MotionType_Dynamic,
-																					  OBJECT_LAYER_DYNAMIC);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Dynamic,
+																						   OBJECT_LAYER_DYNAMIC,
+																						   this);
 	const JPH_MassProperties massProperties = {
 		.mass = 20.0f,
 	};
@@ -58,7 +58,6 @@ void CreateTestActorCollider(Actor *this, const Transform *transform)
 													JPH_AllowedDOFs_TranslationY |
 													JPH_AllowedDOFs_TranslationZ |
 													JPH_AllowedDOFs_RotationY);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
@@ -69,7 +68,7 @@ void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
 	CreateTestActorCollider(this, transform);
 
-	this->actorFlags |= ACTOR_FLAG_ENEMY;
+	this->actorFlags = ACTOR_FLAG_ENEMY;
 
 	this->actorModel = LoadModel(MODEL("model_leafy"));
 	this->currentSkinIndex = 0;

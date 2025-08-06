@@ -27,11 +27,4 @@ void RayCastDestroy();
  */
 Actor *GetTargetedEnemy(const ActorRayCastOptions *options);
 
-bool PerformRaycast(Vector2 origin,
-					float angle,
-					float maxDistance,
-					Vector2 *collisionPoint,
-					uint64_t category,
-					uint16_t mask);
-
 #endif //RAYCAST_H

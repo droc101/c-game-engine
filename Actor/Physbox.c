@@ -19,12 +19,12 @@ void CreatePhysboxCollider(Actor *this, const Transform *transform)
 	// shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
 	// b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
 
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
 			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.2f, 0.2f, 0.2f}}, JPH_DEFAULT_CONVEX_RADIUS),
-			&transform->position,
-			&JPH_Quat_Identity,
+			transform,
 			JPH_MotionType_Dynamic,
-			OBJECT_LAYER_DYNAMIC);
+			OBJECT_LAYER_DYNAMIC,
+			this);
 	const JPH_MassProperties massProperties = {
 		.mass = 2.0f,
 	};
@@ -33,7 +33,6 @@ void CreatePhysboxCollider(Actor *this, const Transform *transform)
 													   JPH_OverrideMassProperties_CalculateInertia);
 	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
 	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
@@ -42,6 +41,7 @@ void CreatePhysboxCollider(Actor *this, const Transform *transform)
 
 void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
+	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 	this->actorModel = LoadModel(MODEL("model_cube"));
 	transform->position.y = -0.3f;
 

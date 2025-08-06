@@ -23,12 +23,11 @@ void CreateCoinSensor(Actor *this, const Transform *transform)
 {
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}},
 																	JPH_DEFAULT_CONVEX_RADIUS);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  &transform->position,
-																					  &JPH_Quat_Identity,
-																					  JPH_MotionType_Static,
-																					  OBJECT_LAYER_SENSOR);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_SENSOR,
+																						   this);
 	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,

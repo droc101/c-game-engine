@@ -55,8 +55,8 @@ int LodThreadMain(void * /*data*/)
 				continue;
 			}
 			JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
-			JPH_Vec3_Subtract(&actorPosition, &state->level->player.transform.position, &offsetFromPlayer);
-			const float distanceSquared = JPH_Vec3_LengthSquared(&offsetFromPlayer);
+			Vector3_Subtract(&actorPosition, &state->level->player.transform.position, &offsetFromPlayer);
+			const float distanceSquared = Vector3_LengthSquared(&offsetFromPlayer);
 			while (actor->currentLod != 0 &&
 				   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distanceSquared)
 			{

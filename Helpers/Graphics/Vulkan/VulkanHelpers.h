@@ -174,7 +174,7 @@ typedef struct ActorWallInstanceData
 typedef struct DebugDrawVertex
 {
 	Vector3 position;
-	Vector4 color;
+	Color color;
 } DebugDrawVertex;
 
 typedef struct BufferRegion

@@ -93,6 +93,9 @@ Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *para
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
+	actor->actorFlags = 0;
+	actor->bodyInterface = bodyInterface;
+	actor->bodyId = JPH_BodyId_InvalidBodyID;
 	actor->actorWall = NULL;
 	actor->health = 1;
 	actor->actorType = actorType;
@@ -108,8 +111,6 @@ Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *para
 	actor->OnPlayerContactPersisted = NULL;
 	actor->OnPlayerContactRemoved = NULL;
 	actor->extraData = NULL;
-	actor->bodyId = JPH_BodyId_InvalidBodyID;
-	actor->bodyInterface = bodyInterface;
 	actor->Init(actor, params, transform); // kindly allow the Actor to initialize itself
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
 	if (params)

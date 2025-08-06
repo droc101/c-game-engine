@@ -3,6 +3,7 @@
 //
 
 #include "Physics.h"
+#include "../../../Actor/Laser.h"
 #include "../../../Debug/JoltDebugRenderer.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
@@ -15,10 +16,10 @@ static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 	{
 		case OBJECT_LAYER_STATIC:
 		case OBJECT_LAYER_SENSOR:
-			return BROADPHASE_LAYER_STATIC;
+			return BROAD_PHASE_LAYER_STATIC;
 		case OBJECT_LAYER_DYNAMIC:
 		case OBJECT_LAYER_PLAYER:
-			return BROADPHASE_LAYER_DYNAMIC;
+			return BROAD_PHASE_LAYER_DYNAMIC;
 		default:
 			return JPH_BroadPhaseLayerInvalid;
 	}
@@ -44,7 +45,7 @@ static bool ObjectLayerShouldCollide(const JPH_ObjectLayer inLayer1, const JPH_O
 static bool ObjectVsBroadPhaseLayerShouldCollide(const JPH_ObjectLayer inObjectLayer,
 												 const JPH_BroadPhaseLayer /*inBroadPhaseLayer*/)
 {
-	if (GetBroadPhaseLayer(inObjectLayer) == BROADPHASE_LAYER_STATIC)
+	if (GetBroadPhaseLayer(inObjectLayer) == BROAD_PHASE_LAYER_STATIC)
 	{
 		return false;
 	}
@@ -71,6 +72,7 @@ void PhysicsInitGlobal(GlobalState *state)
 	RayCastInit();
 	JoltDebugRendererInit();
 	PlayerPersistentStateInit();
+	LaserFiltersInit();
 }
 
 void PhysicsDestroyGlobal(const GlobalState *state)
@@ -78,6 +80,7 @@ void PhysicsDestroyGlobal(const GlobalState *state)
 	RayCastDestroy();
 	JoltDebugRendererDestroy();
 	PlayerPersistentStateDestroy();
+	LaserFiltersDestroy();
 	JPH_JobSystem_Destroy(state->jobSystem);
 	JPH_Shutdown();
 }
@@ -96,17 +99,17 @@ void PhysicsInitLevel(Level *level)
 	const JPH_Plane plane = {
 		.normal.y = 1,
 	};
-	JPH_BodyCreationSettings *floorSettings = JPH_BodyCreationSettings_Create3((const JPH_Shape *)
-																					   JPH_PlaneShape_Create(&plane,
-																											 NULL,
-																											 100),
-																			   (Vector3[]){{0.0f, -0.5f, 0.0f}},
-																			   &JPH_Quat_Identity,
-																			   JPH_MotionType_Static,
-																			   OBJECT_LAYER_STATIC);
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
+																					  (Vector3[]){{0.0f, -0.5f, 0.0f}},
+																					  &JPH_Quat_Identity,
+																					  JPH_MotionType_Static,
+																					  OBJECT_LAYER_STATIC);
 
-	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, floorSettings, JPH_Activation_DontActivate);
-	JPH_BodyCreationSettings_Destroy(floorSettings);
+	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
+															bodyCreationSettings,
+															JPH_Activation_DontActivate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
 void PhysicsDestroyLevel(const Level *level, JPH_BodyInterface *bodyInterface)

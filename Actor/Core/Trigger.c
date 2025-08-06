@@ -84,18 +84,18 @@ void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
 void CreateTriggerSensor(Actor *this, const Transform *transform)
 {
 	const TriggerData *data = this->extraData;
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
 			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
 												   JPH_DEFAULT_CONVEX_RADIUS),
-			&transform->position,
-			&JPH_Quat_Identity,
+			transform,
 			JPH_MotionType_Static,
-			OBJECT_LAYER_SENSOR);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+			OBJECT_LAYER_SENSOR,
+			this);
 	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
 void TriggerInit(Actor *this, const KvList *params, Transform *transform)

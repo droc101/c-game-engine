@@ -33,11 +33,8 @@ typedef enum ActorType ActorType;
 
 // Struct forward declarations
 typedef struct Vector2 Vector2;
-typedef struct Transform Transform;
 typedef struct Viewmodel Viewmodel;
 typedef struct GlobalState GlobalState;
-typedef JPH_Vec3 Vector3;
-typedef JPH_Vec4 Vector4;
 typedef struct Camera Camera;
 typedef struct Player Player;
 typedef struct Wall Wall;
@@ -235,6 +232,7 @@ enum ModelShader
 enum ActorFlags
 {
 	ACTOR_FLAG_ENEMY = 1 << 0,
+	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 1,
 };
 
 enum ObjectLayers
@@ -247,8 +245,8 @@ enum ObjectLayers
 
 enum BroadPhaseLayers
 {
-	BROADPHASE_LAYER_STATIC,
-	BROADPHASE_LAYER_DYNAMIC,
+	BROAD_PHASE_LAYER_STATIC,
+	BROAD_PHASE_LAYER_DYNAMIC,
 
 	/// @warning Used for checking the number of broadphase layers, and as such is not a valid layer index
 	BROADPHASE_LAYER_MAX,
@@ -294,12 +292,6 @@ struct Vector2
 {
 	float x;
 	float y;
-};
-
-struct Transform
-{
-	Vector3 position;
-	Vector3 rotation;
 };
 
 struct Viewmodel

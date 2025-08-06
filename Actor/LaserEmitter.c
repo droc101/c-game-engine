@@ -5,6 +5,7 @@
 #include "LaserEmitter.h"
 
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
@@ -31,6 +32,7 @@ typedef struct LaserEmitterData
 	Actor *laserActor;
 	bool startEnabled;
 	bool hasTicked;
+	Transform transform;
 } LaserEmitterData;
 
 bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -57,17 +59,17 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte sign
 
 void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
+	LaserEmitterData *data = this->extraData;
 	JPH_Quat rotation = {};
 	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
 	Vector3 offsetVector = {};
-	JPH_Vec3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
-	Vector3 position = {};
-	JPH_Vec3_Subtract(&transform->position, &offsetVector, &position);
+	Vector3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
+	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
 			(const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS),
-			&position,
+			&data->transform.position,
 			&rotation,
 			JPH_MotionType_Static,
 			OBJECT_LAYER_STATIC);
@@ -82,6 +84,7 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->SignalHandler = LaserEmitterSignalHandler;
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
+	CheckAlloc(this->extraData);
 	LaserEmitterData *data = this->extraData;
 	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->hasTicked = false;
@@ -91,18 +94,25 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 
 	CreateLaserEmitterCollider(this, transform);
 
-	data->startEnabled = KvGetBool(params, "startEnabled", true);
+	data->transform.rotation = transform->rotation;
 
-	KvList laserParams;
-	KvListCreate(&laserParams);
-	KvSetByte(&laserParams, "height", data->height);
-	KvSetBool(&laserParams, "startEnabled", data->startEnabled);
-	data->laserActor = CreateActor(transform,
-								   ACTOR_TYPE_LASER,
-								   &laserParams,
-								   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
-	AddActor(data->laserActor);
-	data->hasTicked = true;
+	data->startEnabled = KvGetBool(params, "startEnabled", true);
 }
 
-void LaserEmitterUpdate(Actor * /*this*/, const double /*delta*/) {}
+void LaserEmitterUpdate(Actor *this, const double /*delta*/)
+{
+	LaserEmitterData *data = this->extraData;
+	if (!data->hasTicked)
+	{
+		KvList laserParams;
+		KvListCreate(&laserParams);
+		KvSetByte(&laserParams, "height", data->height);
+		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
+		data->laserActor = CreateActor(&data->transform,
+									   ACTOR_TYPE_LASER,
+									   &laserParams,
+									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
+		AddActor(data->laserActor);
+		data->hasTicked = true;
+	}
+}

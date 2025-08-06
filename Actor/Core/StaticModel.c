@@ -6,18 +6,18 @@
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
 
-void StaticModelCreateBody(Actor *this, const Transform *transform)
+static void StaticModelCreateBody(Actor *this, const Transform *transform)
 {
-	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&JPH_Vec3_Zero);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2(shapeSettings,
-																					  &transform->position,
-																					  &JPH_Quat_Identity,
-																					  JPH_MotionType_Static,
-																					  OBJECT_LAYER_STATIC);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
+																						  transform,
+																						  JPH_MotionType_Static,
+																						  OBJECT_LAYER_STATIC,
+																						  this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_DontActivate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
 void StaticModelInit(Actor *this, const KvList *params, Transform *transform)

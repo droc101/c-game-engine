@@ -52,7 +52,7 @@ static inline void DoorSetCloseVector(const Actor *this)
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
 	Vector3 movementVector = {};
-	JPH_Vec3_MultiplyScalar(&forwardVector, -1, &movementVector);
+	Vector3_MultiplyScalar(&forwardVector, -1, &movementVector);
 	JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &movementVector);
 }
 
@@ -64,7 +64,7 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 	switch (state)
 	{
 		case DOOR_CLOSED:
-			JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &JPH_Vec3_Zero);
+			JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &Vector3_Zero);
 			JPH_BodyInterface_SetPosition(this->bodyInterface,
 										  this->bodyId,
 										  &data->closedPosition,
@@ -76,7 +76,7 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 			ActorFireOutput(this, DOOR_OUTPUT_OPENING, PARAM_NONE);
 			break;
 		case DOOR_OPEN:
-			JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &JPH_Vec3_Zero);
+			JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &Vector3_Zero);
 			JPH_BodyInterface_SetPosition(this->bodyInterface,
 										  this->bodyId,
 										  &data->openPosition,
@@ -92,8 +92,6 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 
 static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 {
-	JPH_Quat rotation = {};
-	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
 	const Vector3 points[4] = {
 		{
 			0.0f,
@@ -120,27 +118,28 @@ static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 																						  4,
 																						  JPH_DEFAULT_CONVEX_RADIUS);
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  &transform->position,
-																					  &rotation,
-																					  JPH_MotionType_Kinematic,
-																					  OBJECT_LAYER_STATIC);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Kinematic,
+																						   OBJECT_LAYER_STATIC,
+																						   this);
 	const JPH_MassProperties massProperties = {
 		.mass = 1.0f,
 	};
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
 	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
 													   JPH_OverrideMassProperties_CalculateInertia);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 
 	DoorData *data = this->extraData;
+	JPH_Quat rotation = {};
+	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
-	JPH_Vec3_Add(&transform->position, &forwardVector, &data->openPosition);
+	Vector3_Add(&transform->position, &forwardVector, &data->openPosition);
 	data->closedPosition = transform->position;
 }
 
@@ -153,9 +152,9 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
 	Vector3 offsetVector = {};
-	JPH_Vec3_MultiplyScalar(&forwardVector, 0.5f, &offsetVector);
+	Vector3_MultiplyScalar(&forwardVector, 0.5f, &offsetVector);
 	Vector3 position = {};
-	JPH_Vec3_Subtract(&transform->position, &offsetVector, &position);
+	Vector3_Subtract(&transform->position, &offsetVector, &position);
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
 																	JPH_DEFAULT_CONVEX_RADIUS);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
@@ -301,6 +300,8 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 	{
 		CreateDoorSensor(this, transform);
 	}
+
+	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, -0.5f);
