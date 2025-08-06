@@ -7,12 +7,25 @@
 
 #include "../../../defines.h"
 
+typedef struct ActorRayCastOptions ActorRayCastOptions;
+
+struct ActorRayCastOptions
+{
+	JPH_BodyInterface *bodyInterface;
+	float maxDistance;
+	uint32_t actorFlags;
+};
+
+void RayCastInit();
+
+void RayCastDestroy();
+
 /**
  * Get the enemy that the player is targeting
- * @param maxDistance The maximum distance to check for enemies
+ * @param options The options with which to perform the ray cast
  * @return The actor struct, or NULL if no enemy is targeted
  */
-Actor *GetTargetedEnemy(float maxDistance);
+Actor *GetTargetedEnemy(const ActorRayCastOptions *options);
 
 bool PerformRaycast(Vector2 origin,
 					float angle,

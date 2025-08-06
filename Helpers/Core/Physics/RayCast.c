@@ -5,63 +5,128 @@
 #include "RayCast.h"
 #include "../../../Structs/GlobalState.h"
 
-static void RayCastCallback(void *context, const JPH_RayCastResult *result)
+static bool BroadPhaseLayerShouldCollide(void * /*userData*/, const JPH_BroadPhaseLayer layer)
 {
-
+	switch (layer)
+	{
+		case BROADPHASE_LAYER_STATIC:
+		case BROADPHASE_LAYER_DYNAMIC:
+			return true;
+		default:
+			return false;
+	}
 }
 
-Actor *GetTargetedEnemy(const float maxDistance)
+static bool ObjectLayerShouldCollide(void * /*userData*/, const JPH_ObjectLayer layer)
 {
-	const GlobalState *state = GetState();
-	// Vector2 rayEnd = Vector2FromAngle(state->level->player.transform.rotation.y);
-	// rayEnd = Vector2Scale(rayEnd, maxDistance);
-	// b2ShapeId raycastHit = b2_nullShapeId;
-	// b2World_CastRay(state->level->worldId,
-	// 				state->level->player.position,
-	// 				rayEnd,
-	// 				(b2QueryFilter){.categoryBits = COLLISION_GROUP_PLAYER, .maskBits = COLLISION_GROUP_HURTBOX},
-	// 				RaycastCallback,
-	// 				&raycastHit);
-	//
-	// if (b2Shape_IsValid(raycastHit))
-	// {
-	// 	ListLock(state->level->actors);
-	// 	for (int i = 0; i < state->level->actors.length; i++)
-	// 	{
-	// 		Actor *actor = ListGetPointer(state->level->actors, i);
-	// 		if (b2Shape_GetBody(raycastHit).index1 == actor->bodyId.index1)
-	// 		{
-	// 			ListUnlock(state->level->actors);
-	// 			return actor;
-	// 		}
-	// 	}
-	// 	ListUnlock(state->level->actors);
-	// }
+	switch (layer)
+	{
+		case OBJECT_LAYER_STATIC:
+		case OBJECT_LAYER_DYNAMIC:
+			return true;
+		default:
+			return false;
+	}
+}
 
-	/*
-	JPH_CAPI bool JPH_NarrowPhaseQuery_CastRay3(const JPH_NarrowPhaseQuery *query,
-												const JPH_RVec3 *origin,
-												const JPH_Vec3 *direction,
-												const JPH_RayCastSettings *rayCastSettings,
-												JPH_CollisionCollectorType collectorType,
-												JPH_CastRayResultCallback *callback,
-												void *userData,
-												JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter,
-												JPH_ObjectLayerFilter *objectLayerFilter,
-												const JPH_BodyFilter *bodyFilter,
-												const JPH_ShapeFilter *shapeFilter);
-	*/
-	// const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->level->physicsSystem);
-	// JPH_Quat rotation = {};
-	// JPH_CharacterVirtual_GetRotation(state->level->player.joltCharacter, &rotation);
-	// Vector3 direction = {};
-	// JPH_Quat_Rotate(&rotation, &JPH_Vec3_Forward, &direction);
-	// JPH_RayCastSettings rayCastSettings = {
-	// 	.treatConvexAsSolid = true,
-	// };
-	//
-	// JPH_NarrowPhaseQuery_CastRay3(narrowPhaseQuery, &state->level->player.transform.position, &direction, &rayCastSettings, JPH_CollisionCollectorType_ClosestHit, &RayCastCallback, NULL, );
-	return NULL;
+static bool BodyFilterShouldCollide(void *userData, const JPH_BodyId bodyId)
+{
+	const ActorRayCastOptions *rayCastOptions = userData;
+	const Actor *actor = (const Actor *)JPH_BodyInterface_GetUserData(rayCastOptions->bodyInterface, bodyId);
+	return actor && ((actor->actorFlags & rayCastOptions->actorFlags) == rayCastOptions->actorFlags);
+}
+
+static bool BodyFilterShouldCollideLocked(void *userData, const JPH_Body *body)
+{
+	const ActorRayCastOptions *rayCastOptions = userData;
+	const Actor *actor = (const Actor *)JPH_Body_GetUserData(body);
+	return (actor->actorFlags & rayCastOptions->actorFlags) == rayCastOptions->actorFlags;
+}
+
+static bool ShapeFilterShouldCollide(void * /*userData*/,
+									 const JPH_Shape * /*inShape2*/,
+									 JPH_SubShapeId /*inSubShapeIDOfShape2*/)
+{
+	return true;
+}
+
+static const JPH_BroadPhaseLayerFilter_Impl actorRayCastBroadPhaseLayerFilterImpl = {
+	.ShouldCollide = BroadPhaseLayerShouldCollide,
+};
+static const JPH_ObjectLayerFilter_Impl actorRayCastObjectLayerFilterImpl = {
+	.ShouldCollide = ObjectLayerShouldCollide,
+};
+static const JPH_BodyFilter_Impl actorRayCastBodyFilterImpl = {
+	.ShouldCollide = BodyFilterShouldCollide,
+	.ShouldCollideLocked = BodyFilterShouldCollideLocked,
+};
+static const JPH_ShapeFilter_Impl actorRayCastShapeFilterImpl = {
+	.ShouldCollide = ShapeFilterShouldCollide,
+};
+
+static JPH_BroadPhaseLayerFilter *actorRayCastBroadPhaseLayerFilter;
+static JPH_ObjectLayerFilter *actorRayCastObjectLayerFilter;
+static JPH_BodyFilter *actorRayCastBodyFilter;
+static JPH_ShapeFilter *actorRayCastShapeFilter;
+
+static Actor *targetedEnemy = NULL;
+
+static void RayCastCallback(void *context, const JPH_RayCastResult *result)
+{
+	const ActorRayCastOptions *options = context;
+	targetedEnemy = (Actor *)JPH_BodyInterface_GetUserData(options->bodyInterface, result->bodyID);
+}
+
+void RayCastInit()
+{
+	actorRayCastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(NULL, &actorRayCastBroadPhaseLayerFilterImpl);
+	actorRayCastObjectLayerFilter = JPH_ObjectLayerFilter_Create(NULL, &actorRayCastObjectLayerFilterImpl);
+	actorRayCastBodyFilter = JPH_BodyFilter_Create(NULL, &actorRayCastBodyFilterImpl);
+	actorRayCastShapeFilter = JPH_ShapeFilter_Create(NULL, &actorRayCastShapeFilterImpl);
+}
+
+void RayCastDestroy()
+{
+	JPH_BroadPhaseLayerFilter_Destroy(actorRayCastBroadPhaseLayerFilter);
+	JPH_ObjectLayerFilter_Destroy(actorRayCastObjectLayerFilter);
+	JPH_BodyFilter_Destroy(actorRayCastBodyFilter);
+	JPH_ShapeFilter_Destroy(actorRayCastShapeFilter);
+}
+
+Actor *GetTargetedEnemy(const ActorRayCastOptions *options)
+{
+	JPH_BroadPhaseLayerFilter_SetUserData(actorRayCastBroadPhaseLayerFilter, (void *)options);
+	JPH_ObjectLayerFilter_SetUserData(actorRayCastObjectLayerFilter, (void *)options);
+	JPH_BodyFilter_SetUserData(actorRayCastBodyFilter, (void *)options);
+	JPH_ShapeFilter_SetUserData(actorRayCastShapeFilter, (void *)options);
+
+	const GlobalState *state = GetState();
+	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->level->physicsSystem);
+	JPH_Quat rotation = {};
+	JPH_Quat_FromEulerAngles(&state->level->player.transform.rotation, &rotation);
+	Vector3 direction = {};
+	JPH_Quat_Rotate(&rotation, &JPH_Vec3_Forward, &direction);
+	Vector3 rayCastEnd = {};
+	JPH_Vec3_MultiplyScalar(&direction, options->maxDistance, &rayCastEnd);
+	const JPH_RayCastSettings rayCastSettings = {
+		.treatConvexAsSolid = true,
+	};
+	const bool hitEnemy = JPH_NarrowPhaseQuery_CastRay3(narrowPhaseQuery,
+														&state->level->player.transform.position,
+														&rayCastEnd,
+														&rayCastSettings,
+														JPH_CollisionCollectorType_ClosestHit,
+														&RayCastCallback,
+														(void *)options,
+														actorRayCastBroadPhaseLayerFilter,
+														actorRayCastObjectLayerFilter,
+														actorRayCastBodyFilter,
+														actorRayCastShapeFilter);
+	if (!hitEnemy)
+	{
+		return NULL;
+	}
+	return targetedEnemy;
 }
 
 bool PerformRaycast(const Vector2 origin,

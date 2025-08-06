@@ -2,11 +2,12 @@
 // Created by noah on 2/10/25.
 //
 
-#include "PhysicsInit.h"
+#include "Physics.h"
 #include "../../../Debug/JoltDebugRenderer.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
 #include "Player.h"
+#include "RayCast.h"
 
 static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 {
@@ -60,18 +61,28 @@ static const JPH_BroadPhaseLayerInterface_Impl broadPhaseLayerInterfaceImpl = {
 	.GetBroadPhaseLayer = GetBroadPhaseLayer,
 };
 
-void InitJolt()
+void PhysicsInitGlobal(GlobalState *state)
 {
 	if (!JPH_Init())
 	{
 		Error("Failed to initialize Jolt Physics!");
 	}
-	GetState()->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
+	state->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
+	RayCastInit();
 	JoltDebugRendererInit();
 	PlayerContactListenerInit();
 }
 
-void InitLevel(Level *level)
+void PhysicsDestroyGlobal(const GlobalState *state)
+{
+	RayCastDestroy();
+	JoltDebugRendererDestroy();
+	PlayerContactListenerDestroy();
+	JPH_JobSystem_Destroy(state->jobSystem);
+	JPH_Shutdown();
+}
+
+void PhysicsInitLevel(Level *level)
 {
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
 		.broadPhaseLayerInterface = JPH_BroadPhaseLayerInterface_Create(BROADPHASE_LAYER_MAX,
@@ -96,4 +107,10 @@ void InitLevel(Level *level)
 
 	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, floorSettings, JPH_Activation_DontActivate);
 	JPH_BodyCreationSettings_Destroy(floorSettings);
+}
+
+void PhysicsDestroyLevel(const Level *level, JPH_BodyInterface *bodyInterface)
+{
+	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
+	JPH_PhysicsSystem_Destroy(level->physicsSystem);
 }
