@@ -96,10 +96,11 @@ void GoalInit(Actor *this, const KvList *params, Transform *transform)
 
 void GoalUpdate(Actor *this, double /*delta*/)
 {
-	(void)this;
-	// const float rotation = atan2f(GetState()->level->player.transform.position.z - this->transform.position.z,
-	// 							  GetState()->level->player.transform.position.x - this->transform.position.x) +
-	// 					   PIf / 2;
-	// this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
-	// this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
+	Vector3 position = {};
+	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
+	const float rotation = atan2f(GetState()->level->player.transform.position.z - position.z,
+								  GetState()->level->player.transform.position.x - position.x) +
+						   GLM_PI_2f;
+	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
+	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
 }
