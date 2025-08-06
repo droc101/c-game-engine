@@ -71,7 +71,7 @@ void RemoveActor(Actor *actor)
 
 	// Remove the actor from the named actor lists if it's there
 	const size_t nameIdx = ListFind(l->namedActorPointers, actor);
-	if (nameIdx != -1u)
+	if (nameIdx != SIZE_MAX)
 	{
 		char *name = ListGetPointer(l->namedActorNames, nameIdx);
 		free(name);
@@ -80,7 +80,7 @@ void RemoveActor(Actor *actor)
 	}
 
 	const size_t idx = ListFind(l->actors, actor);
-	if (idx == -1u)
+	if (idx == SIZE_MAX)
 	{
 		return;
 	}

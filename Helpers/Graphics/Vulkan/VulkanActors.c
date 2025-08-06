@@ -59,7 +59,7 @@ static inline bool LoadMaterial(List *materialIds,
 								const uint32_t indexCount)
 {
 	size_t index = ListFind(*materialIds, lodMaterialId);
-	if (index == -1u)
+	if (index == SIZE_MAX)
 	{
 		ListAdd(*materialIds, lodMaterialId);
 		ListAdd(*materialCounts, 1);
@@ -131,8 +131,8 @@ static inline void LoadLod(const Actor *actor, const uint32_t lodIndex)
 	assert(lod);
 	if (lodIndex != actor->currentLod)
 	{
-		const uint64_t lodIdIndex = ListFind(loadedLodIds, lod->id);
-		if (lodIdIndex == -1u)
+		const size_t lodIdIndex = ListFind(loadedLodIds, lod->id);
+		if (lodIdIndex == SIZE_MAX)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
 			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, lod->vertexData, vertexSize);
@@ -153,9 +153,9 @@ static inline void LoadLod(const Actor *actor, const uint32_t lodIndex)
 		}
 	} else
 	{
-		const uint64_t lodIdIndex = ListFind(lodIdsLoadedForDraw, lod->id);
-		if (lodIdIndex == -1u ||
-			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), actor->currentSkinIndex) == -1u)
+		const size_t lodIdIndex = ListFind(lodIdsLoadedForDraw, lod->id);
+		if (lodIdIndex == SIZE_MAX ||
+			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), actor->currentSkinIndex) == SIZE_MAX)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
 			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, lod->vertexData, vertexSize);
@@ -467,7 +467,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 				{
 					case SHADER_SHADED:
 						index = ListFind(shadedMaterialIds, lodMaterialId);
-						if (index == -1u)
+						if (index == SIZE_MAX)
 						{
 							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
 							return VK_SUCCESS;
@@ -475,7 +475,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 						break;
 					case SHADER_UNSHADED:
 						index = ListFind(unshadedMaterialIds, lodMaterialId) + shadedMaterialIds.length;
-						if (index == -1u)
+						if (index == SIZE_MAX)
 						{
 							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
 							return VK_SUCCESS;
