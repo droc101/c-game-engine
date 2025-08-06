@@ -129,7 +129,7 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 	//     return;
 	// }
 
-	if (stack->ActiveControl != ctlIndex)
+	if (stack->activeControl != ctlIndex)
 	{
 		return;
 	}

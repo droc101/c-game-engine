@@ -96,6 +96,7 @@ void GoalInit(Actor *this, const KvList *params, Transform *transform)
 
 void GoalUpdate(Actor *this, double /*delta*/)
 {
+	(void)this;
 	// const float rotation = atan2f(GetState()->level->player.transform.position.z - this->transform.position.z,
 	// 							  GetState()->level->player.transform.position.x - this->transform.position.x) +
 	// 					   PIf / 2;

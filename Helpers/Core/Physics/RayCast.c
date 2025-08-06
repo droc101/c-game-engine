@@ -136,6 +136,12 @@ bool PerformRaycast(const Vector2 origin,
 					const uint64_t category,
 					const uint16_t mask)
 {
+	(void)origin;
+	(void)angle;
+	(void)maxDistance;
+	(void)collisionPoint;
+	(void)category;
+	(void)mask;
 	// const GlobalState *state = GetState();
 	// Vector2 rayEnd = Vector2FromAngle(angle);
 	// rayEnd = Vector2Scale(rayEnd, maxDistance);

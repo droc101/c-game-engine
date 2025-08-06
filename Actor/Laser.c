@@ -83,6 +83,7 @@ void LaserInit(Actor *this, const KvList *params, Transform *transform)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void LaserUpdate(Actor *this, double /*delta*/)
 {
+	(void)this;
 	// const LaserData *data = this->extraData;
 	// if (data->enabled)
 	// {

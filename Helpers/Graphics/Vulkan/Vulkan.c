@@ -6,13 +6,15 @@
 #include <assert.h>
 #include <luna/luna.h>
 #include <string.h>
-#include "../../Core/Error.h"
 #include "../../Core/MathEx.h"
 #include "../LodThread.h"
 #include "VulkanActors.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"
 #include "VulkanResources.h"
+#ifdef JPH_DEBUG_RENDERER
+#include "../../Core/Error.h"
+#endif
 
 static const Level *loadedLevel;
 static uint8_t currentFrame;
@@ -803,6 +805,10 @@ void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, const 
 
 	buffers.debugDrawLines.vertexCount += 2;
 	buffers.debugDrawLines.vertices.bytesUsed += sizeof(DebugDrawVertex) * 2;
+#else
+	(void)from;
+	(void)to;
+	(void)color;
 #endif
 }
 
@@ -844,6 +850,9 @@ void VK_DrawJoltDebugRendererTriangle(const Vector3 *vertices, const uint32_t co
 
 	buffers.debugDrawTriangles.vertexCount += 3;
 	buffers.debugDrawTriangles.vertices.bytesUsed += sizeof(DebugDrawVertex) * 3;
+#else
+	(void)vertices;
+	(void)color;
 #endif
 }
 

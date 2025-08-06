@@ -7,7 +7,7 @@
 #include "../Debug/JoltDebugRenderer.h"
 #include "../defines.h"
 #include "../Helpers/Core/Error.h"
-#include "../Helpers/Core/Physics/PhysicsInit.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "Actor.h"
 #include "GlobalState.h"
@@ -19,7 +19,7 @@ Level *CreateLevel(void)
 	CheckAlloc(level);
 	ListInit(level->actors, LIST_POINTER);
 	ListInit(level->walls, LIST_POINTER);
-	InitLevel(level);
+	PhysicsInitLevel(level);
 	CreatePlayerCollider(level);
 	strncpy(level->ceilOrSkyTex, "texture/level_sky_test.gtex", 28);
 	strncpy(level->floorTex, "texture/level_floor_test.gtex", 30);
@@ -36,21 +36,19 @@ Level *CreateLevel(void)
 
 void DestroyLevel(Level *level)
 {
-	for (int i = 0; i < level->actors.length; i++)
+	for (size_t i = 0; i < level->actors.length; i++)
 	{
 		Actor *actor = ListGetPointer(level->actors, i);
 		FreeActor(actor);
 	}
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
-	for (int i = 0; i < level->walls.length; i++)
+	for (size_t i = 0; i < level->walls.length; i++)
 	{
 		Wall *wall = ListGetPointer(level->walls, i);
 		FreeWall(bodyInterface, wall);
 	}
 
-	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
-
-	JPH_PhysicsSystem_Destroy(level->physicsSystem);
+	PhysicsDestroyLevel(level, bodyInterface);
 
 	ListAndContentsFree(level->namedActorNames);
 	ListFree(level->namedActorPointers);
@@ -73,7 +71,7 @@ void RemoveActor(Actor *actor)
 
 	// Remove the actor from the named actor lists if it's there
 	const size_t nameIdx = ListFind(l->namedActorPointers, actor);
-	if (nameIdx != -1)
+	if (nameIdx != -1u)
 	{
 		char *name = ListGetPointer(l->namedActorNames, nameIdx);
 		free(name);
@@ -82,7 +80,7 @@ void RemoveActor(Actor *actor)
 	}
 
 	const size_t idx = ListFind(l->actors, actor);
-	if (idx == -1)
+	if (idx == -1u)
 	{
 		return;
 	}
@@ -100,7 +98,7 @@ void NameActor(Actor *actor, const char *name, Level *l)
 Actor *GetActorByName(const char *name, const Level *l)
 {
 	ListLock(l->namedActorNames);
-	for (int i = 0; i < l->namedActorNames.length; i++)
+	for (size_t i = 0; i < l->namedActorNames.length; i++)
 	{
 		const char *actorName = ListGetPointer(l->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
@@ -118,7 +116,7 @@ void GetActorsByName(const char *name, const Level *l, List *actors)
 {
 	ListInit(*actors, LIST_POINTER);
 	ListLock(l->namedActorNames);
-	for (int i = 0; i < l->namedActorNames.length; i++)
+	for (size_t i = 0; i < l->namedActorNames.length; i++)
 	{
 		const char *actorName = ListGetPointer(l->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)

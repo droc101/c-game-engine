@@ -53,13 +53,13 @@ void VulkanActorsVariablesCleanup()
 }
 
 static inline bool LoadMaterial(List *materialIds,
-				  List *materialCounts,
-				  const uint64_t lodMaterialId,
-				  BufferRegion *drawInfoBufferRegion,
-				  const uint32_t indexCount)
+								List *materialCounts,
+								const uint64_t lodMaterialId,
+								BufferRegion *drawInfoBufferRegion,
+								const uint32_t indexCount)
 {
 	size_t index = ListFind(*materialIds, lodMaterialId);
-	if (index == -1)
+	if (index == -1u)
 	{
 		ListAdd(*materialIds, lodMaterialId);
 		ListAdd(*materialCounts, 1);
@@ -100,17 +100,17 @@ static inline void LoadLodForDraw(const Actor *actor, const ModelLod *lod)
 		{
 			case SHADER_SHADED:
 				newlyLoaded = LoadMaterial(&shadedMaterialIds,
-							 &shadedMaterialCounts,
-							 lodMaterialId,
-							 &buffers.actorModels.shadedDrawInfo,
-							 indexCount);
+										   &shadedMaterialCounts,
+										   lodMaterialId,
+										   &buffers.actorModels.shadedDrawInfo,
+										   indexCount);
 				break;
 			case SHADER_UNSHADED:
 				newlyLoaded = LoadMaterial(&unshadedMaterialIds,
-							 &unshadedMaterialCounts,
-							 lodMaterialId,
-							 &buffers.actorModels.unshadedDrawInfo,
-							 indexCount);
+										   &unshadedMaterialCounts,
+										   lodMaterialId,
+										   &buffers.actorModels.unshadedDrawInfo,
+										   indexCount);
 				break;
 			default:
 				assert(false && "Invalid material shader!");
@@ -132,7 +132,7 @@ static inline void LoadLod(const Actor *actor, const uint32_t lodIndex)
 	if (lodIndex != actor->currentLod)
 	{
 		const uint64_t lodIdIndex = ListFind(loadedLodIds, lod->id);
-		if (lodIdIndex == -1)
+		if (lodIdIndex == -1u)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
 			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, lod->vertexData, vertexSize);
@@ -154,8 +154,8 @@ static inline void LoadLod(const Actor *actor, const uint32_t lodIndex)
 	} else
 	{
 		const uint64_t lodIdIndex = ListFind(lodIdsLoadedForDraw, lod->id);
-		if (lodIdIndex == -1 ||
-			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), actor->currentSkinIndex) == -1)
+		if (lodIdIndex == -1u ||
+			ListFind(*(List *)ListGetPointer(loadedSkins, lodIdIndex), actor->currentSkinIndex) == -1u)
 		{
 			const size_t vertexSize = sizeof(ModelVertex) * lod->vertexCount;
 			memcpy(buffers.actorModels.vertices.data + vertexDataOffset, lod->vertexData, vertexSize);
@@ -174,10 +174,10 @@ static inline void LoadLod(const Actor *actor, const uint32_t lodIndex)
 				switch (material.shader)
 				{
 					case SHADER_SHADED:
-						LoadMaterial(&shadedMaterialIds, &shadedMaterialCounts, lodMaterialId, NULL, 0);
+						(void)LoadMaterial(&shadedMaterialIds, &shadedMaterialCounts, lodMaterialId, NULL, 0);
 						break;
 					case SHADER_UNSHADED:
-						LoadMaterial(&unshadedMaterialIds, &unshadedMaterialCounts, lodMaterialId, NULL, 0);
+						(void)LoadMaterial(&unshadedMaterialIds, &unshadedMaterialCounts, lodMaterialId, NULL, 0);
 						break;
 					default:
 						assert(false && "Invalid material shader!");
@@ -467,7 +467,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 				{
 					case SHADER_SHADED:
 						index = ListFind(shadedMaterialIds, lodMaterialId);
-						if (index == -1)
+						if (index == -1u)
 						{
 							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
 							return VK_SUCCESS;
@@ -475,7 +475,7 @@ VkResult UpdateActorInstanceData(const LockingList *actors)
 						break;
 					case SHADER_UNSHADED:
 						index = ListFind(unshadedMaterialIds, lodMaterialId) + shadedMaterialIds.length;
-						if (index == -1)
+						if (index == -1u)
 						{
 							VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
 							return VK_SUCCESS;

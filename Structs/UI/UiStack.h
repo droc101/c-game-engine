@@ -65,15 +65,15 @@ struct Control
 struct UiStack
 {
 	/// The controls in the UiStack
-	List Controls;
+	List controls;
 
 	/// The control that is currently being hovered or pressed
-	int ActiveControl;
+	uint activeControl;
 	/// The state of the active control
-	ControlState ActiveControlState;
+	ControlState activeControlState;
 
 	/// The control that has keyboard focus
-	int focusedControl;
+	uint focusedControl;
 };
 
 /**
@@ -157,6 +157,6 @@ void UiStackResetFocus(UiStack *stack);
 * @param stack The UiStack to set the focused control of
  * @param index The index of the control to focus
  */
-void SetFocusedControl(UiStack *stack, int index);
+void SetFocusedControl(UiStack *stack, uint index);
 
 #endif //GAME_UISTACK_H

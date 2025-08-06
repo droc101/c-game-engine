@@ -48,7 +48,7 @@ void KvSet(KvList *list, const char *key, const Param value)
 	Param *p = malloc(sizeof(Param));
 	CheckAlloc(p);
 	*p = value;
-	if (index != -1)
+	if (index != -1u)
 	{
 		ListLock(list->values);
 		free(ListGetPointer(list->values, index));
@@ -74,7 +74,7 @@ Param *KvGet(const KvList *list, const char *key)
 		return NULL;
 	}
 	const size_t index = KvIndexOf(list, key);
-	if (index != -1)
+	if (index != -1u)
 	{
 		return ListGetPointer(list->values, index);
 	}
@@ -139,7 +139,7 @@ void KvDelete(KvList *list, const char *key)
 		return;
 	}
 	const size_t index = KvIndexOf(list, key);
-	if (index != -1)
+	if (index != -1u)
 	{
 		ListRemoveAt(list->keys, index);
 		ListRemoveAt(list->values, index);
@@ -165,7 +165,7 @@ bool KvListHas(const KvList *list, const char *key)
 	{
 		return false;
 	}
-	return KvIndexOf(list, key) != -1;
+	return KvIndexOf(list, key) != -1u;
 }
 
 ParamType KvGetType(const KvList *list, const char *key)

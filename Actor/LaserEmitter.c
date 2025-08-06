@@ -105,4 +105,4 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 	data->hasTicked = true;
 }
 
-void LaserEmitterUpdate(Actor *this, const double /*delta*/) {}
+void LaserEmitterUpdate(Actor * /*this*/, const double /*delta*/) {}

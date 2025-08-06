@@ -71,7 +71,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint actorCount = ReadUint(data, &offset);
-	for (int i = 0; i < actorCount; i++)
+	for (uint i = 0; i < actorCount; i++)
 	{
 		EXPECT_BYTES(sizeof(float) * 3);
 		const float actorX = ReadFloat(data, &offset);
@@ -103,7 +103,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);
-		for (int j = 0; j < connectionCount; j++)
+		for (uint j = 0; j < connectionCount; j++)
 		{
 			ActorConnection *ac = malloc(sizeof(ActorConnection));
 			CheckAlloc(ac);
@@ -126,7 +126,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint wallCount = ReadUint(data, &offset);
-	for (int i = 0; i < wallCount; i++)
+	for (uint i = 0; i < wallCount; i++)
 	{
 		EXPECT_BYTES(sizeof(float) * 4);
 		const float wallAX = ReadFloat(data, &offset);
@@ -136,7 +136,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		char lDataWallTex[64];
 		EXPECT_BYTES(64);
 		ReadString(data, &offset, (char *)&lDataWallTex, 64);
-		const char wallTex[80];
+		char wallTex[80];
 		snprintf(wallTex, 80, "texture/%s.gtex", lDataWallTex);
 		EXPECT_BYTES(sizeof(float) * 2);
 		const float wallUVScale = ReadFloat(data, &offset);

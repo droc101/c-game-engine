@@ -26,7 +26,7 @@
 #include "../Actor/TestActor.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, const KvList * /*params*/, Transform */*transform*/) {}
+void ActorInit(Actor * /*this*/, const KvList * /*params*/, Transform * /*transform*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
@@ -59,7 +59,7 @@ ActorUpdateFunction actorUpdateFunctions[] = {
 	DoorUpdate,
 	ActorUpdate,
 	IoProxyUpdate,
-	PhysboxUpdate,
+	ActorUpdate,
 	LaserUpdate,
 	ActorUpdate,
 	ActorUpdate,
@@ -89,10 +89,7 @@ ActorDestroyFunction actorDestroyFunctions[] = {
 	ActorDestroy,
 };
 
-Actor *CreateActor(const Transform *transform,
-				   const ActorType actorType,
-				   KvList *params,
-				   JPH_BodyInterface *bodyInterface)
+Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
@@ -133,7 +130,7 @@ void FreeActor(Actor *actor)
 	{
 		JPH_BodyInterface_RemoveAndDestroyBody(actor->bodyInterface, actor->bodyId);
 	}
-	for (int i = 0; i < actor->ioConnections.length; i++)
+	for (size_t i = 0; i < actor->ioConnections.length; i++)
 	{
 		ActorConnection *connection = ListGetPointer(actor->ioConnections, i);
 		DestroyActorConnection(connection);
@@ -163,7 +160,7 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 {
 	//LogInfo("Firing signal %d from actor %p with param \"%s\"\n", signal, sender, defaultParam);
 	ListLock(sender->ioConnections);
-	for (int i = 0; i < sender->ioConnections.length; i++)
+	for (size_t i = 0; i < sender->ioConnections.length; i++)
 	{
 		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
 		if (connection->myOutput == signal)
@@ -175,7 +172,7 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->outActorName);
 				continue;
 			}
-			for (int j = 0; j < actors.length; j++)
+			for (size_t j = 0; j < actors.length; j++)
 			{
 				Actor *actor = ListGetPointer(actors, j);
 				if (actor->SignalHandler != NULL)

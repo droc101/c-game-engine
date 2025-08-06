@@ -245,7 +245,7 @@ enum ObjectLayers
 	OBJECT_LAYER_SENSOR,
 };
 
-enum BroadphaseLayers
+enum BroadPhaseLayers
 {
 	BROADPHASE_LAYER_STATIC,
 	BROADPHASE_LAYER_DYNAMIC,
@@ -365,7 +365,7 @@ struct Wall
 	/// The second point of the wall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	const char tex[80];
+	char tex[80];
 	/// The length of the wall (Call @c WallBake to update)
 	float length;
 	/// The angle of the wall (Call @c WallBake to update)
@@ -389,7 +389,7 @@ struct ActorWall
 	/// The second point of the wall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	const char tex[80];
+	char tex[80];
 	/// The X scale of the texture
 	float uvScale;
 	/// The X offset of the texture

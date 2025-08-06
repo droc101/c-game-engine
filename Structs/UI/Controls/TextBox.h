@@ -30,15 +30,15 @@ Control *CreateTextBoxControl(const char *placeholder,
 							  uint maxLength,
 							  TextBoxCallback callback);
 
-void DrawTextBox(const Control *c, ControlState state, Vector2 position);
+void DrawTextBox(const Control *control, ControlState state, Vector2 position);
 
-void UpdateTextBox(UiStack *stack, Control *, Vector2 localMousePos, uint ctlIndex);
+void UpdateTextBox(UiStack *stack, Control *control, Vector2 localMousePosition, uint controlIndex);
 
-void DestroyTextBox(const Control *c);
+void DestroyTextBox(const Control *control);
 
-void FocusTextBox(const Control *c);
+void FocusTextBox(const Control *control);
 
-void UnfocusTextBox(const Control *c);
+void UnfocusTextBox(const Control *control);
 
 void TextBoxTextInputCallback(TextInput *data, SDL_TextInputEvent *event);
 

@@ -355,8 +355,9 @@ void DoorUpdate(Actor *this, const double delta)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void DoorDestroy(Actor *this)
 {
-	// b2DestroyBody(this->bodyId);
-	// b2ShapeId *sensorShapeId = &((DoorData *)this->extraData)->sensorId;
-	// b2DestroyBody(b2Shape_GetBody(*sensorShapeId));
-	// *sensorShapeId = b2_nullShapeId;
+	const DoorData *data = this->extraData;
+	if (data->sensorBodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
+	{
+		JPH_BodyInterface_RemoveAndDestroyBody(this->bodyInterface, data->sensorBodyId);
+	}
 }

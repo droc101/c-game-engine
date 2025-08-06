@@ -80,8 +80,8 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 								deltaTime,
 								OBJECT_LAYER_PLAYER,
 								state->level->physicsSystem,
-								JPH_BodyFilter_Create(NULL),
-								JPH_ShapeFilter_Create(NULL));
+								JPH_BodyFilter_Create(NULL, NULL),
+								JPH_ShapeFilter_Create(NULL, NULL));
 
 	if (WaitForLodThreadToEnd() != 0)
 	{
@@ -91,7 +91,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
 
-	for (int i = 0; i < state->level->actors.length; i++)
+	for (size_t i = 0; i < state->level->actors.length; i++)
 	{
 		Actor *a = ListGetPointer(state->level->actors, i);
 		a->Update(a, delta);
@@ -106,7 +106,12 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		AddActor(leaf);
 	}
 
-	targetedEnemy = GetTargetedEnemy(10);
+	const ActorRayCastOptions rayCastOptions = {
+		.bodyInterface = JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem),
+		.maxDistance = 10.0f,
+		.actorFlags = ACTOR_FLAG_ENEMY,
+	};
+	targetedEnemy = GetTargetedEnemy(&rayCastOptions);
 	if (targetedEnemy)
 	{
 		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))

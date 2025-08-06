@@ -27,5 +27,7 @@ void DwmDarkMode(SDL_Window *window)
 	{
 		LogWarning("Failed to enable dark mode: %lx\n", res);
 	}
+#else
+	(void)window;
 #endif
 }

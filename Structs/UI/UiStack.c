@@ -83,22 +83,22 @@ UiStack *CreateUiStack()
 {
 	UiStack *stack = malloc(sizeof(UiStack));
 	CheckAlloc(stack);
-	ListInit(stack->Controls, LIST_POINTER);
-	stack->ActiveControl = -1;
-	stack->ActiveControlState = NORMAL;
-	stack->focusedControl = -1;
+	ListInit(stack->controls, LIST_POINTER);
+	stack->activeControl = -1u;
+	stack->activeControlState = NORMAL;
+	stack->focusedControl = -1u;
 	UiStackResetFocus(stack);
 	return stack;
 }
 
 void DestroyUiStack(UiStack *stack)
 {
-	for (int i = 0; i < stack->Controls.length; i++)
+	for (size_t i = 0; i < stack->controls.length; i++)
 	{
-		const Control *c = ListGetPointer(stack->Controls, i);
+		const Control *c = ListGetPointer(stack->controls, i);
 		ControlDestroyFuncs[c->type](c);
 	}
-	ListAndContentsFree(stack->Controls);
+	ListAndContentsFree(stack->controls);
 	free(stack);
 	stack = NULL;
 }
@@ -107,56 +107,56 @@ bool ProcessUiStack(UiStack *stack)
 {
 	const Vector2 mousePos = GetMousePos();
 
-	if (stack->focusedControl != -1)
+	if (stack->focusedControl != -1u)
 	{
-		Control *c = ListGetPointer(stack->Controls, stack->focusedControl);
+		Control *c = ListGetPointer(stack->controls, stack->focusedControl);
 		ControlUpdateFuncs[c->type](stack,
 									c,
 									v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
 									stack->focusedControl);
 	}
-	if (stack->ActiveControl != -1)
+	if (stack->activeControl != -1u)
 	{
-		Control *c = ListGetPointer(stack->Controls, stack->ActiveControl);
+		Control *c = ListGetPointer(stack->controls, stack->activeControl);
 		ControlUpdateFuncs[c->type](stack,
 									c,
 									v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-									stack->ActiveControl);
+									stack->activeControl);
 	}
 
 
-	for (size_t i = 0; i < stack->Controls.length; i++)
+	for (size_t i = 0; i < stack->controls.length; i++)
 	{
-		Control *c = ListGetPointer(stack->Controls, i);
+		Control *c = ListGetPointer(stack->controls, i);
 
 		c->anchoredPosition = CalculateControlPosition(c);
 	}
 
 	if (IsMouseButtonPressed(SDL_BUTTON_LEFT) || IsButtonPressed(CONTROLLER_OK))
 	{
-		SetFocusedControl(stack, stack->ActiveControl);
-		//stack->focusedControl = stack->ActiveControl;
-		stack->ActiveControlState = ACTIVE;
-		return stack->ActiveControl != -1;
+		SetFocusedControl(stack, stack->activeControl);
+		//stack->focusedControl = stack->activeControl;
+		stack->activeControlState = ACTIVE;
+		return stack->activeControl != -1u;
 	}
 
-	stack->ActiveControl = -1;
-	stack->ActiveControlState = NORMAL;
+	stack->activeControl = -1;
+	stack->activeControlState = NORMAL;
 
 	if (UseController())
 	{
-		stack->ActiveControl = stack->focusedControl;
-		stack->ActiveControlState = HOVER;
+		stack->activeControl = stack->focusedControl;
+		stack->activeControlState = HOVER;
 		if (IsButtonPressed(CONTROLLER_OK))
 		{
-			stack->ActiveControlState = ACTIVE;
+			stack->activeControlState = ACTIVE;
 		}
 	} else
 	{
 		// iterate through the controls in reverse order so that the last control is on top and gets priority
-		for (int i = (int)stack->Controls.length - 1; i >= 0; i--)
+		for (int i = (int)stack->controls.length - 1; i >= 0; i--)
 		{
-			const Control *c = (Control *)ListGetPointer(stack->Controls, i);
+			const Control *c = (Control *)ListGetPointer(stack->controls, i);
 
 			const Vector2 localMousePos = v2(mousePos.x - c->anchoredPosition.x, mousePos.y - c->anchoredPosition.y);
 			if (localMousePos.x >= 0 &&
@@ -164,17 +164,17 @@ bool ProcessUiStack(UiStack *stack)
 				localMousePos.y >= 0 &&
 				localMousePos.y <= c->size.y)
 			{
-				stack->ActiveControl = i;
+				stack->activeControl = i;
 				if (IsMouseButtonPressed(SDL_BUTTON_LEFT) ||
 					IsKeyJustPressed(SDL_SCANCODE_SPACE) ||
 					IsButtonJustPressed(CONTROLLER_OK))
 				{
-					stack->ActiveControlState = ACTIVE;
+					stack->activeControlState = ACTIVE;
 					// make this control the focused control
 					SetFocusedControl(stack, i);
 				} else
 				{
-					stack->ActiveControlState = HOVER;
+					stack->activeControlState = HOVER;
 				}
 				break;
 			}
@@ -185,39 +185,38 @@ bool ProcessUiStack(UiStack *stack)
 	if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && !IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
 		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
 	{
-		if (stack->focusedControl == -1)
+		if (stack->focusedControl == -1u)
 		{
 			SetFocusedControl(stack, 0);
 		} else
 		{
-			SetFocusedControl(stack, (int)((stack->focusedControl + 1) % stack->Controls.length));
+			SetFocusedControl(stack, (uint)((stack->focusedControl + 1) % stack->controls.length));
 		}
 	} else if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
 			   IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_UP))
 	{
-		if (stack->focusedControl == -1)
+		if (stack->focusedControl == -1u)
 		{
-			SetFocusedControl(stack, (int)stack->Controls.length - 1);
+			SetFocusedControl(stack, (uint)stack->controls.length - 1);
 		} else
 		{
-			const int fc = wrapi(stack->focusedControl - 1, 0, stack->Controls.length);
+			const uint fc = wrap(stack->focusedControl - 1, 0, stack->controls.length);
 			SetFocusedControl(stack, fc);
 		}
-		// ensure the index is positive
-		if (stack->focusedControl < 0)
+		if (stack->focusedControl != -1u)
 		{
-			SetFocusedControl(stack, stack->focusedControl + (int)stack->Controls.length);
+			SetFocusedControl(stack, stack->focusedControl + (int)stack->controls.length);
 		}
 	}
 
 
 	// return whether the mouse is over a control
-	return stack->ActiveControl != -1;
+	return stack->activeControl != -1u;
 }
 
-void SetFocusedControl(UiStack *stack, const int index)
+void SetFocusedControl(UiStack *stack, const uint index)
 {
-	if (stack->Controls.length == 0)
+	if (stack->controls.length == 0)
 	{
 		return;
 	}
@@ -226,9 +225,9 @@ void SetFocusedControl(UiStack *stack, const int index)
 		return;
 	}
 
-	if (stack->focusedControl != -1)
+	if (stack->focusedControl != -1u)
 	{
-		const Control *c = ListGetPointer(stack->Controls, stack->focusedControl);
+		const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
 		if (ControlUnfocusFuncs[c->type] != NULL)
 		{
 			ControlUnfocusFuncs[c->type](c);
@@ -237,9 +236,9 @@ void SetFocusedControl(UiStack *stack, const int index)
 
 	stack->focusedControl = index;
 
-	if (stack->focusedControl != -1)
+	if (stack->focusedControl != -1u)
 	{
-		const Control *c = ListGetPointer(stack->Controls, stack->focusedControl);
+		const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
 		if (ControlFocusFuncs[c->type] != NULL)
 		{
 			ControlFocusFuncs[c->type](c);
@@ -249,11 +248,11 @@ void SetFocusedControl(UiStack *stack, const int index)
 
 void DrawUiStack(const UiStack *stack)
 {
-	for (int i = 0; i < stack->Controls.length; i++)
+	for (size_t i = 0; i < stack->controls.length; i++)
 	{
-		const Control *c = ListGetPointer(stack->Controls, i);
+		const Control *c = ListGetPointer(stack->controls, i);
 		ControlDrawFuncs[c->type](c,
-								  i == stack->ActiveControl ? stack->ActiveControlState : NORMAL,
+								  i == stack->activeControl ? stack->activeControlState : NORMAL,
 								  c->anchoredPosition);
 
 		// if this is the focused control, draw a border around it
@@ -323,14 +322,14 @@ Control *CreateEmptyControl()
 
 void UiStackPush(UiStack *stack, Control *control)
 {
-	ListAdd(stack->Controls, control);
+	ListAdd(stack->controls, control);
 }
 
 void UiStackRemove(UiStack *stack, const Control *control)
 {
 	ControlDestroyFuncs[control->type](control);
 
-	ListRemoveAt(stack->Controls, ListFind(stack->Controls, control));
+	ListRemoveAt(stack->controls, ListFind(stack->controls, control));
 }
 
 bool IsMouseInRect(const Vector2 pos, const Vector2 size)
@@ -353,9 +352,9 @@ bool HasKeyboardActivation(UiStack * /*stack*/, Control * /*Control*/)
 
 bool HasActivation(UiStack *stack, Control *Control)
 {
-	const size_t index = ListFind(stack->Controls, Control);
+	const size_t index = ListFind(stack->controls, Control);
 	bool focus = false;
-	if (index == stack->ActiveControl)
+	if (index == stack->activeControl)
 	{
 		focus |= HasMouseActivation(stack, Control);
 	}

@@ -39,7 +39,7 @@ void IoProxyInit(Actor *this, const KvList * /*params*/, Transform *)
 	{
 		GetState()->level->ioProxy = this;
 	}
-	this->extraData = calloc(sizeof(IoProxyData), 1);
+	this->extraData = calloc(1, sizeof(IoProxyData));
 	this->SignalHandler = IoProxySignalHandler;
 }
 

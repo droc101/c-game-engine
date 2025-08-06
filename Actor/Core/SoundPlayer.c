@@ -12,7 +12,7 @@
 
 typedef struct SoundPlayerData
 {
-	const char asset[64]; // asset name of the sound effect to play
+	char asset[64]; // asset name of the sound effect to play
 } SoundPlayerData;
 
 bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)

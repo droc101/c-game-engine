@@ -5,7 +5,7 @@ project(game C CXX)
 
 set(CMAKE_C_STANDARD 11)
 
-set(CMAKE_C_FLAGS "-Wall -Wno-discarded-qualifiers -fvisibility=hidden")
+set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
@@ -156,8 +156,8 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanPipelines.c
         Helpers/Core/Physics/Navigation.c
         Helpers/Core/Physics/Navigation.h
-        Helpers/Core/Physics/PhysicsInit.c
-        Helpers/Core/Physics/PhysicsInit.h
+        Helpers/Core/Physics/Physics.c
+        Helpers/Core/Physics/Physics.h
         Helpers/TextInputSystem.c
         Helpers/TextInputSystem.h
         Actor/Core/Trigger.c
@@ -212,10 +212,7 @@ fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 #add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
 FetchContent_Declare(
         joltc
-        GIT_REPOSITORY https://github.com/NBT22/joltc
-        GIT_TAG main
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
+        SOURCE_DIR ../../joltc
         EXCLUDE_FROM_ALL
         SYSTEM
 )

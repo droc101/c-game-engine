@@ -90,7 +90,7 @@ inline uint32_t TextureIndex(const char *texture)
 inline uint32_t ImageIndex(const Image *image)
 {
 	const uint32_t index = imageAssetIdToIndexMap[image->id];
-	if (index == -1)
+	if (index == -1u)
 	{
 		if (!LoadTexture(image))
 		{

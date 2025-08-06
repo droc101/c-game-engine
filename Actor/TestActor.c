@@ -22,6 +22,7 @@ bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal,
 
 void TestActorIdle(Actor *this, const double /*delta*/)
 {
+	(void)this;
 	// const NavigationConfig *navigationConfig = this->extraData;
 	// this->transform.rotation.y += 0.01f;
 	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
@@ -30,6 +31,8 @@ void TestActorIdle(Actor *this, const double /*delta*/)
 
 void TestActorTargetReached(Actor *this, const double delta)
 {
+	(void)this;
+	(void)delta;
 	// const NavigationConfig *navigationConfig = this->extraData;
 	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
@@ -90,6 +93,8 @@ void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 
 void TestActorUpdate(Actor *this, const double delta)
 {
+	(void)this;
+	(void)delta;
 	// JPH_Quat rotation;
 	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
 	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);

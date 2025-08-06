@@ -20,7 +20,7 @@
  * @param bodyInterface The Joly body interface within which to create the actor's rigid body
  * @return Initialized Actor struct
  */
-Actor *CreateActor(const Transform *transform, ActorType actorType, KvList *params, JPH_BodyInterface *bodyInterface);
+Actor *CreateActor(Transform *transform, ActorType actorType, KvList *params, JPH_BodyInterface *bodyInterface);
 
 /**
  * Destroy an Actor

@@ -17,7 +17,7 @@
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Core/Physics/PhysicsInit.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/PhysicsThread.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
@@ -50,7 +50,7 @@ void InitOptions()
 
 void InitState()
 {
-	InitJolt();
+	PhysicsInitGlobal(&state);
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
@@ -259,18 +259,14 @@ void DestroyGlobalState()
 	GMenuStateDestroy();
 	GOptionsStateDestroy();
 	GPauseStateDestroy();
-
-	JoltDebugRendererDestroy();
-	PlayerContactListenerDestroy();
-	JPH_JobSystem_Destroy(state.jobSystem);
-	JPH_Shutdown();
+	PhysicsDestroyGlobal(&state);
 }
 
 bool ChangeLevelByName(const char *name)
 {
 	LogInfo("Loading level \"%s\"\n", name);
 
-	const size_t maxPathLength = 80;
+	const int maxPathLength = 80;
 	char *levelPath = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(levelPath);
 

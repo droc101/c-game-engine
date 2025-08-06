@@ -151,10 +151,8 @@ bool GL_Init(SDL_Window *wnd)
 
 	TestSDLFunction_NonFatal(SDL_GL_SetSwapInterval(GetState()->options.vsync ? 1 : 0), "Failed to set VSync");
 
-	// ReSharper disable once CppJoinDeclarationAndAssignment
-	GLenum err;
 	glewExperimental = GL_TRUE; // Please expose OpenGL 3.x+ interfaces
-	err = glewInit();
+	const GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
 		SDL_GL_DeleteContext(ctx);
@@ -257,7 +255,7 @@ void GL_DestroyGL()
 	{
 		if (glModels[i] != NULL)
 		{
-			for (int j = 0; j < glModels[i]->lodCount; j++)
+			for (size_t j = 0; j < glModels[i]->lodCount; j++)
 			{
 				GL_DestroyBuffer(glModels[i]->buffers[j]);
 			}
@@ -289,7 +287,7 @@ GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 
 GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
 {
-	GLint status;
+	GLint status = 0;
 	char errorBuffer[512];
 
 	GL_Shader *shader = malloc(sizeof(GL_Shader));
@@ -437,12 +435,12 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 	buf->buffers = malloc(sizeof(void *) * model->lodCount);
 	CheckAlloc(buf->buffers);
 
-	for (int l = 0; l < buf->lodCount; l++)
+	for (size_t l = 0; l < buf->lodCount; l++)
 	{
 		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialCount);
 		CheckAlloc(buf->buffers[l]);
 
-		for (int m = 0; m < buf->materialCount; m++)
+		for (size_t m = 0; m < buf->materialCount; m++)
 		{
 			GL_Buffer *modelBuffer = &buf->buffers[l][m];
 			glGenVertexArrays(1, &modelBuffer->vertexArrayObject);
@@ -573,8 +571,8 @@ inline void GL_Swap()
 
 inline void GL_UpdateViewportSize()
 {
-	int vpWidth;
-	int vpHeight;
+	int vpWidth = 0;
+	int vpHeight = 0;
 	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
 	glViewport(0, 0, vpWidth, vpHeight);
 }
@@ -1091,7 +1089,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 
 	GL_RenderLevelWalls();
 
-	for (int i = 0; i < level->actors.length; i++)
+	for (size_t i = 0; i < level->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(level->actors, i);
 		if (!actor->actorWall && !actor->actorModel)

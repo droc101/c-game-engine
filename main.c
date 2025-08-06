@@ -160,7 +160,7 @@ void WindowAndRenderInit()
  * @param event The SDL event to handle
  * @param shouldQuit Whether the program should quit after handling the event
  */
-void HandleEvent(const SDL_Event event, bool *shouldQuit)
+void HandleEvent(SDL_Event event, bool *shouldQuit)
 {
 	switch (event.type)
 	{
@@ -327,13 +327,13 @@ int main(const int argc, char *argv[])
 
 		ResetDPrintYPos();
 
-		// SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
-		// // warp the mouse to the center of the screen if we are in the main game state
-		// if (state->currentState == MAIN_STATE)
-		// {
-		// 	const Vector2 realWndSize = ActualWindowSize();
-		// 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
-		// }
+		SDL_SetRelativeMouseMode(state->currentState == MAIN_STATE ? SDL_TRUE : SDL_FALSE);
+		// warp the mouse to the center of the screen if we are in the main game state
+		if (state->currentState == MAIN_STATE)
+		{
+			const Vector2 realWndSize = ActualWindowSize();
+			SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
+		}
 
 		if (state->UpdateGame)
 		{
@@ -348,7 +348,7 @@ int main(const int argc, char *argv[])
 #endif
 
 		state->camera->transform.position.x = state->level->player.transform.position.x;
-		state->camera->transform.position.y = state->level->player.transform.position.y;// + state->camera->yOffset;
+		state->camera->transform.position.y = state->level->player.transform.position.y; // + state->camera->yOffset;
 		state->camera->transform.position.z = state->level->player.transform.position.z;
 		state->camera->transform.rotation = state->level->player.transform.rotation;
 		state->viewmodel.transform.position.y = GetState()->camera->yOffset * 0.2f - 0.35f;

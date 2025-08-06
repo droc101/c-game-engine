@@ -47,10 +47,3 @@ void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
 
 	CreatePhysboxCollider(this, transform);
 }
-
-void PhysboxUpdate(Actor *this, const double /*delta*/)
-{
-	// JPH_Quat rotation;
-	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
-	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
-}

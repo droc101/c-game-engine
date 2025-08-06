@@ -56,7 +56,7 @@ ushort GetOptionsChecksum(Options *options)
 {
 	const byte *data = (byte *)options;
 	ushort checksum = 0;
-	for (int i = sizeof(ushort); i < sizeof(Options) - sizeof(ushort); i++)
+	for (size_t i = sizeof(ushort); i < sizeof(Options) - sizeof(ushort); i++)
 	{
 		checksum += data[i];
 	}
