@@ -59,6 +59,7 @@ void CoinInit(Actor *this, const KvList *params, Transform *transform)
 	data->isBlue = KvGetBool(params, "isBlue", false);
 
 	transform->position.y = -0.25f;
+	transform->rotation.y = 0;
 	CreateCoinSensor(this, transform);
 
 	this->actorWall = malloc(sizeof(ActorWall));

@@ -59,21 +59,14 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte sign
 
 void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
-	LaserEmitterData *data = this->extraData;
-	JPH_Quat rotation = {};
-	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
-	Vector3 forwardVector = {};
-	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
-	Vector3 offsetVector = {};
-	Vector3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
-	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(
-			(const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS),
-			&data->transform.position,
-			&rotation,
-			JPH_MotionType_Static,
-			OBJECT_LAYER_STATIC);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
+	const Vector3 offset = {0.0f, 0.0f, halfExtent.z};
+	const JPH_Shape *boxShape = (const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS);
+	const JPH_Shape *offestShape = (const JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_STATIC,
+																						   this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
@@ -92,9 +85,16 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 	this->actorModel = LoadModel(MODEL("model_laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
-	CreateLaserEmitterCollider(this, transform);
-
+	JPH_Quat rotation = {};
+	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
+	Vector3 forwardVector = {};
+	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
+	Vector3 offsetVector = {};
+	Vector3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
+	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
 	data->transform.rotation = transform->rotation;
+
+	CreateLaserEmitterCollider(this, &data->transform);
 
 	data->startEnabled = KvGetBool(params, "startEnabled", true);
 }

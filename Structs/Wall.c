@@ -51,10 +51,10 @@ void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
 	const Vector3 position = {wall->a.x, 0, wall->a.y};
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																		  &position,
-																		  &JPH_Quat_Identity,
-																		  JPH_MotionType_Static,
-																		  OBJECT_LAYER_STATIC);
+																					  &position,
+																					  &JPH_Quat_Identity,
+																					  JPH_MotionType_Static,
+																					  OBJECT_LAYER_STATIC);
 
 	wall->bodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, bodyCreationSettings, JPH_Activation_DontActivate);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);

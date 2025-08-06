@@ -152,14 +152,14 @@ void LaserInit(Actor *this, const KvList *params, Transform *transform)
 	switch (data->height)
 	{
 		case LASER_HEIGHT_FLOOR:
-			transform->position.y = -0.3f;
+			transform->position.y += -0.3f;
 			break;
 		case LASER_HEIGHT_CEILING:
-			transform->position.y = 0.3f;
+			transform->position.y += 0.3f;
 			break;
 		case LASER_HEIGHT_MIDDLE:
 		default:
-			transform->position.y = 0.0f;
+			transform->position.y += 0.0f;
 			break;
 	}
 	ActorWallBake(this);

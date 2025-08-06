@@ -20,11 +20,11 @@ static inline bool ShouldDrawBody(void * /*userData*/, const JPH_Body *body)
 
 static JPH_DebugRenderer *debugRenderer;
 static JPH_BodyDrawFilter *drawFilter;
-static const JPH_DebugRenderer_Procs debugRendererProcs = {
+static const JPH_DebugRenderer_Impl debugRendererImpl = {
 	.DrawLine = DrawJoltDebugRendererDrawLine,
 	.DrawTriangle = DrawJoltDebugRendererDrawTriangle,
 };
-static const JPH_BodyDrawFilter_Procs bodyDrawFilterProcs = {
+static const JPH_BodyDrawFilter_Impl bodyDrawFilterImpl = {
 	.ShouldDraw = ShouldDrawBody,
 };
 static const JPH_DrawSettings drawSettings = {
@@ -34,9 +34,9 @@ static const JPH_DrawSettings drawSettings = {
 void JoltDebugRendererInit()
 {
 	debugRenderer = JPH_DebugRenderer_Create(NULL);
-	JPH_DebugRenderer_SetProcs(&debugRendererProcs);
+	JPH_DebugRenderer_SetImpl(&debugRendererImpl);
 	drawFilter = JPH_BodyDrawFilter_Create(NULL);
-	JPH_BodyDrawFilter_SetProcs(&bodyDrawFilterProcs);
+	JPH_BodyDrawFilter_SetImpl(&bodyDrawFilterImpl);
 }
 
 void JoltDebugRendererDestroy()

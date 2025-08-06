@@ -90,6 +90,7 @@ void GoalInit(Actor *this, const KvList *params, Transform *transform)
 
 	this->OnPlayerContactAdded = GoalOnPlayerContactAdded;
 
+	transform->rotation.y = 0;
 	CreateGoalSensor(this, transform);
 }
 
