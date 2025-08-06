@@ -7,7 +7,7 @@
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Navigation.h"
+#include "../Helpers/Core/Physics/Navigation.h"
 #include "../Structs/Actor.h"
 
 bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
@@ -65,6 +65,8 @@ void CreateTestActorCollider(Actor *this, const Transform *transform)
 void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
 	CreateTestActorCollider(this, transform);
+
+	this->actorFlags |= ACTOR_FLAG_ENEMY;
 
 	this->actorModel = LoadModel(MODEL("model_leafy"));
 	this->currentSkinIndex = 0;

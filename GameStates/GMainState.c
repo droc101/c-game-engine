@@ -7,19 +7,18 @@
 #include <stdio.h>
 #include "../Debug/DPrint.h"
 #include "../Debug/JoltDebugRenderer.h"
-#include "../Helpers/Collision.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
-#include "../Helpers/Core/LodThread.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Core/PhysicsThread.h"
+#include "../Helpers/Core/Physics/Player.h"
+#include "../Helpers/Core/Physics/RayCast.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
+#include "../Helpers/Graphics/LodThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
-#include "../Helpers/Player.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
@@ -77,7 +76,12 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
-	JPH_CharacterVirtual_Update(state->level->player.joltCharacter, deltaTime, OBJECT_LAYER_PLAYER, state->level->physicsSystem, JPH_BodyFilter_Create(NULL), JPH_ShapeFilter_Create(NULL));
+	JPH_CharacterVirtual_Update(state->level->player.joltCharacter,
+								deltaTime,
+								OBJECT_LAYER_PLAYER,
+								state->level->physicsSystem,
+								JPH_BodyFilter_Create(NULL),
+								JPH_ShapeFilter_Create(NULL));
 
 	if (WaitForLodThreadToEnd() != 0)
 	{

@@ -3,11 +3,9 @@
 //
 
 #include "Trigger.h"
-#include "../../Helpers/Collision.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
-#include "../../Structs/GlobalState.h"
 #include "../../Structs/Level.h"
 
 #define TRIGGER_INPUT_FORCE_TRIGGER 1

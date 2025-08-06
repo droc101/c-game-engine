@@ -133,8 +133,8 @@ add_executable(
         GameStates/Options/GSoundOptionsState.h
         GameStates/Options/GInputOptionsState.c
         GameStates/Options/GInputOptionsState.h
-        Helpers/Core/PhysicsThread.c
-        Helpers/Core/PhysicsThread.h
+        Helpers/Core/Physics/PhysicsThread.c
+        Helpers/Core/Physics/PhysicsThread.h
         Debug/FrameBenchmark.c
         Debug/FrameBenchmark.h
         Structs/UI/Controls/TextBox.c
@@ -154,10 +154,10 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanActors.c
         Helpers/Graphics/Vulkan/VulkanActors.h
         Helpers/Graphics/Vulkan/VulkanPipelines.c
-        Helpers/Navigation.c
-        Helpers/Navigation.h
-        Helpers/Collision.c
-        Helpers/Collision.h
+        Helpers/Core/Physics/Navigation.c
+        Helpers/Core/Physics/Navigation.h
+        Helpers/Core/Physics/PhysicsInit.c
+        Helpers/Core/Physics/PhysicsInit.h
         Helpers/TextInputSystem.c
         Helpers/TextInputSystem.h
         Actor/Core/Trigger.c
@@ -178,8 +178,8 @@ add_executable(
         Actor/Core/Sprite.h
         Actor/LaserEmitter.c
         Actor/LaserEmitter.h
-        Helpers/Core/LodThread.c
-        Helpers/Core/LodThread.h
+        Helpers/Graphics/LodThread.c
+        Helpers/Graphics/LodThread.h
         Actor/Core/LogicBinary.c
         Actor/Core/LogicBinary.h
         Helpers/Core/Arguments.c
@@ -190,8 +190,10 @@ add_executable(
         Actor/Core/LogicCounter.h
         Debug/JoltDebugRenderer.c
         Debug/JoltDebugRenderer.h
-        Helpers/Player.c
-        Helpers/Player.h
+        Helpers/Core/Physics/Player.c
+        Helpers/Core/Physics/Player.h
+        Helpers/Core/Physics/RayCast.c
+        Helpers/Core/Physics/RayCast.h
 )
 
 #endregion

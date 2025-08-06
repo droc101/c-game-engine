@@ -4,16 +4,13 @@
 
 #include "Goal.h"
 #include <math.h>
-#include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
-#include "../Helpers/Core/MathEx.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
-#include "../Structs/Wall.h"
 
 #define GOAL_INPUT_ENABLE 1
 #define GOAL_INPUT_DISABLE 2

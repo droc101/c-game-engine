@@ -3,10 +3,6 @@
 //
 
 #include "Navigation.h"
-#include "../Structs/GlobalState.h"
-#include "../Structs/Vector2.h"
-#include "Collision.h"
-#include "Core/MathEx.h"
 
 float PlayerRelativeAngle(const Actor *actor)
 {

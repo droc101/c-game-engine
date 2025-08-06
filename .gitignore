@@ -29,13 +29,6 @@
 # CMake
 cmake-build-*/
 
-# Libraries
-/lib/cglm
-/lib/glew
-/lib/SDL2
-/lib/SDL2_mixer
-# we include zlib and box2d because they are a pain to get
-
 # Downloaded CMake modules
 /module
 

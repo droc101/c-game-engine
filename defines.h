@@ -27,7 +27,6 @@ typedef enum CurrentState CurrentState;
 typedef enum Renderer Renderer;
 typedef enum OptionsMsaa OptionsMsaa;
 typedef enum ModelShader ModelShader;
-typedef enum ImageDataOffsets ImageDataOffsets;
 typedef enum AssetType AssetType;
 typedef enum ParamType ParamType;
 typedef enum ActorType ActorType;
@@ -233,15 +232,9 @@ enum ModelShader
 	SHADER_SHADED
 };
 
-/// For Box2d
-enum CollisionGroups
+enum ActorFlags
 {
-	COLLISION_GROUP_DEFAULT = 1 << 0,
-	COLLISION_GROUP_PLAYER = 1 << 1,
-	COLLISION_GROUP_ACTOR = 1 << 2,
-	COLLISION_GROUP_TRIGGER = 1 << 3,
-	COLLISION_GROUP_ACTOR_ENEMY = 1 << 4,
-	COLLISION_GROUP_HURTBOX = 1 << 5,
+	ACTOR_FLAG_ENEMY = 1 << 0,
 };
 
 enum ObjectLayers
@@ -250,9 +243,6 @@ enum ObjectLayers
 	OBJECT_LAYER_DYNAMIC,
 	OBJECT_LAYER_PLAYER,
 	OBJECT_LAYER_SENSOR,
-
-	/// @warning Used for checking the number of object layers, and as such is not a valid layer index
-	OBJECT_LAYER_MAX,
 };
 
 enum BroadphaseLayers
@@ -563,6 +553,12 @@ struct SaveData
 // Actor (interactable/moving wall) struct
 struct Actor
 {
+	/// Flags used to provide more information about the actor
+	uint32_t actorFlags;
+
+	JPH_BodyInterface *bodyInterface;
+	JPH_BodyId bodyId;
+
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
 	/// The index of the active skin for the actor's model
@@ -598,9 +594,6 @@ struct Actor
 	int health;
 	/// Extra data for the actor
 	void *extraData;
-
-	JPH_BodyInterface *bodyInterface;
-	JPH_BodyId bodyId;
 };
 
 struct Asset

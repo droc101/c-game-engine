@@ -1,64 +1,18 @@
 //
-// Created by noah on 2/10/25.
+// Created by NBT22 on 8/5/25.
 //
 
-#include "Collision.h"
-#include "../Structs/GlobalState.h"
-#include "Core/Logging.h"
+#include "RayCast.h"
+#include "../../../Structs/GlobalState.h"
 
-float RaycastCallback(const int shapeId, Vector2, Vector2, const float fraction, void *raycastHit)
+static void RayCastCallback(void *context, const JPH_RayCastResult *result)
 {
-	// if (!raycastHit)
-	// {
-	// 	LogError("raycastHit was NULL, likely box2d issue");
-	// 	return -1;
-	// }
-	// *(b2ShapeId *)raycastHit = shapeId;
-	return fraction;
-}
 
-float RaycastCallback_GetPosition(const int, const Vector2 point, Vector2, const float fraction, void *raycastHit)
-{
-	if (!raycastHit)
-	{
-		LogError("raycastHit was NULL, likely box2d issue");
-		return -1;
-	}
-	*(Vector2 *)raycastHit = point;
-	return fraction;
-}
-
-bool GetSensorState(const int worldId, const uint sensorShapeIdIndex, const bool currentState)
-{
-	// const b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
-	// if (currentState)
-	// {
-	// 	for (int i = 0; i < sensorEvents.endCount; i++)
-	// 	{
-	// 		const b2SensorEndTouchEvent event = sensorEvents.endEvents[i];
-	// 		if (event.sensorShapeId.index1 == sensorShapeIdIndex)
-	// 		{
-	// 			return false;
-	// 		}
-	// 	}
-	// } else
-	// {
-	// 	for (int i = 0; i < sensorEvents.beginCount; i++)
-	// 	{
-	// 		const b2SensorBeginTouchEvent event = sensorEvents.beginEvents[i];
-	// 		if (event.sensorShapeId.index1 == sensorShapeIdIndex)
-	// 		{
-	// 			return true;
-	// 		}
-	// 	}
-	// }
-
-	return currentState;
 }
 
 Actor *GetTargetedEnemy(const float maxDistance)
 {
-	// const GlobalState *state = GetState();
+	const GlobalState *state = GetState();
 	// Vector2 rayEnd = Vector2FromAngle(state->level->player.transform.rotation.y);
 	// rayEnd = Vector2Scale(rayEnd, maxDistance);
 	// b2ShapeId raycastHit = b2_nullShapeId;
@@ -83,6 +37,30 @@ Actor *GetTargetedEnemy(const float maxDistance)
 	// 	}
 	// 	ListUnlock(state->level->actors);
 	// }
+
+	/*
+	JPH_CAPI bool JPH_NarrowPhaseQuery_CastRay3(const JPH_NarrowPhaseQuery *query,
+												const JPH_RVec3 *origin,
+												const JPH_Vec3 *direction,
+												const JPH_RayCastSettings *rayCastSettings,
+												JPH_CollisionCollectorType collectorType,
+												JPH_CastRayResultCallback *callback,
+												void *userData,
+												JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter,
+												JPH_ObjectLayerFilter *objectLayerFilter,
+												const JPH_BodyFilter *bodyFilter,
+												const JPH_ShapeFilter *shapeFilter);
+	*/
+	// const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->level->physicsSystem);
+	// JPH_Quat rotation = {};
+	// JPH_CharacterVirtual_GetRotation(state->level->player.joltCharacter, &rotation);
+	// Vector3 direction = {};
+	// JPH_Quat_Rotate(&rotation, &JPH_Vec3_Forward, &direction);
+	// JPH_RayCastSettings rayCastSettings = {
+	// 	.treatConvexAsSolid = true,
+	// };
+	//
+	// JPH_NarrowPhaseQuery_CastRay3(narrowPhaseQuery, &state->level->player.transform.position, &direction, &rayCastSettings, JPH_CollisionCollectorType_ClosestHit, &RayCastCallback, NULL, );
 	return NULL;
 }
 

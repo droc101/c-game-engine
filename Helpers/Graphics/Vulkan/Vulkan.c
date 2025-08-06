@@ -7,8 +7,8 @@
 #include <luna/luna.h>
 #include <string.h>
 #include "../../Core/Error.h"
-#include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
+#include "../LodThread.h"
 #include "VulkanActors.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"

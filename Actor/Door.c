@@ -3,14 +3,11 @@
 //
 
 #include "Door.h"
-#include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
-#include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
-#include "../Structs/Wall.h"
 
 #define DOOR_INPUT_OPEN 1
 #define DOOR_INPUT_CLOSE 2
@@ -180,41 +177,36 @@ static bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signa
 	{
 		return true;
 	}
-	// DoorData *data = this->extraData;
-	// if (signal == DOOR_INPUT_OPEN)
-	// {
-	// 	if (data->state != DOOR_CLOSED)
-	// 	{
-	// 		if (data->state == DOOR_CLOSING)
-	// 		{
-	// 			b2Body_SetLinearVelocity(this->bodyId,
-	// 									 Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
-	// 			data->state = DOOR_OPENING; // Set manually in order to not reset data->animationTime
-	// 			data->animationTime = 1 - data->animationTime;
-	// 		}
-	// 		return true;
-	// 	}
-	// 	b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2Scale(Vector2FromAngle(this->rotation), -1)));
-	// 	DoorSetState(this, DOOR_OPENING);
-	// 	return true;
-	// }
-	// if (signal == DOOR_INPUT_CLOSE)
-	// {
-	// 	if (data->state != DOOR_OPEN)
-	// 	{
-	// 		if (data->state == DOOR_OPENING)
-	// 		{
-	// 			b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
-	// 			data->state = DOOR_CLOSING; // Set manually in order to not reset data->animationTime
-	// 			data->animationTime = 1 - data->animationTime;
-	// 		}
-	// 		return true;
-	// 	}
-	// 	b2Body_SetLinearVelocity(this->bodyId, Vector2Normalize(Vector2FromAngle(this->rotation)));
-	// 	DoorSetState(this, DOOR_CLOSING);
-	// 	return true;
-	// }
-	return false;
+	const DoorData *data = this->extraData;
+	switch (signal)
+	{
+		case DOOR_INPUT_OPEN:
+			switch (data->state)
+			{
+				case DOOR_CLOSED:
+					DoorSetState(this, DOOR_OPENING, 0);
+					return true;
+				case DOOR_CLOSING:
+					DoorSetState(this, DOOR_OPENING, 1 - data->animationTime);
+					return true;
+				default:
+					return true;
+			}
+		case DOOR_INPUT_CLOSE:
+			switch (data->state)
+			{
+				case DOOR_OPEN:
+					DoorSetState(this, DOOR_CLOSING, 0);
+					return true;
+				case DOOR_OPENING:
+					DoorSetState(this, DOOR_CLOSING, 1 - data->animationTime);
+					return true;
+				default:
+					return true;
+			}
+		default:
+			return false;
+	}
 }
 
 static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyId bodyId)

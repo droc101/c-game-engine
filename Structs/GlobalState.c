@@ -17,10 +17,11 @@
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Core/PhysicsThread.h"
+#include "../Helpers/Core/Physics/PhysicsInit.h"
+#include "../Helpers/Core/Physics/PhysicsThread.h"
+#include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Helpers/LevelLoader.h"
-#include "../Helpers/Player.h"
 #include "../Structs/Level.h"
 #include "Options.h"
 
@@ -45,17 +46,6 @@ void ChannelFinished(const int channel)
 void InitOptions()
 {
 	LoadOptions(&state.options);
-}
-
-static void InitJolt()
-{
-	if (!JPH_Init())
-	{
-		Error("Failed to initialize Jolt Physics!");
-	}
-	state.jobSystem = JPH_JobSystemThreadPool_Create(NULL);
-	JoltDebugRendererInit();
-	PlayerContactListenerInit();
 }
 
 void InitState()

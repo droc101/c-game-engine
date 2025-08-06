@@ -6,8 +6,8 @@
 #include <luna/luna.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../Core/Error.h"
-#include "../../Core/LodThread.h"
 #include "../../Core/MathEx.h"
+#include "../LodThread.h"
 #include "VulkanHelpers.h"
 
 VkResult CreateUiBuffers()

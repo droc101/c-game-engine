@@ -5,8 +5,8 @@
 #include "LodThread.h"
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
-#include "../Graphics/Vulkan/Vulkan.h"
-#include "Error.h"
+#include "../Core/Error.h"
+#include "Vulkan/Vulkan.h"
 
 static bool shouldExit;
 static SDL_Thread *lodThread;

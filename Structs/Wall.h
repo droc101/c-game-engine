@@ -19,9 +19,9 @@
 Wall *CreateWall(Vector2 a, Vector2 b, const char *texture, float uvScale, float uvOffset);
 
 /**
- * Create a Box2D rigid body to serve as a wall's hitbox
+ * Create an infinitely thin collider for the wall's hitbox
  * @param wall The wall to create the hitbox for
- * @param bodyInterface
+ * @param bodyInterface The Jolt body interface used to look up the body from the body id
  * @note This function expects the wall to be baked
  */
 void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface);

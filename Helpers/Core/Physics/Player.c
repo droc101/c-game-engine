@@ -3,12 +3,11 @@
 //
 
 #include "Player.h"
-
-#include "../Structs/Actor.h"
-#include "../Structs/GlobalState.h"
-#include "../Structs/Vector2.h"
-#include "Core/Input.h"
-#include "Core/MathEx.h"
+#include "../../../Structs/Actor.h"
+#include "../../../Structs/GlobalState.h"
+#include "../../../Structs/Vector2.h"
+#include "../Input.h"
+#include "../MathEx.h"
 
 static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 						   const JPH_BodyId bodyId,
@@ -64,7 +63,7 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 
 
 static JPH_CharacterContactListener *contactListener;
-static JPH_CharacterContactListener_Procs contactListenerProcs = {
+static JPH_CharacterContactListener_Impl contactListenerImpl = {
 	.OnContactAdded = OnContactAdded,
 	.OnContactPersisted = OnContactPersisted,
 	.OnContactRemoved = OnContactRemoved,
@@ -73,7 +72,7 @@ static JPH_CharacterContactListener_Procs contactListenerProcs = {
 void PlayerContactListenerInit()
 {
 	contactListener = JPH_CharacterContactListener_Create();
-	JPH_CharacterContactListener_SetProcs(contactListener, &contactListenerProcs);
+	JPH_CharacterContactListener_SetImpl(contactListener, &contactListenerImpl);
 }
 
 void PlayerContactListenerDestroy()

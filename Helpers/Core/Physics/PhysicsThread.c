@@ -4,14 +4,14 @@
 
 #include "PhysicsThread.h"
 #include <SDL_thread.h>
-#include "../../Debug/FrameGrapher.h"
-#include "../../Debug/JoltDebugRenderer.h"
-#include "../../defines.h"
-#include "../../Structs/GlobalState.h"
-#include "Error.h"
-#include "Input.h"
-#include "Logging.h"
-#include "Timing.h"
+#include "../../../Debug/FrameGrapher.h"
+#include "../../../Debug/JoltDebugRenderer.h"
+#include "../../../defines.h"
+#include "../../../Structs/GlobalState.h"
+#include "../Error.h"
+#include "../Input.h"
+#include "../Logging.h"
+#include "../Timing.h"
 
 static SDL_Thread *physicsThread;
 static SDL_mutex *physicsThreadMutex;
