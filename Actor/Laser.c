@@ -170,7 +170,7 @@ void LaserInit(Actor *this, const KvList *params, Transform *transform)
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void LaserUpdate(Actor *this, double /*delta*/)
+void LaserUpdate(Actor *this, double delta)
 {
 	const LaserData *data = this->extraData;
 	if (data->enabled)
@@ -198,6 +198,7 @@ void LaserUpdate(Actor *this, double /*delta*/)
 			this->actorWall->b = v2(hitPointOffset.x, hitPointOffset.z);
 			ActorWallBake(this);
 		}
+		this->actorWall->uvOffset = (float)fmod(this->actorWall->uvOffset + delta / 8, 1.0);
 	}
 }
 
