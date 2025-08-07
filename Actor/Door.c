@@ -323,7 +323,6 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void DoorUpdate(Actor *this, const double delta)
 {
-	// this->position = b2Body_GetPosition(this->bodyId);
 	DoorData *data = this->extraData;
 	switch (data->state)
 	{

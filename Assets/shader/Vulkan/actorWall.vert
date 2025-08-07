@@ -28,5 +28,5 @@ void main() {
 	outUV = inUV;
 	outTextureIndex = inTextureIndex;
 
-	outShading = max(0.6, min(1, abs(cos(pushConstants.yaw - inWallAngle))));
+	outShading = max(0.6, abs(cos(pushConstants.yaw - inWallAngle)));
 }

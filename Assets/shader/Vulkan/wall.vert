@@ -26,6 +26,6 @@ void main() {
 	outUV = inUV;
 	outTextureIndex = inTextureIndex;
 	outColor = vec4(unpackUnorm4x8(pushConstants.fogColor).bgr, 1);
-	outColor.a = max(0.6, min(1, abs(cos(pushConstants.yaw - inWallAngle))));
+	outColor.a = max(0.6, abs(cos(pushConstants.yaw - inWallAngle)));
 	gl_Position = pushConstants.transformMatrix * vec4(inWallVertex, 1.0);
 }

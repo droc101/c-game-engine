@@ -220,12 +220,9 @@ void ActorWallBake(const Actor *this)
 	{
 		JPH_Quat rotation = {};
 		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
-		Vector3 eulerAngles = {};
-		JPH_Quat_GetEulerAngles(&rotation, &eulerAngles);
-		this->actorWall->angle = eulerAngles.y;
+		this->actorWall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY);
 	} else
 	{
-		this->actorWall->angle = atan2f(this->actorWall->b.x - this->actorWall->a.x,
-										this->actorWall->b.y - this->actorWall->a.y);
+		this->actorWall->angle = atan2f(dy, dx);
 	}
 }
