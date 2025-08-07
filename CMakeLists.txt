@@ -65,8 +65,8 @@ add_executable(
         Helpers/Graphics/Font.h
         Helpers/Core/Error.c
         Helpers/Core/Error.h
-        Helpers/LevelLoader.c
-        Helpers/LevelLoader.h
+        Helpers/Core/AssetLoaders/LevelLoader.c
+        Helpers/Core/AssetLoaders/LevelLoader.h
         Structs/GlobalState.c
         Structs/GlobalState.h
         GameStates/GMainState.c
@@ -188,6 +188,16 @@ add_executable(
         Actor/Core/LogicDecimal.h
         Actor/Core/LogicCounter.c
         Actor/Core/LogicCounter.h
+        Helpers/Core/AssetLoaders/TextureLoader.c
+        Helpers/Core/AssetLoaders/TextureLoader.h
+        Helpers/Core/AssetLoaders/ModelLoader.c
+        Helpers/Core/AssetLoaders/ModelLoader.h
+        Helpers/Core/AssetLoaders/FontLoader.c
+        Helpers/Core/AssetLoaders/FontLoader.h
+        Helpers/Core/AssetLoaders/ShaderLoader.c
+        Helpers/Core/AssetLoaders/ShaderLoader.h
+        Helpers/Core/SoundSystem.c
+        Helpers/Core/SoundSystem.h
         Debug/JoltDebugRenderer.c
         Debug/JoltDebugRenderer.h
         Helpers/Core/Physics/Player.c
@@ -249,14 +259,13 @@ include_directories(game PRIVATE
 
 #region Asset Generation
 
-add_custom_target( # Python script for generating assets code
-        genassets ALL
-        COMMAND "python" ${CMAKE_CURRENT_SOURCE_DIR}/AssetGenerator/genassets.py ${CMAKE_CURRENT_SOURCE_DIR}/Assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/
-        COMMENT "Generating assets"
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Assets/
+add_custom_target(
+        copy_assets
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_BINARY_DIR}/assets
 )
 
-add_dependencies(game genassets)
+add_dependencies(game copy_assets)
 
 #endregion
 

@@ -10,19 +10,14 @@
 #include <stdlib.h>
 #include <zlib.h>
 #include "../../Structs/GlobalState.h"
-#include "../Graphics/RenderingHelpers.h"
 #include "DataReader.h"
 #include "Error.h"
 #include "Logging.h"
+#include "AssetLoaders/TextureLoader.h"
+#include "AssetLoaders/ModelLoader.h"
 
 List assetCacheNames;
 List assetCacheData;
-uint textureId;
-size_t modelId;
-size_t lodId;
-size_t materialId;
-Image *images[MAX_TEXTURES];
-ModelDefinition *models[MAX_MODELS];
 
 FILE *OpenAssetFile(const char *relPath)
 {
@@ -57,42 +52,11 @@ FILE *OpenAssetFile(const char *relPath)
 	return file;
 }
 
-void FreeModel(ModelDefinition *model)
-{
-	if (model == NULL)
-	{
-		return;
-	}
-	for (int i = 0; i < model->skinCount; i++)
-	{
-		free(model->skins[i]);
-	}
-
-	for (int i = 0; i < model->lodCount; i++)
-	{
-		ModelLod *lod = model->lods[i];
-		free(lod->vertexData);
-		for (int j = 0; j < model->materialCount; j++)
-		{
-			free(lod->indexData[j]);
-		}
-		free(lod->indexData);
-		free(lod->indexCount);
-		free(lod);
-	}
-
-	free(model->name);
-	free(model->skins);
-	free(model->lods);
-	free(model);
-
-	model = NULL;
-}
-
 void AssetCacheInit()
 {
 	ListInit(assetCacheNames, LIST_POINTER);
 	ListInit(assetCacheData, LIST_POINTER);
+	InitModelLoader();
 }
 
 void DestroyAssetCache()
@@ -105,22 +69,10 @@ void DestroyAssetCache()
 	}
 	ListFree(assetCacheData);
 
-	for (int i = 0; i < MAX_TEXTURES; i++)
-	{
-		if (images[i] != NULL)
-		{
-			free(images[i]->name);
-			free(images[i]->pixelData);
-			free(images[i]);
-		}
-	}
-
-	for (int i = 0; i < MAX_MODELS; i++)
-	{
-		FreeModel(models[i]);
-	}
-
 	ListAndContentsFree(assetCacheNames);
+
+	DestroyTextureLoader();
+	DestroyModelLoader();
 }
 
 Asset *DecompressAsset(const char *relPath, const bool cache)
@@ -163,14 +115,29 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 
 	size_t offset = 0;
 	// Read the first 4 bytes of the asset to get the size of the compressed data
-	const uint compressedSize = ReadUint(asset, &offset);
-	const uint decompressedSize = ReadUint(asset, &offset);
-	offset += sizeof(uint); // skip asset ID as it is no longer used
-	const uint assetType = ReadUint(asset, &offset);
+	const uint32_t magic = ReadUint(asset, &offset);
+	if (magic != ASSET_FORMAT_MAGIC)
+	{
+		free(asset);
+		LogError("Failed to read an asset because the magic was incorrect.\n");
+		return NULL;
+	}
+	const uint8_t assetVersion = ReadByte(asset, &offset);
+	if (assetVersion != ASSET_FORMAT_VERSION)
+	{
+		free(asset);
+		LogError("Failed to read an asset because the version was incorrect.\n");
+		return NULL;
+	}
+	const uint8_t assetType = ReadByte(asset, &offset);
+	const uint8_t typeVersion = ReadByte(asset, &offset);
+	const size_t decompressedSize = ReadSizeT(asset, &offset);
+	const size_t compressedSize = ReadSizeT(asset, &offset);
 
 	assetStruct->compressedSize = compressedSize;
 	assetStruct->size = decompressedSize;
 	assetStruct->type = assetType;
+	assetStruct->typeVersion = typeVersion;
 
 	// Allocate memory for the decompressed data
 	byte *decompressedData = malloc(decompressedSize);
@@ -259,237 +226,6 @@ void RemoveAssetFromCache(const char *relPath)
 	{
 		LogWarning("Was told to remove \"%s\" from the asset cache, but it was not present.\n", relPath);
 	}
-}
-
-void GenFallbackImage(Image *src)
-{
-	src->width = 64;
-	src->height = 64;
-	src->pixelDataSize = 64 * 64 * 4;
-	src->pixelData = malloc(src->pixelDataSize);
-	CheckAlloc(src->pixelData);
-
-	for (int x = 0; x < 64; x++)
-	{
-		for (int y = 0; y < 64; y++)
-		{
-			if ((x < 32) ^ (y < 32))
-			{
-				src->pixelData[(x + y * 64) * 4] = 0;
-				src->pixelData[(x + y * 64) * 4 + 1] = 0;
-				src->pixelData[(x + y * 64) * 4 + 2] = 0;
-				src->pixelData[(x + y * 64) * 4 + 3] = 255;
-			} else
-			{
-				src->pixelData[(x + y * 64) * 4] = 255;
-				src->pixelData[(x + y * 64) * 4 + 1] = 0;
-				src->pixelData[(x + y * 64) * 4 + 2] = 255;
-				src->pixelData[(x + y * 64) * 4 + 3] = 255;
-			}
-		}
-	}
-}
-
-Image *LoadImage(const char *asset)
-{
-	for (int i = 0; i < MAX_TEXTURES; i++)
-	{
-		Image *img = images[i];
-		if (img == NULL)
-		{
-			break;
-		}
-		if (strncmp(asset, img->name, 80) == 0)
-		{
-			return img;
-		}
-	}
-
-	if (textureId >= MAX_TEXTURES)
-	{
-		Error("Texture ID heap exhausted. Please increase MAX_TEXTURES");
-	}
-
-	Image *img = malloc(sizeof(Image));
-	CheckAlloc(img);
-
-	Asset *textureAsset = DecompressAsset(asset, false);
-	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
-	{
-		GenFallbackImage(img);
-	} else
-	{
-		img->pixelDataSize = ReadUintA(textureAsset->data, IMAGE_SIZE_OFFSET);
-		img->width = ReadUintA(textureAsset->data, IMAGE_WIDTH_OFFSET);
-		img->height = ReadUintA(textureAsset->data, IMAGE_HEIGHT_OFFSET);
-		img->pixelData = malloc(img->pixelDataSize);
-		memcpy(img->pixelData, textureAsset->data + sizeof(uint) * 4, img->pixelDataSize);
-	}
-
-	img->id = textureId;
-
-	const size_t nameLength = strlen(asset) + 1;
-	img->name = malloc(nameLength);
-	CheckAlloc(img->name);
-	strncpy(img->name, asset, nameLength);
-
-	images[textureId] = img;
-
-	textureId++;
-
-	if (textureId >= MAX_TEXTURES - 10)
-	{
-		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
-	}
-
-	FreeAsset(textureAsset);
-
-	return img;
-}
-
-ModelDefinition *LoadModel(const char *asset)
-{
-	for (int i = 0; i < MAX_MODELS; i++)
-	{
-		ModelDefinition *model = models[i];
-		if (model == NULL)
-		{
-			break;
-		}
-		if (strncmp(asset, model->name, 80) == 0)
-		{
-			return model;
-		}
-	}
-
-	if (modelId >= MAX_MODELS)
-	{
-		Error("Model ID heap exhausted. Please increase MAX_MODELS");
-	}
-
-	Asset *assetData = DecompressAsset(asset, false);
-	if (assetData == NULL)
-	{
-		LogError("Failed to load model from asset, asset was NULL!");
-		Error("Failed to load model!");
-	}
-	ModelDefinition *model = malloc(sizeof(ModelDefinition));
-	CheckAlloc(model);
-
-	model->id = modelId;
-	models[modelId] = model;
-	modelId++;
-
-	const size_t nameLength = strlen(asset) + 1;
-	model->name = malloc(nameLength);
-	CheckAlloc(model->name);
-	strncpy(model->name, asset, nameLength);
-
-	size_t offset = 0;
-	model->materialCount = ReadUint(assetData->data, &offset);
-	model->skinCount = ReadUint(assetData->data, &offset);
-	model->lodCount = ReadUint(assetData->data, &offset);
-	model->skins = malloc(sizeof(Material *) * model->skinCount);
-	CheckAlloc(model->skins);
-
-	const size_t skinSize = sizeof(Material) * model->materialCount;
-	for (int i = 0; i < model->skinCount; i++)
-	{
-		model->skins[i] = malloc(skinSize);
-		CheckAlloc(model->skins[i]);
-		Material *skin = model->skins[i];
-		for (int j = 0; j < model->materialCount; j++)
-		{
-			Material *mat = &skin[j];
-
-			mat->id = materialId;
-			materialId++;
-
-			ReadString(assetData->data, &offset, mat->texture, 64);
-			GetColor(ReadUint(assetData->data, &offset), &mat->color);
-			mat->shader = ReadUint(assetData->data, &offset);
-		}
-	}
-
-	model->lods = malloc(sizeof(ModelLod *) * model->lodCount);
-	CheckAlloc(model->lods);
-	for (int i = 0; i < model->lodCount; i++)
-	{
-		model->lods[i] = malloc(sizeof(ModelLod));
-		CheckAlloc(model->lods[i]);
-		ModelLod *lod = model->lods[i];
-
-		lod->id = lodId;
-		lodId++;
-
-		lod->distance = ReadFloat(assetData->data, &offset);
-		lod->vertexCount = ReadUint(assetData->data, &offset);
-
-		const size_t vertexDataSize = lod->vertexCount * sizeof(float) * 8;
-		lod->vertexData = malloc(vertexDataSize);
-		CheckAlloc(lod->vertexData);
-		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
-
-		lod->totalIndexCount = ReadUint(assetData->data, &offset);
-		const size_t indexCountSize = model->materialCount * sizeof(uint);
-		lod->indexCount = malloc(indexCountSize);
-		CheckAlloc(lod->indexCount);
-		ReadBytes(assetData->data, &offset, indexCountSize, lod->indexCount);
-
-		lod->indexData = malloc(sizeof(uint *) * model->materialCount);
-		CheckAlloc(lod->indexData);
-		for (int j = 0; j < model->materialCount; j++)
-		{
-			uint *indexData = malloc(lod->indexCount[j] * sizeof(uint));
-			CheckAlloc(indexData);
-			lod->indexData[j] = indexData;
-			ReadBytes(assetData->data, &offset, lod->indexCount[j] * sizeof(uint), indexData);
-		}
-	}
-
-	if (modelId >= MAX_MODELS - 10)
-	{
-		LogWarning("Model ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_MODELS - modelId);
-	}
-
-	FreeAsset(assetData);
-
-	return model;
-}
-
-inline ModelDefinition *GetModelFromId(const uint id)
-{
-	if (id >= modelId)
-	{
-		Error("Invalid model ID!");
-	}
-
-	return models[id];
-}
-
-Font *LoadFont(const char *asset)
-{
-	Asset *assetData = DecompressAsset(asset, false);
-	if (assetData == NULL)
-	{
-		LogError("Failed to load font from asset, asset was NULL!");
-		Error("Failed to load model!");
-	}
-	if (assetData->size < sizeof(Font) - sizeof(Image *))
-	{
-		LogError("Failed to load font from asset, size was too small!");
-		return NULL;
-	}
-	Font *font = malloc(sizeof(Font));
-	CheckAlloc(font);
-	memcpy(font, assetData->data, sizeof(Font) - sizeof(Image *));
-	char temp[64];
-	strncpy(temp, font->texture, 64);
-	snprintf(font->texture, 80, "texture/%s.gtex", temp);
-	font->image = LoadImage(font->texture);
-	FreeAsset(assetData);
-
-	return font;
 }
 
 void FreeAsset(Asset *asset)

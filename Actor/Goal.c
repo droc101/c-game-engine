@@ -32,13 +32,13 @@ bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, cons
 	if (signal == GOAL_INPUT_ENABLE && !data->enabled)
 	{
 		data->enabled = true;
-		strcpy(this->actorWall->tex, TEXTURE("actor_goal0"));
+		strcpy(this->actorWall->tex, TEXTURE("actor/goal0"));
 		return true;
 	}
 	if (signal == GOAL_INPUT_DISABLE && data->enabled)
 	{
 		data->enabled = false;
-		strcpy(this->actorWall->tex, TEXTURE("actor_goal1"));
+		strcpy(this->actorWall->tex, TEXTURE("actor/goal1"));
 		return true;
 	}
 	return false;
@@ -82,7 +82,7 @@ void GoalInit(Actor *this, const KvList *params, Transform *transform)
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, 0.5f);
 	this->actorWall->b = v2(0, -0.5f);
-	strncpy(this->actorWall->tex, data->enabled ? TEXTURE("actor_goal0") : TEXTURE("actor_goal1"), 80);
+	strncpy(this->actorWall->tex, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"), 80);
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;

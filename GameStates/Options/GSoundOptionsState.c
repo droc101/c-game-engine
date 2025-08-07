@@ -12,6 +12,7 @@
 #include "../../Structs/UI/Controls/Button.h"
 #include "../../Structs/UI/Controls/Slider.h"
 #include "../../Structs/UI/UiStack.h"
+#include "../../Helpers/Core/SoundSystem.h"
 #include "../../Structs/Vector2.h"
 #include "../GOptionsState.h"
 

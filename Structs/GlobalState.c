@@ -13,6 +13,8 @@
 #include "../GameStates/Options/GInputOptionsState.h"
 #include "../GameStates/Options/GSoundOptionsState.h"
 #include "../GameStates/Options/GVideoOptionsState.h"
+#include "../Helpers/Core/AssetLoaders/LevelLoader.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
@@ -21,27 +23,11 @@
 #include "../Helpers/Core/Physics/PhysicsThread.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
-#include "../Helpers/LevelLoader.h"
 #include "../Structs/Level.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "Options.h"
 
 static GlobalState state;
-
-/**
- * callback for when a channel finishes playing (so we can free it)
- * @param channel The channel that finished
- */
-void ChannelFinished(const int channel)
-{
-	if (state.channels[channel] != NULL)
-	{
-		Mix_FreeChunk(state.channels[channel]);
-		state.channels[channel] = NULL;
-	} else
-	{
-		LogWarning("A sound effect channel finished, but it was already NULL!\n");
-	}
-}
 
 void InitOptions()
 {
@@ -63,19 +49,6 @@ void InitState()
 	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
 	state.viewmodel.transform.position.x = 0.5f;
 	state.viewmodel.transform.rotation.y = degToRad(5);
-
-	UpdateVolume();
-
-	StopMusic();
-	Mix_ChannelFinished(ChannelFinished);
-}
-
-void UpdateVolume()
-{
-	const double sfxVol = state.options.sfxVolume * state.options.masterVolume;
-	const double musicVol = state.options.musicVolume * state.options.masterVolume;
-	Mix_Volume(-1, (int)(sfxVol * MIX_MAX_VOLUME));
-	Mix_VolumeMusic((int)(musicVol * MIX_MAX_VOLUME));
 }
 
 inline GlobalState *GetState()
@@ -140,117 +113,12 @@ void ChangeLevel(Level *level)
 	PhysicsThreadUnlockTickMutex();
 }
 
-void ChangeMusic(const char *asset)
-{
-	if (!state.isAudioStarted)
-	{
-		return;
-	}
-
-	StopMusic(); // stop the current music and free its data
-	const Asset *mp3 = DecompressAsset(asset, true);
-	if (mp3 == NULL)
-	{
-		LogError("Failed to load music asset.\n");
-		return;
-	}
-
-	if (mp3->type != ASSET_TYPE_MP3)
-	{
-		LogWarning("ChangeMusic Error: Asset is not a music file.\n");
-		return;
-	}
-
-	const uint mp3Size = mp3->size;
-	Mix_Music *mus = Mix_LoadMUS_RW(SDL_RWFromConstMem(mp3->data, (int)mp3Size), 1);
-	if (mus == NULL)
-	{
-		printf("Mix_LoadMUS_RW Error: %s\n", Mix_GetError());
-		return;
-	}
-	state.music = mus;
-	Mix_FadeInMusic(mus, -1, 500);
-}
-
-void StopMusic()
-{
-	if (!state.isAudioStarted)
-	{
-		return;
-	}
-	if (state.music != NULL)
-	{
-		// stop and free the current music
-		Mix_HaltMusic();
-		Mix_FreeMusic(state.music);
-		state.music = NULL; // set to NULL, so we don't free it again if this function fails
-	}
-}
-
-void PlaySoundEffect(const char *asset)
-{
-	if (!state.isAudioStarted)
-	{
-		return;
-	}
-
-	const Asset *wav = DecompressAsset(asset, true);
-	if (wav == NULL)
-	{
-		LogError("Failed to load sound effect asset.\n");
-		return;
-	}
-	if (wav->type != ASSET_TYPE_WAV)
-	{
-		LogError("PlaySoundEffect Error: Asset is not a sound effect file.\n");
-		return;
-	}
-	const uint wavSize = wav->size;
-	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(wav->data, (int)wavSize), 1);
-	if (chunk == NULL)
-	{
-		LogError("Mix_LoadWAV_RW Error: %s\n", Mix_GetError());
-		return;
-	}
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
-	{
-		if (state.channels[i] == NULL)
-		{
-			state.channels[i] = chunk;
-			Mix_PlayChannel(i, chunk, 0);
-			return;
-		}
-	}
-	LogError("PlaySoundEffect Error: No available channels.\n");
-	Mix_FreeChunk(chunk);
-}
-
 void DestroyGlobalState()
 {
 	SaveOptions(&state.options);
 	DestroyLevel(state.level);
 	free(state.saveData);
 	free(state.camera);
-	if (state.music != NULL)
-	{
-		Mix_HaltMusic();
-		Mix_FreeMusic(state.music);
-	}
-
-	Mix_ChannelFinished(NULL);
-	Mix_HaltChannel(-1);
-
-	// free sound effects
-	if (state.isAudioStarted)
-	{
-		for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
-		{
-			if (state.channels[i] != NULL)
-			{
-				Mix_FreeChunk(state.channels[i]);
-			}
-		}
-	}
 
 	GInputOptionsStateDestroy();
 	GSoundOptionsStateDestroy();

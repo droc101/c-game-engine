@@ -4,6 +4,7 @@
 
 #include "Physbox.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 
 void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
@@ -42,7 +43,7 @@ void CreatePhysboxCollider(Actor *this, const Transform *transform)
 void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
 	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
-	this->actorModel = LoadModel(MODEL("model_cube"));
+	this->actorModel = LoadModel(MODEL("cube"));
 	transform->position.y = -0.3f;
 
 	CreatePhysboxCollider(this, transform);

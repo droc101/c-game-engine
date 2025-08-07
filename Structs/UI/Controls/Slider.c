@@ -169,14 +169,14 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 
 void DrawSlider(const Control *c, const ControlState /*state*/, const Vector2 position)
 {
-	DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface_slider"));
+	DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/slider"));
 
 	const SliderData *data = (SliderData *)c->ControlData;
 	const float handlePos = remap(data->value, data->min, data->max, 0, c->size.x - 18);
 
 	DrawTexture(v2(position.x + handlePos + 4, position.y + 1),
 				v2(10, c->size.y - 2),
-				TEXTURE("interface_slider_thumb"));
+				TEXTURE("interface/slider_thumb"));
 
 	char *buf = data->getLabel(c);
 	DrawTextAligned(buf,

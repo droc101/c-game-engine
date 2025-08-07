@@ -58,14 +58,6 @@ void UpdateWindowSize();
 Vector2 ActualWindowSize();
 
 /**
- * Set the texture parameters (linear, repeat)
- * @param texture The texture name
- * @param linear Whether to use linear filtering (blurring)
- * @param repeat Whether to repeat the texture
- */
-void SetTexParams(const char *texture, bool linear, bool repeat);
-
-/**
  * Get the size of a texture
  * @param texture The texture name
  * @return The size of the texture

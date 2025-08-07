@@ -10,6 +10,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
+#include "../Helpers/Core/SoundSystem.h"
 
 #define COIN_OUTPUT_COLLECTED 2
 
@@ -46,7 +47,7 @@ void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 		GetState()->saveData->blueCoins++;
 		GetState()->saveData->coins += 5;
 	}
-	PlaySoundEffect(SOUND("sfx_coincling"));
+	(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
 	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
 	RemoveActor(this);
 }
@@ -65,7 +66,7 @@ void CoinInit(Actor *this, const KvList *params, Transform *transform)
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, 0.125f);
 	this->actorWall->b = v2(0, -0.125f);
-	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor_bluecoin") : TEXTURE("actor_coin"), 80);
+	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"), 80);
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 0.25f;

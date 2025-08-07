@@ -33,7 +33,7 @@ cmake-build-*/
 /module
 
 # This file is generated on build
-/Assets/Assets.c
+/source_assets/Assets.c
 *.aps
 
 # CLion code style/config that should be included in the repository

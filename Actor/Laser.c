@@ -137,7 +137,7 @@ void LaserInit(Actor *this, const KvList *params, Transform *transform)
 	this->actorWall->a = v2s(0);
 	this->actorWall->b = v2s(0);
 	strncpy(this->actorWall->tex,
-			data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor_triplelaser") : TEXTURE("actor_laser"),
+			data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"),
 			80);
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;

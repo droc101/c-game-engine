@@ -70,9 +70,10 @@ Vector2 MeasureTextNChars(const char *str, uint size, const Font *font, size_t n
  * @param line Line number to get
  * @param out buffer to store the line in
  * @param outBufferSize Size of the buffer, if the line is longer than this it will be truncated
+ * @param convertToUppercase
  * @param outBufferSize
  */
-void TextGetLine(const char *str, int line, char *out, size_t outBufferSize);
+void TextGetLine(const char *str, int line, char *out, size_t outBufferSize, bool convertToUppercase);
 
 /**
  * Draw a string of text to the screen with alignment

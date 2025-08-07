@@ -81,7 +81,7 @@ ActorDestroyFunction actorDestroyFunctions[] = {
 	ActorDestroy,
 	ActorDestroy,
 	ActorDestroy,
-	ActorDestroy,
+	SoundPlayerDestroy,
 	ActorDestroy,
 	ActorDestroy,
 	ActorDestroy,
@@ -102,6 +102,7 @@ Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *para
 	actor->actorModel = NULL;
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
+	actor->modColor = COLOR_WHITE;
 	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->SignalHandler = DefaultSignalHandler;
 	actor->Init = actorInitFunctions[actorType];

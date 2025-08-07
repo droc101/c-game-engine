@@ -7,10 +7,13 @@
 #include <string.h>
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Vector2.h"
-#include "../../CommonAssets.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../../Core/AssetLoaders/ShaderLoader.h"
+#include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/AssetReader.h"
 #include "../../Core/Error.h"
 #include "../../Core/Logging.h"
+#include "../../Core/MathEx.h"
 #include "../RenderingHelpers.h"
 #include "GLInternal.h"
 
@@ -174,14 +177,15 @@ bool GL_Init(SDL_Window *wnd)
 	glDebugMessageCallback(GL_DebugMessageCallback, NULL);
 #endif
 
-	uiTexturedShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_hud_textured_f"), OGL_SHADER("GL_hud_textured_v"));
-	uiColoredShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_hud_color_f"), OGL_SHADER("GL_hud_color_v"));
-	wallShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_wall_f"), OGL_SHADER("GL_wall_v"));
-	floorAndCeilingShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_floor_f"), OGL_SHADER("GL_floor_v"));
-	skyShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_sky_f"), OGL_SHADER("GL_sky_v"));
-	modelShadedShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_model_shaded_f"), OGL_SHADER("GL_model_shaded_v"));
-	modelUnshadedShader = GL_ConstructShaderFromAssets(OGL_SHADER("GL_model_unshaded_f"),
-													   OGL_SHADER("GL_model_unshaded_v"));
+	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/hud_textured_f"), SHADER("gl/hud/hud_textured_v"));
+	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/hud_color_f"), SHADER("gl/hud/hud_color_v"));
+	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/world/wall_f"), SHADER("gl/world/wall_v"));
+	floorAndCeilingShader = GL_ConstructShaderFromAssets(SHADER("gl/world/floor_f"), SHADER("gl/world/floor_v"));
+	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/world/sky_f"), SHADER("gl/world/sky_v"));
+	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_shaded_f"),
+													 SHADER("gl/model/model_shaded_v"));
+	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model/model_unshaded_f"),
+													   SHADER("gl/model/model_unshaded_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
@@ -273,15 +277,15 @@ void GL_DestroyGL()
 
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
-	Asset *fragmentSource = DecompressAsset(fsh, false);
-	Asset *vertexSource = DecompressAsset(vsh, false);
+	Shader *fragmentSource = LoadShader(fsh);
+	Shader *vertexSource = LoadShader(vsh);
 	if (fragmentSource == NULL || vertexSource == NULL)
 	{
 		Error("Failed to load shaders!");
 	}
-	GL_Shader *shd = GL_ConstructShader((char *)fragmentSource->data, (char *)vertexSource->data);
-	FreeAsset(fragmentSource);
-	FreeAsset(vertexSource);
+	GL_Shader *shd = GL_ConstructShader(fragmentSource->glsl, vertexSource->glsl);
+	FreeShader(fragmentSource);
+	FreeShader(vertexSource);
 	return shd;
 }
 
@@ -379,37 +383,44 @@ void GL_LoadTextureFromAsset(const char *texture)
 		}
 	}
 
-	const int slot = GL_RegisterTexture(image->pixelData, (int)image->width, (int)image->height);
+	const int slot = GL_RegisterTexture(image);
 
 	glAssetTextureMap[image->id] = slot;
 }
 
-int GL_RegisterTexture(const byte *pixelData, const int width, const int height)
+int GL_RegisterTexture(const Image *image)
 {
 	const int slot = glNextFreeSlot;
 
 	glGenTextures(1, &glTextures[slot]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)image->width, (GLsizei)image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixelData);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP);
 
-	if (GetState()->options.mipmaps)
+	if (GetState()->options.mipmaps && image->mipmaps)
 	{
 		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (image->filter)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		} else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
 	} else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, image->filter ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->filter ? GL_LINEAR : GL_NEAREST);
 	}
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, pixelData);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)image->width, (GLsizei)image->height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image->pixelData);
 
 	glNextFreeSlot++;
 
@@ -431,13 +442,13 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 	GL_ModelBuffers *buf = malloc(sizeof(GL_ModelBuffers));
 	CheckAlloc(buf);
 	buf->lodCount = model->lodCount;
-	buf->materialCount = model->materialCount;
+	buf->materialCount = model->materialsPerSkin;
 	buf->buffers = malloc(sizeof(void *) * model->lodCount);
 	CheckAlloc(buf->buffers);
 
 	for (size_t l = 0; l < buf->lodCount; l++)
 	{
-		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialCount);
+		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialsPerSkin);
 		CheckAlloc(buf->buffers[l]);
 
 		for (size_t m = 0; m < buf->materialCount; m++)
@@ -451,7 +462,7 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 
 			glBindBuffer(GL_ARRAY_BUFFER, modelBuffer->vertexBufferObject);
 			glBufferData(GL_ARRAY_BUFFER,
-						 (long)(model->lods[l]->vertexCount * sizeof(float) * 8),
+						 (long)(model->lods[l]->vertexCount * sizeof(float) * 12),
 						 model->lods[l]->vertexData,
 						 GL_STATIC_DRAW);
 
@@ -658,31 +669,6 @@ void GL_DrawRectOutline(const Vector2 pos, const Vector2 size, const Color color
 	glEnableVertexAttribArray(posAttrLoc);
 
 	glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, NULL);
-}
-
-void GL_SetTexParams(const char *texture, const bool linear, const bool repeat)
-{
-	GL_LoadTextureFromAsset(texture); // make sure the texture is loaded
-
-	const Image *image = LoadImage(texture);
-
-	const GLuint glTextureID = glTextures[glAssetTextureMap[image->id]];
-
-	glBindTexture(GL_TEXTURE_2D, glTextureID);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-
-	if (GetState()->options.mipmaps)
-	{
-		glTexParameteri(GL_TEXTURE_2D,
-						GL_TEXTURE_MIN_FILTER,
-						linear ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, linear ? GL_LINEAR : GL_NEAREST);
-	} else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, linear ? GL_LINEAR : GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, linear ? GL_LINEAR : GL_NEAREST);
-	}
 }
 
 void GL_DrawTexture_Internal(const Vector2 pos,
@@ -1081,7 +1067,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 		GL_DrawFloor(floorStart, floorEnd, level->ceilOrSkyTex, 0.5f, 0.8f);
 	} else
 	{
-		GL_RenderModel(skyModel, skyModelWorldMatrix, 0, 0);
+		GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
@@ -1108,7 +1094,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 			GL_DrawActorWall(actor, actorXfm);
 		} else
 		{
-			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod);
+			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
 		}
 	}
 
@@ -1129,7 +1115,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0);
+		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
 	}
 
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -1141,11 +1127,14 @@ void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
 						const uint lod,
 						const int material,
-						const uint skin)
+						const uint skin,
+						Color modColor)
 {
-	Material *skinMats = model->skins[skin];
+	const uint realSkin = clamp(skin, 0, model->skinCount - 1);
+	const size_t *skinIndices = model->skins[realSkin];
+	const Material mat = model->materials[skinIndices[material]];
 
-	const ModelShader shader = skinMats[material].shader;
+	const ModelShader shader = mat.shader;
 
 	const GL_Shader *glShader = NULL;
 	switch (shader)
@@ -1160,7 +1149,8 @@ void GL_RenderModelPart(const ModelDefinition *model,
 			glShader = modelUnshadedShader;
 			break;
 		default:
-			Error("Invalid shader for model drawing");
+			LogError("Invalid shader for model drawing\n");
+			return;
 	}
 
 	glUseProgram(glShader->program);
@@ -1170,7 +1160,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 		GL_LoadTextureFromAsset(GetState()->level->ceilOrSkyTex);
 	} else
 	{
-		GL_LoadTextureFromAsset(skinMats[material].texture);
+		GL_LoadTextureFromAsset(mat.texture);
 	}
 
 
@@ -1186,35 +1176,46 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	GL_LoadModel(model, lod, material);
 
 	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)0);
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(posAttrLoc);
 
 	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
+	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(colAttrLoc);
 
 	if (shader == SHADER_SHADED) // other shaders do not take normals
 	{
 		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
-		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(normAttrLoc);
 	}
 
 	if (shader != SHADER_SKY)
 	{
 		const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
-		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(skinMats[material].color));
+		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(mat.color));
+
+		const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
+		glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(modColor));
 	}
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, const uint skin, const uint lod)
+void GL_RenderModel(const ModelDefinition *model,
+					const mat4 modelWorldMatrix,
+					const uint skin,
+					const uint lod,
+					const Color modColor)
 {
 	glEnable(GL_CULL_FACE);
-	for (int m = 0; m < model->materialCount; m++)
+	for (int m = 0; m < model->materialsPerSkin; m++)
 	{
-		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin);
+		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin, modColor);
 	}
 	glDisable(GL_CULL_FACE);
 }

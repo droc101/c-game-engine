@@ -3,12 +3,14 @@
 //
 
 #include "TestActor.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Navigation.h"
 #include "../Structs/Actor.h"
+#include "../Structs/GlobalState.h"
 
 bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
@@ -70,7 +72,7 @@ void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 
 	this->actorFlags = ACTOR_FLAG_ENEMY;
 
-	this->actorModel = LoadModel(MODEL("model_leafy"));
+	this->actorModel = LoadModel(MODEL("leafy"));
 	this->currentSkinIndex = 0;
 	this->SignalHandler = TestActorSignalHandler;
 	this->extraData = calloc(1, sizeof(NavigationConfig));
@@ -94,6 +96,7 @@ void TestActorUpdate(Actor *this, const double delta)
 {
 	(void)this;
 	(void)delta;
+	this->modColor.r = sin(GetState()->physicsFrame / 10.0f) + 1.0f / 2.0f;
 	// JPH_Quat rotation;
 	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
 	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);

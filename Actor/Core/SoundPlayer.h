@@ -9,4 +9,6 @@
 
 void SoundPlayerInit(Actor *this, const KvList *params, Transform *);
 
+void SoundPlayerDestroy(Actor *this);
+
 #endif //SOUNDPLAYER_H

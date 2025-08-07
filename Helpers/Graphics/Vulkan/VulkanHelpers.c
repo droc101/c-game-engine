@@ -64,21 +64,20 @@ Buffers buffers = {
 };
 #pragma endregion variables
 
-VkResult CreateShaderModule(const char *path, LunaShaderModule *shaderModule)
+VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaShaderModule *shaderModule)
 {
-	Asset *shader = DecompressAsset(path, false);
+	Shader *shader = LoadShader(path);
 	if (!shader)
 	{
 		return VK_ERROR_UNKNOWN;
 	}
+	assert(shader->platform == PLATFORM_VULKAN);
+	assert(shader->type == shaderType);
 
-	// sizeof(uint32_t) * 4 is the asset header
-	VulkanTestReturnResult(lunaCreateShaderModule((uint32_t *)shader->data,
-												  shader->size - sizeof(uint32_t) * 4,
-												  shaderModule),
+	VulkanTestReturnResult(lunaCreateShaderModule(shader->spirv, shader->spirvLength * sizeof(uint32_t), shaderModule),
 						   "Failed to create shader module!");
 
-	FreeAsset(shader);
+	FreeShader(shader);
 	return VK_SUCCESS;
 }
 

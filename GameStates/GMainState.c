@@ -23,6 +23,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GPauseState.h"
 
 static Actor *targetedEnemy = NULL;
@@ -33,7 +34,7 @@ void GMainStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		PlaySoundEffect(SOUND("sfx_popup"));
+		(void)PlaySoundEffect(SOUND("sfx/popup"), 0, 1, NULL, NULL);
 		GPauseStateSet();
 		return;
 	}
@@ -142,7 +143,7 @@ void GMainStateRender(GlobalState *state)
 	RenderLevel3D(level, state->camera);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
-	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface_hud_ycoin"));
+	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface/hud_ycoin"));
 
 	char coinStr[16];
 	sprintf(coinStr, "%d", state->saveData->coins);
@@ -153,7 +154,7 @@ void GMainStateRender(GlobalState *state)
 	for (int blueCoinIndex = 0; blueCoinIndex < state->saveData->blueCoins; blueCoinIndex++)
 	{
 		coinIconRect.x = WindowWidth() - 260 + blueCoinIndex * 48;
-		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface_hud_bcoin"));
+		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface/hud_bcoin"));
 	}
 
 	Color crosshairColor = COLOR(0xFFFFCCCC);
@@ -164,7 +165,7 @@ void GMainStateRender(GlobalState *state)
 
 	DrawTextureMod(v2((WindowWidth() * 0.5) - 12, (WindowHeight() * 0.5) - 12),
 				   v2s(24),
-				   TEXTURE("interface_crosshair"),
+				   TEXTURE("interface/crosshair"),
 				   crosshairColor);
 
 	DPrintF("Position: (%.2f, %.2f, %.2f)\nRotation: %.4f (%.2fdeg)",

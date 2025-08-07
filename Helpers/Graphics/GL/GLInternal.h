@@ -140,12 +140,10 @@ void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm);
 
 /**
  * Register a texture from pixel data
- * @param pixelData The raw RGBA8 pixel data
- * @param width The width of the texture
- * @param height The height of the texture
+ * @param image The height of the texture
  * @return The slot the texture was registered in
  */
-int GL_RegisterTexture(const unsigned char *pixelData, int width, int height);
+int GL_RegisterTexture(const Image *image);
 
 /**
  * Draw a textured rectangle to the screen
@@ -226,8 +224,14 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture);
  * @param lod The level of detail to render
  * @param material The material to render
  * @param skin The skin to use for the model
+ * @param modColor
  */
-void GL_RenderModelPart(const ModelDefinition *model, const mat4 modelWorldMatrix, uint lod, int material, uint skin);
+void GL_RenderModelPart(const ModelDefinition *model,
+						const mat4 modelWorldMatrix,
+						uint lod,
+						int material,
+						uint skin,
+						Color modColor);
 
 
 #endif //GLINTERNAL_H

@@ -8,7 +8,6 @@
 #include <cglm/cglm.h>
 #include <joltc.h>
 #include <SDL.h>
-#include <SDL_mixer.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "config.h"
@@ -156,25 +155,11 @@ typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId
 enum AssetType
 {
 	ASSET_TYPE_TEXTURE = 0,
-	ASSET_TYPE_MP3 = 1,
-	ASSET_TYPE_WAV = 2,
-	ASSET_TYPE_LEVEL = 3,
-	ASSET_TYPE_GLSL = 4,
-	ASSET_TYPE_SPIRV_FRAG = 5,
-	ASSET_TYPE_SPIRV_VERT = 6,
-	ASSET_TYPE_MODEL = 7,
-	ASSET_TYPE_FONT = 8
-};
-
-/**
- * Use to get data from a decompressed image asset using @c ReadUintA
- */
-enum ImageDataOffsets
-{
-	IMAGE_SIZE_OFFSET = 0,
-	IMAGE_WIDTH_OFFSET = 4,
-	IMAGE_HEIGHT_OFFSET = 8,
-	IMAGE_ID_OFFSET = 12
+	ASSET_TYPE_WAV = 1,
+	ASSET_TYPE_LEVEL = 2,
+	ASSET_TYPE_SHADER = 3,
+	ASSET_TYPE_MODEL = 4,
+	ASSET_TYPE_FONT = 5
 };
 
 /**
@@ -397,11 +382,6 @@ struct ActorWall
 // Utility functions are in Structs/level.h
 struct Level
 {
-	/// The level's display name
-	char name[32];
-	/// The level's display course number, with -1 being none
-	short courseNum;
-
 	/// The list of actors in the level
 	LockingList actors;
 	/// The list of walls in the level
@@ -479,11 +459,11 @@ struct Options
 	/* Audio */
 
 	/// The volume of the music
-	double musicVolume;
+	float musicVolume;
 	/// The volume of the sound effects
-	double sfxVolume;
+	float sfxVolume;
 	/// The master volume
-	double masterVolume;
+	float masterVolume;
 } __attribute__((packed)); // This is packed because it is saved to disk
 
 // Global state of the game
@@ -515,12 +495,6 @@ struct GlobalState
 
 	/// Game options
 	Options options;
-	/// Whether the audio system has been started successfully
-	bool isAudioStarted;
-	/// background music
-	Mix_Music *music;
-	/// sound effects
-	Mix_Chunk *channels[SFX_CHANNEL_COUNT];
 
 	/// The path to the executable
 	char executablePath[261];
@@ -557,6 +531,8 @@ struct Actor
 	uint currentSkinIndex;
 	/// The current LOD level of the actor's model, re-calculated each physics tick
 	uint currentLod;
+	/// The color modifier of the actor's model
+	Color modColor;
 
 	/// The actor's wall, in global space
 	ActorWall *actorWall;
@@ -591,25 +567,30 @@ struct Actor
 struct Asset
 {
 	/// The compressed size of the asset, excluding the header
-	uint compressedSize;
+	size_t compressedSize;
 	/// The decompressed size of the asset
-	uint size;
+	size_t size;
 	/// The type of the asset
 	AssetType type;
+	/// The version of the type
+	uint8_t typeVersion;
 	/// The data of the asset
 	byte *data;
 };
 
 struct Image
 {
-	/// The size of the pixel data (width * height * 4)
-	uint pixelDataSize;
 	/// The width of the image
-	uint width;
+	size_t width;
 	/// The height of the image
-	uint height;
+	size_t height;
 	/// The ID of the image. This is generated at runtime and not consistent between runs.
 	uint id;
+
+	bool filter;
+	bool repeat;
+	bool mipmaps;
+
 	/// The name of the image
 	char *name;
 	/// The pixel data of the image
@@ -619,30 +600,30 @@ struct Image
 struct Font
 {
 	/// The texture width of one character
-	uint width;
+	uint8_t width;
 	/// The texture height (including below baseline)
-	uint textureHeight;
+	uint8_t textureHeight;
 	/// The pixel coordinate of the baseline
-	uint baseline;
+	uint8_t baseline;
 	/// The pixels between characters
-	uint charSpacing;
+	uint8_t charSpacing;
 	/// The pixels between lines
-	uint lineSpacing;
+	uint8_t lineSpacing;
 	/// The width of a space character
-	uint spaceWidth;
+	uint8_t spaceWidth;
 	/// The default size of the font, used for calculating scale
-	uint defaultSize;
+	uint8_t defaultSize;
 	/// The number of characters in the font
-	uint charCount;
+	uint8_t charCount;
 	/// Whether this font only contains uppercase characters
 	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char texture[80];
+	char* texture;
 	/// The index of the character in the texture
-	byte indices[128];
+	uint8_t indices[255];
 	/// The width of each character, index directly by the character
-	byte charWidths[128];
+	uint8_t charWidths[255];
 
 	/// The image loaded from the texture
 	Image *image;
@@ -662,7 +643,7 @@ struct Material
 	size_t id;
 
 	/// The texture name of the material
-	char texture[64];
+	char *texture;
 	/// The tint color of the material
 	Color color;
 	/// The shader to use for this material
@@ -674,12 +655,12 @@ struct ModelLod
 	/// The runtime-generated ID of this model
 	size_t id;
 
-	/// How far away the camera must be before this LOD is used
-	float distance;
+	/// How far away the camera must be before this LOD is used (units squared)
+	float distanceSquared;
 
 	/// The number of vertices in the model
-	uint vertexCount;
-	/// Packed vertex data, (X Y Z) (U V) (NX NY NZ)
+	size_t vertexCount;
+	/// Packed vertex data, (X Y Z) (U V) (R G B A) (NX NY NZ)
 	float *vertexData;
 
 	/// The total number of indices across all materials
@@ -698,13 +679,18 @@ struct ModelDefinition
 	char *name;
 
 	/// The number of materials in the model
-	byte materialCount;
+	size_t materialCount;
+
+	size_t materialsPerSkin;
+
 	/// The number of skins in the model
-	byte skinCount;
+	size_t skinCount;
 	/// The number of LODs in the model
-	byte lodCount;
-	/// The skins for this model, each an array of materialCount materials
-	Material **skins;
+	size_t lodCount;
+
+	Material *materials;
+	/// The skins for this model, each an array of materialsPerSkin indices into the materials array
+	size_t **skins;
 	/// The LODs for this model
 	ModelLod **lods;
 };

@@ -4,6 +4,7 @@
 
 #include "Error.h"
 #include <errno.h>
+#include <SDL_mixer.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,11 +47,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	}
 
 	char messageBuffer[256];
-#ifdef BUILDSTYLE_DEBUG
 	sprintf(messageBuffer, "%s\n \n%s:%d (%s)\n", error, file, line, function);
-#else
-	sprintf(messageBuffer, "%s", error);
-#endif
 
 	LogError(messageBuffer);
 

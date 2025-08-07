@@ -10,6 +10,7 @@
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "Laser.h"
 
 #define LASER_EMITTER_INPUT_DISABLE 2
@@ -82,7 +83,7 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->hasTicked = false;
 
-	this->actorModel = LoadModel(MODEL("model_laseremitter"));
+	this->actorModel = LoadModel(MODEL("laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
 	JPH_Quat rotation = {};

@@ -16,6 +16,7 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "GMainState.h"
 #include "GMenuState.h"
 
@@ -57,13 +58,13 @@ void GLevelSelectStateRender(GlobalState * /*State*/)
 	FontDrawString(v2(20, 20), GAME_TITLE, 128, COLOR_WHITE, largeFont);
 	FontDrawString(v2(20, 150), "Press Space to start.", 32, COLOR(0xFFa0a0a0), largeFont);
 
-	char levelNameBuffer[64];
+	char levelNameBuffer[128];
 
 	if (levelList.length > 0)
 	{
 		char *levelName = ListGetPointer(levelList, selectedLevel);
 
-		sprintf(levelNameBuffer, "%02d %s", selectedLevel + 1, levelName);
+		snprintf(levelNameBuffer, 128, "%s", levelName);
 	} else
 	{
 		strcpy((char *)&levelNameBuffer, "No levels found");
@@ -72,11 +73,11 @@ void GLevelSelectStateRender(GlobalState * /*State*/)
 	DrawTextAligned(levelNameBuffer,
 					32,
 					COLOR_WHITE,
-					v2(50, 300),
-					v2(WindowWidthFloat() - 50, 300),
+					v2(50, 250),
+					v2(WindowWidthFloat() - 50, 250),
 					FONT_HALIGN_LEFT,
 					FONT_VALIGN_MIDDLE,
-					largeFont);
+					smallFont);
 }
 
 void LoadLevelList()

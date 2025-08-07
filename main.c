@@ -15,6 +15,7 @@
 #include "Helpers/Core/Input.h"
 #include "Helpers/Core/Logging.h"
 #include "Helpers/Core/Physics/PhysicsThread.h"
+#include "Helpers/Core/SoundSystem.h"
 #include "Helpers/Core/Timing.h"
 #include "Helpers/Graphics/Drawing.h"
 #include "Helpers/Graphics/LodThread.h"
@@ -88,25 +89,6 @@ void InitSDL()
 }
 
 /**
- * Initialize the audio system (SDL_mixer)
- */
-void InitAudio()
-{
-	Mix_AllocateChannels(SFX_CHANNEL_COUNT);
-
-	if (Mix_OpenAudio(48000, AUDIO_S16, 2, 2048) == 0)
-	{
-		GetState()->isAudioStarted = true;
-	} else
-	{
-		GetState()->isAudioStarted = false;
-		LogError("Mix_OpenAudio Error: %s\n", Mix_GetError());
-	}
-
-	UpdateVolume();
-}
-
-/**
  * Initialize the game window and renderer
  */
 void WindowAndRenderInit()
@@ -151,7 +133,7 @@ void WindowAndRenderInit()
 	SDL_SetWindowMinimumSize(window, MIN_WIDTH, MIN_HEIGHT);
 	SDL_SetWindowMaximumSize(window, MAX_WIDTH, MAX_HEIGHT);
 
-	windowIcon = ToSDLSurface(TEXTURE("interface_icon"), "1");
+	windowIcon = ToSDLSurface(TEXTURE("interface/icon"), "1");
 	SDL_SetWindowIcon(window, windowIcon);
 }
 
@@ -229,7 +211,6 @@ void HandleEvent(SDL_Event event, bool *shouldQuit)
 	}
 }
 
-// TODO: Add cache to the github actions workflows
 int main(const int argc, char *argv[])
 {
 	ErrorHandlerInit();
@@ -272,16 +253,11 @@ int main(const int argc, char *argv[])
 		RenderInitError();
 	}
 
-	InitAudio();
+	InitSoundSystem();
 
 	WindowAndRenderInit();
 
 	InitCommonAssets();
-
-	if (!ChangeLevelByName(STARTING_LEVEL))
-	{
-		Error("Failed to load starting level!");
-	}
 
 	GLogoSplashStateSet();
 
@@ -351,7 +327,7 @@ int main(const int argc, char *argv[])
 		state->camera->transform.position.y = state->level->player.transform.position.y; // + state->camera->yOffset;
 		state->camera->transform.position.z = state->level->player.transform.position.z;
 		state->camera->transform.rotation = state->level->player.transform.rotation;
-		state->viewmodel.transform.position.y = GetState()->camera->yOffset * 0.2f - 0.35f;
+		state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 
 		state->RenderGame(state);
 
@@ -382,6 +358,7 @@ int main(const int argc, char *argv[])
 	LodThreadDestroy();
 	InputDestroy();
 	DestroyGlobalState();
+	DestroySoundSystem();
 	RenderDestroy();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);

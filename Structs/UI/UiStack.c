@@ -262,7 +262,7 @@ void DrawUiStack(const UiStack *stack)
 								 v2(c->size.x + 8, c->size.y + 8),
 								 16,
 								 16,
-								 TEXTURE("interface_focus_rect"));
+								 TEXTURE("interface/focus_rect"));
 		}
 	}
 }

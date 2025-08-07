@@ -44,7 +44,7 @@ void LogInternal(const char *type, int color, bool flush, const char *message, .
  * Log a warning message
  * @param ... Format arguments
  */
-#define LogWarning(...) LogInternal("INFO", 33, FLUSH_ON_WARNING, __VA_ARGS__)
+#define LogWarning(...) LogInternal("WARN", 33, FLUSH_ON_WARNING, __VA_ARGS__)
 
 /**
  * Log an error message

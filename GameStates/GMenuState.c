@@ -12,6 +12,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Structs/Vector2.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
@@ -49,14 +50,15 @@ void GMenuStateRender(GlobalState *State)
 	RenderMenuBackground();
 
 	// draw the logo
-	SDL_Rect logoRect;
-	logoRect.x = (WindowWidth() - 480) / 2;
-	logoRect.y = 32;
-	logoRect.w = 480;
-	logoRect.h = 320;
-	DrawTexture(v2((float)logoRect.x, (float)logoRect.y),
-				v2((float)logoRect.w, (float)logoRect.h),
-				TEXTURE("interface_menu_logo"));
+	Vector2 logoPosition;
+	Vector2 logoSize;
+	logoPosition.x = ((float)WindowWidth() - 480) / 2;
+	logoPosition.y = 32;
+	logoSize.x = 480;
+	logoSize.y = 320;
+	DrawTexture(logoPosition,
+				logoSize,
+				TEXTURE("interface/menu_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
 	FontDrawString(v2(20, 200), "DEBUG BUILD", 16, COLOR(0xFF00FF00), smallFont);

@@ -51,9 +51,6 @@
 // Shows a level select after main menu and pause exit course.
 #define USE_LEVEL_SELECT
 
-// Show error trace in release builds (function, source, and line #)
-#define ERROR_TRACE_IN_RELEASE
-
 // Enable or disable the frame benchmark system
 #define BENCHMARK_SYSTEM_ENABLE
 
@@ -80,18 +77,11 @@
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 0
 #define VERSION_PATCH 1
-#define VERSION_SUFFIX "-physics"
+#define VERSION_SUFFIX "-assets-v2"
 #define VERSION TO_STR(VERSION_MAJOR) "." TO_STR(VERSION_MINOR) "." TO_STR(VERSION_PATCH) VERSION_SUFFIX
 
 #define APPDATA_ORG_NAME "Droc101 Development"
 #define APPDATA_APP_NAME "Game"
-
-/// The level to start on when the game loads
-#define STARTING_LEVEL "leveldata_test"
-
-/// Number of sound effect channels
-/// (sound effects that can play at the same time)
-#define SFX_CHANNEL_COUNT 16
 
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60

@@ -5,6 +5,7 @@
 #include "StaticModel.h"
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
+#include "../../Helpers/Core/AssetLoaders/ModelLoader.h"
 
 static void StaticModelCreateBody(Actor *this, const Transform *transform)
 {

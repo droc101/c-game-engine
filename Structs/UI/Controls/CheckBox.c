@@ -9,6 +9,7 @@
 #include "../../../Helpers/Core/Input.h"
 #include "../../../Helpers/Graphics/Drawing.h"
 #include "../../../Helpers/Graphics/Font.h"
+#include "../../../Helpers/Core/SoundSystem.h"
 #include "../../GlobalState.h"
 #include "../../Vector2.h"
 
@@ -47,7 +48,7 @@ void UpdateCheckbox(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint 
 
 	if (HasActivation(stack, c))
 	{
-		PlaySoundEffect(SOUND("sfx_click"));
+		(void)PlaySoundEffect(SOUND("sfx/click"), 0, 1, NULL, NULL);
 		data->checked = !data->checked;
 
 		ConsumeMouseButton(SDL_BUTTON_LEFT);
@@ -77,5 +78,5 @@ void DrawCheckbox(const Control *c, ControlState /*state*/, const Vector2 positi
 	const Vector2 boxPos = v2(position.x + 2, position.y + c->size.y / 2 - boxSize.y / 2);
 	DrawTexture(boxPos,
 				boxSize,
-				data->checked ? TEXTURE("interface_checkbox_checked") : TEXTURE("interface_checkbox_unchecked"));
+				data->checked ? TEXTURE("interface/checkbox_checked") : TEXTURE("interface/checkbox_unchecked"));
 }

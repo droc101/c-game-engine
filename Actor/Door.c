@@ -306,7 +306,7 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, -0.5f);
 	this->actorWall->b = v2(0, 0.5f);
-	strncpy(this->actorWall->tex, TEXTURE("actor_door"), 80);
+	strncpy(this->actorWall->tex, TEXTURE("actor/door"), 80);
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;

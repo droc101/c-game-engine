@@ -47,14 +47,6 @@ void GL_Swap();
 void GL_DestroyGL();
 
 /**
- * Set the filter/repeat parameters for a texture
- * @param texture The texture name
- * @param linear Whether to use linear filtering
- * @param repeat Whether to repeat the texture
- */
-void GL_SetTexParams(const char *texture, bool linear, bool repeat);
-
-/**
  * Draw a rectangle
  * @param pos The position in pixels
  * @param size The size in pixels
@@ -200,8 +192,9 @@ void GL_RenderLevel(const Level *level, const Camera *camera);
  * @param modelWorldMatrix The model -> world matrix
  * @param skin The skin to use
  * @param lod The lod to use
+ * @param modColor
  */
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, uint skin, uint lod);
+void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, uint skin, uint lod, Color modColor);
 
 /**
  * Render the level's static walls

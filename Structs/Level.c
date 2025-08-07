@@ -21,14 +21,12 @@ Level *CreateLevel(void)
 	ListInit(level->walls, LIST_POINTER);
 	PhysicsInitLevel(level);
 	CreatePlayerCollider(level);
-	strncpy(level->ceilOrSkyTex, "texture/level_sky_test.gtex", 28);
-	strncpy(level->floorTex, "texture/level_floor_test.gtex", 30);
+	strncpy(level->ceilOrSkyTex, "texture/level/sky_test.gtex", 28);
+	strncpy(level->floorTex, "texture/level/floor_test.gtex", 30);
 	strncpy(level->music, "none", 5);
 	level->fogColor = 0xff000000;
 	level->fogStart = 10;
 	level->fogEnd = 30;
-	strncpy(level->name, "Unnamed Level", 32);
-	level->courseNum = -1;
 	ListInit(level->namedActorNames, LIST_POINTER);
 	ListInit(level->namedActorPointers, LIST_POINTER);
 	return level;
