@@ -92,6 +92,7 @@ typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId
 #define PHYSICS_TARGET_MS_D (1000.0 / PHYSICS_TARGET_TPS)
 #define PHYSICS_TARGET_NS (1000000000 / PHYSICS_TARGET_TPS) // nanoseconds because precision
 #define PHYSICS_TARGET_NS_D (1000000000.0 / PHYSICS_TARGET_TPS)
+#define PHYSICS_MIN_NS_D (1000000000.0 / PHYSICS_MIN_TPS)
 
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons
 #define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_B : SDL_CONTROLLER_BUTTON_A)

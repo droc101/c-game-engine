@@ -11,6 +11,7 @@
 #include "../Error.h"
 #include "../Input.h"
 #include "../Logging.h"
+#include "../MathEx.h"
 #include "../Timing.h"
 
 static SDL_Thread *physicsThread;
@@ -75,12 +76,12 @@ int PhysicsThreadMain(void *)
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
 			const ulong delayMs = (PHYSICS_TARGET_NS - timeElapsed) / 1000000;
-			SDL_Delay(delayMs);
+			SDL_Delay(delayMs + 1000);
 		}
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
 		TickGraphUpdate(timeElapsed);
-		lastTickTime = (double)timeElapsed;
+		lastTickTime = min(PHYSICS_MIN_NS_D, (double)timeElapsed);
 	}
 }
 
