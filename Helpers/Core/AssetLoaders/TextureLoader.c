@@ -25,14 +25,14 @@ void GenFallbackImage(Image *src)
 	src->mipmaps = false;
 	const size_t pixelDataSize = MISSING_TEX_SIZE * MISSING_TEX_SIZE * sizeof(uint32_t);
 	uint32_t *pixelData = malloc(pixelDataSize);
-	CheckAlloc(src->pixelData);
-	src->pixelData = (uint8_t*)pixelData;
+	CheckAlloc(pixelData);
+	src->pixelData = (uint8_t *)pixelData;
 
 	for (int x = 0; x < MISSING_TEX_SIZE; x++)
 	{
 		for (int y = 0; y < MISSING_TEX_SIZE; y++)
 		{
-			if ((x < MISSING_TEX_SIZE/2) ^ (y < MISSING_TEX_SIZE/2))
+			if ((x < MISSING_TEX_SIZE / 2) ^ (y < MISSING_TEX_SIZE / 2))
 			{
 				pixelData[(x + y * MISSING_TEX_SIZE)] = MISSING_TEX_COLOR_A;
 			} else
