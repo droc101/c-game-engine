@@ -41,9 +41,9 @@ struct GL_Buffer
 struct GL_ModelBuffers
 {
 	/// The number of LODs in this buffer
-	size_t lodCount;
+	uint32_t lodCount;
 	/// The number of materials in this buffer
-	size_t materialCount;
+	uint32_t materialCount;
 	/// The buffers, indexed by LOD then material
 	GL_Buffer **buffers;
 };
@@ -207,7 +207,7 @@ void GL_DestroyBuffer(GL_Buffer *buffer);
  * @param lod The LOD to load
  * @param material The material to load
  */
-void GL_LoadModel(const ModelDefinition *model, uint lod, int material);
+void GL_LoadModel(const ModelDefinition *model, uint lod, size_t material);
 
 /**
  * Get the wall buffer for a texture, or create it if it doesn't exist.
@@ -229,7 +229,7 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture);
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
 						uint lod,
-						int material,
+						size_t material,
 						uint skin,
 						Color modColor);
 

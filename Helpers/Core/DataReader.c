@@ -7,7 +7,7 @@
 
 double ReadDouble(const byte *data, size_t *offset)
 {
-	double d;
+	double d = 0;
 	memcpy(&d, data + *offset, sizeof(double));
 	*offset += sizeof(double);
 	return d;
@@ -15,14 +15,14 @@ double ReadDouble(const byte *data, size_t *offset)
 
 double ReadDoubleA(const byte *data, const size_t offset)
 {
-	double d;
+	double d = 0;
 	memcpy(&d, data + offset, sizeof(double));
 	return d;
 }
 
 uint ReadUint(const byte *data, size_t *offset)
 {
-	uint i;
+	uint i = 0;
 	memcpy(&i, data + *offset, sizeof(uint));
 	*offset += sizeof(uint);
 	return i;
@@ -30,7 +30,7 @@ uint ReadUint(const byte *data, size_t *offset)
 
 int ReadInt(const byte *data, size_t *offset)
 {
-	int i;
+	int i = 0;
 	memcpy(&i, data + *offset, sizeof(int));
 	*offset += sizeof(int);
 	return i;
@@ -38,14 +38,14 @@ int ReadInt(const byte *data, size_t *offset)
 
 uint ReadUintA(const byte *data, const size_t offset)
 {
-	uint i;
+	uint i = 0;
 	memcpy(&i, data + offset, sizeof(uint));
 	return i;
 }
 
 float ReadFloat(const byte *data, size_t *offset)
 {
-	float f;
+	float f = 0;
 	memcpy(&f, data + *offset, sizeof(float));
 	*offset += sizeof(float);
 	return f;
@@ -66,7 +66,7 @@ void ReadString(const byte *data, size_t *offset, char *dest, const size_t len)
 
 short ReadShort(const byte *data, size_t *offset)
 {
-	short s;
+	short s = 0;
 	memcpy(&s, data + *offset, sizeof(short));
 	*offset += sizeof(short);
 	return s;
@@ -80,7 +80,7 @@ void ReadBytes(const byte *data, size_t *offset, const size_t len, void *dest)
 
 size_t ReadSizeT(const byte *data, size_t *offset)
 {
-	size_t i;
+	size_t i = 0;
 	memcpy(&i, data + *offset, sizeof(size_t));
 	*offset += sizeof(size_t);
 	return i;

@@ -3,8 +3,8 @@
 //
 
 #include "Font.h"
-#include <string.h>
 #include <ctype.h>
+#include <string.h>
 #include "../../Structs/Vector2.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
@@ -115,7 +115,7 @@ void TextGetLine(const char *str, const int line, char *out, const size_t outBuf
 
 	if (convertToUppercase)
 	{
-		for (int i = 0; i < copySize; i++)
+		for (size_t i = 0; i < copySize; i++)
 		{
 			out[i] = (char)toupper(out[i]);
 		}
@@ -144,7 +144,7 @@ void DrawTextAligned(const char *str,
 	int c = 0;
 
 	const int lines = StringLineCount(str);
-	int x;
+	int x = 0;
 	int y = (int)rectPos.y;
 	if (vAlign == FONT_VALIGN_MIDDLE)
 	{

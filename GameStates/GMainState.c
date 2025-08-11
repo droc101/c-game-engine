@@ -15,6 +15,7 @@
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/Physics/RayCast.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/LodThread.h"
@@ -23,7 +24,6 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
-#include "../Helpers/Core/SoundSystem.h"
 #include "GPauseState.h"
 
 static Actor *targetedEnemy = NULL;
@@ -75,15 +75,15 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
 
-	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
-
-	Update(&state->level->player, state->level->physicsSystem, deltaTime);
-
 	if (WaitForLodThreadToEnd() != 0)
 	{
 		Error("Failed to wait for LOD thread end semaphore!");
 	}
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
+
+	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
+
+	Update(&state->level->player, state->level->physicsSystem, deltaTime);
 
 	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
 

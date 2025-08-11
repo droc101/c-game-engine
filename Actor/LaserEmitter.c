@@ -3,14 +3,13 @@
 //
 
 #include "LaserEmitter.h"
-
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
-#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "Laser.h"
 
 #define LASER_EMITTER_INPUT_DISABLE 2

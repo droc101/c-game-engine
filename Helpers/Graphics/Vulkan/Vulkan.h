@@ -81,6 +81,4 @@ void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, uint32
 
 void VK_DrawJoltDebugRendererTriangle(const Vector3 *vertices, uint32_t color);
 
-void VK_SetTexParams(const char *texture, bool linear, bool repeat);
-
 #endif //GAME_VULKAN_H

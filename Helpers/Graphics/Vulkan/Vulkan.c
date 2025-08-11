@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <luna/luna.h>
 #include <string.h>
+#include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../../Core/AssetReader.h"
 #include "../../Core/MathEx.h"
 #include "../LodThread.h"
 #include "VulkanActors.h"
@@ -88,7 +90,7 @@ bool VK_LoadLevelWalls(const Level *level)
 {
 	if (!level->hasCeiling)
 	{
-		VulkanTest(LoadSky(LoadModel(MODEL("model_sky"))), "Failed to load sky!");
+		VulkanTest(LoadSky(LoadModel(MODEL("sky"))), "Failed to load sky!");
 	}
 
 	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
@@ -219,6 +221,23 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	{
 		VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
 	}
+	if (!level->hasCeiling)
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
+													 buffers.sky.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.sky,
+													 &pipelineBindInfo,
+													 buffers.sky.indexCount,
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw sky!");
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 6, 1, 0, 0),
+							   "Failed to draw floor!");
+	}
 	if (buffers.debugDrawLines.vertexCount)
 	{
 		lunaWriteDataToBuffer(buffers.debugDrawLines.vertices.buffer,
@@ -250,26 +269,26 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw Jolt debug renderer triangles!");
 	}
 
-	// if (buffers.actorWalls.count)
-	// {
-	// 	lunaBindVertexBuffers(0,
-	// 						  2,
-	// 						  (LunaBuffer[]){buffers.actorWalls.vertices.buffer,
-	// 										 buffers.actorWalls.instanceData.buffer},
-	// 						  (VkDeviceSize[]){0, 0});
-	//
-	// 	VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
-	// 														 buffers.actorWalls.indices.buffer,
-	// 														 0,
-	// 														 VK_INDEX_TYPE_UINT32,
-	// 														 pipelines.actorWalls,
-	// 														 &pipelineBindInfo,
-	// 														 buffers.actorWalls.drawInfo.buffer,
-	// 														 0,
-	// 														 buffers.actorWalls.count,
-	// 														 sizeof(VkDrawIndexedIndirectCommand)),
-	// 						   "Failed to draw wall actors!");
-	// }
+	if (buffers.actorWalls.count)
+	{
+		lunaBindVertexBuffers(0,
+							  2,
+							  (LunaBuffer[]){buffers.actorWalls.vertices.buffer,
+											 buffers.actorWalls.instanceData.buffer},
+							  (VkDeviceSize[]){0, 0});
+
+		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
+															 buffers.actorWalls.indices.buffer,
+															 0,
+															 VK_INDEX_TYPE_UINT32,
+															 pipelines.actorWalls,
+															 &pipelineBindInfo,
+															 buffers.actorWalls.drawInfo.buffer,
+															 0,
+															 buffers.actorWalls.count,
+															 sizeof(VkDrawIndexedIndirectCommand)),
+							   "Failed to draw wall actors!");
+	}
 
 	if (buffers.actorModels.shadedDrawInfo.bytesUsed)
 	{
@@ -313,6 +332,28 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 															 sizeof(VkDrawIndexedIndirectCommand)),
 							   "Failed to draw unshaded model actors!");
 	}
+#ifdef JPH_DEBUG_RENDERER_WIREFRAME
+	if (level->hasCeiling)
+	{
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
+							   "Failed to draw floor and ceiling!");
+	}
+	if (buffers.walls.indices.bytesUsed)
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+													 buffers.walls.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 &pipelineBindInfo,
+													 buffers.walls.indices.bytesUsed / sizeof(uint32_t),
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw walls!");
+	}
+#endif
 #else
 	if (level->hasCeiling)
 	{
@@ -854,38 +895,4 @@ void VK_DrawJoltDebugRendererTriangle(const Vector3 *vertices, const uint32_t co
 	(void)vertices;
 	(void)color;
 #endif
-}
-
-void VK_SetTexParams(const char *texture, const bool linear, const bool repeat)
-{
-	const uint32_t textureIndex = TextureIndex(texture);
-	LunaDescriptorImageInfo imageInfo = {
-		.image = ListGetPointer(textures, textureIndex),
-		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-	};
-	if (linear && repeat)
-	{
-		imageInfo.sampler = textureSamplers.linearRepeat;
-	} else if (linear)
-	{
-		imageInfo.sampler = textureSamplers.linearNoRepeat;
-	} else if (repeat)
-	{
-		imageInfo.sampler = textureSamplers.nearestRepeat;
-	} else
-	{
-		imageInfo.sampler = textureSamplers.nearestNoRepeat;
-	}
-	LunaWriteDescriptorSet writeDescriptors[MAX_FRAMES_IN_FLIGHT];
-	for (uint8_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		writeDescriptors[i] = (LunaWriteDescriptorSet){
-			.descriptorSet = descriptorSets[i],
-			.bindingName = "Textures",
-			.descriptorArrayElement = textureIndex,
-			.descriptorCount = 1,
-			.imageInfo = &imageInfo,
-		};
-	}
-	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
 }

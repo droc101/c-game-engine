@@ -7,7 +7,6 @@
 #include "../../../Structs/GlobalState.h"
 #include "../../Core/Error.h"
 #include "../../Core/MathEx.h"
-#include "../LodThread.h"
 #include "VulkanHelpers.h"
 
 VkResult CreateUiBuffers()
@@ -49,11 +48,11 @@ VkResult CreateViewModelBuffers()
 		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 	};
 	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
-		.size = sizeof(ModelInstanceData) * model->materialCount,
+		.size = sizeof(ModelInstanceData) * model->materialsPerSkin,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 	};
 	const LunaBufferCreationInfo drawInfoBufferCreationInfo = {
-		.size = sizeof(VkDrawIndexedIndirectCommand) * model->materialCount,
+		.size = sizeof(VkDrawIndexedIndirectCommand) * model->materialsPerSkin,
 		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
 	};
 	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.viewModel.vertices),
@@ -70,14 +69,14 @@ VkResult CreateViewModelBuffers()
 	CheckAlloc(vertexData);
 	void *indexData = malloc(indexSize);
 	CheckAlloc(indexData);
-	buffers.viewModel.instanceDatas = calloc(model->materialCount, sizeof(ModelInstanceData));
+	buffers.viewModel.instanceDatas = calloc(model->materialsPerSkin, sizeof(ModelInstanceData));
 	CheckAlloc(buffers.viewModel.instanceDatas);
-	VkDrawIndexedIndirectCommand *drawInfos = calloc(model->materialCount, sizeof(VkDrawIndexedIndirectCommand));
+	VkDrawIndexedIndirectCommand *drawInfos = calloc(model->materialsPerSkin, sizeof(VkDrawIndexedIndirectCommand));
 	CheckAlloc(drawInfos);
 	memcpy(vertexData, model->lods[0]->vertexData, vertexSize);
-	for (uint8_t i = 0; i < model->materialCount; i++)
+	for (uint32_t i = 0; i < model->materialsPerSkin; i++)
 	{
-		const Material *material = &model->skins[viewmodel->modelSkin][i];
+		const Material *material = &model->materials[model->skins[viewmodel->modelSkin][i]];
 		memcpy(indexData + sizeof(uint32_t) * indexCount,
 			   model->lods[0]->indexData[i],
 			   sizeof(uint32_t) * model->lods[0]->indexCount[i]);
@@ -86,7 +85,7 @@ VkResult CreateViewModelBuffers()
 		buffers.viewModel.instanceDatas[i].transform[2][2] = 1;
 		buffers.viewModel.instanceDatas[i].transform[3][3] = 1;
 		buffers.viewModel.instanceDatas[i].textureIndex = TextureIndex(material->texture);
-		buffers.viewModel.instanceDatas[i].color = material->color;
+		buffers.viewModel.instanceDatas[i].materialColor = material->color;
 		drawInfos[i].indexCount = model->lods[0]->indexCount[i];
 		drawInfos[i].instanceCount = 1;
 		drawInfos[i].firstIndex = indexCount;
@@ -94,16 +93,16 @@ VkResult CreateViewModelBuffers()
 		indexCount += model->lods[0]->indexCount[i];
 	}
 
-	buffers.viewModel.drawCount = model->materialCount;
+	buffers.viewModel.drawCount = model->materialsPerSkin;
 	lunaWriteDataToBuffer(buffers.viewModel.vertices, vertexData, vertexSize, 0);
 	lunaWriteDataToBuffer(buffers.viewModel.indices, indexData, indexSize, 0);
 	lunaWriteDataToBuffer(buffers.viewModel.instanceDataBuffer,
 						  buffers.viewModel.instanceDatas,
-						  sizeof(ModelInstanceData) * model->materialCount,
+						  sizeof(ModelInstanceData) * model->materialsPerSkin,
 						  0);
 	lunaWriteDataToBuffer(buffers.viewModel.drawInfo,
 						  drawInfos,
-						  sizeof(VkDrawIndexedIndirectCommand) * model->materialCount,
+						  sizeof(VkDrawIndexedIndirectCommand) * model->materialsPerSkin,
 						  0);
 
 	free(vertexData);
@@ -365,6 +364,28 @@ VkResult ResizeActorWallBuffers()
 	return VK_SUCCESS;
 }
 
+VkResult ResizeActorModelInstanceDataBuffer()
+{
+	if (buffers.actorModels.instanceData.allocatedSize < buffers.actorModels.instanceData.bytesUsed)
+	{
+		if (buffers.actorModels.instanceData.allocatedSize != 0)
+		{
+			lunaDestroyBuffer(buffers.actorModels.instanceData.buffer);
+		}
+		buffers.actorModels.instanceData.allocatedSize = buffers.actorModels.instanceData.bytesUsed;
+		const LunaBufferCreationInfo creationInfo = {
+			.size = buffers.actorModels.instanceData.allocatedSize,
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		};
+		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.instanceData.buffer),
+							   "Failed to recreate model actors instance data buffer!");
+		buffers.actorModels.instanceData.data = calloc(1, buffers.actorModels.instanceData.allocatedSize);
+		CheckAlloc(buffers.actorModels.instanceData.data);
+	}
+
+	return VK_SUCCESS;
+}
+
 VkResult ResizeActorModelBuffers()
 {
 	if (buffers.actorModels.vertices.allocatedSize < buffers.actorModels.vertices.bytesUsed)
@@ -399,22 +420,8 @@ VkResult ResizeActorModelBuffers()
 		buffers.actorModels.indices.data = malloc(buffers.actorModels.indices.allocatedSize);
 		CheckAlloc(buffers.actorModels.indices.data);
 	}
-	if (buffers.actorModels.instanceData.allocatedSize < buffers.actorModels.instanceData.bytesUsed)
-	{
-		if (buffers.actorModels.instanceData.allocatedSize != 0)
-		{
-			lunaDestroyBuffer(buffers.actorModels.instanceData.buffer);
-		}
-		buffers.actorModels.instanceData.allocatedSize = buffers.actorModels.instanceData.bytesUsed;
-		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorModels.instanceData.allocatedSize,
-			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.instanceData.buffer),
-							   "Failed to recreate model actors instance data buffer!");
-		buffers.actorModels.instanceData.data = calloc(1, buffers.actorModels.instanceData.allocatedSize);
-		CheckAlloc(buffers.actorModels.instanceData.data);
-	}
+	VulkanTestReturnResult(ResizeActorModelInstanceDataBuffer(),
+						   "Failed to recreate model actors instance data buffer!");
 	if (buffers.actorModels.shadedDrawInfo.allocatedSize < buffers.actorModels.shadedDrawInfo.bytesUsed)
 	{
 		if (buffers.actorModels.shadedDrawInfo.allocatedSize != 0)
@@ -480,16 +487,34 @@ VkResult ResizeDebugDrawBuffers()
 
 bool LoadTexture(const Image *image)
 {
+	const bool useMipmaps = GetState()->options.mipmaps && image->mipmaps;
+	LunaSampler sampler = LUNA_NULL_HANDLE;
+	if (image->filter && image->repeat)
+	{
+		sampler = textureSamplers.linearRepeat;
+	}
+	if (image->filter && !image->repeat)
+	{
+		sampler = textureSamplers.linearNoRepeat;
+	}
+	if (!image->filter && image->repeat)
+	{
+		sampler = textureSamplers.nearestRepeat;
+	}
+	if (!image->filter && !image->repeat)
+	{
+		sampler = textureSamplers.nearestNoRepeat;
+	}
 	const LunaSampledImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.mipmapLevels = GetState()->options.mipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
-		.generateMipmaps = GetState()->options.mipmaps,
+		.mipmapLevels = useMipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.generateMipmaps = useMipmaps,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.pixels = image->pixelData,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		.sampler = textureSamplers.nearestRepeat,
+		.sampler = sampler,
 		.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,

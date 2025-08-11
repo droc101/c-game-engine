@@ -14,8 +14,8 @@
 #define MAX_FRAMES_IN_FLIGHT 1
 #define MAX_UI_QUADS_INIT 8192 // TODO: find best value (and a fix for resizing the buffer mid-frame)
 #define MAX_WALLS_INIT 1024
-#define MAX_WALL_ACTORS_INIT 256
-#define MAX_MODEL_ACTOR_QUADS_INIT 4096
+#define MAX_WALL_ACTORS_INIT 1
+#define MAX_MODEL_ACTOR_QUADS_INIT 1
 #define MAX_DEBUG_DRAW_VERTICES_INIT 1024
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
@@ -94,24 +94,19 @@ typedef struct UiVertex
 
 typedef struct ModelVertex
 {
-	/// The x component of the vertex's position, in model space
-	float x;
-	/// The y component of the vertex's position, in model space
-	float y;
-	/// The z component of the vertex's position, in model space
-	float z;
+	/// The position of the vertex in local space
+	Vector3 position;
 
 	/// The u component of the vertex's uv
 	float u;
 	/// The v component of the vertex's uv
 	float v;
 
-	/// The x component of the vertex's normal vector, in model space
-	float nx;
-	/// The y component of the vertex's normal vector, in model space
-	float ny;
-	/// The z component of the vertex's normal vector, in model space
-	float nz;
+	/// The color of the vertex
+	Color color;
+
+	/// The normal of the vertex
+	Vector3 normal;
 } ModelVertex;
 
 typedef struct ModelInstanceData
@@ -120,15 +115,15 @@ typedef struct ModelInstanceData
 	mat4 transform;
 	/// The instance's texture index.
 	uint32_t textureIndex;
-	/// The tint color of the instance
-	Color color;
+	/// The color of the instance, given by the material
+	Color materialColor;
+	/// The color of the instance, specified per-instance (such as by Actor::modColor)
+	Color instanceColor;
 } ModelInstanceData;
 
 typedef struct SkyVertex
 {
-	float x;
-	float y;
-	float z;
+	Vector3 position;
 
 	float u;
 	float v;
@@ -136,9 +131,7 @@ typedef struct SkyVertex
 
 typedef struct WallVertex
 {
-	float x;
-	float y;
-	float z;
+	Vector3 position;
 
 	float u;
 	float v;
@@ -149,12 +142,8 @@ typedef struct WallVertex
 
 typedef struct ActorWallVertex
 {
-	/// The x component of the vertex's position, in model space
-	float x;
-	/// The y component of the vertex's position, in model space
-	float y;
-	/// The z component of the vertex's position, in model space
-	float z;
+	/// The position of the vertex in local space
+	Vector3 position;
 
 	/// The u component of the vertex's uv
 	float u;

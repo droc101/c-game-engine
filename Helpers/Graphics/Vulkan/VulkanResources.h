@@ -24,6 +24,8 @@ VkResult ResizeWallBuffers();
 
 VkResult ResizeActorWallBuffers();
 
+VkResult ResizeActorModelInstanceDataBuffer();
+
 VkResult ResizeActorModelBuffers();
 
 VkResult ResizeDebugDrawBuffers();

@@ -259,7 +259,7 @@ void GL_DestroyGL()
 	{
 		if (glModels[i] != NULL)
 		{
-			for (size_t j = 0; j < glModels[i]->lodCount; j++)
+			for (uint32_t j = 0; j < glModels[i]->lodCount; j++)
 			{
 				GL_DestroyBuffer(glModels[i]->buffers[j]);
 			}
@@ -395,12 +395,20 @@ int GL_RegisterTexture(const Image *image)
 	glGenTextures(1, &glTextures[slot]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)image->width, (GLsizei)image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixelData);
+	glTexImage2D(GL_TEXTURE_2D,
+				 0,
+				 GL_RGBA,
+				 (GLsizei)image->width,
+				 (GLsizei)image->height,
+				 0,
+				 GL_RGBA,
+				 GL_UNSIGNED_BYTE,
+				 image->pixelData);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 
 	if (GetState()->options.mipmaps && image->mipmaps)
 	{
@@ -420,14 +428,22 @@ int GL_RegisterTexture(const Image *image)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->filter ? GL_LINEAR : GL_NEAREST);
 	}
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)image->width, (GLsizei)image->height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image->pixelData);
+	glTexSubImage2D(GL_TEXTURE_2D,
+					0,
+					0,
+					0,
+					(GLsizei)image->width,
+					(GLsizei)image->height,
+					GL_RGBA,
+					GL_UNSIGNED_INT_8_8_8_8_REV,
+					image->pixelData);
 
 	glNextFreeSlot++;
 
 	return slot;
 }
 
-void GL_LoadModel(const ModelDefinition *model, const uint lod, const int material)
+void GL_LoadModel(const ModelDefinition *model, const uint lod, const size_t material)
 {
 	if (glModels[model->id] != NULL)
 	{
@@ -443,15 +459,15 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 	CheckAlloc(buf);
 	buf->lodCount = model->lodCount;
 	buf->materialCount = model->materialsPerSkin;
-	buf->buffers = malloc(sizeof(void *) * model->lodCount);
+	buf->buffers = malloc(sizeof(GL_Buffer *) * model->lodCount);
 	CheckAlloc(buf->buffers);
 
-	for (size_t l = 0; l < buf->lodCount; l++)
+	for (uint32_t l = 0; l < buf->lodCount; l++)
 	{
 		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialsPerSkin);
 		CheckAlloc(buf->buffers[l]);
 
-		for (size_t m = 0; m < buf->materialCount; m++)
+		for (uint32_t m = 0; m < buf->materialCount; m++)
 		{
 			GL_Buffer *modelBuffer = &buf->buffers[l][m];
 			glGenVertexArrays(1, &modelBuffer->vertexArrayObject);
@@ -1125,13 +1141,13 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
-						const uint lod,
-						const int material,
-						const uint skin,
+						const uint32_t lod,
+						const size_t material,
+						const uint32_t skin,
 						Color modColor)
 {
-	const uint realSkin = clamp(skin, 0, model->skinCount - 1);
-	const size_t *skinIndices = model->skins[realSkin];
+	const uint32_t realSkin = min(skin, model->skinCount - 1);
+	const uint32_t *skinIndices = model->skins[realSkin];
 	const Material mat = model->materials[skinIndices[material]];
 
 	const ModelShader shader = mat.shader;
@@ -1213,9 +1229,9 @@ void GL_RenderModel(const ModelDefinition *model,
 					const Color modColor)
 {
 	glEnable(GL_CULL_FACE);
-	for (int m = 0; m < model->materialsPerSkin; m++)
+	for (uint32_t material = 0; material < model->materialsPerSkin; material++)
 	{
-		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin, modColor);
+		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
 	}
 	glDisable(GL_CULL_FACE);
 }

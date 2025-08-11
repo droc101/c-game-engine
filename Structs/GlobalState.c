@@ -22,9 +22,9 @@
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/PhysicsThread.h"
 #include "../Helpers/Core/Physics/Player.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Level.h"
-#include "../Helpers/Core/SoundSystem.h"
 #include "Options.h"
 
 static GlobalState state;
@@ -46,7 +46,7 @@ void InitState()
 	state.camera->fov = FOV;
 
 	state.viewmodel.enabled = true;
-	state.viewmodel.model = LoadModel(MODEL("model_eraser"));
+	state.viewmodel.model = LoadModel(MODEL("eraser"));
 	state.viewmodel.transform.position.x = 0.5f;
 	state.viewmodel.transform.rotation.y = degToRad(5);
 }

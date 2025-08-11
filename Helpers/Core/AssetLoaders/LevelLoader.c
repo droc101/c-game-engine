@@ -141,10 +141,14 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		EXPECT_BYTES(sizeof(float) * 2);
 		const float wallUVScale = ReadFloat(data, &offset);
 		const float wallUVOffset = ReadFloat(data, &offset);
-		Wall *w = CreateWall(v2(wallAX, wallAY), v2(wallBX, wallBY), wallTex, wallUVScale, wallUVOffset);
-		WallBake(w);
-		CreateWallCollider(w, bodyInterface);
-		ListAdd(level->walls, w);
+		Wall *wall = CreateWall(v2(wallAX, wallAY), v2(wallBX, wallBY), wallTex, wallUVScale, wallUVOffset);
+		WallBake(wall);
+		if (wall->dx == 0 && wall->dy == 0)
+		{
+			continue;
+		}
+		CreateWallCollider(wall, bodyInterface);
+		ListAdd(level->walls, wall);
 	}
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(level->physicsSystem);

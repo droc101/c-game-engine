@@ -31,6 +31,49 @@ void _LockingListInit(LockingList *list, const enum _ListType listType)
 }
 
 
+static inline void ListCopyHelper(const List *oldList, List *newList)
+{
+	assert(oldList->data);
+	assert(newList->data);
+
+	size_t listSize = 0;
+	switch (oldList->data->type)
+	{
+		case LIST_POINTER:
+		case LIST_UINT64:
+			listSize = oldList->length * 8;
+			break;
+		case LIST_UINT32:
+		case LIST_INT32:
+			listSize = oldList->length * 4;
+			break;
+	}
+	newList->data->pointerData = malloc(listSize);
+	memcpy(newList->data->pointerData, oldList->data->pointerData, listSize);
+	newList->length = oldList->length;
+}
+
+void _ListCopy(const List *oldList, List *newList)
+{
+	assert(oldList);
+	assert(newList);
+
+	_ListInit(newList, oldList->data->type);
+	ListCopyHelper(oldList, newList);
+}
+
+void _LockingListCopy(const LockingList *oldList, LockingList *newList)
+{
+	assert(oldList);
+	assert(newList);
+
+	ListLock(*oldList);
+	_LockingListInit(newList, oldList->data->type);
+	ListCopyHelper((const List *)oldList, (List *)newList);
+	ListUnlock(*oldList);
+}
+
+
 void _ListAdd(List *list, void *data)
 {
 	assert(list);
@@ -362,6 +405,33 @@ void _LockingListClear(LockingList *list)
 
 	ListLock(*list);
 	_ListClear((List *)list);
+	ListUnlock(*list);
+}
+
+
+void _ListZero(const List *list)
+{
+	assert(list);
+
+	switch (list->data->type)
+	{
+		case LIST_POINTER:
+		case LIST_UINT64:
+			memset(list->data->pointerData, 0, list->length * 8);
+			break;
+		case LIST_UINT32:
+		case LIST_INT32:
+			memset(list->data->pointerData, 0, list->length * 4);
+			break;
+	}
+}
+
+void _LockingListZero(const LockingList *list)
+{
+	assert(list);
+
+	ListLock(*list);
+	_ListZero((List *)list);
 	ListUnlock(*list);
 }
 

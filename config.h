@@ -68,6 +68,10 @@
 #define VK_ENABLE_VALIDATION_LAYER
 #endif
 
+// Use wireframe for the Jolt debug renderer
+// Note: This does NOT actually enable the debug renderer
+// #define JPH_DEBUG_RENDERER_WIREFRAME
+
 #pragma endregion
 
 // Program information

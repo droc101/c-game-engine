@@ -619,7 +619,7 @@ struct Font
 	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char* texture;
+	char *texture;
 	/// The index of the character in the texture
 	uint8_t indices[255];
 	/// The width of each character, index directly by the character
@@ -639,9 +639,6 @@ struct ActorConnection
 
 struct Material
 {
-	/// The runtime-generated ID of this model
-	size_t id;
-
 	/// The texture name of the material
 	char *texture;
 	/// The tint color of the material
@@ -653,7 +650,7 @@ struct Material
 struct ModelLod
 {
 	/// The runtime-generated ID of this model
-	size_t id;
+	uint32_t id;
 
 	/// How far away the camera must be before this LOD is used (units squared)
 	float distanceSquared;
@@ -664,33 +661,33 @@ struct ModelLod
 	float *vertexData;
 
 	/// The total number of indices across all materials
-	uint totalIndexCount;
+	uint32_t totalIndexCount;
 	/// The number of indices in each material
-	uint *indexCount;
+	uint32_t *indexCount;
 	/// Index data for each material
-	uint **indexData;
+	uint32_t **indexData;
 };
 
 struct ModelDefinition
 {
 	/// The runtime-generated ID of this model
-	size_t id;
+	uint32_t id;
 	/// The asset name of this model
 	char *name;
 
 	/// The number of materials in the model
-	size_t materialCount;
+	uint32_t materialCount;
 
-	size_t materialsPerSkin;
+	uint32_t materialsPerSkin;
 
 	/// The number of skins in the model
-	size_t skinCount;
+	uint32_t skinCount;
 	/// The number of LODs in the model
-	size_t lodCount;
+	uint32_t lodCount;
 
 	Material *materials;
 	/// The skins for this model, each an array of materialsPerSkin indices into the materials array
-	size_t **skins;
+	uint32_t **skins;
 	/// The LODs for this model
 	ModelLod **lods;
 };

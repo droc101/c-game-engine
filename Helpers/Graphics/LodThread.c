@@ -58,13 +58,13 @@ int LodThreadMain(void * /*data*/)
 			Vector3_Subtract(&actorPosition, &state->level->player.transform.position, &offsetFromPlayer);
 			const float distanceSquared = Vector3_LengthSquared(&offsetFromPlayer);
 			while (actor->currentLod != 0 &&
-				   actor->actorModel->lods[actor->currentLod]->distance * lodMultiplier > distanceSquared)
+				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)
 			{
 				actor->currentLod--;
 				shouldReloadActors = true;
 			}
 			while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-				   actor->actorModel->lods[actor->currentLod + 1]->distance * lodMultiplier <= distanceSquared)
+				   actor->actorModel->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distanceSquared)
 			{
 				actor->currentLod++;
 				shouldReloadActors = true;

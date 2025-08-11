@@ -3,15 +3,14 @@
 //
 
 #include "ModelLoader.h"
-#include "../Error.h"
+#include "../../Graphics/RenderingHelpers.h"
 #include "../AssetReader.h"
 #include "../DataReader.h"
+#include "../Error.h"
 #include "../Logging.h"
-#include "../../Graphics/RenderingHelpers.h"
 
-size_t modelId;
-size_t lodId;
-size_t materialId;
+uint32_t modelId;
+uint32_t lodId;
 ModelDefinition *models[MAX_MODELS];
 ModelDefinition *errorModel = NULL;
 
@@ -20,7 +19,7 @@ void InitModelLoader()
 	errorModel = LoadModel(MODEL("error"));
 }
 
-ModelDefinition *LoadModelInternal(const char* asset)
+ModelDefinition *LoadModelInternal(const char *asset)
 {
 	Asset *assetData = DecompressAsset(asset, false);
 	if (assetData == NULL)
@@ -56,11 +55,11 @@ ModelDefinition *LoadModelInternal(const char* asset)
 
 	model->materials = malloc(sizeof(Material) * model->materialCount);
 	CheckAlloc(model->materials);
-	for (size_t i = 0; i < model->materialCount; i++)
+	for (uint32_t i = 0; i < model->materialCount; i++)
 	{
 		Material *mat = &model->materials[i];
-		size_t l;
-		mat->texture = ReadStringSafe(assetData->data, &offset, assetData->size, &l);
+		size_t _ = 0;
+		mat->texture = ReadStringSafe(assetData->data, &offset, assetData->size, &_);
 		mat->color.r = ReadFloat(assetData->data, &offset);
 		mat->color.g = ReadFloat(assetData->data, &offset);
 		mat->color.b = ReadFloat(assetData->data, &offset);
@@ -68,16 +67,16 @@ ModelDefinition *LoadModelInternal(const char* asset)
 		mat->shader = ReadUint(assetData->data, &offset);
 	}
 
-	model->skins = malloc(sizeof(size_t) * model->skinCount);
+	model->skins = malloc(sizeof(uint32_t *) * model->skinCount);
 	CheckAlloc(model->skins);
 
-	const size_t skinSize = sizeof(size_t) * model->materialsPerSkin;
-	for (int i = 0; i < model->skinCount; i++)
+	const size_t skinSize = sizeof(uint32_t) * model->materialsPerSkin;
+	for (uint32_t i = 0; i < model->skinCount; i++)
 	{
 		model->skins[i] = malloc(skinSize);
 		CheckAlloc(model->skins[i]);
-		size_t *skin = model->skins[i];
-		for (int j = 0; j < model->materialsPerSkin; j++)
+		uint32_t *skin = model->skins[i];
+		for (uint32_t j = 0; j < model->materialsPerSkin; j++)
 		{
 			skin[j] = ReadSizeT(assetData->data, &offset);
 		}
@@ -85,7 +84,7 @@ ModelDefinition *LoadModelInternal(const char* asset)
 
 	model->lods = malloc(sizeof(ModelLod *) * model->lodCount);
 	CheckAlloc(model->lods);
-	for (int i = 0; i < model->lodCount; i++)
+	for (uint32_t i = 0; i < model->lodCount; i++)
 	{
 		model->lods[i] = malloc(sizeof(ModelLod));
 		CheckAlloc(model->lods[i]);
@@ -104,19 +103,19 @@ ModelDefinition *LoadModelInternal(const char* asset)
 		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
 
 		lod->totalIndexCount = ReadUint(assetData->data, &offset);
-		const size_t indexCountSize = model->materialsPerSkin * sizeof(uint);
+		const size_t indexCountSize = model->materialsPerSkin * sizeof(uint32_t);
 		lod->indexCount = malloc(indexCountSize);
 		CheckAlloc(lod->indexCount);
 		ReadBytes(assetData->data, &offset, indexCountSize, lod->indexCount);
 
-		lod->indexData = malloc(sizeof(uint *) * model->materialsPerSkin);
+		lod->indexData = malloc(sizeof(uint32_t *) * model->materialsPerSkin);
 		CheckAlloc(lod->indexData);
-		for (int j = 0; j < model->materialsPerSkin; j++)
+		for (uint32_t j = 0; j < model->materialsPerSkin; j++)
 		{
-			uint *indexData = malloc(lod->indexCount[j] * sizeof(uint));
+			uint32_t *indexData = malloc(lod->indexCount[j] * sizeof(uint32_t));
 			CheckAlloc(indexData);
 			lod->indexData[j] = indexData;
-			ReadBytes(assetData->data, &offset, lod->indexCount[j] * sizeof(uint), indexData);
+			ReadBytes(assetData->data, &offset, lod->indexCount[j] * sizeof(uint32_t), indexData);
 		}
 	}
 
@@ -127,22 +126,22 @@ ModelDefinition *LoadModelInternal(const char* asset)
 
 ModelDefinition *LoadModel(const char *asset)
 {
-	for (int i = 0; i < MAX_MODELS; i++)
+	if (modelId >= MAX_MODELS)
+	{
+		Error("Model ID heap exhausted. Please increase MAX_MODELS\n");
+	}
+
+	for (uint32_t i = 0; i < modelId; i++)
 	{
 		ModelDefinition *model = models[i];
 		if (model == NULL)
 		{
-			break;
+			continue;
 		}
 		if (strncmp(asset, model->name, 80) == 0)
 		{
 			return model;
 		}
-	}
-
-	if (modelId >= MAX_MODELS)
-	{
-		Error("Model ID heap exhausted. Please increase MAX_MODELS\n");
 	}
 
 	ModelDefinition *model = LoadModelInternal(asset);
@@ -165,7 +164,7 @@ ModelDefinition *LoadModel(const char *asset)
 	return model;
 }
 
-inline ModelDefinition *GetModelFromId(const uint id)
+inline ModelDefinition *GetModelFromId(const size_t id)
 {
 	if (id >= modelId)
 	{
@@ -181,16 +180,16 @@ void FreeModel(ModelDefinition *model)
 	{
 		return;
 	}
-	for (int i = 0; i < model->skinCount; i++)
+	for (uint32_t i = 0; i < model->skinCount; i++)
 	{
 		free(model->skins[i]);
 	}
 
-	for (int i = 0; i < model->lodCount; i++)
+	for (uint32_t i = 0; i < model->lodCount; i++)
 	{
 		ModelLod *lod = model->lods[i];
 		free(lod->vertexData);
-		for (int j = 0; j < model->materialCount; j++)
+		for (uint32_t j = 0; j < model->materialsPerSkin; j++)
 		{
 			free(lod->indexData[j]);
 		}
@@ -199,7 +198,7 @@ void FreeModel(ModelDefinition *model)
 		free(lod);
 	}
 
-	for (int i = 0; i < model->materialCount; i++)
+	for (uint32_t i = 0; i < model->materialsPerSkin; i++)
 	{
 		free(model->materials[i].texture);
 	}

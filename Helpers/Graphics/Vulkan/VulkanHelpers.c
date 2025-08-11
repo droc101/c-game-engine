@@ -74,7 +74,7 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 	assert(shader->platform == PLATFORM_VULKAN);
 	assert(shader->type == shaderType);
 
-	VulkanTestReturnResult(lunaCreateShaderModule(shader->spirv, shader->spirvLength * sizeof(uint32_t), shaderModule),
+	VulkanTestReturnResult(lunaCreateShaderModule(shader->spirv, sizeof(uint32_t) * shader->spirvLength, shaderModule),
 						   "Failed to create shader module!");
 
 	FreeShader(shader);
@@ -162,11 +162,11 @@ VkResult LoadSky(const ModelDefinition *skyModel)
 	uint32_t *indices = buffers.sky.indices.data;
 	for (uint32_t i = 0; i < skyModel->lods[0]->vertexCount; i++)
 	{
-		// Copy {x, y, z, u, v} and discard {nx, ny, nz}
-		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 8, sizeof(float) * 5);
+		// Copy {x, y, z, u, v} and discard {r, g, b, a, nx, ny, nz}
+		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 12, sizeof(float) * 5);
 	}
 	buffers.sky.indexCount = 0;
-	for (uint32_t i = 0; i < skyModel->materialCount; i++)
+	for (uint32_t i = 0; i < skyModel->materialsPerSkin; i++)
 	{
 		memcpy(indices + buffers.sky.indexCount,
 			   skyModel->lods[0]->indexData[i],
@@ -192,33 +192,33 @@ void LoadWalls(const Level *level)
 		const vec2 startUV = {wall->uvOffset, 0};
 		const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
 
-		vertices[4 * i].x = startVertex[0];
-		vertices[4 * i].y = 0.5f;
-		vertices[4 * i].z = startVertex[1];
+		vertices[4 * i].position.x = startVertex[0];
+		vertices[4 * i].position.y = 0.5f;
+		vertices[4 * i].position.z = startVertex[1];
 		vertices[4 * i].u = startUV[0];
 		vertices[4 * i].v = startUV[1];
 		vertices[4 * i].textureIndex = TextureIndex(wall->tex);
 		vertices[4 * i].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 1].x = endVertex[0];
-		vertices[4 * i + 1].y = 0.5f;
-		vertices[4 * i + 1].z = endVertex[1];
+		vertices[4 * i + 1].position.x = endVertex[0];
+		vertices[4 * i + 1].position.y = 0.5f;
+		vertices[4 * i + 1].position.z = endVertex[1];
 		vertices[4 * i + 1].u = endUV[0];
 		vertices[4 * i + 1].v = startUV[1];
 		vertices[4 * i + 1].textureIndex = TextureIndex(wall->tex);
 		vertices[4 * i + 1].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 2].x = endVertex[0];
-		vertices[4 * i + 2].y = -0.5f;
-		vertices[4 * i + 2].z = endVertex[1];
+		vertices[4 * i + 2].position.x = endVertex[0];
+		vertices[4 * i + 2].position.y = -0.5f;
+		vertices[4 * i + 2].position.z = endVertex[1];
 		vertices[4 * i + 2].u = endUV[0];
 		vertices[4 * i + 2].v = endUV[1];
 		vertices[4 * i + 2].textureIndex = TextureIndex(wall->tex);
 		vertices[4 * i + 2].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 3].x = startVertex[0];
-		vertices[4 * i + 3].y = -0.5f;
-		vertices[4 * i + 3].z = startVertex[1];
+		vertices[4 * i + 3].position.x = startVertex[0];
+		vertices[4 * i + 3].position.y = -0.5f;
+		vertices[4 * i + 3].position.z = startVertex[1];
 		vertices[4 * i + 3].u = startUV[0];
 		vertices[4 * i + 3].v = endUV[1];
 		vertices[4 * i + 3].textureIndex = TextureIndex(wall->tex);

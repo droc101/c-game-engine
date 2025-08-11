@@ -14,7 +14,7 @@
 
 void InitModelLoader();
 
-ModelDefinition *LoadModelInternal(const char* asset);
+ModelDefinition *LoadModelInternal(const char *asset);
 
 /**
  * Load a model from an asset
@@ -28,7 +28,7 @@ ModelDefinition *LoadModel(const char *asset);
  * @param id The model ID to fetch
  * @return The model with the given ID
  */
-extern ModelDefinition *GetModelFromId(uint id);
+extern ModelDefinition *GetModelFromId(size_t id);
 
 void FreeModel(ModelDefinition *model);
 

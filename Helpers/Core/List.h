@@ -54,6 +54,9 @@ struct LockingList
 void _ListInit(List *list, enum _ListType);
 void _LockingListInit(LockingList *list, enum _ListType);
 
+void _ListCopy(const List *oldList, List *newList);
+void _LockingListCopy(const LockingList *oldList, LockingList *newList);
+
 void _ListAdd(List *list, void *data);
 void _LockingListAdd(LockingList *list, void *data);
 
@@ -76,6 +79,9 @@ void _ListUnlock(const LockingList *list);
 void _ListClear(List *list);
 void _LockingListClear(LockingList *list);
 
+void _ListZero(const List *list);
+void _LockingListZero(const LockingList *list);
+
 void _ListFree(List *list);
 void _LockingListFree(LockingList *list);
 
@@ -92,6 +98,18 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param type A value indicating what type of data the list is storing
  */
 #define ListInit(list, type) _Generic((list), List: _ListInit, LockingList: _LockingListInit)(&(list), type)
+
+/**
+ * Create a copy of a list
+ * @param oldList The list to make a copy of
+ * @param newList The list to copy into
+ */
+#define ListCopy(oldList, newList) \
+	({ \
+		static_assert(sizeof(oldList) == sizeof(newList)); \
+		_Generic((oldList), List: _ListCopy, LockingList: _LockingListCopy)(&(oldList), &(newList)); \
+	}); \
+	(void)0
 
 /**
  * Append an item to the list
@@ -203,6 +221,13 @@ void _LockingListAndContentsFree(LockingList *list);
  * @warning This does not free the data in the list
  */
 #define ListClear(list) _Generic((list), List: _ListClear, LockingList: _LockingListClear)(&(list))
+
+/**
+ * Sets all items in the list to zero
+ * @param list List to zero
+ * @warning This does not free the data in the list
+ */
+#define ListZero(list) _Generic((list), List: _ListZero, LockingList: _LockingListZero)(&(list))
 
 /**
  * Free the list structure

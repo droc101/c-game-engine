@@ -29,6 +29,9 @@ static const JPH_BodyDrawFilter_Impl bodyDrawFilterImpl = {
 };
 static const JPH_DrawSettings drawSettings = {
 	.drawShape = true,
+#ifdef JPH_DEBUG_RENDERER_WIREFRAME
+	.drawShapeWireframe = true,
+#endif
 };
 
 void JoltDebugRendererInit()
