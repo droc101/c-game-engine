@@ -12,33 +12,32 @@
 uint textureId;
 Image *images[MAX_TEXTURES];
 
+#define MISSING_TEX_SIZE 2
+#define MISSING_TEX_COLOR_A 0xFF000000
+#define MISSING_TEX_COLOR_B 0xFFFF00FF
+
 void GenFallbackImage(Image *src)
 {
-	src->width = 64;
-	src->height = 64;
+	src->width = MISSING_TEX_SIZE;
+	src->height = MISSING_TEX_SIZE;
 	src->filter = false;
 	src->repeat = true;
 	src->mipmaps = false;
-	const size_t pixelDataSize = 64 * 64 * sizeof(uint32_t);
-	src->pixelData = malloc(pixelDataSize);
+	const size_t pixelDataSize = MISSING_TEX_SIZE * MISSING_TEX_SIZE * sizeof(uint32_t);
+	uint32_t *pixelData = malloc(pixelDataSize);
 	CheckAlloc(src->pixelData);
+	src->pixelData = (uint8_t*)pixelData;
 
-	for (int x = 0; x < 64; x++)
+	for (int x = 0; x < MISSING_TEX_SIZE; x++)
 	{
-		for (int y = 0; y < 64; y++)
+		for (int y = 0; y < MISSING_TEX_SIZE; y++)
 		{
-			if ((x < 32) ^ (y < 32))
+			if ((x < MISSING_TEX_SIZE/2) ^ (y < MISSING_TEX_SIZE/2))
 			{
-				src->pixelData[(x + y * 64) * 4] = 0;
-				src->pixelData[(x + y * 64) * 4 + 1] = 0;
-				src->pixelData[(x + y * 64) * 4 + 2] = 0;
-				src->pixelData[(x + y * 64) * 4 + 3] = 255;
+				pixelData[(x + y * MISSING_TEX_SIZE)] = MISSING_TEX_COLOR_A;
 			} else
 			{
-				src->pixelData[(x + y * 64) * 4] = 255;
-				src->pixelData[(x + y * 64) * 4 + 1] = 0;
-				src->pixelData[(x + y * 64) * 4 + 2] = 255;
-				src->pixelData[(x + y * 64) * 4 + 3] = 255;
+				pixelData[(x + y * MISSING_TEX_SIZE)] = MISSING_TEX_COLOR_B;
 			}
 		}
 	}
