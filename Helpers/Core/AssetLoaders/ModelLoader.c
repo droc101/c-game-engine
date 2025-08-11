@@ -47,10 +47,10 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	strncpy(model->name, asset, nameLength);
 
 	size_t offset = 0;
-	model->materialCount = ReadSizeT(assetData->data, &offset);
-	model->materialsPerSkin = ReadSizeT(assetData->data, &offset);
-	model->skinCount = ReadSizeT(assetData->data, &offset);
-	model->lodCount = ReadSizeT(assetData->data, &offset);
+	model->materialCount = ReadUint(assetData->data, &offset);
+	model->materialsPerSkin = ReadUint(assetData->data, &offset);
+	model->skinCount = ReadUint(assetData->data, &offset);
+	model->lodCount = ReadUint(assetData->data, &offset);
 	offset += sizeof(uint8_t); // skip collision model type as it is currently unused
 
 	model->materials = malloc(sizeof(Material) * model->materialCount);
@@ -78,7 +78,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		uint32_t *skin = model->skins[i];
 		for (uint32_t j = 0; j < model->materialsPerSkin; j++)
 		{
-			skin[j] = ReadSizeT(assetData->data, &offset);
+			skin[j] = ReadUint(assetData->data, &offset);
 		}
 	}
 
