@@ -3,7 +3,6 @@
 //
 
 #include "LevelLoader.h"
-#include <box2d/box2d.h>
 #include <stdio.h>
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Level.h"
@@ -33,48 +32,50 @@
 
 Level *LoadLevel(const byte *data, const size_t dataSize)
 {
-	Level *l = CreateLevel();
+	Level *level = CreateLevel();
 	size_t offset = 0;
 	size_t bytesRemaining = dataSize;
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
 
 	EXPECT_BYTES(32 + sizeof(short) + 1);
 	offset += sizeof(char) * 32; // discard level name
 	offset += sizeof(short); // discard course number
-	l->hasCeiling = ReadByte(data, &offset);
+	level->hasCeiling = ReadByte(data, &offset);
 
-	char lDataCeilOrSkyTex[64];
-	char lDataFloorTex[64];
+	char levelDataCeilOrSkyTex[64];
+	char levelDataFloorTex[64];
 
-	EXPECT_BYTES(128);
-	ReadString(data, &offset, lDataCeilOrSkyTex, 64);
-	ReadString(data, &offset, lDataFloorTex, 64);
+	EXPECT_BYTES(64 * 2);
+	ReadString(data, &offset, levelDataCeilOrSkyTex, 64);
+	ReadString(data, &offset, levelDataFloorTex, 64);
 
 
-	snprintf(l->ceilOrSkyTex, 80, "texture/%s.gtex", lDataCeilOrSkyTex);
-	snprintf(l->floorTex, 80, "texture/%s.gtex", lDataFloorTex);
+	snprintf(level->ceilOrSkyTex, 80, "texture/%s.gtex", levelDataCeilOrSkyTex);
+	snprintf(level->floorTex, 80, "texture/%s.gtex", levelDataFloorTex);
 
 	EXPECT_BYTES(64);
-	ReadString(data, &offset, l->music, 64);
+	ReadString(data, &offset, level->music, 64);
 
 	EXPECT_BYTES(sizeof(uint) + sizeof(float) + sizeof(float));
-	l->fogColor = ReadUint(data, &offset);
-	l->fogStart = ReadFloat(data, &offset);
-	l->fogEnd = ReadFloat(data, &offset);
+	level->fogColor = ReadUint(data, &offset);
+	level->fogStart = ReadFloat(data, &offset);
+	level->fogEnd = ReadFloat(data, &offset);
 
 	EXPECT_BYTES(sizeof(float) * 3);
-	l->player.pos.x = ReadFloat(data, &offset);
-	l->player.pos.y = ReadFloat(data, &offset);
-	l->player.angle = ReadFloat(data, &offset);
+	level->player.transform.position.x = ReadFloat(data, &offset);
+	level->player.transform.position.z = ReadFloat(data, &offset);
 
-	b2Body_SetTransform(l->player.bodyId, l->player.pos, b2MakeRot(l->player.angle));
+	level->player.transform.rotation.y = ReadFloat(data, &offset);
+
+	JPH_CharacterVirtual_SetPosition(level->player.joltCharacter, &level->player.transform.position);
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint actorCount = ReadUint(data, &offset);
-	for (int i = 0; i < actorCount; i++)
+	for (uint i = 0; i < actorCount; i++)
 	{
 		EXPECT_BYTES(sizeof(float) * 3);
 		const float actorX = ReadFloat(data, &offset);
-		const float actorY = ReadFloat(data, &offset);
+		const float actorZ = ReadFloat(data, &offset);
 		const float actorRotation = ReadFloat(data, &offset);
 		EXPECT_BYTES(sizeof(int) + sizeof(byte) * 4);
 		const uint actorType = ReadUint(data, &offset);
@@ -95,11 +96,14 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			KvSetUnsafe(&params, key, param);
 		}
 
-		Actor *a = CreateActor(v2(actorX, actorY), actorRotation, actorType, &params, l->worldId);
+		Actor *a = CreateActor((Transform[]){{{actorX, 0.0f, actorZ}, {0.0f, actorRotation, 0.0f}}},
+							   actorType,
+							   &params,
+							   bodyInterface);
 
 		EXPECT_BYTES(sizeof(uint));
 		const uint connectionCount = ReadUint(data, &offset);
-		for (int j = 0; j < connectionCount; j++)
+		for (uint j = 0; j < connectionCount; j++)
 		{
 			ActorConnection *ac = malloc(sizeof(ActorConnection));
 			CheckAlloc(ac);
@@ -113,16 +117,16 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 			ListAdd(a->ioConnections, ac);
 		}
 
-		ListAdd(l->actors, a);
+		ListAdd(level->actors, a);
 		if (actorName[0] != '\0')
 		{
-			NameActor(a, actorName, l);
+			NameActor(a, actorName, level);
 		}
 	}
 
 	EXPECT_BYTES(sizeof(uint));
 	const uint wallCount = ReadUint(data, &offset);
-	for (int i = 0; i < wallCount; i++)
+	for (uint i = 0; i < wallCount; i++)
 	{
 		EXPECT_BYTES(sizeof(float) * 4);
 		const float wallAX = ReadFloat(data, &offset);
@@ -132,16 +136,22 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		char lDataWallTex[64];
 		EXPECT_BYTES(64);
 		ReadString(data, &offset, (char *)&lDataWallTex, 64);
-		const char wallTex[80];
+		char wallTex[80];
 		snprintf(wallTex, 80, "texture/%s.gtex", lDataWallTex);
 		EXPECT_BYTES(sizeof(float) * 2);
 		const float wallUVScale = ReadFloat(data, &offset);
 		const float wallUVOffset = ReadFloat(data, &offset);
-		Wall *w = CreateWall(v2(wallAX, wallAY), v2(wallBX, wallBY), wallTex, wallUVScale, wallUVOffset);
-		WallBake(w);
-		CreateWallCollider(w, l->worldId);
-		ListAdd(l->walls, w);
+		Wall *wall = CreateWall(v2(wallAX, wallAY), v2(wallBX, wallBY), wallTex, wallUVScale, wallUVOffset);
+		WallBake(wall);
+		if (wall->dx == 0 && wall->dy == 0)
+		{
+			continue;
+		}
+		CreateWallCollider(wall, bodyInterface);
+		ListAdd(level->walls, wall);
 	}
 
-	return l;
+	JPH_PhysicsSystem_OptimizeBroadPhase(level->physicsSystem);
+
+	return level;
 }

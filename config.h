@@ -23,10 +23,13 @@
 
 #pragma region Movement
 
-/// Player movement speed
-#define MOVE_SPEED 0.237f
-/// Player movement speed when shift is held
-#define SLOW_MOVE_SPEED 0.0237f
+/// Player movement speed (in units per second)
+#define MOVE_SPEED 6.0f
+/// Player movement speed when ctrl is held
+#define SLOW_MOVE_SPEED 0.6f
+
+/// The maximum angle that the player can walk on, in degrees
+#define MAX_WALKABLE_SLOPE 50.0f
 
 #define STICK_DEADZONE 0.1
 
@@ -64,6 +67,10 @@
  */
 #define VK_ENABLE_VALIDATION_LAYER
 #endif
+
+// Use wireframe for the Jolt debug renderer
+// Note: This does NOT actually enable the debug renderer
+// #define JPH_DEBUG_RENDERER_WIREFRAME
 
 #pragma endregion
 

@@ -16,7 +16,7 @@
 
 typedef struct SoundPlayerData
 {
-	const char asset[64]; // asset name of the sound effect to play
+	char asset[64]; // asset name of the sound effect to play
 	SoundEffect *effect;
 	int loops;
 	float volume;
@@ -60,7 +60,7 @@ bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signa
 	return false;
 }
 
-void SoundPlayerInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
+void SoundPlayerInit(Actor *this, const KvList *params, Transform *)
 {
 	this->SignalHandler = SoundPlayerSignalHandler;
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
@@ -80,6 +80,4 @@ void SoundPlayerDestroy(Actor *this)
 	{
 		StopSoundEffect(data->effect);
 	}
-	free(this->extraData);
-	this->extraData = NULL;
 }

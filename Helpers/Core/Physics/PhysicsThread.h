@@ -5,7 +5,7 @@
 #ifndef PHYSICSTHREAD_H
 #define PHYSICSTHREAD_H
 
-#include "../../defines.h"
+#include "../../../defines.h"
 
 /**
  * Start the physics thread

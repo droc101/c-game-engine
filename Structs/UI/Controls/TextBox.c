@@ -28,7 +28,7 @@ Control *CreateTextBoxControl(const char *placeholder,
 	c->position = position;
 	c->size = size;
 
-	TextBoxData *data = calloc(sizeof(TextBoxData), 1);
+	TextBoxData *data = calloc(1, sizeof(TextBoxData));
 	CheckAlloc(data);
 	c->ControlData = data;
 	data->maxLength = maxLength;
@@ -43,17 +43,17 @@ Control *CreateTextBoxControl(const char *placeholder,
 	return c;
 }
 
-void DrawTextBox(const Control *c, ControlState state, Vector2 position)
+void DrawTextBox(const Control *control, ControlState /*state*/, Vector2 position)
 {
-	DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/textbox"));
+	DrawNinePatchTexture(control->anchoredPosition, control->size, 8, 8, TEXTURE("interface/textbox"));
 
-	const TextBoxData *data = (TextBoxData *)c->ControlData;
+	const TextBoxData *data = (TextBoxData *)control->ControlData;
 
 	DrawTextAligned(strlen(data->text) == 0 ? data->placeholder : data->text,
 					16,
 					strlen(data->text) == 0 ? COLOR(0x7F000000) : COLOR_BLACK,
 					v2(position.x + 6, position.y + 6),
-					v2(c->size.x - 12, c->size.y - 12),
+					v2(control->size.x - 12, control->size.y - 12),
 					FONT_HALIGN_LEFT,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
@@ -66,17 +66,17 @@ void DrawTextBox(const Control *c, ControlState state, Vector2 position)
 						16,
 						COLOR_BLACK,
 						v2(position.x + 6 + textSize.x, position.y + 6 + 4),
-						v2(12, c->size.y - 12),
+						v2(12, control->size.y - 12),
 						FONT_HALIGN_LEFT,
 						FONT_VALIGN_MIDDLE,
 						smallFont);
 	}
 }
 
-void UpdateTextBox(UiStack *stack, Control *c, Vector2, const uint ctlIndex)
+void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePosition*/, const uint controlIndex)
 {
-	TextBoxData *data = (TextBoxData *)c->ControlData;
-	if (stack->focusedControl != ctlIndex)
+	TextBoxData *data = (TextBoxData *)control->ControlData;
+	if (stack->focusedControl != controlIndex)
 	{
 		data->isActive = false;
 		return;
@@ -98,7 +98,8 @@ void UpdateTextBox(UiStack *stack, Control *c, Vector2, const uint ctlIndex)
 		if (dir != 0)
 		{
 			size_t i = data->input.cursor + dir;
-			while (i > 0 && i < (int)strlen(data->text) && data->text[i] != ' ')
+			const size_t length = strlen(data->text);
+			while (i > 0 && i < length && data->text[i] != ' ')
 			{
 				i += dir;
 			}
@@ -121,7 +122,7 @@ void UpdateTextBox(UiStack *stack, Control *c, Vector2, const uint ctlIndex)
 		}
 	}
 
-	data->input.cursor = clamp(data->input.cursor, 0, strlen(data->text));
+	data->input.cursor = min(data->input.cursor, strlen(data->text));
 
 	if (IsKeyJustPressed(SDL_SCANCODE_HOME))
 	{
@@ -148,35 +149,32 @@ void UpdateTextBox(UiStack *stack, Control *c, Vector2, const uint ctlIndex)
 				data->callback(data->text);
 			}
 		}
-	} else if (IsKeyJustPressed(SDL_SCANCODE_DELETE))
+	} else if (IsKeyJustPressed(SDL_SCANCODE_DELETE) && data->input.cursor < strlen(data->text))
 	{
-		if (data->input.cursor < (int)strlen(data->text))
+		ConsumeKey(SDL_SCANCODE_DELETE);
+		memmove(data->text + data->input.cursor,
+				data->text + data->input.cursor + 1,
+				strlen(data->text) - data->input.cursor);
+		if (data->callback != NULL)
 		{
-			ConsumeKey(SDL_SCANCODE_DELETE);
-			memmove(data->text + data->input.cursor,
-					data->text + data->input.cursor + 1,
-					strlen(data->text) - data->input.cursor);
-			if (data->callback != NULL)
-			{
-				data->callback(data->text);
-			}
+			data->callback(data->text);
 		}
 	}
 }
 
-void DestroyTextBox(const Control *c)
+void DestroyTextBox(const Control *control)
 {
-	const TextBoxData *textBoxData = c->ControlData;
+	const TextBoxData *textBoxData = control->ControlData;
 	free(textBoxData->text);
-	free(c->ControlData);
+	free(control->ControlData);
 }
 
-void FocusTextBox(const Control *c)
+void FocusTextBox(const Control *control)
 {
-	SetTextInput(&((TextBoxData *)c->ControlData)->input); // very readable yes
+	SetTextInput(&((TextBoxData *)control->ControlData)->input); // very readable yes
 }
 
-void UnfocusTextBox(const Control *c)
+void UnfocusTextBox(const Control * /*control*/)
 {
 	StopTextInput();
 }

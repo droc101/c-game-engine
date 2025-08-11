@@ -6,7 +6,6 @@
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
-#include "../../Structs/Level.h"
 
 #define IOPROXY_OUTPUT_FIRST_TICK 2
 
@@ -31,7 +30,7 @@ bool IoProxySignalHandler(Actor *this, const Actor *sender, const byte signal, c
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*params*/)
+void IoProxyInit(Actor *this, const KvList * /*params*/, Transform *)
 {
 	if (GetState()->level->ioProxy != NULL)
 	{
@@ -40,7 +39,7 @@ void IoProxyInit(Actor *this, const b2WorldId /*worldId*/, const KvList * /*para
 	{
 		GetState()->level->ioProxy = this;
 	}
-	this->extraData = calloc(sizeof(IoProxyData), 1);
+	this->extraData = calloc(1, sizeof(IoProxyData));
 	this->SignalHandler = IoProxySignalHandler;
 }
 
@@ -53,9 +52,4 @@ void IoProxyUpdate(Actor *this, double /*delta*/)
 		ActorFireOutput(this, IOPROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
 	}
 	data->tickCounter++;
-}
-
-void IoProxyDestroy(Actor *this)
-{
-	free(this->extraData);
 }

@@ -3,17 +3,19 @@
 //
 
 #include "LaserEmitter.h"
-
+#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
-#include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "Laser.h"
 
 #define LASER_EMITTER_INPUT_DISABLE 2
 #define LASER_EMITTER_INPUT_ENABLE 1
+
+static const Vector3 halfExtent = {0.2f, 0.48f, 0.05f};
 
 typedef enum LaserEmitterSkin
 {
@@ -30,9 +32,10 @@ typedef struct LaserEmitterData
 	Actor *laserActor;
 	bool startEnabled;
 	bool hasTicked;
+	Transform transform;
 } LaserEmitterData;
 
-bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, byte signal, const Param *param)
+bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
 	const LaserEmitterData *data = this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -54,25 +57,27 @@ bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, byte signal, co
 	return false;
 }
 
-void CreateLaserEmitterCollider(Actor *this, const b2WorldId worldId)
+void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_staticBody;
-	bodyDef.position = this->position;
-	bodyDef.linearDamping = 10;
-	bodyDef.fixedRotation = true;
-	this->bodyId = b2CreateBody(worldId, &bodyDef);
-
-	const b2Polygon sensorShape = b2MakeOffsetBox(0.1f, 0.1f, (Vector2){0, 0}, 0);
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.filter.categoryBits = COLLISION_GROUP_DEFAULT | COLLISION_GROUP_ACTOR;
-	b2CreatePolygonShape(this->bodyId, &shapeDef, &sensorShape);
+	const Vector3 offset = {0.0f, 0.0f, halfExtent.z};
+	const JPH_Shape *boxShape = (const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS);
+	const JPH_Shape *offestShape = (const JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_STATIC,
+																						   this);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
+void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->SignalHandler = LaserEmitterSignalHandler;
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
+	CheckAlloc(this->extraData);
 	LaserEmitterData *data = this->extraData;
 	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->hasTicked = false;
@@ -80,12 +85,21 @@ void LaserEmitterInit(Actor *this, b2WorldId worldId, const KvList *params)
 	this->actorModel = LoadModel(MODEL("laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
-	CreateLaserEmitterCollider(this, worldId);
+	JPH_Quat rotation = {};
+	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
+	Vector3 forwardVector = {};
+	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
+	Vector3 offsetVector = {};
+	Vector3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
+	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
+	data->transform.rotation = transform->rotation;
+
+	CreateLaserEmitterCollider(this, &data->transform);
 
 	data->startEnabled = KvGetBool(params, "startEnabled", true);
 }
 
-void LaserEmitterUpdate(Actor *this, double)
+void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 {
 	LaserEmitterData *data = this->extraData;
 	if (!data->hasTicked)
@@ -94,18 +108,11 @@ void LaserEmitterUpdate(Actor *this, double)
 		KvListCreate(&laserParams);
 		KvSetByte(&laserParams, "height", data->height);
 		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
-		data->laserActor = CreateActor(this->position,
-									   this->rotation,
-									   LASER_ACTOR,
+		data->laserActor = CreateActor(&data->transform,
+									   ACTOR_TYPE_LASER,
 									   &laserParams,
-									   GetState()->level->worldId);
+									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
 		AddActor(data->laserActor);
 		data->hasTicked = true;
 	}
-}
-
-void LaserEmitterDestroy(Actor *this)
-{
-	b2DestroyBody(this->bodyId);
-	free(this->extraData);
 }

@@ -5,9 +5,8 @@
 #include "LodThread.h"
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
-#include "../../Structs/Vector2.h"
-#include "../Graphics/Vulkan/Vulkan.h"
-#include "Error.h"
+#include "../Core/Error.h"
+#include "Vulkan/Vulkan.h"
 
 static bool shouldExit;
 static SDL_Thread *lodThread;
@@ -16,7 +15,7 @@ static SDL_sem *hasEnded;
 static SDL_mutex *mutex;
 
 // ReSharper disable once CppDFAConstantFunctionResult
-int LodThreadMain(void *)
+int LodThreadMain(void * /*data*/)
 {
 	while (!shouldExit)
 	{
@@ -42,11 +41,12 @@ int LodThreadMain(void *)
 		}
 
 		const GlobalState *state = GetState();
-		const Vector2 playerPosition = state->level->player.pos;
 		const LockingList *actors = &state->level->actors;
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
 		bool shouldReloadActors = false;
+		Vector3 actorPosition = {};
+		Vector3 offsetFromPlayer = {};
 		for (size_t i = 0; i < actorCount; i++)
 		{
 			Actor *actor = ListGetPointer(*actors, i);
@@ -54,16 +54,17 @@ int LodThreadMain(void *)
 			{
 				continue;
 			}
-			float distance = Vector2Distance(actor->position, playerPosition);
-			distance *= distance;
+			JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
+			Vector3_Subtract(&actorPosition, &state->level->player.transform.position, &offsetFromPlayer);
+			const float distanceSquared = Vector3_LengthSquared(&offsetFromPlayer);
 			while (actor->currentLod != 0 &&
-				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distance)
+				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)
 			{
 				actor->currentLod--;
 				shouldReloadActors = true;
 			}
 			while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-				   actor->actorModel->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distance)
+				   actor->actorModel->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distanceSquared)
 			{
 				actor->currentLod++;
 				shouldReloadActors = true;
@@ -90,7 +91,7 @@ int LodThreadMain(void *)
 void LodThreadInit()
 {
 	canStart = SDL_CreateSemaphore(0);
-	hasEnded = SDL_CreateSemaphore(0);
+	hasEnded = SDL_CreateSemaphore(1);
 	mutex = SDL_CreateMutex();
 	lodThread = SDL_CreateThread(LodThreadMain, "GameLODThread", NULL);
 }

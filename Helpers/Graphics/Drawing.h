@@ -142,6 +142,28 @@ void DrawBatchedQuadsTextured(const BatchedQuadArray *batch, const char *texture
 void DrawBatchedQuadsColored(const BatchedQuadArray *batch, Color color);
 
 /**
+ * Draw a line. This function is intended to be called from Jolt's built-in debug renderer.
+ * @param from The starting point of the line
+ * @param to The ending point of the line
+ * @param color The color of the line
+ */
+void DrawJoltDebugRendererDrawLine(void * /*userData*/, const JPH_RVec3 *from, const JPH_RVec3 *to, JPH_Color color);
+
+/**
+ * Draw a triangle. This function is intended to be called from Jolt's built-in debug renderer.
+ * @param v1 The first vertex of the triangle
+ * @param v2 The second vertex of the triangle
+ * @param v3 The third vertex of the triangle
+ * @param color The color of the triangle
+ */
+void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
+									   const JPH_RVec3 *v1,
+									   const JPH_RVec3 *v2,
+									   const JPH_RVec3 *v3,
+									   JPH_Color color,
+									   JPH_DebugRenderer_CastShadow /*castShadow*/);
+
+/**
  * Render the background of the menu screen (main menu, options, level select, etc.)
  */
 void RenderMenuBackground();

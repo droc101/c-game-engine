@@ -7,10 +7,8 @@
 
 #include "../defines.h"
 
-void GoalInit(Actor *this, b2WorldId worldId, const KvList *params);
+void GoalInit(Actor *this, const KvList *params, Transform *transform);
 
 void GoalUpdate(Actor *this, double /*delta*/);
-
-void GoalDestroy(Actor *this);
 
 #endif //GAME_GOAL_H

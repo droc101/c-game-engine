@@ -4,7 +4,7 @@
 
 #include "GLoadingState.h"
 #include <string.h>
-#include "../../../Helpers/CommonAssets.h"
+#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"

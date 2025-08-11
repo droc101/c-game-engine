@@ -3,16 +3,14 @@
 //
 
 #include "TestActor.h"
-#include <box2d/box2d.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Navigation.h"
+#include "../Helpers/Core/Physics/Navigation.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
-#include "../Structs/Vector2.h"
 
 bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
 {
@@ -24,45 +22,55 @@ bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal,
 	return false;
 }
 
-void TestActorIdle(Actor *this, const double delta)
+void TestActorIdle(Actor *this, const double /*delta*/)
 {
-	const NavigationConfig *navigationConfig = this->extraData;
-	this->rotation += 0.01f;
-	const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
-	b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
+	(void)this;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += 0.01f;
+	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
+	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
 }
 
 void TestActorTargetReached(Actor *this, const double delta)
 {
-	const NavigationConfig *navigationConfig = this->extraData;
-	this->rotation += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
+	(void)this;
+	(void)delta;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
-void CreateTestActorCollider(Actor *this, const b2WorldId worldId)
+void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position = this->position;
-	bodyDef.fixedRotation = true;
-	bodyDef.linearDamping = 5;
-	this->bodyId = b2CreateBody(worldId, &bodyDef);
-	const b2Circle circle = {
-		.radius = 0.2867f,
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.2867f);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Dynamic,
+																						   OBJECT_LAYER_DYNAMIC,
+																						   this);
+	const JPH_MassProperties massProperties = {
+		.mass = 20.0f,
 	};
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR_ENEMY;
-	b2CreateCircleShape(this->bodyId, &shapeDef, &circle);
-	const b2Circle hurtbox = {
-		.radius = 0.28f,
-	};
-	b2ShapeDef hurtboxDef = b2DefaultShapeDef();
-	hurtboxDef.filter.categoryBits = COLLISION_GROUP_HURTBOX;
-	b2CreateCircleShape(this->bodyId, &hurtboxDef, &hurtbox);
+	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
+	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
+													   JPH_OverrideMassProperties_CalculateInertia);
+	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
+	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
+	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings,
+											JPH_AllowedDOFs_TranslationX |
+													JPH_AllowedDOFs_TranslationY |
+													JPH_AllowedDOFs_TranslationZ |
+													JPH_AllowedDOFs_RotationY);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void TestActorInit(Actor *this, const b2WorldId worldId, const KvList * /*params*/)
+void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
-	CreateTestActorCollider(this, worldId);
+	CreateTestActorCollider(this, transform);
+
+	this->actorFlags = ACTOR_FLAG_ENEMY;
 
 	this->actorModel = LoadModel(MODEL("leafy"));
 	this->currentSkinIndex = 0;
@@ -80,21 +88,18 @@ void TestActorInit(Actor *this, const b2WorldId worldId, const KvList * /*params
 	navigationConfig->agroTicks = 120;
 	navigationConfig->IdleFunction = TestActorIdle;
 	navigationConfig->TargetReachedFunction = TestActorTargetReached;
-	navigationConfig->lastKnownTarget = this->position;
+	navigationConfig->lastKnownTarget.x = transform->position.x;
+	navigationConfig->lastKnownTarget.y = transform->position.z;
 }
 
 void TestActorUpdate(Actor *this, const double delta)
 {
-	this->position = b2Body_GetPosition(this->bodyId);
-
-	NavigationStep(this, this->extraData, delta);
-
+	(void)this;
+	(void)delta;
 	this->modColor.r = sin(GetState()->physicsFrame / 10.0f) + 1.0f / 2.0f;
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void TestActorDestroy(Actor *this)
-{
-	free(this->extraData);
-	b2DestroyBody(this->bodyId);
+	// JPH_Quat rotation;
+	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
+	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
+	//
+	// NavigationStep(this, this->extraData, delta);
 }

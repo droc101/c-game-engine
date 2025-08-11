@@ -91,17 +91,13 @@ bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const byte sign
 	return false;
 }
 
-void LogicDecimalInit(Actor *this, const b2WorldId /*worldId*/, const KvList *params)
+void LogicDecimalInit(Actor *this, const KvList *params, Transform *)
 {
-	LogicDecimalData *data = malloc(sizeof(LogicDecimalData));
-	CheckAlloc(data);
+	this->extraData = malloc(sizeof(LogicDecimalData));
+	CheckAlloc(this->extraData);
+	LogicDecimalData *data = this->extraData;
 	data->operandA = KvGetFloat(params, "operandA", .0f);
 	data->operandB = KvGetFloat(params, "operandB", .0f);
 	data->operation = KvGetByte(params, "operation", DECIMAL_OP_EQUAL);
 	this->SignalHandler = LogicDecimalSignalHandler;
-}
-
-void LogicDecimalDestroy(Actor *this)
-{
-	free(this->extraData);
 }

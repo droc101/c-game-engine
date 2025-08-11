@@ -13,18 +13,16 @@
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
-#include "Helpers/Core/KVList.h"
-#include "Helpers/Core/LodThread.h"
 #include "Helpers/Core/Logging.h"
-#include "Helpers/Core/PhysicsThread.h"
+#include "Helpers/Core/Physics/PhysicsThread.h"
 #include "Helpers/Core/SoundSystem.h"
 #include "Helpers/Core/Timing.h"
 #include "Helpers/Graphics/Drawing.h"
+#include "Helpers/Graphics/LodThread.h"
 #include "Helpers/Graphics/RenderingHelpers.h"
 #include "Helpers/PlatformHelpers.h"
 #include "Helpers/TextInputSystem.h"
 #include "Structs/GlobalState.h"
-#include "Structs/Level.h"
 
 SDL_Surface *windowIcon;
 
@@ -144,7 +142,7 @@ void WindowAndRenderInit()
  * @param event The SDL event to handle
  * @param shouldQuit Whether the program should quit after handling the event
  */
-void HandleEvent(const SDL_Event event, bool *shouldQuit)
+void HandleEvent(SDL_Event event, bool *shouldQuit)
 {
 	switch (event.type)
 	{
@@ -225,6 +223,8 @@ int main(const int argc, char *argv[])
 
 	InitOptions();
 
+	InitTimers();
+
 	if (HasCliArg(argc, argv, "--renderer"))
 	{
 		const char *renderer = GetCliArgStr(argc, argv, "--renderer", "gl");
@@ -245,8 +245,8 @@ int main(const int argc, char *argv[])
 
 	InputInit();
 
-	PhysicsThreadInit();
 	InitState();
+	PhysicsThreadInit();
 
 	if (!RenderPreInit())
 	{
@@ -260,8 +260,6 @@ int main(const int argc, char *argv[])
 	InitCommonAssets();
 
 	GLogoSplashStateSet();
-
-	InitTimers();
 
 	LogInfo("Engine initialized, entering mainloop\n");
 
@@ -325,10 +323,11 @@ int main(const int argc, char *argv[])
 		}
 #endif
 
-		state->cam->x = state->level->player.pos.x;
-		state->cam->y = (float)state->cameraY;
-		state->cam->z = state->level->player.pos.y;
-		state->cam->yaw = state->level->player.angle;
+		state->camera->transform.position.x = state->level->player.transform.position.x;
+		state->camera->transform.position.y = state->level->player.transform.position.y; // + state->camera->yOffset;
+		state->camera->transform.position.z = state->level->player.transform.position.z;
+		state->camera->transform.rotation = state->level->player.transform.rotation;
+		state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 
 		state->RenderGame(state);
 
@@ -365,6 +364,8 @@ int main(const int argc, char *argv[])
 	SDL_FreeSurface(windowIcon);
 	DestroyCommonAssets();
 	DestroyAssetCache(); // Free all assets
+	Mix_CloseAudio();
+	Mix_Quit();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();
 	LogDestroy();

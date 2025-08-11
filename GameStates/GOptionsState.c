@@ -3,7 +3,6 @@
 //
 
 #include "GOptionsState.h"
-#include "../../../Structs/Vector2.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Graphics/Drawing.h"
@@ -12,6 +11,7 @@
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
+#include "../Structs/Vector2.h"
 #include "GMenuState.h"
 #include "GPauseState.h"
 #include "Options/GInputOptionsState.h"

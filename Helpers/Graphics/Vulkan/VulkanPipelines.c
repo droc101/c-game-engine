@@ -2,7 +2,6 @@
 // Created by NBT22 on 7/7/25.
 //
 
-#include <assert.h>
 #include <luna/luna.h>
 #include "../../Core/AssetReader.h"
 #include "VulkanHelpers.h"
@@ -42,6 +41,10 @@ static const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
 	.depthWriteEnable = VK_TRUE,
 	.depthCompareOp = VK_COMPARE_OP_LESS,
 	.maxDepthBounds = 1,
+};
+
+static const VkPipelineDepthStencilStateCreateInfo depthStencilStateUnused = {
+	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 };
 
 static const VkPipelineColorBlendAttachmentState colorBlendAttachment = {
@@ -88,8 +91,8 @@ static const VkPipelineDynamicStateCreateInfo dynamicState = {
 
 bool CreateUIPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/ui_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load UI vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/ui_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -145,10 +148,6 @@ bool CreateUIPipeline()
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(uiShaderStages) / sizeof(*uiShaderStages),
 		.shaderStages = uiShaderStages,
@@ -157,7 +156,7 @@ bool CreateUIPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -170,8 +169,8 @@ bool CreateUIPipeline()
 
 bool CreateViewModelPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/view_model_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load view model vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/view_model_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -205,7 +204,7 @@ bool CreateViewModelPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, x),
+			.offset = offsetof(ModelVertex, position),
 		},
 		{
 			.location = 1,
@@ -216,44 +215,50 @@ bool CreateViewModelPipeline()
 		{
 			.location = 2,
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, nx),
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelVertex, color),
 		},
 		{
 			.location = 3,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ModelVertex, normal),
 		},
 		{
 			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 6,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
 		},
 		{
 			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
+		},
+		{
+			.location = 8,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = offsetof(ModelInstanceData, textureIndex),
 		},
 		{
-			.location = 8,
+			.location = 9,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, color),
+			.offset = offsetof(ModelInstanceData, materialColor),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -264,10 +269,6 @@ bool CreateViewModelPipeline()
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
@@ -276,7 +277,7 @@ bool CreateViewModelPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -290,8 +291,8 @@ bool CreateViewModelPipeline()
 
 bool CreateSkyPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/sky_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load sky vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/sky_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -318,7 +319,7 @@ bool CreateSkyPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(SkyVertex, x),
+			.offset = offsetof(SkyVertex, position),
 		},
 		{
 			.location = 1,
@@ -335,10 +336,6 @@ bool CreateSkyPipeline()
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
@@ -347,7 +344,7 @@ bool CreateSkyPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -360,8 +357,8 @@ bool CreateSkyPipeline()
 
 bool CreateFloorAndCeilingPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/floor_and_ceiling_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load floor and ceiling vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/floor_and_ceiling_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -382,10 +379,6 @@ bool CreateFloorAndCeilingPipeline()
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 	};
 
-	const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	};
-
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
@@ -394,7 +387,7 @@ bool CreateFloorAndCeilingPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &cullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
+		.depthStencilState = &depthStencilStateUnused,
 		.colorBlendState = &colorBlending,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -408,8 +401,8 @@ bool CreateFloorAndCeilingPipeline()
 
 bool CreateWallPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/wall_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load wall vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/wall_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -436,7 +429,7 @@ bool CreateWallPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(WallVertex, x),
+			.offset = offsetof(WallVertex, position),
 		},
 		{
 			.location = 1,
@@ -486,8 +479,8 @@ bool CreateWallPipeline()
 
 bool CreateActorWallPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_wall_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to create actor vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_wall_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -521,7 +514,7 @@ bool CreateActorWallPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorWallVertex, x),
+			.offset = offsetof(ActorWallVertex, position),
 		},
 		{
 			.location = 1,
@@ -596,8 +589,8 @@ bool CreateActorWallPipeline()
 
 bool CreateActorModelShadedPipeline()
 {
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to create actor vertex shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
@@ -631,7 +624,7 @@ bool CreateActorModelShadedPipeline()
 			.location = 0,
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, x),
+			.offset = offsetof(ModelVertex, position),
 		},
 		{
 			.location = 1,
@@ -642,8 +635,136 @@ bool CreateActorModelShadedPipeline()
 		{
 			.location = 2,
 			.binding = 0,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelVertex, color),
+		},
+		{
+			.location = 3,
+			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, nx),
+			.offset = offsetof(ModelVertex, normal),
+		},
+		{
+			.location = 4,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
+		},
+		{
+			.location = 5,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
+		},
+		{
+			.location = 6,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
+		},
+		{
+			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
+		},
+		{
+			.location = 8,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ModelInstanceData, textureIndex),
+		},
+		{
+			.location = 9,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, materialColor),
+		},
+		{
+			.location = 10,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelInstanceData, instanceColor),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.pVertexBindingDescriptions = bindingDescriptions,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &inputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &cullingRasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.shadedActorModels),
+			   "Failed to create shaded actor models pipeline!");
+
+	return true;
+}
+
+bool CreateActorModelUnshadedPipeline()
+{
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to create actor vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+			   "Failed to create actor fragment shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescriptions[] = {
+		{
+			.binding = 0,
+			.stride = sizeof(ModelVertex),
+			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+		},
+		{
+			.binding = 1,
+			.stride = sizeof(ModelInstanceData),
+			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
+		},
+	};
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ModelVertex, position),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ModelVertex, u),
+		},
+		{
+			.location = 2,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ModelVertex, color),
 		},
 		{
 			.location = 3,
@@ -679,117 +800,13 @@ bool CreateActorModelShadedPipeline()
 			.location = 8,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, color),
-		},
-	};
-	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
-		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
-		.pVertexAttributeDescriptions = vertexDescriptions,
-	};
-
-	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
-		.shaderStages = shaderStages,
-		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &cullingRasterizer,
-		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
-		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
-	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.shadedActorModels),
-			   "Failed to create shaded actor models pipeline!");
-
-	return true;
-}
-
-bool CreateActorModelUnshadedPipeline()
-{
-	LunaShaderModule vertShaderModule;
-	LunaShaderModule fragShaderModule;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
-			   "Failed to create actor vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
-			   "Failed to create actor fragment shader!");
-
-	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
-		{
-			.stage = VK_SHADER_STAGE_VERTEX_BIT,
-			.module = vertShaderModule,
+			.offset = offsetof(ModelInstanceData, materialColor),
 		},
 		{
-			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = fragShaderModule,
-		},
-	};
-
-	const VkVertexInputBindingDescription bindingDescriptions[] = {
-		{
-			.binding = 0,
-			.stride = sizeof(ModelVertex),
-			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-		},
-		{
-			.binding = 1,
-			.stride = sizeof(ModelInstanceData),
-			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
-		},
-	};
-	const VkVertexInputAttributeDescription vertexDescriptions[] = {
-		{
-			.location = 0,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, x),
-		},
-		{
-			.location = 1,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ModelVertex, u),
-		},
-		{
-			.location = 2,
+			.location = 9,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 0,
-		},
-		{
-			.location = 3,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 1,
-		},
-		{
-			.location = 4,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 2,
-		},
-		{
-			.location = 5,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, transform) + sizeof(vec4) * 3,
-		},
-		{
-			.location = 6,
-			.binding = 1,
-			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ModelInstanceData, textureIndex),
-		},
-		{
-			.location = 7,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelInstanceData, color),
+			.offset = offsetof(ModelInstanceData, instanceColor),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -820,6 +837,96 @@ bool CreateActorModelUnshadedPipeline()
 	return true;
 }
 
+bool CreateDebugDrawPipeline()
+{
+#ifdef JPH_DEBUG_RENDERER
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
+	VulkanTest(CreateShaderModule(SHADER("vulkan/debug_draw_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to load debug draw vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/debug_draw_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+			   "Failed to load debug draw fragment shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescription = {
+		.binding = 0,
+		.stride = sizeof(DebugDrawVertex),
+		.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+	};
+	const VkVertexInputAttributeDescription vertexDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(DebugDrawVertex, position),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(DebugDrawVertex, color),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &bindingDescription,
+		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.pVertexAttributeDescriptions = vertexDescriptions,
+	};
+
+	const VkPipelineInputAssemblyStateCreateInfo linesInputAssembly = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+		.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	};
+	const LunaGraphicsPipelineCreationInfo linesPipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &linesInputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &nonCullingRasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&linesPipelineInfo, &pipelines.debugDrawLines),
+			   "Failed to create graphics pipeline for Jolt debug renderer lines!");
+
+	const LunaGraphicsPipelineCreationInfo trianglesPipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &inputAssembly,
+		.viewportState = &viewportState,
+		.rasterizationState = &nonCullingRasterizer,
+		.multisampleState = &multisampling,
+		.depthStencilState = &depthStencilState,
+		.colorBlendState = &colorBlending,
+		.dynamicState = &dynamicState,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
+		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(&trianglesPipelineInfo, &pipelines.debugDrawTriangles),
+			   "Failed to create graphics pipeline for Jolt debug renderer triangles!");
+#endif
+
+	return true;
+}
+
 bool CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
@@ -827,6 +934,6 @@ bool CreateGraphicsPipelines()
 	// clang-format off
 	return CreateUIPipeline() && CreateViewModelPipeline() && CreateSkyPipeline() && CreateFloorAndCeilingPipeline() &&
 		   CreateWallPipeline() && CreateActorWallPipeline() && CreateActorModelShadedPipeline() &&
-		   CreateActorModelUnshadedPipeline();
+		   CreateActorModelUnshadedPipeline() && CreateDebugDrawPipeline();
 	// clang-format on
 }

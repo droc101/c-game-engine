@@ -50,7 +50,8 @@ bool GetCliArgBool(const int argc, char *argv[], const char *argument, const boo
 		if (strncmp(argv[i], argument, strlen(argument)) == 0)
 		{
 			char *value = strchr(argv[i], '=');
-			for (int j = 0; j < strlen(value); j++)
+			const size_t length = strlen(value);
+			for (size_t j = 0; j < length; j++)
 			{
 				value[j] = (char)tolower(value[j]);
 			}

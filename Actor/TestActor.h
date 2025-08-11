@@ -7,10 +7,8 @@
 
 #include "../defines.h"
 
-void TestActorInit(Actor *this, b2WorldId worldId, const KvList *params);
+void TestActorInit(Actor *this, const KvList *params, Transform *transform);
 
 void TestActorUpdate(Actor *this, double delta);
-
-void TestActorDestroy(Actor *this);
 
 #endif //GAME_TESTACTOR_H

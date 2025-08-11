@@ -5,7 +5,7 @@
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 
-#include "../defines.h"
+#include "../../../defines.h"
 
 typedef struct NavigationConfig NavigationConfig;
 

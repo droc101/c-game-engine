@@ -297,6 +297,40 @@ inline void DrawBatchedQuadsColored(const BatchedQuadArray *batch, const Color c
 	}
 }
 
+void DrawJoltDebugRendererDrawLine(void * /*userData*/,
+								   const JPH_RVec3 *from,
+								   const JPH_RVec3 *to,
+								   const JPH_Color color)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_VULKAN:
+			VK_DrawJoltDebugRendererLine(from, to, color);
+			break;
+		default:
+		case RENDERER_OPENGL:
+			break;
+	}
+}
+
+void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
+								   const JPH_RVec3 *v1,
+								   const JPH_RVec3 *v2,
+								   const JPH_RVec3 *v3,
+								   const JPH_Color color,
+								   JPH_DebugRenderer_CastShadow /*castShadow*/)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_VULKAN:
+			VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
+			break;
+		default:
+		case RENDERER_OPENGL:
+			break;
+	}
+}
+
 void RenderMenuBackground()
 {
 	// sorry for the confusing variable names
@@ -315,7 +349,7 @@ void RenderMenuBackground()
 void RenderInGameMenuBackground()
 {
 	const GlobalState *state = GetState();
-	RenderLevel3D(state->level, state->cam);
+	RenderLevel3D(state->level, state->camera);
 
 	DrawRect(0, 0, WindowWidth(), WindowHeight(), COLOR(0xA0000000));
 }

@@ -36,6 +36,10 @@ Pipelines pipelines = {
 	.actorWalls = LUNA_NULL_HANDLE,
 	.shadedActorModels = LUNA_NULL_HANDLE,
 	.unshadedActorModels = LUNA_NULL_HANDLE,
+#ifdef JPH_DEBUG_RENDERER
+	.debugDrawLines = LUNA_NULL_HANDLE,
+	.debugDrawTriangles = LUNA_NULL_HANDLE,
+#endif
 };
 Buffers buffers = {
 	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
@@ -53,6 +57,10 @@ Buffers buffers = {
 	.actorModels.instanceData.allocatedSize = sizeof(ModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
+#ifdef JPH_DEBUG_RENDERER
+	.debugDrawLines.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
+	.debugDrawTriangles.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
+#endif
 };
 #pragma endregion variables
 
@@ -66,7 +74,7 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 	assert(shader->platform == PLATFORM_VULKAN);
 	assert(shader->type == shaderType);
 
-	VulkanTestReturnResult(lunaCreateShaderModule(shader->spirv, shader->spirvLength * sizeof(uint32_t), shaderModule),
+	VulkanTestReturnResult(lunaCreateShaderModule(shader->spirv, sizeof(uint32_t) * shader->spirvLength, shaderModule),
 						   "Failed to create shader module!");
 
 	FreeShader(shader);
@@ -81,7 +89,7 @@ inline uint32_t TextureIndex(const char *texture)
 inline uint32_t ImageIndex(const Image *image)
 {
 	const uint32_t index = imageAssetIdToIndexMap[image->id];
-	if (index == -1)
+	if (index == -1u)
 	{
 		if (!LoadTexture(image))
 		{
@@ -154,16 +162,16 @@ VkResult LoadSky(const ModelDefinition *skyModel)
 	uint32_t *indices = buffers.sky.indices.data;
 	for (uint32_t i = 0; i < skyModel->lods[0]->vertexCount; i++)
 	{
-		// Copy {x, y, z, u, v} and discard {nx, ny, nz}
-		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 8, sizeof(float) * 5);
+		// Copy {x, y, z, u, v} and discard {r, g, b, a, nx, ny, nz}
+		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 12, sizeof(float) * 5);
 	}
-	buffers.sky.objectCount = 0;
-	for (uint32_t i = 0; i < skyModel->materialCount; i++)
+	buffers.sky.indexCount = 0;
+	for (uint32_t i = 0; i < skyModel->materialsPerSkin; i++)
 	{
-		memcpy(indices + buffers.sky.objectCount,
+		memcpy(indices + buffers.sky.indexCount,
 			   skyModel->lods[0]->indexData[i],
 			   sizeof(uint32_t) * skyModel->lods[0]->indexCount[i]);
-		buffers.sky.objectCount += skyModel->lods[0]->indexCount[i];
+		buffers.sky.indexCount += skyModel->lods[0]->indexCount[i];
 	}
 	lunaWriteDataToBuffer(buffers.sky.vertices.buffer, vertices, buffers.sky.vertices.bytesUsed, 0);
 	lunaWriteDataToBuffer(buffers.sky.indices.buffer, indices, buffers.sky.indices.bytesUsed, 0);
@@ -176,42 +184,41 @@ void LoadWalls(const Level *level)
 	WallVertex *vertices = buffers.walls.vertices.data;
 	uint32_t *indices = buffers.walls.indices.data;
 
-	for (uint32_t i = 0; i < buffers.walls.objectCount; i++)
+	for (uint32_t i = 0; i < level->walls.length; i++)
 	{
 		const Wall *wall = ListGetPointer(level->walls, i);
-		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
 		const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};
 		const vec2 startUV = {wall->uvOffset, 0};
 		const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
 
-		vertices[4 * i].x = startVertex[0];
-		vertices[4 * i].y = halfHeight;
-		vertices[4 * i].z = startVertex[1];
+		vertices[4 * i].position.x = startVertex[0];
+		vertices[4 * i].position.y = 0.5f;
+		vertices[4 * i].position.z = startVertex[1];
 		vertices[4 * i].u = startUV[0];
 		vertices[4 * i].v = startUV[1];
 		vertices[4 * i].textureIndex = TextureIndex(wall->tex);
 		vertices[4 * i].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 1].x = endVertex[0];
-		vertices[4 * i + 1].y = halfHeight;
-		vertices[4 * i + 1].z = endVertex[1];
+		vertices[4 * i + 1].position.x = endVertex[0];
+		vertices[4 * i + 1].position.y = 0.5f;
+		vertices[4 * i + 1].position.z = endVertex[1];
 		vertices[4 * i + 1].u = endUV[0];
 		vertices[4 * i + 1].v = startUV[1];
 		vertices[4 * i + 1].textureIndex = TextureIndex(wall->tex);
 		vertices[4 * i + 1].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 2].x = endVertex[0];
-		vertices[4 * i + 2].y = -halfHeight;
-		vertices[4 * i + 2].z = endVertex[1];
+		vertices[4 * i + 2].position.x = endVertex[0];
+		vertices[4 * i + 2].position.y = -0.5f;
+		vertices[4 * i + 2].position.z = endVertex[1];
 		vertices[4 * i + 2].u = endUV[0];
 		vertices[4 * i + 2].v = endUV[1];
 		vertices[4 * i + 2].textureIndex = TextureIndex(wall->tex);
 		vertices[4 * i + 2].wallAngle = (float)wall->angle;
 
-		vertices[4 * i + 3].x = startVertex[0];
-		vertices[4 * i + 3].y = -halfHeight;
-		vertices[4 * i + 3].z = startVertex[1];
+		vertices[4 * i + 3].position.x = startVertex[0];
+		vertices[4 * i + 3].position.y = -0.5f;
+		vertices[4 * i + 3].position.z = startVertex[1];
 		vertices[4 * i + 3].u = startUV[0];
 		vertices[4 * i + 3].v = endUV[1];
 		vertices[4 * i + 3].textureIndex = TextureIndex(wall->tex);
@@ -237,13 +244,13 @@ void UpdateTransformMatrix(const Camera *camera)
 						  FAR_Z,
 						  perspectiveMatrix);
 
-	vec3 viewTarget = {cosf(camera->yaw), 0, sinf(camera->yaw)};
+	vec3 viewTarget = {-sinf(camera->transform.rotation.y), 0, -cosf(camera->transform.rotation.y)};
 
 	// TODO roll and pitch might be messed up (test and fix as needed)
-	glm_vec3_rotate(viewTarget, camera->roll, GLM_ZUP); // Roll
-	glm_vec3_rotate(viewTarget, camera->pitch, GLM_XUP); // Pitch
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.x, GLM_XUP); // Pitch
 
-	vec3 cameraPosition = {camera->x, camera->y, camera->z};
+	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
 
 	mat4 viewMatrix;
@@ -264,11 +271,13 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix,
-				  (vec3){viewmodel->translation[0], -viewmodel->translation[1], viewmodel->translation[2]});
+				  (vec3){viewmodel->transform.position.x,
+						 -viewmodel->transform.position.y,
+						 viewmodel->transform.position.z});
 
 	// TODO rotation other than yaw
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_rotate(rotationMatrix, viewmodel->rotation[1], (vec3){0.0f, -1.0f, 0.0f});
+	glm_rotate(rotationMatrix, viewmodel->transform.rotation.y, (vec3){0.0f, -1.0f, 0.0f});
 
 	mat4 viewModelMatrix;
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
@@ -322,10 +331,10 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		buffers.ui.indices.data = newIndices;
 	}
 
-	uint32_t *indices = buffers.ui.indices.data;
-	UiVertex *vertices = buffers.ui.vertices.data;
+	UiVertex *vertices = buffers.ui.vertices.data + buffers.ui.vertices.bytesUsed;
+	uint32_t *indices = buffers.ui.indices.data + buffers.ui.indices.bytesUsed;
 
-	vertices[4 * buffers.ui.objectCount] = (UiVertex){
+	vertices[0] = (UiVertex){
 		.x = vertices_posXY_uvZW[0][0],
 		.y = vertices_posXY_uvZW[0][1],
 		.u = vertices_posXY_uvZW[0][2],
@@ -336,7 +345,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	vertices[4 * buffers.ui.objectCount + 1] = (UiVertex){
+	vertices[1] = (UiVertex){
 		.x = vertices_posXY_uvZW[1][0],
 		.y = vertices_posXY_uvZW[1][1],
 		.u = vertices_posXY_uvZW[1][2],
@@ -347,7 +356,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	vertices[4 * buffers.ui.objectCount + 2] = (UiVertex){
+	vertices[2] = (UiVertex){
 		.x = vertices_posXY_uvZW[2][0],
 		.y = vertices_posXY_uvZW[2][1],
 		.u = vertices_posXY_uvZW[2][2],
@@ -358,7 +367,7 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.a = color.a,
 		.textureIndex = textureIndex,
 	};
-	vertices[4 * buffers.ui.objectCount + 3] = (UiVertex){
+	vertices[3] = (UiVertex){
 		.x = vertices_posXY_uvZW[3][0],
 		.y = vertices_posXY_uvZW[3][1],
 		.u = vertices_posXY_uvZW[3][2],
@@ -370,14 +379,14 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.textureIndex = textureIndex,
 	};
 
-	indices[6 * buffers.ui.objectCount] = buffers.ui.objectCount * 4;
-	indices[6 * buffers.ui.objectCount + 1] = buffers.ui.objectCount * 4 + 1;
-	indices[6 * buffers.ui.objectCount + 2] = buffers.ui.objectCount * 4 + 2;
-	indices[6 * buffers.ui.objectCount + 3] = buffers.ui.objectCount * 4;
-	indices[6 * buffers.ui.objectCount + 4] = buffers.ui.objectCount * 4 + 2;
-	indices[6 * buffers.ui.objectCount + 5] = buffers.ui.objectCount * 4 + 3;
+	const size_t vertexOffset = buffers.ui.vertices.bytesUsed / sizeof(UiVertex);
+	indices[0] = vertexOffset;
+	indices[1] = vertexOffset + 1;
+	indices[2] = vertexOffset + 2;
+	indices[3] = vertexOffset;
+	indices[4] = vertexOffset + 2;
+	indices[5] = vertexOffset + 3;
 
-	buffers.ui.objectCount++;
 	buffers.ui.vertices.bytesUsed += sizeof(UiVertex) * 4;
 	buffers.ui.indices.bytesUsed += sizeof(uint32_t) * 6;
 }

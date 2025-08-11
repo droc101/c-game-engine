@@ -3,7 +3,6 @@
 //
 
 #include "GSoundOptionsState.h"
-#include "../../../Structs/Vector2.h"
 #include "../../Helpers/CommonAssets.h"
 #include "../../Helpers/Core/Input.h"
 #include "../../Helpers/Graphics/Drawing.h"
@@ -14,6 +13,7 @@
 #include "../../Structs/UI/Controls/Slider.h"
 #include "../../Structs/UI/UiStack.h"
 #include "../../Helpers/Core/SoundSystem.h"
+#include "../../Structs/Vector2.h"
 #include "../GOptionsState.h"
 
 UiStack *soundOptionsStack = NULL;

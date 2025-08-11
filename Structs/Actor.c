@@ -3,8 +3,6 @@
 //
 
 #include "Actor.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
@@ -28,13 +26,13 @@
 #include "../Actor/TestActor.h"
 
 // Empty template functions
-void ActorInit(Actor * /*this*/, b2WorldId /*worldId*/, const KvList * /*params*/) {}
+void ActorInit(Actor * /*this*/, const KvList * /*params*/, Transform * /*transform*/) {}
 
 void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorDestroy(Actor * /*this*/) {}
 
-ActorInitFunction ActorInitFuncs[] = {
+ActorInitFunction actorInitFunctions[] = {
 	ActorInit,
 	TestActorInit,
 	CoinInit,
@@ -53,15 +51,15 @@ ActorInitFunction ActorInitFuncs[] = {
 	LogicCounterInit,
 };
 
-ActorUpdateFunction ActorUpdateFuncs[] = {
+ActorUpdateFunction actorUpdateFunctions[] = {
 	ActorUpdate,
 	TestActorUpdate,
 	CoinUpdate,
 	GoalUpdate,
 	DoorUpdate,
-	TriggerUpdate,
+	ActorUpdate,
 	IoProxyUpdate,
-	PhysboxUpdate,
+	ActorUpdate,
 	LaserUpdate,
 	ActorUpdate,
 	ActorUpdate,
@@ -72,50 +70,49 @@ ActorUpdateFunction ActorUpdateFuncs[] = {
 	ActorUpdate,
 };
 
-ActorDestroyFunction ActorDestroyFuncs[] = {
+ActorDestroyFunction actorDestroyFunctions[] = {
 	ActorDestroy,
-	TestActorDestroy,
-	CoinDestroy,
-	GoalDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
 	DoorDestroy,
-	TriggerDestroy,
-	IoProxyDestroy,
-	PhysboxDestroy,
-	LaserDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
 	ActorDestroy,
 	SoundPlayerDestroy,
-	SpriteDestroy,
-	LaserDestroy,
-	LogicBinaryDestroy,
-	LogicDecimalDestroy,
-	LogicCounterDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
+	ActorDestroy,
 };
 
-Actor *CreateActor(const Vector2 position,
-				   const float rotation,
-				   const uint actorType,
-				   KvList *params,
-				   const b2WorldId worldId)
+Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
+	actor->actorFlags = 0;
+	actor->bodyInterface = bodyInterface;
+	actor->bodyId = JPH_BodyId_InvalidBodyID;
 	actor->actorWall = NULL;
-	actor->position = position;
-	actor->rotation = rotation;
 	actor->health = 1;
-	actor->yPosition = 0.0f;
+	actor->actorType = actorType;
 	actor->actorModel = NULL;
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	actor->modColor = COLOR_WHITE;
-	actor->bodyId = b2_nullBodyId;
 	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->SignalHandler = DefaultSignalHandler;
-	actor->Init = ActorInitFuncs[actorType];
-	actor->Update = ActorUpdateFuncs[actorType];
-	actor->Destroy = ActorDestroyFuncs[actorType];
-	actor->Init(actor, worldId, params); // kindly allow the Actor to initialize itself
-	actor->actorType = actorType;
+	actor->Init = actorInitFunctions[actorType];
+	actor->Update = actorUpdateFunctions[actorType];
+	actor->Destroy = actorDestroyFunctions[actorType];
+	actor->OnPlayerContactAdded = NULL;
+	actor->OnPlayerContactPersisted = NULL;
+	actor->OnPlayerContactRemoved = NULL;
+	actor->extraData = NULL;
+	actor->Init(actor, params, transform); // kindly allow the Actor to initialize itself
 	ActorFireOutput(actor, ACTOR_SPAWN_OUTPUT, PARAM_NONE);
 	if (params)
 	{
@@ -127,7 +124,15 @@ Actor *CreateActor(const Vector2 position,
 void FreeActor(Actor *actor)
 {
 	actor->Destroy(actor);
-	for (int i = 0; i < actor->ioConnections.length; i++)
+	free(actor->actorWall);
+	actor->actorWall = NULL;
+	free(actor->extraData);
+	actor->extraData = NULL;
+	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
+	{
+		JPH_BodyInterface_RemoveAndDestroyBody(actor->bodyInterface, actor->bodyId);
+	}
+	for (size_t i = 0; i < actor->ioConnections.length; i++)
 	{
 		ActorConnection *connection = ListGetPointer(actor->ioConnections, i);
 		DestroyActorConnection(connection);
@@ -135,42 +140,6 @@ void FreeActor(Actor *actor)
 	ListFree(actor->ioConnections);
 	free(actor);
 	actor = NULL;
-}
-
-void CreateActorWallCollider(Actor *this, const b2WorldId worldId)
-{
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position = this->actorWall->a;
-	this->bodyId = b2CreateBody(worldId, &bodyDef);
-	this->actorWall->bodyId = this->bodyId;
-	const float dx = this->actorWall->dx;
-	const float dy = this->actorWall->dy;
-	const float invDistance = 1 / sqrtf(dx * dx + dy * dy);
-	const Vector2 points[4] = {
-		{
-			(dy - dx / 2) * 0.01f * invDistance,
-			(-dx - dy / 2) * 0.01f * invDistance,
-		},
-		{
-			(-dy - dx / 2) * 0.01f * invDistance,
-			(dx - dy / 2) * 0.01f * invDistance,
-		},
-		{
-			dx + (dy + dx / 2) * 0.01f * invDistance,
-			dy + (-dx + dy / 2) * 0.01f * invDistance,
-		},
-		{
-			dx + (-dy + dx / 2) * 0.01f * invDistance,
-			dy + (dx + dy / 2) * 0.01f * invDistance,
-		},
-	};
-	const b2Hull hull = b2ComputeHull(points, 4);
-	const b2Polygon shape = b2MakePolygon(&hull, 0);
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.friction = 0;
-	shapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	b2CreatePolygonShape(this->actorWall->bodyId, &shapeDef, &shape);
 }
 
 void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param)
@@ -193,7 +162,7 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 {
 	//LogInfo("Firing signal %d from actor %p with param \"%s\"\n", signal, sender, defaultParam);
 	ListLock(sender->ioConnections);
-	for (int i = 0; i < sender->ioConnections.length; i++)
+	for (size_t i = 0; i < sender->ioConnections.length; i++)
 	{
 		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
 		if (connection->myOutput == signal)
@@ -205,7 +174,7 @@ void ActorFireOutput(const Actor *sender, const byte signal, const Param default
 				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->outActorName);
 				continue;
 			}
-			for (int j = 0; j < actors.length; j++)
+			for (size_t j = 0; j < actors.length; j++)
 			{
 				Actor *actor = ListGetPointer(actors, j);
 				if (actor->SignalHandler != NULL)
@@ -241,4 +210,20 @@ bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const byte sign
 		return true;
 	}
 	return false;
+}
+
+void ActorWallBake(const Actor *this)
+{
+	const float dx = this->actorWall->b.x - this->actorWall->a.x;
+	const float dy = this->actorWall->b.y - this->actorWall->a.y;
+	this->actorWall->length = sqrtf(dx * dx + dy * dy);
+	if (this->bodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
+	{
+		JPH_Quat rotation = {};
+		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
+		this->actorWall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY);
+	} else
+	{
+		this->actorWall->angle = atan2f(dy, dx);
+	}
 }

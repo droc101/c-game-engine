@@ -8,6 +8,7 @@
 #include "../Core/AssetLoaders/TextureLoader.h"
 #include "../Core/AssetLoaders/ModelLoader.h"
 #include "../Core/Error.h"
+#include "../Core/Logging.h"
 #include "../Core/MathEx.h"
 #include "GL/GLHelper.h"
 #include "Vulkan/Vulkan.h"
@@ -77,8 +78,16 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	{
 		Error("A NULL transformMatrix must not be passed to ActorTransformMatrix!");
 	}
-	glm_translate(*transformMatrix, (vec3){(float)actor->position.x, actor->yPosition, (float)actor->position.y});
-	glm_rotate(*transformMatrix, -actor->rotation, (vec3){0, 1, 0});
+	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
+	{
+		JPH_RMatrix4x4 matrix;
+		JPH_BodyInterface_GetCenterOfMassTransform(actor->bodyInterface, actor->bodyId, &matrix);
+		memcpy(*transformMatrix, &matrix, sizeof(mat4));
+	} else
+	{
+		LogWarning("ActorTransformMatrix called on actor which has no body!\n");
+		glm_mat4_identity(*transformMatrix);
+	}
 }
 
 bool RenderPreInit()

@@ -5,11 +5,8 @@
 #ifndef LOGICBINARY_H
 #define LOGICBINARY_H
 
-#include <box2d/id.h>
 #include "../../defines.h"
 
-void LogicBinaryInit(Actor *this, b2WorldId worldId, const KvList *params);
-
-void LogicBinaryDestroy(Actor *this);
+void LogicBinaryInit(Actor *this, const KvList *params, Transform *);
 
 #endif //LOGICBINARY_H

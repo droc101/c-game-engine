@@ -5,7 +5,7 @@ project(game C CXX)
 
 set(CMAKE_C_STANDARD 11)
 
-set(CMAKE_C_FLAGS "-Wall -Wno-discarded-qualifiers -fvisibility=hidden")
+set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
@@ -102,8 +102,6 @@ add_executable(
         GameStates/GLogoSplashState.h
         Helpers/Graphics/GL/GLHelper.c
         Helpers/Graphics/GL/GLHelper.h
-        Structs/Camera.c
-        Structs/Camera.h
         Helpers/Graphics/RenderingHelpers.c
         Helpers/Graphics/RenderingHelpers.h
         Helpers/Graphics/GL/GLDebug.c
@@ -135,8 +133,8 @@ add_executable(
         GameStates/Options/GSoundOptionsState.h
         GameStates/Options/GInputOptionsState.c
         GameStates/Options/GInputOptionsState.h
-        Helpers/Core/PhysicsThread.c
-        Helpers/Core/PhysicsThread.h
+        Helpers/Core/Physics/PhysicsThread.c
+        Helpers/Core/Physics/PhysicsThread.h
         Debug/FrameBenchmark.c
         Debug/FrameBenchmark.h
         Structs/UI/Controls/TextBox.c
@@ -156,10 +154,10 @@ add_executable(
         Helpers/Graphics/Vulkan/VulkanActors.c
         Helpers/Graphics/Vulkan/VulkanActors.h
         Helpers/Graphics/Vulkan/VulkanPipelines.c
-        Helpers/Navigation.c
-        Helpers/Navigation.h
-        Helpers/Collision.c
-        Helpers/Collision.h
+        Helpers/Core/Physics/Navigation.c
+        Helpers/Core/Physics/Navigation.h
+        Helpers/Core/Physics/Physics.c
+        Helpers/Core/Physics/Physics.h
         Helpers/TextInputSystem.c
         Helpers/TextInputSystem.h
         Actor/Core/Trigger.c
@@ -180,8 +178,8 @@ add_executable(
         Actor/Core/Sprite.h
         Actor/LaserEmitter.c
         Actor/LaserEmitter.h
-        Helpers/Core/LodThread.c
-        Helpers/Core/LodThread.h
+        Helpers/Graphics/LodThread.c
+        Helpers/Graphics/LodThread.h
         Actor/Core/LogicBinary.c
         Actor/Core/LogicBinary.h
         Helpers/Core/Arguments.c
@@ -200,47 +198,38 @@ add_executable(
         Helpers/Core/AssetLoaders/ShaderLoader.h
         Helpers/Core/SoundSystem.c
         Helpers/Core/SoundSystem.h
+        Debug/JoltDebugRenderer.c
+        Debug/JoltDebugRenderer.h
+        Helpers/Core/Physics/Player.c
+        Helpers/Core/Physics/Player.h
+        Helpers/Core/Physics/RayCast.c
+        Helpers/Core/Physics/RayCast.h
 )
 
 #endregion
 
 #region Libraries
 
-include(FetchContent)
-find_package(Git 2.18 REQUIRED)
-if (WIN32)
-    execute_process(COMMAND powershell -command "((& '${GIT_EXECUTABLE}' -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort=version:refname --tags https://github.com/NBT22/Luna.git 'v0.1.*' | Select-Object -Last 1) -Split '/')[2]" OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE LATEST_RELEASE)
-else ()
-    execute_process(COMMAND ${GIT_EXECUTABLE} -c "versionsort.suffix=-" ls-remote --exit-code --refs --sort=version:refname --tags https://github.com/NBT22/Luna.git "v0.1.*" COMMAND tail --lines=1 COMMAND cut --delimiter=/ --fields=3 COMMAND tr -d "\n" OUTPUT_VARIABLE LATEST_RELEASE)
-endif ()
-
-FetchContent_Declare(
-        Luna
-        GIT_REPOSITORY https://github.com/NBT22/Luna.git
-        GIT_TAG ${LATEST_RELEASE}
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        EXCLUDE_FROM_ALL
-        SYSTEM
-        OVERRIDE_FIND_PACKAGE
-)
+include(FetchPackage.cmake)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Luna REQUIRED)
+fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 
-if (UNIX)
-    if (TARGET_ARCH STREQUAL "arm64")
-        set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux_arm64.a")
-    else ()
-        set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_linux.a")
-    endif ()
-elseif (WIN32)
-    set(BOX2D_LIB "${CMAKE_SOURCE_DIR}/lib/box2d/libbox2d_windows.a")
-endif ()
+#add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
+FetchContent_Declare(
+        joltc
+        GIT_REPOSITORY https://github.com/NBT22/joltc
+        GIT_TAG main
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        EXCLUDE_FROM_ALL
+        SYSTEM
+)
+FetchContent_MakeAvailable(joltc)
 
 set(CROSS_PLATFORM_LIBRARIES
         ${SDL2_LIBRARIES}
@@ -249,7 +238,7 @@ set(CROSS_PLATFORM_LIBRARIES
         Luna
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}
-        ${BOX2D_LIB}
+        joltc
 )
 
 if (UNIX)
@@ -264,7 +253,6 @@ include_directories(game PRIVATE
         ${ZLIB_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
         ${GLEW_INCLUDE_DIRS}
-        "${CMAKE_SOURCE_DIR}/lib/box2d/include"
 )
 
 #endregion

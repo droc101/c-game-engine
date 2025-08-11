@@ -55,6 +55,7 @@ GLint hudTexturedRegionLoc;
 GLint wallTextureLoc;
 GLint wallModelWorldMatrixLoc;
 GLint wallSharedUniformsLoc;
+GLint wallTransformMatrixLoc;
 
 #pragma endregion
 
@@ -77,6 +78,7 @@ void LoadShaderLocations()
 	wallTextureLoc = glGetUniformLocation(wallShader->program, "alb");
 	wallModelWorldMatrixLoc = glGetUniformLocation(wallShader->program, "MODEL_WORLD_MATRIX");
 	wallSharedUniformsLoc = glGetUniformBlockIndex(wallShader->program, "SharedUniforms");
+	wallTransformMatrixLoc = glGetUniformLocation(wallShader->program, "transformMatrix");
 }
 
 bool GL_PreInit()
@@ -152,10 +154,8 @@ bool GL_Init(SDL_Window *wnd)
 
 	TestSDLFunction_NonFatal(SDL_GL_SetSwapInterval(GetState()->options.vsync ? 1 : 0), "Failed to set VSync");
 
-	// ReSharper disable once CppJoinDeclarationAndAssignment
-	GLenum err;
 	glewExperimental = GL_TRUE; // Please expose OpenGL 3.x+ interfaces
-	err = glewInit();
+	const GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
 		SDL_GL_DeleteContext(ctx);
@@ -259,7 +259,7 @@ void GL_DestroyGL()
 	{
 		if (glModels[i] != NULL)
 		{
-			for (int j = 0; j < glModels[i]->lodCount; j++)
+			for (uint32_t j = 0; j < glModels[i]->lodCount; j++)
 			{
 				GL_DestroyBuffer(glModels[i]->buffers[j]);
 			}
@@ -291,7 +291,7 @@ GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 
 GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
 {
-	GLint status;
+	GLint status = 0;
 	char errorBuffer[512];
 
 	GL_Shader *shader = malloc(sizeof(GL_Shader));
@@ -395,12 +395,20 @@ int GL_RegisterTexture(const Image *image)
 	glGenTextures(1, &glTextures[slot]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)image->width, (GLsizei)image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixelData);
+	glTexImage2D(GL_TEXTURE_2D,
+				 0,
+				 GL_RGBA,
+				 (GLsizei)image->width,
+				 (GLsizei)image->height,
+				 0,
+				 GL_RGBA,
+				 GL_UNSIGNED_BYTE,
+				 image->pixelData);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 
 	if (GetState()->options.mipmaps && image->mipmaps)
 	{
@@ -420,14 +428,22 @@ int GL_RegisterTexture(const Image *image)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->filter ? GL_LINEAR : GL_NEAREST);
 	}
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)image->width, (GLsizei)image->height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image->pixelData);
+	glTexSubImage2D(GL_TEXTURE_2D,
+					0,
+					0,
+					0,
+					(GLsizei)image->width,
+					(GLsizei)image->height,
+					GL_RGBA,
+					GL_UNSIGNED_INT_8_8_8_8_REV,
+					image->pixelData);
 
 	glNextFreeSlot++;
 
 	return slot;
 }
 
-void GL_LoadModel(const ModelDefinition *model, const uint lod, const int material)
+void GL_LoadModel(const ModelDefinition *model, const uint lod, const size_t material)
 {
 	if (glModels[model->id] != NULL)
 	{
@@ -443,15 +459,15 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const int materi
 	CheckAlloc(buf);
 	buf->lodCount = model->lodCount;
 	buf->materialCount = model->materialsPerSkin;
-	buf->buffers = malloc(sizeof(void *) * model->lodCount);
+	buf->buffers = malloc(sizeof(GL_Buffer *) * model->lodCount);
 	CheckAlloc(buf->buffers);
 
-	for (int l = 0; l < buf->lodCount; l++)
+	for (uint32_t l = 0; l < buf->lodCount; l++)
 	{
 		buf->buffers[l] = malloc(sizeof(GL_Buffer) * model->materialsPerSkin);
 		CheckAlloc(buf->buffers[l]);
 
-		for (int m = 0; m < buf->materialCount; m++)
+		for (uint32_t m = 0; m < buf->materialCount; m++)
 		{
 			GL_Buffer *modelBuffer = &buf->buffers[l][m];
 			glGenVertexArrays(1, &modelBuffer->vertexArrayObject);
@@ -529,10 +545,10 @@ void GL_LoadLevelWalls(const Level *l)
 
 		float vertices[4][6] = {
 			// X Y Z U V A
-			{(float)w->a.x, 0.5f * w->height, (float)w->a.y, 0.0f, 0.0f, w->angle},
-			{(float)w->b.x, 0.5f * w->height, (float)w->b.y, (float)w->length, 0.0f, w->angle},
-			{(float)w->b.x, -0.5f * w->height, (float)w->b.y, (float)w->length, 1.0f, w->angle},
-			{(float)w->a.x, -0.5f * w->height, (float)w->a.y, 0.0f, 1.0f, w->angle},
+			{(float)w->a.x, 0.5f, (float)w->a.y, 0.0f, 0.0f, w->angle},
+			{(float)w->b.x, 0.5f, (float)w->b.y, (float)w->length, 0.0f, w->angle},
+			{(float)w->b.x, -0.5f, (float)w->b.y, (float)w->length, 1.0f, w->angle},
+			{(float)w->a.x, -0.5f, (float)w->a.y, 0.0f, 1.0f, w->angle},
 		};
 
 		const float uvOffset = w->uvOffset;
@@ -582,8 +598,8 @@ inline void GL_Swap()
 
 inline void GL_UpdateViewportSize()
 {
-	int vpWidth;
-	int vpHeight;
+	int vpWidth = 0;
+	int vpHeight = 0;
 	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
 	glViewport(0, 0, vpWidth, vpHeight);
 }
@@ -859,7 +875,7 @@ void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level)
 						 (float)(level->fogColor >> 8 & 0xFF) / 255.0f,
 						 (float)(level->fogColor & 0xFF) / 255.0f},
 				  uniforms.fogColor);
-	uniforms.cameraYaw = GetState()->cam->yaw;
+	uniforms.cameraYaw = GetState()->camera->transform.rotation.y;
 	uniforms.fogStart = (float)level->fogStart;
 	uniforms.fogEnd = (float)level->fogEnd;
 
@@ -889,13 +905,13 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
-	vec3 viewTarget = {cosf(camera->yaw), 0, sinf(camera->yaw)};
+	vec3 viewTarget = {-sinf(camera->transform.rotation.y), 0, -cosf(camera->transform.rotation.y)};
 
 	// TODO roll and pitch might be messed up (test and fix as needed)
-	glm_vec3_rotate(viewTarget, camera->roll, GLM_ZUP); // Roll
-	glm_vec3_rotate(viewTarget, camera->pitch, GLM_XUP); // Pitch
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
+	glm_vec3_rotate(viewTarget, camera->transform.rotation.x, GLM_XUP); // Pitch
 
-	vec3 cameraPosition = {camera->x, camera->y, camera->z};
+	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
 
 	mat4 viewMatrix;
@@ -910,11 +926,14 @@ void GL_GetViewmodelMatrix(mat4 *out)
 	glm_perspective(glm_rad(VIEWMODEL_FOV), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix, GetState()->viewmodel.translation);
+	glm_translate(translationMatrix,
+				  (vec3){GetState()->viewmodel.transform.position.x,
+						 GetState()->viewmodel.transform.position.y,
+						 GetState()->viewmodel.transform.position.z});
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
-	glm_rotate(rotationMatrix, GetState()->viewmodel.rotation[1], GLM_YUP);
+	glm_rotate(rotationMatrix, GetState()->viewmodel.transform.rotation.y, GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
@@ -925,26 +944,28 @@ void GL_GetViewmodelMatrix(mat4 *out)
 
 #pragma region World Drawing
 
-void GL_DrawActorWall(const Actor *actor)
+void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 {
-	const Wall *wall = actor->actorWall;
+	const ActorWall *wall = actor->actorWall;
 
 	glUseProgram(wallShader->program);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
 
+	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
 	GL_LoadTextureFromAsset(wall->tex);
 
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(actor->position.x + wall->a.x, actor->position.y + wall->a.y);
-	const Vector2 endVertex = v2(actor->position.x + wall->b.x, actor->position.y + wall->b.y);
+	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
+	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
 	const Vector2 startUV = v2(wall->uvOffset, 0);
 	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
 	const float vertices[4][6] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
-			actor->yPosition + halfHeight,
+			halfHeight,
 			startVertex.y,
 			startUV.x,
 			startUV.y,
@@ -952,7 +973,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			endVertex.x,
-			actor->yPosition + halfHeight,
+			halfHeight,
 			endVertex.y,
 			endUV.x,
 			startUV.y,
@@ -960,7 +981,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			endVertex.x,
-			actor->yPosition - halfHeight,
+			-halfHeight,
 			endVertex.y,
 			endUV.x,
 			endUV.y,
@@ -968,7 +989,7 @@ void GL_DrawActorWall(const Actor *actor)
 		},
 		{
 			startVertex.x,
-			actor->yPosition - halfHeight,
+			-halfHeight,
 			startVertex.y,
 			startUV.x,
 			endUV.y,
@@ -1047,10 +1068,13 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 	mat4 worldViewMatrix;
 	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translated(skyModelWorldMatrix, (vec3){(float)level->player.pos.x, 0, (float)level->player.pos.y});
+	glm_translated(skyModelWorldMatrix,
+				   (vec3){(float)camera->transform.position.x,
+						  (float)camera->transform.position.y,
+						  (float)camera->transform.position.z});
 
-	const Vector2 floorStart = v2(level->player.pos.x - 100, level->player.pos.y - 100);
-	const Vector2 floorEnd = v2(level->player.pos.x + 100, level->player.pos.y + 100);
+	const Vector2 floorStart = v2(level->player.transform.position.x - 100, level->player.transform.position.z - 100);
+	const Vector2 floorEnd = v2(level->player.transform.position.x + 100, level->player.transform.position.z + 100);
 
 	GL_SetLevelParams(&worldViewMatrix, level);
 
@@ -1067,9 +1091,14 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 
 	GL_RenderLevelWalls();
 
-	for (int i = 0; i < level->actors.length; i++)
+	for (size_t i = 0; i < level->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(level->actors, i);
+		if (!actor->actorWall && !actor->actorModel)
+		{
+			continue;
+		}
+
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);
 		if (actor->actorModel == NULL)
@@ -1078,7 +1107,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 			{
 				continue;
 			}
-			GL_DrawActorWall(actor);
+			GL_DrawActorWall(actor, actorXfm);
 		} else
 		{
 			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
@@ -1112,18 +1141,18 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
-						const uint lod,
-						const int material,
-						const uint skin,
+						const uint32_t lod,
+						const size_t material,
+						const uint32_t skin,
 						Color modColor)
 {
-	const uint realSkin = clamp(skin, 0, model->skinCount - 1);
-	const size_t *skinIndices = model->skins[realSkin];
+	const uint32_t realSkin = min(skin, model->skinCount - 1);
+	const uint32_t *skinIndices = model->skins[realSkin];
 	const Material mat = model->materials[skinIndices[material]];
 
 	const ModelShader shader = mat.shader;
 
-	GL_Shader *glShader;
+	const GL_Shader *glShader = NULL;
 	switch (shader)
 	{
 		case SHADER_SKY:
@@ -1158,7 +1187,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
 					   1,
 					   GL_FALSE,
-					   modelWorldMatrix[0]); // model -> world
+					   *modelWorldMatrix); // model -> world
 
 	GL_LoadModel(model, lod, material);
 
@@ -1200,9 +1229,9 @@ void GL_RenderModel(const ModelDefinition *model,
 					const Color modColor)
 {
 	glEnable(GL_CULL_FACE);
-	for (int m = 0; m < model->materialsPerSkin; m++)
+	for (uint32_t material = 0; material < model->materialsPerSkin; material++)
 	{
-		GL_RenderModelPart(model, modelWorldMatrix, lod, m, skin, modColor);
+		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
 	}
 	glDisable(GL_CULL_FACE);
 }
@@ -1212,6 +1241,8 @@ void GL_RenderLevelWalls()
 	glUseProgram(wallShader->program);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *GLM_MAT4_IDENTITY);
 
 	size_t i = 0;
 	while (glWalls[i] != NULL && i < GL_MAX_WALL_BUFFERS)

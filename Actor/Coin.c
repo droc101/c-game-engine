@@ -3,18 +3,13 @@
 //
 
 #include "Coin.h"
-#include <box2d/box2d.h>
-#include <box2d/types.h>
-#include "../Helpers/Collision.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
-#include "../Helpers/Core/MathEx.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
-#include "../Structs/Wall.h"
 #include "../Helpers/Core/SoundSystem.h"
 
 #define COIN_OUTPUT_COLLECTED 2
@@ -22,48 +17,62 @@
 typedef struct CoinData
 {
 	bool isBlue;
-	byte animFrame;
-	b2ShapeId shape;
+	byte currentAnimationFrame;
 } CoinData;
 
-void CreateCoinSensor(Actor *this, const b2WorldId worldId)
+void CreateCoinSensor(Actor *this, const Transform *transform)
 {
-	CoinData *data = this->extraData;
-	b2ShapeId *shapeId = &data->shape;
-
-	b2BodyDef sensorBodyDef = b2DefaultBodyDef();
-	sensorBodyDef.type = b2_staticBody;
-	sensorBodyDef.position = this->position;
-	this->bodyId = b2CreateBody(worldId, &sensorBodyDef);
-	this->actorWall->bodyId = this->bodyId;
-	const b2Circle sensorShape = {
-		.radius = 0.5f,
-	};
-	b2ShapeDef sensorShapeDef = b2DefaultShapeDef();
-	sensorShapeDef.isSensor = true;
-	sensorShapeDef.filter.categoryBits = COLLISION_GROUP_ACTOR;
-	sensorShapeDef.filter.maskBits = COLLISION_GROUP_PLAYER;
-	*shapeId = b2CreateCircleShape(this->bodyId, &sensorShapeDef, &sensorShape);
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}},
+																	JPH_DEFAULT_CONVEX_RADIUS);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_SENSOR,
+																						   this);
+	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void CoinInit(Actor *this, const b2WorldId worldId, const KvList *params)
+void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 {
-	CoinData *data = calloc(1, sizeof(CoinData));
-	CheckAlloc(data);
-	this->extraData = data;
+	const CoinData *data = this->extraData;
+	if (!data->isBlue)
+	{
+		GetState()->saveData->coins++;
+	} else
+	{
+		GetState()->saveData->blueCoins++;
+		GetState()->saveData->coins += 5;
+	}
+	(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
+	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
+	RemoveActor(this);
+}
+
+void CoinInit(Actor *this, const KvList *params, Transform *transform)
+{
+	this->extraData = calloc(1, sizeof(CoinData));
+	CheckAlloc(this->extraData);
+	CoinData *data = this->extraData;
 	data->isBlue = KvGetBool(params, "isBlue", false);
 
-	this->actorWall = CreateWall(v2(0, 0.125f),
-								 v2(0, -0.125f),
-								 data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"),
-								 1.0f,
-								 0.0f);
-	WallBake(this->actorWall);
+	transform->position.y = -0.25f;
+	transform->rotation.y = 0;
+	CreateCoinSensor(this, transform);
 
-	CreateCoinSensor(this, worldId);
-
+	this->actorWall = malloc(sizeof(ActorWall));
+	this->actorWall->a = v2(0, 0.125f);
+	this->actorWall->b = v2(0, -0.125f);
+	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"), 80);
+	this->actorWall->uvScale = 1.0f;
+	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 0.25f;
-	this->yPosition = -0.25f;
+	ActorWallBake(this);
+
+	this->OnPlayerContactAdded = CoinOnPlayerContactAdded;
 }
 
 void CoinUpdate(Actor *this, double /*delta*/)
@@ -71,41 +80,18 @@ void CoinUpdate(Actor *this, double /*delta*/)
 	CoinData *data = this->extraData;
 	if (GetState()->physicsFrame % 8 == 0)
 	{
-		data->animFrame++;
-		data->animFrame %= 4;
+		data->currentAnimationFrame++;
+		data->currentAnimationFrame %= 4;
 
-		const float uvo = 0.25f * (float)data->animFrame;
+		const float uvo = 0.25f * (float)data->currentAnimationFrame;
 		this->actorWall->uvOffset = uvo;
 	}
 
-	const Vector2 playerPosition = GetState()->level->player.pos;
-	const float rotation = atan2f(playerPosition.y - this->position.y, playerPosition.x - this->position.x) + PIf / 2;
+	Vector3 position = {};
+	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
+	const float rotation = atan2f(GetState()->level->player.transform.position.z - position.z,
+								  GetState()->level->player.transform.position.x - position.x) +
+						   GLM_PI_2f;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
-
-	if (GetSensorState(GetState()->level->worldId, data->shape.index1, false))
-	{
-		if (!data->isBlue)
-		{
-			GetState()->saveData->coins++;
-		} else
-		{
-			GetState()->saveData->blueCoins++;
-			GetState()->saveData->coins += 5;
-		}
-		(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
-		ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE); // 2 = coin collected
-		RemoveActor(this);
-	}
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void CoinDestroy(Actor *this)
-{
-	b2DestroyBody(this->bodyId);
-	((CoinData *)this->extraData)->shape = b2_nullShapeId;
-	free(this->actorWall);
-	this->actorWall = NULL;
-	free(this->extraData);
-	this->extraData = NULL;
 }

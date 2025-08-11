@@ -14,8 +14,9 @@
 #define MAX_FRAMES_IN_FLIGHT 1
 #define MAX_UI_QUADS_INIT 8192 // TODO: find best value (and a fix for resizing the buffer mid-frame)
 #define MAX_WALLS_INIT 1024
-#define MAX_WALL_ACTORS_INIT 256
-#define MAX_MODEL_ACTOR_QUADS_INIT 4096
+#define MAX_WALL_ACTORS_INIT 1
+#define MAX_MODEL_ACTOR_QUADS_INIT 1
+#define MAX_DEBUG_DRAW_VERTICES_INIT 1024
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
 // TODO Use LogInternal
@@ -93,24 +94,19 @@ typedef struct UiVertex
 
 typedef struct ModelVertex
 {
-	/// The x component of the vertex's position, in model space
-	float x;
-	/// The y component of the vertex's position, in model space
-	float y;
-	/// The z component of the vertex's position, in model space
-	float z;
+	/// The position of the vertex in local space
+	Vector3 position;
 
 	/// The u component of the vertex's uv
 	float u;
 	/// The v component of the vertex's uv
 	float v;
 
-	/// The x component of the vertex's normal vector, in model space
-	float nx;
-	/// The y component of the vertex's normal vector, in model space
-	float ny;
-	/// The z component of the vertex's normal vector, in model space
-	float nz;
+	/// The color of the vertex
+	Color color;
+
+	/// The normal of the vertex
+	Vector3 normal;
 } ModelVertex;
 
 typedef struct ModelInstanceData
@@ -119,15 +115,15 @@ typedef struct ModelInstanceData
 	mat4 transform;
 	/// The instance's texture index.
 	uint32_t textureIndex;
-	/// The tint color of the instance
-	Color color;
+	/// The color of the instance, given by the material
+	Color materialColor;
+	/// The color of the instance, specified per-instance (such as by Actor::modColor)
+	Color instanceColor;
 } ModelInstanceData;
 
 typedef struct SkyVertex
 {
-	float x;
-	float y;
-	float z;
+	Vector3 position;
 
 	float u;
 	float v;
@@ -135,9 +131,7 @@ typedef struct SkyVertex
 
 typedef struct WallVertex
 {
-	float x;
-	float y;
-	float z;
+	Vector3 position;
 
 	float u;
 	float v;
@@ -148,12 +142,8 @@ typedef struct WallVertex
 
 typedef struct ActorWallVertex
 {
-	/// The x component of the vertex's position, in model space
-	float x;
-	/// The y component of the vertex's position, in model space
-	float y;
-	/// The z component of the vertex's position, in model space
-	float z;
+	/// The position of the vertex in local space
+	Vector3 position;
 
 	/// The u component of the vertex's uv
 	float u;
@@ -171,6 +161,12 @@ typedef struct ActorWallInstanceData
 	float wallAngle;
 } ActorWallInstanceData;
 
+typedef struct DebugDrawVertex
+{
+	Vector3 position;
+	Color color;
+} DebugDrawVertex;
+
 typedef struct BufferRegion
 {
 	LunaBuffer buffer;
@@ -179,13 +175,12 @@ typedef struct BufferRegion
 	void *data;
 } BufferRegion;
 
-typedef struct IndexedVertexBuffer
+typedef struct UiBuffer
 {
 	BufferRegion vertices;
 	BufferRegion indices;
-	uint32_t objectCount;
 	bool shouldResize;
-} IndexedVertexBuffer;
+} UiBuffer;
 
 typedef struct ViewModelBuffer
 {
@@ -196,6 +191,19 @@ typedef struct ViewModelBuffer
 	LunaBuffer drawInfo;
 	uint32_t drawCount;
 } ViewModelBuffer;
+
+typedef struct SkyBuffer
+{
+	BufferRegion vertices;
+	BufferRegion indices;
+	uint32_t indexCount;
+} SkyBuffer;
+
+typedef struct WallsBuffer
+{
+	BufferRegion vertices;
+	BufferRegion indices;
+} WallsBuffer;
 
 typedef struct ActorWallsBuffer
 {
@@ -217,14 +225,25 @@ typedef struct ActorModelsBuffer
 	List loadedModelIds;
 } ActorModelsBuffer;
 
+typedef struct DebugDrawBuffer
+{
+	BufferRegion vertices;
+	uint32_t vertexCount;
+	bool shouldResize;
+} DebugDrawBuffer;
+
 typedef struct Buffers
 {
-	IndexedVertexBuffer ui;
+	UiBuffer ui;
 	ViewModelBuffer viewModel;
-	IndexedVertexBuffer sky;
-	IndexedVertexBuffer walls;
+	SkyBuffer sky;
+	WallsBuffer walls;
 	ActorWallsBuffer actorWalls;
 	ActorModelsBuffer actorModels;
+#ifdef JPH_DEBUG_RENDERER
+	DebugDrawBuffer debugDrawLines;
+	DebugDrawBuffer debugDrawTriangles;
+#endif
 } Buffers;
 
 typedef struct Pipelines
@@ -237,6 +256,10 @@ typedef struct Pipelines
 	LunaGraphicsPipeline actorWalls;
 	LunaGraphicsPipeline shadedActorModels;
 	LunaGraphicsPipeline unshadedActorModels;
+#ifdef JPH_DEBUG_RENDERER
+	LunaGraphicsPipeline debugDrawLines;
+	LunaGraphicsPipeline debugDrawTriangles;
+#endif
 } Pipelines;
 
 typedef struct TextureSamplers
@@ -249,7 +272,7 @@ typedef struct TextureSamplers
 
 typedef struct PushConstants
 {
-	vec2 position;
+	Vector3 cameraPosition;
 	float yaw;
 	mat4 transformMatrix;
 

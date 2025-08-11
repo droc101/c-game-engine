@@ -3,31 +3,34 @@
 //
 
 #include "GMainState.h"
-#include <box2d/box2d.h>
 #include <math.h>
 #include <stdio.h>
 #include "../Debug/DPrint.h"
-#include "../Helpers/Collision.h"
+#include "../Debug/JoltDebugRenderer.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
-#include "../Helpers/Core/LodThread.h"
+#include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Core/Physics/Player.h"
+#include "../Helpers/Core/Physics/RayCast.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
+#include "../Helpers/Graphics/LodThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
-#include "../Helpers/Core/SoundSystem.h"
 #include "GPauseState.h"
 
-Actor *targetedEnemy = NULL;
-bool lodThreadInitDone = false;
+static Actor *targetedEnemy = NULL;
+static bool lodThreadInitDone = false;
 
-void GMainStateUpdate(GlobalState *State)
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+void GMainStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
@@ -36,90 +39,24 @@ void GMainStateUpdate(GlobalState *State)
 		return;
 	}
 
-	State->level->player.angle += GetMouseRel().x * (float)State->options.mouseSpeed / 120.0f;
+	state->level->player.transform.rotation.y -= GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
 
-	if (State->saveData->coins > 9999)
+	if (state->saveData->coins > 9999)
 	{
-		State->saveData->coins = 9999;
+		state->saveData->coins = 9999;
 	}
-	if (State->saveData->blueCoins > 5)
+	if (state->saveData->blueCoins > 5)
 	{
-		State->saveData->blueCoins = 5;
+		state->saveData->blueCoins = 5;
 	}
-}
-
-void CalculateMoveVec(const double delta, const Player *player, Vector2 *moveVec, bool *isMoving)
-{
-	*moveVec = v2s(0);
-	*isMoving = false;
-
-	if (UseController())
-	{
-		moveVec->y = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
-		moveVec->x = -GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
-		if (fabsf(moveVec->x) < STICK_DEADZONE)
-		{
-			moveVec->x = 0;
-		}
-		if (fabsf(moveVec->y) < STICK_DEADZONE)
-		{
-			moveVec->y = 0;
-		}
-
-	} else
-	{
-		if (IsKeyPressed(SDL_SCANCODE_W) || GetAxis(SDL_CONTROLLER_AXIS_LEFTY) < -0.5)
-		{
-			moveVec->x += 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_S) || GetAxis(SDL_CONTROLLER_AXIS_LEFTY) > 0.5)
-		{
-			moveVec->x -= 1;
-		}
-
-		if (IsKeyPressed(SDL_SCANCODE_A) || GetAxis(SDL_CONTROLLER_AXIS_LEFTX) < -0.5)
-		{
-			moveVec->y -= 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_D) || GetAxis(SDL_CONTROLLER_AXIS_LEFTX) > 0.5)
-		{
-			moveVec->y += 1;
-		}
-	}
-
-
-	*isMoving = moveVec->x != 0 || moveVec->y != 0;
-
-	if (*isMoving && !UseController())
-	{
-		*moveVec = Vector2Normalize(*moveVec);
-	}
-
-
-	float speed = MOVE_SPEED;
-	if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0.5)
-	{
-		speed = SLOW_MOVE_SPEED;
-	}
-
-	speed *= (float)delta;
-
-	Vector2 rotScaled = Vector2Scale(*moveVec, speed);
-	rotScaled = Vector2Rotate(rotScaled, player->angle);
-	*moveVec = rotScaled;
 }
 
 void GMainStateFixedUpdate(GlobalState *state, const double delta)
 {
-	Level *l = state->level;
+	float distanceTraveled = 0;
+	MovePlayer(&state->level->player, &distanceTraveled);
 
-	Vector2 moveVec;
-	bool isMoving;
-	CalculateMoveVec(delta, &l->player, &moveVec, &isMoving);
-
-	if (isMoving)
-	{
-		b2Body_ApplyLinearImpulseToCenter(l->player.bodyId, moveVec, true);
-	}
-
+	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
 	{
 		float cx = GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
@@ -129,30 +66,48 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			l->player.angle += cx * (float)state->options.mouseSpeed / 11.25f;
+			state->level->player.transform.rotation.y += cx * (float)state->options.mouseSpeed / 11.25f;
 		}
 	}
 
-	const float velocity = Vector2Length(b2Body_GetLinearVelocity(l->player.bodyId));
-	const float bobHeight = remap(velocity, 0, MOVE_SPEED, 0, 0.003);
-	state->cameraY = 0.1 + sin((double)state->physicsFrame / 7.0) * bobHeight;
-	state->viewmodel.translation[1] = -0.35f + ((float)state->cameraY * 0.2f);
+	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
+	state->camera->yOffset = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
-	l->player.angle = wrap(l->player.angle, 0, 2 * PI);
+	state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
 
-	for (int i = 0; i < l->actors.length; i++)
+	if (WaitForLodThreadToEnd() != 0)
 	{
-		Actor *a = ListGetPointer(l->actors, i);
+		Error("Failed to wait for LOD thread end semaphore!");
+	}
+	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
+
+	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
+
+	Update(&state->level->player, state->level->physicsSystem, deltaTime);
+
+	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
+
+	for (size_t i = 0; i < state->level->actors.length; i++)
+	{
+		Actor *a = ListGetPointer(state->level->actors, i);
 		a->Update(a, delta);
 	}
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(state->level->player.pos, 0, TEST_ACTOR, NULL, state->level->worldId);
+		Actor *leaf = CreateActor(&state->level->player.transform,
+								  ACTOR_TYPE_TEST,
+								  NULL,
+								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
 		AddActor(leaf);
 	}
 
-	targetedEnemy = GetTargetedEnemy(10);
+	const ActorRayCastOptions rayCastOptions = {
+		.bodyInterface = JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem),
+		.maxDistance = 10.0f,
+		.actorFlags = ACTOR_FLAG_ENEMY,
+	};
+	targetedEnemy = GetTargetedEnemy(&rayCastOptions);
 	if (targetedEnemy)
 	{
 		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
@@ -161,17 +116,21 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 	}
 
+	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
 	if (SignalLodThreadCanStart() != 0)
 	{
 		Error("Failed to signal LOD thread start semaphore!");
 	}
 
-	b2World_Step(l->worldId, (float)delta / PHYSICS_TARGET_TPS, 4);
-	l->player.pos = b2Body_GetPosition(l->player.bodyId);
-
-	if (WaitForLodThreadToEnd() != 0)
+	// This is safe to be here because it does not modify the actors in any way.
+	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
+																   deltaTime,
+																   2,
+																   state->jobSystem);
+	if (result != JPH_PhysicsUpdateError_None)
 	{
-		Error("Failed to wait for LOD thread end semaphore!");
+		LogError("Failed to update Jolt physics system with error %d\n", result);
+		Error("Failed to update physics!");
 	}
 }
 
@@ -180,7 +139,8 @@ void GMainStateRender(GlobalState *state)
 {
 	const Level *level = state->level;
 
-	RenderLevel3D(level, state->cam);
+	JoltDebugRendererDrawBodies(level->physicsSystem);
+	RenderLevel3D(level, state->camera);
 
 	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
 	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface/hud_ycoin"));
@@ -208,13 +168,14 @@ void GMainStateRender(GlobalState *state)
 				   TEXTURE("interface/crosshair"),
 				   crosshairColor);
 
-	DPrintF("Position: (%.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
+	DPrintF("Position: (%.2f, %.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
 			COLOR_WHITE,
 			false,
-			level->player.pos.x,
-			level->player.pos.y,
-			fabsf(level->player.angle),
-			radToDeg(fabsf(level->player.angle)));
+			level->player.transform.position.x,
+			level->player.transform.position.y,
+			level->player.transform.position.z,
+			fabsf(level->player.transform.rotation.y),
+			radToDeg(fabsf(level->player.transform.rotation.y)));
 
 	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);

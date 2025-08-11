@@ -61,7 +61,7 @@ void AssetCacheInit()
 
 void DestroyAssetCache()
 {
-	for (int i = 0; i < assetCacheData.length; i++)
+	for (size_t i = 0; i < assetCacheData.length; i++)
 	{
 		Asset *asset = ListGetPointer(assetCacheData, i);
 		free(asset->data);
@@ -78,7 +78,7 @@ void DestroyAssetCache()
 Asset *DecompressAsset(const char *relPath, const bool cache)
 {
 	// see if relPath is already in the cache
-	for (int i = 0; i < assetCacheNames.length; i++)
+	for (size_t i = 0; i < assetCacheNames.length; i++)
 	{
 		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
 		{
@@ -206,7 +206,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 void RemoveAssetFromCache(const char *relPath)
 {
 	int index = -1;
-	for (int i = 0; i < assetCacheNames.length; i++)
+	for (size_t i = 0; i < assetCacheNames.length; i++)
 	{
 		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
 		{
@@ -230,6 +230,9 @@ void RemoveAssetFromCache(const char *relPath)
 
 void FreeAsset(Asset *asset)
 {
-	free(asset->data);
-	free(asset);
+	if (asset != NULL)
+	{
+		free(asset->data);
+		free(asset);
+	}
 }

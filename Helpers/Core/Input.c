@@ -334,7 +334,7 @@ float GetAxis(const SDL_GameControllerAxis axis)
 	}
 }
 
-bool UseController()
+inline bool UseController()
 {
 	return GetState()->options.controllerMode && controller != NULL;
 }

@@ -19,7 +19,7 @@ long framegraphLastUpdateTime = LONG_MIN;
 double tickrates[FRAMEGRAPH_HISTORY_SIZE] = {0};
 double tickGraphLastUpdateTime = LONG_MIN;
 
-void FG_PushIntoArray(const double value)
+static inline void FG_PushIntoArray(const double value)
 {
 	for (int i = 0; i < FRAMEGRAPH_HISTORY_SIZE - 1; i++)
 	{
@@ -28,7 +28,7 @@ void FG_PushIntoArray(const double value)
 	framerates[FRAMEGRAPH_HISTORY_SIZE - 1] = value;
 }
 
-void TG_PushIntoArray(const double value)
+static inline void TG_PushIntoArray(const double value)
 {
 	for (int i = 0; i < FRAMEGRAPH_HISTORY_SIZE - 1; i++)
 	{

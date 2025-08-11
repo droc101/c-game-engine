@@ -5,6 +5,8 @@
 #ifndef GAME_MATHEX_H
 #define GAME_MATHEX_H
 
+#include <stdint.h>
+
 #define PI 3.14159265358979323846
 #define PIf 3.14159265358979323846f
 
@@ -24,31 +26,12 @@
  */
 #define max(a, b) ((a) < (b) ? (b) : (a))
 
-/**
- * Wraps a number between a minimum and maximum value
- * @param x Number to wrap
- * @param min Minimum value
- * @param max Maximum value
- * @return The wrapped number
- */
 int wrapi(int x, int min, int max);
 
-/**
- * Wraps a number between a minimum and maximum value
- * @param x Number to wrap
- * @param min Minimum value
- * @param max Maximum value
- * @return The wrapped number
- */
+uint32_t wrapu(uint32_t x, uint32_t min, uint32_t max);
+
 float wrapf(float x, float min, float max);
 
-/**
- * Wraps a number between a minimum and maximum value
- * @param x Number to wrap
- * @param min Minimum value
- * @param max Maximum value
- * @return The wrapped number
- */
 double wrapd(double x, double min, double max);
 
 /**
@@ -58,7 +41,7 @@ double wrapd(double x, double min, double max);
  * @param max Maximum value
  * @return The wrapped number
  */
-#define wrap(x, min, max) _Generic((x), default: wrapi, float: wrapf, double: wrapd)(x, min, max)
+#define wrap(x, min, max) _Generic((x), float: wrapf, double: wrapd, uint32_t: wrapu, default: wrapi)(x, min, max)
 
 /**
  * Remap a number from one range to another

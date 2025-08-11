@@ -5,11 +5,8 @@
 #ifndef LOGICDECIMAL_H
 #define LOGICDECIMAL_H
 
-#include <box2d/id.h>
 #include "../../defines.h"
 
-void LogicDecimalInit(Actor *this, b2WorldId worldId, const KvList *params);
-
-void LogicDecimalDestroy(Actor *this);
+void LogicDecimalInit(Actor *this, const KvList *params, Transform *);
 
 #endif //LOGICDECIMAL_H

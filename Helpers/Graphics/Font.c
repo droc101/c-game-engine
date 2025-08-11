@@ -3,8 +3,8 @@
 //
 
 #include "Font.h"
-#include <string.h>
 #include <ctype.h>
+#include <string.h>
 #include "../../Structs/Vector2.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
@@ -27,7 +27,7 @@ Vector2 MeasureTextNChars(const char *str, const uint size, const Font *font, co
 	int textHeight = (int)size;
 	int tempWidth = 0;
 	const double sizeMultiplier = (double)size / font->defaultSize;
-	for (int j = 0; j < n; j++)
+	for (size_t j = 0; j < n; j++)
 	{
 		const int fSize = (int)((font->charWidths[(int)str[j]] + font->charSpacing) * sizeMultiplier);
 		tempWidth += fSize;
@@ -55,7 +55,8 @@ Vector2 MeasureTextNChars(const char *str, const uint size, const Font *font, co
 int StringLineCount(const char *str)
 {
 	int count = 1;
-	for (int i = 0; i < strlen(str); i++)
+	const size_t length = strlen(str);
+	for (size_t i = 0; i < length; i++)
 	{
 		if (str[i] == '\n')
 		{
@@ -114,7 +115,7 @@ void TextGetLine(const char *str, const int line, char *out, const size_t outBuf
 
 	if (convertToUppercase)
 	{
-		for (int i = 0; i < copySize; i++)
+		for (size_t i = 0; i < copySize; i++)
 		{
 			out[i] = (char)toupper(out[i]);
 		}
@@ -143,7 +144,7 @@ void DrawTextAligned(const char *str,
 	int c = 0;
 
 	const int lines = StringLineCount(str);
-	int x;
+	int x = 0;
 	int y = (int)rectPos.y;
 	if (vAlign == FONT_VALIGN_MIDDLE)
 	{

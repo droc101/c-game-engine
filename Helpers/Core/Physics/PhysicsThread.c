@@ -4,13 +4,14 @@
 
 #include "PhysicsThread.h"
 #include <SDL_thread.h>
-#include "../../Debug/FrameGrapher.h"
-#include "../../defines.h"
-#include "../../Structs/GlobalState.h"
-#include "Error.h"
-#include "Input.h"
-#include "Logging.h"
-#include "Timing.h"
+#include "../../../Debug/FrameGrapher.h"
+#include "../../../Debug/JoltDebugRenderer.h"
+#include "../../../defines.h"
+#include "../../../Structs/GlobalState.h"
+#include "../Error.h"
+#include "../Input.h"
+#include "../Logging.h"
+#include "../Timing.h"
 
 static SDL_Thread *physicsThread;
 static SDL_mutex *physicsThreadMutex;
@@ -106,9 +107,11 @@ void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 	SDL_UnlockMutex(physicsThreadMutex);
 	if (function)
 	{
-		if (SDL_SemTryWait(physicsTickHasEnded) == SDL_MUTEX_TIMEDOUT)
+		if (SDL_SemTryWait(physicsTickHasEnded) == SDL_MUTEX_TIMEDOUT &&
+			SDL_SemWaitTimeout(physicsTickHasEnded, 1000) < 0)
 		{
-			SDL_SemWait(physicsTickHasEnded);
+			LogError("Failed to wait for physics tick semaphore with error %s", SDL_GetError());
+			Error("Failed to wait for physics tick semaphore!");
 		}
 	}
 }

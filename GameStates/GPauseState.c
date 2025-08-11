@@ -4,17 +4,17 @@
 
 #include "GPauseState.h"
 #include <stdio.h>
-#include "../../../Structs/Vector2.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Input.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
-#include "../Helpers/Core/SoundSystem.h"
+#include "../Structs/Vector2.h"
 #include "GLevelSelectState.h"
 #include "GMainState.h"
 #include "GOptionsState.h"
@@ -37,7 +37,7 @@ void GPauseStateUpdate(GlobalState * /*State*/)
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GPauseStateRender(GlobalState *State)
+void GPauseStateRender(GlobalState * /*state*/)
 {
 	RenderInGameMenuBackground();
 
@@ -47,9 +47,7 @@ void GPauseStateRender(GlobalState *State)
 	logoPosition.y = 32;
 	logoSize.x = 360;
 	logoSize.y = 240;
-	DrawTexture(logoPosition,
-				logoSize,
-				TEXTURE("interface/pause_logo"));
+	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 	ProcessUiStack(pauseStack);
 	DrawUiStack(pauseStack);

@@ -5,9 +5,8 @@
 #ifndef GAME_DEFINES_H
 #define GAME_DEFINES_H
 
-#include <box2d/id.h>
-#include <box2d/math_functions.h>
 #include <cglm/cglm.h>
+#include <joltc.h>
 #include <SDL.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,14 +28,16 @@ typedef enum OptionsMsaa OptionsMsaa;
 typedef enum ModelShader ModelShader;
 typedef enum AssetType AssetType;
 typedef enum ParamType ParamType;
+typedef enum ActorType ActorType;
 
 // Struct forward declarations
+typedef struct Vector2 Vector2;
 typedef struct Viewmodel Viewmodel;
 typedef struct GlobalState GlobalState;
-typedef b2Vec2 Vector2;
 typedef struct Camera Camera;
 typedef struct Player Player;
 typedef struct Wall Wall;
+typedef struct ActorWall ActorWall;
 typedef struct Level Level;
 typedef struct Actor Actor;
 typedef struct Options Options;
@@ -59,7 +60,7 @@ typedef void (*FrameUpdateFunction)(GlobalState *state);
 
 typedef void (*FrameRenderFunction)(GlobalState *state);
 
-typedef void (*ActorInitFunction)(Actor *this, b2WorldId worldId, const KvList *params);
+typedef void (*ActorInitFunction)(Actor *this, const KvList *params, Transform *transform);
 
 typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
@@ -74,6 +75,12 @@ typedef void (*ActorDestroyFunction)(Actor *this);
  * @return True if the signal was handled, false if not
  */
 typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, byte signal, const Param *param);
+
+typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyId bodyId);
+
+typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyId bodyId);
+
+typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId);
 
 #pragma endregion
 
@@ -207,14 +214,27 @@ enum ModelShader
 	SHADER_SHADED
 };
 
-enum CollisionGroups
+enum ActorFlags
 {
-	COLLISION_GROUP_DEFAULT = 1 << 0,
-	COLLISION_GROUP_PLAYER = 1 << 1,
-	COLLISION_GROUP_ACTOR = 1 << 2,
-	COLLISION_GROUP_TRIGGER = 1 << 3,
-	COLLISION_GROUP_ACTOR_ENEMY = 1 << 4,
-	COLLISION_GROUP_HURTBOX = 1 << 5,
+	ACTOR_FLAG_ENEMY = 1 << 0,
+	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 1,
+};
+
+enum ObjectLayers
+{
+	OBJECT_LAYER_STATIC,
+	OBJECT_LAYER_DYNAMIC,
+	OBJECT_LAYER_PLAYER,
+	OBJECT_LAYER_SENSOR,
+};
+
+enum BroadPhaseLayers
+{
+	BROAD_PHASE_LAYER_STATIC,
+	BROAD_PHASE_LAYER_DYNAMIC,
+
+	/// @warning Used for checking the number of broadphase layers, and as such is not a valid layer index
+	BROADPHASE_LAYER_MAX,
 };
 
 enum ParamType
@@ -228,17 +248,43 @@ enum ParamType
 	PARAM_TYPE_COLOR
 };
 
+enum ActorType
+{
+	ACTOR_TYPE_EMPTY,
+	ACTOR_TYPE_TEST,
+	ACTOR_TYPE_COIN,
+	ACTOR_TYPE_GOAL,
+	ACTOR_TYPE_DOOR,
+	ACTOR_TYPE_TRIGGER,
+	ACTOR_TYPE_IO_PROXY,
+	ACTOR_TYPE_PHYSBOX,
+	ACTOR_TYPE_LASER,
+	ACTOR_TYPE_STATIC_MODEL,
+	ACTOR_TYPE_SOUND_PLAYER,
+	ACTOR_TYPE_SPRITE,
+	ACTOR_TYPE_LASER_EMITTER,
+	ACTOR_TYPE_LOGIC_BINARY,
+	ACTOR_TYPE_LOGIC_DECIMAL,
+	ACTOR_TYPE_LOGIC_COUNTER
+};
+
+
 #pragma endregion
 
 #pragma region Struct definitions
+
+struct Vector2
+{
+	float x;
+	float y;
+};
 
 struct Viewmodel
 {
 	bool enabled;
 	ModelDefinition *model;
 	uint modelSkin;
-	vec3 translation;
-	vec3 rotation;
+	Transform transform;
 };
 
 struct KvList
@@ -271,19 +317,10 @@ struct Param
 
 struct Camera
 {
-	/// The X position of the camera
-	float x;
-	/// The Y position of the camera
-	float y;
-	/// The Z position of the camera
-	float z;
-
-	/// The pitch of the camera
-	float pitch;
-	/// The yaw of the camera
-	float yaw;
-	/// The roll of the camera
-	float roll;
+	/// The 3d transform of the camera
+	Transform transform;
+	/// The y-offset, used for view bobbing
+	float yOffset;
 
 	/// The field of view of the camera
 	float fov;
@@ -291,12 +328,10 @@ struct Camera
 
 struct Player
 {
-	/// The player's position
-	Vector2 pos;
-	/// The player's rotation
-	float angle;
-	/// The player's Box2D body ID
-	b2BodyId bodyId;
+	/// The player's 3d transform
+	Transform transform;
+	/// The Jolt character. Includes the rigid body as well as other useful abstractions
+	JPH_CharacterVirtual *joltCharacter;
 };
 
 // Utility functions are in Structs/wall.h
@@ -307,7 +342,7 @@ struct Wall
 	/// The second point of the wall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
-	const char tex[80];
+	char tex[80];
 	/// The length of the wall (Call @c WallBake to update)
 	float length;
 	/// The angle of the wall (Call @c WallBake to update)
@@ -320,10 +355,28 @@ struct Wall
 	float uvScale;
 	/// The X offset of the texture
 	float uvOffset;
+	/// Jolt body ID
+	JPH_BodyId bodyId;
+};
+
+struct ActorWall
+{
+	/// The first point of the wall
+	Vector2 a;
+	/// The second point of the wall
+	Vector2 b;
+	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	char tex[80];
+	/// The X scale of the texture
+	float uvScale;
+	/// The X offset of the texture
+	float uvOffset;
 	/// height of the wall for rendering. Does not affect collision
 	float height;
-	/// The wall's Box2D body ID
-	b2BodyId bodyId;
+	/// The length of the wall (Call @c WallBake to update)
+	float length;
+	/// The angle of the wall (Call @c WallBake to update)
+	float angle;
 };
 
 // Utility functions are in Structs/level.h
@@ -351,8 +404,8 @@ struct Level
 	/// The distance from the player at which the fog is fully opaque
 	float fogEnd;
 
-	/// The ID of the Box2D world
-	b2WorldId worldId;
+	JPH_PhysicsSystem *physicsSystem;
+	uint floorBodyId;
 
 	/// The player object
 	Player player;
@@ -419,6 +472,8 @@ struct GlobalState
 	/// Current level
 	Level *level;
 
+	JPH_JobSystem *jobSystem;
+
 	/// State update function
 	FrameUpdateFunction UpdateGame;
 	/// State render function
@@ -432,9 +487,7 @@ struct GlobalState
 	SaveData *saveData;
 
 	/// The camera
-	Camera *cam;
-	/// The Y position of the camera
-	double cameraY;
+	Camera *camera;
 	/// The scale of the UI.
 	double uiScale;
 
@@ -466,19 +519,12 @@ struct SaveData
 // Actor (interactable/moving wall) struct
 struct Actor
 {
-	/// The center position of the actor
-	/// @warning This is the visual position only, and synchronization between the visual position and the physics
-	///	 position must be explicitly done in the update function
-	Vector2 position;
-	/// The rotation of the actor
-	/// @warning This is the visual rotation only, and synchronization between the visual rotation and the physics
-	///	 rotation must be explicitly done in the update function
-	float rotation;
-	/// Y position for rendering
-	/// @note Because this game uses a 2d physics engine, this value is not considered in any physics calculations.
-	///  As such, an actor can be rendered floating, but will always collide as though it is on the same plane as
-	///  everything else.
-	float yPosition;
+	/// Flags used to provide more information about the actor
+	uint32_t actorFlags;
+
+	JPH_BodyInterface *bodyInterface;
+	JPH_BodyId bodyId;
+
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
 	/// The index of the active skin for the actor's model
@@ -489,11 +535,11 @@ struct Actor
 	Color modColor;
 
 	/// The actor's wall, in global space
-	Wall *actorWall;
+	ActorWall *actorWall;
 
 	/// The actor type index
 	/// @warning Do not change this after creation
-	uint actorType;
+	ActorType actorType;
 	/// The function to call when the actor is initialized
 	/// @note This should only be called once, when the actor is created
 	ActorInitFunction Init;
@@ -505,6 +551,9 @@ struct Actor
 	ActorDestroyFunction Destroy;
 	/// The function to call when the actor receives a signal.
 	ActorSignalHandlerFunction SignalHandler;
+	ActorPlayerContactAddedFunction OnPlayerContactAdded;
+	ActorPlayerContactPersistedFunction OnPlayerContactPersisted;
+	ActorPlayerContactRemovedFunction OnPlayerContactRemoved;
 	/// List of I/O connections
 	LockingList ioConnections;
 
@@ -513,9 +562,6 @@ struct Actor
 	int health;
 	/// Extra data for the actor
 	void *extraData;
-
-	/// The actor's Box2D body ID
-	b2BodyId bodyId;
 };
 
 struct Asset
@@ -573,7 +619,7 @@ struct Font
 	bool uppercaseOnly;
 
 	/// The texture this font uses (fully qualified)
-	char* texture;
+	char *texture;
 	/// The index of the character in the texture
 	uint8_t indices[255];
 	/// The width of each character, index directly by the character
@@ -593,9 +639,6 @@ struct ActorConnection
 
 struct Material
 {
-	/// The runtime-generated ID of this model
-	size_t id;
-
 	/// The texture name of the material
 	char *texture;
 	/// The tint color of the material
@@ -607,7 +650,7 @@ struct Material
 struct ModelLod
 {
 	/// The runtime-generated ID of this model
-	size_t id;
+	uint32_t id;
 
 	/// How far away the camera must be before this LOD is used (units squared)
 	float distanceSquared;
@@ -618,33 +661,33 @@ struct ModelLod
 	float *vertexData;
 
 	/// The total number of indices across all materials
-	uint totalIndexCount;
+	uint32_t totalIndexCount;
 	/// The number of indices in each material
-	uint *indexCount;
+	uint32_t *indexCount;
 	/// Index data for each material
-	uint **indexData;
+	uint32_t **indexData;
 };
 
 struct ModelDefinition
 {
 	/// The runtime-generated ID of this model
-	size_t id;
+	uint32_t id;
 	/// The asset name of this model
 	char *name;
 
 	/// The number of materials in the model
-	size_t materialCount;
+	uint32_t materialCount;
 
-	size_t materialsPerSkin;
+	uint32_t materialsPerSkin;
 
 	/// The number of skins in the model
-	size_t skinCount;
+	uint32_t skinCount;
 	/// The number of LODs in the model
-	size_t lodCount;
+	uint32_t lodCount;
 
 	Material *materials;
 	/// The skins for this model, each an array of materialsPerSkin indices into the materials array
-	size_t **skins;
+	uint32_t **skins;
 	/// The LODs for this model
 	ModelLod **lods;
 };

@@ -5,10 +5,9 @@
 #ifndef SOUNDPLAYER_H
 #define SOUNDPLAYER_H
 
-#include <box2d/id.h>
 #include "../../defines.h"
 
-void SoundPlayerInit(Actor *this, b2WorldId worldId, const KvList *params);
+void SoundPlayerInit(Actor *this, const KvList *params, Transform *);
 
 void SoundPlayerDestroy(Actor *this);
 

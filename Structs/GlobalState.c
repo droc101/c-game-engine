@@ -3,9 +3,9 @@
 //
 
 #include "GlobalState.h"
-#include <box2d/box2d.h>
 #include <stdio.h>
 #include <string.h>
+#include "../Debug/JoltDebugRenderer.h"
 #include "../GameStates/GLevelSelectState.h"
 #include "../GameStates/GMenuState.h"
 #include "../GameStates/GOptionsState.h"
@@ -18,14 +18,16 @@
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
-#include "../Helpers/Core/PhysicsThread.h"
+#include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Core/Physics/Physics.h"
+#include "../Helpers/Core/Physics/PhysicsThread.h"
+#include "../Helpers/Core/Physics/Player.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Level.h"
-#include "../Helpers/Core/SoundSystem.h"
-#include "Camera.h"
 #include "Options.h"
 
-GlobalState state;
+static GlobalState state;
 
 void InitOptions()
 {
@@ -34,25 +36,19 @@ void InitOptions()
 
 void InitState()
 {
+	PhysicsInitGlobal(&state);
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
-	state.saveData->coins = 0;
-	state.saveData->blueCoins = 0;
-	state.physicsFrame = 0;
 	state.level = CreateLevel(); // empty level so we don't segfault
-	state.requestExit = false;
-	state.cameraY = 0;
-	state.cam = CreateCamera();
+	state.camera = calloc(1, sizeof(Camera));
+	CheckAlloc(state.camera);
+	state.camera->fov = FOV;
 
 	state.viewmodel.enabled = true;
 	state.viewmodel.model = LoadModel(MODEL("eraser"));
-	state.viewmodel.translation[0] = 0.5f;
-	state.viewmodel.translation[2] = 0.0f;
-	state.viewmodel.rotation[0] = 0.0f;
-	state.viewmodel.rotation[1] = 0.0872665f; // 5deg
-	state.viewmodel.rotation[2] = 0.0f;
-	state.viewmodel.modelSkin = 0;
+	state.viewmodel.transform.position.x = 0.5f;
+	state.viewmodel.transform.rotation.y = degToRad(5);
 }
 
 inline GlobalState *GetState()
@@ -122,7 +118,7 @@ void DestroyGlobalState()
 	SaveOptions(&state.options);
 	DestroyLevel(state.level);
 	free(state.saveData);
-	free(state.cam);
+	free(state.camera);
 
 	GInputOptionsStateDestroy();
 	GSoundOptionsStateDestroy();
@@ -131,13 +127,14 @@ void DestroyGlobalState()
 	GMenuStateDestroy();
 	GOptionsStateDestroy();
 	GPauseStateDestroy();
+	PhysicsDestroyGlobal(&state);
 }
 
 bool ChangeLevelByName(const char *name)
 {
 	LogInfo("Loading level \"%s\"\n", name);
 
-	const size_t maxPathLength = 80;
+	const int maxPathLength = 80;
 	char *levelPath = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(levelPath);
 

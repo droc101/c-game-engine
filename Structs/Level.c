@@ -3,73 +3,57 @@
 //
 
 #include "Level.h"
-#include <box2d/box2d.h>
 #include <string.h>
+#include "../Debug/JoltDebugRenderer.h"
 #include "../defines.h"
 #include "../Helpers/Core/Error.h"
-#include "../Helpers/Graphics/Drawing.h"
+#include "../Helpers/Core/Physics/Physics.h"
+#include "../Helpers/Core/Physics/Player.h"
 #include "Actor.h"
 #include "GlobalState.h"
-#include "Vector2.h"
+#include "Wall.h"
 
-void CreatePlayerCollider(Level *level)
+Level *CreateLevel(void)
 {
-	b2BodyDef playerBodyDef = b2DefaultBodyDef();
-	playerBodyDef.type = b2_dynamicBody;
-	playerBodyDef.position = level->player.pos;
-	playerBodyDef.fixedRotation = true;
-	playerBodyDef.linearDamping = 12;
-	level->player.bodyId = b2CreateBody(level->worldId, &playerBodyDef);
-	const b2Circle playerShape = {
-		.center = level->player.pos,
-		.radius = 0.25f,
-	};
-	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
-	playerShapeDef.filter.categoryBits = COLLISION_GROUP_PLAYER;
-	b2CreateCircleShape(level->player.bodyId, &playerShapeDef, &playerShape);
+	Level *level = calloc(1, sizeof(Level));
+	CheckAlloc(level);
+	ListInit(level->actors, LIST_POINTER);
+	ListInit(level->walls, LIST_POINTER);
+	PhysicsInitLevel(level);
+	CreatePlayerCollider(level);
+	strncpy(level->ceilOrSkyTex, "texture/level/sky_test.gtex", 28);
+	strncpy(level->floorTex, "texture/level/floor_test.gtex", 30);
+	strncpy(level->music, "none", 5);
+	level->fogColor = 0xff000000;
+	level->fogStart = 10;
+	level->fogEnd = 30;
+	ListInit(level->namedActorNames, LIST_POINTER);
+	ListInit(level->namedActorPointers, LIST_POINTER);
+	return level;
 }
 
-Level *CreateLevel()
+void DestroyLevel(Level *level)
 {
-	Level *l = malloc(sizeof(Level));
-	CheckAlloc(l);
-	ListInit(l->actors, LIST_POINTER);
-	ListInit(l->walls, LIST_POINTER);
-	b2WorldDef worldDef = b2DefaultWorldDef();
-	worldDef.gravity.y = 0;
-	l->worldId = b2CreateWorld(&worldDef);
-	l->player.pos = v2s(0);
-	l->player.angle = 0;
-	CreatePlayerCollider(l);
-	l->hasCeiling = false;
-	strncpy(l->ceilOrSkyTex, "texture/level_sky_test.gtex", 28);
-	strncpy(l->floorTex, "texture/level_floor_test.gtex", 30);
-	strncpy(l->music, "none", 5);
-	l->fogColor = 0xff000000;
-	l->fogStart = 10;
-	l->fogEnd = 30;
-	l->ioProxy = NULL;
-	ListInit(l->namedActorNames, LIST_POINTER);
-	ListInit(l->namedActorPointers, LIST_POINTER);
-	return l;
-}
-
-void DestroyLevel(Level *l)
-{
-	for (int i = 0; i < l->actors.length; i++)
+	for (size_t i = 0; i < level->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(l->actors, i);
-		FreeActor(a);
+		Actor *actor = ListGetPointer(level->actors, i);
+		FreeActor(actor);
+	}
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
+	for (size_t i = 0; i < level->walls.length; i++)
+	{
+		Wall *wall = ListGetPointer(level->walls, i);
+		FreeWall(bodyInterface, wall);
 	}
 
-	b2DestroyWorld(l->worldId);
+	PhysicsDestroyLevel(level, bodyInterface);
 
-	ListAndContentsFree(l->walls);
-	ListAndContentsFree(l->namedActorNames);
-	ListFree(l->namedActorPointers);
-	ListFree(l->actors);
-	free(l);
-	l = NULL;
+	ListAndContentsFree(level->namedActorNames);
+	ListFree(level->namedActorPointers);
+	ListFree(level->actors);
+	ListFree(level->walls);
+	free(level);
+	level = NULL;
 }
 
 void AddActor(Actor *actor)
@@ -85,7 +69,7 @@ void RemoveActor(Actor *actor)
 
 	// Remove the actor from the named actor lists if it's there
 	const size_t nameIdx = ListFind(l->namedActorPointers, actor);
-	if (nameIdx != -1)
+	if (nameIdx != SIZE_MAX)
 	{
 		char *name = ListGetPointer(l->namedActorNames, nameIdx);
 		free(name);
@@ -94,7 +78,7 @@ void RemoveActor(Actor *actor)
 	}
 
 	const size_t idx = ListFind(l->actors, actor);
-	if (idx == -1)
+	if (idx == SIZE_MAX)
 	{
 		return;
 	}
@@ -112,7 +96,7 @@ void NameActor(Actor *actor, const char *name, Level *l)
 Actor *GetActorByName(const char *name, const Level *l)
 {
 	ListLock(l->namedActorNames);
-	for (int i = 0; i < l->namedActorNames.length; i++)
+	for (size_t i = 0; i < l->namedActorNames.length; i++)
 	{
 		const char *actorName = ListGetPointer(l->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
@@ -130,7 +114,7 @@ void GetActorsByName(const char *name, const Level *l, List *actors)
 {
 	ListInit(*actors, LIST_POINTER);
 	ListLock(l->namedActorNames);
-	for (int i = 0; i < l->namedActorNames.length; i++)
+	for (size_t i = 0; i < l->namedActorNames.length; i++)
 	{
 		const char *actorName = ListGetPointer(l->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)

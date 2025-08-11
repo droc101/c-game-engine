@@ -18,7 +18,7 @@ static VkPhysicalDeviceLimits physicalDeviceLimits;
 bool CreateInstance(SDL_Window *window)
 {
 	vulkanWindow = window;
-	uint32_t extensionCount;
+	uint32_t extensionCount = 0;
 	if (SDL_Vulkan_GetInstanceExtensions(vulkanWindow, &extensionCount, NULL) == SDL_FALSE)
 	{
 		VulkanLogError("Failed to acquire extensions required for SDL window!\n");
@@ -106,11 +106,15 @@ bool CreateSwapchain()
 	swapChainExtent = capabilities.currentExtent;
 	if (swapChainExtent.width == UINT32_MAX || swapChainExtent.height == UINT32_MAX)
 	{
-		int32_t width;
-		int32_t height;
+		int32_t width = 0;
+		int32_t height = 0;
 		SDL_Vulkan_GetDrawableSize(vulkanWindow, &width, &height);
-		swapChainExtent.width = clamp(width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-		swapChainExtent.height = clamp(height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+		swapChainExtent.width = clamp((uint32_t)width,
+									  capabilities.minImageExtent.width,
+									  capabilities.maxImageExtent.width);
+		swapChainExtent.height = clamp((uint32_t)height,
+									   capabilities.minImageExtent.height,
+									   capabilities.maxImageExtent.height);
 	}
 
 	const bool vsync = GetState()->options.vsync;
@@ -299,13 +303,14 @@ bool CreateBuffers()
 	VulkanTest(CreateWallBuffers(), "Failed to create wall buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create wall actor buffers!");
 	VulkanTest(CreateActorModelBuffers(), "Failed to create model actor buffers!");
+	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
 
 	return true;
 }
 
 bool CreateDescriptorSets()
 {
-	LunaDescriptorPool descriptorPool;
+	LunaDescriptorPool descriptorPool = LUNA_NULL_HANDLE;
 	const VkDescriptorPoolSize poolSize = {
 		.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = MAX_TEXTURES * MAX_FRAMES_IN_FLIGHT,
