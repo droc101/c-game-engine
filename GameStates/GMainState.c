@@ -69,7 +69,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
 	{
-		float cx = GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+		float cx = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
 		if (state->options.invertHorizontalCamera)
 		{
 			cx *= -1;
@@ -79,7 +79,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 			state->level->player.transform.rotation.y += cx * (float)state->options.cameraSpeed / 11.25f;
 		}
 
-		float cy = GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+		float cy = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
 		if (state->options.invertVerticalCamera)
 		{
 			cy *= -1;
