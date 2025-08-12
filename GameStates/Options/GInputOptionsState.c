@@ -33,7 +33,7 @@ void GInputOptionsStateUpdate(GlobalState * /*State*/)
 
 void SldOptionsMouseSensitivity(const double value)
 {
-	GetState()->options.mouseSpeed = value;
+	GetState()->options.cameraSpeed = value;
 }
 
 void SldOptionsRumbleStrength(const double value)
@@ -47,9 +47,14 @@ void CbOptionsControllerMode(const bool value)
 	GetState()->options.controllerMode = value;
 }
 
-void CbOptionsInvertCamera(const bool value)
+void CbOptionsInvertCameraH(const bool value)
 {
-	GetState()->options.cameraInvertX = value;
+	GetState()->options.invertHorizontalCamera = value;
+}
+
+void CbOptionsInvertCameraV(const bool value)
+{
+	GetState()->options.invertVerticalCamera = value;
 }
 
 void CbOptionsSwapOkCancel(const bool value)
@@ -82,7 +87,7 @@ void GInputOptionsStateRender(GlobalState *)
 	DrawTextAligned("Controller Options",
 					16,
 					COLOR_WHITE,
-					v2(0, 160),
+					v2(0, 260),
 					v2(WindowWidthFloat(), 40),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
@@ -93,7 +98,7 @@ void GInputOptionsStateRender(GlobalState *)
 		DrawTextAligned("Controller Name:",
 						12,
 						COLOR_WHITE,
-						v2(0, 400),
+						v2(0, 460),
 						v2(WindowWidthFloat(), 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
@@ -106,7 +111,7 @@ void GInputOptionsStateRender(GlobalState *)
 		DrawTextAligned(controllerName,
 						12,
 						COLOR_WHITE,
-						v2(0, 420),
+						v2(0, 480),
 						v2(WindowWidthFloat(), 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
@@ -130,10 +135,26 @@ void GInputOptionsStateSet()
 										TOP_CENTER,
 										0.01,
 										2.00,
-										GetState()->options.mouseSpeed,
+										GetState()->options.cameraSpeed,
 										0.01,
 										0.1,
 										SliderLabelPercent));
+		opY += opSpacing;
+		UiStackPush(inputOptionsStack,
+					CreateCheckboxControl(v2(0, opY),
+										  v2(480, 40),
+										  "Invert Horizontal Camera",
+										  CbOptionsInvertCameraH,
+										  TOP_CENTER,
+										  GetState()->options.invertHorizontalCamera));
+		opY += opSpacing;
+		UiStackPush(inputOptionsStack,
+					CreateCheckboxControl(v2(0, opY),
+										  v2(480, 40),
+										  "Invert Vertical Camera",
+										  CbOptionsInvertCameraV,
+										  TOP_CENTER,
+										  GetState()->options.invertVerticalCamera));
 		opY += opSpacing * 3;
 		UiStackPush(inputOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
@@ -155,14 +176,6 @@ void GInputOptionsStateSet()
 										0.25,
 										0.25,
 										SliderLabelPercent));
-		opY += opSpacing;
-		UiStackPush(inputOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Invert Camera",
-										  CbOptionsInvertCamera,
-										  TOP_CENTER,
-										  GetState()->options.cameraInvertX));
 		opY += opSpacing;
 		UiStackPush(inputOptionsStack,
 					CreateCheckboxControl(v2(0, opY),

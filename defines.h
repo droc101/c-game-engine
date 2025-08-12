@@ -429,11 +429,12 @@ struct Options
 	/// Whether the game is in controller mode
 	bool controllerMode;
 	/// The look speed (it affects controller speed too)
-	double mouseSpeed;
+	double cameraSpeed;
 	/// The strength of the rumble
 	float rumbleStrength;
-	/// Whether to invert the camera X axis (controller only)
-	bool cameraInvertX;
+	/// Whether to invert the camera Y axis
+	bool invertHorizontalCamera;
+	bool invertVerticalCamera;
 	/// Whether to swap the controller A and B buttons
 	bool controllerSwapOkCancel;
 

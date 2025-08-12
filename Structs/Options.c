@@ -16,12 +16,13 @@ void DefaultOptions(Options *options)
 	options->fullscreen = false;
 	options->vsync = false;
 	options->lodMultiplier = 1.0f;
-	options->mouseSpeed = 1;
+	options->cameraSpeed = 1;
 	options->controllerMode = false;
 	options->msaa = MSAA_4X;
 	options->mipmaps = true;
 	options->rumbleStrength = 1.0f;
-	options->cameraInvertX = true;
+	options->invertHorizontalCamera = false;
+	options->invertVerticalCamera = false;
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = false;
 	options->limitFpsWhenUnfocused = true;
@@ -45,7 +46,7 @@ bool ValidateOptions(const Options *options)
 	{
 		return false;
 	}
-	if (options->mouseSpeed < 0.01 || options->mouseSpeed > 2.00)
+	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
 	{
 		return false;
 	}

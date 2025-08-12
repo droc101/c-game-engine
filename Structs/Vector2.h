@@ -14,14 +14,14 @@
  * @param y The y value
  * @return The new vector
  */
-#define v2(x, y) ((Vector2){x, y})
+#define v2(x, y) ((Vector2){(x), (y)})
 
 /**
  * Create a 2D vector with the same x and y values
  * @param xy The x and y value
  * @return The new vector
  */
-#define v2s(xy) v2(xy, xy)
+#define v2s(xy) v2((xy), (xy))
 
 /**
  * Create a unit vector from an angle
