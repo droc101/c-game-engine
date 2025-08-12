@@ -190,22 +190,17 @@ bool ProcessUiStack(UiStack *stack)
 			SetFocusedControl(stack, 0);
 		} else
 		{
-			SetFocusedControl(stack, (uint)((stack->focusedControl + 1) % stack->controls.length));
+			SetFocusedControl(stack, (stack->focusedControl + 1) % stack->controls.length);
 		}
 	} else if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
 			   IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_UP))
 	{
-		if (stack->focusedControl == -1u)
+		if (stack->focusedControl == -1u || stack->focusedControl == 0)
 		{
-			SetFocusedControl(stack, (uint)stack->controls.length - 1);
+			SetFocusedControl(stack, stack->controls.length - 1);
 		} else
 		{
-			const uint fc = wrap(stack->focusedControl - 1, 0, stack->controls.length);
-			SetFocusedControl(stack, fc);
-		}
-		if (stack->focusedControl != -1u)
-		{
-			SetFocusedControl(stack, stack->focusedControl + (int)stack->controls.length);
+			SetFocusedControl(stack, (stack->focusedControl - 1) % stack->controls.length);
 		}
 	}
 
