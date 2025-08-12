@@ -74,6 +74,7 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 	}
 	assert(shader->platform == PLATFORM_VULKAN);
 	assert(shader->type == shaderType);
+	(void)shaderType;
 
 	VulkanTestReturnResult(lunaCreateShaderModule(shader->spirv, sizeof(uint32_t) * shader->spirvLength, shaderModule),
 						   "Failed to create shader module!");
