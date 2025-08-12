@@ -109,8 +109,8 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 
 	if (UseController())
 	{
-		moveVec.y = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
-		moveVec.x = -GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
+		moveVec.y = GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
+		moveVec.x = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
 		if (fabsf(moveVec.x) < STICK_DEADZONE)
 		{
 			moveVec.x = 0;
