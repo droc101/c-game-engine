@@ -17,4 +17,6 @@ void MovePlayer(const Player *player, float *distanceTraveled);
 
 void Update(const Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime);
 
+void DPrintPlayer(const Level *level);
+
 #endif //PLAYER_H

@@ -40,6 +40,7 @@ void GMainStateUpdate(GlobalState *state)
 	}
 
 	state->level->player.transform.rotation.y -= GetMouseRel().x * (float)state->options.mouseSpeed / 120.0f;
+	state->level->player.transform.rotation.x -= GetMouseRel().y * (float)state->options.mouseSpeed / 120.0f;
 
 	if (state->saveData->coins > 9999)
 	{
@@ -68,12 +69,23 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		{
 			state->level->player.transform.rotation.y += cx * (float)state->options.mouseSpeed / 11.25f;
 		}
+
+		float cy = GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+		// if (state->options.cameraInvertX) // TODO add option for this
+		// {
+		// 	cx *= -1;
+		// }
+		if (fabsf(cy) > STICK_DEADZONE)
+		{
+			state->level->player.transform.rotation.x += cy * (float)state->options.mouseSpeed / 11.25f;
+		}
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
 	state->camera->yOffset = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
 	state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
+	state->level->player.transform.rotation.x = clamp(state->level->player.transform.rotation.x, -PI / 2, PI / 2);
 
 	if (WaitForLodThreadToEnd() != 0)
 	{
@@ -168,14 +180,8 @@ void GMainStateRender(GlobalState *state)
 				   TEXTURE("interface/crosshair"),
 				   crosshairColor);
 
-	DPrintF("Position: (%.2f, %.2f, %.2f)\nRotation: %.4f (%.2fdeg)",
-			COLOR_WHITE,
-			false,
-			level->player.transform.position.x,
-			level->player.transform.position.y,
-			level->player.transform.position.z,
-			fabsf(level->player.transform.rotation.y),
-			radToDeg(fabsf(level->player.transform.rotation.y)));
+	DPrintPlayer(level);
+
 
 	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);

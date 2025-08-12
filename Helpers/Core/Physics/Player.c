@@ -3,6 +3,7 @@
 //
 
 #include "Player.h"
+#include "../../../Debug/DPrint.h"
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Vector2.h"
@@ -158,4 +159,31 @@ void Update(const Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 								physicsSystem,
 								bodyFilter,
 								shapeFilter);
+}
+
+void DPrintPlayer(const Level *level)
+{
+	DPrintF("Position: (%.2f, %.2f, %.2f)",
+			COLOR_WHITE,
+			false,
+			level->player.transform.position.x,
+			level->player.transform.position.y,
+			level->player.transform.position.z);
+	Vector3 playerVelocity;
+	JPH_CharacterVirtual_GetLinearVelocity(level->player.joltCharacter, &playerVelocity);
+	const float totalVelocity = Vector3_Length(&playerVelocity);
+	DPrintF("Velocity: %.2f (%.2f, %.2f, %.2f)",
+			COLOR_WHITE,
+			false,
+			totalVelocity,
+			playerVelocity.x,
+			playerVelocity.y,
+			playerVelocity.z);
+	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)",
+			COLOR_WHITE,
+			false,
+			level->player.transform.rotation.x,
+			fabsf(level->player.transform.rotation.y),
+			radToDeg(level->player.transform.rotation.x),
+			radToDeg(fabsf(level->player.transform.rotation.y)));
 }

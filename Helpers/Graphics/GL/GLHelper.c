@@ -902,20 +902,26 @@ inline void GL_Disable3D()
 
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 {
+	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
+	vec3 cameraRotation = {camera->transform.rotation.x, camera->transform.rotation.y, camera->transform.rotation.z};
+	versor rotationQuat;
+	glm_euler_yxz_quat_rh(cameraRotation, rotationQuat);
+
+	mat4 rotationMatrix;
+	glm_quat_mat4(rotationQuat, rotationMatrix);
+	vec3 forward = {-rotationMatrix[2][0], -rotationMatrix[2][1], -rotationMatrix[2][2]};
+	glm_vec3_normalize(forward);
+	vec3 up = {rotationMatrix[1][0], rotationMatrix[1][1], rotationMatrix[1][2]};
+	glm_vec3_normalize(up);
+
+	vec3 viewTarget;
+	glm_vec3_add(cameraPosition, forward, viewTarget);
+
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
-	vec3 viewTarget = {-sinf(camera->transform.rotation.y), 0, -cosf(camera->transform.rotation.y)};
-
-	// TODO roll and pitch might be messed up (test and fix as needed)
-	glm_vec3_rotate(viewTarget, camera->transform.rotation.z, GLM_ZUP); // Roll
-	glm_vec3_rotate(viewTarget, camera->transform.rotation.x, GLM_XUP); // Pitch
-
-	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
-	glm_vec3_add(viewTarget, cameraPosition, viewTarget);
-
 	mat4 viewMatrix;
-	glm_lookat(cameraPosition, viewTarget, GLM_YUP, viewMatrix);
+	glm_lookat(cameraPosition, viewTarget, up, viewMatrix);
 
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
