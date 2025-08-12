@@ -11,7 +11,7 @@
 typedef struct List List;
 typedef struct LockingList LockingList;
 
-enum _ListType
+enum _ListType // NOLINT(*-reserved-identifier)
 {
 	LIST_POINTER,
 	LIST_UINT64,
@@ -19,7 +19,7 @@ enum _ListType
 	LIST_INT32,
 };
 
-struct _ListData
+struct _ListData // NOLINT(*-reserved-identifier)
 {
 	/// The type of data the list is storing
 	enum _ListType type;
@@ -51,6 +51,7 @@ struct LockingList
 };
 
 
+// NOLINTBEGIN(*-reserved-identifier)
 void _ListInit(List *list, enum _ListType);
 void _LockingListInit(LockingList *list, enum _ListType);
 
@@ -90,6 +91,7 @@ void _LockingListFreeOnlyContents(const LockingList *list);
 
 void _ListAndContentsFree(List *list);
 void _LockingListAndContentsFree(LockingList *list);
+// NOLINTEND(*-reserved-identifier)
 
 
 /**
@@ -108,8 +110,7 @@ void _LockingListAndContentsFree(LockingList *list);
 	({ \
 		static_assert(sizeof(oldList) == sizeof(newList)); \
 		_Generic((oldList), List: _ListCopy, LockingList: _LockingListCopy)(&(oldList), &(newList)); \
-	}); \
-	(void)0
+	})
 
 /**
  * Append an item to the list
@@ -125,6 +126,7 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param index Index to remove
  */
 #define ListRemoveAt(list, index) \
+	assert((size_t)(index) < (list).length); \
 	_Generic((list), List: _ListRemoveAt, LockingList: _LockingListRemoveAt)(&(list), (index))
 
 /**
@@ -145,8 +147,10 @@ void _LockingListAndContentsFree(LockingList *list);
 */
 #define ListGetPointer(list, index) \
 	(_Generic((list), \
-			 List: (assert((list).data->type == LIST_POINTER), (list).data->pointerData), \
-			 LockingList: (assert((list).data->type == LIST_POINTER), (list).data->pointerData))[index])
+			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), \
+					(list).data->pointerData), \
+			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), \
+						   (list).data->pointerData))[index])
 
 /**
 * Get an item of type @c uint64_t from the list by index
@@ -155,8 +159,10 @@ void _LockingListAndContentsFree(LockingList *list);
 */
 #define ListGetUint64(list, index) \
 	(_Generic((list), \
-			 List: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data), \
-			 LockingList: (assert((list).data->type == LIST_UINT64), (list).data->uint64Data))[index])
+			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_UINT64)), \
+					(list).data->uint64Data), \
+			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_UINT64)), \
+						   (list).data->uint64Data))[index])
 
 /**
 * Get an item of type @c uint32_t from the list by index
@@ -165,8 +171,10 @@ void _LockingListAndContentsFree(LockingList *list);
 */
 #define ListGetUint32(list, index) \
 	(_Generic((list), \
-			 List: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data), \
-			 LockingList: (assert((list).data->type == LIST_UINT32), (list).data->uint32Data))[index])
+			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_UINT32)), \
+					(list).data->uint32Data), \
+			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_UINT32)), \
+						   (list).data->uint32Data))[index])
 
 /**
 * Get an item of type @c int32_t from the list by index
@@ -175,8 +183,10 @@ void _LockingListAndContentsFree(LockingList *list);
 */
 #define ListGetInt32(list, index) \
 	(_Generic((list), \
-			 List: (assert((list).data->type == LIST_INT32), (list).data->int32Data), \
-			 LockingList: (assert((list).data->type == LIST_INT32), (list).data->int32Data))[index])
+			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_INT32)), \
+					(list).data->int32Data), \
+			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_INT32)), \
+						   (list).data->int32Data))[index])
 
 /**
  * Set an item in the list by index
@@ -185,14 +195,27 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param value Value to set at the index
  */
 #define ListSet(list, index, value) \
-	((list).data->type == LIST_POINTER \
-			 ? (void)((list).data->pointerData[index] = (void *)(uintptr_t)(value)) \
-			 : ((list).data->type == LIST_UINT64 \
-						? (void)((list).data->uint64Data[index] = (uint64_t)(uintptr_t)(value)) \
-						: ((list).data->type == LIST_UINT32 \
-								   ? (void)((list).data->uint32Data[index] = (uint32_t)(uintptr_t)(value)) \
-								   : (void)(assert((list).data->type == LIST_INT32), \
-											(list).data->int32Data[index] = (int32_t)(uintptr_t)(value)))))
+	({ \
+		assert((size_t)(index) < (list).length); \
+		switch ((list).data->type) \
+		{ \
+			case LIST_POINTER: \
+				(list).data->pointerData[index] = (void *)(uintptr_t)(value); \
+				break; \
+			case LIST_UINT64: \
+				(list).data->uint64Data[index] = (uint64_t)(uintptr_t)(value); \
+				break; \
+			case LIST_UINT32: \
+				(list).data->uint32Data[index] = (uint32_t)(uintptr_t)(value); \
+				break; \
+			case LIST_INT32: \
+				(list).data->int32Data[index] = (int32_t)(uintptr_t)(value); \
+				break; \
+			default: \
+				assert(false && "Invalid list type!"); \
+				break; \
+		} \
+	})
 
 /**
  * Find an item in the list

@@ -222,6 +222,13 @@ void _LockingListRemoveAt(LockingList *list, const size_t index)
 void _ListInsertAfter(List *list, size_t index, void *data)
 {
 	assert(list);
+
+	if (list->length == 0 || index == SIZE_MAX)
+	{
+		_ListAdd(list, data);
+		return;
+	}
+
 	assert(index <= list->length);
 
 	index++;
@@ -268,14 +275,7 @@ void _LockingListInsertAfter(LockingList *list, const size_t index, void *data)
 	assert(list);
 
 	ListLock(*list);
-	if (list->length == 0)
-	{
-		_ListAdd((List *)list, data);
-	} else
-	{
-		assert(index <= list->length);
-		_ListInsertAfter((List *)list, index, data);
-	}
+	_ListInsertAfter((List *)list, index, data);
 	ListUnlock(*list);
 }
 
