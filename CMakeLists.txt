@@ -202,8 +202,6 @@ add_executable(
         Debug/JoltDebugRenderer.h
         Helpers/Core/Physics/Player.c
         Helpers/Core/Physics/Player.h
-        Helpers/Core/Physics/RayCast.c
-        Helpers/Core/Physics/RayCast.h
 )
 
 #endregion

@@ -322,9 +322,9 @@ void DrawRectInternal(float ndcStartX,
 					  float startV,
 					  float endU,
 					  float endV,
-					  Color color,
+					  const Color *color,
 					  uint32_t textureIndex);
 
-void DrawQuadInternal(const mat4 vertices_posXY_uvZW, Color color, uint32_t textureIndex);
+void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, uint32_t textureIndex);
 
 #endif //VULKANHELPERS_H

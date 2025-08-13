@@ -299,7 +299,7 @@ void DrawRectInternal(const float ndcStartX,
 					  const float startV,
 					  const float endU,
 					  const float endV,
-					  const Color color,
+					  const Color *color,
 					  const uint32_t textureIndex)
 {
 	const mat4 vertices = {
@@ -311,7 +311,7 @@ void DrawRectInternal(const float ndcStartX,
 	DrawQuadInternal(vertices, color, textureIndex);
 }
 
-void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const uint32_t textureIndex)
+void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, const uint32_t textureIndex)
 {
 	if (buffers.ui.vertices.allocatedSize < buffers.ui.vertices.bytesUsed + sizeof(UiVertex) * 4 ||
 		buffers.ui.indices.allocatedSize < buffers.ui.indices.bytesUsed + sizeof(uint32_t) * 6)
@@ -337,10 +337,10 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.y = vertices_posXY_uvZW[0][1],
 		.u = vertices_posXY_uvZW[0][2],
 		.v = vertices_posXY_uvZW[0][3],
-		.r = color.r,
-		.g = color.g,
-		.b = color.b,
-		.a = color.a,
+		.r = color->r,
+		.g = color->g,
+		.b = color->b,
+		.a = color->a,
 		.textureIndex = textureIndex,
 	};
 	vertices[1] = (UiVertex){
@@ -348,10 +348,10 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.y = vertices_posXY_uvZW[1][1],
 		.u = vertices_posXY_uvZW[1][2],
 		.v = vertices_posXY_uvZW[1][3],
-		.r = color.r,
-		.g = color.g,
-		.b = color.b,
-		.a = color.a,
+		.r = color->r,
+		.g = color->g,
+		.b = color->b,
+		.a = color->a,
 		.textureIndex = textureIndex,
 	};
 	vertices[2] = (UiVertex){
@@ -359,10 +359,10 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.y = vertices_posXY_uvZW[2][1],
 		.u = vertices_posXY_uvZW[2][2],
 		.v = vertices_posXY_uvZW[2][3],
-		.r = color.r,
-		.g = color.g,
-		.b = color.b,
-		.a = color.a,
+		.r = color->r,
+		.g = color->g,
+		.b = color->b,
+		.a = color->a,
 		.textureIndex = textureIndex,
 	};
 	vertices[3] = (UiVertex){
@@ -370,10 +370,10 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color color, const u
 		.y = vertices_posXY_uvZW[3][1],
 		.u = vertices_posXY_uvZW[3][2],
 		.v = vertices_posXY_uvZW[3][3],
-		.r = color.r,
-		.g = color.g,
-		.b = color.b,
-		.a = color.a,
+		.r = color->r,
+		.g = color->g,
+		.b = color->b,
+		.a = color->a,
 		.textureIndex = textureIndex,
 	};
 

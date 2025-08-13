@@ -62,7 +62,7 @@ void GLogoSplashStateRender(GlobalState *State)
 	DrawTextureMod(v2((float)destRect.x, (float)destRect.y),
 				   v2((float)destRect.w, (float)destRect.h),
 				   TEXTURE("interface/studio"),
-				   color);
+				   &color);
 }
 
 void GLogoSplashStateSet()

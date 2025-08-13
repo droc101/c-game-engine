@@ -7,13 +7,13 @@
 #include "../../defines.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Vector2.h"
+#include "../Core/AssetLoaders/TextureLoader.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"
 #include "../Core/Logging.h"
 #include "GL/GLHelper.h"
 #include "RenderingHelpers.h"
 #include "SDL.h"
-#include "../Core/AssetLoaders/TextureLoader.h"
 #include "Vulkan/Vulkan.h"
 
 SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
@@ -97,7 +97,7 @@ inline void DrawTexture(const Vector2 pos, const Vector2 size, const char *textu
 	}
 }
 
-inline void DrawTextureMod(const Vector2 pos, const Vector2 size, const char *texture, const Color color)
+inline void DrawTextureMod(const Vector2 pos, const Vector2 size, const char *texture, const Color *color)
 {
 	switch (currentRenderer)
 	{
@@ -105,7 +105,7 @@ inline void DrawTextureMod(const Vector2 pos, const Vector2 size, const char *te
 			VK_DrawTexturedQuadMod((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, texture, color);
 			break;
 		case RENDERER_OPENGL:
-			GL_DrawTextureMod(pos, size, texture, color);
+			GL_DrawTextureMod(pos, size, texture, *color);
 			break;
 		default:
 			break;
@@ -314,11 +314,11 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 }
 
 void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
-								   const JPH_RVec3 *v1,
-								   const JPH_RVec3 *v2,
-								   const JPH_RVec3 *v3,
-								   const JPH_Color color,
-								   JPH_DebugRenderer_CastShadow /*castShadow*/)
+									   const JPH_RVec3 *v1,
+									   const JPH_RVec3 *v2,
+									   const JPH_RVec3 *v3,
+									   const JPH_Color color,
+									   JPH_DebugRenderer_CastShadow /*castShadow*/)
 {
 	switch (currentRenderer)
 	{

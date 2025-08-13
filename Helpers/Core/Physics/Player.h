@@ -11,11 +11,13 @@ void PlayerPersistentStateInit();
 
 void PlayerPersistentStateDestroy();
 
-void CreatePlayerCollider(Level *level);
+void CreatePlayer(Level *level);
 
 void MovePlayer(const Player *player, float *distanceTraveled);
 
-void Update(const Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime);
+void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime);
+
+const Color *GetCrosshairColor();
 
 void DPrintPlayer(const Level *level);
 

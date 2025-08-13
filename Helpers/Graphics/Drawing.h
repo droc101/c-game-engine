@@ -73,7 +73,7 @@ void DrawTexture(Vector2 pos, Vector2 size, const char *texture);
  * @param texture The texture name
  * @param color The color to draw with
  */
-void DrawTextureMod(Vector2 pos, Vector2 size, const char *texture, Color color);
+void DrawTextureMod(Vector2 pos, Vector2 size, const char *texture, const Color *color);
 
 /**
  * Draw a texture region on a rectangle

@@ -48,7 +48,7 @@ void VK_DrawColoredQuadsBatched(const float *vertices, int quadCount, Color colo
 
 void VK_DrawTexturedQuad(int x, int y, int w, int h, const char *texture);
 
-void VK_DrawTexturedQuadMod(int x, int y, int w, int h, const char *texture, Color color);
+void VK_DrawTexturedQuadMod(int x, int y, int w, int h, const char *texture, const Color *color);
 
 void VK_DrawTexturedQuadRegion(int x,
 							   int y,

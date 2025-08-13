@@ -42,7 +42,7 @@ void CreatePhysboxCollider(Actor *this, const Transform *transform)
 
 void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
-	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
+	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS | ACTOR_FLAG_CAN_BE_HELD;
 	this->actorModel = LoadModel(MODEL("cube"));
 	transform->position.y = -0.3f;
 

@@ -20,7 +20,7 @@ Level *CreateLevel(void)
 	ListInit(level->actors, LIST_POINTER);
 	ListInit(level->walls, LIST_POINTER);
 	PhysicsInitLevel(level);
-	CreatePlayerCollider(level);
+	CreatePlayer(level);
 	strncpy(level->ceilOrSkyTex, "texture/level/sky_test.gtex", 28);
 	strncpy(level->floorTex, "texture/level/floor_test.gtex", 30);
 	strncpy(level->music, "none", 5);

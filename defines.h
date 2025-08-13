@@ -218,6 +218,7 @@ enum ActorFlags
 {
 	ACTOR_FLAG_ENEMY = 1 << 0,
 	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 1,
+	ACTOR_FLAG_CAN_BE_HELD = 1 << 2,
 };
 
 enum ObjectLayers
@@ -332,6 +333,17 @@ struct Player
 	Transform transform;
 	/// The Jolt character. Includes the rigid body as well as other useful abstractions
 	JPH_CharacterVirtual *joltCharacter;
+	/// Aliasing for targeted vs held actor to improve code clarity by differentiating between targeted and held actor
+	union
+	{
+		/// The currently targeted actor
+		Actor *targetedActor;
+		/// The currently held actor
+		Actor *heldActor;
+	};
+	/// True if the player is currently holding an actor, false if the player is targeting an actor instead
+	bool hasHeldActor;
+	bool canDropHeldActor;
 };
 
 // Utility functions are in Structs/wall.h

@@ -5,10 +5,8 @@
 #include "Physics.h"
 #include "../../../Actor/Laser.h"
 #include "../../../Debug/JoltDebugRenderer.h"
-#include "../../../Structs/GlobalState.h"
 #include "../Error.h"
 #include "Player.h"
-#include "RayCast.h"
 
 static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 {
@@ -69,7 +67,6 @@ void PhysicsInitGlobal(GlobalState *state)
 		Error("Failed to initialize Jolt Physics!");
 	}
 	state->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
-	RayCastInit();
 	JoltDebugRendererInit();
 	PlayerPersistentStateInit();
 	LaserFiltersInit();
@@ -77,7 +74,6 @@ void PhysicsInitGlobal(GlobalState *state)
 
 void PhysicsDestroyGlobal(const GlobalState *state)
 {
-	RayCastDestroy();
 	JoltDebugRendererDestroy();
 	PlayerPersistentStateDestroy();
 	LaserFiltersDestroy();

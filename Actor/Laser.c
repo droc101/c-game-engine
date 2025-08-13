@@ -16,7 +16,7 @@ typedef struct LaserData
 	bool enabled;
 } LaserData;
 
-static bool NormalLaserBroadPhaseLayerShouldCollide(const JPH_BroadPhaseLayer layer)
+static bool ActorRaycastBroadPhaseLayerShouldCollide(const JPH_BroadPhaseLayer layer)
 {
 	switch (layer)
 	{
@@ -28,7 +28,7 @@ static bool NormalLaserBroadPhaseLayerShouldCollide(const JPH_BroadPhaseLayer la
 	}
 }
 
-static bool NormalLaserObjectLayerShouldCollide(const JPH_ObjectLayer layer)
+static bool ActorRaycastObjectLayerShouldCollide(const JPH_ObjectLayer layer)
 {
 	switch (layer)
 	{
@@ -64,10 +64,10 @@ static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
 }
 
 static const JPH_BroadPhaseLayerFilter_Impl normalLaserBroadPhaseLayerFilterImpl = {
-	.ShouldCollide = NormalLaserBroadPhaseLayerShouldCollide,
+	.ShouldCollide = ActorRaycastBroadPhaseLayerShouldCollide,
 };
 static const JPH_ObjectLayerFilter_Impl normalLaserObjectLayerFilterImpl = {
-	.ShouldCollide = NormalLaserObjectLayerShouldCollide,
+	.ShouldCollide = ActorRaycastObjectLayerShouldCollide,
 };
 static const JPH_BroadPhaseLayerFilter_Impl tripleLaserBroadPhaseLayerFilterImpl = {
 	.ShouldCollide = TripleLaserBroadPhaseLayerShouldCollide,

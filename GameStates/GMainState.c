@@ -14,7 +14,6 @@
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Player.h"
-#include "../Helpers/Core/Physics/RayCast.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
@@ -26,7 +25,6 @@
 #include "../Structs/Vector2.h"
 #include "GPauseState.h"
 
-static Actor *targetedEnemy = NULL;
 static bool lodThreadInitDone = false;
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -42,8 +40,14 @@ void GMainStateUpdate(GlobalState *state)
 	Vector2 cameraMotion = GetMouseRel();
 	cameraMotion.x *= (float)state->options.cameraSpeed / 120.0f;
 	cameraMotion.y *= (float)state->options.cameraSpeed / 120.0f;
-	if (state->options.invertHorizontalCamera) { cameraMotion.x *= -1; }
-	if (state->options.invertVerticalCamera) { cameraMotion.y *= -1; }
+	if (state->options.invertHorizontalCamera)
+	{
+		cameraMotion.x *= -1;
+	}
+	if (state->options.invertVerticalCamera)
+	{
+		cameraMotion.y *= -1;
+	}
 
 	state->level->player.transform.rotation.y -= cameraMotion.x;
 	state->level->player.transform.rotation.x -= cameraMotion.y;
@@ -104,7 +108,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
-	Update(&state->level->player, state->level->physicsSystem, deltaTime);
+	UpdatePlayer(&state->level->player, state->level->physicsSystem, deltaTime);
 
 	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
 
@@ -121,20 +125,6 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 								  NULL,
 								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
 		AddActor(leaf);
-	}
-
-	const ActorRayCastOptions rayCastOptions = {
-		.bodyInterface = JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem),
-		.maxDistance = 10.0f,
-		.actorFlags = ACTOR_FLAG_ENEMY,
-	};
-	targetedEnemy = GetTargetedEnemy(&rayCastOptions);
-	if (targetedEnemy)
-	{
-		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
-		{
-			RemoveActor(targetedEnemy);
-		}
 	}
 
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
@@ -178,11 +168,7 @@ void GMainStateRender(GlobalState *state)
 		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface/hud_bcoin"));
 	}
 
-	Color crosshairColor = COLOR(0xFFFFCCCC);
-	if (targetedEnemy != NULL)
-	{
-		crosshairColor = COLOR(0xFFFF0000);
-	}
+	const Color *crosshairColor = GetCrosshairColor();
 
 	DrawTextureMod(v2((WindowWidth() * 0.5) - 12, (WindowHeight() * 0.5) - 12),
 				   v2s(24),
@@ -194,7 +180,6 @@ void GMainStateRender(GlobalState *state)
 
 	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);
-	DPrintF("Targeted Actor: %p", COLOR_WHITE, false, targetedEnemy);
 }
 
 void GMainStateSet()

@@ -619,7 +619,7 @@ inline void VK_Restore()
 
 void VK_DrawColoredQuad(const int32_t x, const int32_t y, const int32_t w, const int32_t h, const Color color)
 {
-	DrawRectInternal(VK_X_TO_NDC(x), VK_Y_TO_NDC(y), VK_X_TO_NDC(x + w), VK_Y_TO_NDC(y + h), 0, 0, 0, 0, color, -1);
+	DrawRectInternal(VK_X_TO_NDC(x), VK_Y_TO_NDC(y), VK_X_TO_NDC(x + w), VK_Y_TO_NDC(y + h), 0, 0, 0, 0, &color, -1);
 }
 
 void VK_DrawColoredQuadsBatched(const float *vertices, const int32_t quadCount, const Color color)
@@ -633,7 +633,7 @@ void VK_DrawColoredQuadsBatched(const float *vertices, const int32_t quadCount, 
 			{vertices[index + 4], vertices[index + 5], 0, 0},
 			{vertices[index + 6], vertices[index + 7], 0, 0},
 		};
-		DrawQuadInternal(matrix, color, -1);
+		DrawQuadInternal(matrix, &color, -1);
 	}
 }
 
@@ -647,7 +647,7 @@ void VK_DrawTexturedQuad(const int32_t x, const int32_t y, const int32_t w, cons
 					 0,
 					 1,
 					 1,
-					 COLOR_WHITE,
+					 &COLOR_WHITE,
 					 TextureIndex(texture));
 }
 
@@ -656,7 +656,7 @@ void VK_DrawTexturedQuadMod(const int32_t x,
 							const int32_t w,
 							const int32_t h,
 							const char *texture,
-							const Color color)
+							const Color *color)
 {
 	DrawRectInternal(VK_X_TO_NDC(x),
 					 VK_Y_TO_NDC(y),
@@ -693,7 +693,7 @@ void VK_DrawTexturedQuadRegion(const int32_t x,
 					 startV,
 					 startU + (float)regionW / (float)image->width,
 					 startV + (float)regionH / (float)image->height,
-					 COLOR_WHITE,
+					 &COLOR_WHITE,
 					 ImageIndex(image));
 }
 
@@ -721,7 +721,7 @@ void VK_DrawTexturedQuadRegionMod(const int32_t x,
 					 startV,
 					 startU + (float)regionW / (float)image->width,
 					 startV + (float)regionH / (float)image->height,
-					 color,
+					 &color,
 					 ImageIndex(image));
 }
 
@@ -756,7 +756,7 @@ void VK_DrawTexturedQuadsBatched(const float *vertices, const int32_t quadCount,
 				vertices[index + 15],
 			},
 		};
-		DrawQuadInternal(matrix, color, TextureIndex(texture));
+		DrawQuadInternal(matrix, &color, TextureIndex(texture));
 	}
 }
 
@@ -797,7 +797,7 @@ void VK_DrawLine(const int32_t startX,
 			0,
 		},
 	};
-	DrawQuadInternal(matrix, color, -1);
+	DrawQuadInternal(matrix, &color, -1);
 }
 
 void VK_DrawRectOutline(const int32_t x,
