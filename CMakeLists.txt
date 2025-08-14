@@ -5,7 +5,8 @@ project(game C CXX)
 
 set(CMAKE_C_STANDARD 11)
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
@@ -204,6 +205,7 @@ add_executable(
         Structs/Color.h
         Structs/Camera.h
         Structs/Viewmodel.h
+        Helpers/Core/Dict.h
 )
 
 #endregion
@@ -217,6 +219,7 @@ find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+fetchDict()
 fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 
 #add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
@@ -239,6 +242,7 @@ set(CROSS_PLATFORM_LIBRARIES
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}
         joltc
+        dict
 )
 
 if (UNIX)
@@ -246,14 +250,13 @@ if (UNIX)
 elseif (WIN32)
     target_link_libraries(game PRIVATE ${CROSS_PLATFORM_LIBRARIES} opengl32 dwmapi)
 endif ()
-
-set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX)
-include_directories(game PRIVATE
+target_include_directories(game PRIVATE
         ${SDL2_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
         ${GLEW_INCLUDE_DIRS}
 )
+set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX)
 
 #endregion
 

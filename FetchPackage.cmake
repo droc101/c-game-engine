@@ -9,7 +9,7 @@ macro(getLatestPackageVersion gitRepo versionSplat)
     endif ()
 endmacro()
 
-macro(fetchPackage gitRepo versionSplat packageName)
+function(fetchPackage gitRepo versionSplat packageName)
     getLatestPackageVersion(${gitRepo} ${versionSplat})
 
     FetchContent_Declare(
@@ -22,9 +22,9 @@ macro(fetchPackage gitRepo versionSplat packageName)
             SYSTEM
     )
     FetchContent_MakeAvailable(${packageName})
-endmacro()
+endfunction()
 
-macro(findOrFetchPackage gitRepo versionSplat packageName)
+function(findOrFetchPackage gitRepo versionSplat packageName)
     getLatestPackageVersion(${gitRepo} ${versionSplat})
 
     FetchContent_Declare(
@@ -38,4 +38,13 @@ macro(findOrFetchPackage gitRepo versionSplat packageName)
             FIND_PACKAGE_ARGS ${ARGN}
     )
     FetchContent_MakeAvailable(${packageName})
-endmacro()
+endfunction()
+
+function(fetchDict)
+    getLatestPackageVersion(https://github.com/P-p-H-d/mlib.git V0.8.*)
+    file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-core.h ${CMAKE_BINARY_DIR}/_deps/dict/m-core.h)
+    file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-array.h ${CMAKE_BINARY_DIR}/_deps/dict/m-array.h)
+    file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-dict.h ${CMAKE_BINARY_DIR}/_deps/dict/dict.h)
+    add_library(dict INTERFACE)
+    target_include_directories(dict INTERFACE ${CMAKE_BINARY_DIR}/_deps/dict)
+endfunction()
