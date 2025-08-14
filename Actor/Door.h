@@ -5,6 +5,8 @@
 #ifndef DOOR_H
 #define DOOR_H
 
+#include <joltc.h>
+#include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 
 void DoorInit(Actor *this, const KvList *params, Transform *transform);

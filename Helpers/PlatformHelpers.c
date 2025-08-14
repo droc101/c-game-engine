@@ -3,8 +3,7 @@
 //
 
 #include "PlatformHelpers.h"
-
-#include "../defines.h"
+#include <SDL_video.h>
 
 #ifdef WIN32
 #include <dwmapi.h>

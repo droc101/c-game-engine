@@ -5,7 +5,7 @@
 #ifndef GAME_LOGGING_H
 #define GAME_LOGGING_H
 
-#include "../../defines.h"
+#include <stdbool.h>
 
 #define FLUSH_ON_INFO true
 #define FLUSH_ON_DEBUG true

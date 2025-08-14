@@ -5,7 +5,92 @@
 #ifndef GAME_GLOBALSTATE_H
 #define GAME_GLOBALSTATE_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include "Camera.h"
+#include "Level.h"
+#include "Options.h"
+#include "Viewmodel.h"
+
+typedef enum CurrentState CurrentState;
+
+typedef struct GlobalState GlobalState;
+typedef struct SaveData SaveData;
+
+typedef void (*FixedUpdateFunction)(GlobalState *state, double delta);
+
+typedef void (*FrameUpdateFunction)(GlobalState *state);
+
+typedef void (*FrameRenderFunction)(GlobalState *state);
+
+/**
+ * Used to check which game state the game is in
+ * Now, you *could* just set a complete mess of state functions and disregard this, but if you do that, I will find you.
+ */
+enum CurrentState
+{
+	LEVEL_SELECT_STATE,
+	LOGO_SPLASH_STATE,
+	MAIN_STATE,
+	MENU_STATE,
+	PAUSE_STATE,
+	OPTIONS_STATE,
+	VIDEO_OPTIONS_STATE,
+	SOUND_OPTIONS_STATE,
+	INPUT_OPTIONS_STATE,
+	LOADING_STATE,
+};
+
+struct SaveData
+{
+	/// Player health
+	int hp;
+	/// The number of coins the player has
+	int coins;
+	/// The number of blue coins the player has
+	int blueCoins;
+};
+
+// Global state of the game
+struct GlobalState
+{
+	/// Current level
+	Level *level;
+
+	JPH_JobSystem *jobSystem;
+
+	/// State update function
+	FrameUpdateFunction UpdateGame;
+	/// State render function
+	FrameRenderFunction RenderGame;
+	/// The current state of the game
+	CurrentState currentState;
+	/// The number of physics frames that have passed since the last game state change
+	uint64_t physicsFrame;
+
+	/// The save data (persists between levels)
+	SaveData *saveData;
+
+	/// The camera
+	Camera *camera;
+	/// The scale of the UI.
+	double uiScale;
+
+	Viewmodel viewmodel;
+
+	/// Game options
+	Options options;
+
+	/// The path to the executable
+	char executablePath[261];
+	/// The path to the executable folder
+	char executableFolder[261];
+	/// Whether to freeze the event loop. This should only be used for debugging.
+	bool freezeEvents;
+	/// Request to exit the game
+	bool requestExit;
+};
 
 /**
  * Load options

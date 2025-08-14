@@ -3,7 +3,10 @@
 //
 
 #include "JoltDebugRenderer.h"
-
+#include <joltc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Graphics/Drawing.h"
 
 // TODO: Currently only Vulkan is supported, and only the DrawTriangle calls are supported.

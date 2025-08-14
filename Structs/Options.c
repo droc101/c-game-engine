@@ -3,16 +3,25 @@
 //
 
 #include "Options.h"
+#include <SDL_filesystem.h>
+#include <SDL_stdinc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../config.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
+#include "../Helpers/Graphics/RenderingHelpers.h"
 
 void DefaultOptions(Options *options)
 {
 	options->renderer = RENDERER_VULKAN;
-	options->musicVolume = 1.0;
-	options->sfxVolume = 1.0;
-	options->masterVolume = 1.0;
+	options->musicVolume = 1.0f;
+	options->sfxVolume = 1.0f;
+	options->masterVolume = 1.0f;
 	options->fullscreen = false;
 	options->vsync = false;
 	options->lodMultiplier = 1.0f;
@@ -53,11 +62,11 @@ bool ValidateOptions(const Options *options)
 	return true;
 }
 
-ushort GetOptionsChecksum(Options *options)
+uint16_t GetOptionsChecksum(Options *options)
 {
-	const byte *data = (byte *)options;
-	ushort checksum = 0;
-	for (size_t i = sizeof(ushort); i < sizeof(Options) - sizeof(ushort); i++)
+	const uint8_t *data = (uint8_t *)options;
+	uint16_t checksum = 0;
+	for (size_t i = sizeof(uint16_t); i < sizeof(Options) - sizeof(uint16_t); i++)
 	{
 		checksum += data[i];
 	}

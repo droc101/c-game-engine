@@ -5,7 +5,55 @@
 #ifndef KVLIST_H
 #define KVLIST_H
 
-#include "../../defines.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "../../Helpers/Core/List.h"
+#include "../../Structs/Color.h"
+
+#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = x})
+#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = x})
+#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = x})
+#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = x})
+#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = x})
+#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = x})
+#define PARAM_NONE ((Param){PARAM_TYPE_NONE})
+
+typedef enum ParamType ParamType;
+
+typedef struct Param Param;
+typedef struct KvList KvList;
+
+enum ParamType
+{
+	PARAM_TYPE_BYTE,
+	PARAM_TYPE_INTEGER,
+	PARAM_TYPE_FLOAT,
+	PARAM_TYPE_BOOL,
+	PARAM_TYPE_STRING,
+	PARAM_TYPE_NONE,
+	PARAM_TYPE_COLOR
+};
+
+struct KvList
+{
+	LockingList keys;
+	LockingList values;
+};
+
+struct Param
+{
+	ParamType type;
+	union
+	{
+		uint8_t byteValue;
+		int intValue;
+		float floatValue;
+		bool boolValue;
+		char stringValue[64];
+		Color colorValue;
+	};
+};
 
 /**
  * Creates a key-value list.
@@ -58,7 +106,7 @@ ParamType KvGetType(const KvList *list, const char *key);
  * @param defaultValue The default value to return if the key does not exist.
  * @return The byte value associated with the key, or the default value if the key does not exist.
  */
-byte KvGetByte(const KvList *list, const char *key, byte defaultValue);
+uint8_t KvGetByte(const KvList *list, const char *key, uint8_t defaultValue);
 
 /**
  * Get an integer value from the key-value list.
@@ -115,7 +163,7 @@ Color KvGetColor(const KvList *list, const char *key, Color defaultValue);
  * @param key The key to set the value for.
  * @param value The byte value to set.
  */
-void KvSetByte(KvList *list, const char *key, byte value);
+void KvSetByte(KvList *list, const char *key, uint8_t value);
 
 /**
  * Set an integer value in the key-value list.
@@ -163,7 +211,7 @@ void KvSetColor(KvList *list, const char *key, Color value);
  * @param key The key to set the value for.
  * @param value The raw value to set.
  */
-void KvSetUnsafe(KvList *list, const char *key, const Param value);
+void KvSetUnsafe(KvList *list, const char *key, Param value);
 
 #pragma endregion
 

@@ -5,7 +5,7 @@
 #ifndef GAME_FRAMEGRAPHER_H
 #define GAME_FRAMEGRAPHER_H
 
-#include "../defines.h"
+#include <stdint.h>
 
 /// How many frames to store in the graph
 #define FRAMEGRAPH_HISTORY_SIZE 30
@@ -46,14 +46,14 @@
  * Update the frame graph with the time it took to render the frame
  * @param ns nanoseconds the frame took
  */
-void FrameGraphUpdate(ulong ns);
+void FrameGraphUpdate(uint64_t ns);
 
 /**
  * Draw the frame graph
  */
 void FrameGraphDraw();
 
-void TickGraphUpdate(ulong ns);
+void TickGraphUpdate(uint64_t ns);
 
 void TickGraphDraw();
 

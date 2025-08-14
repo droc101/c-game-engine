@@ -3,13 +3,18 @@
 //
 
 #include "GLogoSplashState.h"
+#include <SDL_gamecontroller.h>
+#include <SDL_rect.h>
+#include <SDL_scancode.h>
+#include <stddef.h>
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Input.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
+#include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
-#include "../Helpers/Core/SoundSystem.h"
 #include "GMenuState.h"
 
 void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)

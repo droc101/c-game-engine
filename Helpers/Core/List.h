@@ -7,6 +7,8 @@
 
 #include <assert.h>
 #include <SDL_mutex.h>
+#include <stddef.h>
+#include <stdint.h>
 
 typedef struct List List;
 typedef struct LockingList LockingList;

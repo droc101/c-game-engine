@@ -5,7 +5,9 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "../../defines.h"
+#include <joltc.h>
+#include "../../Helpers/Core/KVList.h"
+#include "../../Structs/Actor.h"
 
 void SpriteInit(Actor *this, const KvList *params, Transform *transform);
 

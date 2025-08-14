@@ -3,20 +3,19 @@
 //
 
 #include "FrameBenchmark.h"
-
 #include <limits.h>
-
-#include "../defines.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/Timing.h"
 
 bool benchRunning = false;
-ulong benchStartTime;
-ulong benchFrameCount;
-ulong highestFrameNs;
-ulong lowestFrameNs;
+uint64_t benchStartTime;
+uint64_t benchFrameCount;
+uint64_t highestFrameNs;
+uint64_t lowestFrameNs;
 
-ulong benchFrameStartTime;
+uint64_t benchFrameStartTime;
 
 void BenchStart()
 {
@@ -63,8 +62,8 @@ void BenchFrameEnd()
 void BenchFinish()
 {
 	benchRunning = false;
-	const ulong endTime = GetTimeNs();
-	const ulong totalTime = endTime - benchStartTime;
+	const uint64_t endTime = GetTimeNs();
+	const uint64_t totalTime = endTime - benchStartTime;
 	double avgFrameTime = (double)totalTime / (double)benchFrameCount;
 	const double avgFps = 1.0 / (avgFrameTime / 1000000000.0);
 

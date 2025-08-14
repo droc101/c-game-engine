@@ -5,8 +5,12 @@
 #ifndef GAME_DRAWING_H
 #define GAME_DRAWING_H
 
-#include "../../defines.h"
-#include "SDL.h"
+#include <joltc.h>
+#include <SDL.h>
+#include "../../Structs/Color.h"
+#include "../../Structs/GlobalState.h"
+#include "../../Structs/Level.h"
+#include "../../Structs/Vector2.h"
 
 typedef struct BatchedQuadArray BatchedQuadArray;
 
@@ -47,7 +51,7 @@ SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode);
  * @param thickness The thickness of the line
  * @param color The color to draw with
  */
-void DrawLine(const Vector2 start, const Vector2 end, const float thickness, const Color color);
+void DrawLine(Vector2 start, Vector2 end, float thickness, Color color);
 
 /**
  * Draw a 1px outline of a rectangle
@@ -56,7 +60,7 @@ void DrawLine(const Vector2 start, const Vector2 end, const float thickness, con
  * @param thickness The thickness of the outline
  * @param color The color to draw with
  */
-void DrawOutlineRect(const Vector2 pos, const Vector2 size, const float thickness, const Color color);
+void DrawOutlineRect(Vector2 pos, Vector2 size, float thickness, Color color);
 
 /**
  * Draw a texture on a rectangle

@@ -4,6 +4,7 @@
 
 #include "MathEx.h"
 #include <math.h>
+#include <stdint.h>
 
 int wrapi(const int x, const int min, const int max)
 {

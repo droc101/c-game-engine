@@ -3,15 +3,23 @@
 //
 
 #include "RadioButton.h"
+#include <SDL_mouse.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../../Helpers/CommonAssets.h"
 #include "../../../Helpers/Core/AssetReader.h"
 #include "../../../Helpers/Core/Error.h"
 #include "../../../Helpers/Core/Input.h"
+#include "../../../Helpers/Core/List.h"
 #include "../../../Helpers/Core/SoundSystem.h"
 #include "../../../Helpers/Graphics/Drawing.h"
 #include "../../../Helpers/Graphics/Font.h"
-#include "../../GlobalState.h"
+#include "../../Color.h"
 #include "../../Vector2.h"
+#include "../UiStack.h"
 
 Control *CreateRadioButtonControl(const Vector2 position,
 								  const Vector2 size,
@@ -19,8 +27,8 @@ Control *CreateRadioButtonControl(const Vector2 position,
 								  const RadioButtonCallback callback,
 								  const ControlAnchor anchor,
 								  const bool checked,
-								  const byte groupId,
-								  const byte id)
+								  const uint8_t groupId,
+								  const uint8_t id)
 {
 	Control *radio = CreateEmptyControl();
 	radio->type = RADIO_BUTTON;
@@ -46,7 +54,7 @@ void DestroyRadioButton(const Control *c)
 	free(data);
 }
 
-void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint /*ctlIndex*/)
+void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	RadioButtonData *data = c->ControlData;
 
@@ -62,7 +70,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 		data->checked = true;
 
 		// Find all radio buttons with the same group id and uncheck them
-		for (uint i = 0; i < stack->controls.length; i++)
+		for (uint32_t i = 0; i < stack->controls.length; i++)
 		{
 			const Control *control = ListGetPointer(stack->controls, i);
 			if (control->type == RADIO_BUTTON)

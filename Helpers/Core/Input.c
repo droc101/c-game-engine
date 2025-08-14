@@ -3,6 +3,17 @@
 //
 
 #include "Input.h"
+#include <SDL_error.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_haptic.h>
+#include <SDL_joystick.h>
+#include <SDL_scancode.h>
+#include <SDL_stdinc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Vector2.h"
 #include "Error.h"
@@ -76,7 +87,7 @@ bool FindGameController()
 	return false;
 }
 
-void Rumble(const float strength, const uint time)
+void Rumble(const float strength, const uint32_t time)
 {
 	if (UseController() && haptic != NULL)
 	{

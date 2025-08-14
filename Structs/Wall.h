@@ -5,7 +5,56 @@
 #ifndef GAME_WALL_H
 #define GAME_WALL_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include "Vector2.h"
+
+typedef struct Wall Wall;
+typedef struct ActorWall ActorWall;
+
+// Utility functions are in Structs/wall.h
+struct Wall
+{
+	/// The first point of the wall
+	Vector2 a;
+	/// The second point of the wall
+	Vector2 b;
+	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	char tex[80];
+	/// The length of the wall (Call @c WallBake to update)
+	float length;
+	/// The angle of the wall (Call @c WallBake to update)
+	float angle;
+	/// The change in x over the length of the wall, calculated with @code Wall.b.x - Wall.a.x@endcode
+	float dx;
+	/// The change in y over the length of the wall, calculated with @code Wall.b.y - Wall.a.y@endcode
+	float dy;
+	/// The X scale of the texture
+	float uvScale;
+	/// The X offset of the texture
+	float uvOffset;
+	/// Jolt body ID
+	JPH_BodyId bodyId;
+};
+
+struct ActorWall
+{
+	/// The first point of the wall
+	Vector2 a;
+	/// The second point of the wall
+	Vector2 b;
+	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	char tex[80];
+	/// The X scale of the texture
+	float uvScale;
+	/// The X offset of the texture
+	float uvOffset;
+	/// height of the wall for rendering. Does not affect collision
+	float height;
+	/// The length of the wall (Call @c WallBake to update)
+	float length;
+	/// The angle of the wall (Call @c WallBake to update)
+	float angle;
+};
 
 /**
  * Create a wall

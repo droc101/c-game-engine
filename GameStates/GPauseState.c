@@ -3,19 +3,19 @@
 //
 
 #include "GPauseState.h"
-#include <stdio.h>
-#include "../Helpers/CommonAssets.h"
+#include <SDL_gamecontroller.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
-#include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
 #include "../Structs/Vector2.h"
-#include "GLevelSelectState.h"
 #include "GMainState.h"
 #include "GOptionsState.h"
 

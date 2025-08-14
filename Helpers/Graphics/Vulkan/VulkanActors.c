@@ -4,7 +4,19 @@
 
 #include "VulkanActors.h"
 #include <assert.h>
+#include <cglm/mat4.h>
+#include <cglm/types.h>
 #include <luna/luna.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vulkan/vulkan_core.h>
+#include "../../../Structs/Actor.h"
+#include "../../../Structs/Wall.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../../Core/List.h"
 #include "../RenderingHelpers.h"
 #include "VulkanHelpers.h"
 #include "VulkanResources.h"

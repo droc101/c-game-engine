@@ -5,7 +5,7 @@
 #ifndef GAME_TIMING_H
 #define GAME_TIMING_H
 
-#include "../../defines.h"
+#include <stdint.h>
 #include "../Core/Logging.h"
 
 #define TIME(thingToTime) \
@@ -25,18 +25,18 @@ void InitTimers();
  * Get the time the program has been running in nanoseconds
  * @return Time in nanoseconds
  */
-ulong GetTimeNs();
+uint64_t GetTimeNs();
 
 /**
  * Get the time the program has been running in milliseconds
  * @return Time in milliseconds
  */
-ulong GetTimeMs();
+uint64_t GetTimeMs();
 
 /**
  * Get the time the program has been running in seconds
  * @return Time in seconds
  */
-ulong GetTimeS();
+uint64_t GetTimeS();
 
 #endif //GAME_TIMING_H

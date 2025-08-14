@@ -5,7 +5,9 @@
 #ifndef LOGICCOUNTER_H
 #define LOGICCOUNTER_H
 
-#include "../../defines.h"
+#include <joltc.h>
+#include "../../Helpers/Core/KVList.h"
+#include "../../Structs/Actor.h"
 
 void LogicCounterInit(Actor *this, const KvList *params, Transform *);
 

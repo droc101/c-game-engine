@@ -5,7 +5,9 @@
 #ifndef LASER_H
 #define LASER_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include "../Helpers/Core/KVList.h"
+#include "../Structs/Actor.h"
 
 #define LASER_INPUT_DISABLE 1
 #define LASER_INPUT_ENABLE 2

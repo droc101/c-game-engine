@@ -3,8 +3,12 @@
 //
 
 #include "Physics.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "../../../Actor/Laser.h"
 #include "../../../Debug/JoltDebugRenderer.h"
+#include "../../../Structs/GlobalState.h"
 #include "../Error.h"
 #include "Player.h"
 

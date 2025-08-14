@@ -3,6 +3,12 @@
 //
 
 #include "FontLoader.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../AssetReader.h"
 #include "../DataReader.h"
 #include "../Error.h"
@@ -45,13 +51,17 @@ Font *LoadFont(const char *asset)
 	}
 	if (assetData->typeVersion != FONT_ASSET_VERSION)
 	{
-		LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)\n", assetData->typeVersion, FONT_ASSET_VERSION);
+		LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)\n",
+				 assetData->typeVersion,
+				 FONT_ASSET_VERSION);
 		return GenerateFallbackFont();
 	}
 	const size_t baseSize = (sizeof(uint8_t) * 8) + sizeof(bool);
 	if (assetData->size < baseSize)
 	{
-		LogError("Failed to load font from asset due to size mismatch (got %d bytes, expected at least %d bytes)\n", assetData->size, baseSize);
+		LogError("Failed to load font from asset due to size mismatch (got %d bytes, expected at least %d bytes)\n",
+				 assetData->size,
+				 baseSize);
 		return GenerateFallbackFont();
 	}
 	Font *font = malloc(sizeof(Font));
@@ -97,4 +107,3 @@ void FreeFont(Font *font)
 	free(font->texture);
 	free(font);
 }
-

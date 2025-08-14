@@ -3,8 +3,13 @@
 //
 
 #include "Trigger.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
+#include "../../Helpers/Core/Physics/Physics.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/Level.h"
 
@@ -24,7 +29,7 @@ typedef struct TriggerData
 	bool enabled;
 } TriggerData;
 
-static bool TriggerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+static bool TriggerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	TriggerData *data = (TriggerData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))

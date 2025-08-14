@@ -4,7 +4,14 @@
 
 #include "Slider.h"
 #include <math.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_mouse.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "../../../Helpers/CommonAssets.h"
 #include "../../../Helpers/Core/AssetReader.h"
 #include "../../../Helpers/Core/Error.h"
@@ -12,7 +19,9 @@
 #include "../../../Helpers/Core/MathEx.h"
 #include "../../../Helpers/Graphics/Drawing.h"
 #include "../../../Helpers/Graphics/Font.h"
+#include "../../Color.h"
 #include "../../Vector2.h"
+#include "../UiStack.h"
 
 char *DefaultSliderLabelCallback(const Control *slider)
 {
@@ -88,7 +97,7 @@ void DestroySlider(const Control *c)
 }
 
 // ReSharper disable twice CppParameterMayBeConstPtrOrRef
-void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const uint ctlIndex)
+void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const uint32_t ctlIndex)
 {
 	SliderData *data = c->ControlData;
 

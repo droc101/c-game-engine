@@ -3,11 +3,14 @@
 //
 
 #include "DPrint.h"
+#include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
-
+#include "../config.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Graphics/Font.h"
+#include "../Structs/Color.h"
 #include "../Structs/Vector2.h"
 
 int dprintYPosition = 10;

@@ -3,10 +3,17 @@
 //
 
 #include "Goal.h"
+#include <cglm/types.h>
+#include <joltc.h>
 #include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
@@ -22,7 +29,7 @@ typedef struct GoalData
 	bool enabled;
 } GoalData;
 
-bool GoalSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool GoalSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	if (DefaultSignalHandler(this, sender, signal, param))
 	{

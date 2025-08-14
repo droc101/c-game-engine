@@ -3,6 +3,12 @@
 //
 
 #include "IoProxy.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
@@ -15,7 +21,7 @@ typedef struct IoProxyData
 	size_t tickCounter;
 } IoProxyData;
 
-bool IoProxySignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool IoProxySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	if (signal == ACTOR_KILL_INPUT)
 	{

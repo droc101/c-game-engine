@@ -5,6 +5,8 @@
 #ifndef GAME_SLIDER_H
 #define GAME_SLIDER_H
 
+#include <stdint.h>
+#include "../../Vector2.h"
 #include "../UiStack.h"
 
 typedef struct SliderData SliderData;
@@ -60,7 +62,7 @@ Control *CreateSliderControl(Vector2 position,
 
 void DestroySlider(const Control *c);
 
-void UpdateSlider(UiStack *stack, Control *c, Vector2 localMousePos, uint ctlIndex);
+void UpdateSlider(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
 void DrawSlider(const Control *c, ControlState state, Vector2 position);
 

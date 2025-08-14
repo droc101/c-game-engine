@@ -5,7 +5,7 @@
 #ifndef GAME_GOPTIONSSTATE_H
 #define GAME_GOPTIONSSTATE_H
 
-#include "../defines.h"
+#include <stdbool.h>
 
 extern bool optionsStateInGame;
 

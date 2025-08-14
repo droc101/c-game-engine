@@ -5,7 +5,25 @@
 #ifndef GAME_RENDERINGHELPERS_H
 #define GAME_RENDERINGHELPERS_H
 
-#include "../../defines.h"
+#include <cglm/cglm.h>
+#include <SDL.h>
+#include <stdbool.h>
+#include "../../../../Structs/Actor.h"
+#include "../../../../Structs/Color.h"
+#include "../../../../Structs/Level.h"
+#include "../../../../Structs/Vector2.h"
+
+typedef enum Renderer Renderer;
+
+/**
+ * Used to check which renderer the game is using
+ */
+enum Renderer
+{
+	RENDERER_OPENGL,
+	RENDERER_VULKAN,
+	RENDERER_MAX
+};
 
 extern Renderer currentRenderer;
 
@@ -145,6 +163,6 @@ float Y_TO_NDC(float y);
  * @param argb The color uint
  * @param color The output color
  */
-void GetColor(const uint argb, Color *color);
+void GetColor(uint32_t argb, Color *color);
 
 #endif //GAME_RENDERINGHELPERS_H

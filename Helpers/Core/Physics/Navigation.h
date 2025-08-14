@@ -5,7 +5,7 @@
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 
-#include "../../../defines.h"
+#include "../../../Structs/Actor.h"
 
 typedef struct NavigationConfig NavigationConfig;
 
@@ -35,7 +35,7 @@ struct NavigationConfig
 	float deAgroDistance;
 	/// The number of physics ticks that it will take for the actor to forget about the target
 	/// once the line of sight is broken
-	uint agroTicks;
+	uint32_t agroTicks;
 	/// The function to call when the actor does not see the target and has no current agro
 	ActorIdleFunction IdleFunction;
 	/// The function to call when the actor has reached @c minDistance from the target

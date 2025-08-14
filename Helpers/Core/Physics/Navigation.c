@@ -3,6 +3,9 @@
 //
 
 #include "Navigation.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include "../../../Structs/Actor.h"
 
 float PlayerRelativeAngle(const Actor *actor)
 {

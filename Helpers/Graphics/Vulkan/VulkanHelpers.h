@@ -5,7 +5,11 @@
 #ifndef VULKANHELPERS_H
 #define VULKANHELPERS_H
 
+#include <cglm/cglm.h>
+#include <joltc.h>
 #include <luna/lunaTypes.h>
+#include "../../../../Structs/Color.h"
+#include "../../../../Structs/GlobalState.h"
 #include "../../Core/AssetLoaders/ShaderLoader.h"
 #include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/Logging.h"

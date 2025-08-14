@@ -3,13 +3,20 @@
 //
 
 #include "GVideoOptionsState.h"
+#include <SDL_scancode.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "../../Helpers/CommonAssets.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/Input.h"
 #include "../../Helpers/Graphics/Drawing.h"
 #include "../../Helpers/Graphics/Font.h"
 #include "../../Helpers/Graphics/RenderingHelpers.h"
+#include "../../Structs/Color.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Options.h"
 #include "../../Structs/UI/Controls/Button.h"
@@ -61,7 +68,7 @@ void CbOptionsFullscreen(const bool value)
 	SDL_SetWindowFullscreen(GetGameWindow(), value ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 }
 
-void RbOptionsRenderer(const bool /*value*/, const byte /*groupId*/, const byte id)
+void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const uint8_t id)
 {
 	GetState()->options.renderer = id;
 	hasChangedVideoOptions = true;

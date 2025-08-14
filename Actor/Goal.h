@@ -5,7 +5,9 @@
 #ifndef GAME_GOAL_H
 #define GAME_GOAL_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include "../Helpers/Core/KVList.h"
+#include "../Structs/Actor.h"
 
 void GoalInit(Actor *this, const KvList *params, Transform *transform);
 

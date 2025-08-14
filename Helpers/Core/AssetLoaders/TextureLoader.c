@@ -3,13 +3,18 @@
 //
 
 #include "TextureLoader.h"
-#include "../Error.h"
+#include <SDL_endian.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../AssetReader.h"
 #include "../DataReader.h"
+#include "../Error.h"
 #include "../Logging.h"
-#include <SDL_endian.h>
 
-uint textureId;
+uint32_t textureId;
 Image *images[MAX_TEXTURES];
 
 #define MISSING_TEX_SIZE 2
@@ -75,7 +80,9 @@ Image *LoadImage(const char *asset)
 	{
 		if (textureAsset->typeVersion != TEXTURE_ASSET_VERSION)
 		{
-			LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)", textureAsset->typeVersion, TEXTURE_ASSET_VERSION);
+			LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)",
+					 textureAsset->typeVersion,
+					 TEXTURE_ASSET_VERSION);
 			GenFallbackImage(img);
 		} else
 		{
@@ -87,7 +94,7 @@ Image *LoadImage(const char *asset)
 			const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
 			img->pixelData = malloc(pixelDataSize);
 			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
-			uint32_t *pixels32 = (uint32_t*)img->pixelData;
+			uint32_t *pixels32 = (uint32_t *)img->pixelData;
 			for (size_t i = 0; i < img->width * img->height; i++)
 			{
 				pixels32[i] = SDL_SwapBE32(pixels32[i]); // endianness is SO fun

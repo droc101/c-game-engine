@@ -3,9 +3,15 @@
 //
 
 #include "Drawing.h"
-#include <stdio.h>
-#include "../../defines.h"
+#include <joltc.h>
+#include <SDL_error.h>
+#include <SDL_hints.h>
+#include <SDL_surface.h>
+#include <stddef.h>
+#include "../../Structs/Camera.h"
+#include "../../Structs/Color.h"
 #include "../../Structs/GlobalState.h"
+#include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
 #include "../Core/AssetLoaders/TextureLoader.h"
 #include "../Core/AssetReader.h"
@@ -13,7 +19,6 @@
 #include "../Core/Logging.h"
 #include "GL/GLHelper.h"
 #include "RenderingHelpers.h"
-#include "SDL.h"
 #include "Vulkan/Vulkan.h"
 
 SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)

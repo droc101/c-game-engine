@@ -3,9 +3,12 @@
 //
 
 #include "GlobalState.h"
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "../Debug/JoltDebugRenderer.h"
+#include "../config.h"
 #include "../GameStates/GLevelSelectState.h"
 #include "../GameStates/GMenuState.h"
 #include "../GameStates/GOptionsState.h"
@@ -25,6 +28,7 @@
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Level.h"
+#include "Camera.h"
 #include "Options.h"
 
 static GlobalState state;

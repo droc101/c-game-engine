@@ -2,7 +2,14 @@
 // Created by NBT22 on 7/7/25.
 //
 
-#include <luna/luna.h>
+#include <cglm/types.h>
+#include <luna/lunaPipeline.h>
+#include <luna/lunaRenderPass.h>
+#include <luna/lunaTypes.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <vulkan/vulkan_core.h>
+#include "../../Core/AssetLoaders/ShaderLoader.h"
 #include "../../Core/AssetReader.h"
 #include "VulkanHelpers.h"
 #include "VulkanInternal.h"

@@ -3,13 +3,14 @@
 //
 
 #include "GLoadingState.h"
+#include <stddef.h>
 #include <string.h>
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Logging.h"
-#include "../Helpers/Graphics/Drawing.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
-#include "../Helpers/Core/SoundSystem.h"
+#include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "GMainState.h"

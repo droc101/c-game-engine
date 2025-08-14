@@ -6,15 +6,21 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <zconf.h>
 #include <zlib.h>
 #include "../../Structs/GlobalState.h"
+#include "AssetLoaders/ModelLoader.h"
+#include "AssetLoaders/TextureLoader.h"
 #include "DataReader.h"
 #include "Error.h"
+#include "List.h"
 #include "Logging.h"
-#include "AssetLoaders/TextureLoader.h"
-#include "AssetLoaders/ModelLoader.h"
 
 List assetCacheNames;
 List assetCacheData;
@@ -96,7 +102,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	fseek(file, 0, SEEK_END);
 	const size_t fileSize = ftell(file);
 
-	byte *asset = malloc(fileSize);
+	uint8_t *asset = malloc(fileSize);
 	CheckAlloc(asset);
 	fseek(file, 0, SEEK_SET);
 	const size_t bytesRead = fread(asset, 1, fileSize, file);
@@ -140,7 +146,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	assetStruct->typeVersion = typeVersion;
 
 	// Allocate memory for the decompressed data
-	byte *decompressedData = malloc(decompressedSize);
+	uint8_t *decompressedData = malloc(decompressedSize);
 	CheckAlloc(decompressedData);
 
 	z_stream stream = {0};

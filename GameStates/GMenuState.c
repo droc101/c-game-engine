@@ -3,16 +3,20 @@
 //
 
 #include "GMenuState.h"
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include "../config.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
+#include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
-#include "../Helpers/Core/SoundSystem.h"
 #include "../Structs/Vector2.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
@@ -56,9 +60,7 @@ void GMenuStateRender(GlobalState *State)
 	logoPosition.y = 32;
 	logoSize.x = 480;
 	logoSize.y = 320;
-	DrawTexture(logoPosition,
-				logoSize,
-				TEXTURE("interface/menu_logo"));
+	DrawTexture(logoPosition, logoSize, TEXTURE("interface/menu_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
 	FontDrawString(v2(20, 200), "DEBUG BUILD", 16, COLOR(0xFF00FF00), smallFont);

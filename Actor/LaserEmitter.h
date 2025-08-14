@@ -5,7 +5,9 @@
 #ifndef LASEREMITTER_H
 #define LASEREMITTER_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include "../Helpers/Core/KVList.h"
+#include "../Structs/Actor.h"
 
 void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform);
 void LaserEmitterUpdate(Actor *this, double /*delta*/);

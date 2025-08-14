@@ -5,17 +5,20 @@
 #ifndef GAME_RADIOBUTTON_H
 #define GAME_RADIOBUTTON_H
 
+#include <stdbool.h>
+#include <stdint.h>
+#include "../../Vector2.h"
 #include "../UiStack.h"
 
 typedef struct RadioButtonData RadioButtonData;
 
-typedef void (*RadioButtonCallback)(bool, byte, byte);
+typedef void (*RadioButtonCallback)(bool, uint8_t, uint8_t);
 
 struct RadioButtonData
 {
 	char *label;
-	byte groupId;
-	byte id;
+	uint8_t groupId;
+	uint8_t id;
 	bool checked;
 	RadioButtonCallback callback;
 };
@@ -38,12 +41,12 @@ Control *CreateRadioButtonControl(Vector2 position,
 								  RadioButtonCallback callback,
 								  ControlAnchor anchor,
 								  bool checked,
-								  byte groupId,
-								  byte id);
+								  uint8_t groupId,
+								  uint8_t id);
 
 void DestroyRadioButton(const Control *c);
 
-void UpdateRadioButton(UiStack *stack, Control *c, Vector2 localMousePos, uint ctlIndex);
+void UpdateRadioButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
 void DrawRadioButton(const Control *c, ControlState state, Vector2 position);
 

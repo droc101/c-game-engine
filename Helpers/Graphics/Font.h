@@ -5,7 +5,9 @@
 #ifndef GAME_FONT_H
 #define GAME_FONT_H
 
-#include "../../defines.h"
+#include "../../../../Structs/Color.h"
+#include "../../../../Structs/Vector2.h"
+#include "../Core/AssetLoaders/FontLoader.h"
 
 typedef enum FontHorizontalAlign FontHorizontalAlign;
 typedef enum FontVerticalAlign FontVerticalAlign;
@@ -34,7 +36,7 @@ enum FontVerticalAlign
  * @return Bottom right position of the text
  * @note This is a wrapper for DrawTextAligned with h_align = FONT_HALIGN_LEFT and v_align = FONT_VALIGN_TOP
  */
-void FontDrawString(Vector2 pos, const char *str, uint size, Color color, const Font *font);
+void FontDrawString(Vector2 pos, const char *str, uint32_t size, Color color, const Font *font);
 
 /**
  * Count the number of lines in a string
@@ -51,7 +53,7 @@ int StringLineCount(const char *str);
  * @return Size of the text
  * @note This is a wrapper for @c MeasureTextNChars where @c n is @code strlen(str) @endcode
  */
-Vector2 MeasureText(const char *str, uint size, const Font *font);
+Vector2 MeasureText(const char *str, uint32_t size, const Font *font);
 
 /**
  * Measure the size of a string of text up to a certain number of characters
@@ -62,7 +64,7 @@ Vector2 MeasureText(const char *str, uint size, const Font *font);
  * @return The size of the text up to n characters
  * @note It is up to the caller to ensure @c n is within the bounds of @c str
  */
-Vector2 MeasureTextNChars(const char *str, uint size, const Font *font, size_t n);
+Vector2 MeasureTextNChars(const char *str, uint32_t size, const Font *font, size_t n);
 
 /**
  * Get a line of text from a string
@@ -87,7 +89,7 @@ void TextGetLine(const char *str, int line, char *out, size_t outBufferSize, boo
  * @param font The font to use
  */
 void DrawTextAligned(const char *str,
-					 uint size,
+					 uint32_t size,
 					 Color color,
 					 Vector2 rectPos,
 					 Vector2 rectSize,

@@ -3,9 +3,16 @@
 //
 
 #include "Laser.h"
+#include <joltc.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
@@ -88,7 +95,7 @@ static JPH_BodyFilter *bodyFilter;
 
 static const float maxDistance = 50.0f;
 
-static bool LaserSignalHandler(Actor *this, const Actor *sender, byte signal, const Param *param)
+static bool LaserSignalHandler(Actor *this, const Actor *sender, uint8_t signal, const Param *param)
 {
 	if (DefaultSignalHandler(this, sender, signal, param))
 	{

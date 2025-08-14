@@ -138,7 +138,11 @@ void GL_UpdateViewportSize();
  * @param texture The texture name
  * @param color The modulate color
  */
-void GL_DrawTexturedArrays(const float *vertices, const uint *indices, int quadCount, const char *texture, Color color);
+void GL_DrawTexturedArrays(const float *vertices,
+						   const uint32_t *indices,
+						   int quadCount,
+						   const char *texture,
+						   Color color);
 
 /**
  * Draw arrays using the ui_colored shader
@@ -147,7 +151,7 @@ void GL_DrawTexturedArrays(const float *vertices, const uint *indices, int quadC
  * @param quadCount The number of quads to draw
  * @param color The color to draw
  */
-void GL_DrawColoredArrays(const float *vertices, const uint *indices, uint quadCount, Color color);
+void GL_DrawColoredArrays(const float *vertices, const uint32_t *indices, uint32_t quadCount, Color color);
 
 /**
  * Convert screen X to NDC
@@ -194,7 +198,11 @@ void GL_RenderLevel(const Level *level, const Camera *camera);
  * @param lod The lod to use
  * @param modColor
  */
-void GL_RenderModel(const ModelDefinition *model, const mat4 modelWorldMatrix, uint skin, uint lod, Color modColor);
+void GL_RenderModel(const ModelDefinition *model,
+					const mat4 modelWorldMatrix,
+					uint32_t skin,
+					uint32_t lod,
+					Color modColor);
 
 /**
  * Render the level's static walls

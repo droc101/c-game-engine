@@ -3,7 +3,9 @@
 //
 
 #include "TextInputSystem.h"
-
+#include <SDL_events.h>
+#include <SDL_keyboard.h>
+#include <stddef.h>
 #include "Core/Logging.h"
 
 TextInput *CurrentTextInput = NULL;

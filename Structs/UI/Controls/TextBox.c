@@ -3,23 +3,31 @@
 //
 
 #include "TextBox.h"
+#include <SDL_events.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include "../../../Helpers/CommonAssets.h"
 #include "../../../Helpers/Core/AssetReader.h"
 #include "../../../Helpers/Core/Error.h"
 #include "../../../Helpers/Core/Input.h"
-#include "../../../Helpers/Core/Logging.h"
 #include "../../../Helpers/Core/MathEx.h"
 #include "../../../Helpers/Core/Timing.h"
 #include "../../../Helpers/Graphics/Drawing.h"
 #include "../../../Helpers/Graphics/Font.h"
+#include "../../../Helpers/TextInputSystem.h"
+#include "../../Color.h"
 #include "../../Vector2.h"
+#include "../UiStack.h"
 
 Control *CreateTextBoxControl(const char *placeholder,
 							  const Vector2 position,
 							  const Vector2 size,
 							  const ControlAnchor anchor,
-							  const uint maxLength,
+							  const uint32_t maxLength,
 							  const TextBoxCallback callback)
 {
 	Control *c = CreateEmptyControl();
@@ -73,7 +81,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, Vector2 positio
 	}
 }
 
-void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePosition*/, const uint controlIndex)
+void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePosition*/, const uint32_t controlIndex)
 {
 	TextBoxData *data = (TextBoxData *)control->ControlData;
 	if (stack->focusedControl != controlIndex)

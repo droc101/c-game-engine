@@ -5,7 +5,9 @@
 #ifndef LOGICDECIMAL_H
 #define LOGICDECIMAL_H
 
-#include "../../defines.h"
+#include <joltc.h>
+#include "../../Helpers/Core/KVList.h"
+#include "../../Structs/Actor.h"
 
 void LogicDecimalInit(Actor *this, const KvList *params, Transform *);
 

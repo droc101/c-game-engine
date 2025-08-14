@@ -3,15 +3,37 @@
 //
 
 #include "GLHelper.h"
-#include <cglm/cglm.h>
+#include <cglm/affine-post.h>
+#include <cglm/affine-pre.h>
+#include <cglm/cam.h>
+#include <cglm/handed/euler_to_quat_rh.h>
+#include <cglm/mat4.h>
+#include <cglm/quat.h>
+#include <cglm/types.h>
+#include <cglm/util.h>
+#include <cglm/vec3.h>
+#include <SDL_error.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "../../../config.h"
+#include "../../../Structs/Actor.h"
+#include "../../../Structs/Color.h"
 #include "../../../Structs/GlobalState.h"
+#include "../../../Structs/Level.h"
+#include "../../../Structs/Options.h"
 #include "../../../Structs/Vector2.h"
+#include "../../../Structs/Wall.h"
 #include "../../Core/AssetLoaders/ModelLoader.h"
 #include "../../Core/AssetLoaders/ShaderLoader.h"
 #include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/AssetReader.h"
 #include "../../Core/Error.h"
+#include "../../Core/List.h"
 #include "../../Core/Logging.h"
 #include "../../Core/MathEx.h"
 #include "../RenderingHelpers.h"
@@ -182,10 +204,8 @@ bool GL_Init(SDL_Window *wnd)
 	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/wall_f"), SHADER("gl/wall_v"));
 	floorAndCeilingShader = GL_ConstructShaderFromAssets(SHADER("gl/floor_f"), SHADER("gl/floor_v"));
 	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/sky_f"), SHADER("gl/sky_v"));
-	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"),
-													 SHADER("gl/model_shaded_v"));
-	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"),
-													   SHADER("gl/model_unshaded_v"));
+	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
+	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"), SHADER("gl/model_unshaded_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
@@ -443,7 +463,7 @@ int GL_RegisterTexture(const Image *image)
 	return slot;
 }
 
-void GL_LoadModel(const ModelDefinition *model, const uint lod, const size_t material)
+void GL_LoadModel(const ModelDefinition *model, const uint32_t lod, const size_t material)
 {
 	if (glModels[model->id] != NULL)
 	{
@@ -484,7 +504,7 @@ void GL_LoadModel(const ModelDefinition *model, const uint lod, const size_t mat
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelBuffer->elementBufferObject);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-						 (long)(model->lods[l]->indexCount[m] * sizeof(uint)),
+						 (long)(model->lods[l]->indexCount[m] * sizeof(uint32_t)),
 						 model->lods[l]->indexData[m],
 						 GL_STATIC_DRAW);
 		}
@@ -528,7 +548,7 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture)
 	glBindBuffer(GL_ARRAY_BUFFER, newBuffer->buffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newBuffer->buffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * 6 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 6 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
 	strncpy(newBuffer->texture, texture, sizeof(newBuffer->texture) - 1);
 	newBuffer->wallCount = 0;
 	glWalls[i] = newBuffer;
@@ -558,14 +578,14 @@ void GL_LoadLevelWalls(const Level *l)
 			vertices[j][3] = vertices[j][3] * uvScale + uvOffset;
 		}
 
-		uint indices[] = {0, 1, 2, 0, 2, 3};
+		uint32_t indices[] = {0, 1, 2, 0, 2, 3};
 		for (int j = 0; j < 6; j++)
 		{
 			indices[j] += wallBuffer->wallCount * 4;
 		}
 
 		const GLintptr vertexOffset = (GLintptr)(sizeof(float) * 24 * wallBuffer->wallCount);
-		const GLintptr indexOffset = (GLintptr)(sizeof(uint) * 6 * wallBuffer->wallCount);
+		const GLintptr indexOffset = (GLintptr)(sizeof(uint32_t) * 6 * wallBuffer->wallCount);
 
 		glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
 		glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(vertices), vertices);
@@ -626,7 +646,7 @@ void GL_DrawRect(const Vector2 pos, const Vector2 size, const Color color)
 		{(float)ndcStartPos.x, (float)ncdEndPos.y},
 	};
 
-	const uint indices[] = {0, 2, 1, 0, 3, 2};
+	const uint32_t indices[] = {0, 2, 1, 0, 3, 2};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -670,7 +690,7 @@ void GL_DrawRectOutline(const Vector2 pos, const Vector2 size, const Color color
 		{(float)ndcStartPos.x, (float)ndcEndPos.y},
 	};
 
-	const uint indices[] = {0, 1, 2, 3};
+	const uint32_t indices[] = {0, 1, 2, 3};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -717,7 +737,7 @@ void GL_DrawTexture_Internal(const Vector2 pos,
 		{(float)ndcStartPos.x, (float)ndcEndPos.y, 0.0f, 1.0f},
 	};
 
-	const uint indices[] = {0, 2, 1, 0, 3, 2};
+	const uint32_t indices[] = {0, 2, 1, 0, 3, 2};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -790,7 +810,7 @@ void GL_DrawLine(const Vector2 start, const Vector2 end, const Color color, cons
 		{(float)ndcEndPos.x, (float)ndcEndPos.y},
 	};
 
-	const uint indices[] = {0, 1};
+	const uint32_t indices[] = {0, 1};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -808,7 +828,7 @@ void GL_DrawLine(const Vector2 start, const Vector2 end, const Color color, cons
 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_DrawColoredArrays(const float *vertices, const uint *indices, const uint quadCount, const Color color)
+void GL_DrawColoredArrays(const float *vertices, const uint32_t *indices, const uint32_t quadCount, const Color color)
 {
 	glUseProgram(uiColoredShader->program);
 
@@ -820,7 +840,7 @@ void GL_DrawColoredArrays(const float *vertices, const uint *indices, const uint
 	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint)), indices, GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint32_t)), indices, GL_STREAM_DRAW);
 
 	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
 	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
@@ -830,7 +850,7 @@ void GL_DrawColoredArrays(const float *vertices, const uint *indices, const uint
 }
 
 void GL_DrawTexturedArrays(const float *vertices,
-						   const uint *indices,
+						   const uint32_t *indices,
 						   const int quadCount,
 						   const char *texture,
 						   const Color color)
@@ -849,7 +869,7 @@ void GL_DrawTexturedArrays(const float *vertices,
 	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint)), indices, GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint32_t)), indices, GL_STREAM_DRAW);
 
 	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
 	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
@@ -993,7 +1013,7 @@ void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 		},
 	};
 
-	const uint indices[] = {0, 1, 2, 0, 2, 3};
+	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -1037,7 +1057,7 @@ void GL_DrawFloor(const Vector2 vp1, const Vector2 vp2, const char *texture, con
 		{(float)vp1.x, (float)vp2.y},
 	};
 
-	const uint indices[] = {0, 1, 2, 0, 2, 3};
+	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -1220,8 +1240,8 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 void GL_RenderModel(const ModelDefinition *model,
 					const mat4 modelWorldMatrix,
-					const uint skin,
-					const uint lod,
+					const uint32_t skin,
+					const uint32_t lod,
 					const Color modColor)
 {
 	glEnable(GL_CULL_FACE);

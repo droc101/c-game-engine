@@ -3,12 +3,16 @@
 //
 
 #include "ShaderLoader.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../AssetReader.h"
+#include "../DataReader.h"
 #include "../Error.h"
 #include "../Logging.h"
-#include "../DataReader.h"
 
-Shader* LoadShader(const char *asset)
+Shader *LoadShader(const char *asset)
 {
 	Asset *assetData = DecompressAsset(asset, false);
 	if (assetData == NULL)
@@ -18,7 +22,9 @@ Shader* LoadShader(const char *asset)
 	}
 	if (assetData->typeVersion != SHADER_ASSET_VERSION)
 	{
-		LogError("Failed to load shader from asset due to version mismatch (got %d, expected %d)\n", assetData->typeVersion, SHADER_ASSET_VERSION);
+		LogError("Failed to load shader from asset due to version mismatch (got %d, expected %d)\n",
+				 assetData->typeVersion,
+				 SHADER_ASSET_VERSION);
 		return NULL;
 	}
 	Shader *shader = malloc(sizeof(Shader));

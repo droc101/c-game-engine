@@ -5,8 +5,11 @@
 #ifndef TEXTBOX_H
 #define TEXTBOX_H
 
-#include "../../../defines.h"
+#include <SDL_events.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include "../../../Helpers/TextInputSystem.h"
+#include "../../Vector2.h"
 #include "../UiStack.h"
 
 typedef struct TextBoxData TextBoxData;
@@ -15,7 +18,7 @@ typedef void (*TextBoxCallback)(const char *text);
 
 struct TextBoxData
 {
-	uint maxLength;
+	uint32_t maxLength;
 	char *text;
 	char placeholder[32];
 	TextBoxCallback callback;
@@ -27,12 +30,12 @@ Control *CreateTextBoxControl(const char *placeholder,
 							  Vector2 position,
 							  Vector2 size,
 							  ControlAnchor anchor,
-							  uint maxLength,
+							  uint32_t maxLength,
 							  TextBoxCallback callback);
 
 void DrawTextBox(const Control *control, ControlState state, Vector2 position);
 
-void UpdateTextBox(UiStack *stack, Control *control, Vector2 localMousePosition, uint controlIndex);
+void UpdateTextBox(UiStack *stack, Control *control, Vector2 localMousePosition, uint32_t controlIndex);
 
 void DestroyTextBox(const Control *control);
 

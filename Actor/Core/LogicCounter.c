@@ -3,7 +3,10 @@
 //
 
 #include "LogicCounter.h"
-#include "../../Helpers/Core/AssetReader.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/MathEx.h"
@@ -67,7 +70,7 @@ void ChangeValue(const int change, LogicCounterData *data, const Actor *this)
 	}
 }
 
-bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicCounterData *data = (LogicCounterData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))

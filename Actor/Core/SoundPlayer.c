@@ -3,10 +3,16 @@
 //
 
 #include "SoundPlayer.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
 #include "../../Helpers/Core/SoundSystem.h"
+#include "../../Structs/Actor.h"
 
 #define SOUNDPLAYER_INPUT_PLAY 1
 #define SOUNDPLAYER_INPUT_PAUSE 2
@@ -24,10 +30,13 @@ typedef struct SoundPlayerData
 
 void SoundPlayerSoundDone(void *pData)
 {
-	if (pData) ((SoundPlayerData*)pData)->effect = NULL;
+	if (pData)
+	{
+		((SoundPlayerData *)pData)->effect = NULL;
+	}
 }
 
-bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	if (DefaultSignalHandler(this, sender, signal, param))
 	{
@@ -75,7 +84,7 @@ void SoundPlayerInit(Actor *this, const KvList *params, Transform *)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void SoundPlayerDestroy(Actor *this)
 {
-	SoundPlayerData *data = this->extraData;
+	const SoundPlayerData *data = this->extraData;
 	if (data->effect)
 	{
 		StopSoundEffect(data->effect);

@@ -3,8 +3,14 @@
 //
 
 #include "SoundSystem.h"
+#include <SDL_audio.h>
+#include <SDL_error.h>
 #include <SDL_mixer.h>
-#include "../../defines.h"
+#include <SDL_rwops.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../Structs/GlobalState.h"
 #include "AssetReader.h"
 #include "Error.h"
@@ -148,7 +154,7 @@ void ChangeMusic(const char *asset)
 	Mix_Music *mus = Mix_LoadMUS_RW(SDL_RWFromConstMem(music->data, (int)musicDataSize), 1);
 	if (mus == NULL)
 	{
-		printf("Mix_LoadMUS_RW Error: %s\n", Mix_GetError());
+		LogError("Mix_LoadMUS_RW Error: %s\n", Mix_GetError());
 		return;
 	}
 	soundSys.music = mus;
@@ -194,7 +200,7 @@ SoundEffect *PlaySoundEffect(const char *asset,
 		LogError("PlaySoundEffect Error: Asset is not a sound effect file.\n");
 		return NULL;
 	}
-	const uint wavSize = wav->size;
+	const uint32_t wavSize = wav->size;
 	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(wav->data, (int)wavSize), 1);
 	if (chunk == NULL)
 	{

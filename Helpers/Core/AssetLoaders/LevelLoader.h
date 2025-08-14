@@ -5,7 +5,9 @@
 #ifndef GAME_LEVELLOADER_H
 #define GAME_LEVELLOADER_H
 
-#include "../../../defines.h"
+#include <stddef.h>
+#include <stdint.h>
+#include "../../../Structs/Level.h"
 
 /**
  * Load a level from level bytecode
@@ -13,6 +15,6 @@
  * @param dataSize
  * @return Level struct
  */
-Level *LoadLevel(const byte *data, size_t dataSize);
+Level *LoadLevel(const uint8_t *data, size_t dataSize);
 
 #endif //GAME_LEVELLOADER_H

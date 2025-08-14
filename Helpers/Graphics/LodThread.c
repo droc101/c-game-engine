@@ -3,9 +3,16 @@
 //
 
 #include "LodThread.h"
-#include "../../defines.h"
+#include <joltc.h>
+#include <SDL_mutex.h>
+#include <SDL_thread.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
 #include "../Core/Error.h"
+#include "../Core/List.h"
+#include "RenderingHelpers.h"
 #include "Vulkan/Vulkan.h"
 
 static bool shouldExit;

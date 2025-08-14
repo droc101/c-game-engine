@@ -4,16 +4,25 @@
 
 #include "Error.h"
 #include <errno.h>
+#include <SDL.h>
+#include <SDL_error.h>
+#include <SDL_messagebox.h>
 #include <SDL_mixer.h>
+#include <SDL_mouse.h>
+#include <SDL_stdinc.h>
+#include <SDL_version.h>
+#include <SDL_video.h>
 #include <signal.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <zlib.h>
-#include "../../defines.h"
+#include "../../config.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Options.h"
-#include "../Graphics/Drawing.h"
 #include "../Graphics/GL/GLHelper.h"
 #include "../Graphics/RenderingHelpers.h"
 #include "Logging.h"

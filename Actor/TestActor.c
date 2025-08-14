@@ -3,16 +3,23 @@
 //
 
 #include "TestActor.h"
+#include <joltc.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Navigation.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 
-bool TestActorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool TestActorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	if (DefaultSignalHandler(this, sender, signal, param))
 	{

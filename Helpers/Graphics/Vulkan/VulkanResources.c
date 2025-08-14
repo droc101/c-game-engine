@@ -4,8 +4,21 @@
 
 #include "VulkanResources.h"
 #include <luna/luna.h>
+#include <luna/lunaImage.h>
+#include <luna/lunaTypes.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vulkan/vulkan_core.h>
 #include "../../../Structs/GlobalState.h"
+#include "../../../Structs/Viewmodel.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/Error.h"
+#include "../../Core/List.h"
 #include "../../Core/MathEx.h"
 #include "VulkanHelpers.h"
 

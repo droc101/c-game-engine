@@ -4,8 +4,14 @@
 
 #include "KVList.h"
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+#include "../../Structs/Color.h"
 #include "Error.h"
+#include "List.h"
 #include "Logging.h"
 
 #pragma region Private Functions
@@ -180,7 +186,7 @@ ParamType KvGetType(const KvList *list, const char *key)
 
 #pragma region Public Getters
 
-byte KvGetByte(const KvList *list, const char *key, const byte defaultValue)
+uint8_t KvGetByte(const KvList *list, const char *key, const uint8_t defaultValue)
 {
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
@@ -244,7 +250,7 @@ Color KvGetColor(const KvList *list, const char *key, const Color defaultValue)
 
 #pragma region Public Setters
 
-inline void KvSetByte(KvList *list, const char *key, const byte value)
+inline void KvSetByte(KvList *list, const char *key, const uint8_t value)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_BYTE, .byteValue = value});
 }

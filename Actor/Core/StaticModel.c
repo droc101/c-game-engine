@@ -3,9 +3,12 @@
 //
 
 #include "StaticModel.h"
-#include "../../Helpers/Core/AssetReader.h"
-#include "../../Helpers/Core/KVList.h"
+#include <joltc.h>
+#include <stdio.h>
 #include "../../Helpers/Core/AssetLoaders/ModelLoader.h"
+#include "../../Helpers/Core/KVList.h"
+#include "../../Helpers/Core/Physics/Physics.h"
+#include "../../Structs/Actor.h"
 
 static void StaticModelCreateBody(Actor *this, const Transform *transform)
 {

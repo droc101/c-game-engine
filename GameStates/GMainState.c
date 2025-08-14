@@ -3,14 +3,22 @@
 //
 
 #include "GMainState.h"
+#include <joltc.h>
 #include <math.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_rect.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include "../config.h"
 #include "../Debug/DPrint.h"
 #include "../Debug/JoltDebugRenderer.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
+#include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Player.h"
@@ -20,6 +28,7 @@
 #include "../Helpers/Graphics/LodThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
+#include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"

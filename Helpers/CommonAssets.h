@@ -5,7 +5,7 @@
 #ifndef GAME_COMMONASSETS_H
 #define GAME_COMMONASSETS_H
 
-#include "../defines.h"
+#include "Core/AssetLoaders/FontLoader.h"
 
 extern Font *smallFont;
 extern Font *largeFont;

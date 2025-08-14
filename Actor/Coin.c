@@ -3,21 +3,31 @@
 //
 
 #include "Coin.h"
+#include <cglm/types.h>
+#include <joltc.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Physics/Physics.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
-#include "../Helpers/Core/SoundSystem.h"
+#include "../Structs/Wall.h"
 
 #define COIN_OUTPUT_COLLECTED 2
 
 typedef struct CoinData
 {
 	bool isBlue;
-	byte currentAnimationFrame;
+	uint8_t currentAnimationFrame;
 } CoinData;
 
 void CreateCoinSensor(Actor *this, const Transform *transform)

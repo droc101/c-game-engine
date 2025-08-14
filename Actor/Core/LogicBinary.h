@@ -5,7 +5,9 @@
 #ifndef LOGICBINARY_H
 #define LOGICBINARY_H
 
-#include "../../defines.h"
+#include <joltc.h>
+#include "../../Helpers/Core/KVList.h"
+#include "../../Structs/Actor.h"
 
 void LogicBinaryInit(Actor *this, const KvList *params, Transform *);
 

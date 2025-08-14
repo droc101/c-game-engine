@@ -3,7 +3,11 @@
 //
 
 #include "ModelLoader.h"
-#include "../../Graphics/RenderingHelpers.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../AssetReader.h"
 #include "../DataReader.h"
 #include "../Error.h"

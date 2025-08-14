@@ -5,7 +5,15 @@
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
 
-#include "../../defines.h"
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+#include "../../Structs/Vector2.h"
+
+/// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons
+#define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_B : SDL_CONTROLLER_BUTTON_A)
+/// Use this for the "Cancel" button in place of hardcoding controller A or B buttons
+#define CONTROLLER_CANCEL \
+	(GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_A : SDL_CONTROLLER_BUTTON_B)
 
 typedef enum InputState InputState;
 
@@ -219,7 +227,7 @@ bool UseController();
  * @param strength The base strength of the rumble (0.0 - 1.0)
  * @param time The time to rumble in milliseconds
  */
-void Rumble(float strength, uint time);
+void Rumble(float strength, uint32_t time);
 
 /**
  * Get the name of the connected controller

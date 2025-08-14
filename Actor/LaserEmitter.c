@@ -3,10 +3,16 @@
 //
 
 #include "LaserEmitter.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
@@ -35,7 +41,7 @@ typedef struct LaserEmitterData
 	Transform transform;
 } LaserEmitterData;
 
-bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	const LaserEmitterData *data = this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))

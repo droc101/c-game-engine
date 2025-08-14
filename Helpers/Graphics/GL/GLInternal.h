@@ -10,7 +10,10 @@
 
 #include <cglm/cglm.h>
 #include <GL/glew.h>
-#include "../../../defines.h"
+#include "../../../../Structs/Actor.h"
+#include "../../../../Structs/Level.h"
+#include "../../../../Structs/Vector2.h"
+#include "../../Core/AssetLoaders/TextureLoader.h"
 
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
@@ -207,7 +210,7 @@ void GL_DestroyBuffer(GL_Buffer *buffer);
  * @param lod The LOD to load
  * @param material The material to load
  */
-void GL_LoadModel(const ModelDefinition *model, uint lod, size_t material);
+void GL_LoadModel(const ModelDefinition *model, uint32_t lod, size_t material);
 
 /**
  * Get the wall buffer for a texture, or create it if it doesn't exist.

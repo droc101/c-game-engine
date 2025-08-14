@@ -5,7 +5,9 @@
 #ifndef STATICMODEL_H
 #define STATICMODEL_H
 
-#include "../../defines.h"
+#include <joltc.h>
+#include "../../Helpers/Core/KVList.h"
+#include "../../Structs/Actor.h"
 
 void StaticModelInit(Actor *this, const KvList *params, Transform *transform);
 

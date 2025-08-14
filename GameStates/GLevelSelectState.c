@@ -4,19 +4,26 @@
 
 #include "GLevelSelectState.h"
 #include <dirent.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_scancode.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../config.h"
 #include "../Helpers/CommonAssets.h"
-#include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
+#include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
+#include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
-#include "../Helpers/Core/SoundSystem.h"
 #include "GMainState.h"
 #include "GMenuState.h"
 

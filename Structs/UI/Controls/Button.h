@@ -31,7 +31,7 @@ Control *CreateButtonControl(Vector2 position, Vector2 size, char *text, ButtonC
 
 void DestroyButton(const Control *c);
 
-void UpdateButton(UiStack *stack, Control *c, Vector2 localMousePos, uint ctlIndex);
+void UpdateButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
 void DrawButton(const Control *c, ControlState state, Vector2 position);
 

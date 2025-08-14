@@ -5,6 +5,7 @@
 #ifndef TEXTINPUTSYSTEM_H
 #define TEXTINPUTSYSTEM_H
 #include <SDL_events.h>
+#include <stddef.h>
 
 typedef struct TextInput TextInput;
 

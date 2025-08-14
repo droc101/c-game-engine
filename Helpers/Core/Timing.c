@@ -3,10 +3,12 @@
 //
 
 #include "Timing.h"
+#include <bits/time.h>
+#include <stdint.h>
 #include <time.h>
 
-static ulong StartTimeNS;
-static ulong StartTimeS;
+static uint64_t StartTimeNS;
+static uint64_t StartTimeS;
 
 void InitTimers()
 {
@@ -16,21 +18,21 @@ void InitTimers()
 	StartTimeS = ts.tv_sec;
 }
 
-ulong GetTimeNs()
+uint64_t GetTimeNs()
 {
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	return ts.tv_sec * 1000000000 + ts.tv_nsec - StartTimeNS;
 }
 
-ulong GetTimeMs()
+uint64_t GetTimeMs()
 {
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000) - (StartTimeNS / 1000000);
 }
 
-ulong GetTimeS()
+uint64_t GetTimeS()
 {
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);

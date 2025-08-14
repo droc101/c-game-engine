@@ -6,7 +6,13 @@
 #ifndef GAME_VECTOR2_H
 #define GAME_VECTOR2_H
 
-#include "../defines.h"
+typedef struct Vector2 Vector2;
+
+struct Vector2
+{
+	float x;
+	float y;
+};
 
 /**
  * Create a 2D vector with the given x and y values

@@ -3,10 +3,14 @@
 //
 
 #include "Sprite.h"
-#include "../../Helpers/Core/AssetReader.h"
+#include <joltc.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../../Helpers/Core/KVList.h"
+#include "../../Helpers/Core/Physics/Physics.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/Vector2.h"
+#include "../../Structs/Wall.h"
 
 void SpriteCreateBody(Actor *this, const Transform *transform)
 {

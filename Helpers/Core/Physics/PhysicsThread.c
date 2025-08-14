@@ -3,15 +3,21 @@
 //
 
 #include "PhysicsThread.h"
+#include <SDL_error.h>
+#include <SDL_mutex.h>
 #include <SDL_thread.h>
+#include <SDL_timer.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "../../../config.h"
 #include "../../../Debug/FrameGrapher.h"
-#include "../../../Debug/JoltDebugRenderer.h"
-#include "../../../defines.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
 #include "../Input.h"
 #include "../Logging.h"
 #include "../Timing.h"
+#include "Physics.h"
 
 static SDL_Thread *physicsThread;
 static SDL_mutex *physicsThreadMutex;
@@ -39,7 +45,7 @@ int PhysicsThreadMain(void *)
 	double lastTickTime = PHYSICS_TARGET_NS_D;
 	while (true)
 	{
-		const ulong timeStart = GetTimeNs();
+		const uint64_t timeStart = GetTimeNs();
 		SDL_SemTryWait(physicsTickHasEnded);
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
@@ -70,11 +76,11 @@ int PhysicsThreadMain(void *)
 		SDL_UnlockMutex(physicsTickMutex);
 		SDL_SemPost(physicsTickHasEnded);
 
-		ulong timeEnd = GetTimeNs();
-		ulong timeElapsed = timeEnd - timeStart;
+		uint64_t timeEnd = GetTimeNs();
+		uint64_t timeElapsed = timeEnd - timeStart;
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
-			const ulong delayMs = (PHYSICS_TARGET_NS - timeElapsed) / 1000000;
+			const uint64_t delayMs = (PHYSICS_TARGET_NS - timeElapsed) / 1000000;
 			SDL_Delay(delayMs);
 		}
 		timeEnd = GetTimeNs();

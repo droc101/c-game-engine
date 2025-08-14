@@ -5,6 +5,9 @@
 #ifndef GAME_CONFIG_H
 #define GAME_CONFIG_H
 
+#define STR(x) #x
+#define TO_STR(x) STR(x)
+
 #pragma region Window Settings
 
 // Default window size

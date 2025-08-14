@@ -5,7 +5,54 @@
 #ifndef GAME_LEVEL_H
 #define GAME_LEVEL_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include "../Helpers/Core/List.h"
+#include "../Helpers/Core/Physics/Player.h"
+#include "Actor.h"
+
+typedef struct Level Level;
+
+// Utility functions are in Structs/level.h
+struct Level
+{
+	/// The list of actors in the level
+	LockingList actors;
+	/// The list of walls in the level
+	List walls;
+
+	/// Indicates if the level has a ceiling. If false, the level will use a sky instead
+	bool hasCeiling;
+	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	char ceilOrSkyTex[80];
+	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	char floorTex[80];
+
+	/// The music name, or "none" for no music
+	char music[80];
+
+	/// The color of the fog
+	uint32_t fogColor;
+	/// The distance from the player at which the fog begins to fade in
+	float fogStart;
+	/// The distance from the player at which the fog is fully opaque
+	float fogEnd;
+
+	JPH_PhysicsSystem *physicsSystem;
+	uint32_t floorBodyId;
+
+	/// The player object
+	Player player;
+
+	/// The map of named actors in the level (key portion)
+	LockingList namedActorNames;
+	/// The map of named actors in the level (value portion)
+	List namedActorPointers;
+
+	/// A pointer to the I/O proxy actor, if it exists
+	Actor *ioProxy;
+};
 
 /**
  * Create a default empty level

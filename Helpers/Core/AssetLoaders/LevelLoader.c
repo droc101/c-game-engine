@@ -3,15 +3,20 @@
 //
 
 #include "LevelLoader.h"
+#include <joltc.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Level.h"
 #include "../../../Structs/Vector2.h"
 #include "../../../Structs/Wall.h"
-#include "../../CommonAssets.h"
 #include "../DataReader.h"
 #include "../Error.h"
 #include "../KVList.h"
+#include "../List.h"
 #include "../Logging.h"
 
 /**
@@ -30,7 +35,7 @@
 		bytesRemaining -= (expected); \
 	}
 
-Level *LoadLevel(const byte *data, const size_t dataSize)
+Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 {
 	Level *level = CreateLevel();
 	size_t offset = 0;
@@ -56,7 +61,7 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 	EXPECT_BYTES(64);
 	ReadString(data, &offset, level->music, 64);
 
-	EXPECT_BYTES(sizeof(uint) + sizeof(float) + sizeof(float));
+	EXPECT_BYTES(sizeof(uint32_t) + sizeof(float) + sizeof(float));
 	level->fogColor = ReadUint(data, &offset);
 	level->fogStart = ReadFloat(data, &offset);
 	level->fogEnd = ReadFloat(data, &offset);
@@ -69,23 +74,23 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 
 	JPH_CharacterVirtual_SetPosition(level->player.joltCharacter, &level->player.transform.position);
 
-	EXPECT_BYTES(sizeof(uint));
-	const uint actorCount = ReadUint(data, &offset);
-	for (uint i = 0; i < actorCount; i++)
+	EXPECT_BYTES(sizeof(uint32_t));
+	const uint32_t actorCount = ReadUint(data, &offset);
+	for (uint32_t i = 0; i < actorCount; i++)
 	{
 		EXPECT_BYTES(sizeof(float) * 3);
 		const float actorX = ReadFloat(data, &offset);
 		const float actorZ = ReadFloat(data, &offset);
 		const float actorRotation = ReadFloat(data, &offset);
-		EXPECT_BYTES(sizeof(int) + sizeof(byte) * 4);
-		const uint actorType = ReadUint(data, &offset);
-		const char actorName[64];
+		EXPECT_BYTES(sizeof(int) + sizeof(uint8_t) * 4);
+		const uint32_t actorType = ReadUint(data, &offset);
+		const char actorName[64] = {0};
 		EXPECT_BYTES(64);
 		ReadString(data, &offset, (char *)&actorName, 64);
 
 		KvList params;
 		KvListCreate(&params);
-		const uint paramCount = ReadUint(data, &offset);
+		const uint32_t paramCount = ReadUint(data, &offset);
 		for (size_t j = 0; j < paramCount; j++)
 		{
 			char key[64];
@@ -101,9 +106,9 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 							   &params,
 							   bodyInterface);
 
-		EXPECT_BYTES(sizeof(uint));
-		const uint connectionCount = ReadUint(data, &offset);
-		for (uint j = 0; j < connectionCount; j++)
+		EXPECT_BYTES(sizeof(uint32_t));
+		const uint32_t connectionCount = ReadUint(data, &offset);
+		for (uint32_t j = 0; j < connectionCount; j++)
 		{
 			ActorConnection *ac = malloc(sizeof(ActorConnection));
 			CheckAlloc(ac);
@@ -124,9 +129,9 @@ Level *LoadLevel(const byte *data, const size_t dataSize)
 		}
 	}
 
-	EXPECT_BYTES(sizeof(uint));
-	const uint wallCount = ReadUint(data, &offset);
-	for (uint i = 0; i < wallCount; i++)
+	EXPECT_BYTES(sizeof(uint32_t));
+	const uint32_t wallCount = ReadUint(data, &offset);
+	for (uint32_t i = 0; i < wallCount; i++)
 	{
 		EXPECT_BYTES(sizeof(float) * 4);
 		const float wallAX = ReadFloat(data, &offset);

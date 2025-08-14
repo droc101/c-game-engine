@@ -3,25 +3,34 @@
 //
 
 #include "Font.h"
+#include <cglm/types.h>
 #include <ctype.h>
+#include <float.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+#include "../../Structs/Color.h"
 #include "../../Structs/Vector2.h"
+#include "../Core/AssetLoaders/FontLoader.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
 #include "Drawing.h"
 #include "RenderingHelpers.h"
 
-inline void FontDrawString(const Vector2 pos, const char *str, const uint size, const Color color, const Font *font)
+inline void FontDrawString(const Vector2 pos, const char *str, const uint32_t size, const Color color, const Font *font)
 {
 	DrawTextAligned(str, size, color, pos, v2s(FLT_MAX), FONT_HALIGN_LEFT, FONT_VALIGN_TOP, font);
 }
 
-inline Vector2 MeasureText(const char *str, const uint size, const Font *font)
+inline Vector2 MeasureText(const char *str, const uint32_t size, const Font *font)
 {
 	return MeasureTextNChars(str, size, font, strlen(str));
 }
 
-Vector2 MeasureTextNChars(const char *str, const uint size, const Font *font, const size_t n)
+Vector2 MeasureTextNChars(const char *str, const uint32_t size, const Font *font, const size_t n)
 {
 	int textWidth = 0;
 	int textHeight = (int)size;
@@ -123,7 +132,7 @@ void TextGetLine(const char *str, const int line, char *out, const size_t outBuf
 }
 
 void DrawTextAligned(const char *str,
-					 const uint size,
+					 const uint32_t size,
 					 const Color color,
 					 const Vector2 rectPos,
 					 const Vector2 rectSize,
@@ -134,7 +143,7 @@ void DrawTextAligned(const char *str,
 	const size_t stringLength = strlen(str);
 	float *verts = calloc(stringLength, sizeof(float[4][4]));
 	CheckAlloc(verts);
-	uint *indices = calloc(stringLength, sizeof(uint[6]));
+	uint32_t *indices = calloc(stringLength, sizeof(uint32_t[6]));
 	CheckAlloc(indices);
 
 	const double sizeMultiplier = (double)size / font->defaultSize;
@@ -197,7 +206,7 @@ void DrawTextAligned(const char *str,
 
 			memcpy(verts + (c + j) * 16, quad, sizeof(quad));
 
-			uint quadIndices[6] = {0, 1, 2, 0, 2, 3};
+			uint32_t quadIndices[6] = {0, 1, 2, 0, 2, 3};
 			for (int k = 0; k < 6; k++)
 			{
 				quadIndices[k] += (c + j) * 4;

@@ -3,11 +3,21 @@
 //
 
 #include "Door.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../config.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Logging.h"
+#include "../Helpers/Core/Physics/Physics.h"
+#include "../Structs/Actor.h"
 #include "../Structs/Vector2.h"
+#include "../Structs/Wall.h"
 
 #define DOOR_INPUT_OPEN 1
 #define DOOR_INPUT_CLOSE 2
@@ -170,7 +180,7 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-static bool DoorSignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+static bool DoorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	if (DefaultSignalHandler(this, sender, signal, param))
 	{
@@ -235,7 +245,7 @@ static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyId bodyId)
 
 static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyId bodyId)
 {
-	DoorData *data = this->extraData;
+	const DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
 	{
 		return;

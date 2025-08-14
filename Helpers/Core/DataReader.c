@@ -3,9 +3,12 @@
 //
 
 #include "DataReader.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
-double ReadDouble(const byte *data, size_t *offset)
+double ReadDouble(const uint8_t *data, size_t *offset)
 {
 	double d = 0;
 	memcpy(&d, data + *offset, sizeof(double));
@@ -13,22 +16,22 @@ double ReadDouble(const byte *data, size_t *offset)
 	return d;
 }
 
-double ReadDoubleA(const byte *data, const size_t offset)
+double ReadDoubleA(const uint8_t *data, const size_t offset)
 {
 	double d = 0;
 	memcpy(&d, data + offset, sizeof(double));
 	return d;
 }
 
-uint ReadUint(const byte *data, size_t *offset)
+uint32_t ReadUint(const uint8_t *data, size_t *offset)
 {
-	uint i = 0;
-	memcpy(&i, data + *offset, sizeof(uint));
-	*offset += sizeof(uint);
+	uint32_t i = 0;
+	memcpy(&i, data + *offset, sizeof(uint32_t));
+	*offset += sizeof(uint32_t);
 	return i;
 }
 
-int ReadInt(const byte *data, size_t *offset)
+int ReadInt(const uint8_t *data, size_t *offset)
 {
 	int i = 0;
 	memcpy(&i, data + *offset, sizeof(int));
@@ -36,14 +39,14 @@ int ReadInt(const byte *data, size_t *offset)
 	return i;
 }
 
-uint ReadUintA(const byte *data, const size_t offset)
+uint32_t ReadUintA(const uint8_t *data, const size_t offset)
 {
-	uint i = 0;
-	memcpy(&i, data + offset, sizeof(uint));
+	uint32_t i = 0;
+	memcpy(&i, data + offset, sizeof(uint32_t));
 	return i;
 }
 
-float ReadFloat(const byte *data, size_t *offset)
+float ReadFloat(const uint8_t *data, size_t *offset)
 {
 	float f = 0;
 	memcpy(&f, data + *offset, sizeof(float));
@@ -51,20 +54,20 @@ float ReadFloat(const byte *data, size_t *offset)
 	return f;
 }
 
-byte ReadByte(const byte *data, size_t *offset)
+uint8_t ReadByte(const uint8_t *data, size_t *offset)
 {
-	const byte b = data[*offset];
-	*offset += sizeof(byte);
+	const uint8_t b = data[*offset];
+	*offset += sizeof(uint8_t);
 	return b;
 }
 
-void ReadString(const byte *data, size_t *offset, char *dest, const size_t len)
+void ReadString(const uint8_t *data, size_t *offset, char *dest, const size_t len)
 {
 	strncpy(dest, (const char *)(data + *offset), len);
 	*offset += len;
 }
 
-short ReadShort(const byte *data, size_t *offset)
+short ReadShort(const uint8_t *data, size_t *offset)
 {
 	short s = 0;
 	memcpy(&s, data + *offset, sizeof(short));
@@ -72,13 +75,13 @@ short ReadShort(const byte *data, size_t *offset)
 	return s;
 }
 
-void ReadBytes(const byte *data, size_t *offset, const size_t len, void *dest)
+void ReadBytes(const uint8_t *data, size_t *offset, const size_t len, void *dest)
 {
 	memcpy(dest, data + *offset, len);
 	*offset += len;
 }
 
-size_t ReadSizeT(const byte *data, size_t *offset)
+size_t ReadSizeT(const uint8_t *data, size_t *offset)
 {
 	size_t i = 0;
 	memcpy(&i, data + *offset, sizeof(size_t));
@@ -86,7 +89,7 @@ size_t ReadSizeT(const byte *data, size_t *offset)
 	return i;
 }
 
-char *ReadStringSafe(const byte *data, size_t *offset, const size_t totalBufferSize, size_t *outLength)
+char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBufferSize, size_t *outLength)
 {
 	size_t remainingSize = totalBufferSize - *offset;
 	if (remainingSize >= sizeof(size_t))

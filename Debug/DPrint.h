@@ -5,7 +5,8 @@
 #ifndef GAME_DPRINT_H
 #define GAME_DPRINT_H
 
-#include "../defines.h"
+#include <stdbool.h>
+#include "../Structs/Color.h"
 
 /**
  * Resets the DPrint Y position to the top of the screen

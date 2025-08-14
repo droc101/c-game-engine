@@ -5,7 +5,9 @@
 #ifndef GAME_COIN_H
 #define GAME_COIN_H
 
-#include "../defines.h"
+#include <joltc.h>
+#include "../Helpers/Core/KVList.h"
+#include "../Structs/Actor.h"
 
 void CoinInit(Actor *this, const KvList *params, Transform *transform);
 

@@ -6,6 +6,7 @@
 #define GAME_VULKAN_H
 
 #include <vulkan/vulkan.h>
+#include "../../../Structs/GlobalState.h"
 #include "../RenderingHelpers.h"
 
 #define VK_X_TO_NDC(x) ((float)(x) / WindowWidthFloat() * 2.0f - 1.0f)

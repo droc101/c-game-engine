@@ -3,14 +3,22 @@
 //
 
 #include "Button.h"
+#include <SDL_mouse.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../../Helpers/CommonAssets.h"
 #include "../../../Helpers/Core/AssetReader.h"
 #include "../../../Helpers/Core/Error.h"
 #include "../../../Helpers/Core/Input.h"
+#include "../../../Helpers/Core/SoundSystem.h"
 #include "../../../Helpers/Graphics/Drawing.h"
 #include "../../../Helpers/Graphics/Font.h"
-#include "../../../Helpers/Core/SoundSystem.h"
-#include "../../GlobalState.h"
+#include "../../Color.h"
+#include "../../Vector2.h"
+#include "../UiStack.h"
 
 Control *CreateButtonControl(const Vector2 position,
 							 const Vector2 size,
@@ -40,7 +48,7 @@ void DestroyButton(const Control *c)
 	free(data);
 }
 
-void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint /*ctlIndex*/)
+void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	const ButtonData *data = (ButtonData *)c->ControlData;
 	if (data->enabled && HasActivation(stack, c))

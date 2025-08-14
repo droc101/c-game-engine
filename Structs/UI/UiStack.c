@@ -3,13 +3,19 @@
 //
 
 #include "UiStack.h"
+#include <SDL_gamecontroller.h>
+#include <SDL_mouse.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/Input.h"
-#include "../../Helpers/Core/MathEx.h"
+#include "../../Helpers/Core/List.h"
 #include "../../Helpers/Graphics/Drawing.h"
 #include "../../Helpers/Graphics/RenderingHelpers.h"
-#include "../GlobalState.h"
 #include "../Vector2.h"
 
 #include "Controls/Button.h"
@@ -19,7 +25,7 @@
 #include "Controls/TextBox.h"
 
 typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
-typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint ctlIndex);
+typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
 typedef void (*ControlDestroyFunc)(const Control *);
 typedef void (*ControlFocusFunc)(const Control *);
 typedef void (*ControlUnfocusFunc)(const Control *);
@@ -209,7 +215,7 @@ bool ProcessUiStack(UiStack *stack)
 	return stack->activeControl != -1u;
 }
 
-void SetFocusedControl(UiStack *stack, const uint index)
+void SetFocusedControl(UiStack *stack, const uint32_t index)
 {
 	if (stack->controls.length == 0)
 	{

@@ -49,7 +49,6 @@ add_executable(
         main.c
         Helpers/Core/Input.h
         Helpers/Core/Input.c
-        defines.h
         Helpers/Graphics/Drawing.h
         Helpers/Graphics/Drawing.c
         Structs/Vector2.h
@@ -202,6 +201,9 @@ add_executable(
         Debug/JoltDebugRenderer.h
         Helpers/Core/Physics/Player.c
         Helpers/Core/Physics/Player.h
+        Structs/Color.h
+        Structs/Camera.h
+        Structs/Viewmodel.h
 )
 
 #endregion

@@ -5,7 +5,8 @@
 #ifndef SHADERLOADER_H
 #define SHADERLOADER_H
 
-#include "../../../defines.h"
+#include <stddef.h>
+#include <stdint.h>
 
 #define SHADER_ASSET_VERSION 1
 
@@ -31,7 +32,7 @@ struct Shader
 	ShaderPlatform platform;
 	ShaderType type;
 	size_t glslLength;
-	char* glsl;
+	char *glsl;
 	size_t spirvLength;
 	uint32_t *spirv;
 };

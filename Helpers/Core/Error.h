@@ -5,8 +5,6 @@
 #ifndef GAME_ERROR_H
 #define GAME_ERROR_H
 
-#include "../../config.h"
-
 /// Throw a fatal error
 #define Error(error) _ErrorInternal(error, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__)
 

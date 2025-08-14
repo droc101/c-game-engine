@@ -3,12 +3,11 @@
 //
 
 #include "CommandParser.h"
-#include <errno.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../GameStates/GLoadingState.h"
-#include "../Structs/GlobalState.h"
 #include "Core/List.h"
 
 void ExecuteCommand(const char *command)

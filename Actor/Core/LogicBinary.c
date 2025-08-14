@@ -3,7 +3,10 @@
 //
 
 #include "LogicBinary.h"
-#include "../../Helpers/Core/AssetReader.h"
+#include <joltc.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
@@ -31,7 +34,7 @@ typedef struct LogicBinaryData
 #define LOGIC_BINARY_OUTPUT_ON_FALSE 3
 #define LOGIC_BINARY_OUTPUT_EXECUTION_RESULT 4
 
-bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const byte signal, const Param *param)
+bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicBinaryData *data = (LogicBinaryData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))

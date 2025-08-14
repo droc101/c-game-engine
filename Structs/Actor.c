@@ -3,9 +3,17 @@
 //
 
 #include "Actor.h"
+#include <joltc.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
+#include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
+#include "Color.h"
 #include "GlobalState.h"
 #include "Level.h"
 
@@ -142,7 +150,7 @@ void FreeActor(Actor *actor)
 	actor = NULL;
 }
 
-void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte signal, const Param *param)
+void ActorTriggerInput(const Actor *sender, const Actor *receiver, const uint8_t signal, const Param *param)
 {
 	LogInfo("Triggering input %d on actor %p from actor %p\n", signal, receiver, sender);
 	if (receiver->SignalHandler != NULL)
@@ -158,7 +166,7 @@ void ActorTriggerInput(const Actor *sender, const Actor *receiver, const byte si
 	}
 }
 
-void ActorFireOutput(const Actor *sender, const byte signal, const Param defaultParam)
+void ActorFireOutput(const Actor *sender, const uint8_t signal, const Param defaultParam)
 {
 	//LogInfo("Firing signal %d from actor %p with param \"%s\"\n", signal, sender, defaultParam);
 	ListLock(sender->ioConnections);
@@ -202,7 +210,7 @@ void DestroyActorConnection(ActorConnection *connection)
 	free(connection);
 }
 
-bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const byte signal, const Param * /*param*/)
+bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const uint8_t signal, const Param * /*param*/)
 {
 	if (signal == ACTOR_KILL_INPUT)
 	{

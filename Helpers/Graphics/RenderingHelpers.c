@@ -3,10 +3,22 @@
 //
 
 #include "RenderingHelpers.h"
+#include <cglm/mat4.h>
+#include <cglm/types.h>
+#include <joltc.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <vulkan/vulkan_core.h>
+#include "../../../config.h"
+#include "../../Structs/Actor.h"
+#include "../../Structs/Color.h"
 #include "../../Structs/GlobalState.h"
+#include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
 #include "../Core/AssetLoaders/TextureLoader.h"
-#include "../Core/AssetLoaders/ModelLoader.h"
 #include "../Core/Error.h"
 #include "../Core/Logging.h"
 #include "../Core/MathEx.h"
@@ -259,7 +271,7 @@ inline float Y_TO_NDC(const float y)
 	}
 }
 
-inline void GetColor(const uint argb, Color *color)
+inline void GetColor(const uint32_t argb, Color *color)
 {
 	color->r = (float)(argb >> 16 & 0xFF) / 255.0f;
 	color->g = (float)(argb >> 8 & 0xFF) / 255.0f;

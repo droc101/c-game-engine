@@ -4,13 +4,16 @@
 
 #include "FrameGrapher.h"
 #include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
+#include "../config.h"
 #include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Timing.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
+#include "../Structs/Color.h"
 #include "../Structs/Vector2.h"
 
 double framerates[FRAMEGRAPH_HISTORY_SIZE] = {0};
@@ -37,7 +40,7 @@ static inline void TG_PushIntoArray(const double value)
 	tickrates[FRAMEGRAPH_HISTORY_SIZE - 1] = value;
 }
 
-void FrameGraphUpdate(const ulong ns)
+void FrameGraphUpdate(const uint64_t ns)
 {
 	// If it's not time to update the graph, return
 	if (GetTimeMs() - framegraphLastUpdateTime < FRAMEGRAPH_INTERVAL)
@@ -49,7 +52,7 @@ void FrameGraphUpdate(const ulong ns)
 	framegraphLastUpdateTime = (long)GetTimeMs();
 }
 
-void TickGraphUpdate(const ulong ns)
+void TickGraphUpdate(const uint64_t ns)
 {
 	// If it's not time to update the graph, return
 	if (GetTimeMs() - tickGraphLastUpdateTime < FRAMEGRAPH_INTERVAL)

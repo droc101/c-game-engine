@@ -1,12 +1,25 @@
 #include <SDL.h>
+#include <SDL_error.h>
+#include <SDL_events.h>
+#include <SDL_filesystem.h>
+#include <SDL_hints.h>
+#include <SDL_keyboard.h>
 #include <SDL_mixer.h>
+#include <SDL_mouse.h>
+#include <SDL_scancode.h>
+#include <SDL_stdinc.h>
+#include <SDL_surface.h>
+#include <SDL_timer.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include "config.h"
 #include "Debug/DPrint.h"
 #include "Debug/FrameBenchmark.h"
 #include "Debug/FrameGrapher.h"
-#include "defines.h"
 #include "GameStates/GLogoSplashState.h"
 #include "Helpers/CommonAssets.h"
 #include "Helpers/Core/Arguments.h"
@@ -23,6 +36,7 @@
 #include "Helpers/PlatformHelpers.h"
 #include "Helpers/TextInputSystem.h"
 #include "Structs/GlobalState.h"
+#include "Structs/Vector2.h"
 
 SDL_Surface *windowIcon;
 
@@ -271,7 +285,7 @@ int main(const int argc, char *argv[])
 		{
 			SDL_Delay(100);
 		}
-		const ulong frameStart = GetTimeNs();
+		const uint64_t frameStart = GetTimeNs();
 #ifdef BENCHMARK_SYSTEM_ENABLE
 		BenchFrameStart();
 #endif
@@ -372,7 +386,15 @@ int main(const int argc, char *argv[])
 	return 0;
 }
 
+#ifdef WIN32
+/// Make this symbol exported (in the symbol table)
+#define EXPORT_SYM __declspec(dllexport)
+#else
+/// Make this symbol exported (in the symbol table)
+#define EXPORT_SYM __attribute__((visibility("default")))
+#endif
+
 // Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems
 // I do not know if these do anything on Linux, but they are here just in case.
-EXPORT_SYM uint NvOptimusEnablement = 0x00000001;
+EXPORT_SYM uint32_t NvOptimusEnablement = 0x00000001;
 EXPORT_SYM int AmdPowerXpressRequestHighPerformance = 1;

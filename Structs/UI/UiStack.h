@@ -5,7 +5,10 @@
 #ifndef GAME_UISTACK_H
 #define GAME_UISTACK_H
 
-#include "../../defines.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include "../../Helpers/Core/List.h"
+#include "../Vector2.h"
 
 typedef enum ControlType ControlType;
 typedef enum ControlState ControlState;
@@ -68,12 +71,12 @@ struct UiStack
 	List controls;
 
 	/// The control that is currently being hovered or pressed
-	uint activeControl;
+	uint32_t activeControl;
 	/// The state of the active control
 	ControlState activeControlState;
 
 	/// The control that has keyboard focus
-	uint focusedControl;
+	uint32_t focusedControl;
 };
 
 /**
@@ -157,6 +160,6 @@ void UiStackResetFocus(UiStack *stack);
 * @param stack The UiStack to set the focused control of
  * @param index The index of the control to focus
  */
-void SetFocusedControl(UiStack *stack, uint index);
+void SetFocusedControl(UiStack *stack, uint32_t index);
 
 #endif //GAME_UISTACK_H

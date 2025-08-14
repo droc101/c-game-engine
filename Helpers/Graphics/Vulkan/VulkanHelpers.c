@@ -4,10 +4,32 @@
 
 #include "VulkanHelpers.h"
 #include <assert.h>
+#include <cglm/affine-pre.h>
 #include <cglm/clipspace/persp_lh_zo.h>
+#include <cglm/handed/euler_to_quat_rh.h>
+#include <cglm/mat4.h>
+#include <cglm/quat.h>
+#include <cglm/types.h>
+#include <cglm/util.h>
 #include <luna/luna.h>
-#include "../../CommonAssets.h"
+#include <luna/lunaTypes.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vulkan/vulkan_core.h>
+#include "../../../config.h"
+#include "../../../Structs/Camera.h"
+#include "../../../Structs/Color.h"
+#include "../../../Structs/Level.h"
+#include "../../../Structs/Viewmodel.h"
+#include "../../../Structs/Wall.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../../Core/AssetLoaders/ShaderLoader.h"
+#include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/Error.h"
+#include "../../Core/List.h"
 #include "VulkanResources.h"
 
 #pragma region variables

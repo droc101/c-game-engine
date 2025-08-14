@@ -5,6 +5,9 @@
 #ifndef GAME_CHECKBOX_H
 #define GAME_CHECKBOX_H
 
+#include <stdbool.h>
+#include <stdint.h>
+#include "../../Vector2.h"
 #include "../UiStack.h"
 
 typedef struct CheckBoxData CheckBoxData;
@@ -37,7 +40,7 @@ Control *CreateCheckboxControl(Vector2 position,
 
 void DestroyCheckbox(const Control *c);
 
-void UpdateCheckbox(UiStack *stack, Control *c, Vector2 localMousePos, uint ctlIndex);
+void UpdateCheckbox(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
 void DrawCheckbox(const Control *c, ControlState state, Vector2 position);
 

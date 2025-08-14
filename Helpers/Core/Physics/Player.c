@@ -3,15 +3,24 @@
 //
 
 #include "Player.h"
-
-#include <volk.h>
-
+#include <joltc.h>
+#include <math.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_mouse.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "../../../config.h"
 #include "../../../Debug/DPrint.h"
+#include "../../../Structs/Actor.h"
+#include "../../../Structs/Color.h"
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Level.h"
 #include "../../../Structs/Vector2.h"
 #include "../Input.h"
 #include "../MathEx.h"
+#include "Physics.h"
 
 static const float actorRaycastMaxDistance = 10.0f;
 static const float offset = 1.0f;

@@ -3,7 +3,15 @@
 //
 
 #include "Logging.h"
+#include <SDL_filesystem.h>
+#include <SDL_stdinc.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../../config.h"
 #include "Error.h"
 
 /// The length of the longest value passed to the type argument of the LogInternal function (including the null) plus 7

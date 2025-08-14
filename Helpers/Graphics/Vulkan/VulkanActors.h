@@ -5,9 +5,6 @@
 #ifndef VULKANACTORS_H
 #define VULKANACTORS_H
 
-#include <vulkan/vulkan.h>
-#include "../../../Helpers/Core/List.h"
-
 void VulkanActorsVariablesInit();
 
 void VulkanActorsVariablesCleanup();

@@ -3,10 +3,13 @@
 //
 
 #include "Wall.h"
+#include <joltc.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
-#include "../defines.h"
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/Physics/Physics.h"
+#include "Vector2.h"
 
 Wall *CreateWall(const Vector2 a, const Vector2 b, const char *texture, const float uvScale, const float uvOffset)
 {
