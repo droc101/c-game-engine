@@ -34,7 +34,7 @@ struct Options
 	/// Whether the game is in controller mode
 	bool controllerMode;
 	/// The look speed (it affects controller speed too)
-	double cameraSpeed;
+	float cameraSpeed;
 	/// The strength of the rumble
 	float rumbleStrength;
 	/// Whether to invert the camera Y axis

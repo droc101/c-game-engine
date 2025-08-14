@@ -71,8 +71,8 @@ inline void UpdateWindowSize()
 
 inline Vector2 ActualWindowSize()
 {
-	int w;
-	int h;
+	int w = 0;
+	int h = 0;
 	SDL_GetWindowSize(window, &w, &h);
 	return v2((float)w, (float)h);
 }

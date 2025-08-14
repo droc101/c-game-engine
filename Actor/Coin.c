@@ -22,7 +22,10 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
-#define COIN_OUTPUT_COLLECTED 2
+enum CoinOutput
+{
+	COIN_OUTPUT_COLLECTED = 2,
+};
 
 typedef struct CoinData
 {
@@ -30,7 +33,7 @@ typedef struct CoinData
 	uint8_t currentAnimationFrame;
 } CoinData;
 
-void CreateCoinSensor(Actor *this, const Transform *transform)
+static inline void CreateCoinSensor(Actor *this, const Transform *transform)
 {
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}},
 																	JPH_DEFAULT_CONVEX_RADIUS);
@@ -46,46 +49,7 @@ void CreateCoinSensor(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
-{
-	const CoinData *data = this->extraData;
-	if (!data->isBlue)
-	{
-		GetState()->saveData->coins++;
-	} else
-	{
-		GetState()->saveData->blueCoins++;
-		GetState()->saveData->coins += 5;
-	}
-	(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
-	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
-	RemoveActor(this);
-}
-
-void CoinInit(Actor *this, const KvList *params, Transform *transform)
-{
-	this->extraData = calloc(1, sizeof(CoinData));
-	CheckAlloc(this->extraData);
-	CoinData *data = this->extraData;
-	data->isBlue = KvGetBool(params, "isBlue", false);
-
-	transform->position.y = -0.25f;
-	transform->rotation.y = 0;
-	CreateCoinSensor(this, transform);
-
-	this->actorWall = malloc(sizeof(ActorWall));
-	this->actorWall->a = v2(0, 0.125f);
-	this->actorWall->b = v2(0, -0.125f);
-	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"), 80);
-	this->actorWall->uvScale = 1.0f;
-	this->actorWall->uvOffset = 0.0f;
-	this->actorWall->height = 0.25f;
-	ActorWallBake(this);
-
-	this->OnPlayerContactAdded = CoinOnPlayerContactAdded;
-}
-
-void CoinUpdate(Actor *this, double /*delta*/)
+static void CoinUpdate(Actor *this, double /*delta*/)
 {
 	CoinData *data = this->extraData;
 	if (GetState()->physicsFrame % 8 == 0)
@@ -104,4 +68,44 @@ void CoinUpdate(Actor *this, double /*delta*/)
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
+}
+
+static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+{
+	const CoinData *data = this->extraData;
+	if (!data->isBlue)
+	{
+		GetState()->saveData->coins++;
+	} else
+	{
+		GetState()->saveData->blueCoins++;
+		GetState()->saveData->coins += 5;
+	}
+	(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
+	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
+	RemoveActor(this);
+}
+
+void CoinInit(Actor *this, const KvList *params, Transform *transform)
+{
+	this->Update = CoinUpdate;
+	this->OnPlayerContactAdded = CoinOnPlayerContactAdded;
+
+	this->extraData = calloc(1, sizeof(CoinData));
+	CheckAlloc(this->extraData);
+	CoinData *data = this->extraData;
+	data->isBlue = KvGetBool(params, "isBlue", false);
+
+	transform->position.y = -0.25f;
+	transform->rotation.y = 0;
+	CreateCoinSensor(this, transform);
+
+	this->actorWall = malloc(sizeof(ActorWall));
+	this->actorWall->a = v2(0, 0.125f);
+	this->actorWall->b = v2(0, -0.125f);
+	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"), 80);
+	this->actorWall->uvScale = 1.0f;
+	this->actorWall->uvOffset = 0.0f;
+	this->actorWall->height = 0.25f;
+	ActorWallBake(this);
 }

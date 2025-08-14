@@ -11,10 +11,10 @@
  * @return The Color struct
  */
 #define COLOR(argb) \
-	(Color){((argb >> 16) & 0xFF) / 255.0f, \
-			((argb >> 8) & 0xFF) / 255.0f, \
+	(Color){(((argb) >> 16) & 0xFF) / 255.0f, \
+			(((argb) >> 8) & 0xFF) / 255.0f, \
 			((argb) & 0xFF) / 255.0f, \
-			((argb >> 24) & 0xFF) / 255.0f}
+			(((argb) >> 24) & 0xFF) / 255.0f}
 
 /**
  * Convert a byte to a float (0-1)
@@ -22,7 +22,7 @@
  * @param byte The byte to convert
  * @return The float value
  */
-#define BYTE_TO_FLOAT(byte) (byte / 255.0f)
+#define BYTE_TO_FLOAT(byte) ((byte) / 255.0f)
 
 /**
  * Convert a Color struct to an array of floats (cglm vec4)

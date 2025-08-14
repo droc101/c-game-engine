@@ -19,13 +19,19 @@
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
-#define DOOR_INPUT_OPEN 1
-#define DOOR_INPUT_CLOSE 2
+enum DoorInput
+{
+	DOOR_INPUT_OPEN = 1,
+	DOOR_INPUT_CLOSE = 2,
+};
 
-#define DOOR_OUTPUT_CLOSING 2
-#define DOOR_OUTPUT_OPENING 3
-#define DOOR_OUTPUT_FULLY_CLOSED 4
-#define DOOR_OUTPUT_FULLY_OPEN 5
+enum DoorOutput
+{
+	DOOR_OUTPUT_CLOSING = 2,
+	DOOR_OUTPUT_OPENING = 3,
+	DOOR_OUTPUT_FULLY_CLOSED = 4,
+	DOOR_OUTPUT_FULLY_OPEN = 5,
+};
 
 typedef enum
 {
@@ -102,33 +108,7 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 
 static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 {
-	const Vector3 points[4] = {
-		{
-			0.0f,
-			-0.5f,
-			0.0f,
-		},
-		{
-			0.0f,
-			-0.5f,
-			-1.0f,
-		},
-		{
-			0.0f,
-			0.5f,
-			0.0f,
-		},
-		{
-			0.0f,
-			0.5f,
-			-1.0f,
-		},
-	};
-	const JPH_ConvexHullShapeSettings *shapeSettings = JPH_ConvexHullShapeSettings_Create(points,
-																						  4,
-																						  JPH_DEFAULT_CONVEX_RADIUS);
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(ActorWallCreateCollider(),
 																						   transform,
 																						   JPH_MotionType_Kinematic,
 																						   OBJECT_LAYER_STATIC,
@@ -178,6 +158,48 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 															bodyCreationSettings,
 															JPH_Activation_Activate);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+}
+
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+static void DoorUpdate(Actor *this, const double delta)
+{
+	DoorData *data = this->extraData;
+	switch (data->state)
+	{
+		case DOOR_OPENING:
+			if (data->animationTime >= 1)
+			{
+				DoorSetState(this, DOOR_OPEN, 0);
+			}
+			break;
+		case DOOR_OPEN:
+			if (data->animationTime >= 1 && data->shouldClose)
+			{
+				DoorSetState(this, DOOR_CLOSING, 0);
+				data->shouldClose = false;
+			}
+			break;
+		case DOOR_CLOSING:
+			if (data->animationTime >= 1)
+			{
+				DoorSetState(this, DOOR_CLOSED, 0);
+				data->shouldClose = false;
+			}
+			break;
+		default:
+			break;
+	}
+	data->animationTime += delta / PHYSICS_TARGET_TPS;
+}
+
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+static void DoorDestroy(Actor *this)
+{
+	const DoorData *data = this->extraData;
+	if (data->sensorBodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
+	{
+		JPH_BodyInterface_RemoveAndDestroyBody(this->bodyInterface, data->sensorBodyId);
+	}
 }
 
 static bool DoorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
@@ -298,9 +320,19 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyId bodyId)
 
 void DoorInit(Actor *this, const KvList *params, Transform *transform)
 {
+	this->Update = DoorUpdate;
+	this->Destroy = DoorDestroy;
+	this->SignalHandler = DoorSignalHandler;
+	this->OnPlayerContactAdded = DoorOnPlayerContactAdded;
+	this->OnPlayerContactPersisted = DoorOnPlayerContactPersisted;
+	this->OnPlayerContactRemoved = DoorOnPlayerContactRemoved;
+
+	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
+
 	this->extraData = calloc(1, sizeof(DoorData));
 	CheckAlloc(this->extraData);
 	DoorData *data = this->extraData;
+	data->stayOpen = KvGetBool(params, "stayOpen", false);
 
 	CreateDoorCollider(this, transform);
 	if (KvGetBool(params, "preventPlayerOpen", false))
@@ -311,8 +343,6 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 		CreateDoorSensor(this, transform);
 	}
 
-	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
-
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, -0.5f);
 	this->actorWall->b = v2(0, 0.5f);
@@ -321,53 +351,4 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
 	ActorWallBake(this);
-
-	this->SignalHandler = DoorSignalHandler;
-	this->OnPlayerContactAdded = DoorOnPlayerContactAdded;
-	this->OnPlayerContactPersisted = DoorOnPlayerContactPersisted;
-	this->OnPlayerContactRemoved = DoorOnPlayerContactRemoved;
-
-	data->stayOpen = KvGetBool(params, "stayOpen", false);
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void DoorUpdate(Actor *this, const double delta)
-{
-	DoorData *data = this->extraData;
-	switch (data->state)
-	{
-		case DOOR_OPENING:
-			if (data->animationTime >= 1)
-			{
-				DoorSetState(this, DOOR_OPEN, 0);
-			}
-			break;
-		case DOOR_OPEN:
-			if (data->animationTime >= 1 && data->shouldClose)
-			{
-				DoorSetState(this, DOOR_CLOSING, 0);
-				data->shouldClose = false;
-			}
-			break;
-		case DOOR_CLOSING:
-			if (data->animationTime >= 1)
-			{
-				DoorSetState(this, DOOR_CLOSED, 0);
-				data->shouldClose = false;
-			}
-			break;
-		default:
-			break;
-	}
-	data->animationTime += delta / PHYSICS_TARGET_TPS;
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void DoorDestroy(Actor *this)
-{
-	const DoorData *data = this->extraData;
-	if (data->sensorBodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
-	{
-		JPH_BodyInterface_RemoveAndDestroyBody(this->bodyInterface, data->sensorBodyId);
-	}
 }

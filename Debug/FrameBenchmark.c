@@ -30,33 +30,31 @@ void BenchStart()
 
 void BenchFrameStart()
 {
-	if (!benchRunning)
-	{
-		return;
-	}
 #ifdef BENCHMARK_RECORD_HIGH_LOW_TIMES
-	benchFrameStartTime = GetTimeNs();
+	if (benchRunning)
+	{
+		benchFrameStartTime = GetTimeNs();
+	}
 #endif
 }
 
 void BenchFrameEnd()
 {
-	if (!benchRunning)
+	if (benchRunning)
 	{
-		return;
-	}
 #ifdef BENCHMARK_RECORD_HIGH_LOW_TIMES
-	const ulong frameTime = GetTimeNs() - benchFrameStartTime;
-	if (frameTime < lowestFrameNs)
-	{
-		lowestFrameNs = frameTime;
-	}
-	if (frameTime > highestFrameNs)
-	{
-		highestFrameNs = frameTime;
-	}
+		const uint64_t frameTime = GetTimeNs() - benchFrameStartTime;
+		if (frameTime < lowestFrameNs)
+		{
+			lowestFrameNs = frameTime;
+		}
+		if (frameTime > highestFrameNs)
+		{
+			highestFrameNs = frameTime;
+		}
 #endif
-	benchFrameCount++;
+		benchFrameCount++;
+	}
 }
 
 void BenchFinish()

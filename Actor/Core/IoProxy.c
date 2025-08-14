@@ -13,7 +13,10 @@
 #include "../../Structs/Actor.h"
 #include "../../Structs/GlobalState.h"
 
-#define IOPROXY_OUTPUT_FIRST_TICK 2
+enum IoProxyOutput
+{
+	IOPROXY_OUTPUT_FIRST_TICK = 2,
+};
 
 typedef struct IoProxyData
 {
@@ -21,9 +24,19 @@ typedef struct IoProxyData
 	size_t tickCounter;
 } IoProxyData;
 
-bool IoProxySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void IoProxyUpdate(Actor *this, double /*delta*/)
 {
-	if (signal == ACTOR_KILL_INPUT)
+	IoProxyData *data = this->extraData;
+	if (data->tickCounter == 1)
+	{
+		ActorFireOutput(this, IOPROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
+	}
+	data->tickCounter++;
+}
+
+static bool IoProxySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+{
+	if (signal == ACTOR_INPUT_KILL)
 	{
 		LogError("IoProxy actor should not be killed! The kill input will be ignored!");
 		return false;
@@ -35,9 +48,11 @@ bool IoProxySignalHandler(Actor *this, const Actor *sender, const uint8_t signal
 	return false;
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void IoProxyInit(Actor *this, const KvList * /*params*/, Transform *)
+void IoProxyInit(Actor *this, const KvList * /*params*/, Transform * /*transform*/)
 {
+	this->Update = IoProxyUpdate;
+	this->SignalHandler = IoProxySignalHandler;
+
 	if (GetState()->level->ioProxy != NULL)
 	{
 		LogError("Attempted to add an I/O proxy actor to level, but it already has one! The new one cannot be used.");
@@ -46,16 +61,4 @@ void IoProxyInit(Actor *this, const KvList * /*params*/, Transform *)
 		GetState()->level->ioProxy = this;
 	}
 	this->extraData = calloc(1, sizeof(IoProxyData));
-	this->SignalHandler = IoProxySignalHandler;
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void IoProxyUpdate(Actor *this, double /*delta*/)
-{
-	IoProxyData *data = this->extraData;
-	if (data->tickCounter == 1)
-	{
-		ActorFireOutput(this, IOPROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
-	}
-	data->tickCounter++;
 }

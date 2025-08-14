@@ -11,9 +11,4 @@
 
 void DoorInit(Actor *this, const KvList *params, Transform *transform);
 
-void DoorUpdate(Actor *this, double delta);
-
-void DoorDestroy(Actor *this);
-
-
 #endif //DOOR_H

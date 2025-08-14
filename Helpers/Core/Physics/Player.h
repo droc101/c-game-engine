@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Color.h"
+
 typedef struct Level Level; // We cannot include Level.h here (cyclic dep.)
 
 typedef struct Player Player;

@@ -27,19 +27,19 @@ void BtnSoundOptionsBack()
 	GOptionsStateSet(optionsStateInGame);
 }
 
-void SldOptionsMasterVolume(const double value)
+void SldOptionsMasterVolume(const float value)
 {
 	GetState()->options.masterVolume = value;
 	UpdateVolume();
 }
 
-void SldOptionsMusicVolume(const double value)
+void SldOptionsMusicVolume(const float value)
 {
 	GetState()->options.musicVolume = value;
 	UpdateVolume();
 }
 
-void SldOptionsSfxVolume(const double value)
+void SldOptionsSfxVolume(const float value)
 {
 	GetState()->options.sfxVolume = value;
 	UpdateVolume();
@@ -53,7 +53,7 @@ void GSoundOptionsStateUpdate(GlobalState * /*State*/)
 	}
 }
 
-void GSoundOptionsStateRender(GlobalState *)
+void GSoundOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{

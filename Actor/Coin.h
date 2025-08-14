@@ -11,6 +11,4 @@
 
 void CoinInit(Actor *this, const KvList *params, Transform *transform);
 
-void CoinUpdate(Actor *this, double /*delta*/);
-
 #endif //GAME_COIN_H

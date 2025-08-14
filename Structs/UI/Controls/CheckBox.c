@@ -33,9 +33,9 @@ Control *CreateCheckboxControl(const Vector2 position,
 	checkbox->size = size;
 	checkbox->anchor = anchor;
 
-	checkbox->ControlData = malloc(sizeof(CheckBoxData));
-	CheckAlloc(checkbox->ControlData);
-	CheckBoxData *data = checkbox->ControlData;
+	checkbox->controlData = malloc(sizeof(CheckBoxData));
+	CheckAlloc(checkbox->controlData);
+	CheckBoxData *data = checkbox->controlData;
 	data->label = label;
 	data->checked = checked;
 	data->callback = callback;
@@ -45,13 +45,13 @@ Control *CreateCheckboxControl(const Vector2 position,
 
 void DestroyCheckbox(const Control *c)
 {
-	CheckBoxData *data = c->ControlData;
+	CheckBoxData *data = c->controlData;
 	free(data);
 }
 
 void UpdateCheckbox(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
-	CheckBoxData *data = c->ControlData;
+	CheckBoxData *data = c->controlData;
 
 	if (HasActivation(stack, c))
 	{
@@ -71,7 +71,7 @@ void UpdateCheckbox(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint3
 
 void DrawCheckbox(const Control *c, ControlState /*state*/, const Vector2 position)
 {
-	const CheckBoxData *data = (CheckBoxData *)c->ControlData;
+	const CheckBoxData *data = (CheckBoxData *)c->controlData;
 	DrawTextAligned(data->label,
 					16,
 					COLOR_WHITE,

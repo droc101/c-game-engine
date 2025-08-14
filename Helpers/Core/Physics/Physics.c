@@ -73,14 +73,14 @@ void PhysicsInitGlobal(GlobalState *state)
 	state->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
 	JoltDebugRendererInit();
 	PlayerPersistentStateInit();
-	LaserFiltersInit();
+	LaserRaycastFiltersInit();
 }
 
 void PhysicsDestroyGlobal(const GlobalState *state)
 {
 	JoltDebugRendererDestroy();
 	PlayerPersistentStateDestroy();
-	LaserFiltersDestroy();
+	LaserRaycastFiltersDestroy();
 	JPH_JobSystem_Destroy(state->jobSystem);
 	JPH_Shutdown();
 }

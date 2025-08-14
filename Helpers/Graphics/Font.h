@@ -5,8 +5,11 @@
 #ifndef GAME_FONT_H
 #define GAME_FONT_H
 
-#include "../../../../Structs/Color.h"
-#include "../../../../Structs/Vector2.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "../../Structs/Color.h"
+#include "../../Structs/Vector2.h"
 #include "../Core/AssetLoaders/FontLoader.h"
 
 typedef enum FontHorizontalAlign FontHorizontalAlign;

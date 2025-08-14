@@ -5,8 +5,11 @@
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
 
-#include <SDL2/SDL.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include "../../Structs/GlobalState.h" // NOLINT(*-include-cleaner)
 #include "../../Structs/Vector2.h"
 
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons

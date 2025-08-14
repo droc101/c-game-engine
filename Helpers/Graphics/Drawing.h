@@ -6,9 +6,10 @@
 #define GAME_DRAWING_H
 
 #include <joltc.h>
-#include <SDL.h>
+#include <SDL_surface.h>
+#include <stdint.h>
+#include "../../Structs/Camera.h"
 #include "../../Structs/Color.h"
-#include "../../Structs/GlobalState.h"
 #include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
 
@@ -19,8 +20,8 @@ struct BatchedQuadArray
 	/// If used in a textured quad, @c verts takes the form of a @c float[quad_count * 16] holding values for X, Y, U, and V for each vertex.
 	/// If used in a colored quad, @c verts takes the form of a @c float[quad_count * 8] holding values for X and Y for each vertex.
 	float *verts;
-	/// uint[quad_count * 6] with indices
-	uint *indices;
+	/// uint32_t[quad_count * 6] with indices
+	uint32_t *indices;
 	/// Number of quads in the array
 	int quadCount;
 };

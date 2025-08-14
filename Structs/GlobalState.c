@@ -105,8 +105,8 @@ void ChangeLevel(Level *level)
 	state.level = level;
 	if (strncmp(level->music, "none", 4) != 0)
 	{
-		char musicPath[92];
-		snprintf(musicPath, 92, "audio/%s.gmus", level->music);
+		char musicPath[80];
+		snprintf(musicPath, sizeof(musicPath), SOUND("%s"), level->music);
 		ChangeMusic(musicPath);
 	} else
 	{
@@ -142,7 +142,7 @@ bool ChangeLevelByName(const char *name)
 	char *levelPath = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(levelPath);
 
-	if (snprintf(levelPath, maxPathLength, "level/%s.gmap", name) > maxPathLength)
+	if (snprintf(levelPath, maxPathLength, LEVEL("%s"), name) > maxPathLength)
 	{
 		LogError("Failed to load level due to level name %s being too long\n", name);
 		free(levelPath);

@@ -32,9 +32,9 @@ Control *CreateButtonControl(const Vector2 position,
 	btn->size = size;
 	btn->anchor = anchor;
 
-	btn->ControlData = malloc(sizeof(ButtonData));
-	CheckAlloc(btn->ControlData);
-	ButtonData *data = btn->ControlData;
+	btn->controlData = malloc(sizeof(ButtonData));
+	CheckAlloc(btn->controlData);
+	ButtonData *data = btn->controlData;
 	data->text = text;
 	data->callback = callback;
 	data->enabled = true;
@@ -44,13 +44,13 @@ Control *CreateButtonControl(const Vector2 position,
 
 void DestroyButton(const Control *c)
 {
-	ButtonData *data = c->ControlData;
+	ButtonData *data = c->controlData;
 	free(data);
 }
 
 void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
-	const ButtonData *data = (ButtonData *)c->ControlData;
+	const ButtonData *data = (ButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
 		(void)PlaySoundEffect(SOUND("sfx/click"), 0, 1, NULL, NULL);
@@ -76,7 +76,7 @@ void DrawButton(const Control *c, const ControlState state, const Vector2 positi
 			break;
 	}
 
-	const ButtonData *data = (ButtonData *)c->ControlData;
+	const ButtonData *data = (ButtonData *)c->controlData;
 
 	DrawTextAligned(data->text, 16, COLOR_BLACK, position, c->size, FONT_HALIGN_CENTER, FONT_VALIGN_MIDDLE, smallFont);
 }

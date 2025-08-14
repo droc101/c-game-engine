@@ -317,7 +317,7 @@ Control *CreateEmptyControl()
 {
 	Control *c = malloc(sizeof(Control));
 	CheckAlloc(c);
-	c->ControlData = NULL;
+	c->controlData = NULL;
 	return c;
 }
 

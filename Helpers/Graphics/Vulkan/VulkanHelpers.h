@@ -5,13 +5,21 @@
 #ifndef VULKANHELPERS_H
 #define VULKANHELPERS_H
 
-#include <cglm/cglm.h>
+#include <cglm/types.h>
 #include <joltc.h>
 #include <luna/lunaTypes.h>
-#include "../../../../Structs/Color.h"
-#include "../../../../Structs/GlobalState.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <vulkan/vulkan_core.h>
+#include "../../../Structs/Camera.h"
+#include "../../../Structs/Color.h"
+#include "../../../Structs/Level.h"
+#include "../../../Structs/Viewmodel.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
 #include "../../Core/AssetLoaders/ShaderLoader.h"
 #include "../../Core/AssetLoaders/TextureLoader.h"
+#include "../../Core/List.h"
 #include "../../Core/Logging.h"
 
 #pragma region macros
@@ -67,7 +75,7 @@
 #pragma endregion macros
 
 #pragma region typedefs
-typedef enum VendorIDs
+enum VendorIDs
 {
 	AMD = 0x1002,
 	APPLE = 0x106B,
@@ -78,7 +86,7 @@ typedef enum VendorIDs
 	MICROSOFT = 0x1414,
 	NVIDIA = 0x10DE,
 	QUALCOMM = 0x5143,
-} VendorIDs;
+};
 
 typedef struct UiVertex
 {

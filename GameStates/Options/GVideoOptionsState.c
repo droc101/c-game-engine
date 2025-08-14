@@ -46,7 +46,7 @@ void BtnVideoOptionsBack()
 char *SliderLabelMSAA(const Control *slider)
 {
 	char *labels[] = {"Off", "2X", "4X", "8X"};
-	const SliderData *data = (SliderData *)slider->ControlData;
+	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
 	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
@@ -55,7 +55,7 @@ char *SliderLabelMSAA(const Control *slider)
 
 char *SliderLabelLod(const Control *slider)
 {
-	const SliderData *data = (SliderData *)slider->ControlData;
+	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
 	sprintf(buf, "%s: %.1fx", data->label, data->value);
@@ -101,14 +101,14 @@ void CbOptionsPreferWayland(const bool value)
 	// Change will happen next restart
 }
 
-void SldOptionsMsaa(const double value)
+void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
 }
 
-void SldOptionsLod(const double value)
+void SldOptionsLod(const float value)
 {
 	GetState()->options.lodMultiplier = value;
 }
@@ -121,7 +121,7 @@ void GVideoOptionsStateUpdate(GlobalState * /*State*/)
 	}
 }
 
-void GVideoOptionsStateRender(GlobalState *)
+void GVideoOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{

@@ -5,6 +5,7 @@
 #include "Wall.h"
 #include <joltc.h>
 #include <math.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../Helpers/Core/Error.h"
@@ -75,4 +76,47 @@ void WallBake(Wall *w)
 	w->dy = w->b.y - w->a.y;
 	w->length = sqrtf(w->dx * w->dx + w->dy * w->dy);
 	w->angle = atan2f(w->b.x - w->a.x, w->b.y - w->a.y);
+}
+
+void ActorWallBake(const Actor *this)
+{
+	const float dx = this->actorWall->b.x - this->actorWall->a.x;
+	const float dy = this->actorWall->b.y - this->actorWall->a.y;
+	this->actorWall->length = sqrtf(dx * dx + dy * dy);
+	if (this->bodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
+	{
+		JPH_Quat rotation = {};
+		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
+		this->actorWall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY);
+	} else
+	{
+		this->actorWall->angle = atan2f(dy, dx);
+	}
+}
+
+const JPH_Shape *ActorWallCreateCollider()
+{
+	static const Vector3 points[4] = {
+		{
+			0.0f,
+			-0.5f,
+			0.0f,
+		},
+		{
+			0.0f,
+			-0.5f,
+			-1.0f,
+		},
+		{
+			0.0f,
+			0.5f,
+			0.0f,
+		},
+		{
+			0.0f,
+			0.5f,
+			-1.0f,
+		},
+	};
+	return (const JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DEFAULT_CONVEX_RADIUS);
 }

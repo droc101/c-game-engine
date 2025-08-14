@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/List.h"
@@ -27,8 +28,8 @@ Level *CreateLevel(void)
 	ListInit(level->walls, LIST_POINTER);
 	PhysicsInitLevel(level);
 	CreatePlayer(level);
-	strncpy(level->ceilOrSkyTex, "texture/level/sky_test.gtex", 28);
-	strncpy(level->floorTex, "texture/level/floor_test.gtex", 30);
+	strncpy(level->ceilOrSkyTex, TEXTURE("level/sky_test"), 28);
+	strncpy(level->floorTex, TEXTURE("level/floor_test"), 30);
 	strncpy(level->music, "none", 5);
 	level->fogColor = 0xff000000;
 	level->fogStart = 10;
@@ -71,7 +72,7 @@ void AddActor(Actor *actor)
 void RemoveActor(Actor *actor)
 {
 	Level *l = GetState()->level;
-	ActorFireOutput(actor, ACTOR_KILLED_OUTPUT, PARAM_NONE);
+	ActorFireOutput(actor, ACTOR_OUTPUT_KILLED, PARAM_NONE);
 
 	// Remove the actor from the named actor lists if it's there
 	const size_t nameIdx = ListFind(l->namedActorPointers, actor);

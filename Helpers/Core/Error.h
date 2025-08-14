@@ -6,7 +6,7 @@
 #define GAME_ERROR_H
 
 /// Throw a fatal error
-#define Error(error) _ErrorInternal(error, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__)
+#define Error(error) _ErrorInternal(error, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__) // NOLINT(*-include-cleaner)
 
 /**
  * Check if a pointer is NULL and if it is, call the error handler

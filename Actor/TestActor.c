@@ -4,7 +4,6 @@
 
 #include "TestActor.h"
 #include <joltc.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -17,36 +16,8 @@
 #include "../Helpers/Core/Physics/Navigation.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
-#include "../Structs/GlobalState.h"
 
-bool TestActorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
-{
-	if (DefaultSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
-	LogDebug("Test actor got signal %d from actor %p\n", signal, sender);
-	return false;
-}
-
-void TestActorIdle(Actor *this, const double /*delta*/)
-{
-	(void)this;
-	// const NavigationConfig *navigationConfig = this->extraData;
-	// this->transform.rotation.y += 0.01f;
-	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
-	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
-}
-
-void TestActorTargetReached(Actor *this, const double delta)
-{
-	(void)this;
-	(void)delta;
-	// const NavigationConfig *navigationConfig = this->extraData;
-	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
-}
-
-void CreateTestActorCollider(Actor *this, const Transform *transform)
+static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.2867f);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
@@ -73,15 +44,54 @@ void CreateTestActorCollider(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
+static void TestActorUpdate(Actor *this, const double delta)
+{
+	(void)this;
+	(void)delta;
+	// this->modColor.r = sinf(GetState()->physicsFrame / 10.0f) + 1.0f / 2.0f;
+	// JPH_Quat rotation;
+	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
+	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
+	//
+	// NavigationStep(this, this->extraData, delta);
+}
+
+static bool TestActorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+{
+	if (DefaultSignalHandler(this, sender, signal, param))
+	{
+		return true;
+	}
+	LogDebug("Test actor got signal %d from actor %p\n", signal, sender);
+	return false;
+}
+
+static void TestActorIdle(Actor *this, const double /*delta*/)
+{
+	(void)this;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += 0.01f;
+	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
+	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
+}
+
+static void TestActorTargetReached(Actor *this, const double delta)
+{
+	(void)this;
+	(void)delta;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
+}
+
 void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
-	CreateTestActorCollider(this, transform);
+	this->Update = TestActorUpdate;
+	this->SignalHandler = TestActorSignalHandler;
 
 	this->actorFlags = ACTOR_FLAG_ENEMY;
-
 	this->actorModel = LoadModel(MODEL("leafy"));
-	this->currentSkinIndex = 0;
-	this->SignalHandler = TestActorSignalHandler;
+	CreateTestActorCollider(this, transform);
+
 	this->extraData = calloc(1, sizeof(NavigationConfig));
 	CheckAlloc(this->extraData);
 	NavigationConfig *navigationConfig = this->extraData;
@@ -97,16 +107,4 @@ void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 	navigationConfig->TargetReachedFunction = TestActorTargetReached;
 	navigationConfig->lastKnownTarget.x = transform->position.x;
 	navigationConfig->lastKnownTarget.y = transform->position.z;
-}
-
-void TestActorUpdate(Actor *this, const double delta)
-{
-	(void)this;
-	(void)delta;
-	this->modColor.r = sin(GetState()->physicsFrame / 10.0f) + 1.0f / 2.0f;
-	// JPH_Quat rotation;
-	// JPH_BodyInterface_GetPositionAndRotation(this->bodyInterface, this->bodyId, &this->transform.position, &rotation);
-	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
-	//
-	// NavigationStep(this, this->extraData, delta);
 }

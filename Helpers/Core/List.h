@@ -54,8 +54,8 @@ struct LockingList
 
 
 // NOLINTBEGIN(*-reserved-identifier)
-void _ListInit(List *list, enum _ListType);
-void _LockingListInit(LockingList *list, enum _ListType);
+void _ListInit(List *list, enum _ListType listType);
+void _LockingListInit(LockingList *list, enum _ListType listType);
 
 void _ListCopy(const List *oldList, List *newList);
 void _LockingListCopy(const LockingList *oldList, LockingList *newList);

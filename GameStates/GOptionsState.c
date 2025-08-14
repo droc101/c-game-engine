@@ -36,7 +36,7 @@ void BtnOptionsBack()
 	}
 }
 
-void GOptionsStateUpdate(GlobalState * /*State*/)
+void GOptionsStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
 	{
@@ -44,7 +44,7 @@ void GOptionsStateUpdate(GlobalState * /*State*/)
 	}
 }
 
-void GOptionsStateRender(GlobalState *)
+void GOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{

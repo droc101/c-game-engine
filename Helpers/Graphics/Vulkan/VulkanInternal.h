@@ -3,11 +3,12 @@
 //
 
 // ReSharper disable CppUnusedIncludeDirective
+
 #ifndef VULKANINTERNAL_H
 #define VULKANINTERNAL_H
 
-#include <cglm/cglm.h>
 #include <SDL_video.h>
+#include <stdbool.h>
 
 bool CreateInstance(SDL_Window *window);
 

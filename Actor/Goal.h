@@ -11,6 +11,4 @@
 
 void GoalInit(Actor *this, const KvList *params, Transform *transform);
 
-void GoalUpdate(Actor *this, double /*delta*/);
-
 #endif //GAME_GOAL_H

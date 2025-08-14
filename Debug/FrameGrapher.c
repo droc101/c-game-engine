@@ -55,13 +55,13 @@ void FrameGraphUpdate(const uint64_t ns)
 void TickGraphUpdate(const uint64_t ns)
 {
 	// If it's not time to update the graph, return
-	if (GetTimeMs() - tickGraphLastUpdateTime < FRAMEGRAPH_INTERVAL)
+	if ((double)GetTimeMs() - tickGraphLastUpdateTime < FRAMEGRAPH_INTERVAL)
 	{
 		return;
 	}
 
 	TG_PushIntoArray(ns == 0 ? 1 : (double)ns);
-	tickGraphLastUpdateTime = (long)GetTimeMs();
+	tickGraphLastUpdateTime = (double)GetTimeMs();
 }
 
 void FrameGraphDraw()
@@ -287,7 +287,7 @@ void TickGraphDraw()
 #endif
 	}
 #else
-	uint lineColor;
+	uint32_t lineColor;
 #endif
 	const double currentNs = tickrates[FRAMEGRAPH_HISTORY_SIZE - 1];
 	const double currentF = 1000000000.0 / currentNs;

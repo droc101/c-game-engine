@@ -31,7 +31,7 @@ void GLoadingStateUpdate(GlobalState *state)
 	}
 }
 
-void GLoadingStateRender(GlobalState *)
+void GLoadingStateRender(GlobalState * /*state*/)
 {
 	DrawTextAligned("LOADING",
 					16,

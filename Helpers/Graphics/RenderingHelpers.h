@@ -5,9 +5,10 @@
 #ifndef GAME_RENDERINGHELPERS_H
 #define GAME_RENDERINGHELPERS_H
 
-#include <cglm/cglm.h>
-#include <SDL.h>
+#include <cglm/types.h>
+#include <SDL_video.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "../../../../Structs/Actor.h"
 #include "../../../../Structs/Color.h"
 #include "../../../../Structs/Level.h"
@@ -159,8 +160,8 @@ float X_TO_NDC(float x);
 float Y_TO_NDC(float y);
 
 /**
- * Convert a color uint (0xAARRGGBB) to a Color vec4 (RGBA 0-1)
- * @param argb The color uint
+ * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)
+ * @param argb The color uint32_t
  * @param color The output color
  */
 void GetColor(uint32_t argb, Color *color);

@@ -28,10 +28,10 @@ double ReadDouble(const uint8_t *data, size_t *offset);
 double ReadDoubleA(const uint8_t *data, size_t offset);
 
 /**
- * Reads a uint from the given data at the given offset
+ * Reads a uint32_t from the given data at the given offset
  * @param data The data to read from
  * @param offset The offset to read from
- * @return The uint read
+ * @return The uint32_t read
  * @note Increments the offset by 4
  */
 uint32_t ReadUint(const uint8_t *data, size_t *offset);
@@ -46,10 +46,10 @@ uint32_t ReadUint(const uint8_t *data, size_t *offset);
 int ReadInt(const uint8_t *data, size_t *offset);
 
 /**
- * Reads a uint from the given data at the given offset, but doesn't increment the offset
+ * Reads a uint32_t from the given data at the given offset, but doesn't increment the offset
  * @param data The data to read from
  * @param offset The offset to read from
- * @return The uint read
+ * @return The uint32_t read
  */
 uint32_t ReadUintA(const uint8_t *data, size_t offset);
 

@@ -5,9 +5,17 @@
 #ifndef GAME_VULKAN_H
 #define GAME_VULKAN_H
 
-#include <vulkan/vulkan.h>
-#include "../../../Structs/GlobalState.h"
-#include "../RenderingHelpers.h"
+#include <joltc.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <vulkan/vulkan_core.h>
+#include "../../../Structs/Camera.h"
+#include "../../../Structs/Color.h"
+#include "../../../Structs/Level.h"
+#include "../../../Structs/Viewmodel.h"
+#include "../../Core/List.h"
+#include "../RenderingHelpers.h" // NOLINT(*-include-cleaner)
 
 #define VK_X_TO_NDC(x) ((float)(x) / WindowWidthFloat() * 2.0f - 1.0f)
 #define VK_Y_TO_NDC(y) ((float)(y) / WindowHeightFloat() * 2.0f - 1.0f)

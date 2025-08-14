@@ -3,15 +3,7 @@
 //
 
 #include "GLHelper.h"
-#include <cglm/affine-post.h>
-#include <cglm/affine-pre.h>
-#include <cglm/cam.h>
-#include <cglm/handed/euler_to_quat_rh.h>
-#include <cglm/mat4.h>
-#include <cglm/quat.h>
-#include <cglm/types.h>
-#include <cglm/util.h>
-#include <cglm/vec3.h>
+#include <cglm/cglm.h>
 #include <SDL_error.h>
 #include <SDL_video.h>
 #include <stdbool.h>

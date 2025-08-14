@@ -36,9 +36,9 @@ Control *CreateRadioButtonControl(const Vector2 position,
 	radio->size = size;
 	radio->anchor = anchor;
 
-	radio->ControlData = malloc(sizeof(RadioButtonData));
-	CheckAlloc(radio->ControlData);
-	RadioButtonData *data = radio->ControlData;
+	radio->controlData = malloc(sizeof(RadioButtonData));
+	CheckAlloc(radio->controlData);
+	RadioButtonData *data = radio->controlData;
 	data->label = label;
 	data->checked = checked;
 	data->callback = callback;
@@ -50,13 +50,13 @@ Control *CreateRadioButtonControl(const Vector2 position,
 
 void DestroyRadioButton(const Control *c)
 {
-	RadioButtonData *data = c->ControlData;
+	RadioButtonData *data = c->controlData;
 	free(data);
 }
 
 void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
-	RadioButtonData *data = c->ControlData;
+	RadioButtonData *data = c->controlData;
 
 	if (HasActivation(stack, c))
 	{
@@ -75,7 +75,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 			const Control *control = ListGetPointer(stack->controls, i);
 			if (control->type == RADIO_BUTTON)
 			{
-				RadioButtonData *radioData = control->ControlData;
+				RadioButtonData *radioData = control->controlData;
 				if (radioData->groupId == data->groupId && radioData->id != data->id)
 				{
 					radioData->checked = false;
@@ -96,7 +96,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 
 void DrawRadioButton(const Control *c, ControlState /*state*/, const Vector2 position)
 {
-	const RadioButtonData *data = (RadioButtonData *)c->ControlData;
+	const RadioButtonData *data = (RadioButtonData *)c->controlData;
 
 	const Color textColor = data->checked ? COLOR_WHITE : COLOR(0xFFc0c0c0);
 

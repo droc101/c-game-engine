@@ -8,6 +8,8 @@
 #include <joltc.h>
 #include "Vector2.h"
 
+typedef struct Actor Actor;
+
 typedef struct Wall Wall;
 typedef struct ActorWall ActorWall;
 
@@ -18,7 +20,7 @@ struct Wall
 	Vector2 a;
 	/// The second point of the wall
 	Vector2 b;
-	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
 	char tex[80];
 	/// The length of the wall (Call @c WallBake to update)
 	float length;
@@ -42,7 +44,7 @@ struct ActorWall
 	Vector2 a;
 	/// The second point of the wall
 	Vector2 b;
-	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
 	char tex[80];
 	/// The X scale of the texture
 	float uvScale;
@@ -87,5 +89,17 @@ void FreeWall(JPH_BodyInterface *bodyInterface, Wall *wall);
  * @param w Wall to bake
  */
 void WallBake(Wall *w);
+
+/**
+ * Bake an actor wall's information
+ * @param this ActorWall to bake
+ */
+void ActorWallBake(const Actor *this);
+
+/**
+ * Create a collider for an actor wall
+ * @return The shape for the collider
+ */
+const JPH_Shape *ActorWallCreateCollider();
 
 #endif //GAME_WALL_H

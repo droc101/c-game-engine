@@ -3,6 +3,7 @@
 //
 
 #include "Error.h"
+#include <asm-generic/errno-base.h>
 #include <errno.h>
 #include <SDL.h>
 #include <SDL_error.h>
@@ -105,11 +106,11 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	mb.window = GetGameWindow();
 	mb.flags = SDL_MESSAGEBOX_ERROR;
 
-	int pressedButtonID;
+	int pressedButtonID = 0;
 	if (SDL_ShowMessageBox(&mb, &pressedButtonID) < 0)
 	{
 		LogError("Failed to show error dialog: %s\n", SDL_GetError());
-	};
+	}
 
 	switch (pressedButtonID)
 	{
@@ -167,7 +168,7 @@ void PromptRelaunch(const char *title, const char *description, const char *yesB
 	mb.window = GetGameWindow();
 	mb.flags = SDL_MESSAGEBOX_ERROR;
 
-	int pressedButtonID;
+	int pressedButtonID = 0;
 	SDL_ShowMessageBox(&mb, &pressedButtonID);
 
 	if (pressedButtonID == 1)
@@ -205,7 +206,7 @@ _Noreturn void RenderInitError()
 	mb.window = NULL;
 	mb.flags = SDL_MESSAGEBOX_ERROR;
 
-	int pressedButtonID;
+	int pressedButtonID = 0;
 	SDL_ShowMessageBox(&mb, &pressedButtonID);
 	if (pressedButtonID == 0)
 	{

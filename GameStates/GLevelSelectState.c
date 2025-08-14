@@ -101,8 +101,8 @@ void LoadLevelList()
 		return;
 	}
 
-	struct dirent *ent;
-	while ((ent = readdir(dir)) != NULL)
+	const struct dirent *ent = readdir(dir);
+	while (ent != NULL)
 	{
 		if (strstr(ent->d_name, ".gmap") != NULL)
 		{
@@ -113,6 +113,7 @@ void LoadLevelList()
 			levelName[strlen(levelName) - 5] = '\0';
 			ListAdd(levelList, levelName);
 		}
+		ent = readdir(dir);
 	}
 	closedir(dir);
 }

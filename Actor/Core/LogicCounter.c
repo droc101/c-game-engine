@@ -12,6 +12,23 @@
 #include "../../Helpers/Core/MathEx.h"
 #include "../../Structs/Actor.h"
 
+enum LogicCounterInput
+{
+	LOGIC_COUNTER_INPUT_INCREMENT = 1,
+	LOGIC_COUNTER_INPUT_DECREMENT = 2,
+	LOGIC_COUNTER_INPUT_ADD = 3,
+	LOGIC_COUNTER_INPUT_SUBTRACT = 4,
+};
+
+enum LogicCounterOutput
+{
+	LOGIC_COUNTER_OUTPUT_HIT_MAX = 2,
+	LOGIC_COUNTER_OUTPUT_HIT_MIN = 3,
+	LOGIC_COUNTER_OUTPUT_LEFT_MAX = 4,
+	LOGIC_COUNTER_OUTPUT_LEFT_MIN = 5,
+	LOGIC_COUNTER_OUTPUT_COUNTER_CHANGED = 6,
+};
+
 typedef struct LogicCounterData
 {
 	int counter;
@@ -21,18 +38,7 @@ typedef struct LogicCounterData
 	bool clampToMax;
 } LogicCounterData;
 
-#define LOGIC_COUNTER_INPUT_INCREMENT 1
-#define LOGIC_COUNTER_INPUT_DECREMENT 2
-#define LOGIC_COUNTER_INPUT_ADD 3
-#define LOGIC_COUNTER_INPUT_SUBTRACT 4
-
-#define LOGIC_COUNTER_OUTPUT_HIT_MAX 2
-#define LOGIC_COUNTER_OUTPUT_HIT_MIN 3
-#define LOGIC_COUNTER_OUTPUT_LEFT_MAX 4
-#define LOGIC_COUNTER_OUTPUT_LEFT_MIN 5
-#define LOGIC_COUNTER_OUTPUT_COUNTER_CHANGED 6
-
-void ChangeValue(const int change, LogicCounterData *data, const Actor *this)
+static inline void ChangeValue(const int change, LogicCounterData *data, const Actor *this)
 {
 	const int prevValue = data->counter;
 	data->counter += change;
@@ -70,7 +76,7 @@ void ChangeValue(const int change, LogicCounterData *data, const Actor *this)
 	}
 }
 
-bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicCounterData *data = (LogicCounterData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -103,8 +109,10 @@ bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const uint8_t s
 	return false;
 }
 
-void LogicCounterInit(Actor *this, const KvList *params, Transform *)
+void LogicCounterInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
+	this->SignalHandler = LogicCounterSignalHandler;
+
 	this->extraData = malloc(sizeof(LogicCounterData));
 	CheckAlloc(this->extraData);
 	LogicCounterData *data = this->extraData;
@@ -114,5 +122,4 @@ void LogicCounterInit(Actor *this, const KvList *params, Transform *)
 	data->counter = clamp(data->counter, data->min, data->max);
 	data->clampToMax = KvGetBool(params, "clampToMax", true);
 	data->clampToMin = KvGetBool(params, "clampToMin", true);
-	this->SignalHandler = LogicCounterSignalHandler;
 }

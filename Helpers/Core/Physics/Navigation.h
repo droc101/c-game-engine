@@ -5,9 +5,16 @@
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "../../../Structs/Actor.h"
+#include "../../../Structs/Vector2.h"
 
 typedef struct NavigationConfig NavigationConfig;
+
+typedef void (*ActorIdleFunction)(Actor *this, double delta);
+
+typedef void (*ActorTargetReachedFunction)(Actor *this, double delta);
 
 /**
  * A struct that holds configuration and state values for the navigation system

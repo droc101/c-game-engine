@@ -12,11 +12,25 @@
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 
-typedef enum LogicBinaryOp
+enum LogicBinaryInput
 {
-	BINARY_OP_AND,
-	BINARY_OP_OR,
-	UNARY_OP_NOT,
+	LOGIC_BINARY_INPUT_OPERAND_A = 1,
+	LOGIC_BINARY_INPUT_OPERAND_B = 2,
+	LOGIC_BINARY_INPUT_EXECUTE = 3,
+};
+
+enum LogicBinaryOutput
+{
+	LOGIC_BINARY_OUTPUT_ON_TRUE = 2,
+	LOGIC_BINARY_OUTPUT_ON_FALSE = 3,
+	LOGIC_BINARY_OUTPUT_EXECUTION_RESULT = 4,
+};
+
+typedef enum LogicOp
+{
+	LOGIC_OP_AND,
+	LOGIC_OP_OR,
+	LOGIC_OP_NOT,
 } LogicOp;
 
 typedef struct LogicBinaryData
@@ -26,15 +40,7 @@ typedef struct LogicBinaryData
 	LogicOp operation;
 } LogicBinaryData;
 
-#define LOGIC_BINARY_INPUT_OPERAND_A 1
-#define LOGIC_BINARY_INPUT_OPERAND_B 2
-#define LOGIC_BINARY_INPUT_EXECUTE 3
-
-#define LOGIC_BINARY_OUTPUT_ON_TRUE 2
-#define LOGIC_BINARY_OUTPUT_ON_FALSE 3
-#define LOGIC_BINARY_OUTPUT_EXECUTION_RESULT 4
-
-bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicBinaryData *data = (LogicBinaryData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -60,13 +66,13 @@ bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uint8_t si
 		bool result = false;
 		switch (data->operation)
 		{
-			case BINARY_OP_AND:
+			case LOGIC_OP_AND:
 				result = data->operandA && data->operandB;
 				break;
-			case BINARY_OP_OR:
+			case LOGIC_OP_OR:
 				result = data->operandA || data->operandB;
 				break;
-			case UNARY_OP_NOT:
+			case LOGIC_OP_NOT:
 				result = !data->operandA;
 				break;
 			default:
@@ -86,13 +92,14 @@ bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uint8_t si
 	return false;
 }
 
-void LogicBinaryInit(Actor *this, const KvList *params, Transform *)
+void LogicBinaryInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
+	this->SignalHandler = LogicBinarySignalHandler;
+
 	this->extraData = malloc(sizeof(LogicBinaryData));
 	CheckAlloc(this->extraData);
 	LogicBinaryData *data = this->extraData;
 	data->operandA = false;
 	data->operandB = false;
-	data->operation = KvGetByte(params, "operation", BINARY_OP_AND);
-	this->SignalHandler = LogicBinarySignalHandler;
+	data->operation = KvGetByte(params, "operation", LOGIC_OP_AND);
 }

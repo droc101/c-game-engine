@@ -5,9 +5,15 @@
 #ifndef GAME_GLHELPER_H
 #define GAME_GLHELPER_H
 
-#include <cglm/cglm.h>
-#include "../Drawing.h"
-#include "SDL.h"
+#include <cglm/types.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include "../../../Structs/Camera.h"
+#include "../../../Structs/Color.h"
+#include "../../../Structs/Level.h"
+#include "../../../Structs/Vector2.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
 
 #define GL_VERSION_MAJOR 3
 #define GL_VERSION_MINOR 3

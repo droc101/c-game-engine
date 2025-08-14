@@ -6,6 +6,7 @@
 #define INIT_H
 
 #include <joltc.h>
+#include "../../../config.h"
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Level.h"
 

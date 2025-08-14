@@ -24,13 +24,13 @@ struct Level
 
 	/// Indicates if the level has a ceiling. If false, the level will use a sky instead
 	bool hasCeiling;
-	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
 	char ceilOrSkyTex[80];
-	/// The fully qualified texture name (texture/level_uvtest.gtex instead of level_uvtest)
+	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
 	char floorTex[80];
 
 	/// The music name, or "none" for no music
-	char music[80];
+	char music[64];
 
 	/// The color of the fog
 	uint32_t fogColor;

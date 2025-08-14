@@ -62,7 +62,7 @@ struct Control
 	Vector2 anchoredPosition;
 
 	/// Extra data for the control
-	void *ControlData;
+	void *controlData;
 };
 
 struct UiStack

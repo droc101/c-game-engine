@@ -14,10 +14,16 @@
 #include "Color.h"
 #include "Wall.h"
 
-#define ACTOR_KILL_INPUT 0
+enum ActorInput
+{
+	ACTOR_INPUT_KILL = 0,
+};
 
-#define ACTOR_SPAWN_OUTPUT 1
-#define ACTOR_KILLED_OUTPUT 0
+enum ActorOutput
+{
+	ACTOR_OUTPUT_SPAWNED = 1,
+	ACTOR_OUTPUT_KILLED = 0,
+};
 
 typedef enum ActorType ActorType;
 
@@ -27,10 +33,6 @@ typedef struct ActorConnection ActorConnection;
 typedef void (*ActorInitFunction)(Actor *this, const KvList *params, Transform *transform);
 
 typedef void (*ActorUpdateFunction)(Actor *this, double delta);
-
-typedef void (*ActorIdleFunction)(Actor *this, double delta);
-
-typedef void (*ActorTargetReachedFunction)(Actor *this, double delta);
 
 typedef void (*ActorDestroyFunction)(Actor *this);
 
@@ -176,9 +178,10 @@ void DestroyActorConnection(ActorConnection *connection);
 bool DefaultSignalHandler(Actor *this, const Actor *sender, uint8_t signal, const Param *param);
 
 /**
- * Bake an actor wall's information
- * @param this ActorWall to bake
+ * Create an empty body for an actor which does not need collision, but does need a position in the world
+ * @param this The actor to create the body for
+ * @param transform The transform with which to create the body
  */
-void ActorWallBake(const Actor *this);
+void ActorCreateEmptyBody(Actor *this, const Transform *transform);
 
 #endif //GAME_ACTOR_H

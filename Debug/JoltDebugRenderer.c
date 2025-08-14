@@ -4,10 +4,6 @@
 
 #include "JoltDebugRenderer.h"
 #include <joltc.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include "../Helpers/Core/Physics/Physics.h"
-#include "../Helpers/Graphics/Drawing.h"
 
 // TODO: Currently only Vulkan is supported, and only the DrawTriangle calls are supported.
 //  Ideally this should be fixed, with having GL support the debug renderer alongside Vulkan, as well as implementing at
@@ -16,6 +12,11 @@
 //  through the shader.
 
 #ifdef JPH_DEBUG_RENDERER
+#include <stdbool.h>
+#include <stddef.h>
+#include "../Helpers/Core/Physics/Physics.h"
+#include "../Helpers/Graphics/Drawing.h"
+
 static inline bool ShouldDrawBody(void * /*userData*/, const JPH_Body *body)
 {
 	return JPH_Body_GetObjectLayer(body) != OBJECT_LAYER_PLAYER;

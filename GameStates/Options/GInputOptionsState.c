@@ -35,14 +35,14 @@ void GInputOptionsStateUpdate(GlobalState * /*State*/)
 	}
 }
 
-void SldOptionsMouseSensitivity(const double value)
+void SldOptionsMouseSensitivity(const float value)
 {
 	GetState()->options.cameraSpeed = value;
 }
 
-void SldOptionsRumbleStrength(const double value)
+void SldOptionsRumbleStrength(const float value)
 {
-	GetState()->options.rumbleStrength = (float)value;
+	GetState()->options.rumbleStrength = value;
 	Rumble(1.0f, 200);
 }
 
@@ -66,7 +66,7 @@ void CbOptionsSwapOkCancel(const bool value)
 	GetState()->options.controllerSwapOkCancel = value;
 }
 
-void GInputOptionsStateRender(GlobalState *)
+void GInputOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{

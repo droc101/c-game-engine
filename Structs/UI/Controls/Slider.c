@@ -25,7 +25,7 @@
 
 char *DefaultSliderLabelCallback(const Control *slider)
 {
-	const SliderData *data = (SliderData *)slider->ControlData;
+	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
 	sprintf(buf, "%s: %.2f", data->label, data->value);
@@ -34,7 +34,7 @@ char *DefaultSliderLabelCallback(const Control *slider)
 
 char *SliderLabelPercent(const Control *slider)
 {
-	const SliderData *data = (SliderData *)slider->ControlData;
+	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
 	sprintf(buf, "%s: %.0f%%", data->label, data->value * 100);
@@ -43,7 +43,7 @@ char *SliderLabelPercent(const Control *slider)
 
 char *SliderLabelInteger(const Control *slider)
 {
-	const SliderData *data = (SliderData *)slider->ControlData;
+	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
 	sprintf(buf, "%s: %.0f", data->label, data->value);
@@ -73,9 +73,9 @@ Control *CreateSliderControl(const Vector2 position,
 	slider->size = size;
 	slider->anchor = anchor;
 
-	slider->ControlData = malloc(sizeof(SliderData));
-	CheckAlloc(slider->ControlData);
-	SliderData *data = slider->ControlData;
+	slider->controlData = malloc(sizeof(SliderData));
+	CheckAlloc(slider->controlData);
+	SliderData *data = slider->controlData;
 	data->label = label;
 	data->callback = callback;
 	data->min = min;
@@ -92,14 +92,14 @@ Control *CreateSliderControl(const Vector2 position,
 
 void DestroySlider(const Control *c)
 {
-	SliderData *data = c->ControlData;
+	SliderData *data = c->controlData;
 	free(data);
 }
 
 // ReSharper disable twice CppParameterMayBeConstPtrOrRef
 void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const uint32_t ctlIndex)
 {
-	SliderData *data = c->ControlData;
+	SliderData *data = c->controlData;
 
 	// handle l and r arrow keys
 	if (stack->focusedControl == ctlIndex)
@@ -115,7 +115,7 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 			}
 			if (data->callback != NULL)
 			{
-				data->callback(data->value);
+				data->callback((float)data->value);
 			}
 		} else if (IsKeyJustPressed(SDL_SCANCODE_RIGHT) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_RIGHT))
 		{
@@ -128,7 +128,7 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 			}
 			if (data->callback != NULL)
 			{
-				data->callback(data->value);
+				data->callback((float)data->value);
 			}
 		}
 	}
@@ -169,7 +169,7 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 
 		if (data->callback != NULL)
 		{
-			data->callback(data->value);
+			data->callback((float)data->value);
 		}
 	}
 
@@ -180,7 +180,7 @@ void DrawSlider(const Control *c, const ControlState /*state*/, const Vector2 po
 {
 	DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/slider"));
 
-	const SliderData *data = (SliderData *)c->ControlData;
+	const SliderData *data = (SliderData *)c->controlData;
 	const float handlePos = remap(data->value, data->min, data->max, 0, c->size.x - 18);
 
 	DrawTexture(v2(position.x + handlePos + 4, position.y + 1),

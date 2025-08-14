@@ -13,13 +13,19 @@
 #include "../../Structs/Actor.h"
 #include "../../Structs/Level.h"
 
-#define TRIGGER_INPUT_FORCE_TRIGGER 1
-#define TRIGGER_INPUT_ENABLE 2
-#define TRIGGER_INPUT_DISABLE 3
+enum TriggerInput
+{
+	TRIGGER_INPUT_FORCE_TRIGGER = 1,
+	TRIGGER_INPUT_ENABLE = 2,
+	TRIGGER_INPUT_DISABLE = 3,
+};
 
-#define TRIGGER_OUTPUT_TRIGGERED 2
-#define TRIGGER_OUTPUT_ENTERED 3
-#define TRIGGER_OUTPUT_EXITED 4
+enum TriggerOutput
+{
+	TRIGGER_OUTPUT_TRIGGERED = 2,
+	TRIGGER_OUTPUT_ENTERED = 3,
+	TRIGGER_OUTPUT_EXITED = 4,
+};
 
 typedef struct TriggerData
 {
@@ -28,6 +34,23 @@ typedef struct TriggerData
 	bool oneShot;
 	bool enabled;
 } TriggerData;
+
+static inline void CreateTriggerSensor(Actor *this, const Transform *transform)
+{
+	const TriggerData *data = this->extraData;
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
+			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
+												   JPH_DEFAULT_CONVEX_RADIUS),
+			transform,
+			JPH_MotionType_Static,
+			OBJECT_LAYER_SENSOR,
+			this);
+	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+}
 
 static bool TriggerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
@@ -54,7 +77,7 @@ static bool TriggerSignalHandler(Actor *this, const Actor *sender, const uint8_t
 	return false;
 }
 
-void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+static void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (data->enabled)
@@ -64,7 +87,7 @@ void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyId /*bodyId*/)
+static void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (!data->oneShot && data->enabled)
@@ -73,7 +96,7 @@ void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
+static void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (data->enabled)
@@ -86,25 +109,13 @@ void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-void CreateTriggerSensor(Actor *this, const Transform *transform)
-{
-	const TriggerData *data = this->extraData;
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
-			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
-												   JPH_DEFAULT_CONVEX_RADIUS),
-			transform,
-			JPH_MotionType_Static,
-			OBJECT_LAYER_SENSOR,
-			this);
-	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
-	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
-													  bodyCreationSettings,
-													  JPH_Activation_Activate);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-}
-
 void TriggerInit(Actor *this, const KvList *params, Transform *transform)
 {
+	this->SignalHandler = TriggerSignalHandler;
+	this->OnPlayerContactAdded = TriggerOnPlayerContactAdded;
+	this->OnPlayerContactPersisted = TriggerOnPlayerContactPersisted;
+	this->OnPlayerContactRemoved = TriggerOnPlayerContactRemoved;
+
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
 	TriggerData *data = this->extraData;
@@ -114,9 +125,4 @@ void TriggerInit(Actor *this, const KvList *params, Transform *transform)
 	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	CreateTriggerSensor(this, transform);
-
-	this->SignalHandler = TriggerSignalHandler;
-	this->OnPlayerContactAdded = TriggerOnPlayerContactAdded;
-	this->OnPlayerContactPersisted = TriggerOnPlayerContactPersisted;
-	this->OnPlayerContactRemoved = TriggerOnPlayerContactRemoved;
 }

@@ -12,6 +12,20 @@
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
 
+enum LogicDecimalInput
+{
+	LOGIC_DECIMAL_INPUT_OPERAND_A = 1,
+	LOGIC_DECIMAL_INPUT_OPERAND_B = 2,
+	LOGIC_DECIMAL_INPUT_EXECUTE = 3,
+};
+
+enum LogicDecimalOutput
+{
+	LOGIC_DECIMAL_OUTPUT_ON_TRUE = 2,
+	LOGIC_DECIMAL_OUTPUT_ON_FALSE = 3,
+	LOGIC_DECIMAL_OUTPUT_EXECUTION_RESULT = 4,
+};
+
 typedef enum LogicDecimalOp
 {
 	DECIMAL_OP_EQUAL,
@@ -28,15 +42,7 @@ typedef struct LogicDecimalData
 	LogicDecimalOp operation;
 } LogicDecimalData;
 
-#define LOGIC_DECIMAL_INPUT_OPERAND_A 1
-#define LOGIC_DECIMAL_INPUT_OPERAND_B 2
-#define LOGIC_DECIMAL_INPUT_EXECUTE 3
-
-#define LOGIC_DECIMAL_OUTPUT_ON_TRUE 2
-#define LOGIC_DECIMAL_OUTPUT_ON_FALSE 3
-#define LOGIC_DECIMAL_OUTPUT_EXECUTION_RESULT 4
-
-bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicDecimalData *data = (LogicDecimalData *)this->extraData;
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -94,13 +100,14 @@ bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const uint8_t s
 	return false;
 }
 
-void LogicDecimalInit(Actor *this, const KvList *params, Transform *)
+void LogicDecimalInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
+	this->SignalHandler = LogicDecimalSignalHandler;
+
 	this->extraData = malloc(sizeof(LogicDecimalData));
 	CheckAlloc(this->extraData);
 	LogicDecimalData *data = this->extraData;
 	data->operandA = KvGetFloat(params, "operandA", .0f);
 	data->operandB = KvGetFloat(params, "operandB", .0f);
 	data->operation = KvGetByte(params, "operation", DECIMAL_OP_EQUAL);
-	this->SignalHandler = LogicDecimalSignalHandler;
 }

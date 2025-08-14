@@ -75,16 +75,16 @@ Font *LoadFont(const char *asset)
 	font->spaceWidth = ReadByte(assetData->data, &offset);
 	font->defaultSize = ReadByte(assetData->data, &offset);
 	font->uppercaseOnly = ReadByte(assetData->data, &offset) != 0;
-	size_t fontTextureLength;
+	size_t fontTextureLength = 0;
 	char *fontTexture = ReadStringSafe(assetData->data, &offset, assetData->size, &fontTextureLength);
 	if (!fontTexture)
 	{
 		LogError("Failed to load font from asset (unable to read texture string)\n");
 		return GenerateFallbackFont();
 	}
-	fontTextureLength += strlen("texture/.gtex");
+	fontTextureLength += strlen(TEXTURE(""));
 	font->texture = calloc(fontTextureLength, sizeof(char));
-	snprintf(font->texture, fontTextureLength, "texture/%s.gtex", fontTexture);
+	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
 	font->image = LoadImage(font->texture);
 	font->charCount = ReadByte(assetData->data, &offset);

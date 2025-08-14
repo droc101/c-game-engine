@@ -54,6 +54,7 @@ CheckOptions:
   bugprone-multi-level-implicit-pointer-conversion.EnableInC: false
   bugprone-unused-return-value.CheckedFunctions: '[A-Z].+'
   bugprone-unused-return-value.AllowCastToVoid: true
+  misc-include-cleaner.IgnoreHeaders: "cglm/.*"
   misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
   readability-function-cognitive-complexity.IgnoreMacros: true
   readability-operators-representation.BinaryOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='

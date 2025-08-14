@@ -3,7 +3,6 @@
 //
 
 #include "Arguments.h"
-
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>

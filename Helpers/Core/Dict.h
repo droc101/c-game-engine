@@ -6,6 +6,7 @@
 #define GAME_DICT_H
 
 #include <dict.h>
+#include <m-core.h>
 
 DICT_DEF2(dict, const char *, M_CSTR_OPLIST, void *, M_PTR_OPLIST);
 

@@ -3,7 +3,6 @@
 //
 
 #include "AssetReader.h"
-
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -211,7 +210,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 
 void RemoveAssetFromCache(const char *relPath)
 {
-	int index = -1;
+	size_t index = SIZE_MAX;
 	for (size_t i = 0; i < assetCacheNames.length; i++)
 	{
 		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
@@ -220,7 +219,7 @@ void RemoveAssetFromCache(const char *relPath)
 			break;
 		}
 	}
-	if (index != -1)
+	if (index != SIZE_MAX)
 	{
 		const Asset *asset = ListGetPointer(assetCacheData, index);
 		free(asset->data);

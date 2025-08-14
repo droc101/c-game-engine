@@ -149,7 +149,7 @@ void DrawTextAligned(const char *str,
 	const double sizeMultiplier = (double)size / font->defaultSize;
 	const int width = (int)(font->width * sizeMultiplier);
 	const int quadHeight = (int)(font->textureHeight * sizeMultiplier);
-	const double uvPixel = 1.0 / font->image->width;
+	const double uvPixel = 1.0 / (double)font->image->width;
 	int c = 0;
 
 	const int lines = StringLineCount(str);

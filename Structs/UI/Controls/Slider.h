@@ -11,7 +11,7 @@
 
 typedef struct SliderData SliderData;
 
-typedef void (*SliderCallback)(double);
+typedef void (*SliderCallback)(float value);
 typedef char *(*SliderLabelFunction)(const Control *slider);
 
 struct SliderData

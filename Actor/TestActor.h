@@ -11,6 +11,4 @@
 
 void TestActorInit(Actor *this, const KvList *params, Transform *transform);
 
-void TestActorUpdate(Actor *this, double delta);
-
 #endif //GAME_TESTACTOR_H

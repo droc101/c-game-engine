@@ -11,12 +11,12 @@
 #include "../../Helpers/Core/List.h"
 #include "../../Structs/Color.h"
 
-#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = x})
-#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = x})
-#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = x})
-#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = x})
-#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = x})
-#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = x})
+#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = (x)})
+#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = (x)})
+#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = (x)})
+#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = (x)})
+#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = (x)})
+#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = (x)})
 #define PARAM_NONE ((Param){PARAM_TYPE_NONE})
 
 typedef enum ParamType ParamType;

@@ -10,7 +10,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "../../../config.h"
 #include "../../../Debug/FrameGrapher.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
@@ -40,7 +39,7 @@ bool physicsThreadPostQuit = false;
  * The main function for the physics thread
  * @return 0
  */
-int PhysicsThreadMain(void *)
+int PhysicsThreadMain(void * /*data*/)
 {
 	double lastTickTime = PHYSICS_TARGET_NS_D;
 	while (true)

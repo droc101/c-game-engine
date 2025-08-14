@@ -47,8 +47,8 @@ void GMainStateUpdate(GlobalState *state)
 	}
 
 	Vector2 cameraMotion = GetMouseRel();
-	cameraMotion.x *= (float)state->options.cameraSpeed / 120.0f;
-	cameraMotion.y *= (float)state->options.cameraSpeed / 120.0f;
+	cameraMotion.x *= state->options.cameraSpeed / 120.0f;
+	cameraMotion.y *= state->options.cameraSpeed / 120.0f;
 	if (state->options.invertHorizontalCamera)
 	{
 		cameraMotion.x *= -1;
@@ -89,7 +89,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			state->level->player.transform.rotation.y += cx * (float)state->options.cameraSpeed / 11.25f;
+			state->level->player.transform.rotation.y += cx * state->options.cameraSpeed / 11.25f;
 		}
 
 		float cy = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
@@ -99,7 +99,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cy) > STICK_DEADZONE)
 		{
-			state->level->player.transform.rotation.x += cy * (float)state->options.cameraSpeed / 11.25f;
+			state->level->player.transform.rotation.x += cy * state->options.cameraSpeed / 11.25f;
 		}
 
 		state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
@@ -185,7 +185,6 @@ void GMainStateRender(GlobalState *state)
 				   crosshairColor);
 
 	DPrintPlayer(level);
-
 
 	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);

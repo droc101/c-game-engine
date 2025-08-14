@@ -9,8 +9,11 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 
-#define LASER_INPUT_DISABLE 1
-#define LASER_INPUT_ENABLE 2
+enum LaserInputs
+{
+	LASER_INPUT_DISABLE = 1,
+	LASER_INPUT_ENABLE = 2,
+};
 
 typedef enum LaserHeight
 {
@@ -22,10 +25,8 @@ typedef enum LaserHeight
 
 void LaserInit(Actor *this, const KvList *params, Transform *transform);
 
-void LaserUpdate(Actor *this, double delta);
+void LaserRaycastFiltersInit();
 
-void LaserFiltersInit();
-
-void LaserFiltersDestroy();
+void LaserRaycastFiltersDestroy();
 
 #endif //LASER_H

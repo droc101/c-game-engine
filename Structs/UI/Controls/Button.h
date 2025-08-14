@@ -5,6 +5,9 @@
 #ifndef GAME_BUTTON_H
 #define GAME_BUTTON_H
 
+#include <stdbool.h>
+#include <stdint.h>
+#include "../../Vector2.h"
 #include "../UiStack.h"
 
 typedef struct ButtonData ButtonData;

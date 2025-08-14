@@ -9,8 +9,6 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 
-void IoProxyInit(Actor *this, const KvList *params, Transform *);
-
-void IoProxyUpdate(Actor *this, double /*delta*/);
+void IoProxyInit(Actor *this, const KvList *params, Transform *transform);
 
 #endif //IOPROXY_H

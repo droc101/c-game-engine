@@ -6,7 +6,7 @@
 #define VULKANRESOURCES_H
 
 #include <stdbool.h>
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 #include "../../Core/AssetLoaders/TextureLoader.h"
 
 VkResult CreateUiBuffers();

@@ -6,6 +6,7 @@
 
 #include <GL/glew.h>
 #include <signal.h>
+#include <stddef.h>
 #include "../../Core/Logging.h"
 #include "GLInternal.h"
 
@@ -19,9 +20,9 @@ void GL_DebugMessageCallback(const GLenum source,
 							 const GLchar *msg,
 							 const void * /*data*/)
 {
-	char *_source;
-	char *_type;
-	char *_severity;
+	char *_source = NULL;
+	char *_type = NULL;
+	char *_severity = NULL;
 
 	if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
 	{

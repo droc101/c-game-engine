@@ -16,6 +16,7 @@
 #include "../Structs/Actor.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
+#include "../Structs/Wall.h"
 
 typedef struct LaserData
 {
@@ -95,6 +96,53 @@ static JPH_BodyFilter *bodyFilter;
 
 static const float maxDistance = 50.0f;
 
+static inline void LaserCreateBody(Actor *this, const Transform *transform)
+{
+	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
+																						  transform,
+																						  JPH_MotionType_Static,
+																						  OBJECT_LAYER_STATIC,
+																						  this);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_DontActivate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+}
+
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+static void LaserUpdate(Actor *this, double delta)
+{
+	const LaserData *data = this->extraData;
+	if (data->enabled)
+	{
+		const JPH_PhysicsSystem *physicsSystem = GetState()->level->physicsSystem;
+		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
+		JPH_RayCastResult result = {};
+		Vector3 hitPointOffset = {};
+		JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter = data->height == LASER_HEIGHT_TRIPLE
+																   ? tripleLaserBroadPhaseLayerFilter
+																   : normalLaserBroadPhaseLayerFilter;
+		JPH_ObjectLayerFilter *objectLayerFilter = data->height == LASER_HEIGHT_TRIPLE ? tripleLaserObjectLayerFilter
+																					   : normalLaserObjectLayerFilter;
+		const bool hit = JPH_NarrowPhaseQuery_CastRay2_GAME(narrowPhaseQuery,
+															this->bodyInterface,
+															this->bodyId,
+															maxDistance,
+															&result,
+															&hitPointOffset,
+															broadPhaseLayerFilter,
+															objectLayerFilter,
+															bodyFilter);
+		if (hit)
+		{
+			this->actorWall->b = v2(hitPointOffset.x, hitPointOffset.z);
+			ActorWallBake(this);
+		}
+		this->actorWall->uvOffset = (float)fmod(this->actorWall->uvOffset + delta / 8, 1.0);
+	}
+}
+
 static bool LaserSignalHandler(Actor *this, const Actor *sender, uint8_t signal, const Param *param)
 {
 	if (DefaultSignalHandler(this, sender, signal, param))
@@ -117,29 +165,17 @@ static bool LaserSignalHandler(Actor *this, const Actor *sender, uint8_t signal,
 	return false;
 }
 
-static void LaserCreateBody(Actor *this, const Transform *transform)
-{
-	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
-																						  transform,
-																						  JPH_MotionType_Static,
-																						  OBJECT_LAYER_STATIC,
-																						  this);
-	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
-													  bodyCreationSettings,
-													  JPH_Activation_DontActivate);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-}
-
 void LaserInit(Actor *this, const KvList *params, Transform *transform)
 {
+	this->Update = LaserUpdate;
+	this->SignalHandler = LaserSignalHandler;
+
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
 	this->extraData = data;
-	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
+	data->height = KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->enabled = KvGetBool(params, "startEnabled", true);
 
-	this->SignalHandler = LaserSignalHandler;
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2s(0);
 	this->actorWall->b = v2s(0);
@@ -176,40 +212,7 @@ void LaserInit(Actor *this, const KvList *params, Transform *transform)
 	// TODO: Make harmful - Depends on being able to take damage
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-void LaserUpdate(Actor *this, double delta)
-{
-	const LaserData *data = this->extraData;
-	if (data->enabled)
-	{
-		const JPH_PhysicsSystem *physicsSystem = GetState()->level->physicsSystem;
-		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
-		JPH_RayCastResult result = {};
-		Vector3 hitPointOffset = {};
-		JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter = data->height == LASER_HEIGHT_TRIPLE
-																   ? tripleLaserBroadPhaseLayerFilter
-																   : normalLaserBroadPhaseLayerFilter;
-		JPH_ObjectLayerFilter *objectLayerFilter = data->height == LASER_HEIGHT_TRIPLE ? tripleLaserObjectLayerFilter
-																					   : normalLaserObjectLayerFilter;
-		const bool hit = JPH_NarrowPhaseQuery_CastRay2_GAME(narrowPhaseQuery,
-															this->bodyInterface,
-															this->bodyId,
-															maxDistance,
-															&result,
-															&hitPointOffset,
-															broadPhaseLayerFilter,
-															objectLayerFilter,
-															bodyFilter);
-		if (hit)
-		{
-			this->actorWall->b = v2(hitPointOffset.x, hitPointOffset.z);
-			ActorWallBake(this);
-		}
-		this->actorWall->uvOffset = (float)fmod(this->actorWall->uvOffset + delta / 8, 1.0);
-	}
-}
-
-void LaserFiltersInit()
+void LaserRaycastFiltersInit()
 {
 	normalLaserBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&normalLaserBroadPhaseLayerFilterImpl);
 	normalLaserObjectLayerFilter = JPH_ObjectLayerFilter_Create(&normalLaserObjectLayerFilterImpl);
@@ -218,7 +221,7 @@ void LaserFiltersInit()
 	bodyFilter = JPH_BodyFilter_Create(&bodyFilterImpl);
 }
 
-void LaserFiltersDestroy()
+void LaserRaycastFiltersDestroy()
 {
 	JPH_BroadPhaseLayerFilter_Destroy(normalLaserBroadPhaseLayerFilter);
 	JPH_ObjectLayerFilter_Destroy(normalLaserObjectLayerFilter);

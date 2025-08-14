@@ -8,11 +8,15 @@
 #ifndef GLINTERNAL_H
 #define GLINTERNAL_H
 
-#include <cglm/cglm.h>
+#include <cglm/types.h>
 #include <GL/glew.h>
-#include "../../../../Structs/Actor.h"
-#include "../../../../Structs/Level.h"
-#include "../../../../Structs/Vector2.h"
+#include <stddef.h>
+#include <stdint.h>
+#include "../../../Structs/Actor.h"
+#include "../../../Structs/Color.h"
+#include "../../../Structs/Level.h"
+#include "../../../Structs/Vector2.h"
+#include "../../Core/AssetLoaders/ModelLoader.h"
 #include "../../Core/AssetLoaders/TextureLoader.h"
 
 typedef struct GL_Shader GL_Shader;
@@ -231,9 +235,9 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture);
  */
 void GL_RenderModelPart(const ModelDefinition *model,
 						const mat4 modelWorldMatrix,
-						uint lod,
+						uint32_t lod,
 						size_t material,
-						uint skin,
+						uint32_t skin,
 						Color modColor);
 
 

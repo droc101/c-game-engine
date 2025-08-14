@@ -7,6 +7,7 @@
     <inspection_tool class="CppRedundantCastExpression" enabled="false" level="HINT" enabled_by_default="false" />
     <inspection_tool class="CppRedundantInlineSpecifier" enabled="false" level="HINT" enabled_by_default="false" />
     <inspection_tool class="CppRedundantParentheses" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppUnusedIncludeDirective" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="CppWrongIncludesOrder" enabled="false" level="HINT" enabled_by_default="false" />
   </profile>
 </component>

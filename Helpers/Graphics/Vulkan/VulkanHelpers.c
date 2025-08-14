@@ -4,13 +4,8 @@
 
 #include "VulkanHelpers.h"
 #include <assert.h>
-#include <cglm/affine-pre.h>
+#include <cglm/cglm.h>
 #include <cglm/clipspace/persp_lh_zo.h>
-#include <cglm/handed/euler_to_quat_rh.h>
-#include <cglm/mat4.h>
-#include <cglm/quat.h>
-#include <cglm/types.h>
-#include <cglm/util.h>
 #include <luna/luna.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>

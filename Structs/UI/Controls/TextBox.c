@@ -38,7 +38,7 @@ Control *CreateTextBoxControl(const char *placeholder,
 
 	TextBoxData *data = calloc(1, sizeof(TextBoxData));
 	CheckAlloc(data);
-	c->ControlData = data;
+	c->controlData = data;
 	data->maxLength = maxLength;
 	data->callback = callback;
 	data->text = calloc(1, maxLength + 1);
@@ -55,7 +55,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, Vector2 positio
 {
 	DrawNinePatchTexture(control->anchoredPosition, control->size, 8, 8, TEXTURE("interface/textbox"));
 
-	const TextBoxData *data = (TextBoxData *)control->ControlData;
+	const TextBoxData *data = (TextBoxData *)control->controlData;
 
 	DrawTextAligned(strlen(data->text) == 0 ? data->placeholder : data->text,
 					16,
@@ -83,7 +83,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, Vector2 positio
 
 void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePosition*/, const uint32_t controlIndex)
 {
-	TextBoxData *data = (TextBoxData *)control->ControlData;
+	TextBoxData *data = (TextBoxData *)control->controlData;
 	if (stack->focusedControl != controlIndex)
 	{
 		data->isActive = false;
@@ -172,14 +172,14 @@ void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePositio
 
 void DestroyTextBox(const Control *control)
 {
-	const TextBoxData *textBoxData = control->ControlData;
+	const TextBoxData *textBoxData = control->controlData;
 	free(textBoxData->text);
-	free(control->ControlData);
+	free(control->controlData);
 }
 
 void FocusTextBox(const Control *control)
 {
-	SetTextInput(&((TextBoxData *)control->ControlData)->input); // very readable yes
+	SetTextInput(&((TextBoxData *)control->controlData)->input); // very readable yes
 }
 
 void UnfocusTextBox(const Control * /*control*/)
@@ -189,7 +189,7 @@ void UnfocusTextBox(const Control * /*control*/)
 
 void TextBoxTextInputCallback(TextInput *data, SDL_TextInputEvent *event)
 {
-	const TextBoxData *textBoxData = (TextBoxData *)((Control *)data->userData)->ControlData;
+	const TextBoxData *textBoxData = (TextBoxData *)((Control *)data->userData)->controlData;
 	const size_t originalLen = strlen(textBoxData->text);
 
 	size_t insertLen = strlen(event->text);

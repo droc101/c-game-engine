@@ -10,7 +10,7 @@
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
 
-void CreatePhysboxCollider(Actor *this, const Transform *transform)
+static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
 			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.2f, 0.2f, 0.2f}}, JPH_DEFAULT_CONVEX_RADIUS),
