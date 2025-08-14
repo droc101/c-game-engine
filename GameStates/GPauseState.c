@@ -18,9 +18,12 @@
 #include "../Structs/Vector2.h"
 #include "GMainState.h"
 #include "GOptionsState.h"
+#include "../config.h"
 
 #ifndef USE_LEVEL_SELECT
 #include "GMenuState.h"
+#else
+#include "GLevelSelectState.h"
 #endif
 
 UiStack *pauseStack = NULL;
