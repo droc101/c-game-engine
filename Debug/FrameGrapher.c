@@ -188,9 +188,10 @@ void FrameGraphDraw()
 void TickGraphDraw()
 {
 #ifdef TICKGRAPH_ENABLE
+	const int start_x = WindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
 #ifndef FRAMEGRAPH_FPS_ONLY
 	const int height = TICKGRAPH_THRESHOLD_GOOD * 2 * TICKGRAPH_V_SCALE + 20;
-	const int start_x = WindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
+
 	// Draw a background for the graph
 	DrawRect(start_x - 10,
 			 WindowHeight() - height,
@@ -287,7 +288,7 @@ void TickGraphDraw()
 #endif
 	}
 #else
-	uint32_t lineColor;
+	Color lineColor;
 #endif
 	const double currentNs = tickrates[FRAMEGRAPH_HISTORY_SIZE - 1];
 	const double currentF = 1000000000.0 / currentNs;
