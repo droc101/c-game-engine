@@ -35,8 +35,8 @@
 #include "VulkanInternal.h"
 #include "VulkanResources.h"
 #ifdef JPH_DEBUG_RENDERER
-#include "../../Core/Error.h"
 #include "../../../config.h"
+#include "../../Core/Error.h"
 #endif
 
 static const Level *loadedLevel;

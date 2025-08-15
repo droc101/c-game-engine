@@ -5,7 +5,7 @@
 #ifndef GAME_GLOBALSTATE_H
 #define GAME_GLOBALSTATE_H
 
-#include <joltc.h>
+#include <joltc/joltc.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "Camera.h"

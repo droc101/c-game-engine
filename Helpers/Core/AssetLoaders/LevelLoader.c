@@ -3,7 +3,7 @@
 //
 
 #include "LevelLoader.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>

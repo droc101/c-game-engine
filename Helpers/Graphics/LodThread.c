@@ -3,7 +3,8 @@
 //
 
 #include "LodThread.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Vector3.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
 #include <stdbool.h>

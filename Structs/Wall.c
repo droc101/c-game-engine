@@ -3,7 +3,9 @@
 //
 
 #include "Wall.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdlib.h>

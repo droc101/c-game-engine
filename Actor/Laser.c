@@ -3,7 +3,9 @@
 //
 
 #include "Laser.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>

@@ -5,7 +5,7 @@
 #ifndef GAME_VIEWMODEL_H
 #define GAME_VIEWMODEL_H
 
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"

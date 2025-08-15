@@ -3,7 +3,9 @@
 //
 
 #include "Drawing.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/RVec3.h>
+#include <joltc/Math/Vector3.h>
 #include <SDL_error.h>
 #include <SDL_hints.h>
 #include <SDL_surface.h>

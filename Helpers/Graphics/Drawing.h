@@ -5,7 +5,8 @@
 #ifndef GAME_DRAWING_H
 #define GAME_DRAWING_H
 
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/RVec3.h>
 #include <SDL_surface.h>
 #include <stdint.h>
 #include "../../Structs/Camera.h"

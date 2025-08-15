@@ -3,7 +3,7 @@
 //
 
 #include "JoltDebugRenderer.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
 
 // TODO: Currently only Vulkan is supported, and only the DrawTriangle calls are supported.
 //  Ideally this should be fixed, with having GL support the debug renderer alongside Vulkan, as well as implementing at

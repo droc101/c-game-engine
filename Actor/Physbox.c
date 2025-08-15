@@ -3,7 +3,9 @@
 //
 
 #include "Physbox.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/KVList.h"

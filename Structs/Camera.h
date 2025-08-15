@@ -5,7 +5,7 @@
 #ifndef GAME_CAMERA_H
 #define GAME_CAMERA_H
 
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 
 typedef struct Camera Camera;
 

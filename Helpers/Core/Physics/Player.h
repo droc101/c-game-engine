@@ -5,7 +5,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Transform.h>
 #include <stdbool.h>
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Color.h"

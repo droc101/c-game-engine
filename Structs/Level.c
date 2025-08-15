@@ -3,7 +3,7 @@
 //
 
 #include "Level.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>

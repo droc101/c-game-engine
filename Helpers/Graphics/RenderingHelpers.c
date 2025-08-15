@@ -5,7 +5,7 @@
 #include "RenderingHelpers.h"
 #include <cglm/mat4.h>
 #include <cglm/types.h>
-#include <joltc.h>
+#include <joltc/joltc.h>
 #include <SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>

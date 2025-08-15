@@ -7,6 +7,7 @@
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "../config.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Core/SoundSystem.h"
@@ -18,7 +19,6 @@
 #include "../Structs/Vector2.h"
 #include "GMainState.h"
 #include "GOptionsState.h"
-#include "../config.h"
 
 #ifndef USE_LEVEL_SELECT
 #include "GMenuState.h"

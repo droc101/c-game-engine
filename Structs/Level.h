@@ -5,7 +5,7 @@
 #ifndef GAME_LEVEL_H
 #define GAME_LEVEL_H
 
-#include <joltc.h>
+#include <joltc/joltc.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "../Helpers/Core/List.h"

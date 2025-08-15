@@ -49,6 +49,8 @@ readability-*,
 -readability-math-missing-parentheses,
 -readability-redundant-member-init,
 -readability-uppercase-literal-suffix,
+-readability-function-cognitive-complexity,
+-bugprone-unused-return-value,
 -readability-use-std-min-max'
 CheckOptions:
   bugprone-multi-level-implicit-pointer-conversion.EnableInC: false

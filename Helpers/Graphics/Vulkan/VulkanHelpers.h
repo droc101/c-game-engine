@@ -6,7 +6,7 @@
 #define VULKANHELPERS_H
 
 #include <cglm/types.h>
-#include <joltc.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>

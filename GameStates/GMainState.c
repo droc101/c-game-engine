@@ -3,7 +3,7 @@
 //
 
 #include "GMainState.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_rect.h>

@@ -3,7 +3,9 @@
 //
 
 #include "Physics.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "../../../Actor/Laser.h"

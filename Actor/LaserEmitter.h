@@ -5,7 +5,7 @@
 #ifndef LASEREMITTER_H
 #define LASEREMITTER_H
 
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 

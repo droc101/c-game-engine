@@ -5,7 +5,7 @@
 #ifndef JOLTDEBUGRENDERER_H
 #define JOLTDEBUGRENDERER_H
 
-#include <joltc.h>
+#include <joltc/joltc.h>
 
 /**
  * Set up the static variables required for the Jolt debug renderer

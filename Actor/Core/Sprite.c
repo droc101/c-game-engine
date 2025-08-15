@@ -3,7 +3,8 @@
 //
 
 #include "Sprite.h"
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../Helpers/Core/AssetReader.h"

@@ -3,7 +3,7 @@
 //
 
 #include "LogicCounter.h"
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

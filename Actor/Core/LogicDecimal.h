@@ -5,7 +5,7 @@
 #ifndef LOGICDECIMAL_H
 #define LOGICDECIMAL_H
 
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 

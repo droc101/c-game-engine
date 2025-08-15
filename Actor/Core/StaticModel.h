@@ -5,7 +5,7 @@
 #ifndef STATICMODEL_H
 #define STATICMODEL_H
 
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 

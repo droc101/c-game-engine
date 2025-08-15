@@ -5,7 +5,7 @@
 #ifndef GAME_VULKAN_H
 #define GAME_VULKAN_H
 
-#include <joltc.h>
+#include <joltc/Math/Vector3.h>
 #include <SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>

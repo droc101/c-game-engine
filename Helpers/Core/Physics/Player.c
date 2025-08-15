@@ -3,7 +3,11 @@
 //
 
 #include "Player.h"
-#include <joltc.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/RVec3.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>

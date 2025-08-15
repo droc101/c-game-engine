@@ -3,7 +3,7 @@
 //
 
 #include "StaticModel.h"
-#include <joltc.h>
+#include <joltc/Math/Transform.h>
 #include <stdio.h>
 #include "../../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../../Helpers/Core/AssetReader.h"
