@@ -70,7 +70,7 @@ struct __attribute__((aligned(16))) GL_SharedUniforms
 	/// The model -> screen matrix
 	mat4 worldViewMatrix;
 	/// The color of the fog
-	vec3 fogColor;
+	Color fogColor;
 	/// The distance from the camera at which the fog starts
 	float fogStart;
 	/// The distance from the camera at which the fog is fully opaque

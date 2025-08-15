@@ -883,10 +883,7 @@ void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level)
 {
 	GL_SharedUniforms uniforms;
 	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
-	glm_vec3_copy((vec3){(float)(level->fogColor >> 16 & 0xFF) / 255.0f,
-						 (float)(level->fogColor >> 8 & 0xFF) / 255.0f,
-						 (float)(level->fogColor & 0xFF) / 255.0f},
-				  uniforms.fogColor);
+	uniforms.fogColor = COLOR(level->fogColor);
 	uniforms.cameraYaw = GetState()->camera->transform.rotation.y;
 	uniforms.fogStart = (float)level->fogStart;
 	uniforms.fogEnd = (float)level->fogEnd;
@@ -1129,11 +1126,11 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 		mat4 viewModelMatrix;
 		GL_GetViewmodelMatrix(&viewModelMatrix);
 
-		GL_SharedUniforms uniforms;
+		GL_SharedUniforms uniforms = {
+			.fogStart = 1000,
+			.fogEnd = 1001,
+		};
 		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
-		uniforms.cameraYaw = 0;
-		uniforms.fogStart = (float)1000;
-		uniforms.fogEnd = (float)1001;
 
 		glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);

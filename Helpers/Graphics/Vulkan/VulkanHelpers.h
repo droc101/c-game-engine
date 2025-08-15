@@ -293,7 +293,7 @@ typedef struct PushConstants
 
 	float fogStart;
 	float fogEnd;
-	uint32_t fogColor;
+	Color fogColor;
 } PushConstants;
 #pragma endregion typedefs
 
