@@ -3,7 +3,6 @@
 //
 
 #include "List.h"
-#include <asm-generic/errno-base.h>
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>

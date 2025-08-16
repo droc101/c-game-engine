@@ -3,7 +3,6 @@
 //
 
 #include "Timing.h"
-#include <bits/time.h>
 #include <stdint.h>
 #include <time.h>
 

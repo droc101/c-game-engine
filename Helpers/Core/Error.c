@@ -3,7 +3,6 @@
 //
 
 #include "Error.h"
-#include <asm-generic/errno-base.h>
 #include <errno.h>
 #include <SDL.h>
 #include <SDL_error.h>
