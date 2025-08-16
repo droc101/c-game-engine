@@ -137,13 +137,6 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		AddActor(leaf);
 	}
 
-	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
-	if (SignalLodThreadCanStart() != 0)
-	{
-		Error("Failed to signal LOD thread start semaphore!");
-	}
-
-	// This is safe to be here because it does not modify the actors in any way.
 	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
 																   deltaTime,
 																   2,
@@ -152,6 +145,12 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	{
 		LogError("Failed to update Jolt physics system with error %d\n", result);
 		Error("Failed to update physics!");
+	}
+
+	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
+	if (SignalLodThreadCanStart() != 0)
+	{
+		Error("Failed to signal LOD thread start semaphore!");
 	}
 }
 
