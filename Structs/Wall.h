@@ -5,7 +5,9 @@
 #ifndef GAME_WALL_H
 #define GAME_WALL_H
 
-#include <joltc/joltc.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include "Vector2.h"
 
 typedef struct Actor Actor;

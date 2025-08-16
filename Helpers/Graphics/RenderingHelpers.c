@@ -5,7 +5,9 @@
 #include "RenderingHelpers.h"
 #include <cglm/mat4.h>
 #include <cglm/types.h>
-#include <joltc/joltc.h>
+#include <joltc/constants.h>
+#include <joltc/Math/RMat44.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -92,7 +94,7 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	}
 	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
 	{
-		JPH_RMatrix4x4 matrix;
+		JPH_RMat44 matrix;
 		JPH_BodyInterface_GetCenterOfMassTransform(actor->bodyInterface, actor->bodyId, &matrix);
 		memcpy(*transformMatrix, &matrix, sizeof(mat4));
 	} else

@@ -4,6 +4,7 @@
 
 #include "Level.h"
 #include <joltc/joltc.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>

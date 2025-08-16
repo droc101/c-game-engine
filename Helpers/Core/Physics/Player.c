@@ -3,11 +3,17 @@
 //
 
 #include "Player.h"
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/PhysicsMaterial.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/Physics/Collision/ShapeFilter.h>
+#include <joltc/types.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>

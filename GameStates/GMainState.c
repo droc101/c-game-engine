@@ -3,6 +3,7 @@
 //
 
 #include "GMainState.h"
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>

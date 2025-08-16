@@ -4,9 +4,15 @@
 
 #include "Coin.h"
 #include <cglm/types.h>
+#include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -38,7 +44,7 @@ typedef struct CoinData
 static inline void CreateCoinSensor(Actor *this, const Transform *transform)
 {
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}},
-																	JPH_DEFAULT_CONVEX_RADIUS);
+																	JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,

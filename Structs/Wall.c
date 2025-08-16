@@ -3,9 +3,14 @@
 //
 
 #include "Wall.h"
+#include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -53,7 +58,7 @@ void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 	};
 	const JPH_ConvexHullShapeSettings *shapeSettings = JPH_ConvexHullShapeSettings_Create(points,
 																						  4,
-																						  JPH_DEFAULT_CONVEX_RADIUS);
+																						  JPH_DefaultConvexRadius);
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
 	const Vector3 position = {wall->a.x, 0, wall->a.y};
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
@@ -120,5 +125,5 @@ const JPH_Shape *ActorWallCreateCollider()
 			-1.0f,
 		},
 	};
-	return (const JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DEFAULT_CONVEX_RADIUS);
+	return (const JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DefaultConvexRadius);
 }

@@ -5,7 +5,7 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include <joltc/joltc.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include "../../../config.h"
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Level.h"

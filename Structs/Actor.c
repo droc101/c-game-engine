@@ -4,9 +4,13 @@
 
 #include "Actor.h"
 #include <assert.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -20,6 +24,7 @@
 #include "GlobalState.h"
 #include "Level.h"
 
+#include <joltc/constants.h>
 #include "../Actor/Coin.h"
 #include "../Actor/Core/IoProxy.h"
 #include "../Actor/Core/LogicBinary.h"

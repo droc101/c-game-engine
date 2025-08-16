@@ -7,7 +7,6 @@
 #include <SDL_rect.h>
 #include <SDL_scancode.h>
 #include <stddef.h>
-#include "../config.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Core/SoundSystem.h"

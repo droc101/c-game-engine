@@ -4,6 +4,7 @@
 
 #include "LevelLoader.h"
 #include <joltc/joltc.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>

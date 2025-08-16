@@ -3,9 +3,15 @@
 //
 
 #include "Laser.h"
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/Body.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>

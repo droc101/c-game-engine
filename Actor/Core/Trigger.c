@@ -3,9 +3,15 @@
 //
 
 #include "Trigger.h"
+#include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -42,7 +48,7 @@ static inline void CreateTriggerSensor(Actor *this, const Transform *transform)
 	const TriggerData *data = this->extraData;
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
 			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
-												   JPH_DEFAULT_CONVEX_RADIUS),
+												   JPH_DefaultConvexRadius),
 			transform,
 			JPH_MotionType_Static,
 			OBJECT_LAYER_SENSOR,

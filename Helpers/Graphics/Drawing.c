@@ -3,9 +3,10 @@
 //
 
 #include "Drawing.h"
-#include <joltc/joltc.h>
+#include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/types.h>
 #include <SDL_error.h>
 #include <SDL_hints.h>
 #include <SDL_surface.h>

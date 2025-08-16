@@ -3,10 +3,17 @@
 //
 
 #include "Door.h"
+#include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Body/MassProperties.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -149,7 +156,7 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 	Vector3 position = {};
 	Vector3_Subtract(&transform->position, &offsetVector, &position);
 	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
-																	JPH_DEFAULT_CONVEX_RADIUS);
+																	JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
 																					  &position,
 																					  &rotation,

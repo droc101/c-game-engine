@@ -6,7 +6,7 @@
 #include <math.h>
 #include <stdint.h>
 
-int wrapi(const int x, const int min, const int max)
+int wrapi(const int x, const int min, const int max) // NOLINT(*-no-recursion)
 {
 	if (min > max)
 	{
@@ -20,7 +20,7 @@ uint32_t wrapu(const uint32_t x, const uint32_t min, const uint32_t max)
 	return min > max ? x % min : x % max;
 }
 
-float wrapf(const float x, const float min, const float max)
+float wrapf(const float x, const float min, const float max) // NOLINT(*-no-recursion)
 {
 	if (min > max)
 	{
@@ -29,7 +29,7 @@ float wrapf(const float x, const float min, const float max)
 	return (x >= 0 ? min : max) + fmodf(x, max - min);
 }
 
-double wrapd(const double x, const double min, const double max)
+double wrapd(const double x, const double min, const double max) // NOLINT(*-no-recursion)
 {
 	if (min > max)
 	{

@@ -3,8 +3,8 @@
 //
 
 #include "LodThread.h"
-#include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
 #include <stdbool.h>

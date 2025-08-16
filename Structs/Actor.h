@@ -5,8 +5,9 @@
 #ifndef GAME_ACTOR_H
 #define GAME_ACTOR_H
 
-#include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/types.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"

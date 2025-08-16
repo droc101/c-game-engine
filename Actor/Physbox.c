@@ -3,9 +3,15 @@
 //
 
 #include "Physbox.h"
+#include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Body/MassProperties.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/KVList.h"
@@ -15,7 +21,7 @@
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
-			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.2f, 0.2f, 0.2f}}, JPH_DEFAULT_CONVEX_RADIUS),
+			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.2f, 0.2f, 0.2f}}, JPH_DefaultConvexRadius),
 			transform,
 			JPH_MotionType_Dynamic,
 			OBJECT_LAYER_DYNAMIC,

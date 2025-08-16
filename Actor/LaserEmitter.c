@@ -3,10 +3,15 @@
 //
 
 #include "LaserEmitter.h"
+#include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -50,7 +55,7 @@ static const Vector3 halfExtent = {0.2f, 0.48f, 0.05f};
 static inline void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
 	const Vector3 offset = {0.0f, 0.0f, halfExtent.z};
-	const JPH_Shape *boxShape = (const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DEFAULT_CONVEX_RADIUS);
+	const JPH_Shape *boxShape = (const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DefaultConvexRadius);
 	const JPH_Shape *offestShape = (const JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
 																						   transform,
