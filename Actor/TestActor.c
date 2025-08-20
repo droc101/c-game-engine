@@ -26,8 +26,8 @@
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
 #include "../Structs/Color.h"
-#include "../Structs/Vector2.h"
 #include "../Structs/GlobalState.h"
+#include "../Structs/Vector2.h"
 
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {

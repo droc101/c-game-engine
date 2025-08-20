@@ -3,6 +3,7 @@
 //
 
 #include "Input.h"
+#include <assert.h>
 #include <SDL_error.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_haptic.h>
@@ -24,7 +25,7 @@
 // on modern systems where memory is not a concern
 InputState keys[SDL_NUM_SCANCODES];
 InputState controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
-InputState mouseButtons[4];
+InputState mouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
 
 typedef struct PhysicsStateBuffer
 {
@@ -32,8 +33,8 @@ typedef struct PhysicsStateBuffer
 	bool physKeysJustReleased[SDL_NUM_SCANCODES];
 	bool physControllerButtonsJustPressed[SDL_CONTROLLER_BUTTON_MAX];
 	bool physControllerButtonsJustReleased[SDL_CONTROLLER_BUTTON_MAX];
-	bool physMouseButtonsJustPressed[4];
-	bool physMouseButtonsJustReleased[4];
+	bool physMouseButtonsJustPressed[MAX_RECOGNIZED_MOUSE_BUTTONS];
+	bool physMouseButtonsJustReleased[MAX_RECOGNIZED_MOUSE_BUTTONS];
 } PhysicsStateBuffer;
 
 /// The buffer that is actively being written to by the render thread.
@@ -177,12 +178,26 @@ void HandleMouseMotion(const int x, const int y, const int xRel, const int yRel)
 
 void HandleMouseDown(const int button)
 {
+	if (button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
+	{
+		LogError("Received mouse event for button %d, which is greater than the maximum of %d that is supported.\n",
+				 button,
+				 MAX_RECOGNIZED_MOUSE_BUTTONS);
+		return;
+	}
 	mouseButtons[button] = INP_JUST_PRESSED;
 	physicsInputWorkingBuffer->physMouseButtonsJustPressed[button] = true;
 }
 
 void HandleMouseUp(const int button)
 {
+	if (button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
+	{
+		LogError("Received mouse event for button %d, which is greater than the maximum of %d that is supported.\n",
+				 button,
+				 MAX_RECOGNIZED_MOUSE_BUTTONS);
+		return;
+	}
 	mouseButtons[button] = INP_JUST_RELEASED;
 	physicsInputWorkingBuffer->physMouseButtonsJustReleased[button] = true;
 }
@@ -212,7 +227,7 @@ void UpdateInputStates()
 		}
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MAX_RECOGNIZED_MOUSE_BUTTONS; i++)
 	{
 		if (mouseButtons[i] == INP_JUST_RELEASED)
 		{
@@ -270,16 +285,19 @@ bool IsKeyJustReleased(const int code)
 
 bool IsMouseButtonPressed(const int button)
 {
+	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
 	return mouseButtons[button] == INP_PRESSED || mouseButtons[button] == INP_JUST_PRESSED;
 }
 
 bool IsMouseButtonJustPressed(const int button)
 {
+	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
 	return mouseButtons[button] == INP_JUST_PRESSED;
 }
 
 bool IsMouseButtonJustReleased(const int button)
 {
+	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
 	return mouseButtons[button] == INP_JUST_RELEASED;
 }
 
@@ -305,6 +323,7 @@ void ConsumeButton(const int btn)
 
 void ConsumeMouseButton(const int button)
 {
+	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
 	mouseButtons[button] = INP_RELEASED;
 }
 
@@ -318,7 +337,7 @@ void ConsumeAllKeys()
 
 void ConsumeAllMouseButtons()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MAX_RECOGNIZED_MOUSE_BUTTONS; i++)
 	{
 		mouseButtons[i] = INP_RELEASED;
 	}

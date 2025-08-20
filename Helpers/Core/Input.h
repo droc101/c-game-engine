@@ -12,6 +12,8 @@
 #include "../../Structs/GlobalState.h" // NOLINT(*-include-cleaner)
 #include "../../Structs/Vector2.h"
 
+#define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
+
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons
 #define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_B : SDL_CONTROLLER_BUTTON_A)
 /// Use this for the "Cancel" button in place of hardcoding controller A or B buttons
