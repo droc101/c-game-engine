@@ -38,6 +38,8 @@ typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 
 typedef void (*ActorDestroyFunction)(Actor *this);
 
+typedef void (*ActorUIRenderFunction)(Actor *this);
+
 /**
  * Signal handler function signature for actor
  * @return True if the signal was handled, false if not
@@ -124,6 +126,7 @@ struct Actor
 	ActorPlayerContactAddedFunction OnPlayerContactAdded;
 	ActorPlayerContactPersistedFunction OnPlayerContactPersisted;
 	ActorPlayerContactRemovedFunction OnPlayerContactRemoved;
+	ActorUIRenderFunction Render;
 	/// List of I/O connections
 	LockingList ioConnections;
 

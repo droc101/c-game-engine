@@ -159,30 +159,8 @@ void GMainStateRender(GlobalState *state)
 {
 	const Level *level = state->level;
 
-	JoltDebugRendererDrawBodies(level->physicsSystem);
-	RenderLevel3D(level, state->camera);
-
-	SDL_Rect coinIconRect = {WindowWidth() - 260, 16, 40, 40};
-	DrawTexture(v2(WindowWidthFloat() - 260, 16), v2(40, 40), TEXTURE("interface/hud_ycoin"));
-
-	char coinStr[16];
-	sprintf(coinStr, "%d", state->saveData->coins);
-	FontDrawString(v2(WindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, largeFont);
-
-	coinIconRect.y = 64;
-
-	for (int blueCoinIndex = 0; blueCoinIndex < state->saveData->blueCoins; blueCoinIndex++)
-	{
-		coinIconRect.x = WindowWidth() - 260 + blueCoinIndex * 48;
-		DrawTexture(v2((float)coinIconRect.x, (float)coinIconRect.y), v2(40, 40), TEXTURE("interface/hud_bcoin"));
-	}
-
-	const Color *crosshairColor = GetCrosshairColor();
-
-	DrawTextureMod(v2((WindowWidth() * 0.5) - 12, (WindowHeight() * 0.5) - 12),
-				   v2s(24),
-				   TEXTURE("interface/crosshair"),
-				   crosshairColor);
+	RenderLevel(level, state->camera);
+	RenderHUD();
 
 	DPrintPlayer(level);
 

@@ -48,6 +48,8 @@ void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorDestroy(Actor * /*this*/) {}
 
+void ActorRender(Actor * /*this*/) {}
+
 ActorInitFunction actorInitFunctions[] = {
 	ActorInit,
 	TestActorInit,
@@ -86,6 +88,7 @@ Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *para
 	actor->Update = ActorUpdate;
 	actor->Destroy = ActorDestroy;
 	actor->SignalHandler = DefaultSignalHandler;
+	actor->Render = ActorRender;
 	actor->OnPlayerContactAdded = NULL;
 	actor->OnPlayerContactPersisted = NULL;
 	actor->OnPlayerContactRemoved = NULL;

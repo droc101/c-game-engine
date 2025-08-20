@@ -11,6 +11,7 @@
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "Actor.h"
+#include "Camera.h"
 
 typedef struct Level Level;
 
@@ -106,5 +107,12 @@ Actor *GetActorByName(const char *name, const Level *l);
  * @note This is extra slow. Use even more sparingly.
  */
 void GetActorsByName(const char *name, const Level *l, List *actors);
+
+/**
+ * Renders a level from a given camera, including actor UI and physics debug.
+ * @param level The level to render
+ * @param camera The camera to view from
+ */
+void RenderLevel(const Level *level, const Camera *camera);
 
 #endif //GAME_LEVEL_H

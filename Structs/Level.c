@@ -11,13 +11,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../Debug/JoltDebugRenderer.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/Player.h"
+#include "../Helpers/Graphics/Drawing.h"
 #include "Actor.h"
+#include "Camera.h"
 #include "GlobalState.h"
 #include "Wall.h"
 
@@ -132,4 +135,16 @@ void GetActorsByName(const char *name, const Level *l, List *actors)
 		}
 	}
 	ListUnlock(l->namedActorNames);
+}
+
+void RenderLevel(const Level *level, const Camera *camera)
+{
+	JoltDebugRendererDrawBodies(level->physicsSystem);
+	RenderLevel3D(level, camera);
+
+	for (size_t i = 0; i < level->actors.length; i++)
+	{
+		Actor *a = ListGetPointer(level->actors, i);
+		a->Render(a);
+	}
 }

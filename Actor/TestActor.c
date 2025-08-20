@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -21,7 +22,12 @@
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Navigation.h"
 #include "../Helpers/Core/Physics/Physics.h"
+#include "../Helpers/Graphics/Font.h"
+#include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
+#include "../Structs/Color.h"
+#include "../Structs/Vector2.h"
+#include "../Structs/GlobalState.h"
 
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
@@ -89,10 +95,50 @@ static void TestActorTargetReached(Actor *this, const double delta)
 	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
+static void TestActorUIRender(Actor *this)
+{
+	DrawTextAligned("I'm TestActor!",
+					16,
+					COLOR_BLACK,
+					v2s(22),
+					v2(WindowWidth() - 40, WindowHeight() - 40),
+					FONT_HALIGN_CENTER,
+					FONT_VALIGN_BOTTOM,
+					smallFont);
+	DrawTextAligned("I'm TestActor!",
+					16,
+					COLOR_WHITE,
+					v2s(20),
+					v2(WindowWidth() - 40, WindowHeight() - 40),
+					FONT_HALIGN_CENTER,
+					FONT_VALIGN_BOTTOM,
+					smallFont);
+	if (!GetState()->level->player.hasHeldActor && GetState()->level->player.targetedActor == this)
+	{
+		DrawTextAligned("please spare me",
+						16,
+						COLOR_BLACK,
+						v2(22, 102),
+						v2(WindowWidth() - 40, WindowHeight() - 40),
+						FONT_HALIGN_CENTER,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
+		DrawTextAligned("please spare me",
+						16,
+						COLOR_WHITE,
+						v2(20, 100),
+						v2(WindowWidth() - 40, WindowHeight() - 40),
+						FONT_HALIGN_CENTER,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
+	}
+}
+
 void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
 	this->Update = TestActorUpdate;
 	this->SignalHandler = TestActorSignalHandler;
+	this->Render = TestActorUIRender;
 
 	this->actorFlags = ACTOR_FLAG_ENEMY;
 	this->actorModel = LoadModel(MODEL("leafy"));

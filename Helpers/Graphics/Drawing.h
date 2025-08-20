@@ -181,6 +181,12 @@ void RenderMenuBackground();
 void RenderInGameMenuBackground();
 
 /**
+ * Render the in-game HUD
+ * @param state The GlobalState to use
+ */
+void RenderHUD();
+
+/**
  * Render the 3D portion of a level
  * @param l The level to render
  * @param cam The camera to render with

@@ -11,15 +11,19 @@
 #include <SDL_hints.h>
 #include <SDL_surface.h>
 #include <stddef.h>
+#include <stdio.h>
 #include "../../Structs/Camera.h"
 #include "../../Structs/Color.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
+#include "../CommonAssets.h"
 #include "../Core/AssetLoaders/TextureLoader.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"
 #include "../Core/Logging.h"
+#include "../Core/Physics/Player.h"
+#include "Font.h"
 #include "GL/GLHelper.h"
 #include "RenderingHelpers.h"
 #include "Vulkan/Vulkan.h"
@@ -357,9 +361,36 @@ void RenderMenuBackground()
 void RenderInGameMenuBackground()
 {
 	const GlobalState *state = GetState();
-	RenderLevel3D(state->level, state->camera);
-
+	RenderLevel(state->level, state->camera);
+	RenderHUD();
 	DrawRect(0, 0, WindowWidth(), WindowHeight(), COLOR(0xA0000000));
+}
+
+void RenderHUD()
+{
+	const GlobalState *state = GetState();
+	Vector2 coinIconPos = v2(WindowWidth() - 260, 16);
+	const Vector2 coinIconSize = v2s(40);
+	DrawTexture(v2(WindowWidthFloat() - 260, 16), coinIconSize, TEXTURE("interface/hud_ycoin"));
+
+	char coinStr[16];
+	sprintf(coinStr, "%d", state->saveData->coins);
+	FontDrawString(v2(WindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, largeFont);
+
+	coinIconPos.y = 64;
+
+	for (int blueCoinIndex = 0; blueCoinIndex < state->saveData->blueCoins; blueCoinIndex++)
+	{
+		coinIconPos.x = (float)WindowWidth() - 260 + (float)blueCoinIndex * 48;
+		DrawTexture(coinIconPos, coinIconSize, TEXTURE("interface/hud_bcoin"));
+	}
+
+	const Color *crosshairColor = GetCrosshairColor();
+
+	DrawTextureMod(v2((WindowWidth() * 0.5) - 12, (WindowHeight() * 0.5) - 12),
+				   v2s(24),
+				   TEXTURE("interface/crosshair"),
+				   crosshairColor);
 }
 
 void RenderLevel3D(const Level *l, const Camera *cam)
