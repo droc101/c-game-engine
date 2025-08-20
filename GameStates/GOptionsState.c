@@ -6,7 +6,6 @@
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"

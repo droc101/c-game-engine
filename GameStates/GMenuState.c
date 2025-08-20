@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "../config.h"
-#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"

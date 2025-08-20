@@ -15,10 +15,14 @@
 #include "../../Structs/Color.h"
 #include "../../Structs/Vector2.h"
 #include "../Core/AssetLoaders/FontLoader.h"
+#include "../Core/AssetReader.h"
 #include "../Core/Error.h"
 #include "../Core/MathEx.h"
 #include "Drawing.h"
 #include "RenderingHelpers.h"
+
+Font *smallFont;
+Font *largeFont;
 
 inline void FontDrawString(const Vector2 pos, const char *str, const uint32_t size, const Color color, const Font *font)
 {
@@ -229,4 +233,16 @@ void DrawTextAligned(const char *str,
 
 	free(verts);
 	free(indices);
+}
+
+void InitCommonFonts()
+{
+	smallFont = LoadFont(FONT("small_font"));
+	largeFont = LoadFont(FONT("large_font"));
+}
+
+void DestroyCommonFonts()
+{
+	FreeFont(smallFont);
+	FreeFont(largeFont);
 }

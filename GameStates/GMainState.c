@@ -15,7 +15,6 @@
 #include "../config.h"
 #include "../Debug/DPrint.h"
 #include "../Debug/JoltDebugRenderer.h"
-#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"

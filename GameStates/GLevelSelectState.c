@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../config.h"
-#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Core/List.h"

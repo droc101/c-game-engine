@@ -29,6 +29,9 @@ enum FontVerticalAlign
 	FONT_VALIGN_BOTTOM
 };
 
+extern Font *smallFont;
+extern Font *largeFont;
+
 /**
  * Draw a string of text to the screen
  * @param pos Top left position of the text
@@ -99,5 +102,15 @@ void DrawTextAligned(const char *str,
 					 FontHorizontalAlign hAlign,
 					 FontVerticalAlign vAlign,
 					 const Font *font);
+
+/**
+ * Initialize common fonts
+ */
+void InitCommonFonts();
+
+/**
+ * Free any common fonts that were allocated
+ */
+void DestroyCommonFonts();
 
 #endif //GAME_FONT_H

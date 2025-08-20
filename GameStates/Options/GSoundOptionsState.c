@@ -6,7 +6,6 @@
 #include <SDL_scancode.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "../../Helpers/CommonAssets.h"
 #include "../../Helpers/Core/Input.h"
 #include "../../Helpers/Core/SoundSystem.h"
 #include "../../Helpers/Graphics/Drawing.h"

@@ -91,8 +91,6 @@ add_executable(
         config.h
         GameStates/GLevelSelectState.c
         GameStates/GLevelSelectState.h
-        Helpers/CommonAssets.c
-        Helpers/CommonAssets.h
         Actor/Coin.c
         Actor/Coin.h
         Actor/Goal.c

@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "../config.h"
-#include "../Helpers/CommonAssets.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Timing.h"
 #include "../Helpers/Graphics/Drawing.h"

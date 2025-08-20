@@ -17,7 +17,6 @@
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Level.h"
 #include "../../Structs/Vector2.h"
-#include "../CommonAssets.h"
 #include "../Core/AssetLoaders/TextureLoader.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"

@@ -21,7 +21,6 @@
 #include "Debug/FrameBenchmark.h"
 #include "Debug/FrameGrapher.h"
 #include "GameStates/GLogoSplashState.h"
-#include "Helpers/CommonAssets.h"
 #include "Helpers/Core/Arguments.h"
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
@@ -31,6 +30,7 @@
 #include "Helpers/Core/SoundSystem.h"
 #include "Helpers/Core/Timing.h"
 #include "Helpers/Graphics/Drawing.h"
+#include "Helpers/Graphics/Font.h"
 #include "Helpers/Graphics/LodThread.h"
 #include "Helpers/Graphics/RenderingHelpers.h"
 #include "Helpers/PlatformHelpers.h"
@@ -271,7 +271,7 @@ int main(const int argc, char *argv[])
 
 	WindowAndRenderInit();
 
-	InitCommonAssets();
+	InitCommonFonts();
 
 	GLogoSplashStateSet();
 
@@ -376,7 +376,7 @@ int main(const int argc, char *argv[])
 	RenderDestroy();
 	SDL_DestroyWindow(GetGameWindow());
 	SDL_FreeSurface(windowIcon);
-	DestroyCommonAssets();
+	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
 	Mix_CloseAudio();
 	Mix_Quit();
