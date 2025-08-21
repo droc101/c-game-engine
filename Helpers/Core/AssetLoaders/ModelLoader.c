@@ -123,6 +123,13 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		}
 	}
 
+	model->boundingBoxOrigin.x = ReadFloat(assetData->data, &offset);
+	model->boundingBoxOrigin.y = ReadFloat(assetData->data, &offset);
+	model->boundingBoxOrigin.z = ReadFloat(assetData->data, &offset);
+	model->boundingBoxExtents.x = ReadFloat(assetData->data, &offset);
+	model->boundingBoxExtents.y = ReadFloat(assetData->data, &offset);
+	model->boundingBoxExtents.z = ReadFloat(assetData->data, &offset);
+
 	FreeAsset(assetData);
 
 	return model;

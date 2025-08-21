@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "../../../Structs/Color.h"
+#include <joltc/Math/Vector3.h>
 
 #define MODEL_ASSET_VERSION 1
 
@@ -86,6 +87,9 @@ struct ModelDefinition
 	uint32_t **skins;
 	/// The LODs for this model
 	ModelLod **lods;
+
+	Vector3 boundingBoxOrigin;
+	Vector3 boundingBoxExtents;
 };
 
 void InitModelLoader();
