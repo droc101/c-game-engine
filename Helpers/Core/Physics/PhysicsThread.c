@@ -6,15 +6,12 @@
 #include <SDL_error.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
-#include <SDL_timer.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include "../../../Debug/FrameGrapher.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
 #include "../Input.h"
 #include "../Logging.h"
+#include "../MathEx.h"
 #include "../Timing.h"
 #include "Physics.h"
 
@@ -85,7 +82,7 @@ int PhysicsThreadMain(void * /*data*/)
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
 		TickGraphUpdate(timeElapsed);
-		lastTickTime = (double)timeElapsed;
+		lastTickTime = min(PHYSICS_MIN_NS_D, (double)timeElapsed);
 	}
 }
 
