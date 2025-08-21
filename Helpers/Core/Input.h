@@ -20,20 +20,6 @@
 #define CONTROLLER_CANCEL \
 	(GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_A : SDL_CONTROLLER_BUTTON_B)
 
-typedef enum InputState InputState;
-
-enum InputState
-{
-	/// The input is not pressed
-	INP_RELEASED,
-	/// The input was just pressed on this frame
-	INP_JUST_PRESSED,
-	// / The input is currently pressed
-	INP_PRESSED,
-	/// The input was just released on this frame
-	INP_JUST_RELEASED
-};
-
 /**
  * Handles controller disconnect event
  * @param which The controller that was disconnected

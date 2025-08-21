@@ -26,14 +26,12 @@ static inline void CreatePhysboxCollider(Actor *this, const Transform *transform
 			JPH_MotionType_Dynamic,
 			OBJECT_LAYER_DYNAMIC,
 			this);
-	const JPH_MassProperties massProperties = {
-		.mass = 2.0f,
+	JPH_MassProperties massProperties = {
+		.mass = 10.0f,
 	};
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
 	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
 													   JPH_OverrideMassProperties_CalculateInertia);
-	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
-	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);

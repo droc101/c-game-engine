@@ -55,9 +55,10 @@ typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId
 
 enum ActorFlags
 {
-	ACTOR_FLAG_ENEMY = 1 << 0,
-	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 1,
-	ACTOR_FLAG_CAN_BE_HELD = 1 << 2,
+	ACTOR_FLAG_CAN_PUSH_PLAYER = 1 << 0,
+	ACTOR_FLAG_ENEMY = 1 << 1,
+	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 2,
+	ACTOR_FLAG_CAN_BE_HELD = 1 << 3,
 };
 
 enum ActorType

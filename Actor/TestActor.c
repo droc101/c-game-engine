@@ -37,13 +37,11 @@ static inline void CreateTestActorCollider(Actor *this, const Transform *transfo
 																						   OBJECT_LAYER_DYNAMIC,
 																						   this);
 	const JPH_MassProperties massProperties = {
-		.mass = 20.0f,
+		.mass = 15.0f,
 	};
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
 	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
 													   JPH_OverrideMassProperties_CalculateInertia);
-	JPH_BodyCreationSettings_SetLinearDamping(bodyCreationSettings, 10.0f);
-	JPH_BodyCreationSettings_SetAngularDamping(bodyCreationSettings, 5.0f);
 	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings,
 											JPH_AllowedDOFs_TranslationX |
 													JPH_AllowedDOFs_TranslationY |
@@ -139,7 +137,7 @@ void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 	this->SignalHandler = TestActorSignalHandler;
 	this->Render = TestActorUIRender;
 
-	this->actorFlags = ACTOR_FLAG_ENEMY;
+	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
 	this->actorModel = LoadModel(MODEL("leafy"));
 	CreateTestActorCollider(this, transform);
 

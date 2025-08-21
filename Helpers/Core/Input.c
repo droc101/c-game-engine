@@ -20,12 +20,17 @@
 #include "Error.h"
 #include "Logging.h"
 
-// every key is tracked, even if it's not used
-// this *could* be optimized, but it's not necessary
-// on modern systems where memory is not a concern
-InputState keys[SDL_NUM_SCANCODES];
-InputState controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
-InputState mouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
+typedef enum InputState
+{
+	/// The input is not pressed
+	INP_RELEASED,
+	/// The input was just pressed on this frame
+	INP_JUST_PRESSED,
+	/// The input is currently pressed
+	INP_PRESSED,
+	/// The input was just released on this frame
+	INP_JUST_RELEASED
+} InputState;
 
 typedef struct PhysicsStateBuffer
 {
@@ -37,24 +42,31 @@ typedef struct PhysicsStateBuffer
 	bool physMouseButtonsJustReleased[MAX_RECOGNIZED_MOUSE_BUTTONS];
 } PhysicsStateBuffer;
 
-/// The buffer that is actively being written to by the render thread.
-PhysicsStateBuffer *physicsInputWorkingBuffer;
-/// The buffer that is for the physics thread to read from.
-PhysicsStateBuffer *physicsInputReadBuffer;
+// every key is tracked, even if it's not used
+// this *could* be optimized, but it's not necessary
+// on modern systems where memory is not a concern
+static InputState keys[SDL_NUM_SCANCODES];
+static InputState controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
+static InputState mouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
 
-int mouseX;
-int mouseY;
-int mouseRelativeX;
-int mouseRelativeY;
+/// The buffer that is actively being written to by the render thread.
+static PhysicsStateBuffer *physicsInputWorkingBuffer;
+/// The buffer that is for the physics thread to read from.
+static PhysicsStateBuffer *physicsInputReadBuffer;
+
+static int mouseX;
+static int mouseY;
+static int mouseRelativeX;
+static int mouseRelativeY;
 
 // 0 is left, 1 is right for axes (not 🪓)
-Vector2 leftStick;
-Vector2 rightStick;
-Vector2 triggers;
+static Vector2 leftStick;
+static Vector2 rightStick;
+static Vector2 triggers;
 
-SDL_GameController *controller;
-SDL_Joystick *stick;
-SDL_Haptic *haptic;
+static SDL_GameController *controller;
+static SDL_Joystick *stick;
+static SDL_Haptic *haptic;
 
 bool FindGameController()
 {

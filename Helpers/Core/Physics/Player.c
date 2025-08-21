@@ -81,7 +81,7 @@ static void OnContactAdded(const JPH_CharacterVirtual *character,
 						   JPH_SubShapeId /*subShapeId*/,
 						   const JPH_RVec3 * /*contactPosition*/,
 						   const Vector3 * /*contactNormal*/,
-						   JPH_CharacterContactSettings * /*ioSettings*/)
+						   JPH_CharacterContactSettings *ioSettings)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
@@ -90,21 +90,24 @@ static void OnContactAdded(const JPH_CharacterVirtual *character,
 		return; // Walls and floor
 	}
 	Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
+	ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
 	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
 	{
 		player->canDropHeldActor = false;
+		ioSettings->canPushCharacter = false;
+		ioSettings->canReceiveImpulses = false;
 	} else if (actor->OnPlayerContactAdded)
 	{
 		actor->OnPlayerContactAdded(actor, bodyId);
 	}
 }
 
-static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
+static void OnContactPersisted(const JPH_CharacterVirtual *character,
 							   const JPH_BodyId bodyId,
 							   JPH_SubShapeId /*subShapeId*/,
 							   const JPH_RVec3 * /*contactPosition*/,
 							   const Vector3 * /*contactNormal*/,
-							   JPH_CharacterContactSettings * /*ioSettings*/)
+							   JPH_CharacterContactSettings *ioSettings)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
@@ -112,7 +115,13 @@ static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
 	{
 		return; // Walls and floor
 	}
-	if (actor->OnPlayerContactPersisted)
+	const Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
+	ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
+	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
+	{
+		ioSettings->canPushCharacter = false;
+		ioSettings->canReceiveImpulses = false;
+	} else if (actor->OnPlayerContactPersisted)
 	{
 		actor->OnPlayerContactPersisted(actor, bodyId);
 	}
@@ -313,12 +322,10 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				JPH_Quat interpolatedRotationNormalized;
 				JPH_Quat_Normalized(&interpolatedRotation, &interpolatedRotationNormalized);
 
-				JPH_BodyInterface_SetLinearVelocity(player->heldActor->bodyInterface,
-													player->heldActor->bodyId,
-													&heldActorLinearVelocity);
-				JPH_BodyInterface_SetAngularVelocity(player->heldActor->bodyInterface,
-													 player->heldActor->bodyId,
-													 &Vector3_Zero);
+				JPH_BodyInterface_SetLinearAndAngularVelocity(player->heldActor->bodyInterface,
+															  player->heldActor->bodyId,
+															  &heldActorLinearVelocity,
+															  &Vector3_Zero);
 				JPH_BodyInterface_SetRotation(player->heldActor->bodyInterface,
 											  player->heldActor->bodyId,
 											  &interpolatedRotationNormalized,

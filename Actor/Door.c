@@ -337,7 +337,7 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 	this->OnPlayerContactPersisted = DoorOnPlayerContactPersisted;
 	this->OnPlayerContactRemoved = DoorOnPlayerContactRemoved;
 
-	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
+	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(DoorData));
 	CheckAlloc(this->extraData);

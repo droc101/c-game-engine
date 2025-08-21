@@ -7,14 +7,12 @@
 #include <joltc/joltc.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
-#include <SDL_rect.h>
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include "../config.h"
 #include "../Debug/DPrint.h"
-#include "../Debug/JoltDebugRenderer.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
@@ -24,7 +22,6 @@
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
-#include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/LodThread.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"

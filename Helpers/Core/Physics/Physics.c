@@ -113,7 +113,7 @@ void PhysicsInitLevel(Level *level)
 																					  &JPH_Quat_Identity,
 																					  JPH_MotionType_Static,
 																					  OBJECT_LAYER_STATIC);
-
+	JPH_BodyCreationSettings_SetFriction(bodyCreationSettings, 4.25f);
 	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
 															bodyCreationSettings,
 															JPH_Activation_DontActivate);
