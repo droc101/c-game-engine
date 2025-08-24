@@ -92,13 +92,13 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	fseek(file, 0, SEEK_END);
 	const size_t fileSize = ftell(file);
 
-	uint8_t *assetPath = malloc(fileSize);
-	CheckAlloc(assetPath);
+	uint8_t *assetData = malloc(fileSize);
+	CheckAlloc(assetData);
 	fseek(file, 0, SEEK_SET);
-	const size_t bytesRead = fread(assetPath, 1, fileSize, file);
+	const size_t bytesRead = fread(assetData, 1, fileSize, file);
 	if (bytesRead != fileSize)
 	{
-		free(assetPath);
+		free(assetData);
 		fclose(file);
 		LogError("Failed to read asset file: %s\n", relPath);
 		return NULL;
@@ -108,24 +108,24 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 
 	size_t offset = 0;
 	// Read the first 4 bytes of the asset to get the size of the compressed data
-	const uint32_t magic = ReadUint(assetPath, &offset);
+	const uint32_t magic = ReadUint(assetData, &offset);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
-		free(assetPath);
+		free(assetData);
 		LogError("Failed to read an asset because the magic was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetVersion = ReadByte(assetPath, &offset);
+	const uint8_t assetVersion = ReadByte(assetData, &offset);
 	if (assetVersion != ASSET_FORMAT_VERSION)
 	{
-		free(assetPath);
+		free(assetData);
 		LogError("Failed to read an asset because the version was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetType = ReadByte(assetPath, &offset);
-	const uint8_t typeVersion = ReadByte(assetPath, &offset);
-	const size_t decompressedSize = ReadSizeT(assetPath, &offset);
-	const size_t compressedSize = ReadSizeT(assetPath, &offset);
+	const uint8_t assetType = ReadByte(assetData, &offset);
+	const uint8_t typeVersion = ReadByte(assetData, &offset);
+	const size_t decompressedSize = ReadSizeT(assetData, &offset);
+	const size_t compressedSize = ReadSizeT(assetData, &offset);
 
 	// Allocate memory for the decompressed data
 	uint8_t *decompressedData = malloc(decompressedSize);
@@ -134,7 +134,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	z_stream stream = {0};
 
 	// Initialize the zlib stream
-	stream.next_in = assetPath + offset; // skip header
+	stream.next_in = assetData + offset; // skip header
 	stream.avail_in = compressedSize;
 	stream.next_out = decompressedData;
 	stream.avail_out = decompressedSize;
@@ -143,7 +143,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	if (inflateInit2(&stream, MAX_WBITS | 16) != Z_OK)
 	{
 		free(decompressedData);
-		free(assetPath);
+		free(assetData);
 		free(asset);
 		LogError("Failed to initialize zlib stream: %s\n", stream.msg);
 		return NULL;
@@ -156,7 +156,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 		if (inflateReturnValue != Z_OK)
 		{
 			free(decompressedData);
-			free(assetPath);
+			free(assetData);
 			free(asset);
 			LogError("Failed to decompress zlib stream: %s\n", stream.msg);
 			return NULL;
@@ -168,12 +168,12 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	if (inflateEnd(&stream) != Z_OK)
 	{
 		free(decompressedData);
-		free(assetPath);
+		free(assetData);
 		LogError("Failed to end zlib stream: %s\n", stream.msg);
 		return NULL;
 	}
 
-	free(assetPath);
+	free(assetData);
 
 	if (cache)
 	{
