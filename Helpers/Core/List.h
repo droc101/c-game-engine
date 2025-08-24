@@ -110,7 +110,7 @@ void _LockingListAndContentsFree(LockingList *list);
  */
 #define ListCopy(oldList, newList) \
 	({ \
-		static_assert(sizeof(oldList) == sizeof(newList)); \
+		static_assert(__builtin_types_compatible_p(typeof(oldList), typeof(newList))); \
 		_Generic((oldList), List: _ListCopy, LockingList: _LockingListCopy)(&(oldList), &(newList)); \
 	})
 

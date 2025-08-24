@@ -5,9 +5,12 @@
 #ifndef GAME_DICT_H
 #define GAME_DICT_H
 
-#include <dict.h>
-#include <m-core.h>
+#include <m-dict.h>
 
-DICT_DEF2(dict, const char *, M_CSTR_OPLIST, void *, M_PTR_OPLIST);
+#define DICT_DEF(name, keyType, ...) \
+	_Pragma("GCC diagnostic push"); \
+	_Pragma("GCC diagnostic ignored \"-Wunused-function\""); \
+	M_DICT_DEF2_AS(name, name, name##_iterator, name##_pair, keyType, __VA_ARGS__); \
+	_Pragma("GCC diagnostic pop");
 
 #endif //GAME_DICT_H
