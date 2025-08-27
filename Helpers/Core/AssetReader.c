@@ -5,6 +5,7 @@
 #include "AssetReader.h"
 #include <assert.h>
 #include <errno.h>
+#include <m-core.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -13,16 +14,18 @@
 #include <string.h>
 #include <zconf.h>
 #include <zlib.h>
+#include "../../Structs/Asset.h"
 #include "../../Structs/GlobalState.h"
 #include "AssetLoaders/ModelLoader.h"
 #include "AssetLoaders/TextureLoader.h"
 #include "DataReader.h"
+#include "Dict.h"
 #include "Error.h"
-#include "List.h"
 #include "Logging.h"
 
-List assetCacheNames;
-List assetCacheData;
+DICT_DEF(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
+
+AssetCache assetCache;
 
 FILE *OpenAssetFile(const char *relPath)
 {
@@ -59,22 +62,13 @@ FILE *OpenAssetFile(const char *relPath)
 
 void AssetCacheInit()
 {
-	ListInit(assetCacheNames, LIST_POINTER);
-	ListInit(assetCacheData, LIST_POINTER);
+	AssetCache_init(assetCache);
 	InitModelLoader();
 }
 
 void DestroyAssetCache()
 {
-	for (size_t i = 0; i < assetCacheData.length; i++)
-	{
-		Asset *asset = ListGetPointer(assetCacheData, i);
-		free(asset->data);
-		free(asset);
-	}
-	ListFree(assetCacheData);
-
-	ListAndContentsFree(assetCacheNames);
+	AssetCache_clear(assetCache);
 
 	DestroyTextureLoader();
 	DestroyModelLoader();
@@ -82,13 +76,10 @@ void DestroyAssetCache()
 
 Asset *DecompressAsset(const char *relPath, const bool cache)
 {
-	// see if relPath is already in the cache
-	for (size_t i = 0; i < assetCacheNames.length; i++)
+	Asset *asset = AssetCache_get(assetCache, relPath);
+	if (asset != NULL)
 	{
-		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
-		{
-			return ListGetPointer(assetCacheData, i);
-		}
+		return asset;
 	}
 
 	FILE *file = OpenAssetFile(relPath);
@@ -101,13 +92,13 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	fseek(file, 0, SEEK_END);
 	const size_t fileSize = ftell(file);
 
-	uint8_t *asset = malloc(fileSize);
-	CheckAlloc(asset);
+	uint8_t *assetData = malloc(fileSize);
+	CheckAlloc(assetData);
 	fseek(file, 0, SEEK_SET);
-	const size_t bytesRead = fread(asset, 1, fileSize, file);
+	const size_t bytesRead = fread(assetData, 1, fileSize, file);
 	if (bytesRead != fileSize)
 	{
-		free(asset);
+		free(assetData);
 		fclose(file);
 		LogError("Failed to read asset file: %s\n", relPath);
 		return NULL;
@@ -115,34 +106,26 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 
 	fclose(file);
 
-	Asset *assetStruct = malloc(sizeof(Asset));
-	CheckAlloc(assetStruct);
-
 	size_t offset = 0;
 	// Read the first 4 bytes of the asset to get the size of the compressed data
-	const uint32_t magic = ReadUint(asset, &offset);
+	const uint32_t magic = ReadUint(assetData, &offset);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
-		free(asset);
+		free(assetData);
 		LogError("Failed to read an asset because the magic was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetVersion = ReadByte(asset, &offset);
+	const uint8_t assetVersion = ReadByte(assetData, &offset);
 	if (assetVersion != ASSET_FORMAT_VERSION)
 	{
-		free(asset);
+		free(assetData);
 		LogError("Failed to read an asset because the version was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetType = ReadByte(asset, &offset);
-	const uint8_t typeVersion = ReadByte(asset, &offset);
-	const size_t decompressedSize = ReadSizeT(asset, &offset);
-	const size_t compressedSize = ReadSizeT(asset, &offset);
-
-	assetStruct->compressedSize = compressedSize;
-	assetStruct->size = decompressedSize;
-	assetStruct->type = assetType;
-	assetStruct->typeVersion = typeVersion;
+	const uint8_t assetType = ReadByte(assetData, &offset);
+	const uint8_t typeVersion = ReadByte(assetData, &offset);
+	const size_t decompressedSize = ReadSizeT(assetData, &offset);
+	const size_t compressedSize = ReadSizeT(assetData, &offset);
 
 	// Allocate memory for the decompressed data
 	uint8_t *decompressedData = malloc(decompressedSize);
@@ -151,7 +134,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	z_stream stream = {0};
 
 	// Initialize the zlib stream
-	stream.next_in = asset + offset; // skip header
+	stream.next_in = assetData + offset; // skip header
 	stream.avail_in = compressedSize;
 	stream.next_out = decompressedData;
 	stream.avail_out = decompressedSize;
@@ -160,8 +143,8 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	if (inflateInit2(&stream, MAX_WBITS | 16) != Z_OK)
 	{
 		free(decompressedData);
+		free(assetData);
 		free(asset);
-		free(assetStruct);
 		LogError("Failed to initialize zlib stream: %s\n", stream.msg);
 		return NULL;
 	}
@@ -173,8 +156,8 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 		if (inflateReturnValue != Z_OK)
 		{
 			free(decompressedData);
+			free(assetData);
 			free(asset);
-			free(assetStruct);
 			LogError("Failed to decompress zlib stream: %s\n", stream.msg);
 			return NULL;
 		}
@@ -185,59 +168,32 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	if (inflateEnd(&stream) != Z_OK)
 	{
 		free(decompressedData);
-		free(asset);
-		free(assetStruct);
+		free(assetData);
 		LogError("Failed to end zlib stream: %s\n", stream.msg);
 		return NULL;
 	}
 
-	assetStruct->data = decompressedData;
+	free(assetData);
 
 	if (cache)
 	{
-		const size_t pathLength = strlen(relPath) + 1;
-		char *data = malloc(pathLength);
-		CheckAlloc(data);
-		strncpy(data, relPath, pathLength);
-		ListAdd(assetCacheNames, data);
-		ListAdd(assetCacheData, assetStruct);
+		asset = AssetCache_safe_get(assetCache, relPath);
+	} else
+	{
+		asset = malloc(sizeof(Asset));
+		CheckAlloc(asset);
 	}
 
-	free(asset);
+	asset->compressedSize = compressedSize;
+	asset->size = decompressedSize;
+	asset->type = assetType;
+	asset->typeVersion = typeVersion;
+	asset->data = decompressedData;
 
-	return assetStruct;
+	return asset;
 }
 
 void RemoveAssetFromCache(const char *relPath)
 {
-	size_t index = SIZE_MAX;
-	for (size_t i = 0; i < assetCacheNames.length; i++)
-	{
-		if (strncmp(ListGetPointer(assetCacheNames, i), relPath, 80) == 0)
-		{
-			index = i;
-			break;
-		}
-	}
-	if (index != SIZE_MAX)
-	{
-		const Asset *asset = ListGetPointer(assetCacheData, index);
-		free(asset->data);
-		free(ListGetPointer(assetCacheNames, index));
-		ListRemoveAt(assetCacheNames, index);
-		free(ListGetPointer(assetCacheData, index));
-		ListRemoveAt(assetCacheData, index);
-	} else
-	{
-		LogWarning("Was told to remove \"%s\" from the asset cache, but it was not present.\n", relPath);
-	}
-}
-
-void FreeAsset(Asset *asset)
-{
-	if (asset != NULL)
-	{
-		free(asset->data);
-		free(asset);
-	}
+	AssetCache_erase(assetCache, relPath);
 }

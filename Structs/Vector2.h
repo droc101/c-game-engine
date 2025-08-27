@@ -44,7 +44,8 @@ struct Vector2
  */
 #define Vector2Distance(a, b) \
 	({ \
-		static_assert(sizeof(a) == sizeof(Vector2) && sizeof(b) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \
+					  __builtin_types_compatible_p(typeof(b), Vector2)); \
 		const float dx = (b).x - (a).x; \
 		const float dy = (b).y - (a).y; \
 		sqrtf(dx * dx + dy * dy); \
@@ -57,7 +58,7 @@ struct Vector2
  */
 #define Vector2Length(vector) \
 	({ \
-		static_assert(sizeof(vector) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(vector), Vector2)); \
 		sqrtf(((vector).x * (vector).x) + ((vector).y * (vector).y)); \
 	})
 
@@ -68,7 +69,7 @@ struct Vector2
  */
 #define Vector2Normalize(vector) \
 	({ \
-		static_assert(sizeof(vector) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(vector), Vector2)); \
 		const float length = Vector2Length(vector); \
 		v2((vector).x / length, (vector).y / length); \
 	})
@@ -81,7 +82,8 @@ struct Vector2
  */
 #define Vector2Add(a, b) \
 	({ \
-		static_assert(sizeof(a) == sizeof(Vector2) && sizeof(b) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \
+					  __builtin_types_compatible_p(typeof(b), Vector2)); \
 		v2((a).x + (b).x, (a).y + (b).y); \
 	})
 
@@ -93,7 +95,8 @@ struct Vector2
  */
 #define Vector2Sub(a, b) \
 	({ \
-		static_assert(sizeof(a) == sizeof(Vector2) && sizeof(b) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \
+					  __builtin_types_compatible_p(typeof(b), Vector2)); \
 		v2((a).x - (b).x, (a).y - (b).y); \
 	})
 
@@ -105,7 +108,7 @@ struct Vector2
  */
 #define Vector2Rotate(vector, angle) \
 	({ \
-		static_assert(sizeof(vector) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(vector), Vector2)); \
 		const float x = cosf(angle); \
 		const float y = sinf(angle); \
 		v2(x * (vector).x - y * (vector).y, y * (vector).x + x * (vector).y); \
@@ -119,7 +122,8 @@ struct Vector2
  */
 #define Vector2Dot(a, b) \
 	({ \
-		static_assert(sizeof(a) == sizeof(Vector2) && sizeof(b) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \
+					  __builtin_types_compatible_p(typeof(b), Vector2)); \
 		((a).x * (b).x + (a).y * (b).y); \
 	})
 
@@ -131,7 +135,8 @@ struct Vector2
  */
 #define Vector2Angle(a, b) \
 	({ \
-		static_assert(sizeof(a) == sizeof(Vector2) && sizeof(b) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \
+					  __builtin_types_compatible_p(typeof(b), Vector2)); \
 		acosf(Vector2Dot(a, b) / (Vector2Length(a) * Vector2Length(b))); \
 	})
 
@@ -143,7 +148,7 @@ struct Vector2
  */
 #define Vector2Scale(vector, scale) \
 	({ \
-		static_assert(sizeof(vector) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(vector), Vector2)); \
 		v2((scale) * (vector).x, (scale) * (vector).y); \
 	})
 
@@ -156,13 +161,14 @@ struct Vector2
  */
 #define Vector2Div(vector, divisor) \
 	({ \
-		static_assert(sizeof(vector) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(vector), Vector2)); \
 		Vector2Scale(vector, (1 / (divisor))); \
 	})
 
 #define Vector2RelativeAngle(a, b) \
 	({ \
-		static_assert(sizeof(a) == sizeof(Vector2) && sizeof(b) == sizeof(Vector2)); \
+		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \
+					  __builtin_types_compatible_p(typeof(b), Vector2)); \
 		atan2f((b).x * (a).x - (b).x * (a).y, (b).y * (a).x + (b).y * (a).y); \
 	})
 

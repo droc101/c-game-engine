@@ -203,6 +203,7 @@ add_executable(
         Structs/Camera.h
         Structs/Viewmodel.h
         Helpers/Core/Dict.h
+        Structs/Asset.h
 )
 
 #endregion
