@@ -6,6 +6,10 @@
 #include <SDL_error.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
+#include <SDL_timer.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include "../../../Debug/FrameGrapher.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
