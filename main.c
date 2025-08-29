@@ -21,6 +21,7 @@
 #include "Debug/FrameBenchmark.h"
 #include "Debug/FrameGrapher.h"
 #include "GameStates/GLogoSplashState.h"
+#include "GameStates/GMainState.h"
 #include "Helpers/Core/Arguments.h"
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
@@ -273,7 +274,22 @@ int main(const int argc, char *argv[])
 
 	InitCommonFonts();
 
-	GLogoSplashStateSet();
+	bool loadMap = false;
+	if (HasCliArg(argc, argv, "--map"))
+	{
+		const char *mapName = GetCliArgStr(argc, argv, "--map", "");
+		if (ChangeLevelByName(mapName))
+		{
+			loadMap = true;
+		}
+	}
+	if (loadMap)
+	{
+		GMainStateSet();
+	} else
+	{
+		GLogoSplashStateSet();
+	}
 
 	LogInfo("Engine initialized, entering mainloop\n");
 
