@@ -40,9 +40,6 @@
 
 #pragma region Debug
 
-// Skip the splash screen
-// #define DEBUG_NOSPLASH
-
 // Enable or disable the frame graph (just the rendering)
 #define FRAMEGRAPH_ENABLE
 #define TICKGRAPH_ENABLE

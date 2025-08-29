@@ -19,18 +19,6 @@
 
 void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
 {
-#ifdef DEBUG_NOSPLASH
-	if (State->physicsFrame == 1)
-	{
-		GMenuStateSet();
-	}
-	if (State->physicsFrame > 0)
-	{
-		State->physicsFrame++;
-		return;
-	}
-#endif
-
 	if (State->physicsFrame == 20)
 	{
 		(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);

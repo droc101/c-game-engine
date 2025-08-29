@@ -22,6 +22,7 @@
 #include "Debug/FrameGrapher.h"
 #include "GameStates/GLogoSplashState.h"
 #include "GameStates/GMainState.h"
+#include "GameStates/GMenuState.h"
 #include "Helpers/Core/Arguments.h"
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
@@ -288,7 +289,13 @@ int main(const int argc, char *argv[])
 		GMainStateSet();
 	} else
 	{
-		GLogoSplashStateSet();
+		if (!HasCliArg(argc, argv, "--nosplash"))
+		{
+			GLogoSplashStateSet();
+		} else
+		{
+			GMenuStateSet();
+		}
 	}
 
 	LogInfo("Engine initialized, entering mainloop\n");
