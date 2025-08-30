@@ -145,6 +145,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 				actorTypeString = "laser_emitter";
 				break;
 			case ACTOR_TYPE_LOGIC_BINARY:
+			case UINT32_MAX:
 				actorTypeString = "logic_binary";
 				break;
 			case ACTOR_TYPE_LOGIC_DECIMAL:

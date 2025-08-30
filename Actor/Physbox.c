@@ -27,7 +27,7 @@ static inline void CreatePhysboxCollider(Actor *this, const Transform *transform
 			JPH_MotionType_Dynamic,
 			OBJECT_LAYER_DYNAMIC,
 			this);
-	JPH_MassProperties massProperties = {
+	const JPH_MassProperties massProperties = {
 		.mass = 10.0f,
 	};
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);

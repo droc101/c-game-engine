@@ -9,6 +9,7 @@
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/Body.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/PhysicsMaterial.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
@@ -27,7 +28,6 @@
 #include "../../../Structs/Color.h"
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Level.h"
-#include "../../../Structs/Vector2.h"
 #include "../Input.h"
 #include "../MathEx.h"
 #include "Physics.h"
@@ -158,11 +158,27 @@ static void OnContactSolve(const JPH_CharacterVirtual *character,
 	}
 }
 
+static bool BodyFilterShouldCollide(const JPH_BodyId /*bodyId*/)
+{
+	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->level->player.joltCharacter);
+	return !player->isNoclipActive;
+}
+
+static bool BodyFilterShouldCollideLocked(const JPH_Body * /*body*/)
+{
+	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->level->player.joltCharacter);
+	return !player->isNoclipActive;
+}
+
 static const JPH_CharacterContactListener_Impl contactListenerImpl = {
 	.OnContactAdded = OnContactAdded,
 	.OnContactPersisted = OnContactPersisted,
 	.OnContactRemoved = OnContactRemoved,
 	.OnContactSolve = OnContactSolve,
+};
+static const JPH_BodyFilter_Impl bodyFilterImpl = {
+	.ShouldCollide = BodyFilterShouldCollide,
+	.ShouldCollideLocked = BodyFilterShouldCollideLocked,
 };
 static JPH_CharacterContactListener *contactListener;
 static JPH_BodyFilter *bodyFilter;
@@ -172,7 +188,7 @@ static JPH_ShapeFilter *shapeFilter;
 void PlayerPersistentStateInit()
 {
 	contactListener = JPH_CharacterContactListener_Create(&contactListenerImpl);
-	bodyFilter = JPH_BodyFilter_Create(NULL);
+	bodyFilter = JPH_BodyFilter_Create(&bodyFilterImpl);
 	shapeFilter = JPH_ShapeFilter_Create(NULL);
 	actorRaycastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&actorRaycastBroadPhaseLayerFilterImpl);
 	actorRaycastObjectLayerFilter = JPH_ObjectLayerFilter_Create(&actorRaycastObjectLayerFilterImpl);
@@ -209,28 +225,28 @@ void CreatePlayer(Level *level)
 
 void MovePlayer(const Player *player, float *distanceTraveled)
 {
-	Vector2 moveVec = v2s(0);
+	Vector3 moveVec = Vector3_Zero;
 
 	if (UseController())
 	{
-		moveVec.y = GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
+		moveVec.z = GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
 		moveVec.x = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
 		if (fabsf(moveVec.x) < STICK_DEADZONE)
 		{
 			moveVec.x = 0;
 		}
-		if (fabsf(moveVec.y) < STICK_DEADZONE)
+		if (fabsf(moveVec.z) < STICK_DEADZONE)
 		{
-			moveVec.y = 0;
+			moveVec.z = 0;
 		}
 	} else
 	{
 		if (IsKeyPressed(SDL_SCANCODE_W))
 		{
-			moveVec.y -= 1;
+			moveVec.z -= 1;
 		} else if (IsKeyPressed(SDL_SCANCODE_S))
 		{
-			moveVec.y += 1;
+			moveVec.z += 1;
 		}
 
 		if (IsKeyPressed(SDL_SCANCODE_D))
@@ -242,17 +258,35 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 		}
 	}
 
-	if (moveVec.x != 0 || moveVec.y != 0)
+	if (moveVec.x != 0 || moveVec.z != 0)
 	{
-		moveVec = Vector2Normalize(moveVec);
-		*distanceTraveled = MOVE_SPEED;
+		Vector3_Normalized(&moveVec, &moveVec);
 		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0.5)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
+		} else if (player->isNoclipActive && (IsKeyPressed(SDL_SCANCODE_LSHIFT) || IsKeyPressed(SDL_SCANCODE_RSHIFT)))
+		{
+			*distanceTraveled = MOVE_SPEED * 2;
+		} else
+		{
+			*distanceTraveled = MOVE_SPEED;
 		}
-		moveVec = Vector2Rotate(Vector2Scale(moveVec, *distanceTraveled), -player->transform.rotation.y);
 	}
-	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, (Vector3[]){{moveVec.x, 0.0f, moveVec.y}});
+
+	JPH_Quat playerRotation;
+	Vector3 rotatedMoveVec;
+	if (player->isNoclipActive)
+	{
+		JPH_Quat_FromEulerAngles(&player->transform.rotation, &playerRotation);
+		JPH_Quat_Rotate(&playerRotation, &moveVec, &rotatedMoveVec);
+	} else
+	{
+		JPH_Quat_FromEulerAngles((Vector3[]){{0.0f, player->transform.rotation.y, 0.0f}}, &playerRotation);
+		JPH_Quat_Rotate(&playerRotation, &moveVec, &rotatedMoveVec);
+	}
+	Vector3 rotatedScaledMoveVec;
+	Vector3_MultiplyScalar(&rotatedMoveVec, *distanceTraveled, &rotatedScaledMoveVec);
+	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &rotatedScaledMoveVec);
 }
 
 static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayCastResult *raycastResult)
@@ -360,12 +394,25 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 			crosshairColor = COLOR(0xFFFFCCCC);
 		}
 	}
-	JPH_CharacterVirtual_Update(player->joltCharacter,
-								deltaTime,
-								OBJECT_LAYER_PLAYER,
-								physicsSystem,
-								bodyFilter,
-								shapeFilter);
+	if (IsKeyJustReleasedPhys(SDL_SCANCODE_V))
+	{
+		player->isNoclipActive = !player->isNoclipActive;
+	}
+	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
+		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.1f,
+		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.1f,
+		.walkStairsMinStepForward = 0.02f,
+		.walkStairsStepForwardTest = 0.15f,
+		.walkStairsCosAngleForwardContact = cosf(degToRad(75)),
+		.walkStairsStepDownExtra = Vector3_Zero,
+	};
+	JPH_CharacterVirtual_ExtendedUpdate(player->joltCharacter,
+										deltaTime,
+										&extendedUpdateSettings,
+										OBJECT_LAYER_PLAYER,
+										physicsSystem,
+										bodyFilter,
+										shapeFilter);
 }
 
 const Color *GetCrosshairColor()

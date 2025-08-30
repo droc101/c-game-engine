@@ -32,6 +32,7 @@ struct Player
 	/// True if the player is currently holding an actor, false if the player is targeting an actor instead
 	bool hasHeldActor;
 	bool canDropHeldActor;
+	bool isNoclipActive;
 };
 
 void PlayerPersistentStateInit();
