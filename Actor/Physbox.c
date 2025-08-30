@@ -17,7 +17,7 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
-#include "../Structs/ActorDefinitions.h"
+#include "../Structs/ActorDefinition.h"
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {

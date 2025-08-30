@@ -22,7 +22,7 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
-#include "../Structs/ActorDefinitions.h"
+#include "../Structs/ActorDefinition.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "Laser.h"
@@ -74,7 +74,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 		KvSetByte(&laserParams, "height", data->height);
 		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
 		data->laserActor = CreateActor(&data->transform,
-									   "laser",
+									   LASER_ACTOR_NAME,
 									   &laserParams,
 									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
 		AddActor(data->laserActor);

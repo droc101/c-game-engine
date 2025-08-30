@@ -22,7 +22,7 @@
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/Physics/Physics.h"
-#include "ActorDefinitions.h"
+#include "ActorDefinition.h"
 #include "Color.h"
 #include "GlobalState.h"
 #include "Level.h"

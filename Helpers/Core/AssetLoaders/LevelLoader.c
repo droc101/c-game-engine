@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../../Structs/Actor.h"
-#include "../../../Structs/ActorDefinitions.h"
+#include "../../../Structs/ActorDefinition.h"
 #include "../../../Structs/Level.h"
 #include "../../../Structs/Vector2.h"
 #include "../../../Structs/Wall.h"
@@ -109,50 +109,50 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 		switch (actorType - 1)
 		{
 			case ACTOR_TYPE_TEST:
-				actorTypeString = "test_actor";
+				actorTypeString = TEST_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_COIN:
-				actorTypeString = "coin";
+				actorTypeString = COIN_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_GOAL:
-				actorTypeString = "goal";
+				actorTypeString = GOAL_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_DOOR:
-				actorTypeString = "door";
+				actorTypeString = DOOR_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_TRIGGER:
-				actorTypeString = "trigger";
+				actorTypeString = TRIGGER_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_IO_PROXY:
-				actorTypeString = "io_proxy";
+				actorTypeString = IO_PROXY_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_PHYSBOX:
-				actorTypeString = "physbox";
+				actorTypeString = PHYSBOX_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_LASER:
-				actorTypeString = "laser";
+				actorTypeString = LASER_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_STATIC_MODEL:
-				actorTypeString = "static_model";
+				actorTypeString = STATIC_MODEL_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_SOUND_PLAYER:
-				actorTypeString = "sound_player";
+				actorTypeString = SOUND_PLAYER_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_SPRITE:
-				actorTypeString = "sprite";
+				actorTypeString = SPRITE_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_LASER_EMITTER:
-				actorTypeString = "laser_emitter";
+				actorTypeString = LASER_EMITTER_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_LOGIC_BINARY:
 			case UINT32_MAX:
-				actorTypeString = "logic_binary";
+				actorTypeString = LOGIC_BINARY_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_LOGIC_DECIMAL:
-				actorTypeString = "logic_decimal";
+				actorTypeString = LOGIC_DECIMAL_ACTOR_NAME;
 				break;
 			case ACTOR_TYPE_LOGIC_COUNTER:
-				actorTypeString = "logic_counter";
+				actorTypeString = LOGIC_COUNTER_ACTOR_NAME;
 				break;
 			default:
 				break;

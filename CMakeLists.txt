@@ -210,8 +210,8 @@ add_executable(
         Structs/Viewmodel.h
         Helpers/Core/Dict.h
         Structs/Asset.h
-        Structs/ActorDefinitions.h
-        Structs/ActorDefinitions.c
+        Structs/ActorDefinition.h
+        Structs/ActorDefinition.c
 )
 
 #endregion
@@ -228,7 +228,7 @@ find_package(GLEW REQUIRED)
 fetchDict()
 fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 
-add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
+#add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()

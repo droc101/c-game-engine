@@ -13,7 +13,7 @@
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/List.h"
-#include "ActorDefinitions.h"
+#include "ActorDefinition.h"
 #include "Color.h"
 #include "Wall.h"
 

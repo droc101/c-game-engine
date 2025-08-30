@@ -14,7 +14,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/SoundSystem.h"
 #include "../../Structs/Actor.h"
-#include "../../Structs/ActorDefinitions.h"
+#include "../../Structs/ActorDefinition.h"
 
 enum SoundPlayerInput
 {

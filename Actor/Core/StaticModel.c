@@ -14,7 +14,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Physics/Physics.h"
 #include "../../Structs/Actor.h"
-#include "../../Structs/ActorDefinitions.h"
+#include "../../Structs/ActorDefinition.h"
 
 static ActorDefinition definition = {
 	.actorType = ACTOR_TYPE_STATIC_MODEL,

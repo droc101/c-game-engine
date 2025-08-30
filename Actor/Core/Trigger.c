@@ -19,7 +19,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Physics/Physics.h"
 #include "../../Structs/Actor.h"
-#include "../../Structs/ActorDefinitions.h"
+#include "../../Structs/ActorDefinition.h"
 #include "../../Structs/Level.h"
 
 enum TriggerInput

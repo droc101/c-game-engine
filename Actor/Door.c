@@ -26,7 +26,7 @@
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
-#include "../Structs/ActorDefinitions.h"
+#include "../Structs/ActorDefinition.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 

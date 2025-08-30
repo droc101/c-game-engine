@@ -11,7 +11,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
-#include "../../Structs/ActorDefinitions.h"
+#include "../../Structs/ActorDefinition.h"
 
 enum LogicDecimalInput
 {

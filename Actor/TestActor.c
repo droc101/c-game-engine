@@ -24,7 +24,7 @@
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
-#include "../Structs/ActorDefinitions.h"
+#include "../Structs/ActorDefinition.h"
 #include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"

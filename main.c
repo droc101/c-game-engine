@@ -37,7 +37,7 @@
 #include "Helpers/Graphics/RenderingHelpers.h"
 #include "Helpers/PlatformHelpers.h"
 #include "Helpers/TextInputSystem.h"
-#include "Structs/ActorDefinitions.h"
+#include "Structs/ActorDefinition.h"
 #include "Structs/GlobalState.h"
 #include "Structs/Vector2.h"
 

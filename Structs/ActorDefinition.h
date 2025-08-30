@@ -7,6 +7,7 @@
 
 #include <joltc/Math/Transform.h>
 #include <joltc/types.h>
+#include <m-core.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "../Helpers/Core/Dict.h"
@@ -40,7 +41,6 @@ typedef enum ActorType ActorType;
 
 typedef struct ActorDefinition ActorDefinition;
 
-
 enum ActorType
 {
 	ACTOR_TYPE_TEST,
@@ -59,6 +59,22 @@ enum ActorType
 	ACTOR_TYPE_LOGIC_DECIMAL,
 	ACTOR_TYPE_LOGIC_COUNTER
 };
+
+#define TEST_ACTOR_NAME "test_actor"
+#define COIN_ACTOR_NAME "prop_coin"
+#define GOAL_ACTOR_NAME "prop_goal"
+#define DOOR_ACTOR_NAME "prop_door"
+#define TRIGGER_ACTOR_NAME "trigger"
+#define IO_PROXY_ACTOR_NAME "io_proxy"
+#define PHYSBOX_ACTOR_NAME "prop_physbox"
+#define LASER_ACTOR_NAME "prop_laser"
+#define STATIC_MODEL_ACTOR_NAME "prop_model_static"
+#define SOUND_PLAYER_ACTOR_NAME "sound_player"
+#define SPRITE_ACTOR_NAME "prop_sprite"
+#define LASER_EMITTER_ACTOR_NAME "prop_laser_emitter"
+#define LOGIC_BINARY_ACTOR_NAME "logic_binary"
+#define LOGIC_DECIMAL_ACTOR_NAME "logic_decimal"
+#define LOGIC_COUNTER_ACTOR_NAME "logic_counter"
 
 struct ActorDefinition
 {
