@@ -59,7 +59,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 	// snprintf(level->floorTex, 80, TEXTURE("%s"), levelDataFloorTex);
 
 	offset += sizeof(char) * 64 * 2;
-	snprintf(level->ceilOrSkyTex, 80, TEXTURE("level/sky_test"));
+	snprintf(level->ceilOrSkyTex, 80, level->hasCeiling ? TEXTURE("level/ceiling_test") : TEXTURE("level/sky_test"));
 	snprintf(level->floorTex, 80, TEXTURE("level/floor_test"));
 
 	EXPECT_BYTES(64);
