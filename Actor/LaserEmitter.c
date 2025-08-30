@@ -51,15 +51,10 @@ typedef struct LaserEmitterData
 	Transform transform;
 } LaserEmitterData;
 
-static const Vector3 halfExtent = {0.2f, 0.48f, 0.05f};
-
 static inline void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
-	const Vector3 offset = {0.0f, 0.0f, halfExtent.z};
-	const JPH_Shape *boxShape = (const JPH_Shape *)JPH_BoxShape_Create(&halfExtent, JPH_DefaultConvexRadius);
-	const JPH_Shape *offestShape = (const JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
-																						   transform,
+	JPH_BodyCreationSettings *bodyCreationSettings = CreateBoundingBoxBodyCreationSettings(transform,
+																						   this->actorModel,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_STATIC,
 																						   this);
@@ -123,6 +118,7 @@ static ActorDefinition definition = {
 void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->definition = &definition;
+	//this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS; // TODO uncomment once laser emitter collision has holes for where the laser comes out
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
 	CheckAlloc(this->extraData);
@@ -138,7 +134,7 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
 	Vector3 offsetVector = {};
-	Vector3_MultiplyScalar(&forwardVector, halfExtent.z, &offsetVector);
+	Vector3_MultiplyScalar(&forwardVector, this->actorModel->boundingBoxExtents.z, &offsetVector);
 	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
 	data->transform.rotation = transform->rotation;
 

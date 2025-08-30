@@ -21,12 +21,11 @@
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
-			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.2f, 0.2f, 0.2f}}, JPH_DefaultConvexRadius),
-			transform,
-			JPH_MotionType_Dynamic,
-			OBJECT_LAYER_DYNAMIC,
-			this);
+	JPH_BodyCreationSettings *bodyCreationSettings = CreateDynamicModelBodyCreationSettings(transform,
+																							this->actorModel,
+																							JPH_MotionType_Dynamic,
+																							OBJECT_LAYER_DYNAMIC,
+																							this);
 	const JPH_MassProperties massProperties = {
 		.mass = 10.0f,
 	};

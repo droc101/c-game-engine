@@ -3,11 +3,22 @@
 //
 
 #include "ModelLoader.h"
+#include <joltc/constants.h>
+#include <joltc/enums.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../../../Structs/Actor.h"
 #include "../AssetReader.h"
 #include "../DataReader.h"
 #include "../Error.h"
@@ -55,7 +66,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->materialsPerSkin = ReadUint(assetData->data, &offset);
 	model->skinCount = ReadUint(assetData->data, &offset);
 	model->lodCount = ReadUint(assetData->data, &offset);
-	offset += sizeof(uint8_t); // skip collision model type as it is currently unused
+	model->collisionModelType = ReadByte(assetData->data, &offset);
 
 	model->materials = malloc(sizeof(Material) * model->materialCount);
 	CheckAlloc(model->materials);
@@ -129,6 +140,27 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->boundingBoxExtents.x = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.y = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.z = ReadFloat(assetData->data, &offset);
+
+	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
+	{
+		model->numHulls = ReadSizeT(assetData->data, &offset);
+		model->hulls = malloc(sizeof(ModelConvexHull) * model->numHulls);
+		CheckAlloc(model->hulls);
+		for (size_t i = 0; i < model->numHulls; i++)
+		{
+			ModelConvexHull *hull = &model->hulls[i];
+			hull->numPoints = ReadSizeT(assetData->data, &offset);
+			hull->points = malloc(sizeof(Vector3) * hull->numPoints);
+			CheckAlloc(hull->points);
+			for (size_t p = 0; p < hull->numPoints; p++)
+			{
+				Vector3 *point = &hull->points[p];
+				point->x = ReadFloat(assetData->data, &offset);
+				point->y = ReadFloat(assetData->data, &offset);
+				point->z = ReadFloat(assetData->data, &offset);
+			}
+		}
+	}
 
 	FreeAsset(assetData);
 
@@ -214,6 +246,15 @@ void FreeModel(ModelDefinition *model)
 		free(model->materials[i].texture);
 	}
 
+	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
+	{
+		for (size_t i = 0; i < model->numHulls; i++)
+		{
+			free(model->hulls[i].points);
+		}
+		free(model->hulls);
+	}
+
 	free(model->name);
 	free(model->skins);
 	free(model->lods);
@@ -229,4 +270,67 @@ void DestroyModelLoader()
 	{
 		FreeModel(models[i]);
 	}
+}
+
+JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform *transform,
+																const ModelDefinition *model,
+																const JPH_MotionType motionType,
+																const JPH_ObjectLayer objectLayer,
+																void *userData)
+{
+	const Vector3 offset = {model->boundingBoxOrigin.x * -1,
+							model->boundingBoxOrigin.y * -1,
+							model->boundingBoxOrigin.z * -1};
+	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, JPH_DefaultConvexRadius);
+	JPH_Shape *offestShape = (JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
+																						   transform,
+																						   motionType,
+																						   objectLayer,
+																						   userData);
+	JPH_Shape_Destroy(boxShape);
+	JPH_Shape_Destroy(offestShape);
+	return bodyCreationSettings;
+}
+
+JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform *transform,
+																 const ModelDefinition *model,
+																 const JPH_MotionType motionType,
+																 const JPH_ObjectLayer objectLayer,
+																 void *userData)
+{
+	if (model->collisionModelType != COLLISION_MODEL_TYPE_DYNAMIC || model->numHulls == 0)
+	{
+		LogWarning("Tried to create dynamic collision for a model that does not have it\n");
+		JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
+		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
+																							  transform,
+																							  motionType,
+																							  objectLayer,
+																							  userData);
+		JPH_ShapeSettings_Destroy(shapeSettings);
+		return bodyCreationSettings;
+	}
+	const JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
+	for (size_t i = 0; i < model->numHulls; i++)
+	{
+		const ModelConvexHull *hull = &model->hulls[i];
+		const JPH_ConvexHullShapeSettings *hullSettings = JPH_ConvexHullShapeSettings_Create(hull->points,
+																							 hull->numPoints,
+																							 JPH_DefaultConvexRadius);
+		JPH_CompoundShapeSettings_AddShape((JPH_CompoundShapeSettings *)compoundShapeSettings,
+										   &Vector3_Zero,
+										   &JPH_Quat_Zero,
+										   (JPH_ShapeSettings *)hullSettings,
+										   0);
+		JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)hullSettings);
+	}
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME((JPH_ShapeSettings *)
+																								  compoundShapeSettings,
+																						  transform,
+																						  motionType,
+																						  objectLayer,
+																						  userData);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
+	return bodyCreationSettings;
 }

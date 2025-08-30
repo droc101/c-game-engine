@@ -228,7 +228,7 @@ find_package(GLEW REQUIRED)
 fetchDict()
 fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 
-#add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
+add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()

@@ -5,9 +5,14 @@
 #ifndef MODELLOADER_H
 #define MODELLOADER_H
 
+#include <joltc/enums.h>
+#include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/types.h>
 #include <stddef.h>
 #include <stdint.h>
+
 #include "../../../Structs/Color.h"
 
 #define MODEL_ASSET_VERSION 1
@@ -16,10 +21,12 @@
 #define MAX_MODELS 128
 
 typedef enum ModelShader ModelShader;
+typedef enum CollisionModelType CollisionModelType;
 
 typedef struct ModelDefinition ModelDefinition;
 typedef struct Material Material;
 typedef struct ModelLod ModelLod;
+typedef struct ModelConvexHull ModelConvexHull;
 
 /**
  * List of shaders a model can be rendered with
@@ -32,6 +39,13 @@ enum ModelShader
 	SHADER_UNSHADED,
 	/// A shader with basic lighting based on the vertex normals.
 	SHADER_SHADED
+};
+
+enum CollisionModelType
+{
+	COLLISION_MODEL_TYPE_NONE,
+	COLLISION_MODEL_TYPE_STATIC, /// NOT YET IMPLEMENTED! DO NOT USE!
+	COLLISION_MODEL_TYPE_DYNAMIC
 };
 
 struct Material
@@ -65,6 +79,12 @@ struct ModelLod
 	uint32_t **indexData;
 };
 
+struct ModelConvexHull
+{
+	Vector3 *points;
+	size_t numPoints;
+};
+
 struct ModelDefinition
 {
 	/// The runtime-generated ID of this model
@@ -90,6 +110,18 @@ struct ModelDefinition
 
 	Vector3 boundingBoxOrigin;
 	Vector3 boundingBoxExtents;
+
+	CollisionModelType collisionModelType;
+
+	union
+	{
+		struct
+		{
+			size_t numHulls;
+			ModelConvexHull *hulls;
+		};
+		// TODO: static collision meshes
+	};
 };
 
 void InitModelLoader();
@@ -113,5 +145,17 @@ extern ModelDefinition *GetModelFromId(size_t id);
 void FreeModel(ModelDefinition *model);
 
 void DestroyModelLoader();
+
+JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform *transform,
+																const ModelDefinition *model,
+																JPH_MotionType motionType,
+																JPH_ObjectLayer objectLayer,
+																void *userData);
+
+JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform *transform,
+																 const ModelDefinition *model,
+																 JPH_MotionType motionType,
+																 JPH_ObjectLayer objectLayer,
+																 void *userData);
 
 #endif //MODELLOADER_H
