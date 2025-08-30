@@ -10,11 +10,25 @@
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 #include "../../Structs/Vector2.h"
 #include "../../Structs/Wall.h"
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_SPRITE,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = DefaultActorSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void SpriteInit(Actor *this, const KvList *params, Transform *transform)
 {
+	this->definition = &definition;
+
 	const float halfWidth = KvGetFloat(params, "width", 1.0f) * 0.5f;
 	transform->position.y = KvGetFloat(params, "yPosition", 0.0f);
 	ActorCreateEmptyBody(this, transform);

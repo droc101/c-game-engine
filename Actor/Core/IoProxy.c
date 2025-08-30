@@ -11,6 +11,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 #include "../../Structs/GlobalState.h"
 
 enum IoProxyOutput
@@ -41,17 +42,27 @@ static bool IoProxySignalHandler(Actor *this, const Actor *sender, const uint8_t
 		LogError("IoProxy actor should not be killed! The kill input will be ignored!");
 		return false;
 	}
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_IO_PROXY,
+	.Update = IoProxyUpdate,
+	.SignalHandler = IoProxySignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void IoProxyInit(Actor *this, const KvList * /*params*/, Transform * /*transform*/)
 {
-	this->Update = IoProxyUpdate;
-	this->SignalHandler = IoProxySignalHandler;
+	this->definition = &definition;
 
 	if (GetState()->level->ioProxy != NULL)
 	{

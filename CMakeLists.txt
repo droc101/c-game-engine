@@ -210,6 +210,8 @@ add_executable(
         Structs/Viewmodel.h
         Helpers/Core/Dict.h
         Structs/Asset.h
+        Structs/ActorDefinitions.h
+        Structs/ActorDefinitions.c
 )
 
 #endregion

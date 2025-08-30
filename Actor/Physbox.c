@@ -17,6 +17,7 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
@@ -38,8 +39,21 @@ static inline void CreatePhysboxCollider(Actor *this, const Transform *transform
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_PHYSBOX,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = DefaultActorSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
+	this->definition = &definition;
+
 	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS | ACTOR_FLAG_CAN_BE_HELD;
 	this->actorModel = LoadModel(MODEL("cube"));
 	transform->position.y = -0.3f;

@@ -14,6 +14,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/SoundSystem.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 
 enum SoundPlayerInput
 {
@@ -50,7 +51,7 @@ static void SoundPlayerDestroy(Actor *this)
 
 static bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -81,10 +82,20 @@ static bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const uin
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_SOUND_PLAYER,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = SoundPlayerSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = SoundPlayerDestroy,
+};
+
 void SoundPlayerInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
-	this->Destroy = SoundPlayerDestroy;
-	this->SignalHandler = SoundPlayerSignalHandler;
+	this->definition = &definition;
 
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);

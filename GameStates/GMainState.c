@@ -121,13 +121,13 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	for (size_t i = 0; i < state->level->actors.length; i++)
 	{
 		Actor *a = ListGetPointer(state->level->actors, i);
-		a->Update(a, delta);
+		a->definition->Update(a, delta);
 	}
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
 		Actor *leaf = CreateActor(&state->level->player.transform,
-								  ACTOR_TYPE_TEST,
+								  "test_actor",
 								  NULL,
 								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
 		AddActor(leaf);

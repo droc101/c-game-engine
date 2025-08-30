@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../../Structs/Actor.h"
+#include "../../../Structs/ActorDefinitions.h"
 #include "../../../Structs/Level.h"
 #include "../../../Structs/Vector2.h"
 #include "../../../Structs/Wall.h"
@@ -104,8 +105,59 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 			KvSetUnsafe(&params, key, param);
 		}
 
+		const char *actorTypeString = "";
+		switch (actorType - 1)
+		{
+			case ACTOR_TYPE_TEST:
+				actorTypeString = "test_actor";
+				break;
+			case ACTOR_TYPE_COIN:
+				actorTypeString = "coin";
+				break;
+			case ACTOR_TYPE_GOAL:
+				actorTypeString = "goal";
+				break;
+			case ACTOR_TYPE_DOOR:
+				actorTypeString = "door";
+				break;
+			case ACTOR_TYPE_TRIGGER:
+				actorTypeString = "trigger";
+				break;
+			case ACTOR_TYPE_IO_PROXY:
+				actorTypeString = "io_proxy";
+				break;
+			case ACTOR_TYPE_PHYSBOX:
+				actorTypeString = "physbox";
+				break;
+			case ACTOR_TYPE_LASER:
+				actorTypeString = "laser";
+				break;
+			case ACTOR_TYPE_STATIC_MODEL:
+				actorTypeString = "static_model";
+				break;
+			case ACTOR_TYPE_SOUND_PLAYER:
+				actorTypeString = "sound_player";
+				break;
+			case ACTOR_TYPE_SPRITE:
+				actorTypeString = "sprite";
+				break;
+			case ACTOR_TYPE_LASER_EMITTER:
+				actorTypeString = "laser_emitter";
+				break;
+			case ACTOR_TYPE_LOGIC_BINARY:
+				actorTypeString = "logic_binary";
+				break;
+			case ACTOR_TYPE_LOGIC_DECIMAL:
+				actorTypeString = "logic_decimal";
+				break;
+			case ACTOR_TYPE_LOGIC_COUNTER:
+				actorTypeString = "logic_counter";
+				break;
+			default:
+				break;
+		}
 		Actor *a = CreateActor((Transform[]){{{actorX, 0.0f, actorZ}, {0.0f, actorRotation, 0.0f}}},
-							   actorType,
+							   actorTypeString,
 							   &params,
 							   bodyInterface);
 

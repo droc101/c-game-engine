@@ -26,6 +26,7 @@
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
@@ -214,7 +215,7 @@ static void DoorDestroy(Actor *this)
 
 static bool DoorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -328,14 +329,20 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyId bodyId)
 	}
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_DOOR,
+	.Update = DoorUpdate,
+	.SignalHandler = DoorSignalHandler,
+	.OnPlayerContactAdded = DoorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DoorDestroy,
+};
+
 void DoorInit(Actor *this, const KvList *params, Transform *transform)
 {
-	this->Update = DoorUpdate;
-	this->Destroy = DoorDestroy;
-	this->SignalHandler = DoorSignalHandler;
-	this->OnPlayerContactAdded = DoorOnPlayerContactAdded;
-	this->OnPlayerContactPersisted = DoorOnPlayerContactPersisted;
-	this->OnPlayerContactRemoved = DoorOnPlayerContactRemoved;
+	this->definition = &definition;
 
 	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 

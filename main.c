@@ -37,6 +37,7 @@
 #include "Helpers/Graphics/RenderingHelpers.h"
 #include "Helpers/PlatformHelpers.h"
 #include "Helpers/TextInputSystem.h"
+#include "Structs/ActorDefinitions.h"
 #include "Structs/GlobalState.h"
 #include "Structs/Vector2.h"
 
@@ -260,6 +261,8 @@ int main(const int argc, char *argv[])
 	InitSDL();
 
 	InputInit();
+
+	RegisterActors();
 
 	InitState();
 	PhysicsThreadInit();

@@ -11,6 +11,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 
 enum LogicBinaryInput
 {
@@ -43,7 +44,7 @@ typedef struct LogicBinaryData
 static bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicBinaryData *data = (LogicBinaryData *)this->extraData;
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -92,9 +93,20 @@ static bool LogicBinarySignalHandler(Actor *this, const Actor *sender, const uin
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_LOGIC_BINARY,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = LogicBinarySignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void LogicBinaryInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
-	this->SignalHandler = LogicBinarySignalHandler;
+	this->definition = &definition;
 
 	this->extraData = malloc(sizeof(LogicBinaryData));
 	CheckAlloc(this->extraData);

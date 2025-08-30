@@ -23,6 +23,7 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
@@ -73,7 +74,7 @@ static void GoalUpdate(Actor *this, double /*delta*/)
 
 static bool GoalSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -104,11 +105,20 @@ static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_GOAL,
+	.Update = GoalUpdate,
+	.SignalHandler = GoalSignalHandler,
+	.OnPlayerContactAdded = GoalOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void GoalInit(Actor *this, const KvList *params, Transform *transform)
 {
-	this->Update = GoalUpdate;
-	this->SignalHandler = GoalSignalHandler;
-	this->OnPlayerContactAdded = GoalOnPlayerContactAdded;
+	this->definition = &definition;
 
 	GoalData *data = calloc(1, sizeof(GoalData));
 	CheckAlloc(data);

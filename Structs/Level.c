@@ -145,6 +145,6 @@ void RenderLevel(const Level *level, const Camera *camera)
 	for (size_t i = 0; i < level->actors.length; i++)
 	{
 		Actor *a = ListGetPointer(level->actors, i);
-		a->Render(a);
+		a->definition->RenderUi(a);
 	}
 }

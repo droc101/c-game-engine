@@ -80,6 +80,7 @@ bool CreateLogicalDevice()
 	};
 	VkPhysicalDeviceVulkan12Features vulkan12Features = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+		.descriptorIndexing = VK_TRUE,
 		.runtimeDescriptorArray = VK_TRUE,
 		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
 		.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
@@ -90,8 +91,10 @@ bool CreateLogicalDevice()
 		.features = vulkan10Features,
 	};
 	const LunaDeviceCreationInfo2 deviceCreationInfo = {
-		.extensionCount = 1,
-		.extensionNames = (const char *const[]){VK_KHR_SWAPCHAIN_EXTENSION_NAME},
+		.extensionCount = 3,
+		.extensionNames = (const char *const[]){VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+												"VK_KHR_maintenance3",
+												"VK_EXT_descriptor_indexing"},
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
 	};
@@ -241,7 +244,7 @@ bool CreateDescriptorSetLayouts()
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = MAX_TEXTURES,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+		.bindingFlags = 1,
 	};
 	const LunaDescriptorSetLayoutCreationInfo descriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,

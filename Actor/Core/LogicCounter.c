@@ -11,6 +11,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/MathEx.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 
 enum LogicCounterInput
 {
@@ -79,7 +80,7 @@ static inline void ChangeValue(const int change, LogicCounterData *data, const A
 static bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicCounterData *data = (LogicCounterData *)this->extraData;
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -109,9 +110,20 @@ static bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const ui
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_LOGIC_COUNTER,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = LogicCounterSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void LogicCounterInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
-	this->SignalHandler = LogicCounterSignalHandler;
+	this->definition = &definition;
 
 	this->extraData = malloc(sizeof(LogicCounterData));
 	CheckAlloc(this->extraData);

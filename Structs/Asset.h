@@ -43,20 +43,8 @@ struct Asset
 #define ASSET_FREE(asset) \
 	free((asset).data); \
 	ASSET_ZERO(asset);
-#define ASSET_INIT_WITH(obj, compressedSizeValue, sizeValue, typeValue, typeVersionValue, dataValue) \
-	(obj).compressedSize = (compressedSizeValue); \
-	(obj).size = (sizeValue); \
-	(obj).type = (typeValue); \
-	(obj).typeVersion = (typeVersionValue); \
-	(obj).data = (dataValue);
 
-#define ASSET_OPLIST \
-	(INIT(ASSET_ZERO), \
-	 INIT_SET(ASSET_COPY), \
-	 INIT_WITH(ASSET_INIT_WITH), \
-	 SET(ASSET_COPY), \
-	 CLEAR(ASSET_FREE), \
-	 EMPLACE_TYPE((size_t, size_t, AssetType, uint8_t, uint8_t *)))
+#define ASSET_OPLIST (INIT(ASSET_ZERO), INIT_SET(ASSET_COPY), SET(ASSET_COPY), CLEAR(ASSET_FREE))
 
 /**
  * Free an asset

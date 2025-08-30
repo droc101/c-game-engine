@@ -96,10 +96,8 @@ static void OnContactAdded(const JPH_CharacterVirtual *character,
 		player->canDropHeldActor = false;
 		ioSettings->canPushCharacter = false;
 		ioSettings->canReceiveImpulses = false;
-	} else if (actor->OnPlayerContactAdded)
-	{
-		actor->OnPlayerContactAdded(actor, bodyId);
 	}
+	actor->definition->OnPlayerContactAdded(actor, bodyId);
 }
 
 static void OnContactPersisted(const JPH_CharacterVirtual *character,
@@ -121,10 +119,8 @@ static void OnContactPersisted(const JPH_CharacterVirtual *character,
 	{
 		ioSettings->canPushCharacter = false;
 		ioSettings->canReceiveImpulses = false;
-	} else if (actor->OnPlayerContactPersisted)
-	{
-		actor->OnPlayerContactPersisted(actor, bodyId);
 	}
+	actor->definition->OnPlayerContactPersisted(actor, bodyId);
 }
 
 static void OnContactRemoved(const JPH_CharacterVirtual *character,
@@ -141,10 +137,8 @@ static void OnContactRemoved(const JPH_CharacterVirtual *character,
 	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
 	{
 		player->canDropHeldActor = true;
-	} else if (actor->OnPlayerContactRemoved)
-	{
-		actor->OnPlayerContactRemoved(actor, bodyId);
 	}
+	actor->definition->OnPlayerContactRemoved(actor, bodyId);
 }
 
 static void OnContactSolve(const JPH_CharacterVirtual *character,

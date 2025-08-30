@@ -11,6 +11,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Logging.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 
 enum LogicDecimalInput
 {
@@ -45,7 +46,7 @@ typedef struct LogicDecimalData
 static bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	LogicDecimalData *data = (LogicDecimalData *)this->extraData;
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -100,9 +101,20 @@ static bool LogicDecimalSignalHandler(Actor *this, const Actor *sender, const ui
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_LOGIC_DECIMAL,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = LogicDecimalSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void LogicDecimalInit(Actor *this, const KvList *params, Transform * /*transform*/)
 {
-	this->SignalHandler = LogicDecimalSignalHandler;
+	this->definition = &definition;
 
 	this->extraData = malloc(sizeof(LogicDecimalData));
 	CheckAlloc(this->extraData);

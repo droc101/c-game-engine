@@ -24,6 +24,7 @@
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 #include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
@@ -67,7 +68,7 @@ static void TestActorUpdate(Actor *this, const double delta)
 
 static bool TestActorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -75,24 +76,7 @@ static bool TestActorSignalHandler(Actor *this, const Actor *sender, const uint8
 	return false;
 }
 
-static void TestActorIdle(Actor *this, const double /*delta*/)
-{
-	(void)this;
-	// const NavigationConfig *navigationConfig = this->extraData;
-	// this->transform.rotation.y += 0.01f;
-	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
-	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
-}
-
-static void TestActorTargetReached(Actor *this, const double delta)
-{
-	(void)this;
-	(void)delta;
-	// const NavigationConfig *navigationConfig = this->extraData;
-	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
-}
-
-static void TestActorUIRender(Actor *this)
+static void TestActorRenderUi(Actor *this)
 {
 	DrawTextAligned("I'm TestActor!",
 					16,
@@ -131,11 +115,37 @@ static void TestActorUIRender(Actor *this)
 	}
 }
 
+static void TestActorIdle(Actor *this, const double /*delta*/)
+{
+	(void)this;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += 0.01f;
+	// const Vector2 impulse = v2(0, navigationConfig->speed * (float)delta);
+	// b2Body_ApplyLinearImpulseToCenter(this->bodyId, Vector2Rotate(impulse, this->rotation), true);
+}
+
+static void TestActorTargetReached(Actor *this, const double delta)
+{
+	(void)this;
+	(void)delta;
+	// const NavigationConfig *navigationConfig = this->extraData;
+	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
+}
+
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_TEST,
+	.Update = TestActorUpdate,
+	.SignalHandler = TestActorSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = TestActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
 {
-	this->Update = TestActorUpdate;
-	this->SignalHandler = TestActorSignalHandler;
-	this->Render = TestActorUIRender;
+	this->definition = &definition;
 
 	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
 	this->actorModel = LoadModel(MODEL("leafy"));

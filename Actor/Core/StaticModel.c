@@ -9,9 +9,23 @@
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
+
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_STATIC_MODEL,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = DefaultActorSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
 
 void StaticModelInit(Actor *this, const KvList *params, Transform *transform)
 {
+	this->definition = &definition;
+
 	char modelPath[80];
 	snprintf(modelPath, 80, MODEL("%s"), KvGetString(params, "model", "leafy"));
 	this->actorModel = LoadModel(modelPath);

@@ -69,6 +69,7 @@ void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 
 	wall->bodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, bodyCreationSettings, JPH_Activation_DontActivate);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)shapeSettings);
 }
 
 void FreeWall(JPH_BodyInterface *bodyInterface, Wall *wall)

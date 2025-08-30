@@ -23,7 +23,7 @@
 #include "Error.h"
 #include "Logging.h"
 
-DICT_DEF(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
+DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
 AssetCache assetCache;
 

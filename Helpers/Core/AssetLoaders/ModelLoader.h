@@ -5,10 +5,10 @@
 #ifndef MODELLOADER_H
 #define MODELLOADER_H
 
+#include <joltc/Math/Vector3.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "../../../Structs/Color.h"
-#include <joltc/Math/Vector3.h>
 
 #define MODEL_ASSET_VERSION 1
 

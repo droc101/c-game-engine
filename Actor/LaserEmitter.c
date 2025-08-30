@@ -22,6 +22,7 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "Laser.h"
@@ -78,7 +79,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 		KvSetByte(&laserParams, "height", data->height);
 		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
 		data->laserActor = CreateActor(&data->transform,
-									   ACTOR_TYPE_LASER,
+									   "laser",
 									   &laserParams,
 									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
 		AddActor(data->laserActor);
@@ -89,7 +90,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 static bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	const LaserEmitterData *data = this->extraData;
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -108,10 +109,20 @@ static bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const ui
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_LASER_EMITTER,
+	.Update = LaserEmitterUpdate,
+	.SignalHandler = LaserEmitterSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
-	this->Update = LaserEmitterUpdate;
-	this->SignalHandler = LaserEmitterSignalHandler;
+	this->definition = &definition;
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
 	CheckAlloc(this->extraData);

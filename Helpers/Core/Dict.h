@@ -7,7 +7,7 @@
 
 #include <m-dict.h>
 
-#define DICT_DEF(name, keyType, ...) \
+#define DEFINE_DICT(name, keyType, ...) \
 	_Pragma("GCC diagnostic push"); \
 	_Pragma("GCC diagnostic ignored \"-Wunused-function\""); \
 	M_DICT_DEF2_AS(name, name, name##_iterator, name##_pair, keyType, __VA_ARGS__); \

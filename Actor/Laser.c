@@ -22,6 +22,7 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
@@ -153,7 +154,7 @@ static void LaserUpdate(Actor *this, double delta)
 
 static bool LaserSignalHandler(Actor *this, const Actor *sender, uint8_t signal, const Param *param)
 {
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -173,10 +174,20 @@ static bool LaserSignalHandler(Actor *this, const Actor *sender, uint8_t signal,
 	return false;
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_LASER,
+	.Update = LaserUpdate,
+	.SignalHandler = LaserSignalHandler,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void LaserInit(Actor *this, const KvList *params, Transform *transform)
 {
-	this->Update = LaserUpdate;
-	this->SignalHandler = LaserSignalHandler;
+	this->definition = &definition;
 
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);

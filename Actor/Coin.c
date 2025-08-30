@@ -25,6 +25,7 @@
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinitions.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
 #include "../Structs/Vector2.h"
@@ -94,10 +95,20 @@ static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 	RemoveActor(this);
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_COIN,
+	.Update = CoinUpdate,
+	.SignalHandler = DefaultActorSignalHandler,
+	.OnPlayerContactAdded = CoinOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void CoinInit(Actor *this, const KvList *params, Transform *transform)
 {
-	this->Update = CoinUpdate;
-	this->OnPlayerContactAdded = CoinOnPlayerContactAdded;
+	this->definition = &definition;
 
 	this->extraData = calloc(1, sizeof(CoinData));
 	CheckAlloc(this->extraData);

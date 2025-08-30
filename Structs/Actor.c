@@ -4,6 +4,7 @@
 
 #include "Actor.h"
 #include <assert.h>
+#include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
@@ -11,6 +12,7 @@
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -20,56 +22,12 @@
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/Physics/Physics.h"
+#include "ActorDefinitions.h"
 #include "Color.h"
 #include "GlobalState.h"
 #include "Level.h"
 
-#include <joltc/constants.h>
-#include "../Actor/Coin.h"
-#include "../Actor/Core/IoProxy.h"
-#include "../Actor/Core/LogicBinary.h"
-#include "../Actor/Core/LogicCounter.h"
-#include "../Actor/Core/LogicDecimal.h"
-#include "../Actor/Core/SoundPlayer.h"
-#include "../Actor/Core/Sprite.h"
-#include "../Actor/Core/StaticModel.h"
-#include "../Actor/Core/Trigger.h"
-#include "../Actor/Door.h"
-#include "../Actor/Goal.h"
-#include "../Actor/Laser.h"
-#include "../Actor/LaserEmitter.h"
-#include "../Actor/Physbox.h"
-#include "../Actor/TestActor.h"
-
-// Empty template functions
-void ActorInit(Actor * /*this*/, const KvList * /*params*/, Transform * /*transform*/) {}
-
-void ActorUpdate(Actor * /*this*/, double /*delta*/) {}
-
-void ActorDestroy(Actor * /*this*/) {}
-
-void ActorRender(Actor * /*this*/) {}
-
-ActorInitFunction actorInitFunctions[] = {
-	ActorInit,
-	TestActorInit,
-	CoinInit,
-	GoalInit,
-	DoorInit,
-	TriggerInit,
-	IoProxyInit,
-	PhysboxInit,
-	LaserInit,
-	StaticModelInit,
-	SoundPlayerInit,
-	SpriteInit,
-	LaserEmitterInit,
-	LogicBinaryInit,
-	LogicDecimalInit,
-	LogicCounterInit,
-};
-
-Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *params, JPH_BodyInterface *bodyInterface)
+Actor *CreateActor(Transform *transform, const char *actorType, KvList *params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);
@@ -78,22 +36,14 @@ Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *para
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
 	actor->actorWall = NULL;
 	actor->health = 1;
-	actor->actorType = actorType;
 	actor->actorModel = NULL;
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	actor->modColor = COLOR_WHITE;
 	ListInit(actor->ioConnections, LIST_POINTER);
-	actor->Init = actorInitFunctions[actorType];
-	actor->Update = ActorUpdate;
-	actor->Destroy = ActorDestroy;
-	actor->SignalHandler = DefaultSignalHandler;
-	actor->Render = ActorRender;
-	actor->OnPlayerContactAdded = NULL;
-	actor->OnPlayerContactPersisted = NULL;
-	actor->OnPlayerContactRemoved = NULL;
 	actor->extraData = NULL;
-	actor->Init(actor, params, transform); // kindly allow the Actor to initialize itself
+	const ActorInitFunction initFunction = GetActorInitFunction(actorType);
+	initFunction(actor, params, transform); // kindly allow the Actor to initialize itself
 	ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
 	if (params)
 	{
@@ -104,7 +54,7 @@ Actor *CreateActor(Transform *transform, const ActorType actorType, KvList *para
 
 void FreeActor(Actor *actor)
 {
-	actor->Destroy(actor);
+	actor->definition->Destroy(actor);
 	free(actor->actorWall);
 	actor->actorWall = NULL;
 	free(actor->extraData);
@@ -126,8 +76,7 @@ void FreeActor(Actor *actor)
 void ActorTriggerInput(const Actor *sender, const Actor *receiver, const uint8_t signal, const Param *param)
 {
 	LogInfo("Triggering input %d on actor %p from actor %p\n", signal, receiver, sender);
-	assert(receiver->SignalHandler != NULL);
-	if (!receiver->SignalHandler((Actor *)receiver, sender, signal, param))
+	if (!receiver->definition->SignalHandler((Actor *)receiver, sender, signal, param))
 	{
 		LogWarning("Signal %d was sent to actor %p but was not handled!", signal, receiver);
 	}
@@ -152,13 +101,12 @@ void ActorFireOutput(const Actor *sender, const uint8_t signal, const Param defa
 			for (size_t j = 0; j < actors.length; j++)
 			{
 				Actor *actor = ListGetPointer(actors, j);
-				assert(actor->SignalHandler != NULL);
 				const Param *param = &defaultParam;
 				if (connection->outParamOverride.type != PARAM_TYPE_NONE)
 				{
 					param = &connection->outParamOverride;
 				}
-				if (!actor->SignalHandler(actor, sender, connection->targetInput, param))
+				if (!actor->definition->SignalHandler(actor, sender, connection->targetInput, param))
 				{
 					LogWarning("Signal %d was sent to actor %p but was not handled!", signal, actor);
 				}
@@ -173,8 +121,9 @@ void DestroyActorConnection(ActorConnection *connection)
 {
 	free(connection);
 }
+void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
-bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const uint8_t signal, const Param * /*param*/)
+bool DefaultActorSignalHandler(Actor *this, const Actor * /*sender*/, const uint8_t signal, const Param * /*param*/)
 {
 	if (signal == ACTOR_INPUT_KILL)
 	{
@@ -183,6 +132,16 @@ bool DefaultSignalHandler(Actor *this, const Actor * /*sender*/, const uint8_t s
 	}
 	return false;
 }
+
+void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+
+void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+
+void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+
+void DefaultActorRenderUi(Actor * /*this*/) {}
+
+void DefaultActorDestroy(Actor * /*this*/) {}
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 {

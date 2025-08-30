@@ -19,6 +19,7 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Physics/Physics.h"
 #include "../../Structs/Actor.h"
+#include "../../Structs/ActorDefinitions.h"
 #include "../../Structs/Level.h"
 
 enum TriggerInput
@@ -63,7 +64,7 @@ static inline void CreateTriggerSensor(Actor *this, const Transform *transform)
 static bool TriggerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
 {
 	TriggerData *data = (TriggerData *)this->extraData;
-	if (DefaultSignalHandler(this, sender, signal, param))
+	if (DefaultActorSignalHandler(this, sender, signal, param))
 	{
 		return true;
 	}
@@ -117,12 +118,20 @@ static void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
+static ActorDefinition definition = {
+	.actorType = ACTOR_TYPE_TRIGGER,
+	.Update = DefaultActorUpdate,
+	.SignalHandler = TriggerSignalHandler,
+	.OnPlayerContactAdded = TriggerOnPlayerContactAdded,
+	.OnPlayerContactPersisted = TriggerOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = TriggerOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+};
+
 void TriggerInit(Actor *this, const KvList *params, Transform *transform)
 {
-	this->SignalHandler = TriggerSignalHandler;
-	this->OnPlayerContactAdded = TriggerOnPlayerContactAdded;
-	this->OnPlayerContactPersisted = TriggerOnPlayerContactPersisted;
-	this->OnPlayerContactRemoved = TriggerOnPlayerContactRemoved;
+	this->definition = &definition;
 
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
