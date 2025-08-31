@@ -283,7 +283,8 @@ JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform 
 	const Vector3 offset = {model->boundingBoxOrigin.x * -1,
 							model->boundingBoxOrigin.y * -1,
 							model->boundingBoxOrigin.z * -1};
-	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, JPH_DefaultConvexRadius);
+
+	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, 0.0005f);
 	JPH_Shape *offestShape = (JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
 																						   transform,
@@ -320,23 +321,18 @@ JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform
 		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(hull->points,
 																	   hull->numPoints,
 																	   JPH_DefaultConvexRadius);
-		Vector3 centerOfMass;
-		JPH_Shape_GetCenterOfMass(hullShape, &centerOfMass);
-		Vector3 position;
-		Vector3_Add(&hull->offset, &centerOfMass, &position);
 		JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings *)compoundShapeSettings,
-											&position,
-											&JPH_Quat_Zero,
+											&Vector3_Zero,
+											&JPH_Quat_Identity,
 											hullShape,
 											0);
 		JPH_Shape_Destroy(hullShape);
 	}
 	JPH_Shape *compoundShape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
+	Transform correctedTransform = *transform;
 	Vector3 centerOfMass;
 	JPH_Shape_GetCenterOfMass(compoundShape, &centerOfMass);
-	Vector3 position;
-	Vector3_Subtract(&transform->position, &centerOfMass, &position);
-	const Transform correctedTransform = {.position = position, .rotation = transform->rotation};
+	Vector3_Subtract(&transform->position, &centerOfMass, &correctedTransform.position);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(compoundShape,
 																						   &correctedTransform,
 																						   motionType,

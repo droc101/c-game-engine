@@ -3,6 +3,10 @@ project(game C CXX)
 
 #region Compile options
 
+option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
+option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert macros. This overrides the build type and forces them to be enabled always." ON)
+option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
+
 set(CMAKE_C_STANDARD 11)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden")
@@ -228,8 +232,13 @@ find_package(GLEW REQUIRED)
 fetchDict()
 fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
 
-add_compile_definitions(JPH_DEBUG_RENDERER) # Enables the Jolt debug renderer
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (JOLT_BUILD_DEBUG_RENDERER)
+    add_compile_definitions(JPH_DEBUG_RENDERER)
+endif ()
+if (JOLT_BUILD_ENABLE_ASSERTS)
+    add_compile_definitions(JPH_ENABLE_ASSERTS)
+endif ()
+if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
 FetchContent_Declare(
