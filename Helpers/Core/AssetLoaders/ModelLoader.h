@@ -82,6 +82,7 @@ struct ModelLod
 struct ModelConvexHull
 {
 	Vector3 *points;
+	Vector3 offset;
 	size_t numPoints;
 };
 

@@ -17,8 +17,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "../../../Structs/Actor.h"
+#include "../../../Structs/Asset.h"
 #include "../AssetReader.h"
 #include "../DataReader.h"
 #include "../Error.h"
@@ -150,6 +149,9 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		{
 			ModelConvexHull *hull = &model->hulls[i];
 			hull->numPoints = ReadSizeT(assetData->data, &offset);
+			hull->offset.x = ReadFloat(assetData->data, &offset);
+			hull->offset.y = ReadFloat(assetData->data, &offset);
+			hull->offset.z = ReadFloat(assetData->data, &offset);
 			hull->points = malloc(sizeof(Vector3) * hull->numPoints);
 			CheckAlloc(hull->points);
 			for (size_t p = 0; p < hull->numPoints; p++)
@@ -315,22 +317,32 @@ JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform
 	for (size_t i = 0; i < model->numHulls; i++)
 	{
 		const ModelConvexHull *hull = &model->hulls[i];
-		const JPH_ConvexHullShapeSettings *hullSettings = JPH_ConvexHullShapeSettings_Create(hull->points,
-																							 hull->numPoints,
-																							 JPH_DefaultConvexRadius);
-		JPH_CompoundShapeSettings_AddShape((JPH_CompoundShapeSettings *)compoundShapeSettings,
-										   &Vector3_Zero,
-										   &JPH_Quat_Zero,
-										   (JPH_ShapeSettings *)hullSettings,
-										   0);
-		JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)hullSettings);
+		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(hull->points,
+																	   hull->numPoints,
+																	   JPH_DefaultConvexRadius);
+		Vector3 centerOfMass;
+		JPH_Shape_GetCenterOfMass(hullShape, &centerOfMass);
+		Vector3 position;
+		Vector3_Add(&hull->offset, &centerOfMass, &position);
+		JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings *)compoundShapeSettings,
+											&position,
+											&JPH_Quat_Zero,
+											hullShape,
+											0);
+		JPH_Shape_Destroy(hullShape);
 	}
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME((JPH_ShapeSettings *)
-																								  compoundShapeSettings,
-																						  transform,
-																						  motionType,
-																						  objectLayer,
-																						  userData);
+	JPH_Shape *compoundShape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
+	Vector3 centerOfMass;
+	JPH_Shape_GetCenterOfMass(compoundShape, &centerOfMass);
+	Vector3 position;
+	Vector3_Subtract(&transform->position, &centerOfMass, &position);
+	const Transform correctedTransform = {.position = position, .rotation = transform->rotation};
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(compoundShape,
+																						   &correctedTransform,
+																						   motionType,
+																						   objectLayer,
+																						   userData);
 	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
+	JPH_Shape_Destroy(compoundShape);
 	return bodyCreationSettings;
 }

@@ -256,9 +256,34 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 													 0,
 													 0),
 							   "Failed to draw sky!");
+#ifdef JPH_DEBUG_RENDERER_WIREFRAME
 		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 6, 1, 0, 0),
 							   "Failed to draw floor!");
 	}
+
+	if (level->hasCeiling)
+	{
+		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
+							   "Failed to draw floor and ceiling!");
+	}
+	if (buffers.walls.indices.bytesUsed)
+	{
+		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
+													 buffers.walls.indices.buffer,
+													 0,
+													 VK_INDEX_TYPE_UINT32,
+													 pipelines.walls,
+													 &pipelineBindInfo,
+													 buffers.walls.indices.bytesUsed / sizeof(uint32_t),
+													 1,
+													 0,
+													 0,
+													 0),
+							   "Failed to draw walls!");
+	}
+#else
+	}
+#endif
 	if (buffers.debugDrawLines.vertexCount)
 	{
 		lunaWriteDataToBuffer(buffers.debugDrawLines.vertices.buffer,
@@ -353,28 +378,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 															 sizeof(VkDrawIndexedIndirectCommand)),
 							   "Failed to draw unshaded model actors!");
 	}
-#ifdef JPH_DEBUG_RENDERER_WIREFRAME
-	if (level->hasCeiling)
-	{
-		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
-							   "Failed to draw floor and ceiling!");
-	}
-	if (buffers.walls.indices.bytesUsed)
-	{
-		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
-													 buffers.walls.indices.buffer,
-													 0,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.walls,
-													 &pipelineBindInfo,
-													 buffers.walls.indices.bytesUsed / sizeof(uint32_t),
-													 1,
-													 0,
-													 0,
-													 0),
-							   "Failed to draw walls!");
-	}
-#endif
 #else
 	if (level->hasCeiling)
 	{
