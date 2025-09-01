@@ -16,6 +16,9 @@
 #define PHYSICS_TARGET_NS_D (1000000000.0 / PHYSICS_TARGET_TPS)
 #define PHYSICS_MIN_NS_D (1000000000.0 / PHYSICS_MIN_TPS)
 
+#define VECTOR3_TO_VEC3(vector) ((vec3){(vector).x, (vector).y, (vector).z})
+#define VEC3_TO_VECTOR3(vec) ((Vector3){(vec)[0], (vec)[1], (vec)[2]})
+
 enum ObjectLayers
 {
 	OBJECT_LAYER_STATIC,

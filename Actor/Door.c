@@ -134,41 +134,49 @@ static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-
-	DoorData *data = this->extraData;
-	JPH_Quat rotation = {};
-	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
-	Vector3 forwardVector = {};
-	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
-	Vector3_Add(&transform->position, &forwardVector, &data->openPosition);
-	data->closedPosition = transform->position;
 }
 
 static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 {
 	DoorData *data = this->extraData;
 
+	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
+																	JPH_DefaultConvexRadius);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_SENSOR,
+																						   this);
+	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
+	data->sensorBodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+															bodyCreationSettings,
+															JPH_Activation_Activate);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+}
+
+static inline void CreateDoorBodies(Actor *this, const Transform *transform, const bool preventPlayerOpen)
+{
+	DoorData *data = this->extraData;
 	JPH_Quat rotation = {};
 	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
 	Vector3 offsetVector = {};
 	Vector3_MultiplyScalar(&forwardVector, 0.5f, &offsetVector);
-	Vector3 position = {};
-	Vector3_Subtract(&transform->position, &offsetVector, &position);
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
-																	JPH_DefaultConvexRadius);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  &position,
-																					  &rotation,
-																					  JPH_MotionType_Static,
-																					  OBJECT_LAYER_SENSOR);
-	JPH_BodyCreationSettings_SetUserData(bodyCreationSettings, (uint64_t)this);
-	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
-	data->sensorBodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
-															bodyCreationSettings,
-															JPH_Activation_Activate);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+	Vector3_Subtract(&transform->position, &offsetVector, &data->closedPosition);
+	Vector3_Add(&data->closedPosition, &forwardVector, &data->openPosition);
+
+	Transform calculatedTransform = *transform;
+	calculatedTransform.position = data->closedPosition;
+
+	CreateDoorCollider(this, &calculatedTransform);
+	if (preventPlayerOpen)
+	{
+		data->sensorBodyId = JPH_BodyId_InvalidBodyID;
+	} else
+	{
+		CreateDoorSensor(this, &calculatedTransform);
+	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -351,14 +359,7 @@ void DoorInit(Actor *this, const KvList *params, Transform *transform)
 	DoorData *data = this->extraData;
 	data->stayOpen = KvGetBool(params, "stayOpen", false);
 
-	CreateDoorCollider(this, transform);
-	if (KvGetBool(params, "preventPlayerOpen", false))
-	{
-		data->sensorBodyId = JPH_BodyId_InvalidBodyID;
-	} else
-	{
-		CreateDoorSensor(this, transform);
-	}
+	CreateDoorBodies(this, transform, KvGetBool(params, "preventPlayerOpen", false));
 
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, -0.5f);

@@ -280,19 +280,19 @@ JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform 
 																const JPH_ObjectLayer objectLayer,
 																void *userData)
 {
-	const Vector3 offset = {model->boundingBoxOrigin.x * -1,
-							model->boundingBoxOrigin.y * -1,
-							model->boundingBoxOrigin.z * -1};
+	// const Vector3 offset = {model->boundingBoxOrigin.x * -1,
+	// 						model->boundingBoxOrigin.y * -1,
+	// 						model->boundingBoxOrigin.z * -1};
 
 	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, 0.0005f);
-	JPH_Shape *offestShape = (JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(offestShape,
+	// JPH_Shape *offestShape = (JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(boxShape,
 																						   transform,
 																						   motionType,
 																						   objectLayer,
 																						   userData);
 	JPH_Shape_Destroy(boxShape);
-	JPH_Shape_Destroy(offestShape);
+	// JPH_Shape_Destroy(offestShape);
 	return bodyCreationSettings;
 }
 
@@ -329,12 +329,8 @@ JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform
 		JPH_Shape_Destroy(hullShape);
 	}
 	JPH_Shape *compoundShape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
-	Transform correctedTransform = *transform;
-	Vector3 centerOfMass;
-	JPH_Shape_GetCenterOfMass(compoundShape, &centerOfMass);
-	Vector3_Subtract(&transform->position, &centerOfMass, &correctedTransform.position);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(compoundShape,
-																						   &correctedTransform,
+																						   transform,
 																						   motionType,
 																						   objectLayer,
 																						   userData);

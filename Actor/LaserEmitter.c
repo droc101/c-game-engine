@@ -118,7 +118,8 @@ static ActorDefinition definition = {
 void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->definition = &definition;
-	//this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS; // TODO uncomment once laser emitter collision has holes for where the laser comes out
+	// TODO: uncomment once laser emitter collision has holes for where the laser comes out
+	this->actorFlags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION; // | ACTOR_FLAG_CAN_BLOCK_LASERS
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
 	CheckAlloc(this->extraData);

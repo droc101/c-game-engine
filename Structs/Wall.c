@@ -108,22 +108,22 @@ const JPH_Shape *ActorWallCreateCollider()
 		{
 			0.0f,
 			-0.5f,
-			0.0f,
+			0.5f,
 		},
 		{
 			0.0f,
 			-0.5f,
-			-1.0f,
+			-0.5f,
 		},
 		{
 			0.0f,
 			0.5f,
-			0.0f,
+			0.5f,
 		},
 		{
 			0.0f,
 			0.5f,
-			-1.0f,
+			-0.5f,
 		},
 	};
 	return (const JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DefaultConvexRadius);

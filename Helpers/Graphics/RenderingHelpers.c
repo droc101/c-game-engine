@@ -3,6 +3,7 @@
 //
 
 #include "RenderingHelpers.h"
+#include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
 #include <joltc/constants.h>
@@ -24,6 +25,7 @@
 #include "../Core/Error.h"
 #include "../Core/Logging.h"
 #include "../Core/MathEx.h"
+#include "../Core/Physics/Physics.h"
 #include "GL/GLHelper.h"
 #include "Vulkan/Vulkan.h"
 
@@ -95,8 +97,15 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
 	{
 		JPH_RMat44 matrix;
-		JPH_BodyInterface_GetCenterOfMassTransform(actor->bodyInterface, actor->bodyId, &matrix);
+		JPH_BodyInterface_GetWorldTransform(actor->bodyInterface, actor->bodyId, &matrix);
 		memcpy(*transformMatrix, &matrix, sizeof(mat4));
+		if (actor->actorModel != NULL &&
+			(actor->actorFlags & ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION) == ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION)
+		{
+			vec3 offest = GLM_VEC3_ZERO_INIT;
+			glm_vec3_muladds(VECTOR3_TO_VEC3(actor->actorModel->boundingBoxOrigin), -1, offest);
+			glm_translate(*transformMatrix, offest);
+		}
 	} else
 	{
 		LogWarning("ActorTransformMatrix called on actor which has no body!\n");
