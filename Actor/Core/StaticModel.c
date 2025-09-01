@@ -44,6 +44,7 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 																	 JPH_MotionType_Static,
 																	 OBJECT_LAYER_STATIC,
 																	 this);
+		this->actorFlags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
 	}
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
