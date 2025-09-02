@@ -30,6 +30,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache Dependencies
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.strings.outputs.build-output-dir }}/_deps
+        key: ${{ matrix.build_type }}-${{ matrix.c_compiler }}-deps-${{ hashFiles('**/.git/HEAD') }}
+
     - name: Install Packages
       run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev python3-pil glslc libxcb1-dev libx11-dev libxrandr-dev libwayland-dev libdirectfb-dev
 
