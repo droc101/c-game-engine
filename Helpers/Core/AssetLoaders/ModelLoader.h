@@ -6,6 +6,7 @@
 #define MODELLOADER_H
 
 #include <joltc/enums.h>
+#include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
@@ -27,6 +28,7 @@ typedef struct ModelDefinition ModelDefinition;
 typedef struct Material Material;
 typedef struct ModelLod ModelLod;
 typedef struct ModelConvexHull ModelConvexHull;
+typedef struct ModelStaticCollider ModelStaticCollider;
 
 /**
  * List of shaders a model can be rendered with
@@ -44,7 +46,6 @@ enum ModelShader
 enum CollisionModelType
 {
 	COLLISION_MODEL_TYPE_NONE,
-	/// NOT YET IMPLEMENTED! DO NOT USE!
 	COLLISION_MODEL_TYPE_STATIC,
 	COLLISION_MODEL_TYPE_DYNAMIC
 };
@@ -87,6 +88,12 @@ struct ModelConvexHull
 	size_t numPoints;
 };
 
+struct ModelStaticCollider
+{
+	size_t numTriangles;
+	JPH_Triangle *tris;
+};
+
 struct ModelDefinition
 {
 	/// The runtime-generated ID of this model
@@ -122,7 +129,7 @@ struct ModelDefinition
 			size_t numHulls;
 			ModelConvexHull *hulls;
 		};
-		// TODO: static collision meshes
+		ModelStaticCollider staticCollider;
 	};
 };
 
@@ -159,5 +166,9 @@ JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform
 																 JPH_MotionType motionType,
 																 JPH_ObjectLayer objectLayer,
 																 void *userData);
+
+JPH_BodyCreationSettings *CreateStaticModelBodyCreationSettings(const Transform *transform,
+																const ModelDefinition *model,
+																void *userData);
 
 #endif //MODELLOADER_H

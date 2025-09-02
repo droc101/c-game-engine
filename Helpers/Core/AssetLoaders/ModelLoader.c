@@ -22,6 +22,7 @@
 #include "../DataReader.h"
 #include "../Error.h"
 #include "../Logging.h"
+#include "../Physics/Physics.h"
 
 uint32_t modelId;
 uint32_t lodId;
@@ -162,6 +163,24 @@ ModelDefinition *LoadModelInternal(const char *asset)
 				point->z = ReadFloat(assetData->data, &offset);
 			}
 		}
+	} else if (model->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
+	{
+		model->staticCollider.numTriangles = ReadSizeT(assetData->data, &offset);
+		model->staticCollider.tris = malloc(sizeof(JPH_Triangle) * model->staticCollider.numTriangles);
+		CheckAlloc(model->staticCollider.tris);
+		for (size_t i = 0; i < model->staticCollider.numTriangles; i++)
+		{
+			JPH_Triangle *triangle = &model->staticCollider.tris[i];
+			triangle->materialIndex = 0;
+			Vector3 *verts[3] = {&triangle->v1, &triangle->v2, &triangle->v3};
+			for (int v = 0; v < 3; v++)
+			{
+				Vector3 *point = verts[v];
+				point->x = ReadFloat(assetData->data, &offset);
+				point->y = ReadFloat(assetData->data, &offset);
+				point->z = ReadFloat(assetData->data, &offset);
+			}
+		}
 	}
 
 	FreeAsset(assetData);
@@ -255,6 +274,9 @@ void FreeModel(ModelDefinition *model)
 			free(model->hulls[i].points);
 		}
 		free(model->hulls);
+	} else if (model->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
+	{
+		free(model->staticCollider.tris);
 	}
 
 	free(model->name);
@@ -280,19 +302,13 @@ JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform 
 																const JPH_ObjectLayer objectLayer,
 																void *userData)
 {
-	// const Vector3 offset = {model->boundingBoxOrigin.x * -1,
-	// 						model->boundingBoxOrigin.y * -1,
-	// 						model->boundingBoxOrigin.z * -1};
-
 	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, 0.0005f);
-	// JPH_Shape *offestShape = (JPH_Shape *)JPH_OffsetCenterOfMassShape_Create(&offset, boxShape);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(boxShape,
 																						   transform,
 																						   motionType,
 																						   objectLayer,
 																						   userData);
 	JPH_Shape_Destroy(boxShape);
-	// JPH_Shape_Destroy(offestShape);
 	return bodyCreationSettings;
 }
 
@@ -336,5 +352,20 @@ JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform
 																						   userData);
 	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
 	JPH_Shape_Destroy(compoundShape);
+	return bodyCreationSettings;
+}
+
+JPH_BodyCreationSettings *CreateStaticModelBodyCreationSettings(const Transform *transform,
+																const ModelDefinition *model,
+																void *userData)
+{
+	JPH_ShapeSettings *meshShapeSettings = (JPH_ShapeSettings *)
+			JPH_MeshShapeSettings_Create(model->staticCollider.tris, model->staticCollider.numTriangles);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(meshShapeSettings,
+																						  transform,
+																						  JPH_MotionType_Static,
+																						  OBJECT_LAYER_STATIC,
+																						  userData);
+	JPH_ShapeSettings_Destroy(meshShapeSettings);
 	return bodyCreationSettings;
 }

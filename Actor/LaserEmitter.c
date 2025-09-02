@@ -53,10 +53,8 @@ typedef struct LaserEmitterData
 
 static inline void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = CreateBoundingBoxBodyCreationSettings(transform,
+	JPH_BodyCreationSettings *bodyCreationSettings = CreateStaticModelBodyCreationSettings(transform,
 																						   this->actorModel,
-																						   JPH_MotionType_Static,
-																						   OBJECT_LAYER_STATIC,
 																						   this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
@@ -119,7 +117,7 @@ void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
 {
 	this->definition = &definition;
 	// TODO: uncomment once laser emitter collision has holes for where the laser comes out
-	this->actorFlags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION; // | ACTOR_FLAG_CAN_BLOCK_LASERS
+	//this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
 	CheckAlloc(this->extraData);

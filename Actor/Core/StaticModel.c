@@ -30,7 +30,12 @@ static ActorDefinition definition = {
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
-	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
+	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
+	{
+		bodyCreationSettings = CreateStaticModelBodyCreationSettings(transform,
+																	  this->actorModel,
+																	  this);
+	} else if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
 		bodyCreationSettings = CreateDynamicModelBodyCreationSettings(transform,
 																	  this->actorModel,

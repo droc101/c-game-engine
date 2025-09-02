@@ -32,10 +32,10 @@
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings *bodyCreationSettings = CreateDynamicModelBodyCreationSettings(transform,
-																	  this->actorModel,
-																	  JPH_MotionType_Static,
-																	  OBJECT_LAYER_STATIC,
-																	  this);
+																							this->actorModel,
+																							JPH_MotionType_Static,
+																							OBJECT_LAYER_STATIC,
+																							this);
 	const JPH_MassProperties massProperties = {
 		.mass = 15.0f,
 	};
