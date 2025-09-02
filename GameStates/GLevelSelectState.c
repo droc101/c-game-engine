@@ -23,7 +23,7 @@
 #include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
-#include "GMainState.h"
+#include "GLoadingState.h"
 #include "GMenuState.h"
 
 int selectedLevel = 0;
@@ -49,10 +49,7 @@ void GLevelSelectStateUpdate(GlobalState * /*State*/)
 		{
 			ConsumeKey(SDL_SCANCODE_SPACE);
 			ConsumeButton(CONTROLLER_OK);
-			if (ChangeLevelByName(ListGetPointer(levelList, selectedLevel)))
-			{
-				GMainStateSet();
-			}
+			GLoadingStateSet(ListGetPointer(levelList, selectedLevel));
 		}
 	}
 }
