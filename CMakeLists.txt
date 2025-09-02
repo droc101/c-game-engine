@@ -255,7 +255,7 @@ FetchContent_MakeAvailable(joltc)
 set(CROSS_PLATFORM_LIBRARIES
         ${SDL2_LIBRARIES}
         ${ZLIB_LIBRARIES}
-        SDL2_mixer::SDL2_mixer
+        SDL2_mixer
         Luna
         ${OPENGL_LIBRARIES}
         ${GLEW_LIBRARIES}
