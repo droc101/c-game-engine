@@ -32,9 +32,7 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
 	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
 	{
-		bodyCreationSettings = CreateStaticModelBodyCreationSettings(transform,
-																	  this->actorModel,
-																	  this);
+		bodyCreationSettings = CreateStaticModelBodyCreationSettings(transform, this->actorModel, this);
 	} else if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
 		bodyCreationSettings = CreateDynamicModelBodyCreationSettings(transform,
