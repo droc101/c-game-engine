@@ -140,15 +140,17 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->boundingBoxExtents.x = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.y = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.z = ReadFloat(assetData->data, &offset);
+	model->boundingBoxShapeSettings = (JPH_ShapeSettings *)
+			JPH_BoxShapeSettings_Create(&model->boundingBoxExtents, 0.0005f); // TODO magic numbers bad
 
 	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
-		model->numHulls = ReadSizeT(assetData->data, &offset);
-		model->hulls = malloc(sizeof(ModelConvexHull) * model->numHulls);
-		CheckAlloc(model->hulls);
-		for (size_t i = 0; i < model->numHulls; i++)
+		const size_t numHulls = ReadSizeT(assetData->data, &offset);
+		ModelConvexHull *hulls = malloc(sizeof(ModelConvexHull) * numHulls);
+		CheckAlloc(hulls);
+		for (size_t i = 0; i < numHulls; i++)
 		{
-			ModelConvexHull *hull = &model->hulls[i];
+			ModelConvexHull *hull = &hulls[i];
 			hull->numPoints = ReadSizeT(assetData->data, &offset);
 			hull->offset.x = ReadFloat(assetData->data, &offset);
 			hull->offset.y = ReadFloat(assetData->data, &offset);
@@ -163,14 +165,17 @@ ModelDefinition *LoadModelInternal(const char *asset)
 				point->z = ReadFloat(assetData->data, &offset);
 			}
 		}
+		model->collisionModelShapeSettings = CreateDynamicModelShapeSettings(numHulls, hulls);
+		free(hulls);
 	} else if (model->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
 	{
-		model->staticCollider.numTriangles = ReadSizeT(assetData->data, &offset);
-		model->staticCollider.tris = malloc(sizeof(JPH_Triangle) * model->staticCollider.numTriangles);
-		CheckAlloc(model->staticCollider.tris);
-		for (size_t i = 0; i < model->staticCollider.numTriangles; i++)
+		ModelStaticCollider staticCollider;
+		staticCollider.numTriangles = ReadSizeT(assetData->data, &offset);
+		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
+		CheckAlloc(staticCollider.tris);
+		for (size_t i = 0; i < staticCollider.numTriangles; i++)
 		{
-			JPH_Triangle *triangle = &model->staticCollider.tris[i];
+			JPH_Triangle *triangle = &staticCollider.tris[i];
 			triangle->materialIndex = 0;
 			Vector3 *verts[3] = {&triangle->v1, &triangle->v2, &triangle->v3};
 			for (int v = 0; v < 3; v++)
@@ -181,6 +186,11 @@ ModelDefinition *LoadModelInternal(const char *asset)
 				point->z = ReadFloat(assetData->data, &offset);
 			}
 		}
+		model->collisionModelShapeSettings = CreateStaticModelShapeSettings(&staticCollider);
+		free(staticCollider.tris);
+	} else
+	{
+		model->collisionModelShapeSettings = NULL;
 	}
 
 	FreeAsset(assetData);
@@ -267,17 +277,11 @@ void FreeModel(ModelDefinition *model)
 		free(model->materials[i].texture);
 	}
 
-	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
+	if (model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
 	{
-		for (size_t i = 0; i < model->numHulls; i++)
-		{
-			free(model->hulls[i].points);
-		}
-		free(model->hulls);
-	} else if (model->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
-	{
-		free(model->staticCollider.tris);
+		JPH_ShapeSettings_Destroy(model->collisionModelShapeSettings);
 	}
+	JPH_ShapeSettings_Destroy(model->boundingBoxShapeSettings);
 
 	free(model->name);
 	free(model->skins);
@@ -295,45 +299,12 @@ void DestroyModelLoader()
 		FreeModel(models[i]);
 	}
 }
-
-JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform *transform,
-																const ModelDefinition *model,
-																const JPH_MotionType motionType,
-																const JPH_ObjectLayer objectLayer,
-																void *userData)
+JPH_ShapeSettings *CreateDynamicModelShapeSettings(const size_t numHulls, const ModelConvexHull *hulls)
 {
-	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, 0.0005f);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(boxShape,
-																						   transform,
-																						   motionType,
-																						   objectLayer,
-																						   userData);
-	JPH_Shape_Destroy(boxShape);
-	return bodyCreationSettings;
-}
-
-JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform *transform,
-																 const ModelDefinition *model,
-																 const JPH_MotionType motionType,
-																 const JPH_ObjectLayer objectLayer,
-																 void *userData)
-{
-	if (model->collisionModelType != COLLISION_MODEL_TYPE_DYNAMIC || model->numHulls == 0)
-	{
-		LogWarning("Tried to create dynamic collision for a model that does not have it\n");
-		JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
-		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
-																							  transform,
-																							  motionType,
-																							  objectLayer,
-																							  userData);
-		JPH_ShapeSettings_Destroy(shapeSettings);
-		return bodyCreationSettings;
-	}
 	const JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
-	for (size_t i = 0; i < model->numHulls; i++)
+	for (size_t i = 0; i < numHulls; i++)
 	{
-		const ModelConvexHull *hull = &model->hulls[i];
+		const ModelConvexHull *hull = &hulls[i];
 		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(hull->points,
 																	   hull->numPoints,
 																	   JPH_DefaultConvexRadius);
@@ -344,28 +315,12 @@ JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform
 											0);
 		JPH_Shape_Destroy(hullShape);
 	}
-	JPH_Shape *compoundShape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(compoundShape,
-																						   transform,
-																						   motionType,
-																						   objectLayer,
-																						   userData);
-	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
-	JPH_Shape_Destroy(compoundShape);
-	return bodyCreationSettings;
+	return (JPH_ShapeSettings *)compoundShapeSettings;
 }
 
-JPH_BodyCreationSettings *CreateStaticModelBodyCreationSettings(const Transform *transform,
-																const ModelDefinition *model,
-																void *userData)
+JPH_ShapeSettings *CreateStaticModelShapeSettings(const ModelStaticCollider *staticCollider)
 {
 	JPH_ShapeSettings *meshShapeSettings = (JPH_ShapeSettings *)
-			JPH_MeshShapeSettings_Create(model->staticCollider.tris, model->staticCollider.numTriangles);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(meshShapeSettings,
-																						  transform,
-																						  JPH_MotionType_Static,
-																						  OBJECT_LAYER_STATIC,
-																						  userData);
-	JPH_ShapeSettings_Destroy(meshShapeSettings);
-	return bodyCreationSettings;
+			JPH_MeshShapeSettings_Create(staticCollider->tris, staticCollider->numTriangles);
+	return meshShapeSettings;
 }

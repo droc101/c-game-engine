@@ -31,11 +31,12 @@
 
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = CreateDynamicModelBodyCreationSettings(transform,
-																							this->actorModel,
-																							JPH_MotionType_Static,
-																							OBJECT_LAYER_STATIC,
-																							this);
+	JPH_BodyCreationSettings
+			*bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->collisionModelShapeSettings,
+																		 transform,
+																		 JPH_MotionType_Dynamic,
+																		 OBJECT_LAYER_DYNAMIC,
+																		 this);
 	const JPH_MassProperties massProperties = {
 		.mass = 15.0f,
 	};

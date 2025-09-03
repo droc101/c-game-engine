@@ -28,6 +28,7 @@
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
 #include "Helpers/Core/Logging.h"
+#include "Helpers/Core/Physics/Physics.h"
 #include "Helpers/Core/Physics/PhysicsThread.h"
 #include "Helpers/Core/SoundSystem.h"
 #include "Helpers/Core/Timing.h"
@@ -255,6 +256,8 @@ int main(const int argc, char *argv[])
 			GetState()->options.renderer = RENDERER_VULKAN;
 		}
 	}
+
+	PhysicsInitGlobal(GetState());
 
 	AssetCacheInit();
 

@@ -96,6 +96,7 @@ void PhysicsDestroyGlobal(const GlobalState *state)
 void PhysicsInitLevel(Level *level)
 {
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
+		.maxContactConstraints = 16384, // TODO magic number BAD
 		.broadPhaseLayerInterface = JPH_BroadPhaseLayerInterface_Create(BROADPHASE_LAYER_MAX,
 																		&broadPhaseLayerInterfaceImpl),
 		.objectLayerPairFilter = JPH_ObjectLayerPairFilter_Create(&objectLayerPairFilterImpl),

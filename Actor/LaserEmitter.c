@@ -53,9 +53,12 @@ typedef struct LaserEmitterData
 
 static inline void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = CreateStaticModelBodyCreationSettings(transform,
-																						   this->actorModel,
-																						   this);
+	JPH_BodyCreationSettings
+			*bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->collisionModelShapeSettings,
+																		 transform,
+																		 JPH_MotionType_Static,
+																		 OBJECT_LAYER_STATIC,
+																		 this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);

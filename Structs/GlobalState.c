@@ -40,7 +40,6 @@ void InitOptions()
 
 void InitState()
 {
-	PhysicsInitGlobal(&state);
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;

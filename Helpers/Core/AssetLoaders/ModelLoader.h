@@ -10,6 +10,7 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -119,18 +120,22 @@ struct ModelDefinition
 
 	Vector3 boundingBoxOrigin;
 	Vector3 boundingBoxExtents;
+	JPH_ShapeSettings *boundingBoxShapeSettings;
 
 	CollisionModelType collisionModelType;
 
-	union
-	{
-		struct
-		{
-			size_t numHulls;
-			ModelConvexHull *hulls;
-		};
-		ModelStaticCollider staticCollider;
-	};
+
+	JPH_ShapeSettings *collisionModelShapeSettings;
+
+	// union
+	// {
+	// 	struct
+	// 	{
+	// 		size_t numHulls;
+	// 		ModelConvexHull *hulls;
+	// 	};
+	// 	ModelStaticCollider staticCollider;
+	// };
 };
 
 void InitModelLoader();
@@ -155,20 +160,8 @@ void FreeModel(ModelDefinition *model);
 
 void DestroyModelLoader();
 
-JPH_BodyCreationSettings *CreateBoundingBoxBodyCreationSettings(const Transform *transform,
-																const ModelDefinition *model,
-																JPH_MotionType motionType,
-																JPH_ObjectLayer objectLayer,
-																void *userData);
+JPH_ShapeSettings *CreateDynamicModelShapeSettings(size_t numHulls, const ModelConvexHull *hulls);
 
-JPH_BodyCreationSettings *CreateDynamicModelBodyCreationSettings(const Transform *transform,
-																 const ModelDefinition *model,
-																 JPH_MotionType motionType,
-																 JPH_ObjectLayer objectLayer,
-																 void *userData);
-
-JPH_BodyCreationSettings *CreateStaticModelBodyCreationSettings(const Transform *transform,
-																const ModelDefinition *model,
-																void *userData);
+JPH_ShapeSettings *CreateStaticModelShapeSettings(const ModelStaticCollider *staticCollider);
 
 #endif //MODELLOADER_H

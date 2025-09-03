@@ -30,23 +30,21 @@ static ActorDefinition definition = {
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
-	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
+	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_STATIC ||
+		this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
-		bodyCreationSettings = CreateStaticModelBodyCreationSettings(transform, this->actorModel, this);
-	} else if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
-	{
-		bodyCreationSettings = CreateDynamicModelBodyCreationSettings(transform,
-																	  this->actorModel,
-																	  JPH_MotionType_Static,
-																	  OBJECT_LAYER_STATIC,
-																	  this);
+		bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->collisionModelShapeSettings,
+																	transform,
+																	JPH_MotionType_Static,
+																	OBJECT_LAYER_STATIC,
+																	this);
 	} else
 	{
-		bodyCreationSettings = CreateBoundingBoxBodyCreationSettings(transform,
-																	 this->actorModel,
-																	 JPH_MotionType_Static,
-																	 OBJECT_LAYER_STATIC,
-																	 this);
+		bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->boundingBoxShapeSettings,
+																	transform,
+																	JPH_MotionType_Static,
+																	OBJECT_LAYER_STATIC,
+																	this);
 		this->actorFlags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
 	}
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
