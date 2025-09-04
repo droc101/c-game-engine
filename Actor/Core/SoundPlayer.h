@@ -9,6 +9,6 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 
-void SoundPlayerInit(Actor *this, const KvList *params, Transform *transform);
+void SoundPlayerInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //SOUND_PLAYER_H

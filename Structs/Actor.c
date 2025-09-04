@@ -27,7 +27,7 @@
 #include "GlobalState.h"
 #include "Level.h"
 
-Actor *CreateActor(Transform *transform, const char *actorType, KvList *params, JPH_BodyInterface *bodyInterface)
+Actor *CreateActor(Transform *transform, const char *actorType, KvList params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = malloc(sizeof(Actor));
 	CheckAlloc(actor);

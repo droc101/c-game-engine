@@ -9,6 +9,6 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 
-void GoalInit(Actor *this, const KvList *params, Transform *transform);
+void GoalInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //GAME_GOAL_H

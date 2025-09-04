@@ -129,7 +129,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void TriggerInit(Actor *this, const KvList *params, Transform *transform)
+void TriggerInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 

@@ -60,7 +60,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void IoProxyInit(Actor *this, const KvList * /*params*/, Transform * /*transform*/)
+void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/)
 {
 	this->definition = &definition;
 

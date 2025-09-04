@@ -116,7 +116,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void GoalInit(Actor *this, const KvList *params, Transform *transform)
+void GoalInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 

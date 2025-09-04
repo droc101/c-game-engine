@@ -185,7 +185,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void LaserInit(Actor *this, const KvList *params, Transform *transform)
+void LaserInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 

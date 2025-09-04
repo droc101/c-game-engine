@@ -8,94 +8,31 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "../../Helpers/Core/List.h"
 #include "../../Structs/Color.h"
+#include "../../Structs/Param.h"
+#include "Dict.h"
 
-#define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = (x)})
-#define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = (x)})
-#define PARAM_FLOAT(x) ((Param){PARAM_TYPE_FLOAT, .floatValue = (x)})
-#define PARAM_BOOL(x) ((Param){PARAM_TYPE_BOOL, .boolValue = (x)})
-#define PARAM_STRING(x) ((Param){PARAM_TYPE_STRING, .stringValue = (x)})
-#define PARAM_COLOR(x) ((Param){PARAM_TYPE_COLOR, .colorValue = (x)})
-#define PARAM_NONE ((Param){PARAM_TYPE_NONE})
-
-typedef enum ParamType ParamType;
-
-typedef struct Param Param;
-typedef struct KvList KvList;
-
-enum ParamType
-{
-	PARAM_TYPE_BYTE,
-	PARAM_TYPE_INTEGER,
-	PARAM_TYPE_FLOAT,
-	PARAM_TYPE_BOOL,
-	PARAM_TYPE_STRING,
-	PARAM_TYPE_NONE,
-	PARAM_TYPE_COLOR
-};
-
-struct KvList
-{
-	LockingList keys;
-	LockingList values;
-};
-
-struct Param
-{
-	ParamType type;
-	union
-	{
-		uint8_t byteValue;
-		int intValue;
-		float floatValue;
-		bool boolValue;
-		char stringValue[64];
-		Color colorValue;
-	};
-};
+// TODO find a way to not leak this into anyone who includes this
+DEFINE_DICT(KvList, const char *, STR_OPLIST, Param, PARAM_OPLIST);
 
 /**
  * Creates a key-value list.
  * @param list The list to create.
  */
-void KvListCreate(KvList *list);
+void KvListCreate(KvList list);
 
 /**
  * Destroys a key-value list, freeing all memory associated with it.
  * @param list The list to destroy.
  */
-void KvListDestroy(KvList *list);
+void KvListDestroy(KvList list);
 
 /**
  * Deletes a key from a key-value list.
  * @param list The list to delete from.
  * @param key The key to delete.
  */
-void KvDelete(KvList *list, const char *key);
-
-/**
- * Get the length of the key-value list (number of keys/values).
- * @param list The list to get the length of.
- * @return The number of keys/values in the list.
- */
-size_t KvListLength(const KvList *list);
-
-/**
- * Check if a key exists in the key-value list.
- * @param list The list to check.
- * @param key The key to check for.
- * @return Whether the key exists in the list.
- */
-bool KvListHas(const KvList *list, const char *key);
-
-/**
- * Get the type of a key in the key-value list.
- * @param list The list to check.
- * @param key The key to check for.
- * @return The type of the key, or PARAM_TYPE_NONE if it does not exist.
- */
-ParamType KvGetType(const KvList *list, const char *key);
+void KvDelete(KvList list, const char *key);
 
 #pragma region Getters
 
@@ -106,7 +43,7 @@ ParamType KvGetType(const KvList *list, const char *key);
  * @param defaultValue The default value to return if the key does not exist.
  * @return The byte value associated with the key, or the default value if the key does not exist.
  */
-uint8_t KvGetByte(const KvList *list, const char *key, uint8_t defaultValue);
+uint8_t KvGetByte(const KvList list, const char *key, uint8_t defaultValue);
 
 /**
  * Get an integer value from the key-value list.
@@ -115,7 +52,7 @@ uint8_t KvGetByte(const KvList *list, const char *key, uint8_t defaultValue);
  * @param defaultValue The default value to return if the key does not exist.
  * @return The integer value associated with the key, or the default value if the key does not exist.
  */
-int KvGetInt(const KvList *list, const char *key, int defaultValue);
+int KvGetInt(const KvList list, const char *key, int defaultValue);
 
 /**
  * Get a float value from the key-value list.
@@ -124,7 +61,7 @@ int KvGetInt(const KvList *list, const char *key, int defaultValue);
  * @param defaultValue The default value to return if the key does not exist.
  * @return The float value associated with the key, or the default value if the key does not exist.
  */
-float KvGetFloat(const KvList *list, const char *key, float defaultValue);
+float KvGetFloat(const KvList list, const char *key, float defaultValue);
 
 /**
  * Get a boolean value from the key-value list.
@@ -133,7 +70,7 @@ float KvGetFloat(const KvList *list, const char *key, float defaultValue);
  * @param defaultValue The default value to return if the key does not exist.
  * @return The boolean value associated with the key, or the default value if the key does not exist.
  */
-bool KvGetBool(const KvList *list, const char *key, bool defaultValue);
+bool KvGetBool(const KvList list, const char *key, bool defaultValue);
 
 /**
  * Get a string value from the key-value list.
@@ -142,7 +79,7 @@ bool KvGetBool(const KvList *list, const char *key, bool defaultValue);
  * @param defaultValue The default value to return if the key does not exist.
  * @return The string value associated with the key, or the default value if the key does not exist.
  */
-const char *KvGetString(const KvList *list, const char *key, const char *defaultValue);
+const char *KvGetString(const KvList list, const char *key, const char *defaultValue);
 
 /**
  * Get a Color value from the key-value list.
@@ -151,7 +88,7 @@ const char *KvGetString(const KvList *list, const char *key, const char *default
  * @param defaultValue The default value to return if the key does not exist.
  * @return The Color value associated with the key, or the default value if the key does not exist.
  */
-Color KvGetColor(const KvList *list, const char *key, Color defaultValue);
+Color KvGetColor(const KvList list, const char *key, Color defaultValue);
 
 #pragma endregion
 
@@ -163,7 +100,7 @@ Color KvGetColor(const KvList *list, const char *key, Color defaultValue);
  * @param key The key to set the value for.
  * @param value The byte value to set.
  */
-void KvSetByte(KvList *list, const char *key, uint8_t value);
+void KvSetByte(KvList list, const char *key, uint8_t value);
 
 /**
  * Set an integer value in the key-value list.
@@ -171,7 +108,7 @@ void KvSetByte(KvList *list, const char *key, uint8_t value);
  * @param key The key to set the value for.
  * @param value The integer value to set.
  */
-void KvSetInt(KvList *list, const char *key, int value);
+void KvSetInt(KvList list, const char *key, int value);
 
 /**
  * Set a float value in the key-value list.
@@ -179,7 +116,7 @@ void KvSetInt(KvList *list, const char *key, int value);
  * @param key The key to set the value for.
  * @param value The float value to set.
  */
-void KvSetFloat(KvList *list, const char *key, float value);
+void KvSetFloat(KvList list, const char *key, float value);
 
 /**
  * Set a boolean value in the key-value list.
@@ -187,7 +124,7 @@ void KvSetFloat(KvList *list, const char *key, float value);
  * @param key The key to set the value for.
  * @param value The boolean value to set.
  */
-void KvSetBool(KvList *list, const char *key, bool value);
+void KvSetBool(KvList list, const char *key, bool value);
 
 /**
  * Set a string value in the key-value list.
@@ -195,7 +132,7 @@ void KvSetBool(KvList *list, const char *key, bool value);
  * @param key The key to set the value for.
  * @param value The string value to set.
  */
-void KvSetString(KvList *list, const char *key, const char *value);
+void KvSetString(KvList list, const char *key, const char *value);
 
 /**
  * Set a Color value in the key-value list.
@@ -203,7 +140,7 @@ void KvSetString(KvList *list, const char *key, const char *value);
  * @param key The key to set the value for.
  * @param value The Color value to set.
  */
-void KvSetColor(KvList *list, const char *key, Color value);
+void KvSetColor(KvList list, const char *key, Color value);
 
 /**
  * Perform a type-unsafe set of a value in the key-value list.
@@ -211,7 +148,7 @@ void KvSetColor(KvList *list, const char *key, Color value);
  * @param key The key to set the value for.
  * @param value The raw value to set.
  */
-void KvSetUnsafe(KvList *list, const char *key, Param value);
+void KvSetUnsafe(KvList list, const char *key, Param value);
 
 #pragma endregion
 

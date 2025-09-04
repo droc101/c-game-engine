@@ -121,7 +121,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void LogicCounterInit(Actor *this, const KvList *params, Transform * /*transform*/)
+void LogicCounterInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->definition = &definition;
 

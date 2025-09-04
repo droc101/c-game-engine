@@ -143,7 +143,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void TestActorInit(Actor *this, const KvList * /*params*/, Transform *transform)
+void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->definition = &definition;
 

@@ -50,7 +50,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void PhysboxInit(Actor *this, const KvList * /*params*/, Transform *transform)
+void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->definition = &definition;
 

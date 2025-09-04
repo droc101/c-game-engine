@@ -9,6 +9,6 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 
-void StaticModelInit(Actor *this, const KvList *params, Transform *transform);
+void StaticModelInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //STATICMODEL_H

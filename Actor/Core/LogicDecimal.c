@@ -112,7 +112,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void LogicDecimalInit(Actor *this, const KvList *params, Transform * /*transform*/)
+void LogicDecimalInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->definition = &definition;
 

@@ -93,7 +93,7 @@ static ActorDefinition definition = {
 	.Destroy = SoundPlayerDestroy,
 };
 
-void SoundPlayerInit(Actor *this, const KvList *params, Transform * /*transform*/)
+void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->definition = &definition;
 

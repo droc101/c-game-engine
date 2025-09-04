@@ -9,6 +9,6 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 
-void LogicBinaryInit(Actor *this, const KvList *params, Transform *transform);
+void LogicBinaryInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //LOGICBINARY_H

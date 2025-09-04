@@ -13,6 +13,7 @@
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/ActorDefinition.h"
 #include "../../../Structs/Level.h"
+#include "../../../Structs/Param.h"
 #include "../../../Structs/Vector2.h"
 #include "../../../Structs/Wall.h"
 #include "../AssetReader.h"
@@ -93,7 +94,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 		ReadString(data, &offset, actorName, 64);
 
 		KvList params;
-		KvListCreate(&params);
+		KvListCreate(params);
 		const uint32_t paramCount = ReadUint(data, &offset);
 		for (size_t j = 0; j < paramCount; j++)
 		{
@@ -102,7 +103,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 			EXPECT_BYTES(64 + sizeof(Param));
 			ReadString(data, &offset, key, 64);
 			ReadBytes(data, &offset, sizeof(Param), &param);
-			KvSetUnsafe(&params, key, param);
+			KvSetUnsafe(params, key, param);
 		}
 
 		const char *actorTypeString = "";
@@ -159,7 +160,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 		}
 		Actor *a = CreateActor((Transform[]){{{actorX, 0.0f, actorZ}, {0.0f, actorRotation, 0.0f}}},
 							   actorTypeString,
-							   &params,
+							   params,
 							   bodyInterface);
 
 		EXPECT_BYTES(sizeof(uint32_t));

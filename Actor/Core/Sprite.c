@@ -25,7 +25,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void SpriteInit(Actor *this, const KvList *params, Transform *transform)
+void SpriteInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 

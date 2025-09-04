@@ -9,6 +9,6 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 
-void CoinInit(Actor *this, const KvList *params, Transform *transform);
+void CoinInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //GAME_COIN_H

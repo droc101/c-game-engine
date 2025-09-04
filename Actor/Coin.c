@@ -106,7 +106,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void CoinInit(Actor *this, const KvList *params, Transform *transform)
+void CoinInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 

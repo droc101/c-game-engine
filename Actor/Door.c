@@ -348,7 +348,7 @@ static ActorDefinition definition = {
 	.Destroy = DoorDestroy,
 };
 
-void DoorInit(Actor *this, const KvList *params, Transform *transform)
+void DoorInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 

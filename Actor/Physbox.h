@@ -9,6 +9,6 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 
-void PhysboxInit(Actor *this, const KvList *params, Transform *transform);
+void PhysboxInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //PHYSBOX_H

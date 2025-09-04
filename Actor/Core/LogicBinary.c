@@ -104,7 +104,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void LogicBinaryInit(Actor *this, const KvList *params, Transform * /*transform*/)
+void LogicBinaryInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->definition = &definition;
 

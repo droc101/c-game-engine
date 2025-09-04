@@ -71,12 +71,12 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 	if (!data->hasTicked)
 	{
 		KvList laserParams;
-		KvListCreate(&laserParams);
-		KvSetByte(&laserParams, "height", data->height);
-		KvSetBool(&laserParams, "startEnabled", data->startEnabled);
+		KvListCreate(laserParams);
+		KvSetByte(laserParams, "height", data->height);
+		KvSetBool(laserParams, "startEnabled", data->startEnabled);
 		data->laserActor = CreateActor(&data->transform,
 									   LASER_ACTOR_NAME,
-									   &laserParams,
+									   laserParams,
 									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
 		AddActor(data->laserActor);
 		data->hasTicked = true;
@@ -116,7 +116,7 @@ static ActorDefinition definition = {
 	.Destroy = DefaultActorDestroy,
 };
 
-void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform)
+void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->definition = &definition;
 	// TODO: uncomment once laser emitter collision has holes for where the laser comes out

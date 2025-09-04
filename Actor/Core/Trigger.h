@@ -9,6 +9,6 @@
 #include "../../Helpers/Core/KVList.h"
 #include "../../Structs/Actor.h"
 
-void TriggerInit(Actor *this, const KvList *params, Transform *transform);
+void TriggerInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //TRIGGER_H

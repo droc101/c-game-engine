@@ -9,6 +9,6 @@
 #include "../Helpers/Core/KVList.h"
 #include "../Structs/Actor.h"
 
-void LaserEmitterInit(Actor *this, const KvList *params, Transform *transform);
+void LaserEmitterInit(Actor *this, const KvList params, Transform *transform);
 
 #endif //LASEREMITTER_H

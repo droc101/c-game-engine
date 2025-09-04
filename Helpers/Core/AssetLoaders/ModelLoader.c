@@ -166,6 +166,10 @@ ModelDefinition *LoadModelInternal(const char *asset)
 			}
 		}
 		model->collisionModelShapeSettings = CreateDynamicModelShapeSettings(numHulls, hulls);
+		for (size_t i = 0; i < numHulls; i++)
+		{
+			free(hulls[i].points);
+		}
 		free(hulls);
 	} else if (model->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
 	{

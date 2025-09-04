@@ -44,7 +44,7 @@ struct Asset
 	free((asset).data); \
 	ASSET_ZERO(asset);
 
-#define ASSET_OPLIST (INIT(ASSET_ZERO), INIT_SET(ASSET_COPY), SET(ASSET_COPY), CLEAR(ASSET_FREE))
+#define ASSET_OPLIST (INIT(ASSET_ZERO), INIT_SET(ASSET_COPY), SET(ASSET_COPY), CLEAR(ASSET_FREE), TYPE(Asset))
 
 /**
  * Free an asset
