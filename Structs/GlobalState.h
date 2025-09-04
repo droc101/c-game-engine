@@ -77,6 +77,7 @@ struct GlobalState
 	/// The scale of the UI.
 	double uiScale;
 
+	/// The view model
 	Viewmodel viewmodel;
 
 	/// Game options

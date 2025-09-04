@@ -69,6 +69,7 @@ struct Actor
 	/// The actor's wall, in global space
 	ActorWall *actorWall;
 
+	/// The actor's definition
 	const ActorDefinition *definition;
 
 	/// List of I/O connections

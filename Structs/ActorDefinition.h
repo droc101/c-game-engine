@@ -89,6 +89,7 @@ struct ActorDefinition
 	ActorPlayerContactAddedFunction OnPlayerContactAdded;
 	ActorPlayerContactPersistedFunction OnPlayerContactPersisted;
 	ActorPlayerContactRemovedFunction OnPlayerContactRemoved;
+	/// The function called to allow the actor to render UI
 	ActorUIRenderFunction RenderUi;
 
 	/// The function to call when the actor is destroyed
@@ -98,10 +99,21 @@ struct ActorDefinition
 
 DEFINE_DICT(ActorInitFunctionDict, const char *, M_CSTR_OPLIST, ActorInitFunction, M_PTR_OPLIST);
 
+/**
+ * Register all actor types
+ */
 void RegisterActors();
 
+/**
+ * Get the init function for an actor type
+ * @param actorType The actor type
+ * @return The actor's init function
+ */
 ActorInitFunction GetActorInitFunction(const char *actorType);
 
+/**
+ * Destroy actor registrations
+ */
 void DestroyActorInitFunctionDictionary();
 
 #endif //GAME_ACTORDEFINITIONS_H

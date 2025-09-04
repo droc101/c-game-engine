@@ -25,8 +25,11 @@ struct Image
 	/// The ID of the image. This is generated at runtime and not consistent between runs.
 	uint32_t id;
 
+	/// Whether to use filtering on this texture
 	bool filter;
+	/// Whether this texture repeats
 	bool repeat;
+	/// Whether to generate mipmaps for this texture
 	bool mipmaps;
 
 	/// The name of the image
@@ -35,6 +38,10 @@ struct Image
 	uint8_t *pixelData;
 };
 
+/**
+ * Generate a "missing texture"
+ * @param src The image to populate
+ */
 void GenFallbackImage(Image *src);
 
 /**
@@ -44,8 +51,14 @@ void GenFallbackImage(Image *src);
  */
 Image *LoadImage(const char *asset);
 
+/**
+ * Create an image that is *always* missing
+ */
 Image *RegisterFallbackImage();
 
+/**
+ * Destroy the texture loader and clean up all loaded textures
+ */
 void DestroyTextureLoader();
 
 #endif //TEXTURELOADER_H

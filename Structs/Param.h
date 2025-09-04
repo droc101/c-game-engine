@@ -35,6 +35,7 @@ enum ParamType
 
 struct Param
 {
+	/// The type contained in this param
 	ParamType type;
 	union
 	{

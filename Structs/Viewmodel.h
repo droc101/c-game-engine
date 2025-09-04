@@ -14,9 +14,13 @@ typedef struct Viewmodel Viewmodel;
 
 struct Viewmodel
 {
+	/// Whether to show the viewmodel
 	bool enabled;
+	/// The model to render
 	ModelDefinition *model;
+	/// The skin to render
 	uint32_t modelSkin;
+	/// The transform to render
 	Transform transform;
 };
 

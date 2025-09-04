@@ -46,8 +46,11 @@ enum ModelShader
 
 enum CollisionModelType
 {
+	/// This model does not contain a collision model.
 	COLLISION_MODEL_TYPE_NONE,
+	/// This model contains a static collision mesh (@c JPH_MeshShape)
 	COLLISION_MODEL_TYPE_STATIC,
+	/// This model contains a set of convex hulls in a compound shape (@c JPH_StaticCompoundShape)
 	COLLISION_MODEL_TYPE_DYNAMIC
 };
 
@@ -84,14 +87,19 @@ struct ModelLod
 
 struct ModelConvexHull
 {
+	/// The points of the hull
 	Vector3 *points;
+	/// The offset of the hull
 	Vector3 offset;
+	/// The number of points in the hull
 	size_t numPoints;
 };
 
 struct ModelStaticCollider
 {
+	/// The number of triangles in this mesh
 	size_t numTriangles;
+	/// The triangles in this mesh
 	JPH_Triangle *tris;
 };
 
@@ -105,6 +113,7 @@ struct ModelDefinition
 	/// The number of materials in the model
 	uint32_t materialCount;
 
+	/// The number of materials per skin
 	uint32_t materialsPerSkin;
 
 	/// The number of skins in the model
@@ -118,28 +127,29 @@ struct ModelDefinition
 	/// The LODs for this model
 	ModelLod **lods;
 
+	/// The origin (center) of the bounding box
 	Vector3 boundingBoxOrigin;
+	/// The extends of the bounding box. The box will be twice this size.
 	Vector3 boundingBoxExtents;
+	/// The jolt shape for the bounding box
 	JPH_Shape *boundingBoxShape;
 
+	/// The type of collision model this model contains
 	CollisionModelType collisionModelType;
-
-
+	/// The jolt collision shape for this model, or @c NULL if there isn't one
 	JPH_Shape *collisionModelShape;
-
-	// union
-	// {
-	// 	struct
-	// 	{
-	// 		size_t numHulls;
-	// 		ModelConvexHull *hulls;
-	// 	};
-	// 	ModelStaticCollider staticCollider;
-	// };
 };
 
+/**
+ * Initialize the model loader and try to load the error model
+ */
 void InitModelLoader();
 
+/**
+ * Internal function to load a model.
+ * @param asset The path to load
+ * @return The loaded model, or @c NULL on error
+ */
 ModelDefinition *LoadModelInternal(const char *asset);
 
 /**
@@ -156,12 +166,30 @@ ModelDefinition *LoadModel(const char *asset);
  */
 extern ModelDefinition *GetModelFromId(size_t id);
 
+/**
+ * Free a model asset
+ * @param model The model to free
+ */
 void FreeModel(ModelDefinition *model);
 
+/**
+ * Destroy the model loader
+ */
 void DestroyModelLoader();
 
+/**
+ * Create a dynamic model collider shape
+ * @param numHulls The number of hulls
+ * @param hulls The hulls
+ * @return The @c JPH_Shape
+ */
 JPH_Shape *CreateDynamicModelShape(size_t numHulls, const ModelConvexHull *hulls);
 
+/**
+ * Create a static model collider shape
+ * @param staticCollider The static collider data
+ * @return The @c JPH_Shape
+ */
 JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollider);
 
 #endif //MODELLOADER_H

@@ -16,13 +16,6 @@ double ReadDouble(const uint8_t *data, size_t *offset)
 	return d;
 }
 
-double ReadDoubleA(const uint8_t *data, const size_t offset)
-{
-	double d = 0;
-	memcpy(&d, data + offset, sizeof(double));
-	return d;
-}
-
 uint32_t ReadUint(const uint8_t *data, size_t *offset)
 {
 	uint32_t i = 0;
@@ -36,13 +29,6 @@ int ReadInt(const uint8_t *data, size_t *offset)
 	int i = 0;
 	memcpy(&i, data + *offset, sizeof(int));
 	*offset += sizeof(int);
-	return i;
-}
-
-uint32_t ReadUintA(const uint8_t *data, const size_t offset)
-{
-	uint32_t i = 0;
-	memcpy(&i, data + offset, sizeof(uint32_t));
 	return i;
 }
 

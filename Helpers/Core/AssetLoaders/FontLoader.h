@@ -55,6 +55,10 @@ Font *GenerateFallbackFont();
  */
 Font *LoadFont(const char *asset);
 
+/**
+ * Free a font asset
+ * @param font The font to free
+ */
 void FreeFont(Font *font);
 
 #endif //FONTLOADER_H
