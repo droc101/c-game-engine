@@ -16,11 +16,11 @@
 	_Pragma("GCC diagnostic pop");
 
 #define STR_COPY(str, value) \
-	(str) = malloc(strlen(value) + 1); \
-	((char *)(str))[strlen(value)] = '\0'; \
-	strncpy((str), (value), strlen((value)));
+	(str) = malloc(strlen((char*)value) + 1); \
+	((char *)(str))[strlen((char*)value)] = '\0'; \
+	strncpy((char*)(str), (char*)(value), strlen((char*)(value)));
 #define STR_FREE(str) \
-	free((str)); \
+	free((char*)(str)); \
 	(str) = NULL;
 
 #define STR_OPLIST \
