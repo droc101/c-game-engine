@@ -140,8 +140,8 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->boundingBoxExtents.x = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.y = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.z = ReadFloat(assetData->data, &offset);
-	model->boundingBoxShapeSettings = (JPH_ShapeSettings *)
-			JPH_BoxShapeSettings_Create(&model->boundingBoxExtents, 0.0005f); // TODO magic numbers bad
+	model->boundingBoxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents,
+															   0.0005f); // TODO magic numbers bad
 
 	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
@@ -165,7 +165,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 				point->z = ReadFloat(assetData->data, &offset);
 			}
 		}
-		model->collisionModelShapeSettings = CreateDynamicModelShapeSettings(numHulls, hulls);
+		model->collisionModelShape = CreateDynamicModelShape(numHulls, hulls);
 		for (size_t i = 0; i < numHulls; i++)
 		{
 			free(hulls[i].points);
@@ -190,11 +190,11 @@ ModelDefinition *LoadModelInternal(const char *asset)
 				point->z = ReadFloat(assetData->data, &offset);
 			}
 		}
-		model->collisionModelShapeSettings = CreateStaticModelShapeSettings(&staticCollider);
+		model->collisionModelShape = CreateStaticModelShape(&staticCollider);
 		free(staticCollider.tris);
 	} else
 	{
-		model->collisionModelShapeSettings = NULL;
+		model->collisionModelShape = NULL;
 	}
 
 	FreeAsset(assetData);
@@ -283,9 +283,9 @@ void FreeModel(ModelDefinition *model)
 
 	if (model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
 	{
-		JPH_ShapeSettings_Destroy(model->collisionModelShapeSettings);
+		JPH_Shape_Destroy(model->collisionModelShape);
 	}
-	JPH_ShapeSettings_Destroy(model->boundingBoxShapeSettings);
+	JPH_Shape_Destroy(model->boundingBoxShape);
 
 	free(model->name);
 	free(model->skins);
@@ -303,9 +303,9 @@ void DestroyModelLoader()
 		FreeModel(models[i]);
 	}
 }
-JPH_ShapeSettings *CreateDynamicModelShapeSettings(const size_t numHulls, const ModelConvexHull *hulls)
+JPH_Shape *CreateDynamicModelShape(const size_t numHulls, const ModelConvexHull *hulls)
 {
-	const JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
+	JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
 	for (size_t i = 0; i < numHulls; i++)
 	{
 		const ModelConvexHull *hull = &hulls[i];
@@ -319,12 +319,15 @@ JPH_ShapeSettings *CreateDynamicModelShapeSettings(const size_t numHulls, const 
 											0);
 		JPH_Shape_Destroy(hullShape);
 	}
-	return (JPH_ShapeSettings *)compoundShapeSettings;
+	JPH_Shape *shape = (JPH_Shape*)JPH_StaticCompoundShape_Create(compoundShapeSettings);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings*)compoundShapeSettings);
+	return shape;
 }
 
-JPH_ShapeSettings *CreateStaticModelShapeSettings(const ModelStaticCollider *staticCollider)
+inline JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollider)
 {
-	JPH_ShapeSettings *meshShapeSettings = (JPH_ShapeSettings *)
-			JPH_MeshShapeSettings_Create(staticCollider->tris, staticCollider->numTriangles);
-	return meshShapeSettings;
+	JPH_MeshShapeSettings *settings = JPH_MeshShapeSettings_Create(staticCollider->tris, staticCollider->numTriangles);
+	JPH_Shape *meshShape = (JPH_Shape*)JPH_MeshShapeSettings_CreateShape(settings);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings*)settings);
+	return meshShape;
 }

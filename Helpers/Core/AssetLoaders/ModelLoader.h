@@ -120,12 +120,12 @@ struct ModelDefinition
 
 	Vector3 boundingBoxOrigin;
 	Vector3 boundingBoxExtents;
-	JPH_ShapeSettings *boundingBoxShapeSettings;
+	JPH_Shape *boundingBoxShape;
 
 	CollisionModelType collisionModelType;
 
 
-	JPH_ShapeSettings *collisionModelShapeSettings;
+	JPH_Shape *collisionModelShape;
 
 	// union
 	// {
@@ -160,8 +160,8 @@ void FreeModel(ModelDefinition *model);
 
 void DestroyModelLoader();
 
-JPH_ShapeSettings *CreateDynamicModelShapeSettings(size_t numHulls, const ModelConvexHull *hulls);
+JPH_Shape *CreateDynamicModelShape(size_t numHulls, const ModelConvexHull *hulls);
 
-JPH_ShapeSettings *CreateStaticModelShapeSettings(const ModelStaticCollider *staticCollider);
+JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollider);
 
 #endif //MODELLOADER_H

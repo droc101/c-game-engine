@@ -21,15 +21,21 @@
 
 char loadStateLevelname[32];
 uint64_t levelLoadStartTime;
+bool loadStateLoadedLevel;
 
 void GLoadingStateUpdate(GlobalState *state)
 {
-	if (state->physicsFrame == 1)
+	if (!loadStateLoadedLevel)
 	{
+		loadStateLoadedLevel = true;
+		const uint64_t realLoadStart = GetTimeNs();
 		if (!ChangeLevelByName((char *)&loadStateLevelname))
 		{
 			LogError("Failed to load level: %s\n", loadStateLevelname);
 		}
+		const uint64_t realLoadEnd = GetTimeNs();
+		const uint64_t realLoadTime = realLoadEnd - realLoadStart;
+		LogInfo("Loaded level %s in %f ms\n", loadStateLevelname, (double)realLoadTime / 1000000.0);
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
@@ -53,6 +59,7 @@ void GLoadingStateRender(GlobalState * /*state*/)
 
 void GLoadingStateSet(const char *levelName)
 {
+	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
 	strncpy(loadStateLevelname, levelName, 31);
 	StopMusic();

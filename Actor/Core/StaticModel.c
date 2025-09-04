@@ -33,14 +33,14 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_STATIC ||
 		this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->collisionModelShapeSettings,
+		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
 																	transform,
 																	JPH_MotionType_Static,
 																	OBJECT_LAYER_STATIC,
 																	this);
 	} else
 	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->boundingBoxShapeSettings,
+		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->boundingBoxShape,
 																	transform,
 																	JPH_MotionType_Static,
 																	OBJECT_LAYER_STATIC,

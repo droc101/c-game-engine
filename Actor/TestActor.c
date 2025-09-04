@@ -32,7 +32,7 @@
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(this->actorModel->collisionModelShapeSettings,
+			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
 																		 transform,
 																		 JPH_MotionType_Dynamic,
 																		 OBJECT_LAYER_DYNAMIC,
