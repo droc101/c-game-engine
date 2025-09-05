@@ -5,10 +5,8 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include <joltc/Math/Transform.h>
-#include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
+#define SPRITE_ACTOR_NAME "prop_sprite"
 
-void SpriteInit(Actor *this, const KvList params, Transform *transform);
+void RegisterSprite();
 
 #endif //SPRITE_H

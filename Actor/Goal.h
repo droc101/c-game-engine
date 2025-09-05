@@ -5,10 +5,13 @@
 #ifndef GAME_GOAL_H
 #define GAME_GOAL_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define GOAL_ACTOR_NAME "prop_goal"
 
-void GoalInit(Actor *this, const KvList params, Transform *transform);
+#define GOAL_INPUT_ENABLE "enable"
+#define GOAL_INPUT_DISABLE "disable"
+
+#define GOAL_OUTPUT_COLLECTED "collected"
+
+void RegisterGoal();
 
 #endif //GAME_GOAL_H

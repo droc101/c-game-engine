@@ -18,10 +18,25 @@
 #include "../../../Structs/Wall.h"
 #include "../AssetReader.h"
 #include "../DataReader.h"
-#include "../Error.h"
 #include "../KVList.h"
 #include "../List.h"
 #include "../Logging.h"
+
+#include "../../../Actor/Coin.h"
+#include "../../../Actor/Core/IoProxy.h"
+#include "../../../Actor/Core/LogicBinary.h"
+#include "../../../Actor/Core/LogicCounter.h"
+#include "../../../Actor/Core/LogicDecimal.h"
+#include "../../../Actor/Core/SoundPlayer.h"
+#include "../../../Actor/Core/Sprite.h"
+#include "../../../Actor/Core/StaticModel.h"
+#include "../../../Actor/Core/Trigger.h"
+#include "../../../Actor/Door.h"
+#include "../../../Actor/Goal.h"
+#include "../../../Actor/Laser.h"
+#include "../../../Actor/LaserEmitter.h"
+#include "../../../Actor/Physbox.h"
+#include "../../../Actor/TestActor.h"
 
 /**
  * Prints an error and returns NULL if there are not enough bytes remaining to read
@@ -167,16 +182,24 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 		const uint32_t connectionCount = ReadUint(data, &offset);
 		for (uint32_t j = 0; j < connectionCount; j++)
 		{
-			ActorConnection *ac = malloc(sizeof(ActorConnection));
-			CheckAlloc(ac);
+			/*
+			 * Connections are no longer loaded from v1 levels after the I/O changes.
+			 * While it is theoretically possible to make a bandaid fix for this, it
+			 * would be complex, and not really worth the effort.
+			 */
 			EXPECT_BYTES(1 + 64 + 1 + sizeof(Param));
-			ac->myOutput = ReadByte(data, &offset);
-			char outActorName[64];
-			ReadString(data, &offset, outActorName, 64);
-			strcpy(ac->outActorName, outActorName);
-			ac->targetInput = ReadByte(data, &offset);
-			ReadBytes(data, &offset, sizeof(Param), &ac->outParamOverride);
-			ListAdd(a->ioConnections, ac);
+			offset += 1 + 64 + 1 + sizeof(Param);
+
+
+			// ActorConnection *ac = malloc(sizeof(ActorConnection));
+			// CheckAlloc(ac);
+			// ac->sourceActorOutput = ReadByte(data, &offset);
+			// char outActorName[64];
+			// ReadString(data, &offset, outActorName, 64);
+			// strcpy(ac->outActorName, outActorName);
+			// ac->targetActorInput = ReadByte(data, &offset);
+			// ReadBytes(data, &offset, sizeof(Param), &ac->outParamOverride);
+			// ListAdd(a->ioConnections, ac);
 		}
 
 		ListAdd(level->actors, a);

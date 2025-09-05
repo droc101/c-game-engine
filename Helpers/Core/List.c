@@ -525,7 +525,7 @@ void *GameReallocArray(void *ptr, const size_t arrayLength, const size_t element
 	if (arrayLength > SIZE_MAX / elementSize)
 	{
 		LogWarning("GameReallocArray: arrayLength * elementSize exceeds SIZE_MAX, returning NULL");
-		errno = ENOMEM;
+		errno = ENOMEM; // NOLINT(*-include-cleaner) (it's sadly not in a consistent file)
 		return NULL;
 	}
 	return realloc(ptr, arrayLength * elementSize);

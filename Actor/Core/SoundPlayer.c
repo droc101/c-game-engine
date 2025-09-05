@@ -4,9 +4,7 @@
 
 #include "SoundPlayer.h"
 #include <joltc/Math/Transform.h>
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../Helpers/Core/AssetReader.h"
@@ -15,14 +13,7 @@
 #include "../../Helpers/Core/SoundSystem.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/ActorDefinition.h"
-
-enum SoundPlayerInput
-{
-	SOUND_PLAYER_INPUT_PLAY = 1,
-	SOUND_PLAYER_INPUT_PAUSE = 2,
-	SOUND_PLAYER_INPUT_RESUME = 3,
-	SOUND_PLAYER_INPUT_STOP = 4,
-};
+#include "../../Structs/Param.h"
 
 typedef struct SoundPlayerData
 {
@@ -49,54 +40,32 @@ static void SoundPlayerDestroy(Actor *this)
 	}
 }
 
-static bool SoundPlayerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
 	SoundPlayerData *data = this->extraData;
-	if (signal == SOUND_PLAYER_INPUT_PLAY)
-	{
-		data->effect = PlaySoundEffect(data->asset, data->loops, data->volume, SoundPlayerSoundDone, data);
-		return true;
-	}
-	if (data->effect)
-	{
-		if (signal == SOUND_PLAYER_INPUT_PAUSE)
-		{
-			PauseSoundEffect(data->effect);
-			return true;
-		}
-		if (signal == SOUND_PLAYER_INPUT_RESUME)
-		{
-			ResumeSoundEffect(data->effect);
-			return true;
-		}
-		if (signal == SOUND_PLAYER_INPUT_STOP)
-		{
-			StopSoundEffect(data->effect);
-			return true;
-		}
-	}
-	return false;
+	data->effect = PlaySoundEffect(data->asset, data->loops, data->volume, SoundPlayerSoundDone, data);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_SOUND_PLAYER,
-	.Update = DefaultActorUpdate,
-	.SignalHandler = SoundPlayerSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = SoundPlayerDestroy,
-};
+static void SoundPlayerPauseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	const SoundPlayerData *data = this->extraData;
+	PauseSoundEffect(data->effect);
+}
+
+static void SoundPlayerResumeHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	const SoundPlayerData *data = this->extraData;
+	ResumeSoundEffect(data->effect);
+}
+
+static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	const SoundPlayerData *data = this->extraData;
+	StopSoundEffect(data->effect);
+}
 
 void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
-	this->definition = &definition;
-
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
 	data->effect = NULL;
@@ -104,4 +73,23 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	data->loops = KvGetInt(params, "loops", 0);
 	data->volume = KvGetFloat(params, "volume", 1);
 	this->extraData = data;
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_SOUND_PLAYER,
+									 .Update = DefaultActorUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = SoundPlayerDestroy,
+									 .Init = SoundPlayerInit};
+
+void RegisterSoundPlayer()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_PLAY, SoundPlayerPlayHandler);
+	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_PAUSE, SoundPlayerPauseHandler);
+	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_RESUME, SoundPlayerResumeHandler);
+	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_STOP, SoundPlayerStopHandler);
+	RegisterActor(SOUND_PLAYER_ACTOR_NAME, &definition);
 }

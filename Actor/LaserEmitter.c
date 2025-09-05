@@ -3,7 +3,6 @@
 //
 
 #include "LaserEmitter.h"
-#include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -11,10 +10,8 @@
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
@@ -25,13 +22,8 @@
 #include "../Structs/ActorDefinition.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
+#include "../Structs/Param.h"
 #include "Laser.h"
-
-enum LaserEmitterInputs
-{
-	LASER_EMITTER_INPUT_ENABLE = 1,
-	LASER_EMITTER_INPUT_DISABLE = 2,
-};
 
 enum LaserEmitterSkin
 {
@@ -46,7 +38,7 @@ typedef struct LaserEmitterData
 {
 	LaserHeight height;
 	Actor *laserActor;
-	bool startEnabled;
+	bool startOn;
 	bool hasTicked;
 	Transform transform;
 } LaserEmitterData;
@@ -55,10 +47,10 @@ static inline void CreateLaserEmitterCollider(Actor *this, const Transform *tran
 {
 	JPH_BodyCreationSettings
 			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
-																		 transform,
-																		 JPH_MotionType_Static,
-																		 OBJECT_LAYER_STATIC,
-																		 this);
+																		  transform,
+																		  JPH_MotionType_Static,
+																		  OBJECT_LAYER_STATIC,
+																		  this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
@@ -73,7 +65,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 		KvList laserParams;
 		KvListCreate(laserParams);
 		KvSetByte(laserParams, "height", data->height);
-		KvSetBool(laserParams, "startEnabled", data->startEnabled);
+		KvSetBool(laserParams, "startEnabled", data->startOn);
 		data->laserActor = CreateActor(&data->transform,
 									   LASER_ACTOR_NAME,
 									   laserParams,
@@ -83,44 +75,24 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 	}
 }
 
-static bool LaserEmitterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void LaserEmitterTurnOnHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const LaserEmitterData *data = this->extraData;
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
-	if (signal == LASER_EMITTER_INPUT_DISABLE)
-	{
-		ActorTriggerInput(this, data->laserActor, LASER_INPUT_DISABLE, NULL);
-		this->currentSkinIndex = EMITTER_SKIN_OFF;
-		return true;
-	}
-	if (signal == LASER_EMITTER_INPUT_ENABLE)
-	{
-		ActorTriggerInput(this, data->laserActor, LASER_INPUT_ENABLE, NULL);
-		this->currentSkinIndex = data->height + 1;
-		return true;
-	}
-	return false;
+	ActorTriggerInput(this, data->laserActor, LASER_INPUT_TURN_ON, NULL);
+	this->currentSkinIndex = data->height + 1;
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LASER_EMITTER,
-	.Update = LaserEmitterUpdate,
-	.SignalHandler = LaserEmitterSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
+static void LaserEmitterTurnOffHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	const LaserEmitterData *data = this->extraData;
+	ActorTriggerInput(this, data->laserActor, LASER_INPUT_TURN_OFF, NULL);
+	this->currentSkinIndex = EMITTER_SKIN_OFF;
+}
 
 void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
 	// TODO: uncomment once laser emitter collision has holes for where the laser comes out
-	//this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
+	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
 	CheckAlloc(this->extraData);
@@ -142,5 +114,22 @@ void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 
 	CreateLaserEmitterCollider(this, transform);
 
-	data->startEnabled = KvGetBool(params, "startEnabled", true);
+	data->startOn = KvGetBool(params, "startOn", true);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_LASER_EMITTER,
+									 .Update = LaserEmitterUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = LaserEmitterInit};
+
+void RegisterLaserEmitter()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, LASER_EMITTER_INPUT_TURN_ON, LaserEmitterTurnOnHandler);
+	RegisterActorInput(&definition, LASER_EMITTER_INPUT_TURN_OFF, LaserEmitterTurnOffHandler);
+	RegisterActor(LASER_EMITTER_ACTOR_NAME, &definition);
 }

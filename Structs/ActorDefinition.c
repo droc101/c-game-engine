@@ -21,53 +21,110 @@
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
 #include "../Helpers/Core/Error.h"
+#include "Actor.h"
 
-ActorInitFunctionDict initFunctions;
+static ActorDefinitionDict actorDefinitions;
 
-void RegisterActor(const char *actorTypeName, const ActorInitFunction actorInitFunction)
+void RegisterActor(const char *actorTypeName, ActorDefinition *definition)
 {
-	assert(ActorInitFunctionDict_get(initFunctions, actorTypeName) == NULL); // Actor name already registered
-	assert(actorInitFunction != NULL); // Bad.
-	ActorInitFunctionDict_set_at(initFunctions, actorTypeName, actorInitFunction);
+	// Please don't be bad.
+	assert(ActorDefinitionDict_get(actorDefinitions, actorTypeName) == NULL); // Actor name already registered
+	assert(actorTypeName != NULL);
+	assert(definition != NULL);
+	assert(definition->Update != NULL);
+	assert(definition->OnPlayerContactAdded != NULL);
+	assert(definition->OnPlayerContactPersisted != NULL);
+	assert(definition->OnPlayerContactRemoved != NULL);
+	assert(definition->RenderUi != NULL);
+	assert(definition->Init != NULL);
+	assert(definition->Destroy != NULL);
+#ifdef BUILDSTYLE_DEBUG
+	ActorInputHandlerFunctionDict_iterator it;
+	ActorInputHandlerFunctionDict_it(it, definition->inputHandlers);
+	while (!ActorInputHandlerFunctionDict_last_p(it))
+	{
+		const ActorInputHandlerFunctionDict_pair *pair = ActorInputHandlerFunctionDict_ref(it);
+		assert(pair->value != NULL);
+		ActorInputHandlerFunctionDict_next(it);
+	}
+#endif
+	ActorDefinitionDict_set_at(actorDefinitions, actorTypeName, definition);
+}
+
+void RegisterActorInput(ActorDefinition *definition, const char *name, const ActorInputHandlerFunction handler)
+{
+	assert(definition != NULL);
+	assert(handler != NULL);
+	assert(name != NULL);
+	assert(ActorInputHandlerFunctionDict_get(definition->inputHandlers, name) ==
+		   NULL); // Signal name already registered
+	ActorInputHandlerFunctionDict_set_at(definition->inputHandlers, name, handler);
+}
+
+void UnregisterActorInput(ActorDefinition *definition, const char *name)
+{
+	assert(definition != NULL);
+	assert(name != NULL);
+	ActorInputHandlerFunctionDict_erase(definition->inputHandlers, name);
+}
+
+void RegisterDefaultActorInputs(ActorDefinition *definition)
+{
+	ActorInputHandlerFunctionDict_init(definition->inputHandlers);
+	RegisterActorInput(definition, ACTOR_INPUT_KILL, ActorSignalKill);
 }
 
 void RegisterActors()
 {
-	ActorInitFunctionDict_init(initFunctions);
+	ActorDefinitionDict_init(actorDefinitions);
 
-	// prop_*
-	RegisterActor(COIN_ACTOR_NAME, CoinInit);
-	RegisterActor(GOAL_ACTOR_NAME, GoalInit);
-	RegisterActor(DOOR_ACTOR_NAME, DoorInit);
-	RegisterActor(PHYSBOX_ACTOR_NAME, PhysboxInit);
-	RegisterActor(LASER_ACTOR_NAME, LaserInit);
-	RegisterActor(STATIC_MODEL_ACTOR_NAME, StaticModelInit);
-	RegisterActor(SOUND_PLAYER_ACTOR_NAME, SoundPlayerInit);
-	RegisterActor(SPRITE_ACTOR_NAME, SpriteInit);
-	RegisterActor(LASER_EMITTER_ACTOR_NAME, LaserEmitterInit);
-
-	// logic_*
-	RegisterActor(LOGIC_BINARY_ACTOR_NAME, LogicBinaryInit);
-	RegisterActor(LOGIC_DECIMAL_ACTOR_NAME, LogicDecimalInit);
-	RegisterActor(LOGIC_COUNTER_ACTOR_NAME, LogicCounterInit);
-
-	// misc
-	RegisterActor(TEST_ACTOR_NAME, TestActorInit);
-	RegisterActor(TRIGGER_ACTOR_NAME, TriggerInit);
-	RegisterActor(IO_PROXY_ACTOR_NAME, IoProxyInit);
+	RegisterIoProxy();
+	RegisterLogicBinary();
+	RegisterLogicCounter();
+	RegisterLogicDecimal();
+	RegisterSoundPlayer();
+	RegisterSprite();
+	RegisterStaticModel();
+	RegisterTrigger();
+	RegisterCoin();
+	RegisterDoor();
+	RegisterGoal();
+	RegisterLaser();
+	RegisterLaserEmitter();
+	RegisterPhysbox();
+	RegisterTestActor();
 }
 
-ActorInitFunction GetActorInitFunction(const char *actorType)
+const ActorDefinition *GetActorDefinition(const char *actorType)
 {
-	const ActorInitFunction *initFunctionPtr = ActorInitFunctionDict_get(initFunctions, actorType);
-	if (initFunctionPtr == NULL)
+	ActorDefinition **definition = ActorDefinitionDict_get(actorDefinitions, actorType);
+	if (definition == NULL)
 	{
 		Error("Unknown actor type!");
 	}
-	return *initFunctionPtr;
+	return *definition;
 }
 
-void DestroyActorInitFunctionDictionary()
+ActorInputHandlerFunction GetActorInputHandler(const ActorDefinition *definition, const char *input)
 {
-	ActorInitFunctionDict_clear(initFunctions);
+	const ActorInputHandlerFunction *handler = ActorInputHandlerFunctionDict_get(definition->inputHandlers, input);
+	if (handler == NULL)
+	{
+		return NULL;
+	}
+	return *handler;
+}
+
+void DestroyActorDefinitions()
+{
+	ActorDefinitionDict_iterator it;
+	ActorDefinitionDict_it(it, actorDefinitions);
+	while (!ActorDefinitionDict_last_p(it))
+	{
+		const ActorDefinitionDict_pair *pair = ActorDefinitionDict_ref(it);
+		ActorInputHandlerFunctionDict_clear(pair->value->inputHandlers);
+		ActorDefinitionDict_next(it);
+	}
+
+	ActorDefinitionDict_clear(actorDefinitions);
 }

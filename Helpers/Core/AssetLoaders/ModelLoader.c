@@ -4,14 +4,10 @@
 
 #include "ModelLoader.h"
 #include <joltc/constants.h>
-#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
-#include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -22,12 +18,13 @@
 #include "../DataReader.h"
 #include "../Error.h"
 #include "../Logging.h"
-#include "../Physics/Physics.h"
 
 uint32_t modelId;
 uint32_t lodId;
 ModelDefinition *models[MAX_MODELS];
 ModelDefinition *errorModel = NULL;
+
+#define BOUNDING_BOX_CONVEX_RADIUS 0.0005f
 
 void InitModelLoader()
 {
@@ -140,8 +137,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->boundingBoxExtents.x = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.y = ReadFloat(assetData->data, &offset);
 	model->boundingBoxExtents.z = ReadFloat(assetData->data, &offset);
-	model->boundingBoxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents,
-															   0.0005f); // TODO magic numbers bad
+	model->boundingBoxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, BOUNDING_BOX_CONVEX_RADIUS);
 
 	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
@@ -319,15 +315,15 @@ JPH_Shape *CreateDynamicModelShape(const size_t numHulls, const ModelConvexHull 
 											0);
 		JPH_Shape_Destroy(hullShape);
 	}
-	JPH_Shape *shape = (JPH_Shape*)JPH_StaticCompoundShape_Create(compoundShapeSettings);
-	JPH_ShapeSettings_Destroy((JPH_ShapeSettings*)compoundShapeSettings);
+	JPH_Shape *shape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
 	return shape;
 }
 
 inline JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollider)
 {
 	JPH_MeshShapeSettings *settings = JPH_MeshShapeSettings_Create(staticCollider->tris, staticCollider->numTriangles);
-	JPH_Shape *meshShape = (JPH_Shape*)JPH_MeshShapeSettings_CreateShape(settings);
-	JPH_ShapeSettings_Destroy((JPH_ShapeSettings*)settings);
+	JPH_Shape *meshShape = (JPH_Shape *)JPH_MeshShapeSettings_CreateShape(settings);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)settings);
 	return meshShape;
 }

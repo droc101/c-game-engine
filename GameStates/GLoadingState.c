@@ -3,6 +3,7 @@
 //
 
 #include "GLoadingState.h"
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -23,7 +24,7 @@ char loadStateLevelname[32];
 uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
 
-void GLoadingStateUpdate(GlobalState *state)
+void GLoadingStateUpdate(GlobalState * /*state*/)
 {
 	if (!loadStateLoadedLevel)
 	{

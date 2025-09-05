@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "../../Structs/Asset.h"
 #include "../../Structs/GlobalState.h"
 #include "AssetReader.h"
 #include "Error.h"

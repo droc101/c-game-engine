@@ -28,13 +28,9 @@
 #include "../Structs/ActorDefinition.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
+#include "../Structs/Param.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
-
-enum CoinOutput
-{
-	COIN_OUTPUT_COLLECTED = 2,
-};
 
 typedef struct CoinData
 {
@@ -95,21 +91,8 @@ static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 	RemoveActor(this);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_COIN,
-	.Update = CoinUpdate,
-	.SignalHandler = DefaultActorSignalHandler,
-	.OnPlayerContactAdded = CoinOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
-
-void CoinInit(Actor *this, const KvList params, Transform *transform)
+static void CoinInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	this->extraData = calloc(1, sizeof(CoinData));
 	CheckAlloc(this->extraData);
 	CoinData *data = this->extraData;
@@ -127,4 +110,19 @@ void CoinInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 0.25f;
 	ActorWallBake(this);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_COIN,
+									 .Update = CoinUpdate,
+									 .OnPlayerContactAdded = CoinOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = CoinInit};
+
+void RegisterCoin()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActor(COIN_ACTOR_NAME, &definition);
 }

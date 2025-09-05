@@ -13,10 +13,9 @@
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/List.h"
@@ -26,6 +25,7 @@
 #include "Color.h"
 #include "GlobalState.h"
 #include "Level.h"
+#include "Param.h"
 
 Actor *CreateActor(Transform *transform, const char *actorType, KvList params, JPH_BodyInterface *bodyInterface)
 {
@@ -42,9 +42,10 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->modColor = COLOR_WHITE;
 	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->extraData = NULL;
-	const ActorInitFunction initFunction = GetActorInitFunction(actorType);
-	initFunction(actor, params, transform); // kindly allow the Actor to initialize itself
-	ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
+	const ActorDefinition *definition = GetActorDefinition(actorType);
+	actor->definition = definition;
+	actor->definition->Init(actor, params, transform); // kindly allow the Actor to initialize itself
+	// ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
 	if (params)
 	{
 		KvListDestroy(params);
@@ -73,23 +74,26 @@ void FreeActor(Actor *actor)
 	actor = NULL;
 }
 
-void ActorTriggerInput(const Actor *sender, const Actor *receiver, const uint8_t signal, const Param *param)
+void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param)
 {
-	LogInfo("Triggering input %d on actor %p from actor %p\n", signal, receiver, sender);
-	if (!receiver->definition->SignalHandler((Actor *)receiver, sender, signal, param))
+	LogInfo("Triggering input %d on actor %p from actor %p\n", input, receiver, sender);
+	const ActorInputHandlerFunction handler = GetActorInputHandler(sender->definition, input);
+	if (handler)
 	{
-		LogWarning("Signal %d was sent to actor %p but was not handled!", signal, receiver);
+		handler(receiver, sender, param);
+	} else
+	{
+		LogWarning("Could not send signal %s to actor %p because it has no handler!", input, receiver);
 	}
 }
 
-void ActorFireOutput(const Actor *sender, const uint8_t signal, const Param defaultParam)
+void ActorFireOutput(const Actor *sender, const char *output, const Param defaultParam)
 {
-	// LogInfo("Firing signal %d from actor %p with param \"%s\"\n", signal, sender, defaultParam);
 	ListLock(sender->ioConnections);
 	for (size_t i = 0; i < sender->ioConnections.length; i++)
 	{
 		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
-		if (connection->myOutput == signal)
+		if (strcmp(connection->sourceActorOutput, output) == 0)
 		{
 			List actors;
 			GetActorsByName(connection->outActorName, GetState()->level, &actors);
@@ -106,10 +110,7 @@ void ActorFireOutput(const Actor *sender, const uint8_t signal, const Param defa
 				{
 					param = &connection->outParamOverride;
 				}
-				if (!actor->definition->SignalHandler(actor, sender, connection->targetInput, param))
-				{
-					LogWarning("Signal %d was sent to actor %p but was not handled!", signal, actor);
-				}
+				ActorTriggerInput(sender, actor, connection->targetActorInput, param);
 			}
 			ListFree(actors);
 		}
@@ -119,18 +120,15 @@ void ActorFireOutput(const Actor *sender, const uint8_t signal, const Param defa
 
 void DestroyActorConnection(ActorConnection *connection)
 {
+	free(connection->sourceActorOutput);
+	free(connection->targetActorInput);
 	free(connection);
 }
 void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
-bool DefaultActorSignalHandler(Actor *this, const Actor * /*sender*/, const uint8_t signal, const Param * /*param*/)
+void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	if (signal == ACTOR_INPUT_KILL)
-	{
-		RemoveActor(this);
-		return true;
-	}
-	return false;
+	RemoveActor(this);
 }
 
 void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../../Structs/Asset.h"
 #include "../AssetReader.h"
 #include "../DataReader.h"
 #include "../Error.h"

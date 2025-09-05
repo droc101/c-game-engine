@@ -5,10 +5,13 @@
 #ifndef SOUND_PLAYER_H
 #define SOUND_PLAYER_H
 
-#include <joltc/Math/Transform.h>
-#include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
+#define SOUND_PLAYER_ACTOR_NAME "sound_player"
 
-void SoundPlayerInit(Actor *this, const KvList params, Transform *transform);
+#define SOUND_PLAYER_INPUT_PLAY "play"
+#define SOUND_PLAYER_INPUT_PAUSE "pause"
+#define SOUND_PLAYER_INPUT_RESUME "resume"
+#define SOUND_PLAYER_INPUT_STOP "stop"
+
+void RegisterSoundPlayer();
 
 #endif //SOUND_PLAYER_H

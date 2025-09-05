@@ -5,10 +5,8 @@
 #ifndef PHYSBOX_H
 #define PHYSBOX_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define PHYSBOX_ACTOR_NAME "prop_physbox"
 
-void PhysboxInit(Actor *this, const KvList params, Transform *transform);
+void RegisterPhysbox();
 
 #endif //PHYSBOX_H

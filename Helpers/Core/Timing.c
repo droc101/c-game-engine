@@ -12,7 +12,7 @@ static uint64_t StartTimeS;
 void InitTimers()
 {
 	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+	clock_gettime(CLOCK_MONOTONIC, &ts); // NOLINT(*-include-cleaner)
 	StartTimeNS = ts.tv_sec * 1000000000 + ts.tv_nsec;
 	StartTimeS = ts.tv_sec;
 }
@@ -20,7 +20,7 @@ void InitTimers()
 uint64_t GetTimeNs()
 {
 	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+	clock_gettime(CLOCK_MONOTONIC, &ts); // NOLINT(*-include-cleaner)
 	return ts.tv_sec * 1000000000 + ts.tv_nsec - StartTimeNS;
 }
 

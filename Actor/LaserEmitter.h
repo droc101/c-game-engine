@@ -5,10 +5,11 @@
 #ifndef LASEREMITTER_H
 #define LASEREMITTER_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define LASER_EMITTER_ACTOR_NAME "prop_laser_emitter"
 
-void LaserEmitterInit(Actor *this, const KvList params, Transform *transform);
+#define LASER_EMITTER_INPUT_TURN_ON "turn_on"
+#define LASER_EMITTER_INPUT_TURN_OFF "turn_off"
+
+void RegisterLaserEmitter();
 
 #endif //LASEREMITTER_H

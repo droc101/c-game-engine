@@ -5,15 +5,10 @@
 #ifndef LASER_H
 #define LASER_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define LASER_ACTOR_NAME "prop_laser"
 
-enum LaserInputs
-{
-	LASER_INPUT_DISABLE = 1,
-	LASER_INPUT_ENABLE = 2,
-};
+#define LASER_INPUT_TURN_ON "turn_on"
+#define LASER_INPUT_TURN_OFF "turn_off"
 
 typedef enum LaserHeight
 {
@@ -23,10 +18,10 @@ typedef enum LaserHeight
 	LASER_HEIGHT_TRIPLE
 } LaserHeight;
 
-void LaserInit(Actor *this, const KvList params, Transform *transform);
-
 void LaserRaycastFiltersInit();
 
 void LaserRaycastFiltersDestroy();
+
+void RegisterLaser();
 
 #endif //LASER_H

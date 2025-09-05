@@ -13,7 +13,6 @@
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
@@ -21,20 +20,7 @@
 #include "../../Structs/Actor.h"
 #include "../../Structs/ActorDefinition.h"
 #include "../../Structs/Level.h"
-
-enum TriggerInput
-{
-	TRIGGER_INPUT_FORCE_TRIGGER = 1,
-	TRIGGER_INPUT_ENABLE = 2,
-	TRIGGER_INPUT_DISABLE = 3,
-};
-
-enum TriggerOutput
-{
-	TRIGGER_OUTPUT_TRIGGERED = 2,
-	TRIGGER_OUTPUT_ENTERED = 3,
-	TRIGGER_OUTPUT_EXITED = 4,
-};
+#include "../../Structs/Param.h"
 
 typedef struct TriggerData
 {
@@ -61,29 +47,21 @@ static inline void CreateTriggerSensor(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-static bool TriggerSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void TriggerForceTriggerHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
+}
+
+static void TriggerEnableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	TriggerData *data = (TriggerData *)this->extraData;
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
-	if (signal == TRIGGER_INPUT_FORCE_TRIGGER)
-	{
-		ActorFireOutput(this, TRIGGER_OUTPUT_TRIGGERED, PARAM_NONE);
-		return true;
-	}
-	if (signal == TRIGGER_INPUT_ENABLE && !data->enabled)
-	{
-		data->enabled = true;
-		return true;
-	}
-	if (signal == TRIGGER_INPUT_DISABLE && data->enabled)
-	{
-		data->enabled = false;
-		return true;
-	}
-	return false;
+	data->enabled = true;
+}
+
+static void TriggerDisableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	TriggerData *data = (TriggerData *)this->extraData;
+	data->enabled = false;
 }
 
 static void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
@@ -118,21 +96,8 @@ static void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_TRIGGER,
-	.Update = DefaultActorUpdate,
-	.SignalHandler = TriggerSignalHandler,
-	.OnPlayerContactAdded = TriggerOnPlayerContactAdded,
-	.OnPlayerContactPersisted = TriggerOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = TriggerOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
-
 void TriggerInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);
 	TriggerData *data = this->extraData;
@@ -142,4 +107,22 @@ void TriggerInit(Actor *this, const KvList params, Transform *transform)
 	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	CreateTriggerSensor(this, transform);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_TRIGGER,
+									 .Update = DefaultActorUpdate,
+									 .OnPlayerContactAdded = TriggerOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = TriggerOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = TriggerOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = TriggerInit};
+
+void RegisterTrigger()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, TRIGGER_INPUT_FORCE_TRIGGER, TriggerForceTriggerHandler);
+	RegisterActorInput(&definition, TRIGGER_INPUT_ENABLE, TriggerEnableHandler);
+	RegisterActorInput(&definition, TRIGGER_INPUT_DISABLE, TriggerDisableHandler);
+	RegisterActor(TRIGGER_ACTOR_NAME, &definition);
 }

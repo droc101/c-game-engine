@@ -14,7 +14,6 @@
 #include <joltc/types.h>
 #include <math.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../Helpers/Core/AssetReader.h"
@@ -24,13 +23,14 @@
 #include "../Structs/Actor.h"
 #include "../Structs/ActorDefinition.h"
 #include "../Structs/GlobalState.h"
+#include "../Structs/Param.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
 
 typedef struct LaserData
 {
 	LaserHeight height;
-	bool enabled;
+	bool on;
 } LaserData;
 
 static bool ActorRaycastBroadPhaseLayerShouldCollide(const JPH_BroadPhaseLayer layer)
@@ -123,7 +123,7 @@ static inline void LaserCreateBody(Actor *this, const Transform *transform)
 static void LaserUpdate(Actor *this, double delta)
 {
 	const LaserData *data = this->extraData;
-	if (data->enabled)
+	if (data->on)
 	{
 		const JPH_PhysicsSystem *physicsSystem = GetState()->level->physicsSystem;
 		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
@@ -152,48 +152,27 @@ static void LaserUpdate(Actor *this, double delta)
 	}
 }
 
-static bool LaserSignalHandler(Actor *this, const Actor *sender, uint8_t signal, const Param *param)
+static void LaserTurnOnHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
 	LaserData *data = this->extraData;
-	if (signal == LASER_INPUT_DISABLE)
-	{
-		data->enabled = false;
-		this->actorWall->b = v2(0.01, 0);
-		ActorWallBake(this);
-		return true;
-	}
-	if (signal == LASER_INPUT_ENABLE)
-	{
-		data->enabled = true;
-		return true;
-	}
-	return false;
+	data->on = true;
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LASER,
-	.Update = LaserUpdate,
-	.SignalHandler = LaserSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
+static void LaserTurnOffHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	LaserData *data = this->extraData;
+	data->on = false;
+	this->actorWall->b = v2(0.01, 0);
+	ActorWallBake(this);
+}
 
 void LaserInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
 	this->extraData = data;
 	data->height = KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
-	data->enabled = KvGetBool(params, "startEnabled", true);
+	data->on = KvGetBool(params, "startOn", true);
 
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2s(0);
@@ -205,7 +184,7 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
 
-	if (!data->enabled)
+	if (!data->on)
 	{
 		this->actorWall->b = v2(0.01, 0);
 		ActorWallBake(this);
@@ -247,4 +226,21 @@ void LaserRaycastFiltersDestroy()
 	JPH_BroadPhaseLayerFilter_Destroy(tripleLaserBroadPhaseLayerFilter);
 	JPH_ObjectLayerFilter_Destroy(tripleLaserObjectLayerFilter);
 	JPH_BodyFilter_Destroy(bodyFilter);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_LASER,
+									 .Update = LaserUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = LaserInit};
+
+void RegisterLaser()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, LASER_INPUT_TURN_ON, LaserTurnOnHandler);
+	RegisterActorInput(&definition, LASER_INPUT_TURN_OFF, LaserTurnOffHandler);
+	RegisterActor(LASER_ACTOR_NAME, &definition);
 }

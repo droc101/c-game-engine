@@ -182,7 +182,6 @@ void RenderInGameMenuBackground();
 
 /**
  * Render the in-game HUD
- * @param state The GlobalState to use
  */
 void RenderHUD();
 

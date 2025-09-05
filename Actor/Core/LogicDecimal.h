@@ -5,10 +5,17 @@
 #ifndef LOGICDECIMAL_H
 #define LOGICDECIMAL_H
 
-#include <joltc/Math/Transform.h>
-#include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
+#define LOGIC_DECIMAL_ACTOR_NAME "logic_decimal"
 
-void LogicDecimalInit(Actor *this, const KvList params, Transform *transform);
+#define LOGIC_DECIMAL_INPUT_OPERAND_A "operand_a"
+#define LOGIC_DECIMAL_INPUT_OPERAND_B "operand_b"
+#define LOGIC_DECIMAL_INPUT_EXECUTE "execute"
+
+#define LOGIC_DECIMAL_OUTPUT_ON_TRUE "on_true"
+#define LOGIC_DECIMAL_OUTPUT_ON_FALSE "on_false"
+#define LOGIC_DECIMAL_OUTPUT_EXECUTION_RESULT "execution_result"
+
+
+void RegisterLogicDecimal();
 
 #endif //LOGICDECIMAL_H

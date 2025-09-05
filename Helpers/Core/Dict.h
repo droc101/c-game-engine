@@ -17,12 +17,12 @@
 	_Pragma("GCC diagnostic pop");
 
 #define STR_COPY(str, value) \
-	(str) = malloc(strlen((char*)value) + 1); \
+	(str) = malloc(strlen((char *)(value)) + 1); \
 	CheckAlloc(str); \
-	((char *)(str))[strlen((char*)value)] = '\0'; \
-	strncpy((char*)(str), (char*)(value), strlen((char*)(value)));
+	((char *)(str))[strlen((char *)(value))] = '\0'; \
+	strncpy((char *)(str), (char *)(value), strlen((char *)(value)));
 #define STR_FREE(str) \
-	free((char*)(str)); \
+	free((char *)(str)); \
 	(str) = NULL;
 
 // TODO: changing the value of a key that already exists may leak memory

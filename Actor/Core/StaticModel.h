@@ -5,10 +5,8 @@
 #ifndef STATICMODEL_H
 #define STATICMODEL_H
 
-#include <joltc/Math/Transform.h>
-#include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
+#define STATIC_MODEL_ACTOR_NAME "prop_model_static"
 
-void StaticModelInit(Actor *this, const KvList params, Transform *transform);
+void RegisterStaticModel();
 
 #endif //STATICMODEL_H

@@ -7,25 +7,14 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <stddef.h>
 #include <stdio.h>
-#include <wchar.h>
 #include "../../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../../Helpers/Core/AssetReader.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/Physics/Physics.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/ActorDefinition.h"
-
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_STATIC_MODEL,
-	.Update = DefaultActorUpdate,
-	.SignalHandler = DefaultActorSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
 
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform)
 {
@@ -34,17 +23,17 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 		this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
 		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
-																	transform,
-																	JPH_MotionType_Static,
-																	OBJECT_LAYER_STATIC,
-																	this);
+																	 transform,
+																	 JPH_MotionType_Static,
+																	 OBJECT_LAYER_STATIC,
+																	 this);
 	} else
 	{
 		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->boundingBoxShape,
-																	transform,
-																	JPH_MotionType_Static,
-																	OBJECT_LAYER_STATIC,
-																	this);
+																	 transform,
+																	 JPH_MotionType_Static,
+																	 OBJECT_LAYER_STATIC,
+																	 this);
 		this->actorFlags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
 	}
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
@@ -55,8 +44,6 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 
 void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	char modelPath[80];
 	snprintf(modelPath, 80, MODEL("%s"), KvGetString(params, "model", "leafy"));
 	this->actorModel = LoadModel(modelPath);
@@ -64,4 +51,19 @@ void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 	// ActorCreateEmptyBody(this, transform);
 	CreateStaticModelCollider(this, transform);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_STATIC_MODEL,
+									 .Update = DefaultActorUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = StaticModelInit};
+
+void RegisterStaticModel()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActor(STATIC_MODEL_ACTOR_NAME, &definition);
 }

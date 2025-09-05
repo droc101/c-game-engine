@@ -16,7 +16,6 @@
 #include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../config.h"
@@ -27,22 +26,9 @@
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Structs/Actor.h"
 #include "../Structs/ActorDefinition.h"
+#include "../Structs/Param.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
-
-enum DoorInput
-{
-	DOOR_INPUT_OPEN = 1,
-	DOOR_INPUT_CLOSE = 2,
-};
-
-enum DoorOutput
-{
-	DOOR_OUTPUT_CLOSING = 2,
-	DOOR_OUTPUT_OPENING = 3,
-	DOOR_OUTPUT_FULLY_CLOSED = 4,
-	DOOR_OUTPUT_FULLY_OPEN = 5,
-};
 
 typedef enum
 {
@@ -108,7 +94,7 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 										  this->bodyId,
 										  &data->openPosition,
 										  JPH_Activation_DontActivate);
-			ActorFireOutput(this, DOOR_OUTPUT_FULLY_OPEN, PARAM_NONE);
+			ActorFireOutput(this, DOOR_OUTPUT_FULLY_OPENED, PARAM_NONE);
 			break;
 		case DOOR_CLOSING:
 			DoorSetCloseVector(this);
@@ -221,41 +207,31 @@ static void DoorDestroy(Actor *this)
 	}
 }
 
-static bool DoorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void DoorOpenHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
 	const DoorData *data = this->extraData;
-	switch (signal)
+	switch (data->state)
 	{
-		case DOOR_INPUT_OPEN:
-			switch (data->state)
-			{
-				case DOOR_CLOSED:
-					DoorSetState(this, DOOR_OPENING, 0);
-					return true;
-				case DOOR_CLOSING:
-					DoorSetState(this, DOOR_OPENING, 1 - data->animationTime);
-					return true;
-				default:
-					return true;
-			}
-		case DOOR_INPUT_CLOSE:
-			switch (data->state)
-			{
-				case DOOR_OPEN:
-					DoorSetState(this, DOOR_CLOSING, 0);
-					return true;
-				case DOOR_OPENING:
-					DoorSetState(this, DOOR_CLOSING, 1 - data->animationTime);
-					return true;
-				default:
-					return true;
-			}
+		case DOOR_CLOSED:
+			DoorSetState(this, DOOR_OPENING, 0);
+			return;
+		case DOOR_CLOSING:
+			DoorSetState(this, DOOR_OPENING, 1 - data->animationTime);
 		default:
-			return false;
+	}
+}
+
+static void DoorCloseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	const DoorData *data = this->extraData;
+	switch (data->state)
+	{
+		case DOOR_OPEN:
+			DoorSetState(this, DOOR_CLOSING, 0);
+			return;
+		case DOOR_OPENING:
+			DoorSetState(this, DOOR_CLOSING, 1 - data->animationTime);
+		default:
 	}
 }
 
@@ -337,21 +313,8 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyId bodyId)
 	}
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_DOOR,
-	.Update = DoorUpdate,
-	.SignalHandler = DoorSignalHandler,
-	.OnPlayerContactAdded = DoorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DoorDestroy,
-};
-
 void DoorInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(DoorData));
@@ -369,4 +332,21 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
 	ActorWallBake(this);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_DOOR,
+									 .Update = DoorUpdate,
+									 .OnPlayerContactAdded = DoorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DoorDestroy,
+									 .Init = DoorInit};
+
+void RegisterDoor()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, DOOR_INPUT_OPEN, DoorOpenHandler);
+	RegisterActorInput(&definition, DOOR_INPUT_CLOSE, DoorCloseHandler);
+	RegisterActor(DOOR_ACTOR_NAME, &definition);
 }
