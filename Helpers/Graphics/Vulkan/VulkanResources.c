@@ -20,6 +20,7 @@
 #include "../../Core/Error.h"
 #include "../../Core/List.h"
 #include "../../Core/MathEx.h"
+#include "../LodThread.h"
 #include "VulkanHelpers.h"
 
 VkResult CreateUiBuffers()
@@ -500,6 +501,7 @@ VkResult ResizeDebugDrawBuffers()
 
 bool LoadTexture(const Image *image)
 {
+	LockLodThreadMutex(); // TODO: This is not a great fix but it works ig
 	const bool useMipmaps = GetState()->options.mipmaps && image->mipmaps;
 	LunaSampler sampler = LUNA_NULL_HANDLE;
 	if (image->filter && image->repeat)
@@ -554,6 +556,7 @@ bool LoadTexture(const Image *image)
 		};
 	}
 	lunaWriteDescriptorSets(MAX_FRAMES_IN_FLIGHT, writeDescriptors);
+	UnlockLodThreadMutex();
 
 	return true;
 }
