@@ -134,6 +134,9 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->height = 1.0f;
 	ActorWallBake(this);
 
-	transform->rotation.y = 0;
-	CreateGoalSensor(this, transform);
+	const Transform adjustedTransform = {
+		.position = transform->position,
+		.rotation.w = 1.0f,
+	};
+	CreateGoalSensor(this, &adjustedTransform);
 }

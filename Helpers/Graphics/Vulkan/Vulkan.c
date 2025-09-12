@@ -5,6 +5,8 @@
 #include "Vulkan.h"
 #include <assert.h>
 #include <cglm/types.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaDevice.h>
 #include <luna/lunaDrawing.h>
@@ -193,7 +195,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	pushConstants.cameraPosition.x = (float)camera->transform.position.x;
 	pushConstants.cameraPosition.y = (float)camera->transform.position.y;
 	pushConstants.cameraPosition.z = (float)camera->transform.position.z;
-	pushConstants.yaw = camera->transform.rotation.y + 1.5f * PIf;
+	pushConstants.yaw = JPH_Quat_GetRotationAngle(&camera->transform.rotation, &Vector3_AxisY) + 1.5f * PIf;
 	UpdateTransformMatrix(camera);
 
 	if (LockLodThreadMutex() != 0)

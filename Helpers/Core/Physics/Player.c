@@ -261,6 +261,7 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 	if (moveVec.x != 0 || moveVec.z != 0)
 	{
 		Vector3_Normalized(&moveVec, &moveVec);
+		*distanceTraveled = MOVE_SPEED;
 		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0.5)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
@@ -271,22 +272,24 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 		{
 			*distanceTraveled = MOVE_SPEED;
 		}
-	}
+		Vector3_MultiplyScalar(&moveVec, *distanceTraveled, &moveVec);
 
-	JPH_Quat playerRotation;
-	Vector3 rotatedMoveVec;
-	if (player->isNoclipActive)
-	{
-		JPH_Quat_FromEulerAngles(&player->transform.rotation, &playerRotation);
-		JPH_Quat_Rotate(&playerRotation, &moveVec, &rotatedMoveVec);
+		if (player->isNoclipActive)
+		{
+			JPH_Quat_Rotate(&player->transform.rotation, &moveVec, &moveVec);
+		} else
+		{
+			JPH_Quat playerRotation;
+			JPH_Quat_Rotation(&Vector3_AxisY,
+							  JPH_Quat_GetRotationAngle(&player->transform.rotation, &Vector3_AxisY),
+							  &playerRotation);
+			JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
+		}
+		JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
 	} else
 	{
-		JPH_Quat_FromEulerAngles((Vector3[]){{0.0f, player->transform.rotation.y, 0.0f}}, &playerRotation);
-		JPH_Quat_Rotate(&playerRotation, &moveVec, &rotatedMoveVec);
+		JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &Vector3_Zero);
 	}
-	Vector3 rotatedScaledMoveVec;
-	Vector3_MultiplyScalar(&rotatedMoveVec, *distanceTraveled, &rotatedScaledMoveVec);
-	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &rotatedScaledMoveVec);
 }
 
 static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayCastResult *raycastResult)
@@ -330,10 +333,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				crosshairColor = COLOR(0xFFFFCCCC);
 			} else
 			{
-				JPH_Quat playerRotationQuat;
-				JPH_Quat_FromEulerAngles(&player->transform.rotation, &playerRotationQuat);
 				Vector3 forward;
-				JPH_Quat_Rotate(&playerRotationQuat, (Vector3[]){{0.0f, 0.0f, -offset}}, &forward);
+				JPH_Quat_Rotate(&player->transform.rotation, (Vector3[]){{0.0f, 0.0f, -offset}}, &forward);
 				Vector3 offsetFromTarget;
 				Vector3_Subtract(&forward, &heldActorPositionOffset, &offsetFromTarget);
 				Vector3 heldActorLinearVelocity;
@@ -343,12 +344,12 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				JPH_BodyInterface_GetRotation(player->heldActor->bodyInterface,
 											  player->heldActor->bodyId,
 											  &heldActorRotation);
-				JPH_Quat targetRotation;
-				JPH_Quat_FromEulerAngles((Vector3[]){{0.0f, player->transform.rotation.y, 0.0f}}, &targetRotation);
-				JPH_Quat interpolatedRotation;
-				JPH_Quat_Lerp(&heldActorRotation, &targetRotation, 0.2f, &interpolatedRotation);
-				JPH_Quat interpolatedRotationNormalized;
-				JPH_Quat_Normalized(&interpolatedRotation, &interpolatedRotationNormalized);
+				JPH_Quat targetRotation = {
+					.y = player->transform.rotation.y,
+					.w = player->transform.rotation.w,
+				};
+				JPH_Quat_Lerp(&heldActorRotation, &targetRotation, 0.2f, &targetRotation);
+				JPH_Quat_Normalized(&targetRotation, &targetRotation);
 
 				JPH_BodyInterface_SetLinearAndAngularVelocity(player->heldActor->bodyInterface,
 															  player->heldActor->bodyId,
@@ -356,7 +357,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 															  &Vector3_Zero);
 				JPH_BodyInterface_SetRotation(player->heldActor->bodyInterface,
 											  player->heldActor->bodyId,
-											  &interpolatedRotationNormalized,
+											  &targetRotation,
 											  JPH_Activation_DontActivate);
 			}
 		}
@@ -438,13 +439,14 @@ void DPrintPlayer(const Level *level)
 			playerVelocity.x,
 			playerVelocity.y,
 			playerVelocity.z);
-	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)",
-			COLOR_WHITE,
-			false,
-			level->player.transform.rotation.x,
-			fabsf(level->player.transform.rotation.y),
-			radToDeg(level->player.transform.rotation.x),
-			radToDeg(fabsf(level->player.transform.rotation.y)));
+	DPrintF("Rotation: TODO", COLOR_WHITE, false);
+	// DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)",
+	// 		COLOR_WHITE,
+	// 		false,
+	// 		level->player.transform.rotation.x,
+	// 		fabsf(level->player.transform.rotation.y),
+	// 		radToDeg(level->player.transform.rotation.x),
+	// 		radToDeg(fabsf(level->player.transform.rotation.y)));
 	DPrintF("%s Actor: %p",
 			COLOR_WHITE,
 			false,

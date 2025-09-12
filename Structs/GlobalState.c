@@ -3,6 +3,8 @@
 //
 
 #include "GlobalState.h"
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -51,7 +53,7 @@ void InitState()
 	state.viewmodel.enabled = true;
 	state.viewmodel.model = LoadModel(MODEL("eraser"));
 	state.viewmodel.transform.position.x = 0.5f;
-	state.viewmodel.transform.rotation.y = degToRad(5);
+	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &state.viewmodel.transform.rotation);
 }
 
 inline GlobalState *GetState()

@@ -157,10 +157,8 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 static inline void CreateDoorBodies(Actor *this, const Transform *transform, const bool preventPlayerOpen)
 {
 	DoorData *data = this->extraData;
-	JPH_Quat rotation = {};
-	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
 	Vector3 forwardVector = {};
-	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
+	JPH_Quat_RotateAxisZ(&transform->rotation, &forwardVector);
 	Vector3 offsetVector = {};
 	Vector3_MultiplyScalar(&forwardVector, 0.5f, &offsetVector);
 	Vector3_Subtract(&transform->position, &offsetVector, &data->closedPosition);

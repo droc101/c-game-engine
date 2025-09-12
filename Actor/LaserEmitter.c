@@ -55,10 +55,10 @@ static inline void CreateLaserEmitterCollider(Actor *this, const Transform *tran
 {
 	JPH_BodyCreationSettings
 			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
-																		 transform,
-																		 JPH_MotionType_Static,
-																		 OBJECT_LAYER_STATIC,
-																		 this);
+																		  transform,
+																		  JPH_MotionType_Static,
+																		  OBJECT_LAYER_STATIC,
+																		  this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
@@ -132,10 +132,8 @@ void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 	this->currentSkinIndex = data->height + 1;
 
 	data->transform = *transform;
-	JPH_Quat rotation = {};
-	JPH_Quat_FromEulerAngles(&transform->rotation, &rotation);
 	Vector3 forwardVector = {};
-	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
+	JPH_Quat_RotateAxisZ(&transform->rotation, &forwardVector);
 	Vector3 offsetVector = {};
 	Vector3_MultiplyScalar(&forwardVector, this->actorModel->boundingBoxExtents.z, &offsetVector);
 	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
