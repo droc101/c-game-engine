@@ -21,6 +21,13 @@
 #define VECTOR3_TO_VEC3(vector) ((vec3){(vector).x, (vector).y, (vector).z})
 #define VEC3_TO_VECTOR3(vec) ((Vector3){(vec)[0], (vec)[1], (vec)[2]})
 
+#define QUAT_TO_VERSOR(src, dest) glm_quat_make(&(src).x, (dest))
+#define VERSOR_TO_QUAT(src, dest) \
+	(dest).x = (src)[0]; \
+	(dest).y = (src)[1]; \
+	(dest).z = (src)[2]; \
+	(dest).w = (src)[3];
+
 enum ObjectLayers
 {
 	OBJECT_LAYER_STATIC,

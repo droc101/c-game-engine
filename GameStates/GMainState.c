@@ -3,8 +3,12 @@
 //
 
 #include "GMainState.h"
+#include <cglm/euler.h>
+#include <cglm/quat.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_scancode.h>
@@ -20,6 +24,7 @@
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
@@ -45,8 +50,8 @@ void GMainStateUpdate(GlobalState *state)
 	}
 
 	Vector2 cameraMotion = GetMouseRel();
-	cameraMotion.x *= state->options.cameraSpeed / 120.0f;
-	cameraMotion.y *= state->options.cameraSpeed / 120.0f;
+	cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
+	cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
 	if (state->options.invertHorizontalCamera)
 	{
 		cameraMotion.x *= -1;
@@ -56,11 +61,15 @@ void GMainStateUpdate(GlobalState *state)
 		cameraMotion.y *= -1;
 	}
 
-	state->level->player.transform.rotation.y -= cameraMotion.x;
-	state->level->player.transform.rotation.x -= cameraMotion.y;
-
-	state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
-	state->level->player.transform.rotation.x = clamp(state->level->player.transform.rotation.x, -PI / 2, PI / 2);
+	const float currentPitch = JPH_Quat_GetRotationAngle(&state->level->player.transform.rotation, &Vector3_AxisX) +
+							   GLM_PI_2f;
+	JPH_Quat newYaw;
+	JPH_Quat newPitch;
+	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
+	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
+	JPH_Quat_Multiply(&newYaw, &state->level->player.transform.rotation, &state->level->player.transform.rotation);
+	JPH_Quat_Multiply(&state->level->player.transform.rotation, &newPitch, &state->level->player.transform.rotation);
+	JPH_Quat_Normalized(&state->level->player.transform.rotation, &state->level->player.transform.rotation);
 
 	if (state->saveData->coins > 9999)
 	{
@@ -80,6 +89,8 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
 	{
+		Vector3 newRotation = Vector3_Zero;
+
 		float cx = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
 		if (state->options.invertHorizontalCamera)
 		{
@@ -87,7 +98,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			state->level->player.transform.rotation.y += cx * state->options.cameraSpeed / 11.25f;
+			newRotation.y = cx * state->options.cameraSpeed / 11.25f;
 		}
 
 		float cy = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
@@ -97,11 +108,15 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cy) > STICK_DEADZONE)
 		{
-			state->level->player.transform.rotation.x += cy * state->options.cameraSpeed / 11.25f;
+			newRotation.x = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		state->level->player.transform.rotation.y = wrap(state->level->player.transform.rotation.y, 0, 2 * PI);
-		state->level->player.transform.rotation.x = clamp(state->level->player.transform.rotation.x, -PI / 2, PI / 2);
+		JPH_Quat newRotationQuat;
+		JPH_Quat_FromEulerAngles(&newRotation, &newRotationQuat);
+		JPH_Quat_Multiply(&state->level->player.transform.rotation,
+						  &newRotationQuat,
+						  &state->level->player.transform.rotation);
+		JPH_Quat_Normalized(&state->level->player.transform.rotation, &state->level->player.transform.rotation);
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);

@@ -57,8 +57,8 @@ struct LockingList
 void _ListInit(List *list, enum _ListType listType);
 void _LockingListInit(LockingList *list, enum _ListType listType);
 
-void _ListCopy(const List *oldList, List *newList);
-void _LockingListCopy(const LockingList *oldList, LockingList *newList);
+void _ListCopy(const List *restrict oldList, List *restrict newList);
+void _LockingListCopy(const LockingList *restrict oldList, LockingList *restrict newList);
 
 void _ListAdd(List *list, void *data);
 void _LockingListAdd(LockingList *list, void *data);
@@ -275,15 +275,5 @@ void _LockingListAndContentsFree(LockingList *list);
  */
 #define ListAndContentsFree(list) \
 	_Generic((list), List: _ListAndContentsFree, LockingList: _LockingListAndContentsFree)(&(list))
-
-
-/**
- * Reallocates memory for an array of arrayLength elements of size bytes each.
- * @param ptr Pointer to the memory block to be reallocated.
- * @param arrayLength Number of elements.
- * @param elementSize Size of each element.
- * @return Pointer to the reallocated memory block.
- */
-void *GameReallocArray(void *ptr, size_t arrayLength, size_t elementSize);
 
 #endif //GAME_LIST_H

@@ -102,6 +102,6 @@ void ActorWallBake(const Actor *this);
  * Create a collider for an actor wall
  * @return The shape for the collider
  */
-const JPH_Shape *ActorWallCreateCollider();
+JPH_Shape *ActorWallCreateCollider();
 
 #endif //GAME_WALL_H

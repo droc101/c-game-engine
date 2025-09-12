@@ -40,8 +40,7 @@ typedef struct CoinData
 
 static inline void CreateCoinSensor(Actor *this, const Transform *transform)
 {
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}},
-																	JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}}, JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -51,6 +50,7 @@ static inline void CreateCoinSensor(Actor *this, const Transform *transform)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
@@ -98,9 +98,13 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	CoinData *data = this->extraData;
 	data->isBlue = KvGetBool(params, "isBlue", false);
 
-	transform->position.y = -0.25f;
-	transform->rotation.y = 0;
-	CreateCoinSensor(this, transform);
+	const Transform adjustedTransform = {
+		.position.x = transform->position.x,
+		.position.y = -0.25f,
+		.position.z = transform->position.z,
+		.rotation.w = 1.0f,
+	};
+	CreateCoinSensor(this, &adjustedTransform);
 
 	this->actorWall = malloc(sizeof(ActorWall));
 	this->actorWall->a = v2(0, 0.125f);

@@ -4,6 +4,8 @@
 
 #include "LevelLoader.h"
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -90,7 +92,8 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 	level->player.transform.position.x = ReadFloat(data, &offset);
 	level->player.transform.position.z = ReadFloat(data, &offset);
 
-	level->player.transform.rotation.y = ReadFloat(data, &offset);
+	const float playerRotation = ReadFloat(data, &offset);
+	JPH_Quat_FromEulerAngles((Vector3[]){{0.0f, playerRotation, 0.0f}}, &level->player.transform.rotation);
 
 	JPH_CharacterVirtual_SetPosition(level->player.joltCharacter, &level->player.transform.position);
 
@@ -173,7 +176,9 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 			default:
 				break;
 		}
-		Actor *a = CreateActor((Transform[]){{{actorX, 0.0f, actorZ}, {0.0f, actorRotation, 0.0f}}},
+		JPH_Quat actorRotationQuat;
+		JPH_Quat_Rotation(&Vector3_AxisY, actorRotation, &actorRotationQuat);
+		Actor *a = CreateActor((Transform[]){{{actorX, 0.0f, actorZ}, .rotation = actorRotationQuat}},
 							   actorTypeString,
 							   params,
 							   bodyInterface);
@@ -233,6 +238,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 		WallBake(wall);
 		if (wall->dx == 0 && wall->dy == 0)
 		{
+			free(wall);
 			continue;
 		}
 		CreateWallCollider(wall, bodyInterface);

@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <cglm/cglm.h>
 #include <cglm/clipspace/persp_lh_zo.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
@@ -25,6 +27,7 @@
 #include "../../Core/AssetLoaders/TextureLoader.h"
 #include "../../Core/Error.h"
 #include "../../Core/List.h"
+#include "../../Core/Physics/Physics.h"
 #include "VulkanResources.h"
 
 #pragma region variables
@@ -261,11 +264,11 @@ void UpdateTransformMatrix(const Camera *camera)
 						  FAR_Z,
 						  perspectiveMatrix);
 
-	vec3 cameraRotation = {camera->transform.rotation.x + GLM_PIf,
-						   camera->transform.rotation.y,
-						   camera->transform.rotation.z};
 	versor rotationQuat;
-	glm_euler_yxz_quat_rh(cameraRotation, rotationQuat);
+	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
+	versor rotationOffset;
+	glm_quatv(rotationOffset, GLM_PIf, GLM_XUP);
+	glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
 
 	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	mat4 viewMatrix;
@@ -292,7 +295,9 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 
 	// TODO rotation other than yaw
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_rotate(rotationMatrix, viewmodel->transform.rotation.y, (vec3){0.0f, -1.0f, 0.0f});
+	glm_rotate(rotationMatrix,
+			   JPH_Quat_GetRotationAngle(&viewmodel->transform.rotation, &Vector3_AxisY),
+			   (vec3){0.0f, -1.0f, 0.0f});
 
 	mat4 viewModelMatrix;
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);

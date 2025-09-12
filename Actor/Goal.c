@@ -36,8 +36,7 @@ typedef struct GoalData
 
 static inline void CreateGoalSensor(Actor *this, const Transform *transform)
 {
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
-																	JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}}, JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -47,6 +46,7 @@ static inline void CreateGoalSensor(Actor *this, const Transform *transform)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
@@ -100,8 +100,11 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->height = 1.0f;
 	ActorWallBake(this);
 
-	transform->rotation.y = 0;
-	CreateGoalSensor(this, transform);
+	const Transform adjustedTransform = {
+		.position = transform->position,
+		.rotation.w = 1.0f,
+	};
+	CreateGoalSensor(this, &adjustedTransform);
 }
 
 static ActorDefinition definition = {.actorType = ACTOR_TYPE_GOAL,

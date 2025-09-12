@@ -143,7 +143,7 @@ void DefaultActorDestroy(Actor * /*this*/) {}
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 {
-	const JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
+	JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
 																						  transform,
 																						  JPH_MotionType_Static,
@@ -152,5 +152,6 @@ void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_DontActivate);
+	JPH_ShapeSettings_Destroy(shapeSettings);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }

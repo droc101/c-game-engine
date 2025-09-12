@@ -4,6 +4,8 @@
 
 #include "GLHelper.h"
 #include <cglm/cglm.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <SDL_error.h>
 #include <SDL_video.h>
 #include <stdbool.h>
@@ -28,6 +30,7 @@
 #include "../../Core/List.h"
 #include "../../Core/Logging.h"
 #include "../../Core/MathEx.h"
+#include "../../Core/Physics/Physics.h"
 #include "../RenderingHelpers.h"
 #include "GLInternal.h"
 
@@ -884,7 +887,7 @@ void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level)
 	GL_SharedUniforms uniforms;
 	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
 	uniforms.fogColor = COLOR(level->fogColor);
-	uniforms.cameraYaw = GetState()->camera->transform.rotation.y;
+	uniforms.cameraYaw = JPH_Quat_GetRotationAngle(&GetState()->camera->transform.rotation, &Vector3_AxisY);
 	uniforms.fogStart = (float)level->fogStart;
 	uniforms.fogEnd = (float)level->fogEnd;
 
@@ -914,9 +917,8 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
-	vec3 cameraRotation = {camera->transform.rotation.x, camera->transform.rotation.y, camera->transform.rotation.z};
 	versor rotationQuat;
-	glm_euler_yxz_quat_rh(cameraRotation, rotationQuat);
+	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
 
 	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	mat4 viewMatrix;
@@ -938,7 +940,9 @@ void GL_GetViewmodelMatrix(mat4 *out)
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
-	glm_rotate(rotationMatrix, GetState()->viewmodel.transform.rotation.y, GLM_YUP);
+	glm_rotate(rotationMatrix,
+			   JPH_Quat_GetRotationAngle(&GetState()->camera->transform.rotation, &Vector3_AxisY),
+			   GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
