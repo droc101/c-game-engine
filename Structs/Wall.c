@@ -59,7 +59,7 @@ void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 	const JPH_ConvexHullShapeSettings *shapeSettings = JPH_ConvexHullShapeSettings_Create(points,
 																						  4,
 																						  JPH_DefaultConvexRadius);
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
+	JPH_Shape *shape = (JPH_Shape *)JPH_ConvexHullShapeSettings_CreateShape(shapeSettings);
 	const Vector3 position = {wall->a.x, 0, wall->a.y};
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
 																					  &position,
@@ -70,6 +70,7 @@ void CreateWallCollider(Wall *wall, JPH_BodyInterface *bodyInterface)
 	wall->bodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface, bodyCreationSettings, JPH_Activation_DontActivate);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)shapeSettings);
+	JPH_Shape_Destroy(shape);
 }
 
 void FreeWall(JPH_BodyInterface *bodyInterface, Wall *wall)
@@ -102,7 +103,7 @@ void ActorWallBake(const Actor *this)
 	}
 }
 
-const JPH_Shape *ActorWallCreateCollider()
+JPH_Shape *ActorWallCreateCollider()
 {
 	static const Vector3 points[4] = {
 		{
@@ -126,5 +127,5 @@ const JPH_Shape *ActorWallCreateCollider()
 			-0.5f,
 		},
 	};
-	return (const JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DefaultConvexRadius);
+	return (JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DefaultConvexRadius);
 }

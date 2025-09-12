@@ -20,6 +20,7 @@
 #include "../../Core/Error.h"
 #include "../../Core/List.h"
 #include "../../Core/MathEx.h"
+#include "../../Core/Realloc.h"
 #include "../LodThread.h"
 #include "VulkanHelpers.h"
 
@@ -316,15 +317,16 @@ VkResult ResizeActorWallBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorWalls.vertices.buffer);
 		}
-		buffers.actorWalls.vertices.allocatedSize = buffers.actorWalls.vertices.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorWalls.vertices.allocatedSize,
+			.size = buffers.actorWalls.vertices.bytesUsed,
 			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorWalls.vertices.buffer),
 							   "Failed to recreate wall actors vertex buffer!");
-		buffers.actorWalls.vertices.data = malloc(buffers.actorWalls.vertices.allocatedSize);
-		CheckAlloc(buffers.actorWalls.vertices.data);
+		ActorWallVertex *newVertices = realloc(buffers.actorWalls.vertices.data, buffers.actorWalls.vertices.bytesUsed);
+		CheckAlloc(newVertices);
+		buffers.actorWalls.vertices.data = newVertices;
+		buffers.actorWalls.vertices.allocatedSize = buffers.actorWalls.vertices.bytesUsed;
 	}
 	if (buffers.actorWalls.indices.allocatedSize < buffers.actorWalls.indices.bytesUsed)
 	{
@@ -332,15 +334,16 @@ VkResult ResizeActorWallBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorWalls.indices.buffer);
 		}
-		buffers.actorWalls.indices.allocatedSize = buffers.actorWalls.indices.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorWalls.indices.allocatedSize,
+			.size = buffers.actorWalls.indices.bytesUsed,
 			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorWalls.indices.buffer),
 							   "Failed to recreate wall actors index buffer!");
-		buffers.actorWalls.indices.data = malloc(buffers.actorWalls.indices.allocatedSize);
-		CheckAlloc(buffers.actorWalls.indices.data);
+		uint32_t *newIndices = realloc(buffers.actorWalls.indices.data, buffers.actorWalls.indices.bytesUsed);
+		CheckAlloc(newIndices);
+		buffers.actorWalls.indices.data = newIndices;
+		buffers.actorWalls.indices.allocatedSize = buffers.actorWalls.indices.bytesUsed;
 	}
 	if (buffers.actorWalls.instanceData.allocatedSize < buffers.actorWalls.instanceData.bytesUsed)
 	{
@@ -348,15 +351,17 @@ VkResult ResizeActorWallBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorWalls.instanceData.buffer);
 		}
-		buffers.actorWalls.instanceData.allocatedSize = buffers.actorWalls.instanceData.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorWalls.instanceData.allocatedSize,
+			.size = buffers.actorWalls.instanceData.bytesUsed,
 			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorWalls.instanceData.buffer),
 							   "Failed to recreate wall actors instance data buffer!");
-		buffers.actorWalls.instanceData.data = calloc(1, buffers.actorWalls.instanceData.allocatedSize);
+		buffers.actorWalls.instanceData.data = Recalloc(buffers.actorWalls.instanceData.data,
+														buffers.actorWalls.instanceData.allocatedSize,
+														buffers.actorWalls.instanceData.bytesUsed);
 		CheckAlloc(buffers.actorWalls.instanceData.data);
+		buffers.actorWalls.instanceData.allocatedSize = buffers.actorWalls.instanceData.bytesUsed;
 	}
 	if (buffers.actorWalls.drawInfo.allocatedSize < buffers.actorWalls.drawInfo.bytesUsed)
 	{
@@ -364,15 +369,17 @@ VkResult ResizeActorWallBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorWalls.drawInfo.buffer);
 		}
-		buffers.actorWalls.drawInfo.allocatedSize = buffers.actorWalls.drawInfo.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorWalls.drawInfo.allocatedSize,
+			.size = buffers.actorWalls.drawInfo.bytesUsed,
 			.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorWalls.drawInfo.buffer),
 							   "Failed to recreate wall actors draw info buffer!");
-		buffers.actorWalls.drawInfo.data = calloc(1, buffers.actorWalls.drawInfo.allocatedSize);
+		buffers.actorWalls.drawInfo.data = Recalloc(buffers.actorWalls.drawInfo.data,
+													buffers.actorWalls.drawInfo.allocatedSize,
+													buffers.actorWalls.drawInfo.bytesUsed);
 		CheckAlloc(buffers.actorWalls.drawInfo.data);
+		buffers.actorWalls.drawInfo.allocatedSize = buffers.actorWalls.drawInfo.bytesUsed;
 	}
 
 	return VK_SUCCESS;
@@ -386,15 +393,16 @@ VkResult ResizeActorModelInstanceDataBuffer()
 		{
 			lunaDestroyBuffer(buffers.actorModels.instanceData.buffer);
 		}
-		buffers.actorModels.instanceData.allocatedSize = buffers.actorModels.instanceData.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorModels.instanceData.allocatedSize,
+			.size = buffers.actorModels.instanceData.bytesUsed,
 			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.instanceData.buffer),
 							   "Failed to recreate model actors instance data buffer!");
-		buffers.actorModels.instanceData.data = calloc(1, buffers.actorModels.instanceData.allocatedSize);
-		CheckAlloc(buffers.actorModels.instanceData.data);
+		buffers.actorModels.instanceData.data = Recalloc(buffers.actorModels.instanceData.data,
+														 buffers.actorModels.instanceData.allocatedSize,
+														 buffers.actorModels.instanceData.bytesUsed);
+		buffers.actorModels.instanceData.allocatedSize = buffers.actorModels.instanceData.bytesUsed;
 	}
 
 	return VK_SUCCESS;
@@ -408,15 +416,16 @@ VkResult ResizeActorModelBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorModels.vertices.buffer);
 		}
-		buffers.actorModels.vertices.allocatedSize = buffers.actorModels.vertices.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorModels.vertices.allocatedSize,
+			.size = buffers.actorModels.vertices.bytesUsed,
 			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.vertices.buffer),
 							   "Failed to recreate model actors shaded vertex buffer!");
-		buffers.actorModels.vertices.data = malloc(buffers.actorModels.vertices.allocatedSize);
-		CheckAlloc(buffers.actorModels.vertices.data);
+		ModelVertex *newVertices = realloc(buffers.actorModels.vertices.data, buffers.actorModels.vertices.bytesUsed);
+		CheckAlloc(newVertices);
+		buffers.actorModels.vertices.data = newVertices;
+		buffers.actorModels.vertices.allocatedSize = buffers.actorModels.vertices.bytesUsed;
 	}
 	if (buffers.actorModels.indices.allocatedSize < buffers.actorModels.indices.bytesUsed)
 	{
@@ -424,15 +433,16 @@ VkResult ResizeActorModelBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorModels.indices.buffer);
 		}
-		buffers.actorModels.indices.allocatedSize = buffers.actorModels.indices.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorModels.indices.allocatedSize,
+			.size = buffers.actorModels.indices.bytesUsed,
 			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.indices.buffer),
 							   "Failed to recreate model actors index buffer!");
-		buffers.actorModels.indices.data = malloc(buffers.actorModels.indices.allocatedSize);
-		CheckAlloc(buffers.actorModels.indices.data);
+		uint32_t *newIndices = realloc(buffers.actorModels.indices.data, buffers.actorModels.indices.bytesUsed);
+		CheckAlloc(newIndices);
+		buffers.actorModels.indices.data = newIndices;
+		buffers.actorModels.indices.allocatedSize = buffers.actorModels.indices.bytesUsed;
 	}
 	VulkanTestReturnResult(ResizeActorModelInstanceDataBuffer(),
 						   "Failed to recreate model actors instance data buffer!");
@@ -442,15 +452,17 @@ VkResult ResizeActorModelBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorModels.shadedDrawInfo.buffer);
 		}
-		buffers.actorModels.shadedDrawInfo.allocatedSize = buffers.actorModels.shadedDrawInfo.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorModels.shadedDrawInfo.allocatedSize,
+			.size = buffers.actorModels.shadedDrawInfo.bytesUsed,
 			.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.shadedDrawInfo.buffer),
 							   "Failed to recreate model actors shaded draw info buffer!");
-		buffers.actorModels.shadedDrawInfo.data = calloc(1, buffers.actorModels.shadedDrawInfo.allocatedSize);
+		buffers.actorModels.shadedDrawInfo.data = Recalloc(buffers.actorModels.shadedDrawInfo.data,
+														   buffers.actorModels.shadedDrawInfo.allocatedSize,
+														   buffers.actorModels.shadedDrawInfo.bytesUsed);
 		CheckAlloc(buffers.actorModels.shadedDrawInfo.data);
+		buffers.actorModels.shadedDrawInfo.allocatedSize = buffers.actorModels.shadedDrawInfo.bytesUsed;
 	}
 	if (buffers.actorModels.unshadedDrawInfo.allocatedSize < buffers.actorModels.unshadedDrawInfo.bytesUsed)
 	{
@@ -458,15 +470,17 @@ VkResult ResizeActorModelBuffers()
 		{
 			lunaDestroyBuffer(buffers.actorModels.unshadedDrawInfo.buffer);
 		}
-		buffers.actorModels.unshadedDrawInfo.allocatedSize = buffers.actorModels.unshadedDrawInfo.bytesUsed;
 		const LunaBufferCreationInfo creationInfo = {
-			.size = buffers.actorModels.unshadedDrawInfo.allocatedSize,
+			.size = buffers.actorModels.unshadedDrawInfo.bytesUsed,
 			.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
 		};
 		VulkanTestReturnResult(lunaCreateBuffer(&creationInfo, &buffers.actorModels.unshadedDrawInfo.buffer),
 							   "Failed to recreate model actors unshaded draw info buffer!");
-		buffers.actorModels.unshadedDrawInfo.data = calloc(1, buffers.actorModels.unshadedDrawInfo.allocatedSize);
+		buffers.actorModels.unshadedDrawInfo.data = Recalloc(buffers.actorModels.unshadedDrawInfo.data,
+															 buffers.actorModels.unshadedDrawInfo.allocatedSize,
+															 buffers.actorModels.unshadedDrawInfo.bytesUsed);
 		CheckAlloc(buffers.actorModels.unshadedDrawInfo.data);
+		buffers.actorModels.unshadedDrawInfo.allocatedSize = buffers.actorModels.unshadedDrawInfo.bytesUsed;
 	}
 
 	return VK_SUCCESS;

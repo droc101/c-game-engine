@@ -119,7 +119,8 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 
 static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(ActorWallCreateCollider(),
+	JPH_Shape *shape = ActorWallCreateCollider();
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Kinematic,
 																						   OBJECT_LAYER_STATIC,
@@ -133,6 +134,7 @@ static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
@@ -140,8 +142,7 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 {
 	DoorData *data = this->extraData;
 
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
-																	JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}}, JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -151,6 +152,7 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 	data->sensorBodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 															bodyCreationSettings,
 															JPH_Activation_Activate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 

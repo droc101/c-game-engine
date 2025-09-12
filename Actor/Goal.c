@@ -47,8 +47,7 @@ typedef struct GoalData
 
 static inline void CreateGoalSensor(Actor *this, const Transform *transform)
 {
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}},
-																	JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}}, JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -58,6 +57,7 @@ static inline void CreateGoalSensor(Actor *this, const Transform *transform)
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 

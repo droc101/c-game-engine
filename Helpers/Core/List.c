@@ -15,6 +15,7 @@
 #include <string.h>
 #include "Error.h"
 #include "Logging.h"
+#include "Realloc.h"
 
 void _ListInit(List *list, const enum _ListType listType)
 {
@@ -58,21 +59,24 @@ static inline void ListCopyHelper(const List *oldList, List *newList)
 	newList->length = oldList->length;
 }
 
-void _ListCopy(const List *oldList, List *newList)
+void _ListCopy(const List *restrict oldList, List *restrict newList)
 {
-	assert(oldList);
+	assert(oldList && oldList->data);
 	assert(newList);
 
+	_ListFree(newList);
+	// ReSharper disable once CppDFANullDereference CLion what are you talking about it cannot possibly be null
 	_ListInit(newList, oldList->data->type);
 	ListCopyHelper(oldList, newList);
 }
 
-void _LockingListCopy(const LockingList *oldList, LockingList *newList)
+void _LockingListCopy(const LockingList *restrict oldList, LockingList *restrict newList)
 {
-	assert(oldList);
+	assert(oldList && oldList->data);
 	assert(newList);
 
 	ListLock(*oldList);
+	_LockingListFree(newList);
 	_LockingListInit(newList, oldList->data->type);
 	ListCopyHelper((const List *)oldList, (List *)newList);
 	ListUnlock(*oldList);
@@ -512,21 +516,4 @@ void _LockingListAndContentsFree(LockingList *list)
 
 	_LockingListFreeOnlyContents(list);
 	_LockingListFree(list);
-}
-
-
-void *GameReallocArray(void *ptr, const size_t arrayLength, const size_t elementSize)
-{
-	if (elementSize == 0)
-	{
-		LogWarning("GameReallocArray: elementSize is zero, returning NULL");
-		return NULL;
-	}
-	if (arrayLength > SIZE_MAX / elementSize)
-	{
-		LogWarning("GameReallocArray: arrayLength * elementSize exceeds SIZE_MAX, returning NULL");
-		errno = ENOMEM;
-		return NULL;
-	}
-	return realloc(ptr, arrayLength * elementSize);
 }

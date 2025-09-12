@@ -205,10 +205,11 @@ void PlayerPersistentStateDestroy()
 
 void CreatePlayer(Level *level)
 {
+	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f);
 	JPH_CharacterVirtualSettings characterSettings = {
 		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
 		.base.enhancedInternalEdgeRemoval = true,
-		.base.shape = (const JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f),
+		.base.shape = shape,
 		.mass = 10.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
@@ -221,6 +222,7 @@ void CreatePlayer(Level *level)
 	JPH_CharacterVirtual_SetListener(level->player.joltCharacter, contactListener);
 	level->player.hasHeldActor = false;
 	level->player.canDropHeldActor = true;
+	JPH_Shape_Destroy(shape);
 }
 
 void MovePlayer(const Player *player, float *distanceTraveled)

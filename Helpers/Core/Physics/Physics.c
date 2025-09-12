@@ -108,7 +108,7 @@ void PhysicsInitLevel(Level *level)
 	const JPH_Plane plane = {
 		.normal.y = 1,
 	};
-	const JPH_Shape *shape = (const JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100);
+	JPH_Shape *shape = (JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
 																					  (Vector3[]){{0.0f, -0.5f, 0.0f}},
 																					  &JPH_Quat_Identity,
@@ -118,11 +118,13 @@ void PhysicsInitLevel(Level *level)
 	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
 															bodyCreationSettings,
 															JPH_Activation_DontActivate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
 void PhysicsDestroyLevel(const Level *level, JPH_BodyInterface *bodyInterface)
 {
+	JPH_CharacterVirtual_Destroy(level->player.joltCharacter);
 	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
 	JPH_PhysicsSystem_Destroy(level->physicsSystem);
 }

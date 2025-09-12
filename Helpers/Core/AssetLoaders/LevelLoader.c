@@ -215,6 +215,7 @@ Level *LoadLevel(const uint8_t *data, const size_t dataSize)
 		WallBake(wall);
 		if (wall->dx == 0 && wall->dy == 0)
 		{
+			free(wall);
 			continue;
 		}
 		CreateWallCollider(wall, bodyInterface);

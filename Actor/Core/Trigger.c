@@ -47,17 +47,18 @@ typedef struct TriggerData
 static inline void CreateTriggerSensor(Actor *this, const Transform *transform)
 {
 	const TriggerData *data = this->extraData;
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(
-			(const JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
-												   JPH_DefaultConvexRadius),
-			transform,
-			JPH_MotionType_Static,
-			OBJECT_LAYER_SENSOR,
-			this);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
+														JPH_DefaultConvexRadius);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_SENSOR,
+																						   this);
 	JPH_BodyCreationSettings_SetIsSensor(bodyCreationSettings, true);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
+	JPH_Shape_Destroy(shape);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
