@@ -441,14 +441,23 @@ void DPrintPlayer(const Level *level)
 			playerVelocity.x,
 			playerVelocity.y,
 			playerVelocity.z);
-	DPrintF("Rotation: TODO", COLOR_WHITE, false);
-	// DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)",
-	// 		COLOR_WHITE,
-	// 		false,
-	// 		level->player.transform.rotation.x,
-	// 		fabsf(level->player.transform.rotation.y),
-	// 		radToDeg(level->player.transform.rotation.x),
-	// 		radToDeg(fabsf(level->player.transform.rotation.y)));
+	Vector3 eulerAngles;
+	Vector3 axis;
+	float angle = NAN;
+	JPH_Quat_GetEulerAngles(&level->player.transform.rotation, &eulerAngles);
+	JPH_Quat_GetAxisAngle(&level->player.transform.rotation, &axis, &angle);
+	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)\nRotation Angle: %.4f (%.2fdeg)",
+			COLOR_WHITE,
+			false,
+			level->player.transform.rotation.x,
+			fabsf(level->player.transform.rotation.y),
+			radToDeg(level->player.transform.rotation.x),
+			radToDeg(fabsf(level->player.transform.rotation.y)),
+			axis.x,
+			axis.y,
+			axis.z,
+			angle,
+			radToDeg(angle));
 	DPrintF("%s Actor: %p",
 			COLOR_WHITE,
 			false,
