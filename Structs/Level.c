@@ -14,7 +14,6 @@
 #include "../Debug/JoltDebugRenderer.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
-#include "../Helpers/Core/KVList.h"
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/Player.h"
@@ -22,6 +21,7 @@
 #include "Actor.h"
 #include "Camera.h"
 #include "GlobalState.h"
+#include "Param.h"
 #include "Wall.h"
 
 Level *CreateLevel(void)

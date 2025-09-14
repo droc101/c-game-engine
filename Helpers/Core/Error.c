@@ -32,7 +32,7 @@ SDL_MessageBoxColorScheme mbColorScheme;
 _Noreturn inline void _GameAllocFailure()
 {
 	LogError("Memory Allocation Failed: %s\n", strerror(errno));
-	if (errno == ENOMEM)
+	if (errno == ENOMEM) // NOLINT(*-include-cleaner)
 	{
 		exit(1); // We should not attempt to do complex things if we are out of memory
 	}

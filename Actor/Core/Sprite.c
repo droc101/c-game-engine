@@ -14,21 +14,8 @@
 #include "../../Structs/Vector2.h"
 #include "../../Structs/Wall.h"
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_SPRITE,
-	.Update = DefaultActorUpdate,
-	.SignalHandler = DefaultActorSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
-
 void SpriteInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	const float halfWidth = KvGetFloat(params, "width", 1.0f) * 0.5f;
 	transform->position.y = KvGetFloat(params, "yPosition", 0.0f);
 	ActorCreateEmptyBody(this, transform);
@@ -40,4 +27,19 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
 	ActorWallBake(this);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_SPRITE,
+									 .Update = DefaultActorUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = SpriteInit};
+
+void RegisterSprite()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActor(SPRITE_ACTOR_NAME, &definition);
 }

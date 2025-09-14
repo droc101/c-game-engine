@@ -10,6 +10,8 @@
 #include "../../../Structs/GlobalState.h"
 #include "../../../Structs/Level.h"
 
+#define MAX_CONTACT_CONSTRAINTS 16384
+
 #define PHYSICS_TARGET_MS (1000 / PHYSICS_TARGET_TPS)
 #define PHYSICS_TARGET_MS_D (1000.0 / PHYSICS_TARGET_TPS)
 #define PHYSICS_TARGET_NS (1000000000 / PHYSICS_TARGET_TPS) // nanoseconds because precision

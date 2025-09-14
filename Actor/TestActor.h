@@ -5,10 +5,8 @@
 #ifndef GAME_TESTACTOR_H
 #define GAME_TESTACTOR_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define TEST_ACTOR_NAME "test_actor"
 
-void TestActorInit(Actor *this, const KvList params, Transform *transform);
+void RegisterTestActor();
 
 #endif //GAME_TESTACTOR_H

@@ -5,30 +5,13 @@
 #include "LogicCounter.h"
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "../../Helpers/Core/Error.h"
 #include "../../Helpers/Core/KVList.h"
 #include "../../Helpers/Core/MathEx.h"
 #include "../../Structs/Actor.h"
 #include "../../Structs/ActorDefinition.h"
-
-enum LogicCounterInput
-{
-	LOGIC_COUNTER_INPUT_INCREMENT = 1,
-	LOGIC_COUNTER_INPUT_DECREMENT = 2,
-	LOGIC_COUNTER_INPUT_ADD = 3,
-	LOGIC_COUNTER_INPUT_SUBTRACT = 4,
-};
-
-enum LogicCounterOutput
-{
-	LOGIC_COUNTER_OUTPUT_HIT_MAX = 2,
-	LOGIC_COUNTER_OUTPUT_HIT_MIN = 3,
-	LOGIC_COUNTER_OUTPUT_LEFT_MAX = 4,
-	LOGIC_COUNTER_OUTPUT_LEFT_MIN = 5,
-	LOGIC_COUNTER_OUTPUT_COUNTER_CHANGED = 6,
-};
+#include "../../Structs/Param.h"
 
 typedef struct LogicCounterData
 {
@@ -77,54 +60,38 @@ static inline void ChangeValue(const int change, LogicCounterData *data, const A
 	}
 }
 
-static bool LogicCounterSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void LogicCounterAddHandler(Actor *this, const Actor * /*sender*/, const Param *param)
 {
 	LogicCounterData *data = (LogicCounterData *)this->extraData;
-	if (DefaultActorSignalHandler(this, sender, signal, param))
+	if (param->type == PARAM_TYPE_INTEGER)
 	{
-		return true;
+		ChangeValue(param->intValue, data, this);
 	}
-	if (signal == LOGIC_COUNTER_INPUT_ADD)
-	{
-		if (param->type == PARAM_TYPE_INTEGER)
-		{
-			ChangeValue(param->intValue, data, this);
-			return true;
-		}
-	} else if (signal == LOGIC_COUNTER_INPUT_SUBTRACT)
-	{
-		if (param->type == PARAM_TYPE_INTEGER)
-		{
-			ChangeValue(-param->intValue, data, this);
-			return true;
-		}
-	} else if (signal == LOGIC_COUNTER_INPUT_INCREMENT)
-	{
-		ChangeValue(1, data, this);
-		return true;
-	} else if (signal == LOGIC_COUNTER_INPUT_DECREMENT)
-	{
-		ChangeValue(-1, data, this);
-		return true;
-	}
-	return false;
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LOGIC_COUNTER,
-	.Update = DefaultActorUpdate,
-	.SignalHandler = LogicCounterSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
+static void LogicCounterSubtractHandler(Actor *this, const Actor * /*sender*/, const Param *param)
+{
+	LogicCounterData *data = (LogicCounterData *)this->extraData;
+	if (param->type == PARAM_TYPE_INTEGER)
+	{
+		ChangeValue(-param->intValue, data, this);
+	}
+}
+
+static void LogicCounterIncrementHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	LogicCounterData *data = (LogicCounterData *)this->extraData;
+	ChangeValue(1, data, this);
+}
+
+static void LogicCounterDecrementHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	LogicCounterData *data = (LogicCounterData *)this->extraData;
+	ChangeValue(1, data, this);
+}
 
 void LogicCounterInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
-	this->definition = &definition;
-
 	this->extraData = malloc(sizeof(LogicCounterData));
 	CheckAlloc(this->extraData);
 	LogicCounterData *data = this->extraData;
@@ -134,4 +101,23 @@ void LogicCounterInit(Actor *this, const KvList params, Transform * /*transform*
 	data->counter = clamp(data->counter, data->min, data->max);
 	data->clampToMax = KvGetBool(params, "clampToMax", true);
 	data->clampToMin = KvGetBool(params, "clampToMin", true);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_LOGIC_COUNTER,
+									 .Update = DefaultActorUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = LogicCounterInit};
+
+void RegisterLogicCounter()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_ADD, LogicCounterAddHandler);
+	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_SUBTRACT, LogicCounterSubtractHandler);
+	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_INCREMENT, LogicCounterIncrementHandler);
+	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_DECREMENT, LogicCounterDecrementHandler);
+	RegisterActor(LOGIC_COUNTER_ACTOR_NAME, &definition);
 }

@@ -4,20 +4,15 @@
 
 #include "TestActor.h"
 #include <joltc/enums.h>
-#include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
-#include <joltc/Physics/Collision/Shape/Shape.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
-#include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Navigation.h"
 #include "../Helpers/Core/Physics/Physics.h"
@@ -33,10 +28,10 @@ static inline void CreateTestActorCollider(Actor *this, const Transform *transfo
 {
 	JPH_BodyCreationSettings
 			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
-																		 transform,
-																		 JPH_MotionType_Dynamic,
-																		 OBJECT_LAYER_DYNAMIC,
-																		 this);
+																		  transform,
+																		  JPH_MotionType_Dynamic,
+																		  OBJECT_LAYER_DYNAMIC,
+																		  this);
 	const JPH_MassProperties massProperties = {
 		.mass = 15.0f,
 	};
@@ -64,16 +59,6 @@ static void TestActorUpdate(Actor *this, const double delta)
 	// JPH_Quat_GetEulerAngles(&rotation, &this->transform.rotation);
 	//
 	// NavigationStep(this, this->extraData, delta);
-}
-
-static bool TestActorSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
-{
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
-	LogDebug("Test actor got signal %d from actor %p\n", signal, sender);
-	return false;
 }
 
 static void TestActorRenderUi(Actor *this)
@@ -132,21 +117,8 @@ static void TestActorTargetReached(Actor *this, const double delta)
 	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_TEST,
-	.Update = TestActorUpdate,
-	.SignalHandler = TestActorSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = TestActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
-
 void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
-	this->definition = &definition;
-
 	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
 	this->actorModel = LoadModel(MODEL("leafy"));
 	CreateTestActorCollider(this, transform);
@@ -166,4 +138,19 @@ void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 	navigationConfig->TargetReachedFunction = TestActorTargetReached;
 	navigationConfig->lastKnownTarget.x = transform->position.x;
 	navigationConfig->lastKnownTarget.y = transform->position.z;
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_TEST,
+									 .Update = TestActorUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = TestActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = TestActorInit};
+
+void RegisterTestActor()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActor(TEST_ACTOR_NAME, &definition);
 }

@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-
+#include "../Actor/TestActor.h"
 #include "../config.h"
 #include "../Debug/DPrint.h"
 #include "../Helpers/Core/AssetReader.h"
@@ -29,8 +29,8 @@
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/LodThread.h"
-#include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Actor.h"
+#include "../Structs/ActorDefinition.h"
 #include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"

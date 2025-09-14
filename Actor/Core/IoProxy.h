@@ -5,10 +5,10 @@
 #ifndef IOPROXY_H
 #define IOPROXY_H
 
-#include <joltc/Math/Transform.h>
-#include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
+#define IO_PROXY_ACTOR_NAME "io_proxy"
 
-void IoProxyInit(Actor *this, const KvList params, Transform *transform);
+#define IO_PROXY_OUTPUT_FIRST_TICK "first_tick"
+
+void RegisterIoProxy();
 
 #endif //IOPROXY_H

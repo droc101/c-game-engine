@@ -30,6 +30,7 @@
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Level.h"
+#include "Asset.h"
 #include "Camera.h"
 #include "Options.h"
 

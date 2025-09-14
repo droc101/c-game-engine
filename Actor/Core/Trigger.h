@@ -5,10 +5,16 @@
 #ifndef TRIGGER_H
 #define TRIGGER_H
 
-#include <joltc/Math/Transform.h>
-#include "../../Helpers/Core/KVList.h"
-#include "../../Structs/Actor.h"
+#define TRIGGER_ACTOR_NAME "trigger"
 
-void TriggerInit(Actor *this, const KvList params, Transform *transform);
+#define TRIGGER_INPUT_FORCE_TRIGGER "force_trigger"
+#define TRIGGER_INPUT_ENABLE "enable"
+#define TRIGGER_INPUT_DISABLE "disable"
+
+#define TRIGGER_OUTPUT_TRIGGERED "triggered"
+#define TRIGGER_OUTPUT_ENTERED "entered"
+#define TRIGGER_OUTPUT_EXITED "exited"
+
+void RegisterTrigger();
 
 #endif //TRIGGER_H

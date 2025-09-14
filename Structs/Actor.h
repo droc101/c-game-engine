@@ -15,21 +15,16 @@
 #include "../Helpers/Core/List.h"
 #include "ActorDefinition.h"
 #include "Color.h"
+#include "Param.h"
 #include "Wall.h"
 
 typedef struct Actor Actor;
 typedef struct ActorConnection ActorConnection;
 
-enum ActorInput
-{
-	ACTOR_INPUT_KILL = 0,
-};
+#define ACTOR_INPUT_KILL "kill"
 
-enum ActorOutput
-{
-	ACTOR_OUTPUT_SPAWNED = 1,
-	ACTOR_OUTPUT_KILLED = 0,
-};
+#define ACTOR_OUTPUT_SPAWNED "spawned"
+#define ACTOR_OUTPUT_KILLED "killed"
 
 enum ActorFlags
 {
@@ -42,8 +37,8 @@ enum ActorFlags
 
 struct ActorConnection
 {
-	uint8_t targetInput;
-	uint8_t myOutput;
+	char *targetActorInput;
+	char *sourceActorOutput;
 	char outActorName[64];
 	Param outParamOverride;
 };
@@ -102,18 +97,18 @@ void FreeActor(Actor *actor);
  * Directly trigger an input on an actor
  * @param sender The actor sending the signal
  * @param receiver The actor receiving the signal
- * @param signal The signal to send
+ * @param input The signal to send
  * @param param The parameter to send with the signal
  */
-void ActorTriggerInput(const Actor *sender, const Actor *receiver, uint8_t signal, const Param *param);
+void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param);
 
 /**
  * Fire signal from an actor
  * @param sender The actor sending the signal
- * @param signal The signal to send
+ * @param output The signal to send
  * @param defaultParam The default parameter to send with the signal
  */
-void ActorFireOutput(const Actor *sender, uint8_t signal, Param defaultParam);
+void ActorFireOutput(const Actor *sender, const char *output, Param defaultParam);
 
 /**
  * Destroy an actor connection
@@ -131,11 +126,7 @@ void ActorCreateEmptyBody(Actor *this, const Transform *transform);
 
 void DefaultActorUpdate(Actor * /*this*/, double /*delta*/);
 
-/**
- * Default signal handler for actors, handling global signals such as kill
- * @return Whether the signal was handled
- */
-bool DefaultActorSignalHandler(Actor *this, const Actor *sender, uint8_t signal, const Param *param);
+void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/);
 
 void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/);
 

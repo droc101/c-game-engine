@@ -5,10 +5,16 @@
 #ifndef DOOR_H
 #define DOOR_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define DOOR_ACTOR_NAME "prop_door"
 
-void DoorInit(Actor *this, const KvList params, Transform *transform);
+#define DOOR_INPUT_OPEN "open"
+#define DOOR_INPUT_CLOSE "close"
+
+#define DOOR_OUTPUT_OPENING "opening"
+#define DOOR_OUTPUT_CLOSING "closing"
+#define DOOR_OUTPUT_FULLY_OPENED "fully_opened"
+#define DOOR_OUTPUT_FULLY_CLOSED "fully_closed"
+
+void RegisterDoor();
 
 #endif //DOOR_H

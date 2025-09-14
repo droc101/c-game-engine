@@ -8,13 +8,15 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/types.h>
 #include <m-core.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include "../Helpers/Core/Dict.h"
 #include "../Helpers/Core/KVList.h"
+#include "Param.h"
 
 typedef struct Actor Actor;
 
+typedef enum ActorType ActorType;
+
+typedef struct ActorDefinition ActorDefinition;
 
 typedef void (*ActorInitFunction)(Actor *this, const KvList params, Transform *transform);
 
@@ -24,11 +26,7 @@ typedef void (*ActorDestroyFunction)(Actor *this);
 
 typedef void (*ActorUIRenderFunction)(Actor *this);
 
-/**
- * Signal handler function signature for actor
- * @return True if the signal was handled, false if not
- */
-typedef bool (*ActorSignalHandlerFunction)(Actor *this, const Actor *sender, uint8_t signal, const Param *param);
+typedef void (*ActorInputHandlerFunction)(Actor *this, const Actor *sender, const Param *param);
 
 typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyId bodyId);
 
@@ -36,10 +34,11 @@ typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyId body
 
 typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId);
 
+typedef void (*ActorRegisterFunction)();
 
-typedef enum ActorType ActorType;
+DEFINE_DICT(ActorInputHandlerFunctionDict, const char *, M_CSTR_OPLIST, ActorInputHandlerFunction, M_PTR_OPLIST);
 
-typedef struct ActorDefinition ActorDefinition;
+DEFINE_DICT(ActorDefinitionDict, const char *, M_CSTR_OPLIST, ActorDefinition *, M_PTR_OPLIST);
 
 enum ActorType
 {
@@ -60,22 +59,6 @@ enum ActorType
 	ACTOR_TYPE_LOGIC_COUNTER
 };
 
-#define TEST_ACTOR_NAME "test_actor"
-#define COIN_ACTOR_NAME "prop_coin"
-#define GOAL_ACTOR_NAME "prop_goal"
-#define DOOR_ACTOR_NAME "prop_door"
-#define TRIGGER_ACTOR_NAME "trigger"
-#define IO_PROXY_ACTOR_NAME "io_proxy"
-#define PHYSBOX_ACTOR_NAME "prop_physbox"
-#define LASER_ACTOR_NAME "prop_laser"
-#define STATIC_MODEL_ACTOR_NAME "prop_model_static"
-#define SOUND_PLAYER_ACTOR_NAME "sound_player"
-#define SPRITE_ACTOR_NAME "prop_sprite"
-#define LASER_EMITTER_ACTOR_NAME "prop_laser_emitter"
-#define LOGIC_BINARY_ACTOR_NAME "logic_binary"
-#define LOGIC_DECIMAL_ACTOR_NAME "logic_decimal"
-#define LOGIC_COUNTER_ACTOR_NAME "logic_counter"
-
 struct ActorDefinition
 {
 	/// The actor type index
@@ -84,36 +67,49 @@ struct ActorDefinition
 	/// The function to call when the actor is updated
 	/// @note This should be called every tick
 	ActorUpdateFunction Update;
-	/// The function to call when the actor receives a signal.
-	ActorSignalHandlerFunction SignalHandler;
+
 	ActorPlayerContactAddedFunction OnPlayerContactAdded;
 	ActorPlayerContactPersistedFunction OnPlayerContactPersisted;
 	ActorPlayerContactRemovedFunction OnPlayerContactRemoved;
+
 	/// The function called to allow the actor to render UI
 	ActorUIRenderFunction RenderUi;
 
+	/// The list of input handlers
+	ActorInputHandlerFunctionDict inputHandlers;
+
+
+	ActorInitFunction Init;
 	/// The function to call when the actor is destroyed
 	/// @note This should only be called once, when the actor is destroyed
 	ActorDestroyFunction Destroy;
 };
 
-DEFINE_DICT(ActorInitFunctionDict, const char *, M_CSTR_OPLIST, ActorInitFunction, M_PTR_OPLIST);
+/**
+ * Register an actor type
+ * @param actorTypeName The name of the actor type
+ * @param definition The actor's definition
+ */
+void RegisterActor(const char *actorTypeName, ActorDefinition *definition);
+
+void RegisterActorInput(ActorDefinition *definition, const char *name, ActorInputHandlerFunction handler);
+
+void UnregisterActorInput(ActorDefinition *definition, const char *name);
+
+void RegisterDefaultActorInputs(ActorDefinition *definition);
 
 /**
  * Register all actor types
  */
 void RegisterActors();
 
-/**
- * Get the init function for an actor type
- * @param actorType The actor type
- * @return The actor's init function
- */
-ActorInitFunction GetActorInitFunction(const char *actorType);
+const ActorDefinition *GetActorDefinition(const char *actorType);
+
+ActorInputHandlerFunction GetActorInputHandler(const ActorDefinition *definition, const char *input);
 
 /**
  * Destroy actor registrations
  */
-void DestroyActorInitFunctionDictionary();
+void DestroyActorDefinitions();
 
 #endif //GAME_ACTORDEFINITIONS_H

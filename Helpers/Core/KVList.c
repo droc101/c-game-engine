@@ -10,7 +10,6 @@
 #include <string.h>
 #include "../../Structs/Color.h"
 #include "../../Structs/Param.h"
-#include "Logging.h"
 
 #pragma region Private Functions
 

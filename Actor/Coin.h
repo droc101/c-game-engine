@@ -5,10 +5,10 @@
 #ifndef GAME_COIN_H
 #define GAME_COIN_H
 
-#include <joltc/Math/Transform.h>
-#include "../Helpers/Core/KVList.h"
-#include "../Structs/Actor.h"
+#define COIN_ACTOR_NAME "prop_coin"
 
-void CoinInit(Actor *this, const KvList params, Transform *transform);
+#define COIN_OUTPUT_COLLECTED "collected"
+
+void RegisterCoin();
 
 #endif //GAME_COIN_H

@@ -15,7 +15,6 @@
 #include <joltc/types.h>
 #include <math.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../Helpers/Core/AssetReader.h"
@@ -26,19 +25,9 @@
 #include "../Structs/ActorDefinition.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Level.h"
+#include "../Structs/Param.h"
 #include "../Structs/Vector2.h"
 #include "../Structs/Wall.h"
-
-enum GoalInput
-{
-	GOAL_INPUT_ENABLE = 1,
-	GOAL_INPUT_DISABLE = 2,
-};
-
-enum GoalOutput
-{
-	GOAL_OUTPUT_COLLECTED = 2,
-};
 
 typedef struct GoalData
 {
@@ -72,26 +61,16 @@ static void GoalUpdate(Actor *this, double /*delta*/)
 	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
 }
 
-static bool GoalSignalHandler(Actor *this, const Actor *sender, const uint8_t signal, const Param *param)
+static void GoalEnableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	if (DefaultActorSignalHandler(this, sender, signal, param))
-	{
-		return true;
-	}
 	GoalData *data = this->extraData;
-	if (signal == GOAL_INPUT_ENABLE && !data->enabled)
-	{
-		data->enabled = true;
-		strcpy(this->actorWall->tex, TEXTURE("actor/goal0"));
-		return true;
-	}
-	if (signal == GOAL_INPUT_DISABLE && data->enabled)
-	{
-		data->enabled = false;
-		strcpy(this->actorWall->tex, TEXTURE("actor/goal1"));
-		return true;
-	}
-	return false;
+	data->enabled = true;
+}
+
+static void GoalDisableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	GoalData *data = this->extraData;
+	data->enabled = false;
 }
 
 static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
@@ -105,21 +84,8 @@ static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_GOAL,
-	.Update = GoalUpdate,
-	.SignalHandler = GoalSignalHandler,
-	.OnPlayerContactAdded = GoalOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
-
 void GoalInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->definition = &definition;
-
 	GoalData *data = calloc(1, sizeof(GoalData));
 	CheckAlloc(data);
 	this->extraData = data;
@@ -139,4 +105,21 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 		.rotation.w = 1.0f,
 	};
 	CreateGoalSensor(this, &adjustedTransform);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_GOAL,
+									 .Update = GoalUpdate,
+									 .OnPlayerContactAdded = GoalOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = GoalInit};
+
+void RegisterGoal()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActorInput(&definition, GOAL_INPUT_ENABLE, GoalEnableHandler);
+	RegisterActorInput(&definition, GOAL_INPUT_DISABLE, GoalDisableHandler);
+	RegisterActor(GOAL_ACTOR_NAME, &definition);
 }

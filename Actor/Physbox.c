@@ -3,15 +3,12 @@
 //
 
 #include "Physbox.h"
-#include <joltc/constants.h>
 #include <joltc/enums.h>
-#include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
-#include <joltc/Physics/Collision/Shape/Shape.h>
 #include "../Helpers/Core/AssetLoaders/ModelLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/KVList.h"
@@ -39,24 +36,26 @@ static inline void CreatePhysboxCollider(Actor *this, const Transform *transform
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_PHYSBOX,
-	.Update = DefaultActorUpdate,
-	.SignalHandler = DefaultActorSignalHandler,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Destroy = DefaultActorDestroy,
-};
-
 void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
-	this->definition = &definition;
-
 	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS | ACTOR_FLAG_CAN_BE_HELD;
 	this->actorModel = LoadModel(MODEL("cube"));
 	transform->position.y = -0.3f;
 
 	CreatePhysboxCollider(this, transform);
+}
+
+static ActorDefinition definition = {.actorType = ACTOR_TYPE_PHYSBOX,
+									 .Update = DefaultActorUpdate,
+									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+									 .RenderUi = DefaultActorRenderUi,
+									 .Destroy = DefaultActorDestroy,
+									 .Init = PhysboxInit};
+
+void RegisterPhysbox()
+{
+	RegisterDefaultActorInputs(&definition);
+	RegisterActor(PHYSBOX_ACTOR_NAME, &definition);
 }
