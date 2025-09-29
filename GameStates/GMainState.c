@@ -89,7 +89,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
 	{
-		Vector3 newRotation = Vector3_Zero;
+		Vector3 cameraMotion = Vector3_Zero;
 
 		float cx = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
 		if (state->options.invertHorizontalCamera)
@@ -98,7 +98,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cx) > STICK_DEADZONE)
 		{
-			newRotation.y = cx * state->options.cameraSpeed / 11.25f;
+			cameraMotion.x = cx * state->options.cameraSpeed / 11.25f;
 		}
 
 		float cy = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
@@ -108,14 +108,17 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 		if (fabsf(cy) > STICK_DEADZONE)
 		{
-			newRotation.x = cy * state->options.cameraSpeed / 11.25f;
+			cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		JPH_Quat newRotationQuat;
-		JPH_Quat_FromEulerAngles(&newRotation, &newRotationQuat);
-		JPH_Quat_Multiply(&state->level->player.transform.rotation,
-						  &newRotationQuat,
-						  &state->level->player.transform.rotation);
+		const float currentPitch = JPH_Quat_GetRotationAngle(&state->level->player.transform.rotation, &Vector3_AxisX) +
+								   GLM_PI_2f;
+		JPH_Quat newYaw;
+		JPH_Quat newPitch;
+		JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
+		JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
+		JPH_Quat_Multiply(&newYaw, &state->level->player.transform.rotation, &state->level->player.transform.rotation);
+		JPH_Quat_Multiply(&state->level->player.transform.rotation, &newPitch, &state->level->player.transform.rotation);
 		JPH_Quat_Normalized(&state->level->player.transform.rotation, &state->level->player.transform.rotation);
 	}
 
