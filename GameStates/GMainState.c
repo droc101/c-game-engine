@@ -24,7 +24,6 @@
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
-#include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Graphics/Drawing.h"
@@ -38,6 +37,24 @@
 #include "GPauseState.h"
 
 static bool lodThreadInitDone = false;
+
+static inline void RotateCamera(const Vector2 cameraMotion)
+{
+	const float currentPitch = JPH_Quat_GetRotationAngle(&GetState()->level->player.transform.rotation,
+														 &Vector3_AxisX) +
+							   GLM_PI_2f;
+	JPH_Quat newYaw;
+	JPH_Quat newPitch;
+	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
+	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
+	JPH_Quat_Multiply(&newYaw,
+					  &GetState()->level->player.transform.rotation,
+					  &GetState()->level->player.transform.rotation);
+	JPH_Quat_Multiply(&GetState()->level->player.transform.rotation,
+					  &newPitch,
+					  &GetState()->level->player.transform.rotation);
+	JPH_Quat_Normalized(&GetState()->level->player.transform.rotation, &GetState()->level->player.transform.rotation);
+}
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void GMainStateUpdate(GlobalState *state)
@@ -61,15 +78,7 @@ void GMainStateUpdate(GlobalState *state)
 		cameraMotion.y *= -1;
 	}
 
-	const float currentPitch = JPH_Quat_GetRotationAngle(&state->level->player.transform.rotation, &Vector3_AxisX) +
-							   GLM_PI_2f;
-	JPH_Quat newYaw;
-	JPH_Quat newPitch;
-	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
-	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-	JPH_Quat_Multiply(&newYaw, &state->level->player.transform.rotation, &state->level->player.transform.rotation);
-	JPH_Quat_Multiply(&state->level->player.transform.rotation, &newPitch, &state->level->player.transform.rotation);
-	JPH_Quat_Normalized(&state->level->player.transform.rotation, &state->level->player.transform.rotation);
+	RotateCamera(cameraMotion);
 
 	if (state->saveData->coins > 9999)
 	{
@@ -89,7 +98,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
 	{
-		Vector3 cameraMotion = Vector3_Zero;
+		Vector2 cameraMotion = v2s(0);
 
 		float cx = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
 		if (state->options.invertHorizontalCamera)
@@ -111,15 +120,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		const float currentPitch = JPH_Quat_GetRotationAngle(&state->level->player.transform.rotation, &Vector3_AxisX) +
-								   GLM_PI_2f;
-		JPH_Quat newYaw;
-		JPH_Quat newPitch;
-		JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
-		JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-		JPH_Quat_Multiply(&newYaw, &state->level->player.transform.rotation, &state->level->player.transform.rotation);
-		JPH_Quat_Multiply(&state->level->player.transform.rotation, &newPitch, &state->level->player.transform.rotation);
-		JPH_Quat_Normalized(&state->level->player.transform.rotation, &state->level->player.transform.rotation);
+		RotateCamera(cameraMotion);
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);

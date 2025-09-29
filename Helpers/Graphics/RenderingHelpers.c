@@ -102,9 +102,10 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 		if (actor->actorModel != NULL &&
 			(actor->actorFlags & ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION) == ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION)
 		{
-			vec3 offest = GLM_VEC3_ZERO_INIT;
-			glm_vec3_muladds(VECTOR3_TO_VEC3(actor->actorModel->boundingBoxOrigin), -1, offest);
-			glm_translate(*transformMatrix, offest);
+			glm_translate(*transformMatrix,
+						  (vec3){-actor->actorModel->boundingBoxOrigin.x,
+								 -actor->actorModel->boundingBoxOrigin.y,
+								 -actor->actorModel->boundingBoxOrigin.z});
 		}
 	} else
 	{

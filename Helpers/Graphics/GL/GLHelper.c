@@ -920,9 +920,8 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	versor rotationQuat;
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
 
-	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	mat4 viewMatrix;
-	glm_quat_look(cameraPosition, rotationQuat, viewMatrix);
+	glm_quat_look(VECTOR3_TO_VEC3(camera->transform.position), rotationQuat, viewMatrix);
 
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
@@ -933,10 +932,7 @@ void GL_GetViewmodelMatrix(mat4 *out)
 	glm_perspective(glm_rad(VIEWMODEL_FOV), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix,
-				  (vec3){GetState()->viewmodel.transform.position.x,
-						 GetState()->viewmodel.transform.position.y,
-						 GetState()->viewmodel.transform.position.z});
+	glm_translate(translationMatrix, VECTOR3_TO_VEC3(GetState()->viewmodel.transform.position));
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
@@ -1077,10 +1073,7 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 	mat4 worldViewMatrix;
 	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translated(skyModelWorldMatrix,
-				   (vec3){(float)camera->transform.position.x,
-						  (float)camera->transform.position.y,
-						  (float)camera->transform.position.z});
+	glm_translated(skyModelWorldMatrix, VECTOR3_TO_VEC3(camera->transform.position));
 
 	const Vector2 floorStart = v2(level->player.transform.position.x - 100, level->player.transform.position.z - 100);
 	const Vector2 floorEnd = v2(level->player.transform.position.x + 100, level->player.transform.position.z + 100);
