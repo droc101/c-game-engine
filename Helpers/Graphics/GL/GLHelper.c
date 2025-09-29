@@ -941,7 +941,7 @@ void GL_GetViewmodelMatrix(mat4 *out)
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
 	glm_rotate(rotationMatrix,
-			   JPH_Quat_GetRotationAngle(&GetState()->camera->transform.rotation, &Vector3_AxisY),
+			   JPH_Quat_GetRotationAngle(&GetState()->viewmodel.transform.rotation, &Vector3_AxisY),
 			   GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
