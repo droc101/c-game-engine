@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.25)
 project(game C CXX)
 
+include(FetchPackage.cmake)
+include(CheckCSourceCompiles)
+include(CheckIncludeFile)
+
 #region Compile options
 
 option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
@@ -34,14 +38,13 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDeb
     endif ()
 endif ()
 
-include(CheckCSourceCompiles)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 check_c_source_compiles("
-    #if !(defined(__x86_64__) || defined(_M_X64))
+    #if !((defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)) && !defined(_M_ARM64EC))
         #error
     #endif" x86_64)
 if (x86_64)
     message(STATUS "Detected x86_64 architecture")
-    set(TARGET_ARCH "x86_64")
 else ()
     check_c_source_compiles("
         #if !(defined(__aarch64__) || defined(_M_ARM64))
@@ -49,7 +52,6 @@ else ()
         #endif" arm64)
     if (arm64)
         message(STATUS "Detected ARM64 architecture (no support will be provided)")
-        set(TARGET_ARCH "arm64")
     else ()
         message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
     endif ()
@@ -238,8 +240,6 @@ add_executable(
 
 add_library(CrossPlatformLibraries INTERFACE)
 
-include(FetchPackage.cmake)
-
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -357,14 +357,6 @@ if (WIN32)
                 "${CMAKE_BINARY_DIR}\\${dll}"
         )
     endforeach ()
-
-    if (x86_64)
-        add_custom_command(TARGET copydlls POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${CMAKE_BINARY_DIR}\\_deps\\discordGameSDK\\lib\\x86_64\\discord_game_sdk.dll"
-                "${CMAKE_BINARY_DIR}\\discord_game_sdk.dll"
-        )
-    endif ()
 
     add_dependencies(game copydlls)
 
