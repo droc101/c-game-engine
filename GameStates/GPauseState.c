@@ -17,7 +17,7 @@
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
 #include "../Structs/Vector2.h"
-#include "/home/droc101/CLionProjects/raytracer-c/Helpers/Discord.h"
+#include "../Helpers/Discord.h"
 #include "GMainState.h"
 #include "GOptionsState.h"
 

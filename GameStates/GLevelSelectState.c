@@ -23,7 +23,7 @@
 #include "../Structs/Color.h"
 #include "../Structs/GlobalState.h"
 #include "../Structs/Vector2.h"
-#include "/home/droc101/CLionProjects/raytracer-c/Helpers/Discord.h"
+#include "../Helpers/Discord.h"
 #include "GLoadingState.h"
 #include "GMenuState.h"
 

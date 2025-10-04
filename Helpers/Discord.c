@@ -35,7 +35,7 @@ void DiscordInit()
 	enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
 	if (res != DiscordResult_Ok)
 	{
-		LogError("Failed to start Discord Game SDK: Errno %d", res);
+		LogError("Failed to start Discord Game SDK: Errno %d\n", res);
 		return;
 	}
 
@@ -55,7 +55,7 @@ void ActivityCallback(void * /*data*/, const enum EDiscordResult result)
 {
 	if (result != DiscordResult_Ok)
 	{
-		LogError("Failed to set Discord RPC: Errno %d", result);
+		LogError("Failed to set Discord RPC: Errno %d\n", result);
 	}
 }
 
