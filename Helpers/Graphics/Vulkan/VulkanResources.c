@@ -538,15 +538,16 @@ bool LoadTexture(const Image *image)
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,
-		.mipmapLevels = useMipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
-		.generateMipmaps = useMipmaps,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
-		.pixels = image->pixelData,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		.writeInfo.bytes = image->width * image->height * sizeof(uint32_t),
+		.writeInfo.pixels = image->pixelData,
+		.writeInfo.mipmapLevels = useMipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
+		.writeInfo.generateMipmaps = useMipmaps,
+		.writeInfo.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		.writeInfo.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.writeInfo.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 		.sampler = sampler,
-		.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-		.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-		.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 	};
 	LunaImage lunaImage = VK_NULL_HANDLE;
 	const size_t index = textures.length;

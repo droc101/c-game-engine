@@ -7,7 +7,6 @@
 #include <luna/lunaDevice.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaInstance.h>
-#include <luna/lunaRenderPass.h>
 #include <luna/lunaTypes.h>
 #include <SDL_rect.h>
 #include <SDL_stdinc.h>
@@ -90,6 +89,9 @@ bool CreateLogicalDevice()
 		.pNext = &vulkan12Features,
 		.features = vulkan10Features,
 	};
+	const LunaPhysicalDevicePreferenceDefinition devicePreferenceDefinition = {
+		.preferredDeviceType = VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU,
+	};
 	const LunaDeviceCreationInfo2 deviceCreationInfo = {
 		.extensionCount = 3,
 		.extensionNames = (const char *const[]){VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -97,6 +99,7 @@ bool CreateLogicalDevice()
 												"VK_EXT_descriptor_indexing"},
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
+		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
 	};
 	VulkanTest(lunaAddNewDevice2(&deviceCreationInfo), "Failed to create logical device!");
 	physicalDeviceLimits = lunaGetPhysicalDeviceProperties().limits;
@@ -157,6 +160,7 @@ bool CreateSwapchain()
 													 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}},
 		.presentModeCount = vsync ? 1 : 3,
 		.presentModePriorityList = presentModes,
+		.clipped = true,
 	};
 
 	VulkanTest(lunaCreateSwapchain(&swapChainCreationInfo), "Failed to create swap chain!");

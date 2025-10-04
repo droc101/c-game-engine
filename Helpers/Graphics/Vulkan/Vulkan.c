@@ -11,7 +11,6 @@
 #include <luna/lunaDevice.h>
 #include <luna/lunaDrawing.h>
 #include <luna/lunaInstance.h>
-#include <luna/lunaRenderPass.h>
 #include <luna/lunaTypes.h>
 #include <math.h>
 #include <SDL_error.h>
@@ -225,16 +224,16 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
 		{
 			.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
-			.viewportBindInfo = &viewportBindInfo,
+			.bindInfo.viewportBindInfo = &viewportBindInfo,
 		},
 		{
 			.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
-			.scissorBindInfo = &scissorBindInfo,
+			.bindInfo.scissorBindInfo = &scissorBindInfo,
 		},
 	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-		.descriptorSetCount = 1,
-		.descriptorSets = &descriptorSets[currentFrame],
+		.descriptorSetBindInfo.descriptorSetCount = 1,
+		.descriptorSetBindInfo.descriptorSets = &descriptorSets[currentFrame],
 		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
@@ -389,7 +388,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
 													 buffers.sky.indices.buffer,
-													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.sky,
 													 &pipelineBindInfo,
@@ -407,7 +405,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
 													 buffers.walls.indices.buffer,
-													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.walls,
 													 &pipelineBindInfo,
@@ -429,7 +426,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.actorWalls.indices.buffer,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.actorWalls,
 															 &pipelineBindInfo,
@@ -450,7 +446,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.actorModels.indices.buffer,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.shadedActorModels,
 															 &pipelineBindInfo,
@@ -471,7 +466,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.actorModels.indices.buffer,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.unshadedActorModels,
 															 &pipelineBindInfo,
@@ -492,7 +486,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							  (VkDeviceSize[]){0, 0});
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.viewModel.indices,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.viewModel,
 															 &pipelineBindInfo,
@@ -569,22 +562,21 @@ VkResult VK_FrameEnd()
 		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
 			{
 				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
-				.viewportBindInfo = &viewportBindInfo,
+				.bindInfo.viewportBindInfo = &viewportBindInfo,
 			},
 			{
 				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
-				.scissorBindInfo = &scissorBindInfo,
+				.bindInfo.scissorBindInfo = &scissorBindInfo,
 			},
 		};
 		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetCount = 1,
-			.descriptorSets = &descriptorSets[currentFrame],
+			.descriptorSetBindInfo.descriptorSetCount = 1,
+			.descriptorSetBindInfo.descriptorSets = &descriptorSets[currentFrame],
 			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 			.dynamicStates = dynamicStateBindInfos,
 		};
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.ui.vertices.buffer,
 													 buffers.ui.indices.buffer,
-													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.ui,
 													 &pipelineBindInfo,
