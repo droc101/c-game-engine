@@ -3,13 +3,14 @@
 //
 
 #include "Arguments.h"
+#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-char *GetCliArgStr(const int argc, char *argv[], const char *argument, char *default_value)
+char *GetCliArgStr(const int argc, const char *argv[], const char *argument, char *default_value)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -25,7 +26,7 @@ char *GetCliArgStr(const int argc, char *argv[], const char *argument, char *def
 	return default_value;
 }
 
-int GetCliArgInt(const int argc, char *argv[], const char *argument, const int default_value)
+int GetCliArgInt(const int argc, const char *argv[], const char *argument, const int default_value)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -41,13 +42,14 @@ int GetCliArgInt(const int argc, char *argv[], const char *argument, const int d
 	return default_value;
 }
 
-bool GetCliArgBool(const int argc, char *argv[], const char *argument, const bool default_value)
+bool GetCliArgBool(const int argc, const char *argv[], const char *argument, const bool default_value)
 {
 	for (int i = 0; i < argc; i++)
 	{
 		if (strncmp(argv[i], argument, strlen(argument)) == 0)
 		{
 			char *value = strchr(argv[i], '=');
+			assert(value);
 			const size_t length = strlen(value);
 			for (size_t j = 0; j < length; j++)
 			{
@@ -70,7 +72,7 @@ bool GetCliArgBool(const int argc, char *argv[], const char *argument, const boo
 	return default_value;
 }
 
-bool HasCliArg(const int argc, char *argv[], const char *argument)
+bool HasCliArg(const int argc, const char *argv[], const char *argument)
 {
 	for (int i = 0; i < argc; i++)
 	{

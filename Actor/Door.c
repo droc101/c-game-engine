@@ -325,6 +325,7 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	CreateDoorBodies(this, transform, KvGetBool(params, "preventPlayerOpen", false));
 
 	this->actorWall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, -0.5f);
 	this->actorWall->b = v2(0, 0.5f);
 	strncpy(this->actorWall->tex, TEXTURE("actor/door"), 80);

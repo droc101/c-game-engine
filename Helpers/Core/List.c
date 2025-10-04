@@ -24,6 +24,7 @@ void _ListInit(List *list, const enum _ListType listType)
 
 	list->length = 0;
 	list->data = malloc(sizeof(struct _ListData));
+	CheckAlloc(list->data);
 	list->data->type = listType;
 	list->data->pointerData = NULL;
 }
@@ -54,7 +55,9 @@ static inline void ListCopyHelper(const List *oldList, List *newList)
 			listSize = oldList->length * 4;
 			break;
 	}
+	assert(!newList->data->pointerData);
 	newList->data->pointerData = malloc(listSize);
+	CheckAlloc(newList->data->pointerData);
 	memcpy(newList->data->pointerData, oldList->data->pointerData, listSize);
 	newList->length = oldList->length;
 }

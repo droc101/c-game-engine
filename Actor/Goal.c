@@ -92,6 +92,7 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	data->enabled = KvGetBool(params, "startEnabled", true);
 
 	this->actorWall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, 0.5f);
 	this->actorWall->b = v2(0, -0.5f);
 	strncpy(this->actorWall->tex, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"), 80);

@@ -6,12 +6,12 @@
 #define ARGUMENTS_H
 #include <stdbool.h>
 
-char *GetCliArgStr(int argc, char *argv[], const char *argument, char *default_value);
+char *GetCliArgStr(int argc, const char *argv[], const char *argument, char *default_value);
 
-int GetCliArgInt(int argc, char *argv[], const char *argument, int default_value);
+int GetCliArgInt(int argc, const char *argv[], const char *argument, int default_value);
 
-bool GetCliArgBool(int argc, char *argv[], const char *argument, bool default_value);
+bool GetCliArgBool(int argc, const char *argv[], const char *argument, bool default_value);
 
-bool HasCliArg(int argc, char *argv[], const char *argument);
+bool HasCliArg(int argc, const char *argv[], const char *argument);
 
 #endif //ARGUMENTS_H

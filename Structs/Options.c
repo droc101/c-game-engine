@@ -3,6 +3,7 @@
 //
 
 #include "Options.h"
+#include <errno.h>
 #include <SDL_filesystem.h>
 #include <SDL_stdinc.h>
 #include <stdbool.h>
@@ -146,6 +147,12 @@ void SaveOptions(Options *options)
 	char *filePath = GetOptionsPath();
 
 	FILE *file = fopen(filePath, "wb");
+	if (file == NULL)
+	{
+		LogError("File opening failed: %s\n", strerror(errno));
+		free(filePath);
+		return;
+	}
 	fwrite(options, sizeof(Options), 1, file);
 	fclose(file);
 

@@ -107,6 +107,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	CreateCoinSensor(this, &adjustedTransform);
 
 	this->actorWall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, 0.125f);
 	this->actorWall->b = v2(0, -0.125f);
 	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"), 80);

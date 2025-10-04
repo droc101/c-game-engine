@@ -49,7 +49,7 @@ SDL_Surface *windowIcon;
  * @param argc Program argument count
  * @param argv Program arguments
  */
-void ExecPathInit(const int argc, char *argv[])
+void ExecPathInit(const int argc, const char *argv[])
 {
 	if (argc < 1)
 	{
@@ -229,7 +229,7 @@ void HandleEvent(SDL_Event event, bool *shouldQuit)
 	}
 }
 
-int main(const int argc, char *argv[])
+int main(const int argc, const char *argv[])
 {
 	ErrorHandlerInit();
 	LogInit();

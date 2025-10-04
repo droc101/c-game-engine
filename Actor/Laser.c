@@ -176,6 +176,7 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	data->on = KvGetBool(params, "startOn", true);
 
 	this->actorWall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2s(0);
 	this->actorWall->b = v2s(0);
 	strncpy(this->actorWall->tex,

@@ -29,6 +29,7 @@ Font *GenerateFallbackFont()
 	font->defaultSize = 16;
 	font->uppercaseOnly = false;
 	font->texture = calloc(strlen("_generic_fallback") + 1, sizeof(char));
+	CheckAlloc(font->texture);
 	strcpy(font->texture, "_generic_fallback");
 	font->image = RegisterFallbackImage();
 	font->charCount = 255;
@@ -81,6 +82,7 @@ Font *LoadFont(const char *asset)
 	if (!fontTexture)
 	{
 		LogError("Failed to load font from asset (unable to read texture string)\n");
+		free(font);
 		return GenerateFallbackFont();
 	}
 	fontTextureLength += strlen(TEXTURE(""));
