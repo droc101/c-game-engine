@@ -32,6 +32,7 @@
 #include "Helpers/Core/Physics/PhysicsThread.h"
 #include "Helpers/Core/SoundSystem.h"
 #include "Helpers/Core/Timing.h"
+#include "Helpers/Discord.h"
 #include "Helpers/Graphics/Drawing.h"
 #include "Helpers/Graphics/Font.h"
 #include "Helpers/Graphics/LodThread.h"
@@ -304,6 +305,8 @@ int main(const int argc, const char *argv[])
 		}
 	}
 
+	DiscordInit();
+
 	LogInfo("Engine initialized, entering mainloop\n");
 
 	SDL_Event event;
@@ -366,11 +369,16 @@ int main(const int argc, const char *argv[])
 		}
 #endif
 
-		state->camera->transform.position.x = state->level->player.transform.position.x;
-		state->camera->transform.position.y = state->level->player.transform.position.y; // + state->camera->yOffset;
-		state->camera->transform.position.z = state->level->player.transform.position.z;
-		state->camera->transform.rotation = state->level->player.transform.rotation;
-		state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
+		if (state->level)
+		{
+			// TODO should this be moved somewhere else?
+			state->camera->transform.position.x = state->level->player.transform.position.x;
+			state->camera->transform.position.y = state->level->player.transform.position
+														  .y; // + state->camera->yOffset;
+			state->camera->transform.position.z = state->level->player.transform.position.z;
+			state->camera->transform.rotation = state->level->player.transform.rotation;
+			state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
+		}
 
 		state->RenderGame(state);
 
@@ -380,6 +388,8 @@ int main(const int argc, const char *argv[])
 		FrameEnd();
 
 		UpdateInputStates();
+
+		DiscordUpdate();
 
 		if (state->requestExit)
 		{

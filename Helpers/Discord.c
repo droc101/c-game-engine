@@ -1,0 +1,97 @@
+//
+// Created by droc101 on 10/4/25.
+//
+
+#include <alloca.h>
+#include <stdio.h>
+#include <wchar.h>
+#ifdef ENABLE_DISCORD_SDK
+#include <discord_game_sdk.h>
+#include "../config.h"
+#include "../Structs/GlobalState.h"
+#include "Core/Logging.h"
+#include "Core/Timing.h"
+#include "Discord.h"
+
+struct DiscordApplication
+{
+	struct IDiscordCore *core;
+	struct IDiscordUsers *users;
+	struct IDiscordActivityManager *activityManager;
+	DiscordUserId user_id;
+};
+
+struct DiscordApplication app;
+
+void DiscordInit()
+{
+	memset(&app, 0, sizeof(app));
+
+	struct DiscordCreateParams params;
+	params.client_id = DISCORD_APP_ID;
+	params.flags = DiscordCreateFlags_Default;
+	params.event_data = &app;
+
+	enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
+	if (res != DiscordResult_Ok)
+	{
+		LogError("Failed to start Discord Game SDK: Errno %d", res);
+		return;
+	}
+
+	app.activityManager = app.core->get_activity_manager(app.core);
+
+	DiscordUpdateRPC();
+
+	LogInfo("Discord Game SDK started");
+}
+
+void DiscordUpdate()
+{
+	app.core->run_callbacks(app.core);
+}
+
+void ActivityCallback(void * /*data*/, const enum EDiscordResult result)
+{
+	if (result != DiscordResult_Ok)
+	{
+		LogError("Failed to set Discord RPC: Errno %d", result);
+	}
+}
+
+void DiscordUpdateRPC()
+{
+	if (!app.core || !app.activityManager)
+	{
+		return;
+	}
+	struct DiscordActivity activity = {0};
+	activity.application_id = DISCORD_APP_ID;
+	activity.type = DiscordActivityType_Playing;
+	switch (GetState()->rpcState)
+	{
+		case IN_GAME:
+			snprintf(activity.assets.large_text, 128, "Playing %s", GetState()->levelName);
+			snprintf(activity.details, 128, "Playing %s", GetState()->levelName);
+			snprintf(activity.assets.large_image, 128, "level_%s", GetState()->levelName);
+			break;
+		case PAUSED:
+			snprintf(activity.assets.large_text, 128, "Playing %s", GetState()->levelName);
+			snprintf(activity.details, 128, "Game Paused");
+			snprintf(activity.assets.large_image, 128, "level_%s", GetState()->levelName);
+			break;
+		case IN_MENUS:
+		default:
+			strcpy(activity.assets.large_image, "logo");
+			snprintf(activity.details, 128, "In the menus");
+			strcpy(activity.assets.large_text, "GAME");
+			break;
+	}
+	app.activityManager->update_activity(app.activityManager, &activity, NULL, ActivityCallback);
+}
+
+#else
+void DiscordInit() {}
+void DiscordUpdate() {}
+void DiscordUpdateRPC() {}
+#endif

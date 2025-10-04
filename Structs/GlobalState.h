@@ -8,6 +8,8 @@
 #include <joltc/joltc.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "../Helpers/Discord.h"
+#include "Asset.h"
 #include "Camera.h"
 #include "Level.h"
 #include "Options.h"
@@ -57,6 +59,7 @@ struct GlobalState
 {
 	/// Current level
 	Level *level;
+	char *levelName;
 
 	JPH_JobSystem *jobSystem;
 
@@ -91,6 +94,8 @@ struct GlobalState
 	bool freezeEvents;
 	/// Request to exit the game
 	bool requestExit;
+
+	RPCState rpcState;
 };
 
 /**
@@ -138,8 +143,9 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 /**
  * Change the current level
  * @param level Level to change to
+ * @param levelName
  */
-void ChangeLevel(Level *level);
+void ChangeLevel(Level *level, char *levelName);
 
 /**
  * Destroy the global state

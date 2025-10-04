@@ -17,6 +17,7 @@
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
 #include "../Structs/Vector2.h"
+#include "/home/droc101/CLionProjects/raytracer-c/Helpers/Discord.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
 
@@ -110,6 +111,7 @@ void GMenuStateSetWithFade()
 
 void GMenuStateSet()
 {
+	GetState()->rpcState = IN_MENUS;
 	fadeIn = false;
 	if (menuStack == NULL)
 	{

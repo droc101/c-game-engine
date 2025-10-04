@@ -87,6 +87,8 @@
 #define APPDATA_ORG_NAME "Droc101 Development"
 #define APPDATA_APP_NAME "Game"
 
+#define DISCORD_APP_ID 1424114028548063302
+
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60
 /// Minimum physics updates per second. Delta time gets clamped to this valued.

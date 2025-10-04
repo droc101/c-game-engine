@@ -186,6 +186,7 @@ void GMainStateRender(GlobalState *state)
 
 void GMainStateSet()
 {
+	GetState()->rpcState = IN_GAME;
 	if (!lodThreadInitDone)
 	{
 		LodThreadInit();

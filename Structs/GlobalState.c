@@ -28,6 +28,7 @@
 #include "../Helpers/Core/Physics/PhysicsThread.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/SoundSystem.h"
+#include "../Helpers/Discord.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
 #include "../Structs/Level.h"
 #include "Asset.h"
@@ -47,9 +48,11 @@ void InitState()
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
 	state.level = CreateLevel(); // empty level so we don't segfault
+	state.levelName = calloc(1, 1);
 	state.camera = calloc(1, sizeof(Camera));
 	CheckAlloc(state.camera);
 	state.camera->fov = FOV;
+	state.rpcState = IN_MENUS;
 
 	state.viewmodel.enabled = true;
 	state.viewmodel.model = LoadModel(MODEL("eraser"));
@@ -90,9 +93,10 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	state.currentState = currentState;
 	state.RenderGame = RenderGame;
 	PhysicsThreadSetFunction(FixedUpdateGame);
+	DiscordUpdateRPC();
 }
 
-void ChangeLevel(Level *level)
+void ChangeLevel(Level *level, char *levelName)
 {
 	if (!level)
 	{
@@ -103,8 +107,10 @@ void ChangeLevel(Level *level)
 	if (state.level)
 	{
 		DestroyLevel(state.level);
+		free(state.levelName);
 	}
 	state.level = level;
+	state.levelName = levelName;
 	if (strncmp(level->music, "none", 4) != 0)
 	{
 		char musicPath[80];
@@ -158,7 +164,8 @@ bool ChangeLevelByName(const char *name)
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
-	ChangeLevel(LoadLevel(levelData->data, levelData->size));
+	ChangeLevel(LoadLevel(levelData->data, levelData->size), strdup(name));
 	FreeAsset(levelData);
+	DiscordUpdateRPC();
 	return true;
 }

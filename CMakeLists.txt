@@ -232,6 +232,8 @@ add_executable(
         Structs/Param.h
         Helpers/Core/Realloc.c
         Helpers/Core/Realloc.h
+        Helpers/Discord.c
+        Helpers/Discord.h
 )
 
 #endregion
