@@ -3,8 +3,7 @@
 //
 
 #include <cglm/types.h>
-#include <luna/lunaPipeline.h>
-#include <luna/lunaRenderPass.h>
+#include <luna/luna.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
