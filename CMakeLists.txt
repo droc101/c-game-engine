@@ -3,7 +3,7 @@ project(game C CXX)
 
 #region Compile options
 
-option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." ON)
+option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
 option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert macros. This overrides the build type and forces them to be enabled always." ON)
 option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
 
@@ -34,14 +34,25 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDeb
     endif ()
 endif ()
 
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|ARM64|arm64)")
-    message(STATUS "Detected ARM64 architecture (no support will be provided)")
-    set(TARGET_ARCH "arm64")
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)")
+include(CheckCSourceCompiles)
+check_c_source_compiles("
+    #if !(defined(__x86_64__) || defined(_M_X64))
+        #error
+    #endif" x86_64)
+if (x86_64)
     message(STATUS "Detected x86_64 architecture")
     set(TARGET_ARCH "x86_64")
 else ()
-    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
+    check_c_source_compiles("
+        #if !(defined(__aarch64__) || defined(_M_ARM64))
+            #error
+        #endif" arm64)
+    if (arm64)
+        message(STATUS "Detected ARM64 architecture (no support will be provided)")
+        set(TARGET_ARCH "arm64")
+    else ()
+        message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
+    endif ()
 endif ()
 
 if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -225,6 +236,8 @@ add_executable(
 
 #region Libraries
 
+add_library(CrossPlatformLibraries INTERFACE)
+
 include(FetchPackage.cmake)
 
 find_package(SDL2 REQUIRED)
@@ -234,6 +247,16 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 fetchDict()
 fetchPackage(https://github.com/NBT22/Luna v0.1.* Luna)
+if (x86_64)
+    fetchDiscordGameSDK()
+    add_compile_definitions(ENABLE_DISCORD_SDK)
+endif ()
+check_include_file("cglm/cglm.h" cglm_FOUND)
+if (NOT cglm_FOUND)
+    makePackageAvailable(https://github.com/recp/cglm.git v0.*.* cglm)
+else ()
+    add_library(cglm INTERFACE)
+endif ()
 
 if (JOLT_BUILD_DEBUG_RENDERER)
     add_compile_definitions(JPH_DEBUG_RENDERER)
@@ -255,29 +278,31 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(joltc)
 
-set(CROSS_PLATFORM_LIBRARIES
-        ${SDL2_LIBRARIES}
-        ${ZLIB_LIBRARIES}
-        SDL2_mixer
+target_link_libraries(CrossPlatformLibraries INTERFACE
+        ${SDL2_LIBRARIES} # SDL2::SDL2
+        ${ZLIB_LIBRARIES} # ZLIB::ZLIB
+        SDL2_mixer # SDL2_mixer::SDL2_mixer
         Luna
-        ${OPENGL_LIBRARIES}
-        ${GLEW_LIBRARIES}
+        ${OPENGL_LIBRARIES} # OpenGL::GL
+        ${GLEW_LIBRARIES} # GLEW::GLEW
         joltc
+        cglm
         dict
 )
-
-if (UNIX)
-    target_link_libraries(game PRIVATE ${CROSS_PLATFORM_LIBRARIES} m)
-elseif (WIN32)
-    target_link_libraries(game PRIVATE ${CROSS_PLATFORM_LIBRARIES} opengl32 dwmapi)
-endif ()
-target_include_directories(game PRIVATE
+target_include_directories(CrossPlatformLibraries INTERFACE
         ${SDL2_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
         ${GLEW_INCLUDE_DIRS}
 )
-set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(CrossPlatformLibraries PROPERTIES LINKER_LANGUAGE CXX)
+
+if (UNIX)
+    target_link_libraries(game PRIVATE CrossPlatformLibraries m)
+    set_target_properties(game PROPERTIES LINK_FLAGS "-Wl,-rpath='$ORIGIN'")
+elseif (WIN32)
+    target_link_libraries(game PRIVATE CrossPlatformLibraries opengl32 dwmapi)
+endif ()
 
 #endregion
 
@@ -332,6 +357,14 @@ if (WIN32)
                 "${CMAKE_BINARY_DIR}\\${dll}"
         )
     endforeach ()
+
+    if (x86_64)
+        add_custom_command(TARGET copydlls POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_BINARY_DIR}\\_deps\\discordGameSDK\\lib\\x86_64\\discord_game_sdk.dll"
+                "${CMAKE_BINARY_DIR}\\discord_game_sdk.dll"
+        )
+    endif ()
 
     add_dependencies(game copydlls)
 
