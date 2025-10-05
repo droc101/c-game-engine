@@ -45,6 +45,7 @@ function(fetchDict)
     file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-core.h ${CMAKE_BINARY_DIR}/_deps/dict/m-core.h)
     file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-array.h ${CMAKE_BINARY_DIR}/_deps/dict/m-array.h)
     file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-dict.h ${CMAKE_BINARY_DIR}/_deps/dict/m-dict.h)
+    file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/LICENSE ${CMAKE_BINARY_DIR}/_deps/dict/LICENSE)
 
     add_library(dict INTERFACE)
     target_include_directories(dict INTERFACE ${CMAKE_BINARY_DIR}/_deps/dict)
