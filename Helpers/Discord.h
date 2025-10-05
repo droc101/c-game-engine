@@ -18,4 +18,6 @@ void DiscordUpdate();
 
 void DiscordUpdateRPC();
 
+void DiscordDestroy();
+
 #endif //GAME_DISCORD_H

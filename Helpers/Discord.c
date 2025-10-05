@@ -10,6 +10,8 @@
 #include "../Structs/GlobalState.h"
 #include "Core/AssetLoaders/GameConfigLoader.h"
 #include "Core/Logging.h"
+#include <string.h>
+#include <stddef.h>
 
 struct DiscordApplication
 {
@@ -30,8 +32,8 @@ void DiscordInit()
 	}
 
 	struct DiscordCreateParams params;
-	params.client_id = config.discordAppId;
-	params.flags = DiscordCreateFlags_Default;
+	params.client_id = (DiscordClientId)config.discordAppId;
+	params.flags = DiscordCreateFlags_NoRequireDiscord;
 	params.event_data = &app;
 
 	enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
@@ -46,7 +48,7 @@ void DiscordInit()
 
 	DiscordUpdateRPC();
 
-	LogInfo("Discord Game SDK started\n");
+	LogInfo("Discord Game SDK started with App ID %lu\n", config.discordAppId);
 }
 
 void DiscordUpdate()
@@ -73,7 +75,7 @@ void DiscordUpdateRPC()
 		return;
 	}
 	struct DiscordActivity activity = {0};
-	activity.application_id = config.discordAppId;
+	activity.application_id = (DiscordClientId)config.discordAppId;
 	activity.type = DiscordActivityType_Playing;
 	switch (GetState()->rpcState)
 	{
@@ -97,8 +99,17 @@ void DiscordUpdateRPC()
 	app.activityManager->update_activity(app.activityManager, &activity, NULL, ActivityCallback);
 }
 
+void DiscordDestroy()
+{
+	if (app.core)
+	{
+		app.core->destroy(app.core);
+	}
+}
+
 #else
 void DiscordInit() {}
 void DiscordUpdate() {}
 void DiscordUpdateRPC() {}
+void DiscordDestroy() {}
 #endif

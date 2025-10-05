@@ -410,6 +410,7 @@ int main(const int argc, const char *argv[])
 		FrameGraphUpdate(GetTimeNs() - frameStart);
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
+	DiscordDestroy();
 	PhysicsThreadTerminate();
 	LodThreadDestroy();
 	InputDestroy();
