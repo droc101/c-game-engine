@@ -14,7 +14,6 @@
 struct DiscordApplication
 {
 	struct IDiscordCore *core;
-	struct IDiscordUsers *users;
 	struct IDiscordActivityManager *activityManager;
 	DiscordUserId user_id;
 };
@@ -33,6 +32,7 @@ void DiscordInit()
 	enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
 	if (res != DiscordResult_Ok)
 	{
+		app.core = NULL;
 		LogError("Failed to start Discord Game SDK: Errno %d\n", res);
 		return;
 	}
@@ -46,6 +46,10 @@ void DiscordInit()
 
 void DiscordUpdate()
 {
+	if (!app.core)
+	{
+		return;
+	}
 	app.core->run_callbacks(app.core);
 }
 
