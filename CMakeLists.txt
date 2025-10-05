@@ -246,7 +246,7 @@ add_executable(
 
 add_library(CrossPlatformLibraries INTERFACE)
 
-find_package(SDL2 REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -259,7 +259,7 @@ if (x86_64)
 endif ()
 check_include_file("cglm/cglm.h" cglm_FOUND)
 if (NOT cglm_FOUND)
-    makePackageAvailable(https://github.com/recp/cglm.git v0.*.* cglm)
+    fetchPackage(https://github.com/recp/cglm.git v0.*.* cglm)
 else ()
     add_library(cglm INTERFACE)
 endif ()
@@ -285,9 +285,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(joltc)
 
 target_link_libraries(CrossPlatformLibraries INTERFACE
-        ${SDL2_LIBRARIES} # SDL2::SDL2
+        SDL2::SDL2
         ${ZLIB_LIBRARIES} # ZLIB::ZLIB
-        SDL2_mixer # SDL2_mixer::SDL2_mixer
+        SDL2_mixer::SDL2_mixer
         Luna
         ${OPENGL_LIBRARIES} # OpenGL::GL
         ${GLEW_LIBRARIES} # GLEW::GLEW
@@ -296,7 +296,6 @@ target_link_libraries(CrossPlatformLibraries INTERFACE
         dict
 )
 target_include_directories(CrossPlatformLibraries INTERFACE
-        ${SDL2_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
         ${GLEW_INCLUDE_DIRS}
