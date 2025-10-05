@@ -9,6 +9,7 @@
 #include "../config.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/SoundSystem.h"
+#include "../Helpers/Discord.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/Font.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
@@ -17,7 +18,6 @@
 #include "../Structs/UI/Controls/Button.h"
 #include "../Structs/UI/UiStack.h"
 #include "../Structs/Vector2.h"
-#include "../Helpers/Discord.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
 

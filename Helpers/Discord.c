@@ -2,16 +2,15 @@
 // Created by droc101 on 10/4/25.
 //
 
-#include <alloca.h>
-#include <stdio.h>
-#include <wchar.h>
 #ifdef ENABLE_DISCORD_SDK
+#include <stdio.h>
 #include <discord_game_sdk.h>
 #include "../config.h"
 #include "../Structs/GlobalState.h"
 #include "Core/Logging.h"
-#include "Core/Timing.h"
 #include "Discord.h"
+#include <string.h>
+#include <stddef.h>
 
 struct DiscordApplication
 {
