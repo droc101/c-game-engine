@@ -43,6 +43,8 @@
 #include "Structs/GlobalState.h"
 #include "Structs/Vector2.h"
 
+#undef main // Leaked by SDL_main.h
+
 SDL_Surface *windowIcon;
 
 /**

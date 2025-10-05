@@ -7,7 +7,7 @@
 #include <cglm/types.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
-#include <luna/luna.h>
+#include <luna/lunaBuffer.h>
 #include <luna/lunaDevice.h>
 #include <luna/lunaDrawing.h>
 #include <luna/lunaInstance.h>
@@ -247,7 +247,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
 													 buffers.sky.indices.buffer,
-													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.sky,
 													 &pipelineBindInfo,
@@ -271,7 +270,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.walls.vertices.buffer,
 													 buffers.walls.indices.buffer,
-													 0,
 													 VK_INDEX_TYPE_UINT32,
 													 pipelines.walls,
 													 &pipelineBindInfo,
@@ -326,7 +324,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.actorWalls.indices.buffer,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.actorWalls,
 															 &pipelineBindInfo,
@@ -347,7 +344,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.actorModels.indices.buffer,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.shadedActorModels,
 															 &pipelineBindInfo,
@@ -368,7 +364,6 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 
 		VulkanTestReturnResult(lunaDrawBufferIndexedIndirect(NULL,
 															 buffers.actorModels.indices.buffer,
-															 0,
 															 VK_INDEX_TYPE_UINT32,
 															 pipelines.unshadedActorModels,
 															 &pipelineBindInfo,

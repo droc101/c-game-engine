@@ -3,14 +3,13 @@
 //
 
 #ifdef ENABLE_DISCORD_SDK
-#include <stdio.h>
+
+#include "Discord.h"
 #include <discord_game_sdk.h>
+#include <stdio.h>
 #include "../config.h"
 #include "../Structs/GlobalState.h"
 #include "Core/Logging.h"
-#include "Discord.h"
-#include <string.h>
-#include <stddef.h>
 
 struct DiscordApplication
 {
@@ -50,7 +49,7 @@ void DiscordUpdate()
 	app.core->run_callbacks(app.core);
 }
 
-void ActivityCallback(void * /*data*/, const enum EDiscordResult result)
+static void ActivityCallback(void * /*data*/, const enum EDiscordResult result)
 {
 	if (result != DiscordResult_Ok)
 	{
