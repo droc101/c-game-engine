@@ -65,7 +65,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 			"Sorry, but the game has crashed.\n\n%s\n\nEngine Version: %s\nSDL Version: %d.%d.%d\nSDL_Mixer Version: "
 			"%d.%d.%d\nZlib Version: %s",
 			messageBuffer,
-			VERSION,
+			ENGINE_VERSION,
 			SDL_MAJOR_VERSION,
 			SDL_MINOR_VERSION,
 			SDL_PATCHLEVEL,

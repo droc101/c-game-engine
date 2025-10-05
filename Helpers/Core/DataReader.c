@@ -87,7 +87,10 @@ char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBuff
 			char *string = calloc(stringLength, sizeof(char));
 			memcpy(string, data + *offset, stringLength);
 			*offset += stringLength * sizeof(char);
-			*outLength = stringLength;
+			if (outLength)
+			{
+				*outLength = stringLength;
+			}
 			return string;
 		}
 	}

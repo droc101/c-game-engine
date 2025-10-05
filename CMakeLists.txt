@@ -11,6 +11,8 @@ option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug render
 option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert macros. This overrides the build type and forces them to be enabled always." ON)
 option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 set(CMAKE_C_STANDARD 11)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden")
@@ -234,6 +236,8 @@ add_executable(
         Helpers/Core/Realloc.h
         Helpers/Discord.c
         Helpers/Discord.h
+        Helpers/Core/AssetLoaders/GameConfigLoader.c
+        Helpers/Core/AssetLoaders/GameConfigLoader.h
 )
 
 #endregion
@@ -312,17 +316,21 @@ endif ()
 
 add_custom_target(
         copy_assets
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/assets
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_BINARY_DIR}/assets
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
 )
 
 add_dependencies(game copy_assets)
 
 #endregion
 
-#region Windows DLLs
-if (WIN32)
+#region Copy Libraries
 
+add_custom_target(copy_libraries ALL
+        COMMENT "Copying shared libraries to build output directory"
+)
+
+if (WIN32)
     execute_process(
             COMMAND cygpath -w /mingw64
             OUTPUT_VARIABLE MINGW_PATH
@@ -348,19 +356,27 @@ if (WIN32)
             libstdc++-6.dll
     )
 
-    add_custom_target(copydlls ALL
-            COMMENT "Copying DLLs to build output directory"
-    )
-
     foreach (dll IN LISTS DLLS)
-        add_custom_command(TARGET copydlls POST_BUILD
+        add_custom_command(TARGET copy_libraries POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${MINGW_PATH}\\bin\\${dll}"
-                "${CMAKE_BINARY_DIR}\\${dll}"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}\\${dll}"
         )
     endforeach ()
 
-    add_dependencies(game copydlls)
-
+    add_custom_command(TARGET copy_libraries POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/_deps/discordGameSDK/lib/x86_64/discord_game_sdk.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/discord_game_sdk.dll"
+    )
+else ()
+    add_custom_command(TARGET copy_libraries POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/_deps/discordGameSDK/lib/x86_64/discord_game_sdk.so"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/discord_game_sdk.so"
+    )
 endif ()
+
+add_dependencies(game copy_libraries)
+
 #endregion

@@ -76,10 +76,14 @@ void DestroyAssetCache()
 
 Asset *DecompressAsset(const char *relPath, const bool cache)
 {
-	Asset *asset = AssetCache_get(assetCache, relPath);
-	if (asset != NULL)
+	Asset *asset = NULL;
+	if (cache)
 	{
-		return asset;
+		asset = AssetCache_get(assetCache, relPath);
+		if (asset != NULL)
+		{
+			return asset;
+		}
 	}
 
 	FILE *file = OpenAssetFile(relPath);

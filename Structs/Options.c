@@ -4,18 +4,16 @@
 
 #include "Options.h"
 #include <errno.h>
-#include <SDL_filesystem.h>
-#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../config.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Graphics/RenderingHelpers.h"
+#include "GlobalState.h"
 
 void DefaultOptions(Options *options)
 {
@@ -76,14 +74,12 @@ uint16_t GetOptionsChecksum(Options *options)
 
 char *GetOptionsPath()
 {
-	char *folderPath = SDL_GetPrefPath(APPDATA_ORG_NAME, APPDATA_APP_NAME);
-	const char *fileName = "options.bin";
+	const char *folderPath = GetState()->executableFolder;
+	const char *fileName = "/options.bin";
 	char *filePath = malloc(strlen(folderPath) + strlen(fileName) + 1);
 	CheckAlloc(filePath);
 	strcpy(filePath, folderPath);
 	strcat(filePath, fileName);
-
-	SDL_free(folderPath);
 	return filePath;
 }
 
@@ -143,7 +139,6 @@ void LoadOptions(Options *options)
 void SaveOptions(Options *options)
 {
 	options->checksum = GetOptionsChecksum(options);
-
 	char *filePath = GetOptionsPath();
 
 	FILE *file = fopen(filePath, "wb");

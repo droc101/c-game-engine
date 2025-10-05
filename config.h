@@ -74,20 +74,12 @@
 
 #pragma endregion
 
-// Program information
-#define COPYRIGHT "2025 Droc101 Development"
-#define GAME_TITLE "Game" // Used for window title
-
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 0
-#define VERSION_PATCH 1
-#define VERSION_SUFFIX "-assets-v2"
-#define VERSION TO_STR(VERSION_MAJOR) "." TO_STR(VERSION_MINOR) "." TO_STR(VERSION_PATCH) VERSION_SUFFIX
-
-#define APPDATA_ORG_NAME "Droc101 Development"
-#define APPDATA_APP_NAME "Game"
-
-#define DISCORD_APP_ID 1424114028548063302
+#define ENGINE_VERSION_MAJOR 0
+#define ENGINE_VERSION_MINOR 0
+#define ENGINE_VERSION_PATCH 1
+#define ENGINE_VERSION_SUFFIX "-assets-v2"
+#define ENGINE_VERSION \
+	TO_STR(ENGINE_VERSION_MAJOR) "." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX
 
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60

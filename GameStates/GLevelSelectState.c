@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../config.h"
+#include "../Helpers/Core/AssetLoaders/GameConfigLoader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"
 #include "../Helpers/Core/List.h"
@@ -59,7 +60,7 @@ void GLevelSelectStateRender(GlobalState * /*State*/)
 {
 	RenderMenuBackground();
 
-	FontDrawString(v2(20, 20), GAME_TITLE, 128, COLOR_WHITE, largeFont);
+	FontDrawString(v2(20, 20), config.gameTitle, 128, COLOR_WHITE, largeFont);
 	FontDrawString(v2(20, 150), "Press Space to start.", 32, COLOR(0xFFa0a0a0), largeFont);
 
 	char levelNameBuffer[128];

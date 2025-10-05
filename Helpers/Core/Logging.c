@@ -3,8 +3,6 @@
 //
 
 #include "Logging.h"
-#include <SDL_filesystem.h>
-#include <SDL_stdinc.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -12,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../config.h"
+#include "../../Structs/GlobalState.h"
 #include "Error.h"
 
 /// The length of the longest value passed to the type argument of the LogInternal function (including the null) plus 7
@@ -21,14 +20,12 @@ FILE *logFile = NULL;
 
 void LogInit()
 {
-	char *folderPath = SDL_GetPrefPath(APPDATA_ORG_NAME, APPDATA_APP_NAME);
+	const char *folderPath = GetState()->executableFolder;
 	const char *fileName = "game.log";
 	char *filePath = malloc(strlen(folderPath) + strlen(fileName) + 1);
 	CheckAlloc(filePath);
 	strcpy(filePath, folderPath);
 	strcat(filePath, fileName);
-
-	SDL_free(folderPath);
 
 	logFile = fopen(filePath, "w");
 	free(filePath);
@@ -63,12 +60,18 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	printf("\x1b[0m");
 	va_end(args);
 	va_start(args, message);
-	fprintf(logFile, "[%.*s] ", bufferLength - 8, type); // Minus 8 due to color, brackets, and null not included
-	vfprintf(logFile, message, args);
+	if (logFile)
+	{
+		fprintf(logFile, "[%.*s] ", bufferLength - 8, type); // Minus 8 due to color, brackets, and null not included
+		vfprintf(logFile, message, args);
+	}
 	va_end(args);
 	if (flush)
 	{
 		fflush(stdout);
-		fflush(logFile);
+		if (logFile)
+		{
+			fflush(logFile);
+		}
 	}
 }

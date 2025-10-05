@@ -24,6 +24,7 @@
 #include "GameStates/GMainState.h"
 #include "GameStates/GMenuState.h"
 #include "Helpers/Core/Arguments.h"
+#include "Helpers/Core/AssetLoaders/GameConfigLoader.h"
 #include "Helpers/Core/AssetReader.h"
 #include "Helpers/Core/Error.h"
 #include "Helpers/Core/Input.h"
@@ -87,7 +88,7 @@ void ExecPathInit(const int argc, const char *argv[])
  */
 void InitSDL()
 {
-	SDL_SetHint(SDL_HINT_APP_NAME, GAME_TITLE);
+	SDL_SetHint(SDL_HINT_APP_NAME, config.gameTitle);
 #ifdef __LINUX__
 	if (GetState()->options.preferWayland)
 	{
@@ -114,18 +115,18 @@ void InitSDL()
  */
 void WindowAndRenderInit()
 {
-	const size_t titleLen = strlen(GAME_TITLE) + strlen(" - Vulkan") + 1;
+	const size_t titleLen = strlen(config.gameTitle) + strlen(" - Vulkan") + 1;
 	char title[titleLen];
 	switch (currentRenderer)
 	{
 		case RENDERER_OPENGL:
-			snprintf(title, titleLen, "%s - OpenGL", GAME_TITLE);
+			snprintf(title, titleLen, "%s - OpenGL", config.gameTitle);
 			break;
 		case RENDERER_VULKAN:
-			snprintf(title, titleLen, "%s - Vulkan", GAME_TITLE);
+			snprintf(title, titleLen, "%s - Vulkan", config.gameTitle);
 			break;
 		default:
-			snprintf(title, titleLen, "%s", GAME_TITLE);
+			snprintf(title, titleLen, "%s", config.gameTitle);
 			break;
 	}
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
@@ -235,12 +236,12 @@ void HandleEvent(SDL_Event event, bool *shouldQuit)
 int main(const int argc, const char *argv[])
 {
 	ErrorHandlerInit();
+	ExecPathInit(argc, argv);
 	LogInit();
 	LogInfo("Build time: %s at %s\n", __DATE__, __TIME__);
-	LogInfo("Version: %s\n", VERSION);
+	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Initializing Engine\n");
-
-	ExecPathInit(argc, argv);
+	LoadGameConfig();
 
 	InitOptions();
 

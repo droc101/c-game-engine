@@ -7,8 +7,8 @@
 #include "Discord.h"
 #include <discord_game_sdk.h>
 #include <stdio.h>
-#include "../config.h"
 #include "../Structs/GlobalState.h"
+#include "Core/AssetLoaders/GameConfigLoader.h"
 #include "Core/Logging.h"
 
 struct DiscordApplication
@@ -24,8 +24,13 @@ void DiscordInit()
 {
 	memset(&app, 0, sizeof(app));
 
+	if (config.discordAppId == 0)
+	{
+		return;
+	}
+
 	struct DiscordCreateParams params;
-	params.client_id = DISCORD_APP_ID;
+	params.client_id = config.discordAppId;
 	params.flags = DiscordCreateFlags_Default;
 	params.event_data = &app;
 
@@ -41,7 +46,7 @@ void DiscordInit()
 
 	DiscordUpdateRPC();
 
-	LogInfo("Discord Game SDK started");
+	LogInfo("Discord Game SDK started\n");
 }
 
 void DiscordUpdate()
@@ -68,7 +73,7 @@ void DiscordUpdateRPC()
 		return;
 	}
 	struct DiscordActivity activity = {0};
-	activity.application_id = DISCORD_APP_ID;
+	activity.application_id = config.discordAppId;
 	activity.type = DiscordActivityType_Playing;
 	switch (GetState()->rpcState)
 	{

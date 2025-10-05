@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "../config.h"
+#include "../Helpers/Core/AssetLoaders/GameConfigLoader.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Discord.h"
@@ -68,7 +69,7 @@ void GMenuStateRender(GlobalState *State)
 
 	// draw version and copyright info
 	char buffer[256];
-	sprintf(buffer, "Engine %s\n%s", VERSION, COPYRIGHT);
+	sprintf(buffer, "Engine %s\n%s", ENGINE_VERSION, config.gameCopyright);
 	DrawTextAligned(buffer,
 					16,
 					COLOR_BLACK,

@@ -74,22 +74,5 @@ jobs:
       with:
         name: ${{ matrix.zip_name }}
         path: |
-          build-${{ matrix.build_type }}/game.exe
-          build-${{ matrix.build_type }}/SDL2.dll
-          build-${{ matrix.build_type }}/SDL2_mixer.dll
-          build-${{ matrix.build_type }}/glew32.dll
-          build-${{ matrix.build_type }}/zlib1.dll
-          build-${{ matrix.build_type }}/libmpg123-0.dll
-          build-${{ matrix.build_type }}/libFLAC.dll
-          build-${{ matrix.build_type }}/libopusfile-0.dll
-          build-${{ matrix.build_type }}/libvorbisfile-3.dll
-          build-${{ matrix.build_type }}/libwavpack-1.dll
-          build-${{ matrix.build_type }}/libxmp.dll
-          build-${{ matrix.build_type }}/libvorbis-0.dll
-          build-${{ matrix.build_type }}/libogg-0.dll
-          build-${{ matrix.build_type }}/libwinpthread-1.dll
-          build-${{ matrix.build_type }}/libopus-0.dll 
-          build-${{ matrix.build_type }}/libgcc_s_seh-1.dll
-          build-${{ matrix.build_type }}/libstdc++-6.dll
-          build-${{ matrix.build_type }}/assets/
+          build-${{ matrix.build_type }}/bin/
         retention-days: 90
