@@ -24,6 +24,7 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffun
 if (WIN32)
     set(CMAKE_AUTO_RCC ON)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mwindows") # Hides console window
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows") # Hides console window
 else ()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -rdynamic")
 endif ()
