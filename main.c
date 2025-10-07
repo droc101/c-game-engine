@@ -141,7 +141,7 @@ void WindowAndRenderInit()
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		Error("Failed to create window.");
 	}
-	DwmDarkMode(window);
+	SetDwmWindowAttribs(window);
 	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 	SetGameWindow(window);
 

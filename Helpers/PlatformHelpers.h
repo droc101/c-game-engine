@@ -8,9 +8,9 @@
 #include <SDL_video.h>
 
 /**
- * Attempt to enable dark mode on Windows 10
- * @param window The window to enable dark mode on
+ * Attempt to set Win32 DWM window attributes (dark mode, square corners)
+ * @param window The window to set attributes for
  */
-void DwmDarkMode(SDL_Window *window);
+void SetDwmWindowAttribs(SDL_Window *window);
 
 #endif //PLATFORMHELPERS_H
