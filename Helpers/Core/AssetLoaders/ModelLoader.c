@@ -232,7 +232,7 @@ ModelDefinition *LoadModel(const char *asset)
 
 	if (modelId >= MAX_MODELS - 10)
 	{
-		LogWarning("Model ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_MODELS - modelId);
+		LogWarning("Model ID heap is nearly exhausted! Only %zu slots remain.\n", MAX_MODELS - modelId);
 	}
 
 	return model;

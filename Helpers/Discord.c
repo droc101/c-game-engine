@@ -48,7 +48,7 @@ void DiscordInit()
 
 	DiscordUpdateRPC();
 
-	LogInfo("Discord Game SDK started with App ID %lu\n", config.discordAppId);
+	LogInfo("Discord Game SDK started with App ID %zu\n", config.discordAppId);
 }
 
 void DiscordUpdate()

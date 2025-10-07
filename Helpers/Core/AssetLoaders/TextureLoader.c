@@ -116,7 +116,7 @@ Image *LoadImage(const char *asset)
 
 	if (textureId >= MAX_TEXTURES - 10)
 	{
-		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
+		LogWarning("Texture ID heap is nearly exhausted! Only %zu slots remain.\n", MAX_TEXTURES - textureId);
 	}
 
 	if (textureAsset)
@@ -165,7 +165,7 @@ Image *RegisterFallbackImage()
 
 	if (textureId >= MAX_TEXTURES - 10)
 	{
-		LogWarning("Texture ID heap is nearly exhausted! Only %lu slots remain.\n", MAX_TEXTURES - textureId);
+		LogWarning("Texture ID heap is nearly exhausted! Only %zu slots remain.\n", MAX_TEXTURES - textureId);
 	}
 
 	return img;
