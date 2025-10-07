@@ -36,10 +36,10 @@ void DiscordInit()
 	params.flags = DiscordCreateFlags_NoRequireDiscord;
 	params.event_data = &app;
 
-	enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
+	const enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
 	if (res != DiscordResult_Ok)
 	{
-		app.core = NULL;
+		DiscordDestroy();
 		LogError("Failed to start Discord Game SDK: Errno %d\n", res);
 		return;
 	}
@@ -103,7 +103,10 @@ void DiscordDestroy()
 {
 	if (app.core)
 	{
+		app.activityManager->clear_activity(app.activityManager, NULL, NULL);
 		app.core->destroy(app.core);
+		app.core = NULL;
+		app.activityManager = NULL;
 	}
 }
 
