@@ -282,18 +282,16 @@ typedef struct TextureSamplers
 	LunaSampler nearestNoRepeat;
 } TextureSamplers;
 
-typedef struct PushConstants
+typedef struct __attribute__((aligned(16))) PushConstants
 {
-	Vector3 cameraPosition;
-	float yaw;
 	mat4 transformMatrix;
-
+	Color fogColor;
+	Vector3 cameraPosition;
 	uint32_t roofTextureIndex;
 	uint32_t floorTextureIndex;
-
+	float yaw;
 	float fogStart;
 	float fogEnd;
-	Color fogColor;
 } PushConstants;
 #pragma endregion typedefs
 
