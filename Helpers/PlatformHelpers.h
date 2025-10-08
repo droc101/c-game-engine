@@ -13,4 +13,9 @@
  */
 void SetDwmWindowAttribs(SDL_Window *window);
 
+/**
+ * Restart the game.
+ */
+_Noreturn void RestartProgram();
+
 #endif //PLATFORMHELPERS_H

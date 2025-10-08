@@ -4,14 +4,21 @@
 
 #include "PlatformHelpers.h"
 #include <SDL_video.h>
+#include "../Structs/GlobalState.h"
+#include "Core/Logging.h"
 
 #ifdef WIN32
 #include <dwmapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <processthreadsapi.h>
 #include <SDL_syswm.h>
-#include "Core/Logging.h"
+#include <winbase.h>
+#endif
 
 void SetDwmWindowAttribs(SDL_Window *window)
 {
+#ifdef WIN32
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
 	SDL_GetWindowWMInfo(window, &info);
@@ -28,10 +35,32 @@ void SetDwmWindowAttribs(SDL_Window *window)
 	{
 		LogWarning("Failed to set window corner preference: %lx\n", res);
 	}
-}
-#else
-void DwmDarkMode(SDL_Window *window)
-{
-	(void)window;
-}
 #endif
+}
+
+_Noreturn void RestartProgram()
+{
+	LogWarning("Exiting early to restart engine, resources may not get cleaned properly.\n"); // TODO clean properly
+#ifdef WIN32
+	STARTUPINFO si = {0};
+	PROCESS_INFORMATION pi = {0};
+	si.cb = sizeof(si);
+	CreateProcess(
+			GetState()->executablePath,
+			NULL,
+			NULL,
+			NULL,
+			FALSE,
+			CREATE_NEW_CONSOLE, // If this is not present it will almost certainly freeze during init. Thank you windows.
+			NULL,
+			NULL,
+			&si,
+			&pi);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+#else
+	char *args[] = {GetState()->executablePath, NULL};
+	execv(GetState()->executablePath, args);
+#endif
+	exit(1);
+}

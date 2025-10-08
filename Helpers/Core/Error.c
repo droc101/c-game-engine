@@ -10,6 +10,7 @@
 #include <SDL_mixer.h>
 #include <SDL_mouse.h>
 #include <SDL_stdinc.h>
+#include <SDL_syswm.h>
 #include <SDL_version.h>
 #include <SDL_video.h>
 #include <signal.h>
@@ -25,6 +26,9 @@
 #include "../../Structs/Options.h"
 #include "../Graphics/GL/GLHelper.h"
 #include "../Graphics/RenderingHelpers.h"
+#include "../PlatformHelpers.h"
+#include "AssetReader.h"
+#include "Engine.h"
 #include "Logging.h"
 
 SDL_MessageBoxColorScheme mbColorScheme;
@@ -37,14 +41,6 @@ _Noreturn inline void _GameAllocFailure()
 		exit(1); // We should not attempt to do complex things if we are out of memory
 	}
 	Error("Memory Allocation Failed");
-}
-
-_Noreturn void RestartProgram()
-{
-	SDL_Quit();
-	char *args[] = {GetState()->executablePath, NULL};
-	execv(GetState()->executablePath, args);
-	exit(1);
 }
 
 _Noreturn void _ErrorInternal(char *error, const char *file, const int line, const char *function)
@@ -62,7 +58,8 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 
 	char messageBoxTextBuffer[768];
 	sprintf(messageBoxTextBuffer,
-			"Sorry, but the game has crashed.\n\n%s\n\nEngine Version: %s\nSDL Version: %d.%d.%d\nSDL_Mixer Version: "
+			"Sorry, but the game has crashed.\n\n%s\n\nEngine Version: %s\nSDL Version: %d.%d.%d\nSDL_Mixer "
+			"Version: "
 			"%d.%d.%d\nZlib Version: %s",
 			messageBuffer,
 			ENGINE_VERSION,
