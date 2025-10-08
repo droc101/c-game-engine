@@ -48,6 +48,7 @@ check_c_source_compiles("
     #endif" x86_64)
 if (x86_64)
     message(STATUS "Detected x86_64 architecture")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64 -mmmx -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2") # TODO add -mavx -mavx2 once vulkan doesnt break with them
 else ()
     check_c_source_compiles("
         #if !(defined(__aarch64__) || defined(_M_ARM64))
@@ -72,6 +73,7 @@ endif ()
 
 add_executable(
         game
+        $<$<BOOL:${WIN32}>:game.rc> # Add the Win32 resource file only on Windows
         main.c
         Helpers/Core/Input.h
         Helpers/Core/Input.c
@@ -134,7 +136,6 @@ add_executable(
         Structs/UI/Controls/Button.h
         Structs/UI/Controls/Slider.c
         Structs/UI/Controls/Slider.h
-        $<$<BOOL:${WIN32}>:game.rc> # Add the Win32 resource file only on Windows
         Structs/Options.c
         Structs/Options.h
         GameStates/GOptionsState.c
@@ -369,7 +370,7 @@ if (WIN32)
             "${CMAKE_BINARY_DIR}/_deps/discordGameSDK/lib/x86_64/discord_game_sdk.dll"
             "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/discord_game_sdk.dll"
     )
-else ()
+else () # Linux
     add_custom_command(TARGET copy_libraries POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_BINARY_DIR}/_deps/discordGameSDK/lib/x86_64/discord_game_sdk.so"
