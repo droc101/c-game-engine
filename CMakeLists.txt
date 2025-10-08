@@ -240,6 +240,8 @@ add_executable(
         Helpers/Discord.h
         Helpers/Core/AssetLoaders/GameConfigLoader.c
         Helpers/Core/AssetLoaders/GameConfigLoader.h
+        Helpers/Core/Engine.c
+        Helpers/Core/Engine.h
 )
 
 #endregion
