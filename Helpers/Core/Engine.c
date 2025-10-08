@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include <SDL.h>
+#include <SDL_cpuinfo.h>
 #include <SDL_error.h>
 #include <SDL_events.h>
 #include <SDL_filesystem.h>
@@ -52,6 +53,61 @@
 SDL_Surface *windowIcon;
 SDL_Event event;
 bool shouldQuit = false;
+
+bool CheckCPUSupport()
+{
+	// TODO i sure hope this doesn't rely on any of the extensions
+	LogInfo("System has %d processors and %d MiB RAM.\n", SDL_GetCPUCount(), SDL_GetSystemRAM());
+	bool cpuSupported = true;
+	if (SDL_GetCPUCount() < 2)
+	{
+		LogWarning("Running on system with only one core, this may be very slow!\n");
+	}
+#ifdef __x86_64__
+	if (!SDL_HasMMX())
+	{
+		LogError("CPU does not have the MMX extension!\n");
+		cpuSupported = false;
+	}
+	if (!SDL_HasSSE())
+	{
+		LogError("CPU does not have the SSE extension!\n");
+		cpuSupported = false;
+	}
+	if (!SDL_HasSSE2())
+	{
+		LogError("CPU does not have the SSE2 extension!\n");
+		cpuSupported = false;
+	}
+	if (!SDL_HasSSE3())
+	{
+		LogError("CPU does not have the SSE3 extension!\n");
+		cpuSupported = false;
+	}
+	// TODO SSSE3 & SSE4(.0)
+	if (!SDL_HasSSE41())
+	{
+		LogError("CPU does not have the SSE4.1 extension!\n");
+		cpuSupported = false;
+	}
+	if (!SDL_HasSSE42())
+	{
+		LogError("CPU does not have the SSE4.2 extension!\n");
+		cpuSupported = false;
+	}
+	if (!SDL_HasAVX())
+	{
+		LogError("CPU does not have the AVX extension!\n");
+		cpuSupported = false;
+	}
+	if (!SDL_HasAVX2())
+	{
+		LogError("CPU does not have the AVX2 extension!\n");
+		cpuSupported = false;
+	}
+#endif
+	return cpuSupported;
+}
 
 void ExecPathInit(const int argc, const char *argv[])
 {
@@ -233,6 +289,12 @@ void InitEngine(const int argc, const char *argv[])
 	LogInfo("Build time: %s at %s\n", __DATE__, __TIME__);
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Initializing Engine\n");
+
+	if (!CheckCPUSupport())
+	{
+		Error("Your computer's CPU does not meet the minimum requirements.");
+	}
+
 	LoadGameConfig();
 
 	InitOptions();
