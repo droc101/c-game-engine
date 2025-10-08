@@ -100,6 +100,7 @@ void LoadShaderLocations()
 
 bool GL_PreInit()
 {
+	LogDebug("Pre-initializing OpenGL...\n");
 	const bool msaaEnabled = GetState()->options.msaa != MSAA_NONE;
 	if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, msaaEnabled) != 0)
 	{
@@ -159,7 +160,7 @@ bool GL_PreInit()
 
 bool GL_Init(SDL_Window *wnd)
 {
-	LogInfo("Initializing OpenGL\n");
+	LogDebug("Initializing OpenGL renderer...\n");
 
 	ctx = SDL_GL_CreateContext(wnd);
 	if (ctx == NULL)
@@ -251,6 +252,7 @@ bool GL_Init(SDL_Window *wnd)
 
 void GL_DestroyGL()
 {
+	LogDebug("Cleaning up OpenGL renderer...\n");
 	GL_DestroyShader(uiTexturedShader);
 	GL_DestroyShader(uiColoredShader);
 	GL_DestroyShader(wallShader);

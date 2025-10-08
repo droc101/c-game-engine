@@ -12,11 +12,13 @@
 #include "../AssetReader.h"
 #include "../DataReader.h"
 #include "../Error.h"
+#include "../Logging.h"
 
 GameConfig config = {0};
 
 void LoadGameConfig()
 {
+	LogDebug("Loading game configuration...\n");
 	Asset *asset = DecompressAsset("game.game", false);
 	if (!asset || asset->type != ASSET_TYPE_GAME_CONFIG || asset->typeVersion != 1)
 	{

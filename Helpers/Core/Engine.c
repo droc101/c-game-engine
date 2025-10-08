@@ -85,6 +85,7 @@ void ExecPathInit(const int argc, const char *argv[])
 
 void InitSDL()
 {
+	LogDebug("Initializing SDL...\n");
 	SDL_SetHint(SDL_HINT_APP_NAME, config.gameTitle);
 #ifdef __LINUX__
 	if (GetState()->options.preferWayland)
@@ -109,6 +110,7 @@ void InitSDL()
 
 void WindowAndRenderInit()
 {
+	LogDebug("Creating window...\n");
 	const size_t titleLen = strlen(config.gameTitle) + strlen(" - Vulkan") + 1;
 	char title[titleLen];
 	switch (currentRenderer)
@@ -149,6 +151,7 @@ void WindowAndRenderInit()
 	SDL_SetWindowMinimumSize(window, MIN_WIDTH, MIN_HEIGHT);
 	SDL_SetWindowMaximumSize(window, MAX_WIDTH, MAX_HEIGHT);
 
+	LogDebug("Setting window icon...\n");
 	windowIcon = ToSDLSurface(TEXTURE("interface/icon"), "1");
 	SDL_SetWindowIcon(window, windowIcon);
 }
@@ -404,12 +407,16 @@ void DestroyEngine()
 	DestroyGlobalState();
 	DestroySoundSystem();
 	RenderDestroy();
+	LogDebug("Cleaning up window...\n");
 	SDL_DestroyWindow(GetGameWindow());
+	LogDebug("Cleaning up icon...\n");
 	SDL_FreeSurface(windowIcon);
 	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
+	LogDebug("Cleaning up SDL_Mixer...\n");
 	Mix_CloseAudio();
 	Mix_Quit();
+	LogDebug("Cleaning up SDL...\n");
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();
 	LogDestroy();

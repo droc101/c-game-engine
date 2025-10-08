@@ -64,6 +64,7 @@ void ChannelFinished(const int channel)
 
 void InitSoundSystem()
 {
+	LogDebug("Initializing sound system...\n");
 	(void)Mix_AllocateChannels(SFX_CHANNEL_COUNT);
 
 	if (Mix_OpenAudio(48000, AUDIO_S16, 2, 2048) == 0)
@@ -88,6 +89,7 @@ void InitSoundSystem()
 
 void DestroySoundSystem()
 {
+	LogDebug("Cleaning up sound system...\n");
 	if (soundSys.music != NULL)
 	{
 		(void)Mix_HaltMusic();

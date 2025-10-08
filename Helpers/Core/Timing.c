@@ -11,6 +11,7 @@ static uint64_t StartTimeS;
 
 void InitTimers()
 {
+	LogDebug("Initializing timers...\n");
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts); // NOLINT(*-include-cleaner)
 	StartTimeNS = ts.tv_sec * 1000000000 + ts.tv_nsec;

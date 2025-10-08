@@ -392,6 +392,7 @@ const char *GetControllerName()
 
 void InputInit()
 {
+	LogDebug("Initializing input system...\n");
 	physicsInputReadBuffer = calloc(1, sizeof(PhysicsStateBuffer));
 	CheckAlloc(physicsInputReadBuffer);
 	physicsInputWorkingBuffer = calloc(1, sizeof(PhysicsStateBuffer));
@@ -400,6 +401,7 @@ void InputInit()
 
 void InputDestroy()
 {
+	LogDebug("Cleaning up input system...\n");
 	free(physicsInputWorkingBuffer);
 	free(physicsInputReadBuffer);
 }

@@ -103,6 +103,7 @@ void DiscordDestroy()
 {
 	if (app.core)
 	{
+		LogDebug("Cleaning up Discord Game SDK...\n");
 		app.activityManager->clear_activity(app.activityManager, NULL, NULL);
 		app.core->destroy(app.core);
 		app.core = NULL;

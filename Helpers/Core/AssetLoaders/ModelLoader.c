@@ -294,6 +294,7 @@ void FreeModel(ModelDefinition *model)
 
 void DestroyModelLoader()
 {
+	LogDebug("Cleaning up model cache...\n");
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		FreeModel(models[i]);

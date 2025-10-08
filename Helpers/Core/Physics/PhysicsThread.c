@@ -92,6 +92,7 @@ int PhysicsThreadMain(void * /*data*/)
 
 void PhysicsThreadInit()
 {
+	LogDebug("Initializing physics thread...\n");
 	PhysicsThreadFunction = NULL;
 	physicsThreadPostQuit = false;
 	physicsThreadMutex = SDL_CreateMutex();
@@ -124,6 +125,7 @@ void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 
 void PhysicsThreadTerminate()
 {
+	LogDebug("Terminating physics thread...\n");
 	SDL_LockMutex(physicsThreadMutex);
 	physicsThreadPostQuit = true;
 	SDL_UnlockMutex(physicsThreadMutex);

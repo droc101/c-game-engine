@@ -21,6 +21,7 @@
 #include "../Actor/Physbox.h"
 #include "../Actor/TestActor.h"
 #include "../Helpers/Core/Error.h"
+#include "../Helpers/Core/Logging.h"
 #include "Actor.h"
 
 static ActorDefinitionDict actorDefinitions;
@@ -76,6 +77,7 @@ void RegisterDefaultActorInputs(ActorDefinition *definition)
 
 void RegisterActors()
 {
+	LogDebug("Registering actors...\n");
 	ActorDefinitionDict_init(actorDefinitions);
 
 	RegisterIoProxy();

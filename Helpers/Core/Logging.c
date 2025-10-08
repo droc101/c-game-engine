@@ -37,6 +37,7 @@ void LogInit()
 
 void LogDestroy()
 {
+	LogDebug("Cleaning up logging system...goodbye!\n");
 	if (logFile != NULL)
 	{
 		fclose(logFile);

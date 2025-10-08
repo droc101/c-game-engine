@@ -45,6 +45,7 @@ static uint8_t currentFrame;
 
 bool VK_Init(SDL_Window *window)
 {
+	LogDebug("Initializing Vulkan renderer...\n");
 	// clang-format off
 	if (CreateInstance(window) && CreateSurface() && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
 		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
@@ -598,6 +599,7 @@ VkResult VK_FrameEnd()
 
 bool VK_Cleanup()
 {
+	LogDebug("Cleaning up Vulkan renderer...\n");
 	VulkanTest(lunaDestroyInstance(), "Cleanup failed!");
 	VulkanActorsVariablesCleanup();
 	free(buffers.ui.vertices.data);

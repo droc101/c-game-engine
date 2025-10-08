@@ -18,6 +18,7 @@
 #include "../../../Debug/JoltDebugRenderer.h"
 #include "../../../Structs/GlobalState.h"
 #include "../Error.h"
+#include "../Logging.h"
 #include "Player.h"
 
 static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
@@ -74,6 +75,7 @@ static const JPH_BroadPhaseLayerInterface_Impl broadPhaseLayerInterfaceImpl = {
 
 void PhysicsInitGlobal(GlobalState *state)
 {
+	LogDebug("Initializing physics...\n");
 	if (!JPH_Init())
 	{
 		Error("Failed to initialize Jolt Physics!");

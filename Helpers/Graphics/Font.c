@@ -17,6 +17,7 @@
 #include "../Core/AssetLoaders/FontLoader.h"
 #include "../Core/AssetReader.h"
 #include "../Core/Error.h"
+#include "../Core/Logging.h"
 #include "../Core/MathEx.h"
 #include "Drawing.h"
 #include "RenderingHelpers.h"
@@ -237,12 +238,14 @@ void DrawTextAligned(const char *str,
 
 void InitCommonFonts()
 {
+	LogDebug("Loading fonts...\n");
 	smallFont = LoadFont(FONT("small_font"));
 	largeFont = LoadFont(FONT("large_font"));
 }
 
 void DestroyCommonFonts()
 {
+	LogDebug("Cleaning up fonts...\n");
 	FreeFont(smallFont);
 	FreeFont(largeFont);
 }

@@ -62,12 +62,14 @@ FILE *OpenAssetFile(const char *relPath)
 
 void AssetCacheInit()
 {
+	LogDebug("Initializing asset cache...\n");
 	AssetCache_init(assetCache);
 	InitModelLoader();
 }
 
 void DestroyAssetCache()
 {
+	LogDebug("Cleaning up asset cache...\n");
 	AssetCache_clear(assetCache);
 
 	DestroyTextureLoader();

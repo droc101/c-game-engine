@@ -39,11 +39,13 @@ static GlobalState state;
 
 void InitOptions()
 {
+	LogDebug("Loading options...\n");
 	LoadOptions(&state.options);
 }
 
 void InitState()
 {
+	LogDebug("Initializing global state...\n");
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
@@ -127,11 +129,13 @@ void ChangeLevel(Level *level, char *levelName)
 
 void DestroyGlobalState()
 {
+	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
 	DestroyLevel(state.level);
 	free(state.saveData);
 	free(state.camera);
 
+	LogDebug("Cleaning up game states...\n");
 	GInputOptionsStateDestroy();
 	GSoundOptionsStateDestroy();
 	GVideoOptionsStateDestroy();

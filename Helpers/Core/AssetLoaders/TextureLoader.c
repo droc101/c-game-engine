@@ -173,6 +173,7 @@ Image *RegisterFallbackImage()
 
 void DestroyTextureLoader()
 {
+	LogDebug("Cleaning up texture cache...\n");
 	for (int i = 0; i < MAX_TEXTURES; i++)
 	{
 		if (images[i] != NULL)

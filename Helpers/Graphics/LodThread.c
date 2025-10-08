@@ -13,6 +13,7 @@
 #include "../../Structs/GlobalState.h"
 #include "../Core/Error.h"
 #include "../Core/List.h"
+#include "../Core/Logging.h"
 #include "RenderingHelpers.h"
 #include "Vulkan/Vulkan.h"
 
@@ -110,6 +111,7 @@ void LodThreadDestroy()
 	{
 		return;
 	}
+	LogDebug("Terminating LOD thread...\n");
 	shouldExit = true;
 	SDL_WaitThread(lodThread, NULL);
 	SDL_DestroySemaphore(canStart);
