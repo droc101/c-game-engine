@@ -4,6 +4,8 @@
 
 #include "PlatformHelpers.h"
 #include <SDL_video.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "../Structs/GlobalState.h"
 #include "Core/Logging.h"
 
