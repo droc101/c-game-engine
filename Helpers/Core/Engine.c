@@ -59,9 +59,9 @@ bool CheckCPUSupport()
 	// TODO i sure hope this doesn't rely on any of the extensions
 	LogInfo("System has %d processors and %d MiB RAM.\n", SDL_GetCPUCount(), SDL_GetSystemRAM());
 	bool cpuSupported = true;
-	if (SDL_GetCPUCount() < 2)
+	if (SDL_GetCPUCount() < 4)
 	{
-		LogWarning("Running on system with only one core, this may be very slow!\n");
+		LogWarning("Running on system with less than 4 threads, this may be very slow!\n");
 	}
 #ifdef __x86_64__
 	if (!SDL_HasMMX())
@@ -79,12 +79,7 @@ bool CheckCPUSupport()
 		LogError("CPU does not have the SSE2 extension!\n");
 		cpuSupported = false;
 	}
-	if (!SDL_HasSSE3())
-	{
-		LogError("CPU does not have the SSE3 extension!\n");
-		cpuSupported = false;
-	}
-	// TODO SSSE3 & SSE4(.0)
+	// TODO SSE4(.0)
 	if (!SDL_HasSSE41())
 	{
 		LogError("CPU does not have the SSE4.1 extension!\n");

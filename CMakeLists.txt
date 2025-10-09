@@ -48,7 +48,7 @@ check_c_source_compiles("
     #endif" x86_64)
 if (x86_64)
     message(STATUS "Detected x86_64 architecture")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64 -mmmx -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mavx -mavx2")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64 -mmmx -msse -msse2") # See https://github.com/jrouwe/JoltPhysics/blob/master/Build/README.md#defines for jolt extension options
 else ()
     check_c_source_compiles("
         #if !(defined(__aarch64__) || defined(_M_ARM64))

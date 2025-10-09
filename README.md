@@ -12,16 +12,13 @@ Runs on x86_64 Windows and Linux.
 See the [wiki page](https://wiki.droc101.dev/index.php/Building_GAME) for instructions on building.
 
 ## Minimum System Requirements
-
 ### CPU
-
-- x86_64/amd64 with the MMX, SSE, SSE2, SSE3, SSSE3, SSE4, SSE4.1, SSE4.2, AVX, and AVX2 extensions
+- x86_64/amd64 with the MMX, SSE, SSE2, SSE4, SSE4.1, SSE4.2, AVX, and AVX2 extensions
     - Core i3/i5/i7/i9 series 4th generation or newer (Intel Haswell)
     - AMD Athlon X4 845 or newer (AMD Excavator)
 - Experimental support for arm64 CPUs
-
+- A CPU with 4 or more hardware threads is strongly recommended, but not required.
 ### GPU
-
 - Primary Vulkan 1.2 Renderer:
     - NVIDIA GeForce 900 series or newer
     - AMD Radeon HD 7000 series / Southern Islands / GCN 1.0 or newer
