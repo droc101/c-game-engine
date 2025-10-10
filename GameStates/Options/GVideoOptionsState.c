@@ -112,6 +112,12 @@ void SldOptionsLod(const float value)
 	GetState()->options.lodMultiplier = value;
 }
 
+void SldOptionsFov(const float value)
+{
+	GetState()->options.fov = value;
+	GetState()->camera->fov = GetState()->options.fov;
+}
+
 void GVideoOptionsStateUpdate(GlobalState * /*State*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
@@ -150,6 +156,20 @@ void GVideoOptionsStateSet()
 		videoOptionsStack = CreateUiStack();
 		float opY = 80;
 		const float opSpacing = 45;
+		UiStackPush(videoOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"FOV",
+										SldOptionsFov,
+										TOP_CENTER,
+										30.0,
+										120.0,
+										GetState()->options.fov,
+										1,
+										1,
+										NULL));
+
+		opY += opSpacing * 1.5;
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
 										  v2(480, 40),

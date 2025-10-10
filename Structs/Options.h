@@ -61,6 +61,8 @@ struct Options
 	bool limitFpsWhenUnfocused;
 	/// The LOD distance multiplier
 	float lodMultiplier;
+	// Field of view
+	float fov;
 
 	/* Audio */
 

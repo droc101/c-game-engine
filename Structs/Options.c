@@ -34,6 +34,7 @@ void DefaultOptions(Options *options)
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = false;
 	options->limitFpsWhenUnfocused = true;
+	options->fov = 90.0f;
 }
 
 bool ValidateOptions(const Options *options)
@@ -55,6 +56,10 @@ bool ValidateOptions(const Options *options)
 		return false;
 	}
 	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
+	{
+		return false;
+	}
+	if (options->fov < 30 || options->fov > 120)
 	{
 		return false;
 	}

@@ -53,7 +53,7 @@ void InitState()
 	state.levelName = calloc(1, 1);
 	state.camera = calloc(1, sizeof(Camera));
 	CheckAlloc(state.camera);
-	state.camera->fov = FOV;
+	state.camera->fov = GetState()->options.fov;
 	state.rpcState = IN_MENUS;
 
 	state.viewmodel.enabled = true;

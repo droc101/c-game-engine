@@ -86,8 +86,6 @@
 /// Minimum physics updates per second. Delta time gets clamped to this valued.
 #define PHYSICS_MIN_TPS 10
 
-/// Field of view
-#define FOV 90
 /// Field of view used for viewmodels
 #define VIEWMODEL_FOV 70
 /// Near clipping plane
