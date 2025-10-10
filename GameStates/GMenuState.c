@@ -6,9 +6,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "../config.h"
 #include "../Helpers/Core/AssetLoaders/GameConfigLoader.h"
 #include "../Helpers/Core/AssetReader.h"
+#include "../Helpers/Core/Engine.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Discord.h"
 #include "../Helpers/Graphics/Drawing.h"
@@ -21,6 +21,9 @@
 #include "../Structs/Vector2.h"
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
+
+// Shows a level select after main menu and pause exit course.
+#define USE_LEVEL_SELECT
 
 #ifndef USE_LEVEL_SELECT
 #include "GMainState.h"

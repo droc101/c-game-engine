@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../config.h"
 #include "../GameStates/GLevelSelectState.h"
 #include "../GameStates/GMenuState.h"
 #include "../GameStates/GOptionsState.h"
@@ -34,6 +33,8 @@
 #include "Asset.h"
 #include "Camera.h"
 #include "Options.h"
+
+#define MAX_HEALTH 100
 
 static GlobalState state;
 

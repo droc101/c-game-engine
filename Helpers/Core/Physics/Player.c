@@ -22,7 +22,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "../../../config.h"
 #include "../../../Debug/DPrint.h"
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Color.h"

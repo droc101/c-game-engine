@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../config.h"
 #include "../../Debug/DPrint.h"
 #include "../../Debug/FrameBenchmark.h"
 #include "../../Debug/FrameGrapher.h"

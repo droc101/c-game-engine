@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../config.h"
 #include "../Helpers/Core/AssetLoaders/GameConfigLoader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/Input.h"

@@ -8,6 +8,16 @@
 #include <SDL_events.h>
 #include <stdbool.h>
 
+#define STR(x) #x
+#define TO_STR(x) STR(x)
+
+#define ENGINE_VERSION_MAJOR 0
+#define ENGINE_VERSION_MINOR 0
+#define ENGINE_VERSION_PATCH 1
+#define ENGINE_VERSION_SUFFIX "-assets-v2"
+#define ENGINE_VERSION \
+	TO_STR(ENGINE_VERSION_MAJOR) "." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX
+
 /**
  * Initialize the engine
  * @param argc Argument count

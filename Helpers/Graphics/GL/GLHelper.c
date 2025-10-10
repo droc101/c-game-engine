@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../config.h"
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Color.h"
 #include "../../../Structs/GlobalState.h"

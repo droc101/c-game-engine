@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include "../../../config.h"
 #include "../../../Structs/Camera.h"
 #include "../../../Structs/Color.h"
 #include "../../../Structs/Level.h"
@@ -29,6 +28,7 @@
 #include "../../Core/Error.h"
 #include "../../Core/List.h"
 #include "../../Core/Physics/Physics.h"
+#include "../RenderingHelpers.h"
 #include "VulkanResources.h"
 
 #pragma region variables

@@ -8,6 +8,9 @@
 #include <stdbool.h>
 #include "../Structs/Color.h"
 
+// Show debug print statements in the top left corner
+#define ENABLE_DEBUG_PRINT
+
 /**
  * Resets the DPrint Y position to the top of the screen
  * @note Should only be called once at the start of the physicsFrame

@@ -11,6 +11,14 @@
 #include "../../../Structs/Actor.h"
 #include "../../../Structs/Color.h"
 
+/// Player movement speed (in units per second)
+#define MOVE_SPEED 6.0f
+/// Player movement speed when ctrl is held
+#define SLOW_MOVE_SPEED 0.6f
+
+/// The maximum angle that the player can walk on, in degrees
+#define MAX_WALKABLE_SLOPE 50.0f
+
 typedef struct Level Level; // We cannot include Level.h here (cyclic dep.)
 
 typedef struct Player Player;

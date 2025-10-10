@@ -7,6 +7,10 @@
 
 #include <joltc/joltc.h>
 
+// Use wireframe for the Jolt debug renderer
+// Note: This does NOT actually enable the debug renderer
+#define JPH_DEBUG_RENDERER_WIREFRAME
+
 /**
  * Set up the static variables required for the Jolt debug renderer
  */

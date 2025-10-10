@@ -24,6 +24,7 @@
 #include "../../Core/Error.h"
 #include "../../Core/List.h"
 #include "../../Core/MathEx.h"
+#include "Vulkan.h"
 #include "VulkanHelpers.h"
 #include "VulkanResources.h"
 

@@ -14,6 +14,25 @@
 #include "../../../../Structs/Level.h"
 #include "../../../../Structs/Vector2.h"
 
+/// Field of view used for viewmodels
+#define VIEWMODEL_FOV 70
+/// Near clipping plane
+#define NEAR_Z 0.01
+/// Far clipping plane
+#define FAR_Z 1000
+
+// Default window size
+#define DEF_WIDTH 1280
+#define DEF_HEIGHT 720
+
+// Minimum and maximum window size
+#define MIN_WIDTH 960
+#define MIN_HEIGHT 720
+
+// Maximum window size
+#define MAX_WIDTH 9999
+#define MAX_HEIGHT 9999
+
 typedef enum Renderer Renderer;
 
 /**

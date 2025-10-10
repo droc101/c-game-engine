@@ -36,7 +36,7 @@
 #include "VulkanInternal.h"
 #include "VulkanResources.h"
 #ifdef JPH_DEBUG_RENDERER
-#include "../../../config.h"
+#include "../../../Debug/JoltDebugRenderer.h"
 #include "../../Core/Error.h"
 #endif
 

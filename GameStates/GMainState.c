@@ -16,7 +16,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "../Actor/TestActor.h"
-#include "../config.h"
 #include "../Debug/DPrint.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
@@ -24,6 +23,7 @@
 #include "../Helpers/Core/List.h"
 #include "../Helpers/Core/Logging.h"
 #include "../Helpers/Core/MathEx.h"
+#include "../Helpers/Core/Physics/Physics.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/SoundSystem.h"
 #include "../Helpers/Discord.h"

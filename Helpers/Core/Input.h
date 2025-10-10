@@ -12,6 +12,8 @@
 #include "../../Structs/GlobalState.h" // NOLINT(*-include-cleaner)
 #include "../../Structs/Vector2.h"
 
+#define STICK_DEADZONE 0.1
+
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
 
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons

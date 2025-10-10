@@ -19,12 +19,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <zlib.h>
-#include "../../config.h"
 #include "../../Structs/GlobalState.h"
 #include "../../Structs/Options.h"
 #include "../Graphics/GL/GLHelper.h"
 #include "../Graphics/RenderingHelpers.h"
 #include "../PlatformHelpers.h"
+#include "Engine.h"
 #include "Logging.h"
 
 SDL_MessageBoxColorScheme mbColorScheme;

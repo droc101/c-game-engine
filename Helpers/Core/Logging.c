@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../config.h"
 #include "../../Structs/GlobalState.h"
+#include "Engine.h"
 #include "Error.h"
 
 /// The length of the longest value passed to the type argument of the LogInternal function (including the null) plus 7

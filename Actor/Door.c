@@ -18,7 +18,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../config.h"
 #include "../Helpers/Core/AssetReader.h"
 #include "../Helpers/Core/Error.h"
 #include "../Helpers/Core/KVList.h"
