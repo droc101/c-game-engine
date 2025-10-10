@@ -272,7 +272,7 @@ void FreeModel(ModelDefinition *model)
 		free(lod);
 	}
 
-	for (uint32_t i = 0; i < model->materialsPerSkin; i++)
+	for (uint32_t i = 0; i < model->materialCount; i++)
 	{
 		free(model->materials[i].texture);
 	}
