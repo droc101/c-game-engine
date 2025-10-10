@@ -169,7 +169,7 @@ void GVideoOptionsStateSet()
 										1,
 										NULL));
 
-		opY += opSpacing * 1.5;
+		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
 										  v2(480, 40),

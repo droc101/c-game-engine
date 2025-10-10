@@ -4,6 +4,7 @@
 
 #include "VulkanResources.h"
 #include <luna/luna.h>
+#include <luna/lunaBuffer.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaTypes.h>
 #include <math.h>

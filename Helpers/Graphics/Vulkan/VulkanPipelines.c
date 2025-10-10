@@ -4,6 +4,7 @@
 
 #include <cglm/types.h>
 #include <luna/luna.h>
+#include <luna/lunaDrawing.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>

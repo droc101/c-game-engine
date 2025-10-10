@@ -25,7 +25,6 @@
 #include "../Core/Error.h"
 #include "../Core/Logging.h"
 #include "../Core/MathEx.h"
-#include "../Core/Physics/Physics.h"
 #include "GL/GLHelper.h"
 #include "Vulkan/Vulkan.h"
 

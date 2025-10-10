@@ -446,7 +446,8 @@ void DPrintPlayer(const Level *level)
 	float angle = NAN;
 	JPH_Quat_GetEulerAngles(&level->player.transform.rotation, &eulerAngles);
 	JPH_Quat_GetAxisAngle(&level->player.transform.rotation, &axis, &angle);
-	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)\nRotation Angle: %.4f (%.2fdeg)",
+	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)\nRotation Angle: %.4f "
+			"(%.2fdeg)",
 			COLOR_WHITE,
 			false,
 			level->player.transform.rotation.x,

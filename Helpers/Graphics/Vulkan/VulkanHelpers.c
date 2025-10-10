@@ -9,6 +9,7 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
+#include <luna/lunaBuffer.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>

@@ -7,6 +7,7 @@
 #include <cglm/mat4.h>
 #include <cglm/types.h>
 #include <luna/luna.h>
+#include <luna/lunaBuffer.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

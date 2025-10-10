@@ -4,13 +4,11 @@
 
 #include "Error.h"
 #include <errno.h>
-#include <SDL.h>
 #include <SDL_error.h>
 #include <SDL_messagebox.h>
 #include <SDL_mixer.h>
 #include <SDL_mouse.h>
 #include <SDL_stdinc.h>
-#include <SDL_syswm.h>
 #include <SDL_version.h>
 #include <SDL_video.h>
 #include <signal.h>
@@ -27,8 +25,6 @@
 #include "../Graphics/GL/GLHelper.h"
 #include "../Graphics/RenderingHelpers.h"
 #include "../PlatformHelpers.h"
-#include "AssetReader.h"
-#include "Engine.h"
 #include "Logging.h"
 
 SDL_MessageBoxColorScheme mbColorScheme;

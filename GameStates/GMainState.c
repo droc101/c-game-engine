@@ -26,6 +26,7 @@
 #include "../Helpers/Core/MathEx.h"
 #include "../Helpers/Core/Physics/Player.h"
 #include "../Helpers/Core/SoundSystem.h"
+#include "../Helpers/Discord.h"
 #include "../Helpers/Graphics/Drawing.h"
 #include "../Helpers/Graphics/LodThread.h"
 #include "../Structs/Actor.h"

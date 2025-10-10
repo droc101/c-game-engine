@@ -6,12 +6,12 @@
 
 #include "Discord.h"
 #include <discord_game_sdk.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include "../Structs/GlobalState.h"
 #include "Core/AssetLoaders/GameConfigLoader.h"
 #include "Core/Logging.h"
-#include <string.h>
-#include <stddef.h>
 
 struct DiscordApplication
 {

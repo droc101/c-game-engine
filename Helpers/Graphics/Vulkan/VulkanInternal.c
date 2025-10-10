@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <luna/luna.h>
 #include <luna/lunaDevice.h>
+#include <luna/lunaDrawing.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaInstance.h>
 #include <luna/lunaTypes.h>

@@ -5,6 +5,7 @@
 #include "Timing.h"
 #include <stdint.h>
 #include <time.h>
+#include "Logging.h"
 
 static uint64_t StartTimeNS;
 static uint64_t StartTimeS;
