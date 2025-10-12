@@ -235,75 +235,58 @@ void DrawNinePatchTexture(const Vector2 pos,
 	const Vector2 marginUvSize = v2((1.0f / textureSize.x) * textureMarginsPx,
 									(1.0f / textureSize.y) * textureMarginsPx);
 
+	// clang-format off
 	float verts[4 * 16] = {
-		pos.x,
-		pos.y,
-		0.0f,
-		0.0f,
-		pos.x + outputMarginsPx,
-		pos.y,
-		marginUvSize.x,
-		0.0f,
-		pos.x + size.x - outputMarginsPx,
-		pos.y,
-		1.0f - marginUvSize.x,
-		0.0f,
-		pos.x + size.x,
-		pos.y,
-		1.0f,
-		0.0f,
+		pos.x, pos.y, 0.0f, 0.0f,
+		pos.x + outputMarginsPx, pos.y, marginUvSize.x, 0.0f,
+		pos.x + size.x - outputMarginsPx, pos.y, 1.0f - marginUvSize.x, 0.0f,
+		pos.x + size.x, pos.y, 1.0f, 0.0f,
 
-		pos.x,
-		pos.y + outputMarginsPx,
-		0.0f,
-		marginUvSize.y,
-		pos.x + outputMarginsPx,
-		pos.y + outputMarginsPx,
-		marginUvSize.x,
-		marginUvSize.y,
-		pos.x + size.x - outputMarginsPx,
-		pos.y + outputMarginsPx,
-		1.0f - marginUvSize.x,
-		marginUvSize.y,
-		pos.x + size.x,
-		pos.y + outputMarginsPx,
-		1.0f,
-		marginUvSize.y,
+		pos.x, pos.y + outputMarginsPx, 0.0f, marginUvSize.y,
+		pos.x + outputMarginsPx, pos.y + outputMarginsPx, marginUvSize.x, marginUvSize.y,
+		pos.x + size.x - outputMarginsPx, pos.y + outputMarginsPx, 1.0f - marginUvSize.x, marginUvSize.y,
+		pos.x + size.x, pos.y + outputMarginsPx, 1.0f, marginUvSize.y,
 
-		pos.x,
-		pos.y + size.y - outputMarginsPx,
-		0.0f,
-		1.0f - marginUvSize.y,
-		pos.x + outputMarginsPx,
-		pos.y + size.y - outputMarginsPx,
-		marginUvSize.x,
-		1.0f - marginUvSize.y,
-		pos.x + size.x - outputMarginsPx,
-		pos.y + size.y - outputMarginsPx,
-		1.0f - marginUvSize.x,
-		1.0f - marginUvSize.y,
-		pos.x + size.x,
-		pos.y + size.y - outputMarginsPx,
-		1.0f,
-		1.0f - marginUvSize.y,
+		pos.x, pos.y + size.y - outputMarginsPx, 0.0f, 1.0f - marginUvSize.y,
+		pos.x + outputMarginsPx, pos.y + size.y - outputMarginsPx, marginUvSize.x, 1.0f - marginUvSize.y,
+		pos.x + size.x - outputMarginsPx, pos.y + size.y - outputMarginsPx, 1.0f - marginUvSize.x, 1.0f - marginUvSize.y,
+		pos.x + size.x, pos.y + size.y - outputMarginsPx, 1.0f, 1.0f - marginUvSize.y,
 
-		pos.x,
-		pos.y + size.y,
-		0.0f,
-		1.0f,
-		pos.x + outputMarginsPx,
-		pos.y + size.y,
-		marginUvSize.x,
-		1.0f,
-		pos.x + size.x - outputMarginsPx,
-		pos.y + size.y,
-		1.0f - marginUvSize.x,
-		1.0f,
-		pos.x + size.x,
-		pos.y + size.y,
-		1.0f,
-		1.0f,
+		pos.x, pos.y + size.y, 0.0f, 1.0f,
+		pos.x + outputMarginsPx, pos.y + size.y, marginUvSize.x, 1.0f,
+		pos.x + size.x - outputMarginsPx, pos.y + size.y, 1.0f - marginUvSize.x, 1.0f,
+		pos.x + size.x, pos.y + size.y, 1.0f, 1.0f,
 	};
+
+	uint32_t indices[9 * 6] = {
+		4, 1, 0,
+		1, 4, 5,
+
+		5, 2, 1,
+		5, 6, 2,
+
+		6, 3, 2,
+		3, 6, 7,
+
+		8, 5, 4,
+		5, 8, 9,
+
+		9, 6, 5,
+		6, 9, 10,
+
+		10, 7, 6,
+		7, 10, 11,
+
+		12, 9, 8,
+		9, 12, 13,
+
+		13, 10, 9,
+		10, 13, 14,
+
+		14, 11, 10,
+		11, 14, 15,
+	};
+	// clang-format on
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -311,31 +294,11 @@ void DrawNinePatchTexture(const Vector2 pos,
 		verts[i * 4 + 1] = Y_TO_NDC(verts[i * 4 + 1]);
 	}
 
-	uint32_t indices[9 * 6] = {
-		4,	1,	0,	1,	4,	5,
-
-		5,	2,	1,	5,	6,	2,
-
-		6,	3,	2,	3,	6,	7,
-
-		8,	5,	4,	5,	8,	9,
-
-		9,	6,	5,	6,	9,	10,
-
-		10, 7,	6,	7,	10, 11,
-
-		12, 9,	8,	9,	12, 13,
-
-		13, 10, 9,	10, 13, 14,
-
-		14, 11, 10, 11, 14, 15,
-	};
-
 	const UITriangleArray tris = {
 		.verts = verts,
 		.vertexCount = 16,
 		.indices = indices,
-		.indexCount = 9*6,
+		.indexCount = 9 * 6,
 	};
 
 	DrawUITriangles(&tris, texture, COLOR_WHITE);
