@@ -5,6 +5,9 @@
 #ifndef GAME_GMENUSTATE_H
 #define GAME_GMENUSTATE_H
 
+// Shows a level select after main menu and pause exit course.
+#define USE_LEVEL_SELECT
+
 void GMenuStateSetWithFade();
 
 void GMenuStateSet();

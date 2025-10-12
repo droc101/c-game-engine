@@ -22,9 +22,6 @@
 #include "GLevelSelectState.h"
 #include "GOptionsState.h"
 
-// Shows a level select after main menu and pause exit course.
-#define USE_LEVEL_SELECT
-
 #ifndef USE_LEVEL_SELECT
 #include "GMainState.h"
 #endif
