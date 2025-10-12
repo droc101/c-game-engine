@@ -878,6 +878,35 @@ void GL_DrawTexturedArrays(const float *vertices,
 	glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, NULL);
 }
 
+void GL_DrawUITriangles(const UITriangleArray *tris, const char *texture, const Color col)
+{
+	glUseProgram(uiTexturedShader->program);
+
+	GL_LoadTextureFromAsset(texture);
+
+	glUniform4fv(hudTexturedColorLoc, 1, COLOR_TO_ARR(col));
+
+	glUniform4f(hudTexturedRegionLoc, -1, 0, 0, 0);
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, (long)(tris->vertexCount * 4 * sizeof(float)), tris->verts, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(tris->indexCount * sizeof(uint32_t)), tris->indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
+
+	glDrawElements(GL_TRIANGLES, (GLsizei)tris->indexCount, GL_UNSIGNED_INT, NULL);
+}
+
 #pragma endregion
 
 

@@ -306,8 +306,14 @@ void TickGraphDraw()
 	// Draw the current framerate
 	char fps[40];
 	sprintf(fps, "TPS: %.2f\nMSPT: %2.2f", currentF, currentMs);
-	FontDrawString(v2(start_x + 2, WindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
-	FontDrawString(v2(start_x, WindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
+#ifdef FRAMEGRAPH_FPS_ONLY
+	const Vector2 textSize = MeasureText(fps, 16, smallFont);
+	const float xPos = WindowWidthFloat() - textSize.x - 10;
+#else
+	const float xPos = (float)start_x;
+#endif
+	FontDrawString(v2(xPos + 2, WindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
+	FontDrawString(v2(xPos, WindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
 
 #endif
 }

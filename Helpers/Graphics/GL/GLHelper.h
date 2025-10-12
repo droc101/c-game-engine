@@ -14,6 +14,7 @@
 #include "../../../Structs/Level.h"
 #include "../../../Structs/Vector2.h"
 #include "../../Core/AssetLoaders/ModelLoader.h"
+#include "../Drawing.h"
 
 #define GL_VERSION_MAJOR 3
 #define GL_VERSION_MINOR 3
@@ -149,6 +150,14 @@ void GL_DrawTexturedArrays(const float *vertices,
 						   int quadCount,
 						   const char *texture,
 						   Color color);
+
+/**
+ * Draw a `UITriangleArray` using the textured shader.
+ * @param tris The triangles to draw
+ * @param texture The texture name
+ * @param col The color to use
+ */
+void GL_DrawUITriangles(const UITriangleArray *tris, const char *texture, Color col);
 
 /**
  * Draw arrays using the ui_colored shader

@@ -11,6 +11,7 @@
 #include <SDL_hints.h>
 #include <SDL_surface.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "../../Structs/Camera.h"
 #include "../../Structs/Color.h"
@@ -231,51 +232,113 @@ void DrawNinePatchTexture(const Vector2 pos,
 						  const char *texture)
 {
 	const Vector2 textureSize = GetTextureSize(texture);
+	const Vector2 marginUvSize = v2((1.0f / textureSize.x) * textureMarginsPx,
+									(1.0f / textureSize.y) * textureMarginsPx);
 
-	DrawTextureRegion(pos, v2s(outputMarginsPx), texture, v2s(0), v2s(textureMarginsPx)); // top left
-	DrawTextureRegion(v2(pos.x, pos.y + outputMarginsPx),
-					  v2(outputMarginsPx, size.y - textureMarginsPx * 2),
-					  texture,
-					  v2(0, textureMarginsPx),
-					  v2(textureMarginsPx, textureSize.y - textureMarginsPx * 2)); // middle left
-	DrawTextureRegion(v2(pos.x, pos.y + size.y - outputMarginsPx),
-					  v2s(outputMarginsPx),
-					  texture,
-					  v2(0, textureSize.y - textureMarginsPx),
-					  v2s(textureMarginsPx)); // bottom left
+	float verts[4 * 16] = {
+		pos.x,
+		pos.y,
+		0.0f,
+		0.0f,
+		pos.x + outputMarginsPx,
+		pos.y,
+		marginUvSize.x,
+		0.0f,
+		pos.x + size.x - outputMarginsPx,
+		pos.y,
+		1.0f - marginUvSize.x,
+		0.0f,
+		pos.x + size.x,
+		pos.y,
+		1.0f,
+		0.0f,
 
-	DrawTextureRegion(v2(pos.x + outputMarginsPx, pos.y),
-					  v2(size.x - textureMarginsPx * 2, outputMarginsPx),
-					  texture,
-					  v2(textureMarginsPx, 0),
-					  v2(textureSize.x - textureMarginsPx * 2, textureMarginsPx)); // top middle
-	DrawTextureRegion(v2(pos.x + outputMarginsPx, pos.y + outputMarginsPx),
-					  v2(size.x - textureMarginsPx * 2, size.y - textureMarginsPx * 2),
-					  texture,
-					  v2(textureMarginsPx, textureMarginsPx),
-					  v2(textureSize.x - textureMarginsPx * 2,
-						 textureSize.y - textureMarginsPx * 2)); // middle middle
-	DrawTextureRegion(v2(pos.x + outputMarginsPx, pos.y + (size.y - outputMarginsPx)),
-					  v2(size.x - textureMarginsPx * 2, outputMarginsPx),
-					  texture,
-					  v2(textureMarginsPx, textureSize.y - textureMarginsPx),
-					  v2(textureSize.x - textureMarginsPx * 2, textureMarginsPx)); // bottom middle
+		pos.x,
+		pos.y + outputMarginsPx,
+		0.0f,
+		marginUvSize.y,
+		pos.x + outputMarginsPx,
+		pos.y + outputMarginsPx,
+		marginUvSize.x,
+		marginUvSize.y,
+		pos.x + size.x - outputMarginsPx,
+		pos.y + outputMarginsPx,
+		1.0f - marginUvSize.x,
+		marginUvSize.y,
+		pos.x + size.x,
+		pos.y + outputMarginsPx,
+		1.0f,
+		marginUvSize.y,
 
-	DrawTextureRegion(v2(pos.x + (size.x - outputMarginsPx), pos.y),
-					  v2s(outputMarginsPx),
-					  texture,
-					  v2(textureSize.x - textureMarginsPx, 0),
-					  v2s(textureMarginsPx)); // top right
-	DrawTextureRegion(v2(pos.x + (size.x - outputMarginsPx), pos.y + outputMarginsPx),
-					  v2(outputMarginsPx, size.y - textureMarginsPx * 2),
-					  texture,
-					  v2(textureSize.x - textureMarginsPx, textureMarginsPx),
-					  v2(textureMarginsPx, textureSize.y - textureMarginsPx * 2)); // middle right
-	DrawTextureRegion(v2(pos.x + (size.x - outputMarginsPx), pos.y + (size.y - outputMarginsPx)),
-					  v2s(outputMarginsPx),
-					  texture,
-					  v2(textureSize.x - textureMarginsPx, textureSize.y - textureMarginsPx),
-					  v2s(textureMarginsPx)); // bottom right
+		pos.x,
+		pos.y + size.y - outputMarginsPx,
+		0.0f,
+		1.0f - marginUvSize.y,
+		pos.x + outputMarginsPx,
+		pos.y + size.y - outputMarginsPx,
+		marginUvSize.x,
+		1.0f - marginUvSize.y,
+		pos.x + size.x - outputMarginsPx,
+		pos.y + size.y - outputMarginsPx,
+		1.0f - marginUvSize.x,
+		1.0f - marginUvSize.y,
+		pos.x + size.x,
+		pos.y + size.y - outputMarginsPx,
+		1.0f,
+		1.0f - marginUvSize.y,
+
+		pos.x,
+		pos.y + size.y,
+		0.0f,
+		1.0f,
+		pos.x + outputMarginsPx,
+		pos.y + size.y,
+		marginUvSize.x,
+		1.0f,
+		pos.x + size.x - outputMarginsPx,
+		pos.y + size.y,
+		1.0f - marginUvSize.x,
+		1.0f,
+		pos.x + size.x,
+		pos.y + size.y,
+		1.0f,
+		1.0f,
+	};
+
+	for (int i = 0; i < 16; i++)
+	{
+		verts[i * 4 + 0] = X_TO_NDC(verts[i * 4 + 0]);
+		verts[i * 4 + 1] = Y_TO_NDC(verts[i * 4 + 1]);
+	}
+
+	uint32_t indices[9 * 6] = {
+		4,	1,	0,	1,	4,	5,
+
+		5,	2,	1,	5,	6,	2,
+
+		6,	3,	2,	3,	6,	7,
+
+		8,	5,	4,	5,	8,	9,
+
+		9,	6,	5,	6,	9,	10,
+
+		10, 7,	6,	7,	10, 11,
+
+		12, 9,	8,	9,	12, 13,
+
+		13, 10, 9,	10, 13, 14,
+
+		14, 11, 10, 11, 14, 15,
+	};
+
+	const UITriangleArray tris = {
+		.verts = verts,
+		.vertexCount = 16,
+		.indices = indices,
+		.indexCount = 9*6,
+	};
+
+	DrawUITriangles(&tris, texture, COLOR_WHITE);
 }
 
 inline void DrawBatchedQuadsTextured(const BatchedQuadArray *batch, const char *texture, const Color color)
@@ -305,6 +368,18 @@ inline void DrawBatchedQuadsColored(const BatchedQuadArray *batch, const Color c
 			break;
 		default:
 			break;
+	}
+}
+
+inline void DrawUITriangles(const UITriangleArray *tris, const char *texture, const Color col)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_OPENGL:
+			GL_DrawUITriangles(tris, texture, col);
+			break;
+		default:
+			LogWarning("DrawTrianglesTextured not implemented in current renderer!\n");
 	}
 }
 

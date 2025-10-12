@@ -9,6 +9,7 @@
 #include <joltc/Math/RVec3.h>
 #include <joltc/types.h>
 #include <SDL_surface.h>
+#include <stddef.h>
 #include <stdint.h>
 #include "../../Structs/Camera.h"
 #include "../../Structs/Color.h"
@@ -16,6 +17,7 @@
 #include "../../Structs/Vector2.h"
 
 typedef struct BatchedQuadArray BatchedQuadArray;
+typedef struct UITriangleArray UITriangleArray;
 
 struct BatchedQuadArray
 {
@@ -26,6 +28,19 @@ struct BatchedQuadArray
 	uint32_t *indices;
 	/// Number of quads in the array
 	int quadCount;
+};
+
+struct UITriangleArray
+{
+	/// The vertices in this triangle array, in the format of X, Y, U, V for each vertex
+	float *verts;
+	/// The indices in this triangle array
+	uint32_t *indices;
+
+	/// The number of vertices in this triangle array
+	size_t vertexCount;
+	/// The number of indices in this triangle array
+	size_t indexCount;
 };
 
 /**
@@ -125,7 +140,6 @@ void ClearDepthOnly();
  * @param outputMarginsPx The 9patch margins of the output
  * @param textureMarginsPx The 9patch margins of the texture
  * @param texture The texture name
- * @warning This is nine draw calls.
  */
 void DrawNinePatchTexture(Vector2 pos,
 						  Vector2 size,
@@ -147,6 +161,14 @@ void DrawBatchedQuadsTextured(const BatchedQuadArray *batch, const char *texture
  * @param color The color to use
  */
 void DrawBatchedQuadsColored(const BatchedQuadArray *batch, Color color);
+
+/**
+ * Draw a `UITriangleArray` using the textured shader.
+ * @param tris The triangles to draw
+ * @param texture The texture name
+ * @param col The color to use
+ */
+void DrawUITriangles(const UITriangleArray *tris, const char *texture, Color col);
 
 /**
  * Draw a line. This function is intended to be called from Jolt's built-in debug renderer.
