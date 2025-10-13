@@ -324,6 +324,8 @@ void UpdateTransformMatrix(const Camera *camera);
 
 void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
+void EnsureSpaceForUiElements(size_t vertexCount, size_t indexCount);
+
 void DrawRectInternal(float ndcStartX,
 					  float ndcStartY,
 					  float ndcEndX,

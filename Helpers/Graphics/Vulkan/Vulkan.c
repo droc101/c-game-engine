@@ -30,6 +30,7 @@
 #include "../../Core/AssetReader.h"
 #include "../../Core/Logging.h"
 #include "../../Core/MathEx.h"
+#include "../Drawing.h"
 #include "../LodThread.h"
 #include "VulkanActors.h"
 #include "VulkanHelpers.h"
@@ -826,6 +827,32 @@ void VK_DrawRectOutline(const int32_t x,
 	VK_DrawLine(x + w, y, x + w, y + h, thickness, color);
 	VK_DrawLine(x + w, y + h, x, y + h, thickness, color);
 	VK_DrawLine(x, y + h, x, y, thickness, color);
+}
+
+void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, const Color color)
+{
+	EnsureSpaceForUiElements(triangleArray->vertexCount, triangleArray->indexCount);
+
+	UiVertex *vertices = buffers.ui.vertices.data + buffers.ui.vertices.bytesUsed;
+	uint32_t *indices = buffers.ui.indices.data + buffers.ui.indices.bytesUsed;
+	const uint32_t vertexOffset = buffers.ui.vertices.bytesUsed / sizeof(UiVertex);
+
+	for (size_t i = 0; i < triangleArray->vertexCount; i++)
+	{
+		memcpy(vertices + i, triangleArray->vertices[i], sizeof(*triangleArray->vertices));
+		vertices[i].r = color.r;
+		vertices[i].g = color.g;
+		vertices[i].b = color.b;
+		vertices[i].a = color.a;
+		vertices[i].textureIndex = TextureIndex(texture);
+	}
+	for (size_t i = 0; i < triangleArray->indexCount; i++)
+	{
+		indices[i] = (*triangleArray->indices)[i] + vertexOffset;
+	}
+
+	buffers.ui.vertices.bytesUsed += triangleArray->vertexCount * sizeof(UiVertex);
+	buffers.ui.indices.bytesUsed += triangleArray->indexCount * sizeof(uint32_t);
 }
 
 void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, const uint32_t color)

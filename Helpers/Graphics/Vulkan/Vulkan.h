@@ -15,6 +15,7 @@
 #include "../../../Structs/Level.h"
 #include "../../../Structs/Viewmodel.h"
 #include "../../Core/List.h"
+#include "../Drawing.h"
 #include "../RenderingHelpers.h" // NOLINT(*-include-cleaner)
 
 #ifdef BUILDSTYLE_DEBUG
@@ -96,6 +97,8 @@ void VK_DrawTexturedQuadsBatched(const float *vertices, int quadCount, const cha
 void VK_DrawLine(int startX, int startY, int endX, int endY, int thickness, Color color);
 
 void VK_DrawRectOutline(int x, int y, int w, int h, int thickness, Color color);
+
+void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, Color color);
 
 void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, uint32_t color);
 

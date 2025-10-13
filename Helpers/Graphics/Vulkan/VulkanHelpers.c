@@ -318,6 +318,25 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 						  0);
 }
 
+void EnsureSpaceForUiElements(const size_t vertexCount, const size_t indexCount)
+{
+	if (buffers.ui.vertices.allocatedSize < buffers.ui.vertices.bytesUsed + sizeof(UiVertex) * vertexCount ||
+		buffers.ui.indices.allocatedSize < buffers.ui.indices.bytesUsed + sizeof(uint32_t) * indexCount)
+	{
+		buffers.ui.vertices.allocatedSize += sizeof(UiVertex) * vertexCount * 16;
+		buffers.ui.indices.allocatedSize += sizeof(uint32_t) * indexCount * 16;
+		buffers.ui.shouldResize = true;
+
+		UiVertex *newVertices = realloc(buffers.ui.vertices.data, buffers.ui.vertices.allocatedSize);
+		CheckAlloc(newVertices);
+		buffers.ui.vertices.data = newVertices;
+
+		uint32_t *newIndices = realloc(buffers.ui.indices.data, buffers.ui.indices.allocatedSize);
+		CheckAlloc(newIndices);
+		buffers.ui.indices.data = newIndices;
+	}
+}
+
 void DrawRectInternal(const float ndcStartX,
 					  const float ndcStartY,
 					  const float ndcEndX,
@@ -340,21 +359,7 @@ void DrawRectInternal(const float ndcStartX,
 
 void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, const uint32_t textureIndex)
 {
-	if (buffers.ui.vertices.allocatedSize < buffers.ui.vertices.bytesUsed + sizeof(UiVertex) * 4 ||
-		buffers.ui.indices.allocatedSize < buffers.ui.indices.bytesUsed + sizeof(uint32_t) * 6)
-	{
-		buffers.ui.vertices.allocatedSize += sizeof(UiVertex) * 4 * 16;
-		buffers.ui.indices.allocatedSize += sizeof(uint32_t) * 6 * 16;
-		buffers.ui.shouldResize = true;
-
-		UiVertex *newVertices = realloc(buffers.ui.vertices.data, buffers.ui.vertices.allocatedSize);
-		CheckAlloc(newVertices);
-		buffers.ui.vertices.data = newVertices;
-
-		uint32_t *newIndices = realloc(buffers.ui.indices.data, buffers.ui.indices.allocatedSize);
-		CheckAlloc(newIndices);
-		buffers.ui.indices.data = newIndices;
-	}
+	EnsureSpaceForUiElements(4, 6);
 
 	UiVertex *vertices = buffers.ui.vertices.data + buffers.ui.vertices.bytesUsed;
 	uint32_t *indices = buffers.ui.indices.data + buffers.ui.indices.bytesUsed;

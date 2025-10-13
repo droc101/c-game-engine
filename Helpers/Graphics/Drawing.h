@@ -17,7 +17,7 @@
 #include "../../Structs/Vector2.h"
 
 typedef struct BatchedQuadArray BatchedQuadArray;
-typedef struct UITriangleArray UITriangleArray;
+typedef struct UITriangleArray UiTriangleArray;
 
 struct BatchedQuadArray
 {
@@ -33,9 +33,9 @@ struct BatchedQuadArray
 struct UITriangleArray
 {
 	/// The vertices in this triangle array, in the format of X, Y, U, V for each vertex
-	float *verts;
+	float (*vertices)[4];
 	/// The indices in this triangle array
-	uint32_t *indices;
+	uint32_t (*indices)[3];
 
 	/// The number of vertices in this triangle array
 	size_t vertexCount;
@@ -164,11 +164,11 @@ void DrawBatchedQuadsColored(const BatchedQuadArray *batch, Color color);
 
 /**
  * Draw a `UITriangleArray` using the textured shader.
- * @param tris The triangles to draw
+ * @param triangleArray The triangles to draw
  * @param texture The texture name
- * @param col The color to use
+ * @param color The color to use
  */
-void DrawUITriangles(const UITriangleArray *tris, const char *texture, Color col);
+void DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, Color color);
 
 /**
  * Draw a line. This function is intended to be called from Jolt's built-in debug renderer.

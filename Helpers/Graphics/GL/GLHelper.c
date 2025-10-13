@@ -878,7 +878,7 @@ void GL_DrawTexturedArrays(const float *vertices,
 	glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_DrawUITriangles(const UITriangleArray *tris, const char *texture, const Color col)
+void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, const Color col)
 {
 	glUseProgram(uiTexturedShader->program);
 
@@ -891,7 +891,7 @@ void GL_DrawUITriangles(const UITriangleArray *tris, const char *texture, const 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
 	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, (long)(tris->vertexCount * 4 * sizeof(float)), tris->verts, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (long)(tris->vertexCount * 4 * sizeof(float)), tris->vertices, GL_STREAM_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(tris->indexCount * sizeof(uint32_t)), tris->indices, GL_STREAM_DRAW);

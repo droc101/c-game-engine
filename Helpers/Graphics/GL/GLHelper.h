@@ -157,7 +157,7 @@ void GL_DrawTexturedArrays(const float *vertices,
  * @param texture The texture name
  * @param col The color to use
  */
-void GL_DrawUITriangles(const UITriangleArray *tris, const char *texture, Color col);
+void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, Color col);
 
 /**
  * Draw arrays using the ui_colored shader
