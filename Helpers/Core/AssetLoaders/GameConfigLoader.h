@@ -19,6 +19,9 @@ struct GameConfig
 
 extern GameConfig config;
 
+/**
+ * Load the game config asset
+ */
 void LoadGameConfig();
 
 #endif //GAME_GAMECONFIGLOADER_H
