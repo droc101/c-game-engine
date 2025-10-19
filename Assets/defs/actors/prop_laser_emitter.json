@@ -1,0 +1,26 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "turn_on": {
+      "description": "Turn on this laser emitter"
+    },
+    "turn_off": {
+      "description": "Turn off this laser emitter"
+    }
+  },
+  "params": {
+    "startOn": {
+      "display": "Start On",
+      "description": "Whether this laser emitter should be on when it spawns",
+      "default": true,
+      "type": "bool"
+    },
+    "height": {
+      "display": "Laser Emitter Slot",
+      "description": "Which slot of the laser emitter the laser should come out of",
+      "default": "Middle",
+      "type": "byte",
+      "options": "laser_height"
+    }
+  }
+}

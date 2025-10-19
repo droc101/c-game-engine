@@ -1,0 +1,17 @@
+{
+  "extends": "actor",
+  "outputs": {
+    "collected": {
+      "description": "Emitted when this coin is collected by the player"
+    }
+  },
+  "params": {
+    "isBlue": {
+      "display": "Coin Type",
+      "description": "Whether this coin should be blue or yellow.",
+      "type": "bool",
+      "default": "Yellow",
+      "options": "coin_type"
+    }
+  }
+}

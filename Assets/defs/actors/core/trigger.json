@@ -1,0 +1,35 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "force_trigger": {},
+    "enable": {},
+    "disable": {}
+  },
+  "outputs": {
+    "triggered": {},
+    "entered": {},
+    "exited": {}
+  },
+  "params": {
+    "width": {
+      "display": "Width",
+      "default": 1.0,
+      "type": "float"
+    },
+    "depth": {
+      "display": "Depth",
+      "default": 1.0,
+      "type": "float"
+    },
+    "oneShot": {
+      "display": "One Shot",
+      "default": true,
+      "type": "bool"
+    },
+    "startEnabled": {
+      "display": "Start Enabled",
+      "default": true,
+      "type": "bool"
+    }
+  }
+}

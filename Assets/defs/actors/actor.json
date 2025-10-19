@@ -1,0 +1,16 @@
+{
+  "virtual": true,
+  "inputs": {
+    "kill": {}
+  },
+  "outputs": {
+    "spawned": {},
+    "killed": {}
+  },
+  "params": {
+    "name": {
+      "display": "Actor Name",
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "play": {},
+    "pause": {},
+    "resume": {},
+    "stop": {}
+  },
+  "params": {
+    "sound": {
+      "display": "Sound",
+      "default": "sfx/click",
+      "type": "string",
+      "string_hint": "sound"
+    },
+    "loops": {
+      "display": "# of loops",
+      "default": 0,
+      "type": "int"
+    },
+    "volume": {
+      "display": "Volume",
+      "default": 1.0,
+      "type": "float",
+      "min": 0.0,
+      "max": 1.0
+    }
+  }
+}

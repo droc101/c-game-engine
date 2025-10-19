@@ -1,0 +1,27 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "operand_a": {
+      "type": "bool"
+    },
+    "operand_b": {
+      "type": "bool"
+    },
+    "execute": {}
+  },
+  "outputs": {
+    "on_true": {},
+    "on_false": {},
+    "execution_result": {
+      "type": "bool"
+    }
+  },
+  "params": {
+    "operation": {
+      "display": "Operation",
+      "default": "AND",
+      "type": "byte",
+      "options": "binary_operation"
+    }
+  }
+}

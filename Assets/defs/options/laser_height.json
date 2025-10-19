@@ -1,0 +1,21 @@
+{
+  "type": "byte",
+  "options": [
+    [
+      0,
+      "Lower"
+    ],
+    [
+      1,
+      "Middle"
+    ],
+    [
+      2,
+      "Upper"
+    ],
+    [
+      3,
+      "Triple"
+    ]
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "extends": "actor",
+  "params": {
+    "width": {
+      "display": "Width",
+      "default": 1.0,
+      "type": "float"
+    },
+    "height": {
+      "display": "Height",
+      "default": 1.0,
+      "type": "float"
+    },
+    "texture": {
+      "display": "Texture",
+      "default": "level/uvtest",
+      "type": "string",
+      "string_hint": "texture"
+    }
+  }
+}

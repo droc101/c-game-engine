@@ -1,0 +1,13 @@
+{
+  "type": "bool",
+  "options": [
+    [
+      false,
+      "Yellow"
+    ],
+    [
+      true,
+      "Blue"
+    ]
+  ]
+}

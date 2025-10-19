@@ -1,0 +1,49 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "increment": {},
+    "decrement": {},
+    "add": {
+      "type": "int"
+    },
+    "subtract": {
+      "type": "int"
+    }
+  },
+  "outputs": {
+    "hit_max": {},
+    "hit_min": {},
+    "left_max": {},
+    "left_min": {},
+    "counter_changed": {
+      "type": "int"
+    }
+  },
+  "params": {
+    "min": {
+      "display": "Minimum",
+      "default": 0,
+      "type": "int"
+    },
+    "max": {
+      "display": "Maximum",
+      "default": 100,
+      "type": "int"
+    },
+    "counter": {
+      "display": "Initial Value",
+      "default": 0,
+      "type": "int"
+    },
+    "clampToMax": {
+      "display": "Clamp To Maximum",
+      "default": true,
+      "type": "bool"
+    },
+    "clampToMin": {
+      "display": "Clamp To Minimum",
+      "default": true,
+      "type": "bool"
+    }
+  }
+}

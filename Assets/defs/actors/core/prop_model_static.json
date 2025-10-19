@@ -1,0 +1,15 @@
+{
+  "params": {
+    "model": {
+      "display": "Model",
+      "default": "leafy",
+      "type": "string",
+      "string_hint": "model"
+    },
+    "skin": {
+      "display": "Skin",
+      "default": 0,
+      "type": "int"
+    }
+  }
+}

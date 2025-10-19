@@ -1,0 +1,39 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "open": {
+      "description": "Forcefully open this door, regardless of player position"
+    },
+    "close": {
+      "description": "Forcefully close this door, regardless of player position"
+    }
+  },
+  "outputs": {
+    "opening": {
+      "description": "The door has started to open"
+    },
+    "fully_opened": {
+      "description": "The door has finished opening"
+    },
+    "closing": {
+      "description": "The door has started to close"
+    },
+    "fully_closed": {
+      "description": "the door has finished closing"
+    }
+  },
+  "params": {
+    "stayOpen": {
+      "display": "Stay Open",
+      "description": "Whether this door should remain open until closed via I/O",
+      "default": false,
+      "type": "bool"
+    },
+    "preventPlayerOpen": {
+      "display": "Prevent Player Open",
+      "description": "Whether this door should open when the player approaches",
+      "default": false,
+      "type": "bool"
+    }
+  }
+}

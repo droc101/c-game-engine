@@ -1,0 +1,7 @@
+{
+  "outputs": {
+    "first_tick": {
+      "description": "Emitted on the first physics tick of the map"
+    }
+  }
+}

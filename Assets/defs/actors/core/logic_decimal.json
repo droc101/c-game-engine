@@ -1,0 +1,27 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "operand_a": {
+      "type": "int"
+    },
+    "operand_b": {
+      "type": "int"
+    },
+    "execute": {}
+  },
+  "outputs": {
+    "on_true": {},
+    "on_false": {},
+    "execution_result": {
+      "type": "int"
+    }
+  },
+  "params": {
+    "operation": {
+      "display": "Operation",
+      "default": "=",
+      "type": "byte",
+      "options": "decimal_operation"
+    }
+  }
+}

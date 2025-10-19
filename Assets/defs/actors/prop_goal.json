@@ -1,0 +1,24 @@
+{
+  "extends": "actor",
+  "inputs": {
+    "enable": {
+      "description": "Allow the player to collect this goal"
+    },
+    "disable": {
+      "description": "Prevent the player from collecting this goal"
+    }
+  },
+  "outputs": {
+    "collected": {
+      "description": "This goal has been collected by the player"
+    }
+  },
+  "params": {
+    "startEnabled": {
+      "display": "Start Enabled",
+      "description": "Whether the player should be able to collect this goal when it spawns",
+      "default": true,
+      "type": "bool"
+    }
+  }
+}
