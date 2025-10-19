@@ -37,9 +37,13 @@ enum ActorFlags
 
 struct ActorConnection
 {
+	/// The name of the input on the target actor
 	char *targetActorInput;
+	/// The name of the output on the source actor
 	char *sourceActorOutput;
+	/// The name of the actor firing the output
 	char outActorName[64];
+	/// The param to send to the input
 	Param outParamOverride;
 };
 
@@ -123,19 +127,40 @@ void DestroyActorConnection(ActorConnection *connection);
  */
 void ActorCreateEmptyBody(Actor *this, const Transform *transform);
 
-
+/**
+ * Default actor update function
+ */
 void DefaultActorUpdate(Actor * /*this*/, double /*delta*/);
 
+/**
+ * Actor kill signal handler
+ * @param this The actor this signal was sent to
+ */
 void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/);
 
+/**
+ * Default actor on player contact added function
+ */
 void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/);
 
+/**
+ * Default actor on player contact persisted function
+ */
 void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyId /*bodyId*/);
 
+/**
+ * Default actor on player contact removed function
+ */
 void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyId /*bodyId*/);
 
+/**
+ * Default actor render ui function
+ */
 void DefaultActorRenderUi(Actor * /*this*/);
 
+/**
+ * Default actor destroy function
+ */
 void DefaultActorDestroy(Actor * /*this*/);
 
 

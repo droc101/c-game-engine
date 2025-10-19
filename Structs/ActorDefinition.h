@@ -78,7 +78,7 @@ struct ActorDefinition
 	/// The list of input handlers
 	ActorInputHandlerFunctionDict inputHandlers;
 
-
+	/// The function to call to initialize the actor
 	ActorInitFunction Init;
 	/// The function to call when the actor is destroyed
 	/// @note This should only be called once, when the actor is destroyed
@@ -92,10 +92,25 @@ struct ActorDefinition
  */
 void RegisterActor(const char *actorTypeName, ActorDefinition *definition);
 
+/**
+ * Register an input handler to an actor definition
+ * @param definition The actor definition to modify
+ * @param name The name of the input
+ * @param handler The handler function
+ */
 void RegisterActorInput(ActorDefinition *definition, const char *name, ActorInputHandlerFunction handler);
 
+/**
+ * Remove an input handler from an actor definition
+ * @param definition The actor definition to modify
+ * @param name The input name to remove
+ */
 void UnregisterActorInput(ActorDefinition *definition, const char *name);
 
+/**
+ * Register default actor inputs
+ * @param definition The definition to modify
+ */
 void RegisterDefaultActorInputs(ActorDefinition *definition);
 
 /**
@@ -103,8 +118,19 @@ void RegisterDefaultActorInputs(ActorDefinition *definition);
  */
 void RegisterActors();
 
+/**
+ * Get the actor definition for an actor type name
+ * @param actorType The actor type name
+ * @return The actor's definition
+ */
 const ActorDefinition *GetActorDefinition(const char *actorType);
 
+/**
+ * Get an input handler for an actor definition
+ * @param definition The actor definition
+ * @param input The signal name
+ * @return The signal handler function
+ */
 ActorInputHandlerFunction GetActorInputHandler(const ActorDefinition *definition, const char *input);
 
 /**
