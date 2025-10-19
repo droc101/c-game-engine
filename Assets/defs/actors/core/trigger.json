@@ -1,35 +1,52 @@
 {
+  "description": "Emits signals based on player contact",
   "extends": "actor",
   "inputs": {
-    "force_trigger": {},
-    "enable": {},
-    "disable": {}
+    "force_trigger": {
+      "description": "Forcibly output the \"triggered\" signal"
+    },
+    "enable": {
+      "description": "Enable contact sensing"
+    },
+    "disable": {
+      "description": "Disable contact sensing"
+    }
   },
   "outputs": {
-    "triggered": {},
-    "entered": {},
-    "exited": {}
+    "triggered": {
+      "description": "Emitted when the player is inside the trigger"
+    },
+    "entered": {
+      "description": "Emitted when the player enters the trigger"
+    },
+    "exited": {
+      "description": "Emitted when the player exits the trigger"
+    }
   },
   "params": {
     "width": {
       "display": "Width",
       "default": 1.0,
-      "type": "float"
+      "type": "float",
+      "description": "The width of this trigger"
     },
     "depth": {
       "display": "Depth",
       "default": 1.0,
-      "type": "float"
+      "type": "float",
+      "description": "The depth of this trigger"
     },
     "oneShot": {
       "display": "One Shot",
       "default": true,
-      "type": "bool"
+      "type": "bool",
+      "description": "Whether this trigger should be removed after it is triggered"
     },
     "startEnabled": {
       "display": "Start Enabled",
       "default": true,
-      "type": "bool"
+      "type": "bool",
+      "description": "Whether this trigger should be enabled and sensing contact when it spawns"
     }
   }
 }

@@ -1,4 +1,5 @@
 {
+  "description": "A goal the player can collect",
   "extends": "actor",
   "inputs": {
     "enable": {

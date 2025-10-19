@@ -1,15 +1,18 @@
 {
+  "description": "An arbitrary model that cannot move or change in any way.",
   "params": {
     "model": {
       "display": "Model",
       "default": "leafy",
       "type": "string",
-      "string_hint": "model"
+      "string_hint": "model",
+      "description": "The model to use"
     },
     "skin": {
       "display": "Skin",
       "default": 0,
-      "type": "int"
+      "type": "int",
+      "description": "The skin of the model to use"
     }
   }
 }

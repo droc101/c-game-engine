@@ -1,21 +1,25 @@
 {
+  "description": "An arbitrary 2D sprite",
   "extends": "actor",
   "params": {
     "width": {
       "display": "Width",
       "default": 1.0,
-      "type": "float"
+      "type": "float",
+      "description": "The in-game width of the sprite"
     },
     "height": {
       "display": "Height",
       "default": 1.0,
-      "type": "float"
+      "type": "float",
+      "description": "The in-game height of the sprite"
     },
     "texture": {
       "display": "Texture",
       "default": "level/uvtest",
       "type": "string",
-      "string_hint": "texture"
+      "string_hint": "texture",
+      "description": "The texture of the sprite"
     }
   }
 }

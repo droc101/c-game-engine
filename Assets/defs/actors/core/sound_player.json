@@ -1,29 +1,41 @@
 {
+  "description": "Plays a sound with the ability to control volume and looping",
   "extends": "actor",
   "inputs": {
-    "play": {},
-    "pause": {},
-    "resume": {},
-    "stop": {}
+    "play": {
+      "description": "Play this sound from the start"
+    },
+    "pause": {
+      "description": "Pause this sound"
+    },
+    "resume": {
+      "description": "Resume the previously paused sound"
+    },
+    "stop": {
+      "description": "Stop the sound"
+    }
   },
   "params": {
     "sound": {
       "display": "Sound",
       "default": "sfx/click",
       "type": "string",
-      "string_hint": "sound"
+      "string_hint": "sound",
+      "description": "The sound this actor should play"
     },
     "loops": {
       "display": "# of loops",
       "default": 0,
-      "type": "int"
+      "type": "int",
+      "description": "How many times this sound should loop"
     },
     "volume": {
       "display": "Volume",
       "default": 1.0,
       "type": "float",
-      "min": 0.0,
-      "max": 1.0
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "The volume of this sound, where 0 is silent and 1 is maximum volume"
     }
   }
 }

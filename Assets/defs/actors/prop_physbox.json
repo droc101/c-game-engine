@@ -1,3 +1,4 @@
 {
+  "description": "A physics-enabled box the player can pick up",
   "extends": "actor"
 }

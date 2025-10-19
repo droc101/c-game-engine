@@ -1,16 +1,24 @@
 {
+  "description": "Base actor class",
   "virtual": true,
   "inputs": {
-    "kill": {}
+    "kill": {
+      "description": "Remove this actor"
+    }
   },
   "outputs": {
-    "spawned": {},
-    "killed": {}
+    "spawned": {
+      "description": "This actor has been created. For actors placed in map data, this may be called BEFORE the level is fully loaded."
+    },
+    "killed": {
+      "description": "This actor is about to be removed"
+    }
   },
   "params": {
     "name": {
       "display": "Actor Name",
-      "type": "string"
+      "type": "string",
+      "description": "The name other actors use to refer to this actor"
     }
   }
 }

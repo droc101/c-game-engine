@@ -1,4 +1,5 @@
 {
+  "description": "A door that can open and close",
   "extends": "actor",
   "inputs": {
     "open": {

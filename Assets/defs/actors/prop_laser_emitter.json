@@ -1,4 +1,5 @@
 {
+  "description": "A prop that emits a prop_laser actor",
   "extends": "actor",
   "inputs": {
     "turn_on": {

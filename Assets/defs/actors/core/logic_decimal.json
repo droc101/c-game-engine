@@ -1,19 +1,29 @@
 {
+  "description": "Performs numerical comparison logic",
   "extends": "actor",
   "inputs": {
     "operand_a": {
-      "type": "int"
+      "type": "int",
+      "description": "Set operand A for the next execution"
     },
     "operand_b": {
-      "type": "int"
+      "type": "int",
+      "description": "Set operand B for the next execution"
     },
-    "execute": {}
+    "execute": {
+      "description": "Perform a comparison"
+    }
   },
   "outputs": {
-    "on_true": {},
-    "on_false": {},
+    "on_true": {
+      "description": "Emitted when the result of the execution was true"
+    },
+    "on_false": {
+      "description": "Emitted when the result of the execution was false"
+    },
     "execution_result": {
-      "type": "int"
+      "type": "bool",
+      "description": "Emitted when the \"execute\" input is received. Param contains the result of the execution."
     }
   },
   "params": {
@@ -21,7 +31,8 @@
       "display": "Operation",
       "default": "=",
       "type": "byte",
-      "options": "decimal_operation"
+      "options": "decimal_operation",
+      "description": "The operation this logic_decimal performs"
     }
   }
 }

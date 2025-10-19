@@ -1,4 +1,5 @@
 {
+  "description": "A laser that can be blocked by props",
   "extends": "actor",
   "inputs": {
     "turn_on": {

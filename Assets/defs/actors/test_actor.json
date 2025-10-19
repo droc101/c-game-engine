@@ -1,3 +1,4 @@
 {
-  "extends": "actor"
+  "extends": "actor",
+  "description": "Actor used for engine testing. Subject to change."
 }

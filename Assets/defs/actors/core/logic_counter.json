@@ -1,49 +1,70 @@
 {
+  "description": "Simple counter with increment/decrement/add/subtract operations, as well as optional clamping",
   "extends": "actor",
   "inputs": {
-    "increment": {},
-    "decrement": {},
+    "increment": {
+      "description": "Add 1 to the counter"
+    },
+    "decrement": {
+      "description": "Subtract 1 to the counter"
+    },
     "add": {
-      "type": "int"
+      "type": "int",
+      "description": "Add to the counter"
     },
     "subtract": {
-      "type": "int"
+      "type": "int",
+      "description": "Subtract from the counter"
     }
   },
   "outputs": {
-    "hit_max": {},
-    "hit_min": {},
-    "left_max": {},
-    "left_min": {},
+    "hit_max": {
+      "description": "The last operation caused the counter to hit the maximum value"
+    },
+    "hit_min": {
+      "description": "The last operation caused the counter to hit the minimum value"
+    },
+    "left_max": {
+      "description": "The last operation caused the counter to leave the maximum value"
+    },
+    "left_min": {
+      "description": "The last operation caused the counter to leave the minimum value"
+    },
     "counter_changed": {
-      "type": "int"
+      "type": "int",
+      "description": "Emitted whenever the counter processes an operation. The param contains the current value of the counter."
     }
   },
   "params": {
-    "min": {
+    "min`": {
       "display": "Minimum",
       "default": 0,
-      "type": "int"
+      "type": "int",
+      "description": "The lower bound of this counter"
     },
     "max": {
       "display": "Maximum",
       "default": 100,
-      "type": "int"
+      "type": "int",
+      "description": "The upper bound of this counter"
     },
     "counter": {
       "display": "Initial Value",
       "default": 0,
-      "type": "int"
+      "type": "int",
+      "description": "The initial value this counter will have when it spawns"
     },
     "clampToMax": {
       "display": "Clamp To Maximum",
       "default": true,
-      "type": "bool"
+      "type": "bool",
+      "description": "Whether to check and enforce the upper bound"
     },
     "clampToMin": {
       "display": "Clamp To Minimum",
       "default": true,
-      "type": "bool"
+      "type": "bool",
+      "description": "Whether to check and enforce the lower bound"
     }
   }
 }
