@@ -36,7 +36,7 @@
     }
   },
   "params": {
-    "min`": {
+    "min": {
       "display": "Minimum",
       "default": 0,
       "type": "int",
