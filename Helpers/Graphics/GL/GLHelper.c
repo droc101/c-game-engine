@@ -560,7 +560,8 @@ void GL_LoadLevelWalls(const Level *l)
 		GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
 		if (wallBuffer->wallCount + 1 > GL_MAX_WALLS_PER_BUFFER)
 		{
-			Error("Too many walls per buffer");
+			LogError("Too many walls of same material! Increase GL_MAX_WALLS_PER_BUFFER to fix this");
+			Error("Too many walls of same material!");
 		}
 
 		float vertices[4][6] = {
