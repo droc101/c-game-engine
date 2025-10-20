@@ -558,6 +558,10 @@ void GL_LoadLevelWalls(const Level *l)
 	{
 		const Wall *w = ListGetPointer(l->walls, i);
 		GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
+		if (wallBuffer->wallCount + 1 > GL_MAX_WALLS_PER_BUFFER)
+		{
+			Error("Too many walls per buffer");
+		}
 
 		float vertices[4][6] = {
 			// X Y Z U V A
