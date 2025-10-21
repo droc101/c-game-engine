@@ -1,0 +1,10 @@
+//
+// Created by NBT22 on 10/20/25.
+//
+
+#ifndef GAME_GAMEACTORREGISTRATION_H
+#define GAME_GAMEACTORREGISTRATION_H
+
+void RegisterGameActors();
+
+#endif //GAME_GAMEACTORREGISTRATION_H

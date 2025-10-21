@@ -1,33 +1,10 @@
 cmake_minimum_required(VERSION 3.25)
 project(game C CXX)
 
-include(FetchPackage.cmake)
-include(CheckCSourceCompiles)
-include(CheckIncludeFile)
-
-#region Compile options
-
-option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
-option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert macros. This overrides the build type and forces them to be enabled always." ON)
-option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
-
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(CMAKE_C_STANDARD 11)
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden -Wundef")
-
-set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG -fwhole-program")
-
-if (WIN32)
-    set(CMAKE_AUTO_RCC ON)
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mwindows") # Hides console window
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows") # Hides console window
-else ()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -rdynamic")
-endif ()
+#region Compile options
 
 # Enable LTO in release builds
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
@@ -41,275 +18,64 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDeb
     endif ()
 endif ()
 
-set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-check_c_source_compiles("
-    #if !((defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)) && !defined(_M_ARM64EC))
-        #error
-    #endif" x86_64)
-if (x86_64)
-    message(STATUS "Detected x86_64 architecture")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64 -mmmx -msse -msse2") # See https://github.com/jrouwe/JoltPhysics/blob/master/Build/README.md#defines for jolt extension options
-else ()
-    check_c_source_compiles("
-        #if !(defined(__aarch64__) || defined(_M_ARM64))
-            #error
-        #endif" arm64)
-    if (arm64)
-        message(STATUS "Detected ARM64 architecture (no support will be provided)")
-    else ()
-        message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
-    endif ()
-endif ()
-
-if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "GAME only supports 64-bit systems (CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P})")
-else ()
-    message(STATUS "CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P}")
-endif ()
-
 #endregion
+
+add_subdirectory(engine)
 
 #region Game Executable
 
-add_executable(
-        game
-        $<$<BOOL:${WIN32}>:game.rc> # Add the Win32 resource file only on Windows
-        main.c
-        Helpers/Core/Input.h
-        Helpers/Core/Input.c
-        Helpers/Graphics/Drawing.h
-        Helpers/Graphics/Drawing.c
-        Structs/Vector2.h
-        Helpers/Core/MathEx.h
-        Helpers/Core/MathEx.c
-        Structs/Wall.h
-        Structs/Wall.c
-        Helpers/Core/List.h
-        Helpers/Core/List.c
-        Structs/Level.h
-        Structs/Level.c
-        Helpers/Graphics/Font.c
-        Helpers/Graphics/Font.h
-        Helpers/Core/Error.c
-        Helpers/Core/Error.h
-        Helpers/Core/AssetLoaders/LevelLoader.c
-        Helpers/Core/AssetLoaders/LevelLoader.h
-        Structs/GlobalState.c
-        Structs/GlobalState.h
-        GameStates/GMainState.c
-        GameStates/GMainState.h
-        GameStates/GMenuState.c
-        GameStates/GMenuState.h
-        Structs/Actor.c
-        Structs/Actor.h
-        Actor/TestActor.c
-        Actor/TestActor.h
-        GameStates/GPauseState.c
-        GameStates/GPauseState.h
-        Debug/FrameGrapher.c
-        Debug/FrameGrapher.h
-        Debug/DPrint.c
-        Debug/DPrint.h
-        Helpers/Core/Timing.c
-        Helpers/Core/Timing.h
-        Helpers/Core/AssetReader.c
-        Helpers/Core/AssetReader.h
-        Helpers/Core/DataReader.c
-        Helpers/Core/DataReader.h
-        GameStates/GLevelSelectState.c
-        GameStates/GLevelSelectState.h
-        Actor/Coin.c
-        Actor/Coin.h
-        Actor/Goal.c
-        Actor/Goal.h
-        GameStates/GLogoSplashState.c
-        GameStates/GLogoSplashState.h
-        Helpers/Graphics/GL/GLHelper.c
-        Helpers/Graphics/GL/GLHelper.h
-        Helpers/Graphics/RenderingHelpers.c
-        Helpers/Graphics/RenderingHelpers.h
-        Helpers/Graphics/GL/GLDebug.c
-        Structs/UI/UiStack.c
-        Structs/UI/UiStack.h
-        Structs/UI/Controls/Button.c
-        Structs/UI/Controls/Button.h
-        Structs/UI/Controls/Slider.c
-        Structs/UI/Controls/Slider.h
-        Structs/Options.c
-        Structs/Options.h
-        GameStates/GOptionsState.c
-        GameStates/GOptionsState.h
-        Structs/UI/Controls/CheckBox.c
-        Structs/UI/Controls/CheckBox.h
-        Structs/UI/Controls/RadioButton.c
-        Structs/UI/Controls/RadioButton.h
-        Helpers/Core/Logging.c
-        Helpers/Core/Logging.h
-        Actor/Door.c
-        Actor/Door.h
-        Helpers/PlatformHelpers.c
-        Helpers/PlatformHelpers.h
-        Helpers/Graphics/GL/GLInternal.h
-        GameStates/Options/GVideoOptionsState.c
-        GameStates/Options/GVideoOptionsState.h
-        GameStates/Options/GSoundOptionsState.c
-        GameStates/Options/GSoundOptionsState.h
-        GameStates/Options/GInputOptionsState.c
-        GameStates/Options/GInputOptionsState.h
-        Helpers/Core/Physics/PhysicsThread.c
-        Helpers/Core/Physics/PhysicsThread.h
-        Debug/FrameBenchmark.c
-        Debug/FrameBenchmark.h
-        Structs/UI/Controls/TextBox.c
-        Structs/UI/Controls/TextBox.h
-        Helpers/CommandParser.c
-        Helpers/CommandParser.h
-        GameStates/GLoadingState.c
-        GameStates/GLoadingState.h
-        Helpers/Graphics/Vulkan/Vulkan.c
-        Helpers/Graphics/Vulkan/Vulkan.h
-        Helpers/Graphics/Vulkan/VulkanInternal.c
-        Helpers/Graphics/Vulkan/VulkanInternal.h
-        Helpers/Graphics/Vulkan/VulkanHelpers.c
-        Helpers/Graphics/Vulkan/VulkanHelpers.h
-        Helpers/Graphics/Vulkan/VulkanResources.c
-        Helpers/Graphics/Vulkan/VulkanResources.h
-        Helpers/Graphics/Vulkan/VulkanActors.c
-        Helpers/Graphics/Vulkan/VulkanActors.h
-        Helpers/Graphics/Vulkan/VulkanPipelines.c
-        Helpers/Core/Physics/Navigation.c
-        Helpers/Core/Physics/Navigation.h
-        Helpers/Core/Physics/Physics.c
-        Helpers/Core/Physics/Physics.h
-        Helpers/TextInputSystem.c
-        Helpers/TextInputSystem.h
-        Actor/Core/Trigger.c
-        Actor/Core/Trigger.h
-        Actor/Core/IoProxy.c
-        Actor/Core/IoProxy.h
-        Actor/Physbox.c
-        Actor/Physbox.h
-        Actor/Laser.c
-        Actor/Laser.h
-        Helpers/Core/KVList.c
-        Helpers/Core/KVList.h
-        Actor/Core/StaticModel.c
-        Actor/Core/StaticModel.h
-        Actor/Core/SoundPlayer.c
-        Actor/Core/SoundPlayer.h
-        Actor/Core/Sprite.c
-        Actor/Core/Sprite.h
-        Actor/LaserEmitter.c
-        Actor/LaserEmitter.h
-        Helpers/Graphics/LodThread.c
-        Helpers/Graphics/LodThread.h
-        Actor/Core/LogicBinary.c
-        Actor/Core/LogicBinary.h
-        Helpers/Core/Arguments.c
-        Helpers/Core/Arguments.h
-        Actor/Core/LogicDecimal.c
-        Actor/Core/LogicDecimal.h
-        Actor/Core/LogicCounter.c
-        Actor/Core/LogicCounter.h
-        Helpers/Core/AssetLoaders/TextureLoader.c
-        Helpers/Core/AssetLoaders/TextureLoader.h
-        Helpers/Core/AssetLoaders/ModelLoader.c
-        Helpers/Core/AssetLoaders/ModelLoader.h
-        Helpers/Core/AssetLoaders/FontLoader.c
-        Helpers/Core/AssetLoaders/FontLoader.h
-        Helpers/Core/AssetLoaders/ShaderLoader.c
-        Helpers/Core/AssetLoaders/ShaderLoader.h
-        Helpers/Core/SoundSystem.c
-        Helpers/Core/SoundSystem.h
-        Debug/JoltDebugRenderer.c
-        Debug/JoltDebugRenderer.h
-        Helpers/Core/Physics/Player.c
-        Helpers/Core/Physics/Player.h
-        Structs/Color.h
-        Structs/Camera.h
-        Structs/Viewmodel.h
-        Helpers/Core/Dict.h
-        Structs/Asset.h
-        Structs/ActorDefinition.h
-        Structs/ActorDefinition.c
-        Structs/Param.h
-        Helpers/Core/Realloc.c
-        Helpers/Core/Realloc.h
-        Helpers/Discord.c
-        Helpers/Discord.h
-        Helpers/Core/AssetLoaders/GameConfigLoader.c
-        Helpers/Core/AssetLoaders/GameConfigLoader.h
-        Helpers/Core/Engine.c
-        Helpers/Core/Engine.h
+add_executable(game
+        $<$<BOOL:${WIN32}>:game/game.rc> # Add the Win32 resource file only on Windows
+
+        game/src/actor/Coin.c
+        game/include/actor/Coin.h
+        game/src/actor/Door.c
+        game/include/actor/Door.h
+        game/src/actor/Goal.c
+        game/include/actor/Goal.h
+        game/src/actor/Laser.c
+        game/include/actor/Laser.h
+        game/src/actor/LaserEmitter.c
+        game/include/actor/LaserEmitter.h
+        game/src/actor/Physbox.c
+        game/include/actor/Physbox.h
+        game/src/actor/TestActor.c
+        game/include/actor/TestActor.h
+
+        game/src/gameState/LevelSelectState/GLevelSelectState.c
+        game/include/gameState/LevelSelectState.h
+        game/src/gameState/LoadingState/GLoadingState.c
+        game/include/gameState/LoadingState.h
+        game/src/gameState/LogoSplashState/GLogoSplashState.c
+        game/include/gameState/LogoSplashState.h
+        game/src/gameState/MainState/GMainState.c
+        game/include/gameState/MainState.h
+        game/src/gameState/MenuState/GMenuState.c
+        game/include/gameState/MenuState.h
+        game/src/gameState/OptionsState/GOptionsState.c
+        game/include/gameState/OptionsState.h
+        game/src/gameState/OptionsState/InputOptionsState/GInputOptionsState.c
+        game/include/gameState/options/InputOptionsState.h
+        game/src/gameState/OptionsState/SoundOptionsState/GSoundOptionsState.c
+        game/include/gameState/options/SoundOptionsState.h
+        game/src/gameState/OptionsState/VideoOptionsState/GVideoOptionsState.c
+        game/include/gameState/options/VideoOptionsState.h
+        game/include/gameState/PauseState.h
+        game/src/gameState/PauseState/GPauseState.c
+
+        game/src/helpers/GameActorRegistration.c
+        game/include/helpers/GameActorRegistration.h
+
+        game/src/main.c
+        game/src/gameState/LevelSelectState/Render.c
+        game/src/gameState/LevelSelectState/Update.c
 )
-
-#endregion
-
-#region Libraries
-
-add_library(CrossPlatformLibraries INTERFACE)
-
-find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2_mixer REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-fetchDict()
-fetchPackage(https://github.com/NBT22/Luna v0.2.* Luna)
+target_link_libraries(game PRIVATE engine)
+target_include_directories(game PRIVATE game/include)
+set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'")
 if (x86_64)
-    fetchDiscordGameSDK()
-    add_compile_definitions(ENABLE_DISCORD_SDK)
-endif ()
-check_include_file("cglm/cglm.h" cglm_FOUND)
-if (NOT cglm_FOUND)
-    fetchPackage(https://github.com/recp/cglm.git v0.*.* cglm)
-else ()
-    add_library(cglm INTERFACE)
-endif ()
-
-if (JOLT_BUILD_DEBUG_RENDERER)
-    add_compile_definitions(JPH_DEBUG_RENDERER)
-endif ()
-if (JOLT_BUILD_ENABLE_ASSERTS)
-    add_compile_definitions(JPH_ENABLE_ASSERTS)
-endif ()
-if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(JPH_BUILD_TYPE RelWithDebInfo)
-endif ()
-FetchContent_Declare(
-        joltc
-        GIT_REPOSITORY https://github.com/NBT22/joltc
-        GIT_TAG main
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        EXCLUDE_FROM_ALL
-        SYSTEM
-)
-FetchContent_MakeAvailable(joltc)
-
-target_link_libraries(CrossPlatformLibraries INTERFACE
-        SDL2::SDL2
-        ${ZLIB_LIBRARIES} # ZLIB::ZLIB
-        SDL2_mixer::SDL2_mixer
-        Luna
-        ${OPENGL_LIBRARIES} # OpenGL::GL
-        ${GLEW_LIBRARIES} # GLEW::GLEW
-        joltc
-        cglm
-        dict
-)
-target_include_directories(CrossPlatformLibraries INTERFACE
-        ${ZLIB_INCLUDE_DIRS}
-        ${OPENGL_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIRS}
-)
-set_target_properties(CrossPlatformLibraries PROPERTIES LINKER_LANGUAGE CXX)
-
-if (UNIX)
-    target_link_libraries(game PRIVATE CrossPlatformLibraries m)
-    set_target_properties(game PROPERTIES LINK_FLAGS "-Wl,-rpath='$ORIGIN'")
-elseif (WIN32)
-    target_link_libraries(game PRIVATE CrossPlatformLibraries opengl32 dwmapi)
+    fetchDiscordGameSDK(engine)
+    target_compile_definitions(game PRIVATE ENABLE_DISCORD_SDK)
 endif ()
 
 #endregion
@@ -319,7 +85,7 @@ endif ()
 add_custom_target(
         copy_assets
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
 )
 
 add_dependencies(game copy_assets)

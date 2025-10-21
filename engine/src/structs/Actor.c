@@ -1,0 +1,157 @@
+//
+// Created by droc101 on 4/22/2024.
+//
+
+#include <engine/structs/Actor.h>
+#include <assert.h>
+#include <joltc/constants.h>
+#include <joltc/enums.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <engine/subsystem/Error.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/List.h>
+#include <engine/subsystem/Logging.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Level.h>
+#include <engine/structs/Param.h>
+
+Actor *CreateActor(Transform *transform, const char *actorType, KvList params, JPH_BodyInterface *bodyInterface)
+{
+	Actor *actor = malloc(sizeof(Actor));
+	CheckAlloc(actor);
+	actor->actorFlags = 0;
+	actor->bodyInterface = bodyInterface;
+	actor->bodyId = JPH_BodyId_InvalidBodyID;
+	actor->actorWall = NULL;
+	actor->health = 1;
+	actor->actorModel = NULL;
+	actor->currentSkinIndex = 0;
+	actor->currentLod = 0;
+	actor->modColor = COLOR_WHITE;
+	ListInit(actor->ioConnections, LIST_POINTER);
+	actor->extraData = NULL;
+	const ActorDefinition *definition = GetActorDefinition(actorType);
+	actor->definition = definition;
+	actor->definition->Init(actor, params, transform); // kindly allow the Actor to initialize itself
+	// ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
+	if (params)
+	{
+		KvListDestroy(params);
+	}
+	return actor;
+}
+
+void FreeActor(Actor *actor)
+{
+	actor->definition->Destroy(actor);
+	free(actor->actorWall);
+	actor->actorWall = NULL;
+	free(actor->extraData);
+	actor->extraData = NULL;
+	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
+	{
+		JPH_BodyInterface_RemoveAndDestroyBody(actor->bodyInterface, actor->bodyId);
+	}
+	for (size_t i = 0; i < actor->ioConnections.length; i++)
+	{
+		ActorConnection *connection = ListGetPointer(actor->ioConnections, i);
+		DestroyActorConnection(connection);
+	}
+	ListFree(actor->ioConnections);
+	free(actor);
+	actor = NULL;
+}
+
+void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param)
+{
+	LogInfo("Triggering input %d on actor %p from actor %p\n", input, receiver, sender);
+	const ActorInputHandlerFunction handler = GetActorInputHandler(sender->definition, input);
+	if (handler)
+	{
+		handler(receiver, sender, param);
+	} else
+	{
+		LogWarning("Could not send signal %s to actor %p because it has no handler!", input, receiver);
+	}
+}
+
+void ActorFireOutput(const Actor *sender, const char *output, const Param defaultParam)
+{
+	ListLock(sender->ioConnections);
+	for (size_t i = 0; i < sender->ioConnections.length; i++)
+	{
+		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
+		if (strcmp(connection->sourceActorOutput, output) == 0)
+		{
+			List actors;
+			GetActorsByName(connection->outActorName, GetState()->level, &actors);
+			if (actors.length == 0)
+			{
+				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->outActorName);
+				continue;
+			}
+			for (size_t j = 0; j < actors.length; j++)
+			{
+				Actor *actor = ListGetPointer(actors, j);
+				const Param *param = &defaultParam;
+				if (connection->outParamOverride.type != PARAM_TYPE_NONE)
+				{
+					param = &connection->outParamOverride;
+				}
+				ActorTriggerInput(sender, actor, connection->targetActorInput, param);
+			}
+			ListFree(actors);
+		}
+	}
+	ListUnlock(sender->ioConnections);
+}
+
+void DestroyActorConnection(ActorConnection *connection)
+{
+	free(connection->sourceActorOutput);
+	free(connection->targetActorInput);
+	free(connection);
+}
+void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
+
+void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	RemoveActor(this);
+}
+
+void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+
+void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+
+void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+
+void DefaultActorRenderUi(Actor * /*this*/) {}
+
+void DefaultActorDestroy(Actor * /*this*/) {}
+
+void ActorCreateEmptyBody(Actor *this, const Transform *transform)
+{
+	JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
+																						  transform,
+																						  JPH_MotionType_Static,
+																						  OBJECT_LAYER_STATIC,
+																						  this);
+	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
+													  bodyCreationSettings,
+													  JPH_Activation_DontActivate);
+	JPH_ShapeSettings_Destroy(shapeSettings);
+	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+}
