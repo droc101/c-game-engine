@@ -34,8 +34,7 @@
 
 static const float actorRaycastMaxDistance = 10.0f;
 static const float offset = 1.0f;
-/// The code for holding objects is heavily based on the implementation in Kill Spud Simulator/Hide and Seek
-/// This variable comes from there, and interestingly enough lower numbers seem to be "smoother"
+/// Lower values are smoother
 static const float smoothFactor = 17.5f;
 static const float heldActorMaxDistanceSquared = 6.0f;
 
