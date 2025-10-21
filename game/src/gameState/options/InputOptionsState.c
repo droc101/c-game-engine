@@ -3,30 +3,30 @@
 //
 
 #include "gameState/options/InputOptionsState.h"
-#include <SDL_scancode.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <engine/subsystem/Input.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <engine/structs/Vector2.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "gameState/OptionsState.h"
 
 UiStack *inputOptionsStack = NULL;
 
 void BtnInputOptionsBack()
 {
-	GOptionsStateSet(optionsStateInGame);
+	OptionsStateSet(optionsStateInGame);
 }
 
-void GInputOptionsStateUpdate(GlobalState * /*State*/)
+void InputOptionsStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
 	{
@@ -65,7 +65,7 @@ void CbOptionsSwapOkCancel(const bool value)
 	GetState()->options.controllerSwapOkCancel = value;
 }
 
-void GInputOptionsStateRender(GlobalState * /*state*/)
+void InputOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{
@@ -122,7 +122,7 @@ void GInputOptionsStateRender(GlobalState * /*state*/)
 	}
 }
 
-void GInputOptionsStateSet()
+void InputOptionsStateSet()
 {
 	if (inputOptionsStack == NULL)
 	{
@@ -195,14 +195,14 @@ void GInputOptionsStateSet()
 	}
 	UiStackResetFocus(inputOptionsStack);
 
-	SetStateCallbacks(GInputOptionsStateUpdate,
+	SetStateCallbacks(InputOptionsStateUpdate,
 					  NULL,
 					  GAME_STATE_INPUT_OPTIONS,
-					  GInputOptionsStateRender,
+					  InputOptionsStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GInputOptionsStateDestroy()
+void InputOptionsStateDestroy()
 {
 	if (inputOptionsStack != NULL)
 	{

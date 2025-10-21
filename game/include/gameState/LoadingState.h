@@ -11,6 +11,6 @@
  * Change to the level loading state
  * @param levelName The name of the level to load
  */
-void GLoadingStateSet(const char *levelName);
+void LoadingStateSet(const char *levelName);
 
 #endif //LOADINGSTATE_H

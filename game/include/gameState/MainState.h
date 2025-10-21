@@ -7,6 +7,6 @@
 
 #define GAME_STATE_MAIN 7
 
-void GMainStateSet();
+void MainStateSet();
 
 #endif //MAINSTATE_H

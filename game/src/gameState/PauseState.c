@@ -27,19 +27,19 @@
 
 UiStack *pauseStack = NULL;
 
-void GPauseStateUpdate(GlobalState * /*State*/)
+void PauseStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(CONTROLLER_CANCEL) ||
 		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
 		(void)PlaySoundEffect(SOUND("sfx/popdown"), 0, 1, NULL, NULL);
-		GMainStateSet();
+		MainStateSet();
 	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GPauseStateRender(GlobalState * /*state*/)
+void PauseStateRender(GlobalState * /*state*/)
 {
 	RenderInGameMenuBackground();
 
@@ -57,24 +57,24 @@ void GPauseStateRender(GlobalState * /*state*/)
 
 void BtnPauseResume()
 {
-	GMainStateSet();
+	MainStateSet();
 }
 
 void BtnOptions()
 {
-	GOptionsStateSet(true);
+	OptionsStateSet(true);
 }
 
 void BtnPauseExit()
 {
 #ifdef USE_LEVEL_SELECT
-	GLevelSelectStateSet();
+	LevelSelectStateSet();
 #else
-	GMenuStateSet();
+	MenuStateSet();
 #endif
 }
 
-void GPauseStateSet()
+void PauseStateSet()
 {
 	GetState()->rpcState = PAUSED;
 	if (pauseStack == NULL)
@@ -87,14 +87,14 @@ void GPauseStateSet()
 	}
 	UiStackResetFocus(pauseStack);
 
-	SetStateCallbacks(GPauseStateUpdate,
+	SetStateCallbacks(PauseStateUpdate,
 					  NULL,
 					  GAME_STATE_PAUSE,
-					  GPauseStateRender,
+					  PauseStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GPauseStateDestroy()
+void PauseStateDestroy()
 {
 	if (pauseStack != NULL)
 	{

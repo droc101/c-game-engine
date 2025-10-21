@@ -32,9 +32,9 @@ bool fadeIn = false;
 void StartGame()
 {
 #ifdef USE_LEVEL_SELECT
-	GLevelSelectStateSet();
+	LevelSelectStateSet();
 #else
-	GMainStateSet();
+	MainStateSet();
 #endif
 }
 
@@ -45,12 +45,12 @@ void QuitGame()
 
 void OpenOptions()
 {
-	GOptionsStateSet(false);
+	OptionsStateSet(false);
 }
 
-void GMenuStateUpdate(GlobalState * /*State*/) {}
+void MenuStateUpdate(GlobalState * /*state*/) {}
 
-void GMenuStateRender(GlobalState *State)
+void MenuStateRender(GlobalState *state)
 {
 	RenderMenuBackground();
 
@@ -92,7 +92,7 @@ void GMenuStateRender(GlobalState *State)
 
 	if (fadeIn)
 	{
-		const float alpha = 1.0f - ((float)(State->physicsFrame) / 20.0f);
+		const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
 		Color color = COLOR_BLACK;
 		color.a = alpha;
 		DrawRect(0, 0, WindowWidth(), WindowHeight(), color);
@@ -104,13 +104,13 @@ void GMenuStateRender(GlobalState *State)
 	}
 }
 
-void GMenuStateSetWithFade()
+void MenuStateSetWithFade()
 {
-	GMenuStateSet();
+	MenuStateSet();
 	fadeIn = true;
 }
 
-void GMenuStateSet()
+void MenuStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
 	fadeIn = false;
@@ -130,14 +130,14 @@ void GMenuStateSet()
 	UiStackResetFocus(menuStack);
 	StopMusic();
 
-	SetStateCallbacks(GMenuStateUpdate,
+	SetStateCallbacks(MenuStateUpdate,
 					  NULL,
 					  GAME_STATE_MENU,
-					  GMenuStateRender,
+					  MenuStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GMenuStateDestroy()
+void MenuStateDestroy()
 {
 	if (menuStack != NULL)
 	{

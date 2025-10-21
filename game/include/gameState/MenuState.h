@@ -10,10 +10,10 @@
 // Shows a level select after main menu and pause exit course.
 #define USE_LEVEL_SELECT
 
-void GMenuStateSetWithFade();
+void MenuStateSetWithFade();
 
-void GMenuStateSet();
+void MenuStateSet();
 
-void GMenuStateDestroy();
+void MenuStateDestroy();
 
 #endif //MENUSTATE_H

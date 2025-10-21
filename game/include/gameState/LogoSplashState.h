@@ -7,6 +7,6 @@
 
 #define GAME_STATE_LOGO_SPLASH 6
 
-void GLogoSplashStateSet();
+void LogoSplashStateSet();
 
 #endif //LOGOSPLASHSTATE_H

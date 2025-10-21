@@ -31,15 +31,15 @@ void SetInitialGameState(const int argc, const char *argv[])
 	}
 	if (loadMap)
 	{
-		GMainStateSet();
+		MainStateSet();
 	} else
 	{
 		if (!HasCliArg(argc, argv, "--nosplash"))
 		{
-			GLogoSplashStateSet();
+			LogoSplashStateSet();
 		} else
 		{
-			GMenuStateSet();
+			MenuStateSet();
 		}
 	}
 }
@@ -55,13 +55,13 @@ int main(const int argc, const char *argv[])
 		EngineIteration();
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
-	GInputOptionsStateDestroy();
-	GSoundOptionsStateDestroy();
-	GVideoOptionsStateDestroy();
-	GLevelSelectStateDestroy();
-	GMenuStateDestroy();
-	GOptionsStateDestroy();
-	GPauseStateDestroy();
+	InputOptionsStateDestroy();
+	SoundOptionsStateDestroy();
+	VideoOptionsStateDestroy();
+	LevelSelectStateDestroy();
+	MenuStateDestroy();
+	OptionsStateDestroy();
+	PauseStateDestroy();
 	LaserRaycastFiltersDestroy();
 	DestroyEngine();
 	return 0;

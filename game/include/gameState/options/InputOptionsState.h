@@ -7,8 +7,8 @@
 
 #define GAME_STATE_INPUT_OPTIONS 1
 
-void GInputOptionsStateSet();
+void InputOptionsStateSet();
 
-void GInputOptionsStateDestroy();
+void InputOptionsStateDestroy();
 
 #endif //INPUTOPTIONSSTATE_H

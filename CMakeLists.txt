@@ -42,33 +42,31 @@ add_executable(game
         game/src/actor/TestActor.c
         game/include/actor/TestActor.h
 
-        game/src/gameState/LevelSelectState/GLevelSelectState.c
+        game/src/gameState/LevelSelectState.c
         game/include/gameState/LevelSelectState.h
-        game/src/gameState/LoadingState/GLoadingState.c
+        game/src/gameState/LoadingState.c
         game/include/gameState/LoadingState.h
-        game/src/gameState/LogoSplashState/GLogoSplashState.c
+        game/src/gameState/LogoSplashState.c
         game/include/gameState/LogoSplashState.h
-        game/src/gameState/MainState/GMainState.c
+        game/src/gameState/MainState.c
         game/include/gameState/MainState.h
-        game/src/gameState/MenuState/GMenuState.c
+        game/src/gameState/MenuState.c
         game/include/gameState/MenuState.h
-        game/src/gameState/OptionsState/GOptionsState.c
+        game/src/gameState/OptionsState.c
         game/include/gameState/OptionsState.h
-        game/src/gameState/OptionsState/InputOptionsState/GInputOptionsState.c
+        game/src/gameState/options/InputOptionsState.c
         game/include/gameState/options/InputOptionsState.h
-        game/src/gameState/OptionsState/SoundOptionsState/GSoundOptionsState.c
+        game/src/gameState/options/SoundOptionsState.c
         game/include/gameState/options/SoundOptionsState.h
-        game/src/gameState/OptionsState/VideoOptionsState/GVideoOptionsState.c
+        game/src/gameState/options/VideoOptionsState.c
         game/include/gameState/options/VideoOptionsState.h
+        game/src/gameState/PauseState.c
         game/include/gameState/PauseState.h
-        game/src/gameState/PauseState/GPauseState.c
 
         game/src/helpers/GameActorRegistration.c
         game/include/helpers/GameActorRegistration.h
 
         game/src/main.c
-        game/src/gameState/LevelSelectState/Render.c
-        game/src/gameState/LevelSelectState/Update.c
 )
 target_link_libraries(game PRIVATE engine)
 target_include_directories(game PRIVATE game/include)

@@ -24,7 +24,7 @@ char loadStateLevelname[32];
 uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
 
-void GLoadingStateUpdate(GlobalState * /*state*/)
+void LoadingStateUpdate(GlobalState * /*state*/)
 {
 	if (!loadStateLoadedLevel)
 	{
@@ -42,11 +42,11 @@ void GLoadingStateUpdate(GlobalState * /*state*/)
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
 	if (loadTime > LEVEL_LOAD_MIN_TIME_MS)
 	{
-		GMainStateSet();
+		MainStateSet();
 	}
 }
 
-void GLoadingStateRender(GlobalState * /*state*/)
+void LoadingStateRender(GlobalState * /*state*/)
 {
 	DrawTextAligned("LOADING",
 					16,
@@ -58,11 +58,11 @@ void GLoadingStateRender(GlobalState * /*state*/)
 					smallFont);
 }
 
-void GLoadingStateSet(const char *levelName)
+void LoadingStateSet(const char *levelName)
 {
 	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
 	strncpy(loadStateLevelname, levelName, 31);
 	StopMusic();
-	SetStateCallbacks(GLoadingStateUpdate, NULL, GAME_STATE_LOADING, GLoadingStateRender, SDL_FALSE);
+	SetStateCallbacks(LoadingStateUpdate, NULL, GAME_STATE_LOADING, LoadingStateRender, SDL_FALSE);
 }

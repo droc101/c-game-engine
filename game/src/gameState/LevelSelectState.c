@@ -30,11 +30,11 @@
 int selectedLevel = 0;
 List levelList;
 
-void GLevelSelectStateUpdate(GlobalState * /*State*/)
+void LevelSelectStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
 	{
-		GMenuStateSet();
+		MenuStateSet();
 	}
 	if (levelList.length > 1)
 	{
@@ -52,11 +52,11 @@ void GLevelSelectStateUpdate(GlobalState * /*State*/)
 	{
 		ConsumeKey(SDL_SCANCODE_SPACE);
 		ConsumeButton(CONTROLLER_OK);
-		GLoadingStateSet(ListGetPointer(levelList, selectedLevel));
+		LoadingStateSet(ListGetPointer(levelList, selectedLevel));
 	}
 }
 
-void GLevelSelectStateRender(GlobalState * /*State*/)
+void LevelSelectStateRender(GlobalState * /*state*/)
 {
 	RenderMenuBackground();
 
@@ -116,7 +116,7 @@ void LoadLevelList()
 	closedir(dir);
 }
 
-void GLevelSelectStateSet()
+void LevelSelectStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
 	if (levelList.length == 0)
@@ -124,14 +124,14 @@ void GLevelSelectStateSet()
 		LoadLevelList();
 	}
 	StopMusic();
-	SetStateCallbacks(GLevelSelectStateUpdate,
+	SetStateCallbacks(LevelSelectStateUpdate,
 					  NULL,
 					  GAME_STATE_LEVEL_SELECT,
-					  GLevelSelectStateRender,
+					  LevelSelectStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GLevelSelectStateDestroy()
+void LevelSelectStateDestroy()
 {
 	ListFreeOnlyContents(levelList);
 }

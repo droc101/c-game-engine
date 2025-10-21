@@ -39,7 +39,7 @@ void BtnVideoOptionsBack()
 					   "Yes",
 					   "No");
 	}
-	GOptionsStateSet(optionsStateInGame);
+	OptionsStateSet(optionsStateInGame);
 }
 
 char *SliderLabelMSAA(const Control *slider)
@@ -118,7 +118,7 @@ void SldOptionsFov(const float value)
 	GetState()->camera->fov = GetState()->options.fov;
 }
 
-void GVideoOptionsStateUpdate(GlobalState * /*State*/)
+void VideoOptionsStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
 	{
@@ -126,7 +126,7 @@ void GVideoOptionsStateUpdate(GlobalState * /*State*/)
 	}
 }
 
-void GVideoOptionsStateRender(GlobalState * /*state*/)
+void VideoOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{
@@ -149,7 +149,7 @@ void GVideoOptionsStateRender(GlobalState * /*state*/)
 	DrawUiStack(videoOptionsStack);
 }
 
-void GVideoOptionsStateSet()
+void VideoOptionsStateSet()
 {
 	if (videoOptionsStack == NULL)
 	{
@@ -269,14 +269,14 @@ void GVideoOptionsStateSet()
 	UiStackResetFocus(videoOptionsStack);
 	hasChangedVideoOptions = false;
 
-	SetStateCallbacks(GVideoOptionsStateUpdate,
+	SetStateCallbacks(VideoOptionsStateUpdate,
 					  NULL,
 					  GAME_STATE_VIDEO_OPTIONS,
-					  GVideoOptionsStateRender,
+					  VideoOptionsStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GVideoOptionsStateDestroy()
+void VideoOptionsStateDestroy()
 {
 	if (videoOptionsStack != NULL)
 	{

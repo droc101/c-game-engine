@@ -3,27 +3,27 @@
 //
 
 #include "gameState/options/SoundOptionsState.h"
-#include <SDL_scancode.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Input.h>
+#include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <engine/structs/Vector2.h>
+#include <SDL_scancode.h>
+#include <stddef.h>
+#include <stdint.h>
 #include "gameState/OptionsState.h"
 
 UiStack *soundOptionsStack = NULL;
 
 void BtnSoundOptionsBack()
 {
-	GOptionsStateSet(optionsStateInGame);
+	OptionsStateSet(optionsStateInGame);
 }
 
 void SldOptionsMasterVolume(const float value)
@@ -44,7 +44,7 @@ void SldOptionsSfxVolume(const float value)
 	UpdateVolume();
 }
 
-void GSoundOptionsStateUpdate(GlobalState * /*State*/)
+void SoundOptionsStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
 	{
@@ -52,7 +52,7 @@ void GSoundOptionsStateUpdate(GlobalState * /*State*/)
 	}
 }
 
-void GSoundOptionsStateRender(GlobalState * /*state*/)
+void SoundOptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{
@@ -75,7 +75,7 @@ void GSoundOptionsStateRender(GlobalState * /*state*/)
 	DrawUiStack(soundOptionsStack);
 }
 
-void GSoundOptionsStateSet()
+void SoundOptionsStateSet()
 {
 	if (soundOptionsStack == NULL)
 	{
@@ -128,14 +128,14 @@ void GSoundOptionsStateSet()
 	}
 	UiStackResetFocus(soundOptionsStack);
 
-	SetStateCallbacks(GSoundOptionsStateUpdate,
+	SetStateCallbacks(SoundOptionsStateUpdate,
 					  NULL,
 					  GAME_STATE_SOUND_OPTIONS,
-					  GSoundOptionsStateRender,
+					  SoundOptionsStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GSoundOptionsStateDestroy()
+void SoundOptionsStateDestroy()
 {
 	if (soundOptionsStack != NULL)
 	{

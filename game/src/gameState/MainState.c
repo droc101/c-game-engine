@@ -61,12 +61,12 @@ static inline void RotateCamera(const Vector2 cameraMotion)
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GMainStateUpdate(GlobalState *state)
+void MainStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
 	{
 		(void)PlaySoundEffect(SOUND("sfx/popup"), 0, 1, NULL, NULL);
-		GPauseStateSet();
+		PauseStateSet();
 		return;
 	}
 
@@ -94,7 +94,7 @@ void GMainStateUpdate(GlobalState *state)
 	}
 }
 
-void GMainStateFixedUpdate(GlobalState *state, const double delta)
+void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
 	float distanceTraveled = 0;
 	MovePlayer(&state->level->player, &distanceTraveled);
@@ -175,7 +175,7 @@ void GMainStateFixedUpdate(GlobalState *state, const double delta)
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GMainStateRender(GlobalState *state)
+void MainStateRender(GlobalState *state)
 {
 	// warp the mouse to the center of the screen
 	const Vector2 realWndSize = ActualWindowSize();
@@ -192,7 +192,7 @@ void GMainStateRender(GlobalState *state)
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);
 }
 
-void GMainStateSet()
+void MainStateSet()
 {
 	GetState()->rpcState = IN_GAME;
 	if (!lodThreadInitDone)
@@ -200,5 +200,5 @@ void GMainStateSet()
 		LodThreadInit();
 		lodThreadInitDone = true;
 	}
-	SetStateCallbacks(GMainStateUpdate, GMainStateFixedUpdate, GAME_STATE_MAIN, GMainStateRender, SDL_TRUE);
+	SetStateCallbacks(MainStateUpdate, MainStateFixedUpdate, GAME_STATE_MAIN, MainStateRender, SDL_TRUE);
 }

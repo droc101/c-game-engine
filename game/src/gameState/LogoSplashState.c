@@ -17,21 +17,21 @@
 #include <engine/structs/Vector2.h>
 #include "gameState/MenuState.h"
 
-void GLogoSplashStateFixedUpdate(GlobalState *State, double /*delta*/)
+void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 {
-	if (State->physicsFrame == 20)
+	if (state->physicsFrame == 20)
 	{
 		(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
 	}
 
-	if (State->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))
+	if (state->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))
 	{
-		GMenuStateSetWithFade();
+		MenuStateSetWithFade();
 	}
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-void GLogoSplashStateRender(GlobalState *State)
+void LogoSplashStateRender(GlobalState *State)
 {
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)
 	{
@@ -58,11 +58,11 @@ void GLogoSplashStateRender(GlobalState *State)
 				   &color);
 }
 
-void GLogoSplashStateSet()
+void LogoSplashStateSet()
 {
 	SetStateCallbacks(NULL,
-					  GLogoSplashStateFixedUpdate,
+					  LogoSplashStateFixedUpdate,
 					  GAME_STATE_LOGO_SPLASH,
-					  GLogoSplashStateRender,
+					  LogoSplashStateRender,
 					  SDL_FALSE); // Non-fixed is not needed for this state
 }

@@ -3,23 +3,23 @@
 //
 
 #include "gameState/OptionsState.h"
-#include <SDL_scancode.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <engine/subsystem/Input.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <engine/structs/Vector2.h>
+#include <SDL_scancode.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "gameState/MenuState.h"
-#include "gameState/PauseState.h"
 #include "gameState/options/InputOptionsState.h"
 #include "gameState/options/SoundOptionsState.h"
 #include "gameState/options/VideoOptionsState.h"
+#include "gameState/PauseState.h"
 
 UiStack *optionsStack = NULL;
 bool optionsStateInGame = false;
@@ -28,14 +28,14 @@ void BtnOptionsBack()
 {
 	if (optionsStateInGame)
 	{
-		GPauseStateSet();
+		PauseStateSet();
 	} else
 	{
-		GMenuStateSet();
+		MenuStateSet();
 	}
 }
 
-void GOptionsStateUpdate(GlobalState * /*state*/)
+void OptionsStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
 	{
@@ -43,7 +43,7 @@ void GOptionsStateUpdate(GlobalState * /*state*/)
 	}
 }
 
-void GOptionsStateRender(GlobalState * /*state*/)
+void OptionsStateRender(GlobalState * /*state*/)
 {
 	if (optionsStateInGame)
 	{
@@ -66,7 +66,7 @@ void GOptionsStateRender(GlobalState * /*state*/)
 	DrawUiStack(optionsStack);
 }
 
-void GOptionsStateSet(const bool inGame)
+void OptionsStateSet(const bool inGame)
 {
 	optionsStateInGame = inGame;
 	if (optionsStack == NULL)
@@ -76,27 +76,27 @@ void GOptionsStateSet(const bool inGame)
 		const float opSpacing = 45;
 
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Video Options", GVideoOptionsStateSet, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Video Options", VideoOptionsStateSet, TOP_CENTER));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Sound Options", GSoundOptionsStateSet, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Sound Options", SoundOptionsStateSet, TOP_CENTER));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", GInputOptionsStateSet, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", InputOptionsStateSet, TOP_CENTER));
 		opY += opSpacing;
 
 		UiStackPush(optionsStack, CreateButtonControl(v2(0, -40), v2(480, 40), "Done", BtnOptionsBack, BOTTOM_CENTER));
 	}
 	UiStackResetFocus(optionsStack);
 
-	SetStateCallbacks(GOptionsStateUpdate,
+	SetStateCallbacks(OptionsStateUpdate,
 					  NULL,
 					  GAME_STATE_OPTIONS,
-					  GOptionsStateRender,
+					  OptionsStateRender,
 					  SDL_FALSE); // Fixed update is not needed for this state
 }
 
-void GOptionsStateDestroy()
+void OptionsStateDestroy()
 {
 	if (optionsStack != NULL)
 	{

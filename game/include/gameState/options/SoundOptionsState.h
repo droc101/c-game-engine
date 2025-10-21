@@ -7,8 +7,8 @@
 
 #define GAME_STATE_SOUND_OPTIONS 2
 
-void GSoundOptionsStateSet();
+void SoundOptionsStateSet();
 
-void GSoundOptionsStateDestroy();
+void SoundOptionsStateDestroy();
 
 #endif //SOUNDOPTIONSSTATE_H

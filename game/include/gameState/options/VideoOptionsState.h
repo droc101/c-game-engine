@@ -7,8 +7,8 @@
 
 #define GAME_STATE_VIDEO_OPTIONS 3
 
-void GVideoOptionsStateSet();
+void VideoOptionsStateSet();
 
-void GVideoOptionsStateDestroy();
+void VideoOptionsStateDestroy();
 
 #endif //VIDEOOPTIONSSTATE_H

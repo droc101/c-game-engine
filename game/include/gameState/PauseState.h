@@ -7,8 +7,8 @@
 
 #define GAME_STATE_PAUSE 10
 
-void GPauseStateSet();
+void PauseStateSet();
 
-void GPauseStateDestroy();
+void PauseStateDestroy();
 
 #endif //PAUSESTATE_H

@@ -7,8 +7,8 @@
 
 #define GAME_STATE_LEVEL_SELECT 4
 
-void GLevelSelectStateSet();
+void LevelSelectStateSet();
 
-void GLevelSelectStateDestroy();
+void LevelSelectStateDestroy();
 
 #endif //LEVELSELECTSTATE_H
