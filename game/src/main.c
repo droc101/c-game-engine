@@ -1,10 +1,10 @@
 #include <engine/Engine.h>
+#include <engine/helpers/Arguments.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "actor/Laser.h"
-#include "engine/helpers/Arguments.h"
-#include "engine/structs/GlobalState.h"
 #include "gameState/LevelSelectState.h"
 #include "gameState/LogoSplashState.h"
 #include "gameState/MainState.h"
@@ -44,6 +44,18 @@ void SetInitialGameState(const int argc, const char *argv[])
 	}
 }
 
+void DestroyGame()
+{
+	InputOptionsStateDestroy();
+	SoundOptionsStateDestroy();
+	VideoOptionsStateDestroy();
+	LevelSelectStateDestroy();
+	MenuStateDestroy();
+	OptionsStateDestroy();
+	PauseStateDestroy();
+	LaserRaycastFiltersDestroy();
+}
+
 int main(const int argc, const char *argv[])
 {
 	InitEngine(argc, argv, RegisterGameActors);
@@ -55,27 +67,7 @@ int main(const int argc, const char *argv[])
 		EngineIteration();
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
-	InputOptionsStateDestroy();
-	SoundOptionsStateDestroy();
-	VideoOptionsStateDestroy();
-	LevelSelectStateDestroy();
-	MenuStateDestroy();
-	OptionsStateDestroy();
-	PauseStateDestroy();
-	LaserRaycastFiltersDestroy();
+	DestroyGame();
 	DestroyEngine();
 	return 0;
 }
-
-#ifdef WIN32
-/// Make this symbol exported (in the symbol table)
-#define EXPORT_SYM __declspec(dllexport)
-#else
-/// Make this symbol exported (in the symbol table)
-#define EXPORT_SYM __attribute__((visibility("default")))
-#endif
-
-// Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems
-// I do not know if these do anything on Linux, but they are here just in case.
-EXPORT_SYM uint32_t NvOptimusEnablement = 0x00000001;
-EXPORT_SYM int AmdPowerXpressRequestHighPerformance = 1;

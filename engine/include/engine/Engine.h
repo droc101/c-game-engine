@@ -19,6 +19,14 @@
 #define ENGINE_VERSION \
 	TO_STR(ENGINE_VERSION_MAJOR) "." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX
 
+#ifdef WIN32
+/// Make this symbol exported (in the symbol table)
+#define EXPORT_SYM __declspec(dllexport)
+#else
+/// Make this symbol exported (in the symbol table)
+#define EXPORT_SYM __attribute__((visibility("default")))
+#endif
+
 /**
  * Initialize the engine
  * @param argc Argument count
