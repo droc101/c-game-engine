@@ -391,10 +391,10 @@ void RenderMenuBackground()
 	const Vector2 bgTileSize = v2(320, 240); // size on screen
 	const Vector2 bgTexSize = GetTextureSize(TEXTURE("interface/menu_bg_tile")); // actual size of the texture
 
-	const Vector2 tilesOnScreen = v2(WindowWidthFloat() / bgTileSize.x, WindowHeightFloat() / bgTileSize.y);
+	const Vector2 tilesOnScreen = v2(ScaledWindowWidthFloat() / bgTileSize.x, ScaledWindowHeightFloat() / bgTileSize.y);
 	const Vector2 tileRegion = v2(tilesOnScreen.x * bgTexSize.x, tilesOnScreen.y * bgTexSize.y);
 	DrawTextureRegion(v2(0, 0),
-					  v2(WindowWidthFloat(), WindowHeightFloat()),
+					  v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
 					  TEXTURE("interface/menu_bg_tile"),
 					  v2(0, 0),
 					  tileRegion);
@@ -405,31 +405,31 @@ void RenderInGameMenuBackground()
 	const GlobalState *state = GetState();
 	RenderLevel(state->level, state->camera);
 	RenderHUD();
-	DrawRect(0, 0, WindowWidth(), WindowHeight(), COLOR(0xA0000000));
+	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0xA0000000));
 }
 
 void RenderHUD()
 {
 	const GlobalState *state = GetState();
-	Vector2 coinIconPos = v2(WindowWidth() - 260, 16);
+	Vector2 coinIconPos = v2(ScaledWindowWidth() - 260, 16);
 	const Vector2 coinIconSize = v2s(40);
-	DrawTexture(v2(WindowWidthFloat() - 260, 16), coinIconSize, TEXTURE("interface/hud_ycoin"));
+	DrawTexture(v2(ScaledWindowWidthFloat() - 260, 16), coinIconSize, TEXTURE("interface/hud_ycoin"));
 
 	char coinStr[16];
 	sprintf(coinStr, "%d", state->saveData->coins);
-	FontDrawString(v2(WindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, largeFont);
+	FontDrawString(v2(ScaledWindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, largeFont);
 
 	coinIconPos.y = 64;
 
 	for (int blueCoinIndex = 0; blueCoinIndex < state->saveData->blueCoins; blueCoinIndex++)
 	{
-		coinIconPos.x = (float)WindowWidth() - 260 + (float)blueCoinIndex * 48;
+		coinIconPos.x = (float)ScaledWindowWidth() - 260 + (float)blueCoinIndex * 48;
 		DrawTexture(coinIconPos, coinIconSize, TEXTURE("interface/hud_bcoin"));
 	}
 
 	const Color *crosshairColor = GetCrosshairColor();
 
-	DrawTextureMod(v2((WindowWidth() * 0.5) - 12, (WindowHeight() * 0.5) - 12),
+	DrawTextureMod(v2((ScaledWindowWidth() * 0.5) - 12, (ScaledWindowHeight() * 0.5) - 12),
 				   v2s(24),
 				   TEXTURE("interface/crosshair"),
 				   crosshairColor);

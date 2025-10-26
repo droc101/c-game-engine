@@ -2,6 +2,7 @@
 // Created by droc101 on 4/22/2024.
 //
 
+#include "gameState/MenuState.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/Engine.h>
@@ -19,7 +20,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "gameState/LevelSelectState.h"
-#include "gameState/MenuState.h"
 #include "gameState/OptionsState.h"
 
 #ifndef USE_LEVEL_SELECT
@@ -57,7 +57,7 @@ void MenuStateRender(GlobalState *state)
 	// draw the logo
 	Vector2 logoPosition;
 	Vector2 logoSize;
-	logoPosition.x = ((float)WindowWidth() - 480) / 2;
+	logoPosition.x = ((float)ScaledWindowWidth() - 480) / 2;
 	logoPosition.y = 32;
 	logoSize.x = 480;
 	logoSize.y = 320;
@@ -73,7 +73,7 @@ void MenuStateRender(GlobalState *state)
 	DrawTextAligned(buffer,
 					16,
 					COLOR_BLACK,
-					v2(WindowWidthFloat() - 208, WindowHeightFloat() - 208),
+					v2(ScaledWindowWidthFloat() - 208, ScaledWindowHeightFloat() - 208),
 					v2(200, 200),
 					FONT_HALIGN_RIGHT,
 					FONT_VALIGN_BOTTOM,
@@ -81,7 +81,7 @@ void MenuStateRender(GlobalState *state)
 	DrawTextAligned(buffer,
 					16,
 					COLOR(0xFFa0a0a0),
-					v2(WindowWidthFloat() - 210, WindowHeightFloat() - 210),
+					v2(ScaledWindowWidthFloat() - 210, ScaledWindowHeightFloat() - 210),
 					v2(200, 200),
 					FONT_HALIGN_RIGHT,
 					FONT_VALIGN_BOTTOM,
@@ -95,7 +95,7 @@ void MenuStateRender(GlobalState *state)
 		const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
 		Color color = COLOR_BLACK;
 		color.a = alpha;
-		DrawRect(0, 0, WindowWidth(), WindowHeight(), color);
+		DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), color);
 
 		if (GetState()->physicsFrame >= 20)
 		{

@@ -2,6 +2,13 @@
 // Created by droc101 on 10/7/2024.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>
@@ -10,13 +17,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Input.h>
-#include <engine/structs/List.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/Vector2.h>
 
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/CheckBox.h>
@@ -279,32 +279,33 @@ Vector2 CalculateControlPosition(const Control *control)
 			pos = v2(0, 0);
 			break;
 		case TOP_CENTER:
-			pos.x = (WindowWidthFloat() - control->size.x) / 2;
+			pos.x = (ScaledWindowWidthFloat() - control->size.x) / 2;
 			pos.y = 0;
 			break;
 		case TOP_RIGHT:
-			pos.x = WindowWidthFloat() - control->size.x;
+			pos.x = ScaledWindowWidthFloat() - control->size.x;
 			pos.y = 0;
 			break;
 		case MIDDLE_LEFT:
-			pos.y = (WindowHeightFloat() - control->size.y) / 2;
+			pos.y = (ScaledWindowHeightFloat() - control->size.y) / 2;
 			pos.x = 0;
 			break;
 		case MIDDLE_CENTER:
-			pos = v2((WindowWidthFloat() - control->size.x) / 2, (WindowHeightFloat() - control->size.y) / 2);
+			pos = v2((ScaledWindowWidthFloat() - control->size.x) / 2,
+					 (ScaledWindowHeightFloat() - control->size.y) / 2);
 			break;
 		case MIDDLE_RIGHT:
-			pos = v2(WindowWidthFloat() - control->size.x, (WindowHeightFloat() - control->size.y) / 2);
+			pos = v2(ScaledWindowWidthFloat() - control->size.x, (ScaledWindowHeightFloat() - control->size.y) / 2);
 			break;
 		case BOTTOM_LEFT:
-			pos.y = WindowHeightFloat() - control->size.y;
+			pos.y = ScaledWindowHeightFloat() - control->size.y;
 			pos.x = 0;
 			break;
 		case BOTTOM_CENTER:
-			pos = v2((WindowWidthFloat() - control->size.x) / 2, WindowHeightFloat() - control->size.y);
+			pos = v2((ScaledWindowWidthFloat() - control->size.x) / 2, ScaledWindowHeightFloat() - control->size.y);
 			break;
 		case BOTTOM_RIGHT:
-			pos = v2(WindowWidthFloat() - control->size.x, WindowHeightFloat() - control->size.y);
+			pos = v2(ScaledWindowWidthFloat() - control->size.x, ScaledWindowHeightFloat() - control->size.y);
 			break;
 	}
 

@@ -67,7 +67,7 @@ static void TestActorRenderUi(Actor *this)
 					16,
 					COLOR_BLACK,
 					v2s(22),
-					v2(WindowWidth() - 40, WindowHeight() - 40),
+					v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_BOTTOM,
 					smallFont);
@@ -75,7 +75,7 @@ static void TestActorRenderUi(Actor *this)
 					16,
 					COLOR_WHITE,
 					v2s(20),
-					v2(WindowWidth() - 40, WindowHeight() - 40),
+					v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_BOTTOM,
 					smallFont);
@@ -85,7 +85,7 @@ static void TestActorRenderUi(Actor *this)
 						16,
 						COLOR_BLACK,
 						v2(22, 102),
-						v2(WindowWidth() - 40, WindowHeight() - 40),
+						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
 						smallFont);
@@ -93,7 +93,7 @@ static void TestActorRenderUi(Actor *this)
 						16,
 						COLOR_WHITE,
 						v2(20, 100),
-						v2(WindowWidth() - 40, WindowHeight() - 40),
+						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
 						smallFont);

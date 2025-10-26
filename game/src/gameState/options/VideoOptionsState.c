@@ -3,6 +3,20 @@
 //
 
 #include "gameState/options/VideoOptionsState.h"
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
+#include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/controls/CheckBox.h>
+#include <engine/uiStack/controls/RadioButton.h>
+#include <engine/uiStack/controls/Slider.h>
+#include <engine/uiStack/UiStack.h>
 #include <SDL_scancode.h>
 #include <SDL_video.h>
 #include <stdbool.h>
@@ -10,20 +24,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Input.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Options.h>
-#include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/CheckBox.h>
-#include <engine/uiStack/controls/RadioButton.h>
-#include <engine/uiStack/controls/Slider.h>
-#include <engine/uiStack/UiStack.h>
-#include <engine/structs/Vector2.h>
 #include "gameState/OptionsState.h"
 
 UiStack *videoOptionsStack = NULL;
@@ -140,7 +140,7 @@ void VideoOptionsStateRender(GlobalState * /*state*/)
 					32,
 					COLOR_WHITE,
 					v2s(0),
-					v2(WindowWidthFloat(), 100),
+					v2(ScaledWindowWidthFloat(), 100),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					largeFont);

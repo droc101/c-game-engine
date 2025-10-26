@@ -44,22 +44,22 @@ inline SDL_Window *GetGameWindow()
 	return window;
 }
 
-inline int WindowWidth()
+inline int ScaledWindowWidth()
 {
 	return windowWidth;
 }
 
-inline int WindowHeight()
+inline int ScaledWindowHeight()
 {
 	return windowHeight;
 }
 
-inline float WindowWidthFloat()
+inline float ScaledWindowWidthFloat()
 {
 	return (float)windowWidth;
 }
 
-inline float WindowHeightFloat()
+inline float ScaledWindowHeightFloat()
 {
 	return (float)windowHeight;
 }

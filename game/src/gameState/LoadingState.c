@@ -3,18 +3,18 @@
 //
 
 #include "gameState/LoadingState.h"
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SoundSystem.h>
-#include <engine/subsystem/Timing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Logging.h>
+#include <engine/subsystem/SoundSystem.h>
+#include <engine/subsystem/Timing.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 #include "gameState/MainState.h"
 
 /// The minimum time the loading screen should be visible for, to prevent quick flashes
@@ -52,7 +52,7 @@ void LoadingStateRender(GlobalState * /*state*/)
 					16,
 					COLOR_WHITE,
 					v2s(0),
-					v2(WindowWidthFloat(), WindowHeightFloat()),
+					v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					smallFont);

@@ -5,18 +5,18 @@
 #ifndef GAME_VULKAN_H
 #define GAME_VULKAN_H
 
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner)
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Level.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Viewmodel.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Viewmodel.h>
-#include <engine/structs/List.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner)
 
 #ifdef BUILDSTYLE_DEBUG
 /**
@@ -29,8 +29,8 @@
 #define VK_ENABLE_VALIDATION_LAYER
 #endif
 
-#define VK_X_TO_NDC(x) ((float)(x) / WindowWidthFloat() * 2.0f - 1.0f)
-#define VK_Y_TO_NDC(y) ((float)(y) / WindowHeightFloat() * 2.0f - 1.0f)
+#define VK_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
+#define VK_Y_TO_NDC(y) ((float)(y) / ScaledWindowHeightFloat() * 2.0f - 1.0f)
 
 /**
  * This function is used to create the Vulkan instance and surface, as well as configuring the environment properly.

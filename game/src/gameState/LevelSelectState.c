@@ -2,6 +2,7 @@
 // Created by droc101 on 7/4/2024.
 //
 
+#include "gameState/LevelSelectState.h"
 #include <dirent.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/graphics/Drawing.h>
@@ -23,7 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gameState/LevelSelectState.h"
 #include "gameState/LoadingState.h"
 #include "gameState/MenuState.h"
 
@@ -79,7 +79,7 @@ void LevelSelectStateRender(GlobalState * /*state*/)
 					32,
 					COLOR_WHITE,
 					v2(50, 250),
-					v2(WindowWidthFloat() - 50, 250),
+					v2(ScaledWindowWidthFloat() - 50, 250),
 					FONT_HALIGN_LEFT,
 					FONT_VALIGN_MIDDLE,
 					smallFont);

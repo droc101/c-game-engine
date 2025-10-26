@@ -3,16 +3,16 @@
 //
 
 #include <engine/debug/FrameGrapher.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/subsystem/Timing.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Timing.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
 
 double framerates[FRAMEGRAPH_HISTORY_SIZE] = {0};
 long framegraphLastUpdateTime = LONG_MIN;
@@ -68,21 +68,25 @@ void FrameGraphDraw()
 #ifndef FRAMEGRAPH_FPS_ONLY
 	const int height = FRAMEGRAPH_THRESHOLD_GOOD * 2 * FRAMEGRAPH_V_SCALE + 20;
 	// Draw a background for the graph
-	DrawRect(0, WindowHeight() - height, FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10, height, COLOR(0x80000000));
+	DrawRect(0,
+			 ScaledWindowHeight() - height,
+			 FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10,
+			 height,
+			 COLOR(0x80000000));
 
 	// Draw a line at the bottom of the graph
-	DrawLine(v2(10, WindowHeightFloat() - 10),
-			 v2(FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE, WindowHeightFloat() - 10),
+	DrawLine(v2(10, ScaledWindowHeightFloat() - 10),
+			 v2(FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE, ScaledWindowHeightFloat() - 10),
 			 2,
 			 COLOR(0x80808080));
 
 	// Draw a line at the target framerate
-	DrawLine(v2(10, WindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
+	DrawLine(v2(10, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
 			 v2(FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE,
-				WindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
+				ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
 			 2,
 			 COLOR(0x80808080));
-	FontDrawString(v2(10, WindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE - 6),
+	FontDrawString(v2(10, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE - 6),
 				   "Target",
 				   12,
 				   COLOR(0xff00ffff),
@@ -133,9 +137,9 @@ void FrameGraphDraw()
 
 		// first line for fps
 		const double x1 = i * FRAMEGRAPH_H_SCALE + 10;
-		double y1 = WindowHeight() - f * FRAMEGRAPH_V_SCALE - 10;
+		double y1 = ScaledWindowHeight() - f * FRAMEGRAPH_V_SCALE - 10;
 		const double x2 = (i + 1) * FRAMEGRAPH_H_SCALE + 10;
-		double y2 = WindowHeight() - nextF * FRAMEGRAPH_V_SCALE - 10;
+		double y2 = ScaledWindowHeight() - nextF * FRAMEGRAPH_V_SCALE - 10;
 
 		if (f > FRAMEGRAPH_THRESHOLD_GOOD)
 		{
@@ -150,8 +154,8 @@ void FrameGraphDraw()
 		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
 #ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
 		// 2nd line for frame time
-		y1 = (double)WindowHeight() - nsRemapped * FRAMEGRAPH_V_SCALE - 10;
-		y2 = (double)WindowHeight() - nextNsRemapped * FRAMEGRAPH_V_SCALE - 10;
+		y1 = (double)ScaledWindowHeight() - nsRemapped * FRAMEGRAPH_V_SCALE - 10;
+		y2 = (double)ScaledWindowHeight() - nextNsRemapped * FRAMEGRAPH_V_SCALE - 10;
 		lineColor.a = 0.5f;
 		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
 #endif
@@ -177,8 +181,8 @@ void FrameGraphDraw()
 	// Draw the current framerate
 	char fps[40];
 	sprintf(fps, "FPS: %.2f\nMSPF: %2.2f", currentF, currentMs);
-	FontDrawString(v2(12, WindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
-	FontDrawString(v2(10, WindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
+	FontDrawString(v2(12, ScaledWindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
+	FontDrawString(v2(10, ScaledWindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
 
 #endif
 }
@@ -186,30 +190,30 @@ void FrameGraphDraw()
 void TickGraphDraw()
 {
 #ifdef TICKGRAPH_ENABLE
-	const int start_x = WindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
+	const int start_x = ScaledWindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
 #ifndef FRAMEGRAPH_FPS_ONLY
 	const int height = TICKGRAPH_THRESHOLD_GOOD * 2 * TICKGRAPH_V_SCALE + 20;
 
 	// Draw a background for the graph
 	DrawRect(start_x - 10,
-			 WindowHeight() - height,
+			 ScaledWindowHeight() - height,
 			 TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10,
 			 height,
 			 COLOR(0x80000000));
 
 	// Draw a line at the bottom of the graph
-	DrawLine(v2(start_x, WindowHeightFloat() - 10),
-			 v2(start_x + FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE, WindowHeightFloat() - 10),
+	DrawLine(v2(start_x, ScaledWindowHeightFloat() - 10),
+			 v2(start_x + FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE, ScaledWindowHeightFloat() - 10),
 			 2,
 			 COLOR(0x80808080));
 
 	// Draw a line at the target framerate
-	DrawLine(v2(start_x, WindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
+	DrawLine(v2(start_x, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
 			 v2(start_x + FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE,
-				WindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
+				ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
 			 2,
 			 COLOR(0x80808080));
-	FontDrawString(v2(start_x, WindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE - 6),
+	FontDrawString(v2(start_x, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE - 6),
 				   "Target",
 				   12,
 				   COLOR(0xff00ffff),
@@ -261,10 +265,10 @@ void TickGraphDraw()
 		// first line for fps
 		double x1 = i * TICKGRAPH_H_SCALE + 10;
 		x1 += start_x;
-		double y1 = WindowHeight() - f * TICKGRAPH_V_SCALE - 10;
+		double y1 = ScaledWindowHeight() - f * TICKGRAPH_V_SCALE - 10;
 		double x2 = (i + 1) * TICKGRAPH_H_SCALE + 10;
 		x2 += start_x;
-		double y2 = WindowHeight() - nextF * TICKGRAPH_V_SCALE - 10;
+		double y2 = ScaledWindowHeight() - nextF * TICKGRAPH_V_SCALE - 10;
 
 		if (f > TICKGRAPH_THRESHOLD_GOOD)
 		{
@@ -279,8 +283,8 @@ void TickGraphDraw()
 		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
 #ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
 		// 2nd line for frame time
-		y1 = (double)WindowHeight() - nsRemapped * TICKGRAPH_V_SCALE - 10;
-		y2 = (double)WindowHeight() - nextNsRemapped * TICKGRAPH_V_SCALE - 10;
+		y1 = (double)ScaledWindowHeight() - nsRemapped * TICKGRAPH_V_SCALE - 10;
+		y2 = (double)ScaledWindowHeight() - nextNsRemapped * TICKGRAPH_V_SCALE - 10;
 		lineColor.a = 0.5f;
 		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
 #endif
@@ -308,12 +312,12 @@ void TickGraphDraw()
 	sprintf(fps, "TPS: %.2f\nMSPT: %2.2f", currentF, currentMs);
 #ifdef FRAMEGRAPH_FPS_ONLY
 	const Vector2 textSize = MeasureText(fps, 16, smallFont);
-	const float xPos = WindowWidthFloat() - textSize.x - 10;
+	const float xPos = ScaledWindowWidthFloat() - textSize.x - 10;
 #else
 	const float xPos = (float)start_x;
 #endif
-	FontDrawString(v2(xPos + 2, WindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
-	FontDrawString(v2(xPos, WindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
+	FontDrawString(v2(xPos + 2, ScaledWindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
+	FontDrawString(v2(xPos, ScaledWindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
 
 #endif
 }

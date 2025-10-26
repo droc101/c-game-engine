@@ -3,18 +3,18 @@
 //
 
 #include "gameState/LogoSplashState.h"
-#include <SDL_gamecontroller.h>
-#include <SDL_rect.h>
-#include <SDL_scancode.h>
-#include <stddef.h>
 #include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Input.h>
+#include <engine/subsystem/SoundSystem.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_rect.h>
+#include <SDL_scancode.h>
+#include <stddef.h>
 #include "gameState/MenuState.h"
 
 void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
@@ -38,7 +38,7 @@ void LogoSplashStateRender(GlobalState *State)
 		return;
 	}
 
-	const SDL_Rect destRect = {WindowWidth() / 2 - 150, WindowHeight() / 2 - 150, 300, 300};
+	const SDL_Rect destRect = {ScaledWindowWidth() / 2 - 150, ScaledWindowHeight() / 2 - 150, 300, 300};
 
 	// HIGH EFFORT FANCY ANIMATION
 	float alpha = 1.0f;

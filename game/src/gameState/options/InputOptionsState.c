@@ -79,7 +79,7 @@ void InputOptionsStateRender(GlobalState * /*state*/)
 					32,
 					COLOR_WHITE,
 					v2s(0),
-					v2(WindowWidthFloat(), 100),
+					v2(ScaledWindowWidthFloat(), 100),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					largeFont);
@@ -91,7 +91,7 @@ void InputOptionsStateRender(GlobalState * /*state*/)
 					16,
 					COLOR_WHITE,
 					v2(0, 260),
-					v2(WindowWidthFloat(), 40),
+					v2(ScaledWindowWidthFloat(), 40),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
@@ -102,7 +102,7 @@ void InputOptionsStateRender(GlobalState * /*state*/)
 						12,
 						COLOR_WHITE,
 						v2(0, 460),
-						v2(WindowWidthFloat(), 40),
+						v2(ScaledWindowWidthFloat(), 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
 						smallFont);
@@ -115,7 +115,7 @@ void InputOptionsStateRender(GlobalState * /*state*/)
 						12,
 						COLOR_WHITE,
 						v2(0, 480),
-						v2(WindowWidthFloat(), 40),
+						v2(ScaledWindowWidthFloat(), 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
 						smallFont);

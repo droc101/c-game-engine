@@ -6,15 +6,15 @@
 #define GAME_GLHELPER_H
 
 #include <cglm/types.h>
-#include <SDL_video.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/graphics/Drawing.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Level.h>
 #include <engine/structs/Vector2.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/graphics/Drawing.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define GL_VERSION_MAJOR 3
 #define GL_VERSION_MINOR 3
@@ -173,14 +173,14 @@ void GL_DrawColoredArrays(const float *vertices, const uint32_t *indices, uint32
  * @param x X position in pixels
  * @return The NDC position
  */
-#define GL_X_TO_NDC(x) ((float)(x) / WindowWidthFloat() * 2.0f - 1.0f)
+#define GL_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
 
 /**
  * Convert screen Y to NDC
  * @param y Y position in pixels
  * @return The NDC position
  */
-#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / WindowHeightFloat() * 2.0f)
+#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
 
 /**
  * Get the transformation matrix for a camera

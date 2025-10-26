@@ -6,13 +6,13 @@
 #define GAME_RENDERINGHELPERS_H
 
 #include <cglm/types.h>
-#include <SDL_video.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Level.h>
 #include <engine/structs/Vector2.h>
+#include <SDL_video.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 /// Field of view used for viewmodels
 #define VIEWMODEL_FOV 70
@@ -61,28 +61,28 @@ void SetGameWindow(SDL_Window *w);
 SDL_Window *GetGameWindow();
 
 /**
- * Get the width of the window
- * @return width of the window
+ * Get the width of the window divided by the ui scale
+ * @return width of the window divided by the ui scale
  */
-int WindowWidth();
+int ScaledWindowWidth();
 
 /**
- * Get the height of the window
- * @return height of the window
+ * Get the height of the window divided by the ui scale
+ * @return height of the window divided by the ui scale
  */
-int WindowHeight();
+int ScaledWindowHeight();
 
 /**
- * Get the width of the window
- * @return width of the window
+ * Get the width of the window divided by the ui scale
+ * @return width of the window divided by the ui scale
  */
-float WindowWidthFloat();
+float ScaledWindowWidthFloat();
 
 /**
- * Get the height of the window
- * @return height of the window
+ * Get the height of the window divided by the ui scale
+ * @return height of the window divided by the ui scale
  */
-float WindowHeightFloat();
+float ScaledWindowHeightFloat();
 
 /**
  * Updates the variables returned by @c WindowWidth() and @c WindowHeight()

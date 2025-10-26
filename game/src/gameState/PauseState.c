@@ -3,20 +3,20 @@
 //
 
 #include "gameState/PauseState.h"
+#include <engine/assets/AssetReader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Discord.h>
+#include <engine/subsystem/Input.h>
+#include <engine/subsystem/SoundSystem.h>
+#include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/UiStack.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
-#include <engine/subsystem/Discord.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/UiStack.h>
-#include <engine/structs/Vector2.h>
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 #include "gameState/OptionsState.h"
@@ -45,7 +45,7 @@ void PauseStateRender(GlobalState * /*state*/)
 
 	Vector2 logoPosition;
 	Vector2 logoSize;
-	logoPosition.x = ((float)WindowWidth() - 360) / 2;
+	logoPosition.x = ((float)ScaledWindowWidth() - 360) / 2;
 	logoPosition.y = 32;
 	logoSize.x = 360;
 	logoSize.y = 240;

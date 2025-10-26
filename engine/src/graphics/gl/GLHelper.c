@@ -2,8 +2,26 @@
 // Created by droc101 on 9/30/2024.
 //
 
-#include <engine/graphics/gl/GLHelper.h>
 #include <cglm/cglm.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/ShaderLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/gl/GLHelper.h>
+#include <engine/graphics/gl/GLInternal.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Level.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL_error.h>
@@ -14,24 +32,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Options.h>
-#include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/ShaderLoader.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/List.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/physics/Physics.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/graphics/gl/GLInternal.h>
 
 SDL_GLContext ctx;
 
@@ -950,7 +950,11 @@ inline void GL_Disable3D()
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 {
 	mat4 perspectiveMatrix;
-	glm_perspective(glm_rad(camera->fov), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
+	glm_perspective(glm_rad(camera->fov),
+					ScaledWindowWidthFloat() / ScaledWindowHeightFloat(),
+					NEAR_Z,
+					FAR_Z,
+					perspectiveMatrix);
 
 	versor rotationQuat;
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
@@ -964,7 +968,11 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 void GL_GetViewmodelMatrix(mat4 *out)
 {
 	mat4 perspectiveMatrix;
-	glm_perspective(glm_rad(VIEWMODEL_FOV), WindowWidthFloat() / WindowHeightFloat(), NEAR_Z, FAR_Z, perspectiveMatrix);
+	glm_perspective(glm_rad(VIEWMODEL_FOV),
+					ScaledWindowWidthFloat() / ScaledWindowHeightFloat(),
+					NEAR_Z,
+					FAR_Z,
+					perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix, VECTOR3_TO_VEC3(GetState()->viewmodel.transform.position));

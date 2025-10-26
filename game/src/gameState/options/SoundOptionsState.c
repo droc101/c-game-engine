@@ -66,7 +66,7 @@ void SoundOptionsStateRender(GlobalState * /*state*/)
 					32,
 					COLOR_WHITE,
 					v2s(0),
-					v2(WindowWidthFloat(), 100),
+					v2(ScaledWindowWidthFloat(), 100),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					largeFont);
