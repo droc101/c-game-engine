@@ -5,13 +5,9 @@
 #ifndef MODELLOADER_H
 #define MODELLOADER_H
 
-#include <joltc/enums.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <stddef.h>
 #include <stdint.h>
 

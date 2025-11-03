@@ -6,7 +6,6 @@
 #define GAME_ENGINE_H
 
 #include <engine/structs/ActorDefinition.h>
-#include <SDL_events.h>
 #include <stdbool.h>
 
 #define STR(x) #x

@@ -30,7 +30,7 @@ enum ActorFlags
 {
 	ACTOR_FLAG_CAN_PUSH_PLAYER = 1 << 0,
 	ACTOR_FLAG_ENEMY = 1 << 1,
-	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 2,
+	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 2, // TODO should we split this enum into engine-side and game-side
 	ACTOR_FLAG_CAN_BE_HELD = 1 << 3,
 	ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION = 1 << 4,
 };
@@ -47,7 +47,6 @@ struct ActorConnection
 	Param outParamOverride;
 };
 
-// Actor (interactable/moving wall) struct
 struct Actor
 {
 	/// Flags used to provide more information about the actor

@@ -57,8 +57,15 @@ void FrameGraphUpdate(uint64_t ns);
  */
 void FrameGraphDraw();
 
+/**
+ * Update the tick graph with the time it took to perform a physics tick
+ * @param ns nanoseconds the tick took
+ */
 void TickGraphUpdate(uint64_t ns);
 
+/**
+ * Draw the tick graph
+ */
 void TickGraphDraw();
 
 #endif //GAME_FRAMEGRAPHER_H

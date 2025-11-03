@@ -5,12 +5,13 @@
 #ifndef GAME_ACTORDEFINITIONS_H
 #define GAME_ACTORDEFINITIONS_H
 
-#include <joltc/Math/Transform.h>
-#include <joltc/types.h>
-#include <m-core.h>
 #include <engine/structs/Dict.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Param.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/types.h>
+#include <m-core.h>
+#include <stdint.h>
 
 #define FIRST_GAME_ACTOR_TYPE_ID (1 << 16)
 
