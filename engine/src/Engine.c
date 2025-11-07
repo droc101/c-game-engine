@@ -65,6 +65,7 @@ bool CheckCPUSupport()
 		LogWarning("Running on system with less than 4 threads, this may be very slow!\n");
 	}
 #ifdef __x86_64__
+#ifdef X86_V1
 	if (!SDL_HasMMX())
 	{
 		LogError("CPU does not have the MMX extension!\n");
@@ -80,6 +81,9 @@ bool CheckCPUSupport()
 		LogError("CPU does not have the SSE2 extension!\n");
 		cpuSupported = false;
 	}
+#endif
+
+#ifdef X86_V2
 	// TODO SSE4(.0)
 	if (!SDL_HasSSE41())
 	{
@@ -91,6 +95,9 @@ bool CheckCPUSupport()
 		LogError("CPU does not have the SSE4.2 extension!\n");
 		cpuSupported = false;
 	}
+#endif
+
+#ifdef X86_V3
 	if (!SDL_HasAVX())
 	{
 		LogError("CPU does not have the AVX extension!\n");
@@ -101,6 +108,16 @@ bool CheckCPUSupport()
 		LogError("CPU does not have the AVX2 extension!\n");
 		cpuSupported = false;
 	}
+#endif
+
+#ifdef X86_V4
+	if (!SDL_HasAVX512F())
+	{
+		LogError("CPU does not have the AVX512F extension!\n");
+		cpuSupported = false;
+	}
+#endif
+
 #endif
 	return cpuSupported;
 }
