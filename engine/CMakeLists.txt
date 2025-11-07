@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.18)
 project(engine C CXX)
 
 set(CMAKE_C_STANDARD 11)

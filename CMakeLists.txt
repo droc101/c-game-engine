@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.18)
 project(game C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 #region Compile options
 
@@ -92,11 +93,11 @@ add_dependencies(game copy_assets)
 
 #region Copy Libraries
 
-add_custom_target(copy_libraries ALL
-        COMMENT "Copying shared libraries to build output directory"
-)
-
 if (WIN32)
+    add_custom_target(copy_libraries ALL
+            COMMENT "Copying shared libraries to build output directory"
+    )
+
     execute_process(
             COMMAND cygpath -w /mingw64
             OUTPUT_VARIABLE MINGW_PATH
@@ -130,19 +131,7 @@ if (WIN32)
         )
     endforeach ()
 
-    add_custom_command(TARGET copy_libraries POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_BINARY_DIR}/_deps/discordGameSDK/lib/x86_64/discord_game_sdk.dll"
-            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/discord_game_sdk.dll"
-    )
-else () # Linux
-    add_custom_command(TARGET copy_libraries POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_BINARY_DIR}/_deps/discordGameSDK/lib/x86_64/discord_game_sdk.so"
-            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/discord_game_sdk.so"
-    )
+    add_dependencies(game copy_libraries)
 endif ()
-
-add_dependencies(game copy_libraries)
 
 #endregion
