@@ -56,7 +56,7 @@ void DestroyGame()
 	LaserRaycastFiltersDestroy();
 }
 
-int main(const int argc, const char *argv[])
+EXPORT_SYM int GameMain(const int argc, const char *argv[])
 {
 	InitEngine(argc, argv, RegisterGameActors);
 	LaserRaycastFiltersInit();

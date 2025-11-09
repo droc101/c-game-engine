@@ -55,73 +55,6 @@ SDL_Surface *windowIcon;
 SDL_Event event;
 bool shouldQuit = false;
 
-bool CheckCPUSupport()
-{
-	// TODO i sure hope this doesn't rely on any of the extensions
-	LogInfo("System has %d processors and %d MiB RAM.\n", SDL_GetCPUCount(), SDL_GetSystemRAM());
-	bool cpuSupported = true;
-	if (SDL_GetCPUCount() < 4)
-	{
-		LogWarning("Running on system with less than 4 threads, this may be very slow!\n");
-	}
-#ifdef __x86_64__
-#ifdef X86_V1
-	if (!SDL_HasMMX())
-	{
-		LogError("CPU does not have the MMX extension!\n");
-		cpuSupported = false;
-	}
-	if (!SDL_HasSSE())
-	{
-		LogError("CPU does not have the SSE extension!\n");
-		cpuSupported = false;
-	}
-	if (!SDL_HasSSE2())
-	{
-		LogError("CPU does not have the SSE2 extension!\n");
-		cpuSupported = false;
-	}
-#endif
-
-#ifdef X86_V2
-	// TODO SSE4(.0)
-	if (!SDL_HasSSE41())
-	{
-		LogError("CPU does not have the SSE4.1 extension!\n");
-		cpuSupported = false;
-	}
-	if (!SDL_HasSSE42())
-	{
-		LogError("CPU does not have the SSE4.2 extension!\n");
-		cpuSupported = false;
-	}
-#endif
-
-#ifdef X86_V3
-	if (!SDL_HasAVX())
-	{
-		LogError("CPU does not have the AVX extension!\n");
-		cpuSupported = false;
-	}
-	if (!SDL_HasAVX2())
-	{
-		LogError("CPU does not have the AVX2 extension!\n");
-		cpuSupported = false;
-	}
-#endif
-
-#ifdef X86_V4
-	if (!SDL_HasAVX512F())
-	{
-		LogError("CPU does not have the AVX512F extension!\n");
-		cpuSupported = false;
-	}
-#endif
-
-#endif
-	return cpuSupported;
-}
-
 void ExecPathInit(const int argc, const char *argv[])
 {
 	if (argc < 1)
@@ -302,11 +235,6 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	LogInfo("Build time: %s at %s\n", __DATE__, __TIME__);
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Initializing Engine\n");
-
-	if (!CheckCPUSupport())
-	{
-		Error("Your computer's CPU does not meet the minimum requirements.");
-	}
 
 	LoadGameConfig();
 

@@ -54,11 +54,6 @@ bool EngineShouldQuit();
 //
 
 /**
- * Check if the system's CPU supports the required features.
- */
-bool CheckCPUSupport();
-
-/**
  * Attempt to initialize the executable path
  * @param argc Program argument count
  * @param argv Program arguments
