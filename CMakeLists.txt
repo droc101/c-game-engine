@@ -63,7 +63,7 @@ if (WIN32)
             libwinpthread-1.dll
             libopus-0.dll
             libgcc_s_seh-1.dll
-            libstdc++-6.dll'
+            libstdc++-6.dll
             libdl.dll
     )
 
