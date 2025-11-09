@@ -37,7 +37,7 @@ jobs:
         key: ${{ matrix.build_type }}-${{ matrix.c_compiler }}-deps-${{ hashFiles('**/.git/HEAD') }}
 
     - name: Install Packages
-      run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev python3-pil glslc libxcb1-dev libx11-dev libxrandr-dev libwayland-dev libdirectfb-dev
+      run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev python3-pil glslc libxcb1-dev libx11-dev libxrandr-dev libwayland-dev libdirectfb-dev cmake gcc
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
