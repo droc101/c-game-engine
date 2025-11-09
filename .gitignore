@@ -44,3 +44,6 @@ cmake-build-*/
 .idea/.name
 .idea/*.xml
 .idea/*.iml
+
+# Local GitHub actions testing
+.artifacts
