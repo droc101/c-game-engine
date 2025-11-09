@@ -1,5 +1,3 @@
-add_subdirectory(../engine engine)
-
 include(cmake/Helpers.cmake)
 
 #region Game Executable

@@ -32,6 +32,7 @@ if (WIN32)
     target_link_libraries(launcher dlfcn-win32::dl)
 endif ()
 
+add_subdirectory(engine)
 add_subdirectory(game)
 
 add_dependencies(launcher game_x86_v1 game_x86_v2 game_x86_v3 game_x86_v4)
