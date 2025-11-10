@@ -10,9 +10,19 @@
 #include <libloaderapi.h>
 #include <minwindef.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <winbase.h>
 #include <windef.h>
+
 #include <winnt.h>
+
+void LibraryLoaderSetup()
+{
+	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+	wchar_t fullPath[MAX_PATH];
+	GetFullPathNameW(L"./bin/", MAX_PATH, fullPath, NULL);
+	AddDllDirectory(fullPath);
+}
 
 LibraryHandle OpenLibrary(const char *path)
 {
@@ -47,6 +57,11 @@ const char *LibraryLoaderError()
 
 #else
 #include <dlfcn.h>
+
+void LibraryLoaderSetup()
+{
+	// nothing to do on linux
+}
 
 LibraryHandle OpenLibrary(const char *path)
 {

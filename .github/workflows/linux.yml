@@ -50,6 +50,6 @@ jobs:
       with:
         name: ${{ matrix.zip_name }}
         path: |
-          build-${{ matrix.build_type }}/bin/
+          build-${{ matrix.build_type }}/out/
         retention-days: 90
 

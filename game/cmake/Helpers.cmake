@@ -30,7 +30,7 @@ function(enable_lto)
 endfunction()
 
 function(create_executable target_name march sources)
-    add_library(${target_name} SHARED)
+    add_library(${target_name} MODULE)
     target_sources(${target_name} PRIVATE ${sources})
 
     target_compile_definitions(${target_name} PUBLIC ${ARGN})

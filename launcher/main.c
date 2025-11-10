@@ -9,17 +9,17 @@
 #define ANSI_YELLOW "\x1b[33m"
 #define ANSI_RESET "\x1b[39m"
 
+#define LIB_PREFIX "bin/" // TODO don't assume work dir = binary dir
+
 #ifdef WIN32
 #include <windows.h> // This include must be above commctrl.h otherwise there are compile errors.
 #include <commctrl.h>
 
 #define LIB_SUFFIX ".dll"
-#define LIB_PREFIX ""
 #else
 #include <wchar.h>
 
 #define LIB_SUFFIX ".so"
-#define LIB_PREFIX "./" // TODO don't assume work dir = binary dir
 #endif
 
 typedef int (*GameMainFunction)(int argc, const char *argv[]);
@@ -98,6 +98,7 @@ int main(const int argc, const char *argv[])
 	}
 
 	printf("bootstrap: using game library \"%s\"\n", library_basename);
+	LibraryLoaderSetup();
 	const LibraryHandle library = OpenLibrary(library_basename);
 	if (library)
 	{
@@ -110,7 +111,8 @@ int main(const int argc, const char *argv[])
 			return ret;
 		}
 	}
-	ErrorMessageBox(L"Fatal Error", L"Failed to load the game executable.", L"Fatal Error");
 	printf(ANSI_RED "bootstrap: error loading game library: %s\n" ANSI_RESET, LibraryLoaderError());
+	ErrorMessageBox(L"Fatal Error", L"Failed to load the game executable.", L"Fatal Error");
+	
 	return -1;
 }

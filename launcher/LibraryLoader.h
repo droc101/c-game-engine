@@ -14,6 +14,8 @@ typedef void* LibraryHandle;
 
 #endif //GAME_LIBRARYLOADER_H
 
+void LibraryLoaderSetup();
+
 LibraryHandle OpenLibrary(const char *path);
 
 void *OpenSymbol(LibraryHandle library, const char *symbol);

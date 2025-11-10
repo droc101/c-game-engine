@@ -5,9 +5,10 @@ include(game/cmake/Helpers.cmake)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) # TODO github actions spits out things into this directory because we build some of the deps
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin) # TODO github actions spits out things into this directory because we build some of the deps
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 detect_platform()
 
@@ -72,7 +73,7 @@ if (WIN32)
         add_custom_command(TARGET copy_libraries POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${MINGW_PATH}\\bin\\${dll}"
-                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}\\${dll}"
+                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\${dll}"
         )
     endforeach ()
 
