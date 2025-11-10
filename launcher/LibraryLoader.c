@@ -7,10 +7,10 @@
 #ifdef WIN32
 #include <errhandlingapi.h>
 #include <libloaderapi.h>
-#include <windef.h>
 #include <minwindef.h>
 #include <stddef.h>
 #include <winbase.h>
+#include <windef.h>
 #include <winnt.h>
 
 LibraryHandle OpenLibrary(const char *path)
@@ -54,7 +54,7 @@ LibraryHandle OpenLibrary(const char *path)
 
 void *OpenSymbol(const LibraryHandle library, const char *symbol)
 {
-	return dlsym(library, "GameMain");
+	return dlsym(library, symbol);
 }
 
 int CloseLibrary(const LibraryHandle library)
