@@ -16,7 +16,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDeb
     enable_lto()
 endif ()
 
-add_executable(launcher launcher/main.c)
+add_executable(launcher launcher/main.c
+        launcher/LibraryLoader.c
+        launcher/LibraryLoader.h)
 set_target_properties(launcher PROPERTIES OUTPUT_NAME "game")
 if (x86_64)
     target_compile_options(launcher PRIVATE "-march=x86-64")
@@ -28,8 +30,7 @@ if (WIN32)
     set(CMAKE_AUTO_RCC ON)
     target_compile_options(launcher PRIVATE "-mwindows")
     target_sources(launcher PRIVATE launcher/game.rc)
-    find_package(dlfcn-win32 REQUIRED)
-    target_link_libraries(launcher dlfcn-win32::dl)
+    target_link_libraries(launcher PRIVATE comctl32)
 endif ()
 
 add_subdirectory(engine)
@@ -65,7 +66,6 @@ if (WIN32)
             libopus-0.dll
             libgcc_s_seh-1.dll
             libstdc++-6.dll
-            libdl.dll
     )
 
     foreach (dll IN LISTS DLLS)
