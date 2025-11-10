@@ -16,6 +16,8 @@
 #define LIB_SUFFIX ".dll"
 #define LIB_PREFIX ""
 #else
+#include <wchar.h>
+
 #define LIB_SUFFIX ".so"
 #define LIB_PREFIX "./" // TODO don't assume work dir = binary dir
 #endif
