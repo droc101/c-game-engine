@@ -54,18 +54,9 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 
 	char messageBoxTextBuffer[768];
 	sprintf(messageBoxTextBuffer,
-			"Sorry, but the game has crashed.\n\n%s\n\nEngine Version: %s\nSDL Version: %d.%d.%d\nSDL_Mixer "
-			"Version: "
-			"%d.%d.%d\nZlib Version: %s",
+			"Sorry, but the game has crashed.\n\n%s\n\nEngine Version: %s",
 			messageBuffer,
-			ENGINE_VERSION,
-			SDL_MAJOR_VERSION,
-			SDL_MINOR_VERSION,
-			SDL_PATCHLEVEL,
-			SDL_MIXER_MAJOR_VERSION,
-			SDL_MIXER_MINOR_VERSION,
-			SDL_MIXER_PATCHLEVEL,
-			ZLIB_VERSION);
+			ENGINE_VERSION);
 
 	SDL_MessageBoxData mb;
 	mb.message = messageBoxTextBuffer;
@@ -223,6 +214,8 @@ void SignalHandler(const int sig)
 			Error("Segmentation Fault");
 		case SIGFPE:
 			Error("Floating Point Exception");
+		case SIGILL:
+			Error("Illegal Instruction");
 		default:
 			break;
 	}
@@ -259,6 +252,7 @@ void ErrorHandlerInit()
 #ifdef BUILDSTYLE_RELEASE
 	signal(SIGSEGV, SignalHandler);
 	signal(SIGFPE, SignalHandler);
+	signal(SIGILL, SignalHandler);
 #endif
 }
 
