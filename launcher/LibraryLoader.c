@@ -5,6 +5,7 @@
 #include "LibraryLoader.h"
 
 #ifdef WIN32
+#include <windows.h>
 #include <errhandlingapi.h>
 #include <libloaderapi.h>
 #include <minwindef.h>
