@@ -5,10 +5,16 @@ add_executable(launcher
         src/main.c
         src/LibraryLoader.c
         include/LibraryLoader.h
+        src/DialogSystem.c
+        include/DialogSystem.h
+        include/AnsiCodes.h
+        src/Filesystem.c
+        include/Filesystem.h
 )
 set_target_properties(launcher PROPERTIES OUTPUT_NAME "game")
 if (x86_64)
     target_compile_options(launcher PRIVATE "-march=x86-64")
+    target_sources(launcher PRIVATE src/x86.c include/x86.h)
 else ()
     target_compile_options(launcher PRIVATE "-march=native")
 endif ()
@@ -16,7 +22,7 @@ endif ()
 if (WIN32)
     target_compile_options(launcher PRIVATE "-mwindows")
     target_sources(launcher PRIVATE res/game.rc)
-    target_link_libraries(launcher PRIVATE comctl32)
+    target_link_libraries(launcher PRIVATE comctl32 pathcch)
 endif ()
 
 add_custom_target(

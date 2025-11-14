@@ -1,0 +1,18 @@
+//
+// Created by droc101 on 11/14/2025.
+//
+
+#ifndef GAME_DIALOGSYSTEM_H
+#define GAME_DIALOGSYSTEM_H
+
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <wchar.h>
+#endif
+
+void InitDialogSystem();
+
+void ErrorDialog(const wchar_t *instruction, const wchar_t *message, const wchar_t *title);
+
+#endif //GAME_DIALOGSYSTEM_H
