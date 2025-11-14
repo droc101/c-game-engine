@@ -7,7 +7,14 @@ shopt -s extglob
 SRC_DIR=$PWD
 BUILD_DIR=$1
 if [ -z "$BUILD_DIR" ]; then
+  echo "No build folder specified, defaulting to \$PWD/build."
   BUILD_DIR=$PWD/build
+fi
+
+BUILD_TYPE=$2
+if [ -z "$BUILD_TYPE" ]; then
+  echo "No build type specified, defaulting to Release."
+  BUILD_TYPE="Release"
 fi
 
 export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
@@ -23,7 +30,7 @@ clean_build_dir() {
 for i in {1..4}; do
   clean_build_dir
   echo "---------- CONFIGURING x86_64 v$i ----------"
-  cmake -B "$BUILD_DIR" -DX86_64_VERSION=$i -DCMAKE_BUILD_TYPE=$2 $3
+  cmake -B "$BUILD_DIR" -DX86_64_VERSION=$i -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $3
   echo "---------- BUILDING x86_64 v$i ----------"
   cmake --build "$BUILD_DIR" --target game $4
 done
@@ -38,7 +45,7 @@ fi
 clean_build_dir
 
 echo "---------- CONFIGURING Launcher ----------"
-cmake -B "$BUILD_DIR" -DX86_64_VERSION=$i -DSTANDALONE_LAUNCHER=ON -DCMAKE_BUILD_TYPE=$2 $3
+cmake -B "$BUILD_DIR" -DX86_64_VERSION=$i -DSTANDALONE_LAUNCHER=ON -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $3
 echo "---------- BUILDING Launcher ----------"
 cmake --build "$BUILD_DIR" --target launcher $4
 clean_build_dir
