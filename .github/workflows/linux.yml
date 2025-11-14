@@ -36,7 +36,7 @@ jobs:
       run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev python3-pil glslc libxcb1-dev libx11-dev libxrandr-dev libwayland-dev libdirectfb-dev cmake gcc
 
     - name: Configure & Build
-      run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}"
+      run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
 
     - name: Upload results
       uses: actions/upload-artifact@v4

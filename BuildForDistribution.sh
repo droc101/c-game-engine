@@ -27,7 +27,7 @@ for i in {1..4}; do
   echo "---------- BUILDING x86_64 v$i ----------"
   cmake --build "$BUILD_DIR" --target game $4
 done
-cp "$BUILD_DIR/discord_game_sdk.so" "$BUILD_DIR/out/bin"
+cp "$BUILD_DIR/discord_game_sdk.so" "$BUILD_DIR/out/bin" # TODO this cannot be .so on win32
 clean_build_dir
 
 echo "---------- CONFIGURING Launcher ----------"
