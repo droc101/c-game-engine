@@ -32,6 +32,7 @@ void DiscordInit()
 	}
 
 	struct DiscordCreateParams params;
+	DiscordCreateParamsSetDefault(&params);
 	params.client_id = (DiscordClientId)config.discordAppId;
 	params.flags = DiscordCreateFlags_NoRequireDiscord;
 	params.event_data = &app;
