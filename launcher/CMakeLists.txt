@@ -14,7 +14,6 @@ else ()
 endif ()
 
 if (WIN32)
-    set_target_properties(launcher PROPERTIES AUTORCC ON)
     target_compile_options(launcher PRIVATE "-mwindows")
     target_sources(launcher PRIVATE launcher/game.rc)
     target_link_libraries(launcher PRIVATE comctl32)
