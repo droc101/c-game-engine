@@ -7,9 +7,6 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,12 +14,11 @@ jobs:
     strategy:
       matrix:
         build_type: [ Debug, Release ]
-        zip_name: [ game.linux.debug, game.linux.release ]
-        exclude:
+        include:
           - build_type: Debug
-            zip_name: game.linux.release
-          - build_type: Release
             zip_name: game.linux.debug
+          - build_type: Release
+            zip_name: game.linux.release
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -39,11 +35,8 @@ jobs:
     - name: Install Packages
       run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev python3-pil glslc libxcb1-dev libx11-dev libxrandr-dev libwayland-dev libdirectfb-dev cmake gcc
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build-${{ matrix.build_type }} --config ${{ matrix.build_type }}
+    - name: Configure & Build
+      run: bash BuildForDistribution.sh
 
     - name: Upload results
       uses: actions/upload-artifact@v4

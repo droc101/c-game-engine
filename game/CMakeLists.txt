@@ -1,18 +1,9 @@
-include(cmake/Helpers.cmake)
+cmake_minimum_required(VERSION 3.24)
+project(game_module C CXX)
 
 #region Game Executable
 
-add_custom_target(
-        copy_assets
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
-)
-
-if (NOT WIN32)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -rdynamic")
-endif ()
-
-set(SOURCES
+add_library(game MODULE EXCLUDE_FROM_ALL
         src/actor/Coin.c
         include/actor/Coin.h
         src/actor/Door.c
@@ -55,20 +46,44 @@ set(SOURCES
         src/GameMain.c
 )
 
-if (x86_64)
+if (X86_64_VERSION STREQUAL "1")
+    target_compile_options(game PRIVATE -march=x86-64)
     disable_options(USE_SSE4_1 USE_SSE4_2 USE_AVX USE_AVX2 USE_AVX512 USE_LZCNT USE_TZCNT USE_F16C USE_FMADD)
-    function(create_x86_executable version march)
-        create_executable(game_x86_${version} ${march} "${SOURCES}" ${ARGN})
-        set_target_properties(game_x86_${version} PROPERTIES OUTPUT_NAME "game.x86${version}")
-    endfunction()
-
-    create_x86_executable(v1 x86-64)
-    create_x86_executable(v2 x86-64-v2 JPH_USE_SSE4_1 JPH_USE_SSE4_2)
-    create_x86_executable(v3 x86-64-v3 JPH_USE_SSE4_1 JPH_USE_SSE4_2 JPH_USE_AVX JPH_USE_AVX2 JPH_USE_LZCNT JPH_USE_TZCNT JPH_USE_F16C JPH_USE_FMADD)
-    create_x86_executable(v4 x86-64-v4 JPH_USE_SSE4_1 JPH_USE_SSE4_2 JPH_USE_AVX JPH_USE_AVX2 JPH_USE_LZCNT JPH_USE_TZCNT JPH_USE_F16C JPH_USE_FMADD JPH_USE_AVX512)
+elseif (X86_64_VERSION STREQUAL "2")
+    target_compile_options(game PRIVATE -march=x86-64-v2)
+    disable_options(USE_AVX USE_AVX2 USE_AVX512 USE_LZCNT USE_TZCNT USE_F16C USE_FMADD)
+    enable_options(USE_SSE4_1 USE_SSE4_2)
+elseif (X86_64_VERSION STREQUAL "3")
+    target_compile_options(game PRIVATE -march=x86-64-v3)
+    disable_options(USE_AVX512)
+    enable_options(USE_SSE4_1 USE_SSE4_2 USE_AVX USE_AVX2 USE_LZCNT USE_TZCNT USE_F16C USE_FMADD)
+elseif (X86_64_VERSION STREQUAL "4")
+    target_compile_options(game PRIVATE -march=x86-64-v4)
+    enable_options(USE_SSE4_1 USE_SSE4_2 USE_AVX USE_AVX2 USE_AVX512 USE_LZCNT USE_TZCNT USE_F16C USE_FMADD)
 else ()
-    create_executable(game_arm64 native "${SOURCES}") # Setting march to native because we do not intend to distribute arm64
-    set_target_properties(game_arm64 PROPERTIES OUTPUT_NAME "game.arm64")
+    message(FATAL_ERROR "Invalid x86_64 ABI version ${X86_64_VERSION}")
 endif ()
+
+add_subdirectory(${ENGINE_SOURCE_DIR}/engine engine)
+
+target_link_libraries(game PRIVATE engine)
+target_include_directories(game PRIVATE include)
+set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
+
+if (WIN32)
+    # TODO: I don't like DISCORD_GAME_SDK_LIBRARY_DIR now that we're back to a more simple build structure
+    add_custom_command(TARGET game PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${DISCORD_GAME_SDK_LIBRARY_DIR}/discord_game_sdk.dll"
+                "${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.dll"
+    )
+else ()
+    add_custom_command(TARGET game PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${DISCORD_GAME_SDK_LIBRARY_DIR}/discord_game_sdk.so"
+                "${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.so"
+    )
+endif ()
+set_target_properties(game PROPERTIES OUTPUT_NAME "game.x86v${X86_64_VERSION}")
 
 #endregion

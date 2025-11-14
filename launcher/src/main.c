@@ -3,7 +3,9 @@
 //
 #include <stdint.h>
 #include <stdio.h>
-#include "LibraryLoader.h"
+#include <stdlib.h>
+#include <string.h>
+#include "../include/LibraryLoader.h"
 
 #define ANSI_RED "\x1b[31m"
 #define ANSI_YELLOW "\x1b[33m"
@@ -12,8 +14,10 @@
 #define LIB_PREFIX "bin/" // TODO don't assume work dir = binary dir
 
 #ifdef WIN32
+// clang-format off
 #include <windows.h> // This include must be above commctrl.h otherwise there are compile errors.
 #include <commctrl.h>
+// clang-format on
 
 #define LIB_SUFFIX ".dll"
 #else
@@ -34,8 +38,33 @@ void ErrorMessageBox(const wchar_t *instruction, const wchar_t *message, const w
 	{
 		printf(ANSI_RED "bootstrap: failed to show error message box HRESULT=%lx\n" ANSI_RESET, res);
 	}
+#else
+	// TODO: linux
+	(void)instruction;
+	(void)message;
+	(void)title;
 #endif
-	// TODO linux
+}
+
+int GetAbiArgument(const int argc, const char *argv[])
+{
+	for (int i = 0; i < argc; i++)
+	{
+		if (strncmp(argv[i], "--abi-level", strlen("--abi-level")) == 0)
+		{
+			const char *value = strchr(argv[i], '=');
+			if (value != NULL)
+			{
+				const int level = (int)strtol(value + 1, NULL, 10);
+				if (level > 0 && level <= 4)
+				{
+					return level;
+				}
+				printf(ANSI_YELLOW "bootstrap: --abi-level was set, but the value was not valid.\n" ANSI_RESET);
+			}
+		}
+	}
+	return 0;
 }
 
 int main(const int argc, const char *argv[])
@@ -48,21 +77,27 @@ int main(const int argc, const char *argv[])
 
 	const char *library_basename = NULL;
 #ifdef __x86_64__
-	uint8_t abiLevel = 0;
+	uint8_t abiLevel = GetAbiArgument(argc, argv);
 
-	__builtin_cpu_init();
-	if (__builtin_cpu_supports("x86-64-v4"))
+	if (abiLevel == 0)
 	{
-		abiLevel = 4;
-	} else if (__builtin_cpu_supports("x86-64-v3"))
+		__builtin_cpu_init();
+		if (__builtin_cpu_supports("x86-64-v4"))
+		{
+			abiLevel = 4;
+		} else if (__builtin_cpu_supports("x86-64-v3"))
+		{
+			abiLevel = 3;
+		} else if (__builtin_cpu_supports("x86-64-v2"))
+		{
+			abiLevel = 2;
+		} else if (__builtin_cpu_supports("x86-64"))
+		{
+			abiLevel = 1;
+		}
+	} else
 	{
-		abiLevel = 3;
-	} else if (__builtin_cpu_supports("x86-64-v2"))
-	{
-		abiLevel = 2;
-	} else if (__builtin_cpu_supports("x86-64"))
-	{
-		abiLevel = 1;
+		printf("bootstrap: forcing abi level %d\n", abiLevel);
 	}
 
 	while (abiLevel > 0)
@@ -113,6 +148,6 @@ int main(const int argc, const char *argv[])
 	}
 	printf(ANSI_RED "bootstrap: error loading game library: %s\n" ANSI_RESET, LibraryLoaderError());
 	ErrorMessageBox(L"Fatal Error", L"Failed to load the game executable.", L"Fatal Error");
-	
+
 	return -1;
 }

@@ -2,7 +2,7 @@
 // Created by droc101 on 11/9/2025.
 //
 
-#include "LibraryLoader.h"
+#include "../include/LibraryLoader.h"
 
 #ifdef WIN32
 #include <windows.h>

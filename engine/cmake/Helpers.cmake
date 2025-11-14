@@ -1,3 +1,15 @@
+macro(enable_options)
+    foreach (OPTION_TO_SET IN ITEMS ${ARGN})
+        set(${OPTION_TO_SET} ON CACHE BOOL "" FORCE)
+    endforeach ()
+endmacro()
+
+macro(disable_options)
+    foreach (OPTION_TO_SET IN ITEMS ${ARGN})
+        set(${OPTION_TO_SET} OFF CACHE BOOL "" FORCE)
+    endforeach ()
+endmacro()
+
 macro(detect_platform)
     include(CheckCSourceCompiles)
     set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
@@ -16,6 +28,9 @@ macro(detect_platform)
             message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}. Supported architectures are x86_64 and aarch64.")
         endif ()
     endif ()
+    if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+        message(FATAL_ERROR "GAME only supports 64-bit systems (CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P})")
+    endif ()
 endmacro()
 
 function(enable_lto)
@@ -29,30 +44,26 @@ function(enable_lto)
     endif ()
 endfunction()
 
-function(create_executable target_name march sources)
-    add_library(${target_name} MODULE)
+macro(create_game_module target_name march sources compile_definitions)
+    add_library(${target_name} MODULE EXCLUDE_FROM_ALL)
     target_sources(${target_name} PRIVATE ${sources})
 
-    target_compile_definitions(${target_name} PUBLIC ${ARGN})
+    target_compile_definitions(${target_name} PRIVATE ${compile_definitions})
     target_compile_options(${target_name} PRIVATE -march=${march})
     target_link_libraries(${target_name} PRIVATE engine)
     target_include_directories(${target_name} PRIVATE include)
-    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'")
-    if (NOT WIN32)
-        file(COPY_FILE ${CMAKE_BINARY_DIR}/discord_game_sdk.so ${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.so)
+    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
+    if (WIN32)
+        add_custom_command(TARGET ${target_name} PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${DISCORD_GAME_SDK_LIBRARY_DIR}/discord_game_sdk.dll"
+                "${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.dll"
+        )
+    else ()
+        add_custom_command(TARGET ${target_name} PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${DISCORD_GAME_SDK_LIBRARY_DIR}/discord_game_sdk.so"
+                "${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.so"
+        )
     endif ()
-    add_dependencies(${target_name} copy_assets)
-    set_target_properties(${target_name} PROPERTIES PREFIX "")
-endfunction()
-
-macro(enable_options)
-    foreach (OPTION_TO_SET IN ITEMS ${ARGN})
-        set(${OPTION_TO_SET} ON CACHE BOOL "" FORCE)
-    endforeach ()
-endmacro()
-
-macro(disable_options)
-    foreach (OPTION_TO_SET IN ITEMS ${ARGN})
-        set(${OPTION_TO_SET} OFF CACHE BOOL "" FORCE)
-    endforeach ()
 endmacro()

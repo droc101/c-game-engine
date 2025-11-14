@@ -7,9 +7,6 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
   build:
     runs-on: windows-latest
@@ -17,12 +14,11 @@ jobs:
     strategy:
       matrix:
         build_type: [ Debug, Release ]
-        zip_name: [ game.windows.debug, game.windows.release ]
-        exclude:
+        include:
           - build_type: Debug
-            zip_name: game.windows.release
-          - build_type: Release
             zip_name: game.windows.debug
+          - build_type: Release
+            zip_name: game.windows.release
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -61,13 +57,9 @@ jobs:
       shell: msys2 {0}
       run: echo "MINGW_WORKSPACE=$(cygpath -u '${{github.workspace}}')" >> $GITHUB_ENV
 
-    - name: Configure CMake
+    - name: Configure & Build
       shell: msys2 {0}
-      run: cmake -B "$MINGW_WORKSPACE/build-${{ matrix.build_type }}" -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-
-    - name: Build
-      shell: msys2 {0}
-      run: cmake --build "$MINGW_WORKSPACE/build-${{ matrix.build_type }}" --config ${{ matrix.build_type }}
+      run: bash BuildForDistribution.sh
 
     - name: Upload results
       uses: actions/upload-artifact@v4

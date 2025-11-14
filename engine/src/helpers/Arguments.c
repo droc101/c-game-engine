@@ -35,7 +35,7 @@ int GetCliArgInt(const int argc, const char *argv[], const char *argument, const
 			const char *value = strchr(argv[i], '=');
 			if (value != NULL)
 			{
-				return (int)strtol(value, NULL, 10);
+				return (int)strtol(value+1, NULL, 10);
 			}
 		}
 	}

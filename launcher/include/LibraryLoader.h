@@ -5,7 +5,7 @@
 #ifndef GAME_LIBRARYLOADER_H
 #define GAME_LIBRARYLOADER_H
 
-#if WIN32
+#ifdef WIN32
 #include <minwindef.h>
 typedef HMODULE LibraryHandle;
 #else

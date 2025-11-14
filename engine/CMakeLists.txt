@@ -1,32 +1,11 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.21) # Required by Luna dependency
 project(engine C CXX)
 
-set(CMAKE_C_STANDARD 11)
-
-include(cmake/FetchPackage.cmake)
 include(CheckIncludeFile)
+include(cmake/FetchPackage.cmake)
+include(cmake/Helpers.cmake)
 
-add_library(engine STATIC)
-
-#region Compile Options
-
-option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
-option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert macros. This overrides the build type and forces them to be enabled always." ON)
-option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden -Wundef")
-
-set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG -fwhole-program")
-
-if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "GAME only supports 64-bit systems (CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P})")
-else ()
-    message(STATUS "CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P}")
-endif ()
-
-#endregion Compile Options
+detect_platform()
 
 #region Dependencies
 
@@ -35,45 +14,33 @@ find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+message("fetch dict")
 fetch_dict()
-fetch_package(https://github.com/NBT22/Luna v0.2.* Luna)
+message("fetch luna")
+fetch_package_tag(https://github.com/NBT22/Luna v0.2.* Luna)
 if (x86_64)
+    message("fetch discord sdk")
     fetch_discord_sdk()
-    target_compile_definitions(engine PUBLIC ENABLE_DISCORD_SDK)
 endif ()
 check_include_file("cglm/cglm.h" cglm_FOUND)
 if (NOT cglm_FOUND)
-    fetch_package(https://github.com/recp/cglm.git v0.*.* cglm)
+    fetch_package_tag(https://github.com/recp/cglm.git v0.*.* cglm)
 else ()
     add_library(cglm INTERFACE)
 endif ()
 
-if (JOLT_BUILD_DEBUG_RENDERER)
-    target_compile_definitions(engine PRIVATE JPH_DEBUG_RENDERER)
-endif ()
-if (JOLT_BUILD_ENABLE_ASSERTS)
-    target_compile_definitions(engine PRIVATE JPH_ENABLE_ASSERTS)
-endif ()
-
-target_compile_definitions(engine PRIVATE BUILD_SHARED_LIBS)
-
 if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
-FetchContent_Declare(
-        joltc
-        GIT_REPOSITORY https://github.com/NBT22/joltc
-        GIT_TAG main
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        EXCLUDE_FROM_ALL
-        SYSTEM
-)
-FetchContent_MakeAvailable(joltc)
+message("fetch jolt")
+fetch_package(https://github.com/NBT22/joltc main joltc)
+set_target_properties(Jolt PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(joltc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 #endregion
 
-target_sources(engine PRIVATE
+add_library(engine INTERFACE)
+target_sources(engine INTERFACE
         src/actor/IoProxy.c
         include/engine/actor/IoProxy.h
         src/actor/LogicBinary.c
@@ -218,24 +185,32 @@ target_sources(engine PRIVATE
         src/Engine.c
         include/engine/Engine.h
 )
-target_include_directories(engine PUBLIC include)
-
-target_link_libraries(engine PUBLIC
+target_include_directories(engine INTERFACE include)
+if (x86_64)
+    target_compile_definitions(engine INTERFACE ENABLE_DISCORD_SDK)
+    target_include_directories(engine INTERFACE ${DISCORD_GAME_SDK_DIR}/c/)
+    target_link_libraries(engine INTERFACE discord_game_sdk)
+endif ()
+if (JOLT_BUILD_DEBUG_RENDERER)
+    target_compile_definitions(engine INTERFACE JPH_DEBUG_RENDERER)
+endif ()
+if (JOLT_BUILD_ENABLE_ASSERTS)
+    target_compile_definitions(engine INTERFACE JPH_ENABLE_ASSERTS)
+endif ()
+target_link_libraries(engine INTERFACE
         SDL2::SDL2
+        SDL2_mixer
+        ZLIB::ZLIB
         joltc
         cglm
         dict
-)
-target_link_libraries(engine PRIVATE
-        SDL2_mixer
-        ZLIB::ZLIB
         Luna
         OpenGL::GL
         GLEW::GLEW
 )
 
 if (UNIX)
-    target_link_libraries(engine PUBLIC m)
+    target_link_libraries(engine INTERFACE m)
 elseif (WIN32)
-    target_link_libraries(engine PRIVATE opengl32 dwmapi)
+    target_link_libraries(engine INTERFACE opengl32 dwmapi)
 endif ()

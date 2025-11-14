@@ -1,81 +1,48 @@
-cmake_minimum_required(VERSION 3.18)
-project(game C CXX)
+cmake_minimum_required(VERSION 3.18) # TODO: Figure out the real number for all of these (and test with that version)
+project(game C)
 
-include(game/cmake/Helpers.cmake)
+include(engine/cmake/Helpers.cmake)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+#region Options
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin) # TODO github actions spits out things into this directory because we build some of the deps
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
-detect_platform()
+option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
+option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert macros. This overrides the build type and forces them to be enabled always." ON)
+option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
+
+option(STANDALONE_LAUNCHER "Whether or not to build only the launcher" OFF)
+set(X86_64_VERSION "3" CACHE STRING "The x86_64 microarchitecture level to target, 1 to 4. Using lower levels has a performance penalty.") # See https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels for details
+
+#endregion
+
+#region Compile flags
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden -Wundef")
+
+set(CMAKE_C_FLAGS_DEBUG "-g -O0 -DBUILDSTYLE_DEBUG")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_RELEASE")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections -DBUILDSTYLE_DEBUG -fwhole-program")
 
 # Enable LTO in release builds
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     enable_lto()
 endif ()
 
-add_executable(launcher launcher/main.c
-        launcher/LibraryLoader.c
-        launcher/LibraryLoader.h)
-set_target_properties(launcher PROPERTIES OUTPUT_NAME "game")
-if (x86_64)
-    target_compile_options(launcher PRIVATE "-march=x86-64")
-else ()
-    target_compile_options(launcher PRIVATE "-march=native")
+#endregion
+
+detect_platform()
+
+set(ENGINE_SOURCE_DIR ${CMAKE_SOURCE_DIR} CACHE PATH "The root directory of the engine, containing both the engine and the launcher projects")
+
+if (NOT STANDALONE_LAUNCHER)
+    add_subdirectory(game)
+else()
+    add_custom_target(game)
 endif ()
 
-if (WIN32)
-    set(CMAKE_AUTO_RCC ON)
-    target_compile_options(launcher PRIVATE "-mwindows")
-    target_sources(launcher PRIVATE launcher/game.rc)
-    target_link_libraries(launcher PRIVATE comctl32)
-endif ()
-
-add_subdirectory(engine)
-add_subdirectory(game)
-
-add_dependencies(launcher game_x86_v1 game_x86_v2 game_x86_v3 game_x86_v4)
-
-if (WIN32)
-    add_custom_target(copy_libraries ALL
-            COMMENT "Copying shared libraries to build output directory"
-    )
-
-    execute_process(
-            COMMAND cygpath -w /mingw64
-            OUTPUT_VARIABLE MINGW_PATH
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-
-    set(DLLS
-            SDL2.dll
-            SDL2_mixer.dll
-            glew32.dll
-            zlib1.dll
-            libmpg123-0.dll
-            libFLAC.dll
-            libopusfile-0.dll
-            libvorbisfile-3.dll
-            libwavpack-1.dll
-            libxmp.dll
-            libvorbis-0.dll
-            libogg-0.dll
-            libwinpthread-1.dll
-            libopus-0.dll
-            libgcc_s_seh-1.dll
-            libstdc++-6.dll
-    )
-
-    foreach (dll IN LISTS DLLS)
-        add_custom_command(TARGET copy_libraries POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${MINGW_PATH}\\bin\\${dll}"
-                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\${dll}"
-        )
-    endforeach ()
-
-    add_dependencies(launcher copy_libraries)
-endif ()
+add_subdirectory(${ENGINE_SOURCE_DIR}/launcher launcher)
