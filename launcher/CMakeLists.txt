@@ -15,7 +15,7 @@ endif ()
 
 if (WIN32)
     target_compile_options(launcher PRIVATE "-mwindows")
-    target_sources(launcher PRIVATE launcher/res/game.rc)
+    target_sources(launcher PRIVATE res/game.rc)
     target_link_libraries(launcher PRIVATE comctl32)
 endif ()
 
