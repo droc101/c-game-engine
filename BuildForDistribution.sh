@@ -27,7 +27,14 @@ for i in {1..4}; do
   echo "---------- BUILDING x86_64 v$i ----------"
   cmake --build "$BUILD_DIR" --target game $4
 done
-cp "$BUILD_DIR/discord_game_sdk.so" "$BUILD_DIR/out/bin" # TODO this cannot be .so on win32
+
+# MSYSTEM is defined by MSYS2
+# TODO should we check if it's equal to "MINGW64"?
+if [ -z "$MSYSTEM" ]; then
+  cp "$BUILD_DIR/discord_game_sdk.so" "$BUILD_DIR/out/bin"
+else
+  cp "$BUILD_DIR/discord_game_sdk.dll" "$BUILD_DIR/out/bin"
+fi
 clean_build_dir
 
 echo "---------- CONFIGURING Launcher ----------"
