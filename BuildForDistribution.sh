@@ -35,8 +35,6 @@ for i in {1..4}; do
   cmake --build "$BUILD_DIR" --target game $4
 done
 
-# MSYSTEM is defined by MSYS2
-# TODO should we check if it's equal to "MINGW64"?
 if [ -z "$MSYSTEM" ]; then
   cp "$BUILD_DIR/discord_game_sdk.so" "$BUILD_DIR/out/bin"
 else

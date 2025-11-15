@@ -20,8 +20,9 @@ jobs:
           - build_type: Release
             zip_name: game.linux.arm64.release
 
-    env:
-      CMAKE_BUILD_PARALLEL_LEVEL: $(nproc)
+# TODO: This
+#    env:
+#      CMAKE_BUILD_PARALLEL_LEVEL: $(nproc)
 
     steps:
       - uses: actions/checkout@v4
