@@ -20,16 +20,13 @@ jobs:
           - build_type: Release
             zip_name: game.windows.release
 
-    env:
-      BUILD_TYPE: ${{ matrix.build_type }}
-
     steps:
     - uses: actions/checkout@v4
 
     - name: Cache Dependencies
       uses: actions/cache@v4
       with:
-        path: ${{ steps.strings.outputs.build-output-dir }}/_deps
+        path: build-${{ matrix.build_type }}/_deps
         key: ${{ matrix.build_type }}-${{ matrix.c_compiler }}-deps-${{ hashFiles('**/.git/HEAD') }}
 
     - name: Setup MSYS2
@@ -37,20 +34,14 @@ jobs:
       with:
           msystem: MINGW64
           install: >-
-            mingw-w64-x86_64-toolchain
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-python-pillow
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-shaderc
-            mingw-w64-x86_64-vulkan-headers
-            mingw-w64-x86_64-vulkan-loader
-            mingw-w64-x86_64-zlib
-            mingw-w64-x86_64-glew
-            mingw-w64-x86_64-cglm
-            mingw-w64-x86_64-SDL2
-            mingw-w64-x86_64-SDL2_mixer
+            git
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-SDL2_mixer
+            mingw-w64-ucrt-x86_64-zlib
+            mingw-w64-ucrt-x86_64-glew
+            mingw-w64-ucrt-x86_64-cglm
           update: true
 
     - name: Convert github.workspace to mingw path

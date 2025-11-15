@@ -1,4 +1,4 @@
-name: Linux Build
+name: Linux (x86_64) Build
 
 on:
   push:
@@ -16,12 +16,9 @@ jobs:
         build_type: [ Debug, Release ]
         include:
           - build_type: Debug
-            zip_name: game.linux.debug
+            zip_name: game.linux.x86_64.debug
           - build_type: Release
-            zip_name: game.linux.release
-
-    env:
-      BUILD_TYPE: ${{ matrix.build_type }}
+            zip_name: game.linux.x86_64.release
 
     steps:
     - uses: actions/checkout@v4
@@ -29,11 +26,11 @@ jobs:
     - name: Cache Dependencies
       uses: actions/cache@v4
       with:
-        path: ${{ steps.strings.outputs.build-output-dir }}/_deps
-        key: ${{ matrix.build_type }}-${{ matrix.c_compiler }}-deps-${{ hashFiles('**/.git/HEAD') }}
+        path: build-${{ matrix.build_type }}/_deps
+        key: ${{ matrix.build_type }}-x86_64-deps-${{ hashFiles('**/.git/HEAD') }}
 
     - name: Install Packages
-      run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev python3-pil glslc libxcb1-dev libx11-dev libxrandr-dev libwayland-dev libdirectfb-dev cmake gcc
+      run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev cmake gcc g++ git
 
     - name: Configure & Build
       run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}

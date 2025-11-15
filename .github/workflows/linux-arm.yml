@@ -1,0 +1,51 @@
+name: Linux (ARM64) Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+
+    strategy:
+      matrix:
+        build_type: [ Debug, Release ]
+        include:
+          - build_type: Debug
+            zip_name: game.linux.arm64.debug
+          - build_type: Release
+            zip_name: game.linux.arm64.release
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: $(nproc)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        with:
+          path: build-${{ matrix.build_type }}/_deps
+          key: ${{ matrix.build_type }}-arm64-deps-${{ hashFiles('**/.git/HEAD') }}
+
+      - name: Install Packages
+        run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev cmake gcc g++ git
+
+      - name: Configure CMake
+        run: cmake -B build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
+      - name: Build
+        run: cmake --build build-${{ matrix.build_type }} --target launcher
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.zip_name }}
+          path: |
+            build-${{ matrix.build_type }}/out/
+          retention-days: 90
+

@@ -43,27 +43,3 @@ function(enable_lto)
         message(WARNING "IPO/LTO is not supported")
     endif ()
 endfunction()
-
-macro(create_game_module target_name march sources compile_definitions)
-    add_library(${target_name} MODULE EXCLUDE_FROM_ALL)
-    target_sources(${target_name} PRIVATE ${sources})
-
-    target_compile_definitions(${target_name} PRIVATE ${compile_definitions})
-    target_compile_options(${target_name} PRIVATE -march=${march})
-    target_link_libraries(${target_name} PRIVATE engine)
-    target_include_directories(${target_name} PRIVATE include)
-    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
-    if (WIN32)
-        add_custom_command(TARGET ${target_name} PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${DISCORD_GAME_SDK_LIBRARY_DIR}/discord_game_sdk.dll"
-                "${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.dll"
-        )
-    else ()
-        add_custom_command(TARGET ${target_name} PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${DISCORD_GAME_SDK_LIBRARY_DIR}/discord_game_sdk.so"
-                "${CMAKE_CURRENT_BINARY_DIR}/discord_game_sdk.so"
-        )
-    endif ()
-endmacro()

@@ -37,8 +37,8 @@ add_custom_target(copy_libraries ALL
 if (WIN32)
 
     execute_process(
-            COMMAND cygpath -w /mingw64
-            OUTPUT_VARIABLE MINGW_PATH
+            COMMAND cygpath -w /ucrt64
+            OUTPUT_VARIABLE MSYS_PATH
             OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
@@ -61,11 +61,11 @@ if (WIN32)
             libstdc++-6.dll
     )
 
-    foreach (dll IN LISTS DLLS)
+    foreach (DLL IN LISTS DLLS)
         add_custom_command(TARGET copy_libraries POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${MINGW_PATH}\\bin\\${dll}"
-                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\${dll}"
+                "${MSYS_PATH}\\bin\\${DLL}"
+                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\${DLL}"
         )
     endforeach ()
 endif ()

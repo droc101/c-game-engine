@@ -48,8 +48,6 @@ macro(fetch_discord_sdk)
     if ((NOT DEFINED DISCORD_GAME_SDK_LIBRARY_DIR) OR (DISCORD_GAME_SDK_LIBRARY_DIR STREQUAL ""))
         set(DISCORD_GAME_SDK_LIBRARY_DIR ${DISCORD_GAME_SDK_DIR}/lib/x86_64)
     endif ()
-    set(DISCORD_GAME_SDK_DIR ${DISCORD_GAME_SDK_DIR} PARENT_SCOPE)
-    set(DISCORD_GAME_SDK_LIBRARY_DIR ${DISCORD_GAME_SDK_LIBRARY_DIR} PARENT_SCOPE)
 
     file(DOWNLOAD https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip ${DISCORD_GAME_SDK_DIR}/discord_game_sdk.zip)
     file(ARCHIVE_EXTRACT INPUT ${DISCORD_GAME_SDK_DIR}/discord_game_sdk.zip DESTINATION ${DISCORD_GAME_SDK_DIR}/)
