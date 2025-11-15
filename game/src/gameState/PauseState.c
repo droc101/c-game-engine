@@ -5,7 +5,9 @@
 #include "gameState/PauseState.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
@@ -17,6 +19,8 @@
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+#include "engine/Engine.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 #include "gameState/OptionsState.h"
@@ -50,6 +54,10 @@ void PauseStateRender(GlobalState * /*state*/)
 	logoSize.x = 360;
 	logoSize.y = 240;
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
+
+#ifdef BUILDSTYLE_DEBUG
+	FontDrawString(v2(20,20), "Engine " ENGINE_VERSION "\nDEBUG BUILD", 16, COLOR_WHITE, smallFont);
+#endif
 
 	ProcessUiStack(pauseStack);
 	DrawUiStack(pauseStack);

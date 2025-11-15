@@ -64,7 +64,7 @@ void MenuStateRender(GlobalState *state)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/menu_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	FontDrawString(v2(20, 200), "DEBUG BUILD", 16, COLOR(0xFF00FF00), smallFont);
+	FontDrawString(v2(20, 20), "DEBUG BUILD", 16, COLOR(0xFF00FF00), smallFont);
 #endif
 
 	// draw version and copyright info
