@@ -11,8 +11,17 @@
 #include <wchar.h>
 #endif
 
+/**
+ * Initialize the dialog system
+ */
 void InitDialogSystem();
 
+/**
+ * Show an error dialog
+ * @param instruction The instruction (top text)
+ * @param message The message (body text)
+ * @param title The title bar text
+ */
 void ErrorDialog(const wchar_t *instruction, const wchar_t *message, const wchar_t *title);
 
 #endif //GAME_DIALOGSYSTEM_H

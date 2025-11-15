@@ -33,6 +33,11 @@ uint8_t GetX86AbiArgument(const int argc, const char *argv[])
 
 uint8_t GetX86AbiLevel()
 {
+	/**
+	 * The "__builtin_cpu_init" and "__builtin_cpu_supports" are provided by GCC.
+	 * An IDE may (incorrectly) display them as errors.
+	 */
+
 	uint8_t abiLevel = 0;
 	__builtin_cpu_init();
 	if (__builtin_cpu_supports("x86-64-v4"))
