@@ -56,7 +56,7 @@ void PauseStateRender(GlobalState * /*state*/)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	FontDrawString(v2(20,20), "Engine " ENGINE_VERSION "\nDEBUG BUILD", 16, COLOR_WHITE, smallFont);
+	FontDrawString(v2(20, 20), "Engine " ENGINE_VERSION "\nDEBUG BUILD", 16, COLOR_WHITE, smallFont);
 #endif
 
 	ProcessUiStack(pauseStack);
