@@ -65,8 +65,7 @@ void DPrintPlayer(const Player *player)
 	float angle = NAN;
 	JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
 	JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
-	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)\nRotation Angle: %.4f "
-			"(%.2fdeg)",
+	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
 			COLOR_WHITE,
 			false,
 			player->transform.rotation.x,
@@ -75,8 +74,6 @@ void DPrintPlayer(const Player *player)
 			radToDeg(fabsf(player->transform.rotation.y)),
 			axis.x,
 			axis.y,
-			axis.z,
-			angle,
-			radToDeg(angle));
+			axis.z);
 	DPrintF("%s Actor: %p", COLOR_WHITE, false, player->hasHeldActor ? "Held" : "Targeted", player->targetedActor);
 }

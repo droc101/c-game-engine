@@ -128,6 +128,7 @@ void DestroyGlobalState()
 	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
 	DestroyMap(state.map);
+	state.map = NULL;
 	free(state.saveData);
 	free(state.camera);
 

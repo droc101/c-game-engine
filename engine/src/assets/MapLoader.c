@@ -5,35 +5,29 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapLoader.h>
+#include <engine/assets/MapMaterialLoader.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
+#include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <engine/actor/IoProxy.h>
-#include <engine/actor/LogicBinary.h>
-#include <engine/actor/LogicCounter.h>
-#include <engine/actor/LogicDecimal.h>
-#include <engine/actor/SoundPlayer.h>
-#include <engine/actor/Sprite.h>
-#include <engine/actor/StaticModel.h>
-#include <engine/actor/Trigger.h>
-#include "engine/assets/MapMaterialLoader.h"
-#include "engine/structs/Asset.h"
 
 Map *LoadMap(const char *path)
 {
@@ -69,22 +63,25 @@ Map *LoadMap(const char *path)
 			conn->targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
 			uint8_t hasOverride = ReadByte(mapData->data, &offset);
 			ReadParam(mapData->data, mapData->size, &offset, &conn->outParamOverride);
+			conn->numRefires = ReadSizeT(mapData->data, &offset);
 			ListAdd(ioConnections, conn);
 		}
 		KvList params;
 		KvListCreate(params);
-		size_t numParams = ReadSizeT(mapData->data, &offset);
+		const size_t numParams = ReadSizeT(mapData->data, &offset);
 		for (size_t j = 0; j < numParams; j++)
 		{
 			char *key = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
 			Param p;
 			ReadParam(mapData->data, mapData->size, &offset, &p);
 			KvSetUnsafe(params, key, p);
+			free(key);
 		}
 
 		if (strcmp(actorClass, "player") == 0)
 		{
 			map->player.transform = xfm;
+			free(actorClass);
 			// TODO free stuff
 			continue;
 		}
@@ -92,6 +89,7 @@ Map *LoadMap(const char *path)
 		Actor *a = CreateActor(&xfm, actorClass, params, bodyInterface);
 		a->ioConnections = ioConnections;
 		ListAdd(map->actors, a);
+		free(actorClass);
 	}
 
 	map->numModels = ReadSizeT(mapData->data, &offset);

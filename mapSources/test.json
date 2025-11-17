@@ -2483,15 +2483,54 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
-        },
         "isBlue": {
           "type": "bool",
           "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
+    },
+    {
+      "class": "prop_model_static",
+      "position": {
+        "x": -13.0,
+        "y": 0.0,
+        "z": -0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "model": {
+          "type": "string",
+          "value": "leafy"
+        },
+        "skin": {
+          "type": "int",
+          "value": 0
+        }
+      }
+    },
+    {
+      "class": "player",
+      "position": {
+        "x": -26.0,
+        "y": 0.0,
+        "z": -5.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {}
     }
   ]
 }

@@ -47,6 +47,16 @@ void DestroyMap(Map *map)
 		Actor *actor = ListGetPointer(map->actors, i);
 		FreeActor(actor);
 	}
+
+	for (size_t i = 0; i < map->numModels; i++)
+	{
+		const MapModel *m = &map->models[i];
+		free(m->verts);
+		free(m->indices);
+	}
+	free(map->models);
+	map->models = NULL;
+
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
 	PhysicsDestroyMap(map, bodyInterface);
