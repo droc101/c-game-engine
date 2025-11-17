@@ -2259,6 +2259,198 @@
           "z": -1.570164442062378
         }
       ]
+    },
+    {
+      "floorHeight": -1.0,
+      "ceilingHeight": 1.0,
+      "floorMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "ceilingMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "lightColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "wallMaterials": [
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        }
+      ],
+      "points": [
+        {
+          "x": -26.0,
+          "z": 6.0
+        },
+        {
+          "x": -30.0,
+          "z": 6.0
+        },
+        {
+          "x": -30.0,
+          "z": 2.0
+        },
+        {
+          "x": -26.0,
+          "z": 2.0
+        }
+      ]
+    },
+    {
+      "floorHeight": -1.0,
+      "ceilingHeight": 1.0,
+      "floorMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "ceilingMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "lightColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "wallMaterials": [
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        }
+      ],
+      "points": [
+        {
+          "x": -34.0,
+          "z": 6.0
+        },
+        {
+          "x": -34.0,
+          "z": 2.0
+        },
+        {
+          "x": -38.0,
+          "z": 2.0
+        },
+        {
+          "x": -38.0,
+          "z": 6.0
+        }
+      ]
     }
   ],
   "actors": [
@@ -2291,13 +2483,13 @@
       },
       "connections": [],
       "params": {
-        "isBlue": {
-          "type": "bool",
-          "value": false
-        },
         "name": {
           "type": "string",
           "value": ""
+        },
+        "isBlue": {
+          "type": "bool",
+          "value": false
         }
       }
     }
