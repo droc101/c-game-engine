@@ -1,5 +1,8 @@
 {
   "version": 1,
+  "discord_rpc_icon_id": "level_test",
+  "discord_rpc_map_name": "Test",
+  "sky_texture": "texture/actor/BLOB2.gtex",
   "sectors": [
     {
       "floorHeight": -1.0,
@@ -2483,13 +2486,13 @@
       },
       "connections": [],
       "params": {
-        "isBlue": {
-          "type": "bool",
-          "value": false
-        },
         "name": {
           "type": "string",
           "value": ""
+        },
+        "isBlue": {
+          "type": "bool",
+          "value": false
         }
       }
     },
@@ -2507,13 +2510,13 @@
       },
       "connections": [],
       "params": {
-        "model": {
-          "type": "string",
-          "value": "leafy"
-        },
         "skin": {
           "type": "int",
           "value": 0
+        },
+        "model": {
+          "type": "string",
+          "value": "leafy"
         }
       }
     },

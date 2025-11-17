@@ -36,7 +36,9 @@ Map *LoadMap(const char *path)
 	size_t offset = 0;
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
-	snprintf(map->skyTexture, 80, TEXTURE("level/sky_test"));
+	map->skyTexture = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+	map->discordRpcIcon = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+	map->discordRpcName = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
 
 	const size_t numActors = ReadSizeT(mapData->data, &offset);
 	for (size_t i = 0; i < numActors; i++)

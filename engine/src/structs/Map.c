@@ -31,10 +31,13 @@ Map *CreateMap(void)
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
 	CreatePlayer(&map->player, map->physicsSystem);
-	strncpy(map->skyTexture, TEXTURE("level/sky_test"), 28);
+	// strncpy(map->skyTexture, TEXTURE("level/sky_test"), 28);
 	map->fogColor = 0xff000000;
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
+	map->discordRpcIcon = NULL;
+	map->discordRpcName = NULL;
+	map->skyTexture = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	return map;
@@ -56,6 +59,10 @@ void DestroyMap(Map *map)
 	}
 	free(map->models);
 	map->models = NULL;
+
+	free(map->skyTexture);
+	free(map->discordRpcIcon);
+	free(map->discordRpcName);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 

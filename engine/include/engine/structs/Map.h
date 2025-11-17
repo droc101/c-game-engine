@@ -40,6 +40,9 @@ struct MapModel
 
 struct Map
 {
+	char *discordRpcIcon;
+	char *discordRpcName;
+
 	/// The list of actors in the map
 	LockingList actors;
 
@@ -47,7 +50,7 @@ struct Map
 	MapModel *models;
 
 	/// The fully qualified texture name of the sky
-	char skyTexture[80];
+	char *skyTexture;
 
 	/// The color of the fog
 	uint32_t fogColor;

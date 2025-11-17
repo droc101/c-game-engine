@@ -43,7 +43,6 @@ struct GlobalState
 {
 	/// Current map
 	Map *map;
-	char *mapName;
 
 	JPH_JobSystem *jobSystem;
 

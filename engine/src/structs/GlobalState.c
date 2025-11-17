@@ -45,7 +45,6 @@ void InitState()
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
 	state.map = CreateMap(); // empty map so we don't segfault
-	state.mapName = calloc(1, 1);
 	state.camera = calloc(1, sizeof(Camera));
 	CheckAlloc(state.camera);
 	state.camera->fov = GetState()->options.fov;
@@ -106,10 +105,8 @@ void ChangeMap(Map *map, char *mapName)
 	if (state.map)
 	{
 		DestroyMap(state.map);
-		free(state.mapName);
 	}
 	state.map = map;
-	state.mapName = mapName;
 	// if (strncmp(level->music, "none", 4) != 0)
 	// {
 	// 	char musicPath[80];
