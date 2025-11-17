@@ -150,9 +150,11 @@ void RenderMap(const Map *map, const Camera *camera)
 	JoltDebugRendererDrawBodies(map->physicsSystem);
 	RenderMap3D(map, camera);
 
+	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		Actor *a = ListGetPointer(map->actors, i);
 		a->definition->RenderUi(a);
 	}
+	ListUnlock(map->actors);
 }
