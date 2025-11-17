@@ -33,8 +33,8 @@ Map *CreateMap(void)
 	CreatePlayer(&map->player, map->physicsSystem);
 	strncpy(map->skyTexture, TEXTURE("level/sky_test"), 28);
 	map->fogColor = 0xff000000;
-	map->fogStart = 10;
-	map->fogEnd = 30;
+	map->fogStart = 2000;
+	map->fogEnd = 2500;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	return map;

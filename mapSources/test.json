@@ -192,6 +192,2073 @@
           "z": 8.0
         }
       ]
+    },
+    {
+      "floorHeight": -8.0,
+      "ceilingHeight": 8.0,
+      "floorMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "ceilingMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "lightColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "wallMaterials": [
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/tools/invisible.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/tools/skip.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        }
+      ],
+      "points": [
+        {
+          "x": -8.0,
+          "z": 8.0
+        },
+        {
+          "x": -16.0,
+          "z": 5.0
+        },
+        {
+          "x": -20.0,
+          "z": 0.0
+        },
+        {
+          "x": -16.0,
+          "z": -5.0
+        },
+        {
+          "x": -8.0,
+          "z": -8.0
+        }
+      ]
+    },
+    {
+      "floorHeight": -16.0,
+      "ceilingHeight": 16.0,
+      "floorMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "ceilingMaterial": {
+        "material": "material/dev/wall_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "lightColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "wallMaterials": [
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        }
+      ],
+      "points": [
+        {
+          "x": 96.0,
+          "z": 0.0
+        },
+        {
+          "x": 95.96145629882813,
+          "z": 1.5701656341552734
+        },
+        {
+          "x": 95.84590911865234,
+          "z": 3.1365485191345215
+        },
+        {
+          "x": 95.65364837646484,
+          "z": 4.695374965667725
+        },
+        {
+          "x": 95.3851318359375,
+          "z": 6.242890357971191
+        },
+        {
+          "x": 95.04100036621094,
+          "z": 7.775366306304932
+        },
+        {
+          "x": 94.6220932006836,
+          "z": 9.28911018371582
+        },
+        {
+          "x": 94.12940979003906,
+          "z": 10.780475616455078
+        },
+        {
+          "x": 93.56414794921875,
+          "z": 12.245870590209961
+        },
+        {
+          "x": 92.92765808105469,
+          "z": 13.6817626953125
+        },
+        {
+          "x": 92.22148132324219,
+          "z": 15.084695816040039
+        },
+        {
+          "x": 91.44731140136719,
+          "z": 16.4512882232666
+        },
+        {
+          "x": 90.60702514648438,
+          "z": 17.778247833251953
+        },
+        {
+          "x": 89.70263671875,
+          "z": 19.0623779296875
+        },
+        {
+          "x": 88.73633575439453,
+          "z": 20.300586700439453
+        },
+        {
+          "x": 87.71043395996094,
+          "z": 21.489887237548828
+        },
+        {
+          "x": 86.6274185180664,
+          "z": 22.627416610717773
+        },
+        {
+          "x": 85.48988342285156,
+          "z": 23.710437774658203
+        },
+        {
+          "x": 84.30058288574219,
+          "z": 24.7363338470459
+        },
+        {
+          "x": 83.0623779296875,
+          "z": 25.702640533447266
+        },
+        {
+          "x": 81.77824401855469,
+          "z": 26.60702896118164
+        },
+        {
+          "x": 80.45128631591797,
+          "z": 27.447317123413086
+        },
+        {
+          "x": 79.0846939086914,
+          "z": 28.221481323242188
+        },
+        {
+          "x": 77.6817626953125,
+          "z": 28.927658081054688
+        },
+        {
+          "x": 76.2458724975586,
+          "z": 29.564144134521484
+        },
+        {
+          "x": 74.78047180175781,
+          "z": 30.129409790039063
+        },
+        {
+          "x": 73.28910827636719,
+          "z": 30.62209129333496
+        },
+        {
+          "x": 71.77536010742188,
+          "z": 31.041000366210938
+        },
+        {
+          "x": 70.24288940429688,
+          "z": 31.385129928588867
+        },
+        {
+          "x": 68.69537353515625,
+          "z": 31.653648376464844
+        },
+        {
+          "x": 67.13655090332031,
+          "z": 31.845911026000977
+        },
+        {
+          "x": 65.5701675415039,
+          "z": 31.961454391479492
+        },
+        {
+          "x": 64.0,
+          "z": 32.0
+        },
+        {
+          "x": 62.429832458496094,
+          "z": 31.961454391479492
+        },
+        {
+          "x": 60.86344909667969,
+          "z": 31.845911026000977
+        },
+        {
+          "x": 59.304622650146484,
+          "z": 31.653648376464844
+        },
+        {
+          "x": 57.757110595703125,
+          "z": 31.385128021240234
+        },
+        {
+          "x": 56.224632263183594,
+          "z": 31.041000366210938
+        },
+        {
+          "x": 54.71088790893555,
+          "z": 30.622089385986328
+        },
+        {
+          "x": 53.219520568847656,
+          "z": 30.129409790039063
+        },
+        {
+          "x": 51.754127502441406,
+          "z": 29.564144134521484
+        },
+        {
+          "x": 50.3182373046875,
+          "z": 28.927658081054688
+        },
+        {
+          "x": 48.91530227661133,
+          "z": 28.221479415893555
+        },
+        {
+          "x": 47.54871368408203,
+          "z": 27.447315216064453
+        },
+        {
+          "x": 46.22174835205078,
+          "z": 26.607025146484375
+        },
+        {
+          "x": 44.9376220703125,
+          "z": 25.702640533447266
+        },
+        {
+          "x": 43.69941711425781,
+          "z": 24.73633575439453
+        },
+        {
+          "x": 42.510108947753906,
+          "z": 23.710433959960938
+        },
+        {
+          "x": 41.372581481933594,
+          "z": 22.627416610717773
+        },
+        {
+          "x": 40.28955841064453,
+          "z": 21.489883422851563
+        },
+        {
+          "x": 39.26366424560547,
+          "z": 20.30058479309082
+        },
+        {
+          "x": 38.29735565185547,
+          "z": 19.0623722076416
+        },
+        {
+          "x": 37.39297103881836,
+          "z": 17.77824592590332
+        },
+        {
+          "x": 36.55268478393555,
+          "z": 16.4512882232666
+        },
+        {
+          "x": 35.77851867675781,
+          "z": 15.084692001342773
+        },
+        {
+          "x": 35.07234191894531,
+          "z": 13.681761741638184
+        },
+        {
+          "x": 34.43585205078125,
+          "z": 12.245864868164063
+        },
+        {
+          "x": 33.87059020996094,
+          "z": 10.780473709106445
+        },
+        {
+          "x": 33.377906799316406,
+          "z": 9.289111137390137
+        },
+        {
+          "x": 32.95899963378906,
+          "z": 7.775362491607666
+        },
+        {
+          "x": 32.6148681640625,
+          "z": 6.242889881134033
+        },
+        {
+          "x": 32.346351623535156,
+          "z": 4.695370674133301
+        },
+        {
+          "x": 32.154090881347656,
+          "z": 3.136547088623047
+        },
+        {
+          "x": 32.038543701171875,
+          "z": 1.5701595544815063
+        },
+        {
+          "x": 32.0,
+          "z": -2.7975288503512274e-06
+        },
+        {
+          "x": 32.038543701171875,
+          "z": -1.5701651573181152
+        },
+        {
+          "x": 32.154090881347656,
+          "z": -3.136552572250366
+        },
+        {
+          "x": 32.346351623535156,
+          "z": -4.695375919342041
+        },
+        {
+          "x": 32.614871978759766,
+          "z": -6.242895603179932
+        },
+        {
+          "x": 32.95899963378906,
+          "z": -7.775367736816406
+        },
+        {
+          "x": 33.37791061401367,
+          "z": -9.289115905761719
+        },
+        {
+          "x": 33.87059020996094,
+          "z": -10.780478477478027
+        },
+        {
+          "x": 34.435855865478516,
+          "z": -12.245869636535645
+        },
+        {
+          "x": 35.07234191894531,
+          "z": -13.681767463684082
+        },
+        {
+          "x": 35.77851867675781,
+          "z": -15.084696769714355
+        },
+        {
+          "x": 36.55268859863281,
+          "z": -16.451292037963867
+        },
+        {
+          "x": 37.392974853515625,
+          "z": -17.778249740600586
+        },
+        {
+          "x": 38.297359466552734,
+          "z": -19.0623779296875
+        },
+        {
+          "x": 39.263668060302734,
+          "z": -20.300588607788086
+        },
+        {
+          "x": 40.28956604003906,
+          "z": -21.489887237548828
+        },
+        {
+          "x": 41.372589111328125,
+          "z": -22.62742042541504
+        },
+        {
+          "x": 42.51011657714844,
+          "z": -23.710437774658203
+        },
+        {
+          "x": 43.69941329956055,
+          "z": -24.7363338470459
+        },
+        {
+          "x": 44.937625885009766,
+          "z": -25.7026424407959
+        },
+        {
+          "x": 46.22175979614258,
+          "z": -26.607032775878906
+        },
+        {
+          "x": 47.548709869384766,
+          "z": -27.44731330871582
+        },
+        {
+          "x": 48.915306091308594,
+          "z": -28.221481323242188
+        },
+        {
+          "x": 50.318241119384766,
+          "z": -28.92765998840332
+        },
+        {
+          "x": 51.7541389465332,
+          "z": -29.564149856567383
+        },
+        {
+          "x": 53.21952438354492,
+          "z": -30.129409790039063
+        },
+        {
+          "x": 54.71089553833008,
+          "z": -30.62209129333496
+        },
+        {
+          "x": 56.22464370727539,
+          "z": -31.04100227355957
+        },
+        {
+          "x": 57.75710678100586,
+          "z": -31.385128021240234
+        },
+        {
+          "x": 59.30462646484375,
+          "z": -31.653648376464844
+        },
+        {
+          "x": 60.86345672607422,
+          "z": -31.845911026000977
+        },
+        {
+          "x": 62.42984390258789,
+          "z": -31.961454391479492
+        },
+        {
+          "x": 64.0,
+          "z": -32.0
+        },
+        {
+          "x": 65.5701675415039,
+          "z": -31.961454391479492
+        },
+        {
+          "x": 67.13655853271484,
+          "z": -31.845911026000977
+        },
+        {
+          "x": 68.69537353515625,
+          "z": -31.653648376464844
+        },
+        {
+          "x": 70.24288940429688,
+          "z": -31.385128021240234
+        },
+        {
+          "x": 71.77537536621094,
+          "z": -31.040998458862305
+        },
+        {
+          "x": 73.28912353515625,
+          "z": -30.622087478637695
+        },
+        {
+          "x": 74.78047943115234,
+          "z": -30.129409790039063
+        },
+        {
+          "x": 76.2458724975586,
+          "z": -29.56414222717285
+        },
+        {
+          "x": 77.68177032470703,
+          "z": -28.92765235900879
+        },
+        {
+          "x": 79.0846939086914,
+          "z": -28.221481323242188
+        },
+        {
+          "x": 80.4512939453125,
+          "z": -27.44731330871582
+        },
+        {
+          "x": 81.77825164794922,
+          "z": -26.607023239135742
+        },
+        {
+          "x": 83.0623779296875,
+          "z": -25.7026424407959
+        },
+        {
+          "x": 84.30058288574219,
+          "z": -24.7363338470459
+        },
+        {
+          "x": 85.4898910522461,
+          "z": -23.710432052612305
+        },
+        {
+          "x": 86.62742614746094,
+          "z": -22.627408981323242
+        },
+        {
+          "x": 87.71043395996094,
+          "z": -21.489887237548828
+        },
+        {
+          "x": 88.73633575439453,
+          "z": -20.300580978393555
+        },
+        {
+          "x": 89.70264434814453,
+          "z": -19.06237030029297
+        },
+        {
+          "x": 90.60702514648438,
+          "z": -17.778249740600586
+        },
+        {
+          "x": 91.44731903076172,
+          "z": -16.45128631591797
+        },
+        {
+          "x": 92.22148132324219,
+          "z": -15.084689140319824
+        },
+        {
+          "x": 92.92765808105469,
+          "z": -13.681753158569336
+        },
+        {
+          "x": 93.56414794921875,
+          "z": -12.245869636535645
+        },
+        {
+          "x": 94.12940979003906,
+          "z": -10.780470848083496
+        },
+        {
+          "x": 94.6220932006836,
+          "z": -9.289100646972656
+        },
+        {
+          "x": 95.04100036621094,
+          "z": -7.775367259979248
+        },
+        {
+          "x": 95.3851318359375,
+          "z": -6.242887496948242
+        },
+        {
+          "x": 95.65364837646484,
+          "z": -4.695367813110352
+        },
+        {
+          "x": 95.84591674804688,
+          "z": -3.1365365982055664
+        },
+        {
+          "x": 95.96145629882813,
+          "z": -1.570164442062378
+        }
+      ]
     }
   ],
   "actors": [
@@ -224,13 +2291,13 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
-        },
         "isBlue": {
           "type": "bool",
           "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     }

@@ -32,6 +32,7 @@
 #include <engine/actor/Sprite.h>
 #include <engine/actor/StaticModel.h>
 #include <engine/actor/Trigger.h>
+#include "engine/assets/MapMaterialLoader.h"
 #include "engine/structs/Asset.h"
 
 Map *LoadMap(const char *path)
@@ -99,6 +100,10 @@ Map *LoadMap(const char *path)
 	for (size_t i = 0; i < map->numModels; i++)
 	{
 		MapModel *model = &map->models[i];
+		char *materialName = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+		model->material = LoadMapMaterial(materialName);
+		free(materialName);
+
 		model->numVerts = ReadUint(mapData->data, &offset);
 		model->verts = malloc(sizeof(MapVertex) * model->numVerts);
 		for (uint32_t j = 0; j < model->numVerts; j++)

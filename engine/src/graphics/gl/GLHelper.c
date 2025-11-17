@@ -1140,14 +1140,11 @@ void GL_RenderModel(const ModelDefinition *model,
 
 void GL_RenderMapModel(const MapModel *model)
 {
-	const ModelShader shader = SHADER_SHADED;
+	const ModelShader shader = model->material->shader;
 
 	const GL_Shader *glShader = NULL;
 	switch (shader)
 	{
-		case SHADER_SKY:
-			glShader = skyShader;
-			break;
 		case SHADER_SHADED:
 			glShader = modelShadedShader;
 			break;
@@ -1161,13 +1158,7 @@ void GL_RenderMapModel(const MapModel *model)
 
 	glUseProgram(glShader->program);
 
-	if (shader == SHADER_SKY)
-	{
-		GL_LoadTextureFromAsset(GetState()->map->skyTexture);
-	} else
-	{
-		GL_LoadTextureFromAsset("");
-	}
+	GL_LoadTextureFromAsset(model->material->texture);
 
 	mat4 idty = GLM_MAT4_IDENTITY_INIT;
 

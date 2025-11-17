@@ -5,6 +5,7 @@
 #ifndef GAME_MAP_H
 #define GAME_MAP_H
 
+#include <engine/assets/MapMaterialLoader.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/List.h>
@@ -30,6 +31,7 @@ struct MapVertex
 
 struct MapModel
 {
+	MapMaterial *material;
 	uint32_t numVerts;
 	MapVertex *verts;
 	uint32_t numIndices;
