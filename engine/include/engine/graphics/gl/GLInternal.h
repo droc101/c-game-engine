@@ -22,7 +22,6 @@
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
 typedef struct GL_ModelBuffers GL_ModelBuffers;
-typedef struct GL_WallBuffers GL_WallBuffers;
 typedef struct GL_SharedUniforms GL_SharedUniforms;
 
 struct GL_Shader
@@ -55,16 +54,6 @@ struct GL_ModelBuffers
 	GL_Buffer **buffers;
 };
 
-struct GL_WallBuffers
-{
-	/// The number of walls in this buffer
-	size_t wallCount;
-	/// The texture name for this buffer
-	char texture[80];
-	/// The GPU buffer for the walls
-	GL_Buffer *buffer;
-};
-
 struct __attribute__((aligned(16))) GL_SharedUniforms
 {
 	/// The model -> screen matrix
@@ -79,10 +68,6 @@ struct __attribute__((aligned(16))) GL_SharedUniforms
 	float cameraYaw;
 };
 
-/// The maximum number of different wall textures that can be used in a level
-#define GL_MAX_WALL_BUFFERS 128
-/// The maximum number of walls that can be in a single wall buffer (i.e. a single texture)
-#define GL_MAX_WALLS_PER_BUFFER 2048
 /**
  * Log an OpenGL error
  * @param error the error message
@@ -186,12 +171,6 @@ void GL_Enable3D();
 void GL_Disable3D();
 
 /**
- * Destroy any existing wall buffers.
- * This is OK to call if there are no buffers.
- */
-void GL_DestroyWallBuffers();
-
-/**
  * Load shader uniform locations
  */
 void LoadShaderLocations();
@@ -215,14 +194,6 @@ void GL_DestroyBuffer(GL_Buffer *buffer);
  * @param material The material to load
  */
 void GL_LoadModel(const ModelDefinition *model, uint32_t lod, size_t material);
-
-/**
- * Get the wall buffer for a texture, or create it if it doesn't exist.
- * @param texture The texture name
- * @return The wall buffer for the texture
- * @warning This will crash the game if there are no free slots left.
- */
-GL_WallBuffers *GL_GetWallBuffer(const char *texture);
 
 /**
  * Render a single material of a model

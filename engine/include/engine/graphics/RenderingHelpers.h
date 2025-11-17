@@ -135,8 +135,6 @@ bool FrameStart();
  */
 void FrameEnd();
 
-void LoadLevelWalls(const Map *l);
-
 /**
  * Update the viewport size
  */

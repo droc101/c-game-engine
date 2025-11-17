@@ -181,21 +181,6 @@ void FrameEnd()
 	}
 }
 
-void LoadLevelWalls(const Map *l)
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_LoadLevelWalls(l);
-			break;
-		case RENDERER_OPENGL:
-			GL_LoadLevelWalls(l);
-			break;
-		default:
-			break;
-	}
-}
-
 inline void UpdateViewportSize()
 {
 	const float newScaleX = ActualWindowSize().x / DEF_WIDTH;

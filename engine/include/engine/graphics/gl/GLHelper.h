@@ -123,16 +123,6 @@ void GL_DrawTextureRegionMod(Vector2 pos,
 							 Color color);
 
 /**
- * Draw the floor in 3D
- * @param vp1 The start of the floor
- * @param vp2 The end of the floor
- * @param texture The texture name
- * @param height The height of the floor
- * @param shade The shade of the floor
- */
-void GL_DrawFloor(Vector2 vp1, Vector2 vp2, const char *texture, float height, float shade);
-
-/**
  * Update the viewport size
  */
 void GL_UpdateViewportSize();
@@ -218,16 +208,5 @@ void GL_RenderModel(const ModelDefinition *model,
 					uint32_t skin,
 					uint32_t lod,
 					Color modColor);
-
-/**
- * Render the level's static walls
- */
-void GL_RenderLevelWalls();
-
-/**
- * Load the level's static walls into buffers
- * @param l The level to load walls from
- */
-void GL_LoadLevelWalls(const Map *l);
 
 #endif //GAME_GLHELPER_H

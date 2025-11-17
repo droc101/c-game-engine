@@ -120,7 +120,6 @@ void ChangeLevel(Map *level, char *levelName)
 	// 	StopMusic();
 	// }
 
-	LoadLevelWalls(level);
 	PhysicsThreadUnlockTickMutex();
 }
 

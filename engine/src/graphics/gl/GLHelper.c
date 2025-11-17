@@ -38,7 +38,6 @@ SDL_GLContext ctx;
 GL_Shader *uiTexturedShader;
 GL_Shader *uiColoredShader;
 GL_Shader *wallShader;
-GL_Shader *floorAndCeilingShader;
 GL_Shader *skyShader;
 GL_Shader *modelUnshadedShader;
 GL_Shader *modelShadedShader;
@@ -51,7 +50,6 @@ int glAssetTextureMap[MAX_TEXTURES];
 char glLastError[512];
 
 GL_ModelBuffers *glModels[MAX_MODELS];
-GL_WallBuffers *glWalls[GL_MAX_WALL_BUFFERS];
 
 GLuint sharedUniformBuffer;
 
@@ -80,11 +78,6 @@ GLint wallTransformMatrixLoc;
 
 void LoadShaderLocations()
 {
-	floorTextureLoc = glGetUniformLocation(floorAndCeilingShader->program, "alb");
-	floorShadeLoc = glGetUniformLocation(floorAndCeilingShader->program, "shade");
-	floorHeightLoc = glGetUniformLocation(floorAndCeilingShader->program, "height");
-	floorSharedUniformsLoc = glGetUniformBlockIndex(floorAndCeilingShader->program, "SharedUniforms");
-
 	hudColoredColorLoc = glGetUniformLocation(uiColoredShader->program, "col");
 
 	hudTexturedTextureLoc = glGetUniformLocation(uiTexturedShader->program, "alb");
@@ -197,7 +190,6 @@ bool GL_Init(SDL_Window *wnd)
 	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_textured_f"), SHADER("gl/hud_textured_v"));
 	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_color_f"), SHADER("gl/hud_color_v"));
 	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/wall_f"), SHADER("gl/wall_v"));
-	floorAndCeilingShader = GL_ConstructShaderFromAssets(SHADER("gl/floor_f"), SHADER("gl/floor_v"));
 	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/sky_f"), SHADER("gl/sky_v"));
 	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
 	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"), SHADER("gl/model_unshaded_v"));
@@ -205,7 +197,6 @@ bool GL_Init(SDL_Window *wnd)
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
 		!wallShader ||
-		!floorAndCeilingShader ||
 		!skyShader ||
 		!modelShadedShader ||
 		!modelUnshadedShader)
@@ -255,7 +246,6 @@ void GL_DestroyGL()
 	GL_DestroyShader(uiTexturedShader);
 	GL_DestroyShader(uiColoredShader);
 	GL_DestroyShader(wallShader);
-	GL_DestroyShader(floorAndCeilingShader);
 	GL_DestroyShader(skyShader);
 	GL_DestroyShader(modelShadedShader);
 	GL_DestroyShader(modelUnshadedShader);
@@ -263,7 +253,6 @@ void GL_DestroyGL()
 	glDisableVertexAttribArray(0);
 	GL_DestroyBuffer(glBuffer);
 	glDeleteBuffers(1, &sharedUniformBuffer);
-	GL_DestroyWallBuffers();
 	for (int i = 0; i < MAX_TEXTURES; i++)
 	{
 		if (glTextures[i] != 0)
@@ -507,94 +496,6 @@ void GL_LoadModel(const ModelDefinition *model, const uint32_t lod, const size_t
 	}
 
 	glModels[model->id] = buf;
-}
-
-void GL_DestroyWallBuffers()
-{
-	size_t i = 0;
-	while (glWalls[i] != NULL && i < GL_MAX_WALL_BUFFERS)
-	{
-		GL_WallBuffers *wallBuffer = glWalls[i];
-		GL_DestroyBuffer(wallBuffer->buffer);
-		free(wallBuffer);
-		glWalls[i] = NULL;
-		i++;
-	}
-}
-
-GL_WallBuffers *GL_GetWallBuffer(const char *texture)
-{
-	size_t i = 0;
-	while (glWalls[i] != NULL &&
-		   i < GL_MAX_WALL_BUFFERS) // TODO: maybe look into a faster lookup, but also this is level load sooooooo
-	{
-		if (strcmp(glWalls[i]->texture, texture) == 0)
-		{
-			return glWalls[i];
-		}
-		i++;
-	}
-	if (i >= GL_MAX_WALL_BUFFERS)
-	{
-		Error("Too many wall buffers allocated, increase GL_MAX_WALL_BUFFERS");
-	}
-	GL_WallBuffers *newBuffer = malloc(sizeof(GL_WallBuffers));
-	CheckAlloc(newBuffer);
-	newBuffer->buffer = GL_ConstructBuffer();
-	glBindBuffer(GL_ARRAY_BUFFER, newBuffer->buffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newBuffer->buffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 6 * GL_MAX_WALLS_PER_BUFFER, NULL, GL_STREAM_DRAW);
-	strncpy(newBuffer->texture, texture, sizeof(newBuffer->texture) - 1);
-	newBuffer->wallCount = 0;
-	glWalls[i] = newBuffer;
-	return newBuffer;
-}
-
-void GL_LoadLevelWalls(const Map *l)
-{
-	GL_DestroyWallBuffers();
-	// for (size_t i = 0; i < l->walls.length; i++)
-	// {
-	// 	const Wall *w = ListGetPointer(l->walls, i);
-	// 	GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
-	// 	if (wallBuffer->wallCount + 1 > GL_MAX_WALLS_PER_BUFFER)
-	// 	{
-	// 		LogError("Too many walls of same material! Increase GL_MAX_WALLS_PER_BUFFER to fix this");
-	// 		Error("Too many walls of same material!");
-	// 	}
-	//
-	// 	float vertices[4][6] = {
-	// 		// X Y Z U V A
-	// 		{(float)w->a.x, 0.5f, (float)w->a.y, 0.0f, 0.0f, w->angle},
-	// 		{(float)w->b.x, 0.5f, (float)w->b.y, (float)w->length, 0.0f, w->angle},
-	// 		{(float)w->b.x, -0.5f, (float)w->b.y, (float)w->length, 1.0f, w->angle},
-	// 		{(float)w->a.x, -0.5f, (float)w->a.y, 0.0f, 1.0f, w->angle},
-	// 	};
-	//
-	// 	const float uvOffset = w->uvOffset;
-	// 	const float uvScale = w->uvScale;
-	// 	for (int j = 0; j < 4; j++)
-	// 	{
-	// 		vertices[j][3] = vertices[j][3] * uvScale + uvOffset;
-	// 	}
-	//
-	// 	uint32_t indices[] = {0, 1, 2, 0, 2, 3};
-	// 	for (int j = 0; j < 6; j++)
-	// 	{
-	// 		indices[j] += wallBuffer->wallCount * 4;
-	// 	}
-	//
-	// 	const GLintptr vertexOffset = (GLintptr)(sizeof(float) * 24 * wallBuffer->wallCount);
-	// 	const GLintptr indexOffset = (GLintptr)(sizeof(uint32_t) * 6 * wallBuffer->wallCount);
-	//
-	// 	glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
-	// 	glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(vertices), vertices);
-	// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wallBuffer->buffer->elementBufferObject);
-	// 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, indexOffset, sizeof(indices), indices);
-	//
-	// 	wallBuffer->wallCount++;
-	// }
 }
 
 #pragma endregion
@@ -1070,42 +971,6 @@ void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_DrawFloor(const Vector2 vp1, const Vector2 vp2, const char *texture, const float height, const float shade)
-{
-	glUseProgram(floorAndCeilingShader->program);
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, floorSharedUniformsLoc, sharedUniformBuffer);
-
-	GL_LoadTextureFromAsset(texture);
-
-	glUniform1f(floorHeightLoc, height);
-	glUniform1f(floorShadeLoc, shade);
-
-	const float vertices[4][2] = {
-		// X Z
-		{(float)vp1.x, (float)vp1.y},
-		{(float)vp2.x, (float)vp1.y},
-		{(float)vp2.x, (float)vp2.y},
-		{(float)vp1.x, (float)vp2.y},
-	};
-
-	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
-
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
-
-	const GLint posAttrLoc = glGetAttribLocation(floorAndCeilingShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-}
-
 void GL_RenderLevel(const Map *level, const Camera *camera)
 {
 	GL_Enable3D();
@@ -1118,15 +983,10 @@ void GL_RenderLevel(const Map *level, const Camera *camera)
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translated(skyModelWorldMatrix, VECTOR3_TO_VEC3(camera->transform.position));
 
-	const Vector2 floorStart = v2(level->player.transform.position.x - 100, level->player.transform.position.z - 100);
-	const Vector2 floorEnd = v2(level->player.transform.position.x + 100, level->player.transform.position.z + 100);
-
 	GL_SetLevelParams(&worldViewMatrix, level);
 
 	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 	GL_ClearDepthOnly(); // prevent sky from clipping into walls
-
-	GL_RenderLevelWalls();
 
 	for (size_t i = 0; i < level->actors.length; i++)
 	{
@@ -1271,45 +1131,6 @@ void GL_RenderModel(const ModelDefinition *model,
 		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
 	}
 	glDisable(GL_CULL_FACE);
-}
-
-void GL_RenderLevelWalls()
-{
-	glUseProgram(wallShader->program);
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
-
-	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *GLM_MAT4_IDENTITY);
-
-	size_t i = 0;
-	while (glWalls[i] != NULL && i < GL_MAX_WALL_BUFFERS)
-	{
-		const GL_WallBuffers *wallBuffer = glWalls[i];
-
-		GL_LoadTextureFromAsset(wallBuffer->texture);
-
-		glBindVertexArray(wallBuffer->buffer->vertexArrayObject);
-
-		glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wallBuffer->buffer->elementBufferObject);
-
-		const GLint posAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX");
-		glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
-		glEnableVertexAttribArray(posAttrLoc);
-
-		const GLint texAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_UV");
-		glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(texAttrLoc);
-
-		const GLint angleAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_ANGLE");
-		glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(angleAttrLoc);
-
-		glDrawElements(GL_TRIANGLES, (GLsizei)wallBuffer->wallCount * 6, GL_UNSIGNED_INT, NULL);
-
-		i++;
-	}
 }
 
 #pragma endregion
