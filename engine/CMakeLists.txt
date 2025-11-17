@@ -74,6 +74,8 @@ target_sources(engine INTERFACE
         include/engine/assets/ShaderLoader.h
         src/assets/TextureLoader.c
         include/engine/assets/TextureLoader.h
+        src/assets/MapMaterialLoader.c
+        include/engine/assets/MapMaterialLoader.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h

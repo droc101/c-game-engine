@@ -32,6 +32,7 @@
 #include <engine/actor/Sprite.h>
 #include <engine/actor/StaticModel.h>
 #include <engine/actor/Trigger.h>
+#include "engine/structs/Asset.h"
 
 Map *LoadMap(const char *path)
 {
@@ -92,7 +93,38 @@ Map *LoadMap(const char *path)
 		ListAdd(map->actors, a);
 	}
 
+	map->numModels = ReadSizeT(mapData->data, &offset);
+	map->models = malloc(sizeof(MapModel) * map->numModels);
+	CheckAlloc(map->models);
+	for (size_t i = 0; i < map->numModels; i++)
+	{
+		MapModel *model = &map->models[i];
+		model->numVerts = ReadUint(mapData->data, &offset);
+		model->verts = malloc(sizeof(MapVertex) * model->numVerts);
+		for (uint32_t j = 0; j < model->numVerts; j++)
+		{
+			MapVertex *vtx = &model->verts[j];
+			vtx->position.x = ReadFloat(mapData->data, &offset);
+			vtx->position.y = ReadFloat(mapData->data, &offset);
+			vtx->position.z = ReadFloat(mapData->data, &offset);
+			vtx->uv.x = ReadFloat(mapData->data, &offset);
+			vtx->uv.y = ReadFloat(mapData->data, &offset);
+			vtx->color.r = ReadFloat(mapData->data, &offset);
+			vtx->color.g = ReadFloat(mapData->data, &offset);
+			vtx->color.b = ReadFloat(mapData->data, &offset);
+			vtx->color.a = ReadFloat(mapData->data, &offset);
+			vtx->normal.x = ReadFloat(mapData->data, &offset);
+			vtx->normal.y = ReadFloat(mapData->data, &offset);
+			vtx->normal.z = ReadFloat(mapData->data, &offset);
+		}
+		model->numIndices = ReadUint(mapData->data, &offset);
+		model->indices = malloc(sizeof(uint32_t) * model->numIndices);
+		ReadBytes(mapData->data, &offset, sizeof(uint32_t) * model->numIndices, model->indices);
+	}
+
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
+
+	FreeAsset(mapData);
 
 	return map;
 }

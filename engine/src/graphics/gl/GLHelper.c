@@ -988,6 +988,11 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 	GL_ClearDepthOnly(); // prevent sky from clipping into walls
 
+	for (size_t i = 0; i < map->numModels; i++)
+	{
+		GL_RenderMapModel(&map->models[i]);
+	}
+
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(map->actors, i);
@@ -1131,6 +1136,85 @@ void GL_RenderModel(const ModelDefinition *model,
 		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
 	}
 	glDisable(GL_CULL_FACE);
+}
+
+void GL_RenderMapModel(const MapModel *model)
+{
+	const ModelShader shader = SHADER_SHADED;
+
+	const GL_Shader *glShader = NULL;
+	switch (shader)
+	{
+		case SHADER_SKY:
+			glShader = skyShader;
+			break;
+		case SHADER_SHADED:
+			glShader = modelShadedShader;
+			break;
+		case SHADER_UNSHADED:
+			glShader = modelUnshadedShader;
+			break;
+		default:
+			LogError("Invalid shader for model drawing\n");
+			return;
+	}
+
+	glUseProgram(glShader->program);
+
+	if (shader == SHADER_SKY)
+	{
+		GL_LoadTextureFromAsset(GetState()->map->skyTexture);
+	} else
+	{
+		GL_LoadTextureFromAsset("");
+	}
+
+	mat4 idty = GLM_MAT4_IDENTITY_INIT;
+
+	glBindBufferBase(GL_UNIFORM_BUFFER,
+					 glGetUniformBlockIndex(glShader->program, "SharedUniforms"),
+					 sharedUniformBuffer);
+
+	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
+					   1,
+					   GL_FALSE,
+					   *idty); // model -> world
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, model->numVerts * sizeof(MapVertex), model->verts, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->numIndices * sizeof(uint32_t), model->indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
+	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(colAttrLoc);
+
+	if (shader == SHADER_SHADED) // other shaders do not take normals
+	{
+		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
+		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(normAttrLoc);
+	}
+
+	const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
+	glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
+
+	const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
+	glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
+
+
+	glDrawElements(GL_TRIANGLES, (int)model->numIndices, GL_UNSIGNED_INT, NULL);
 }
 
 #pragma endregion

@@ -5,9 +5,9 @@
 #ifndef GAME_ASSETREADER_H
 #define GAME_ASSETREADER_H
 
+#include <engine/structs/Asset.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <engine/structs/Asset.h>
 
 #define ASSET_FORMAT_VERSION 2
 #define ASSET_FORMAT_MAGIC 0x454D4147
@@ -46,5 +46,6 @@ void RemoveAssetFromCache(const char *relPath);
 #define SHADER(assetName) ("shader/" assetName ".gshd")
 #define MODEL(assetName) ("model/" assetName ".gmdl")
 #define FONT(assetName) ("font/" assetName ".gfon")
+#define MAP_MATERIAL(assetName) ("material/" assetName ".gmtl")
 
 #endif //GAME_ASSETREADER_H

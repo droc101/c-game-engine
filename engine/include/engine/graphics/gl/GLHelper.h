@@ -209,4 +209,6 @@ void GL_RenderModel(const ModelDefinition *model,
 					uint32_t lod,
 					Color modColor);
 
+void GL_RenderMapModel(const MapModel *model);
+
 #endif //GAME_GLHELPER_H

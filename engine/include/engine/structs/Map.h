@@ -10,15 +10,39 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "engine/structs/Color.h"
+#include "engine/structs/Vector2.h"
 
 typedef struct Map Map;
+typedef struct MapVertex MapVertex;
+typedef struct MapModel MapModel;
+
+struct MapVertex
+{
+	Vector3 position;
+	Vector2 uv;
+	Color color;
+	Vector3 normal;
+};
+
+struct MapModel
+{
+	uint32_t numVerts;
+	MapVertex *verts;
+	uint32_t numIndices;
+	uint32_t *indices;
+};
 
 struct Map
 {
 	/// The list of actors in the map
 	LockingList actors;
+
+	size_t numModels;
+	MapModel *models;
 
 	/// The fully qualified texture name of the sky
 	char skyTexture[80];
