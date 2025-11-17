@@ -43,7 +43,7 @@ struct Param
 		int intValue;
 		float floatValue;
 		bool boolValue;
-		char stringValue[64];
+		char *stringValue;
 		Color colorValue;
 	};
 };
@@ -55,5 +55,9 @@ struct Param
 #define PARAM_OPL_FREE(param) PARAM_OPL_ZERO(param);
 
 #define PARAM_OPLIST (INIT(PARAM_OPL_ZERO), INIT_SET(PARAM_OPL_COPY), SET(PARAM_OPL_COPY), CLEAR(PARAM_OPL_FREE))
+
+void ReadParam(const void *data, size_t dataSize, size_t *offset, Param *out);
+
+void FreeParam(Param *p);
 
 #endif //GAME_PARAM_H

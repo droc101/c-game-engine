@@ -10,7 +10,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <SDL_video.h>
 #include <stdbool.h>
@@ -203,7 +203,7 @@ void GL_GetViewmodelMatrix(mat4 *out);
  * @note - This does not render the sky
  * @note - This destroys the contents of the depth buffer
  */
-void GL_RenderLevel(const Level *level, const Camera *camera);
+void GL_RenderLevel(const Map *level, const Camera *camera);
 
 /**
  * Render a 3D model
@@ -228,6 +228,6 @@ void GL_RenderLevelWalls();
  * Load the level's static walls into buffers
  * @param l The level to load walls from
  */
-void GL_LoadLevelWalls(const Level *l);
+void GL_LoadLevelWalls(const Map *l);
 
 #endif //GAME_GLHELPER_H

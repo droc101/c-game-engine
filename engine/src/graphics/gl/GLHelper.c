@@ -15,8 +15,8 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Wall.h>
@@ -551,50 +551,50 @@ GL_WallBuffers *GL_GetWallBuffer(const char *texture)
 	return newBuffer;
 }
 
-void GL_LoadLevelWalls(const Level *l)
+void GL_LoadLevelWalls(const Map *l)
 {
 	GL_DestroyWallBuffers();
-	for (size_t i = 0; i < l->walls.length; i++)
-	{
-		const Wall *w = ListGetPointer(l->walls, i);
-		GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
-		if (wallBuffer->wallCount + 1 > GL_MAX_WALLS_PER_BUFFER)
-		{
-			LogError("Too many walls of same material! Increase GL_MAX_WALLS_PER_BUFFER to fix this");
-			Error("Too many walls of same material!");
-		}
-
-		float vertices[4][6] = {
-			// X Y Z U V A
-			{(float)w->a.x, 0.5f, (float)w->a.y, 0.0f, 0.0f, w->angle},
-			{(float)w->b.x, 0.5f, (float)w->b.y, (float)w->length, 0.0f, w->angle},
-			{(float)w->b.x, -0.5f, (float)w->b.y, (float)w->length, 1.0f, w->angle},
-			{(float)w->a.x, -0.5f, (float)w->a.y, 0.0f, 1.0f, w->angle},
-		};
-
-		const float uvOffset = w->uvOffset;
-		const float uvScale = w->uvScale;
-		for (int j = 0; j < 4; j++)
-		{
-			vertices[j][3] = vertices[j][3] * uvScale + uvOffset;
-		}
-
-		uint32_t indices[] = {0, 1, 2, 0, 2, 3};
-		for (int j = 0; j < 6; j++)
-		{
-			indices[j] += wallBuffer->wallCount * 4;
-		}
-
-		const GLintptr vertexOffset = (GLintptr)(sizeof(float) * 24 * wallBuffer->wallCount);
-		const GLintptr indexOffset = (GLintptr)(sizeof(uint32_t) * 6 * wallBuffer->wallCount);
-
-		glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(vertices), vertices);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wallBuffer->buffer->elementBufferObject);
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, indexOffset, sizeof(indices), indices);
-
-		wallBuffer->wallCount++;
-	}
+	// for (size_t i = 0; i < l->walls.length; i++)
+	// {
+	// 	const Wall *w = ListGetPointer(l->walls, i);
+	// 	GL_WallBuffers *wallBuffer = GL_GetWallBuffer(w->tex);
+	// 	if (wallBuffer->wallCount + 1 > GL_MAX_WALLS_PER_BUFFER)
+	// 	{
+	// 		LogError("Too many walls of same material! Increase GL_MAX_WALLS_PER_BUFFER to fix this");
+	// 		Error("Too many walls of same material!");
+	// 	}
+	//
+	// 	float vertices[4][6] = {
+	// 		// X Y Z U V A
+	// 		{(float)w->a.x, 0.5f, (float)w->a.y, 0.0f, 0.0f, w->angle},
+	// 		{(float)w->b.x, 0.5f, (float)w->b.y, (float)w->length, 0.0f, w->angle},
+	// 		{(float)w->b.x, -0.5f, (float)w->b.y, (float)w->length, 1.0f, w->angle},
+	// 		{(float)w->a.x, -0.5f, (float)w->a.y, 0.0f, 1.0f, w->angle},
+	// 	};
+	//
+	// 	const float uvOffset = w->uvOffset;
+	// 	const float uvScale = w->uvScale;
+	// 	for (int j = 0; j < 4; j++)
+	// 	{
+	// 		vertices[j][3] = vertices[j][3] * uvScale + uvOffset;
+	// 	}
+	//
+	// 	uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+	// 	for (int j = 0; j < 6; j++)
+	// 	{
+	// 		indices[j] += wallBuffer->wallCount * 4;
+	// 	}
+	//
+	// 	const GLintptr vertexOffset = (GLintptr)(sizeof(float) * 24 * wallBuffer->wallCount);
+	// 	const GLintptr indexOffset = (GLintptr)(sizeof(uint32_t) * 6 * wallBuffer->wallCount);
+	//
+	// 	glBindBuffer(GL_ARRAY_BUFFER, wallBuffer->buffer->vertexBufferObject);
+	// 	glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(vertices), vertices);
+	// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wallBuffer->buffer->elementBufferObject);
+	// 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, indexOffset, sizeof(indices), indices);
+	//
+	// 	wallBuffer->wallCount++;
+	// }
 }
 
 #pragma endregion
@@ -917,7 +917,7 @@ void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, const 
 
 #pragma region World Utilities
 
-void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level)
+void GL_SetLevelParams(mat4 *modelViewProjection, const Map *level)
 {
 	GL_SharedUniforms uniforms;
 	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
@@ -1106,7 +1106,7 @@ void GL_DrawFloor(const Vector2 vp1, const Vector2 vp2, const char *texture, con
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderLevel(const Level *level, const Camera *camera)
+void GL_RenderLevel(const Map *level, const Camera *camera)
 {
 	GL_Enable3D();
 
@@ -1123,16 +1123,8 @@ void GL_RenderLevel(const Level *level, const Camera *camera)
 
 	GL_SetLevelParams(&worldViewMatrix, level);
 
-	if (level->hasCeiling)
-	{
-		GL_DrawFloor(floorStart, floorEnd, level->ceilOrSkyTex, 0.5f, 0.8f);
-	} else
-	{
-		GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
-		GL_ClearDepthOnly(); // prevent sky from clipping into walls
-	}
-
-	GL_DrawFloor(floorStart, floorEnd, level->floorTex, -0.5f, 1.0f);
+	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
+	GL_ClearDepthOnly(); // prevent sky from clipping into walls
 
 	GL_RenderLevelWalls();
 
@@ -1218,7 +1210,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 	if (shader == SHADER_SKY)
 	{
-		GL_LoadTextureFromAsset(GetState()->level->ceilOrSkyTex);
+		GL_LoadTextureFromAsset(GetState()->level->skyTexture);
 	} else
 	{
 		GL_LoadTextureFromAsset(mat.texture);

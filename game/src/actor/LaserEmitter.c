@@ -3,6 +3,16 @@
 //
 
 #include "actor/LaserEmitter.h"
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Param.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -13,16 +23,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/KVList.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Param.h>
 #include "actor/Laser.h"
 
 enum LaserEmitterSkin

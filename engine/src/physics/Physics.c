@@ -93,7 +93,7 @@ void PhysicsDestroyGlobal(const GlobalState *state)
 	JPH_Shutdown();
 }
 
-void PhysicsInitLevel(Level *level)
+void PhysicsInitLevel(Map *level)
 {
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
 		.maxContactConstraints = MAX_CONTACT_CONSTRAINTS,
@@ -122,7 +122,7 @@ void PhysicsInitLevel(Level *level)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void PhysicsDestroyLevel(const Level *level, JPH_BodyInterface *bodyInterface)
+void PhysicsDestroyLevel(const Map *level, JPH_BodyInterface *bodyInterface)
 {
 	JPH_CharacterVirtual_Destroy(level->player.joltCharacter);
 	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);

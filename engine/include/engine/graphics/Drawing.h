@@ -5,16 +5,16 @@
 #ifndef GAME_DRAWING_H
 #define GAME_DRAWING_H
 
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Vector2.h>
 #include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/types.h>
 #include <SDL_surface.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Vector2.h>
 
 typedef struct BatchedQuadArray BatchedQuadArray;
 typedef struct UITriangleArray UiTriangleArray;
@@ -214,6 +214,6 @@ void RenderHUD();
  * @note - This does not render the sky
  * @note - This destroys the contents of the depth buffer
  */
-void RenderLevel3D(const Level *l, const Camera *cam);
+void RenderLevel3D(const Map *l, const Camera *cam);
 
 #endif //GAME_DRAWING_H

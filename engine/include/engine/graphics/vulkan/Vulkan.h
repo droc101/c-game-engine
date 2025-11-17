@@ -9,8 +9,8 @@
 #include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Viewmodel.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL_video.h>
@@ -42,7 +42,7 @@
  */
 bool VK_Init(SDL_Window *window);
 
-bool VK_LoadLevelWalls(const Level *level);
+bool VK_LoadLevelWalls(const Map *level);
 
 /// Update actors
 bool VK_UpdateActors(const LockingList *actors, bool shouldReloadActors); // This is implemented in VulkanActors.c
@@ -51,7 +51,7 @@ bool VK_UpdateActors(const LockingList *actors, bool shouldReloadActors); // Thi
 VkResult VK_FrameStart();
 
 //TODO document me
-VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel);
+VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel *viewmodel);
 
 //TODO document me
 VkResult VK_FrameEnd();

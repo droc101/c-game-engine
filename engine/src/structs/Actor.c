@@ -2,8 +2,18 @@
 // Created by droc101 on 4/22/2024.
 //
 
-#include <engine/structs/Actor.h>
 #include <assert.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Param.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -16,16 +26,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/KVList.h>
-#include <engine/structs/List.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Param.h>
 
 Actor *CreateActor(Transform *transform, const char *actorType, KvList params, JPH_BodyInterface *bodyInterface)
 {
@@ -96,10 +96,10 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 		if (strcmp(connection->sourceActorOutput, output) == 0)
 		{
 			List actors;
-			GetActorsByName(connection->outActorName, GetState()->level, &actors);
+			GetActorsByName(connection->targetActorName, GetState()->level, &actors);
 			if (actors.length == 0)
 			{
-				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->outActorName);
+				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->targetActorName);
 				continue;
 			}
 			for (size_t j = 0; j < actors.length; j++)

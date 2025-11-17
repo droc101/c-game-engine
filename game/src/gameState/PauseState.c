@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "engine/debug/DPrint.h"
 #include "engine/Engine.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
@@ -56,7 +57,7 @@ void PauseStateRender(GlobalState * /*state*/)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	FontDrawString(v2(20, 20), "Engine " ENGINE_VERSION "\nDEBUG BUILD", 16, COLOR_WHITE, smallFont);
+	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", COLOR_WHITE, false);
 #endif
 
 	ProcessUiStack(pauseStack);

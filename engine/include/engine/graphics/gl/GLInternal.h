@@ -9,15 +9,15 @@
 #define GLINTERNAL_H
 
 #include <cglm/types.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Vector2.h>
 #include <GL/glew.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Vector2.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/TextureLoader.h>
 
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
@@ -173,7 +173,7 @@ void GL_DrawTexture_Internal(Vector2 pos,
  * @param modelViewProjection The model -> screen matrix
  * @param level The level
  */
-void GL_SetLevelParams(mat4 *modelViewProjection, const Level *level);
+void GL_SetLevelParams(mat4 *modelViewProjection, const Map *level);
 
 /**
  * Enable 3D mode

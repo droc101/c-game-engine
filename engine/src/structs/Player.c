@@ -9,7 +9,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Input.h>
 #include <joltc/enums.h>

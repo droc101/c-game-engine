@@ -2,7 +2,19 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <engine/structs/Level.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/debug/JoltDebugRenderer.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/Camera.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Param.h>
+#include <engine/structs/Player.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
@@ -11,30 +23,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/debug/JoltDebugRenderer.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/List.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Player.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Wall.h>
 
-Level *CreateLevel(void)
+Map *CreateLevel(void)
 {
-	Level *level = calloc(1, sizeof(Level));
+	Map *level = calloc(1, sizeof(Map));
 	CheckAlloc(level);
 	ListInit(level->actors, LIST_POINTER);
-	ListInit(level->walls, LIST_POINTER);
 	PhysicsInitLevel(level);
 	CreatePlayer(&level->player, level->physicsSystem);
-	strncpy(level->ceilOrSkyTex, TEXTURE("level/sky_test"), 28);
-	strncpy(level->floorTex, TEXTURE("level/floor_test"), 30);
-	strncpy(level->music, "none", 5);
+	strncpy(level->skyTexture, TEXTURE("level/sky_test"), 28);
 	level->fogColor = 0xff000000;
 	level->fogStart = 10;
 	level->fogEnd = 30;
@@ -43,7 +40,7 @@ Level *CreateLevel(void)
 	return level;
 }
 
-void DestroyLevel(Level *level)
+void DestroyLevel(Map *level)
 {
 	for (size_t i = 0; i < level->actors.length; i++)
 	{
@@ -51,31 +48,25 @@ void DestroyLevel(Level *level)
 		FreeActor(actor);
 	}
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
-	for (size_t i = 0; i < level->walls.length; i++)
-	{
-		Wall *wall = ListGetPointer(level->walls, i);
-		FreeWall(bodyInterface, wall);
-	}
 
 	PhysicsDestroyLevel(level, bodyInterface);
 
 	ListAndContentsFree(level->namedActorNames);
 	ListFree(level->namedActorPointers);
 	ListFree(level->actors);
-	ListFree(level->walls);
 	free(level);
 	level = NULL;
 }
 
 void AddActor(Actor *actor)
 {
-	Level *l = GetState()->level;
+	Map *l = GetState()->level;
 	ListAdd(l->actors, actor);
 }
 
 void RemoveActor(Actor *actor)
 {
-	Level *l = GetState()->level;
+	Map *l = GetState()->level;
 	ActorFireOutput(actor, ACTOR_OUTPUT_KILLED, PARAM_NONE);
 
 	// Remove the actor from the named actor lists if it's there
@@ -97,14 +88,14 @@ void RemoveActor(Actor *actor)
 	FreeActor(actor);
 }
 
-void NameActor(Actor *actor, const char *name, Level *l)
+void NameActor(Actor *actor, const char *name, Map *l)
 {
 	char *nameCopy = strdup(name);
 	ListAdd(l->namedActorNames, nameCopy);
 	ListAdd(l->namedActorPointers, actor);
 }
 
-Actor *GetActorByName(const char *name, const Level *l)
+Actor *GetActorByName(const char *name, const Map *l)
 {
 	ListLock(l->namedActorNames);
 	for (size_t i = 0; i < l->namedActorNames.length; i++)
@@ -121,7 +112,7 @@ Actor *GetActorByName(const char *name, const Level *l)
 	return NULL;
 }
 
-void GetActorsByName(const char *name, const Level *l, List *actors)
+void GetActorsByName(const char *name, const Map *l, List *actors)
 {
 	ListInit(*actors, LIST_POINTER);
 	ListLock(l->namedActorNames);
@@ -137,7 +128,7 @@ void GetActorsByName(const char *name, const Level *l, List *actors)
 	ListUnlock(l->namedActorNames);
 }
 
-void RenderLevel(const Level *level, const Camera *camera)
+void RenderLevel(const Map *level, const Camera *camera)
 {
 	JoltDebugRendererDrawBodies(level->physicsSystem);
 	RenderLevel3D(level, camera);

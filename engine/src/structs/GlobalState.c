@@ -3,7 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/LevelLoader.h>
+#include <engine/assets/MapLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
@@ -11,7 +11,7 @@
 #include <engine/structs/Asset.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Discord.h>
@@ -95,7 +95,7 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	SDL_SetRelativeMouseMode(enableRelativeMouseMode);
 }
 
-void ChangeLevel(Level *level, char *levelName)
+void ChangeLevel(Map *level, char *levelName)
 {
 	if (!level)
 	{
@@ -110,15 +110,15 @@ void ChangeLevel(Level *level, char *levelName)
 	}
 	state.level = level;
 	state.levelName = levelName;
-	if (strncmp(level->music, "none", 4) != 0)
-	{
-		char musicPath[80];
-		snprintf(musicPath, sizeof(musicPath), SOUND("%s"), level->music);
-		ChangeMusic(musicPath);
-	} else
-	{
-		StopMusic();
-	}
+	// if (strncmp(level->music, "none", 4) != 0)
+	// {
+	// 	char musicPath[80];
+	// 	snprintf(musicPath, sizeof(musicPath), SOUND("%s"), level->music);
+	// 	ChangeMusic(musicPath);
+	// } else
+	// {
+	// 	StopMusic();
+	// }
 
 	LoadLevelWalls(level);
 	PhysicsThreadUnlockTickMutex();
@@ -144,22 +144,15 @@ bool ChangeLevelByName(const char *name)
 	char *levelPath = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(levelPath);
 
-	if (snprintf(levelPath, maxPathLength, LEVEL("%s"), name) > maxPathLength)
+	if (snprintf(levelPath, maxPathLength, MAP("%s"), name) > maxPathLength)
 	{
 		LogError("Failed to load level due to level name %s being too long\n", name);
 		free(levelPath);
 		return false;
 	}
-	Asset *levelData = DecompressAsset(levelPath, false);
-	free(levelPath);
-	if (levelData == NULL)
-	{
-		LogError("Failed to load level asset.\n");
-		return false;
-	}
 	GetState()->saveData->blueCoins = 0;
-	ChangeLevel(LoadLevel(levelData->data, levelData->size), strdup(name));
-	FreeAsset(levelData);
+	ChangeLevel(LoadMap(levelPath), strdup(name));
+	free(levelPath);
 	DiscordUpdateRPC();
 	return true;
 }

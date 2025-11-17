@@ -2,10 +2,23 @@
 // Created by Noah on 11/23/2024.
 //
 
-#include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <assert.h>
 #include <cglm/cglm.h>
 #include <cglm/clipspace/persp_lh_zo.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/ShaderLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Viewmodel.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
@@ -17,19 +30,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Viewmodel.h>
-#include <engine/structs/Wall.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/ShaderLoader.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/List.h>
-#include <engine/physics/Physics.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/graphics/vulkan/VulkanResources.h>
 
 #pragma region variables
 bool minimized = false;
@@ -204,58 +204,58 @@ VkResult LoadSky(const ModelDefinition *skyModel)
 	return VK_SUCCESS;
 }
 
-void LoadWalls(const Level *level)
+void LoadWalls(const Map *level)
 {
 	WallVertex *vertices = buffers.walls.vertices.data;
 	uint32_t *indices = buffers.walls.indices.data;
 
-	for (uint32_t i = 0; i < level->walls.length; i++)
-	{
-		const Wall *wall = ListGetPointer(level->walls, i);
-		const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
-		const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};
-		const vec2 startUV = {wall->uvOffset, 0};
-		const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
-
-		vertices[4 * i].position.x = startVertex[0];
-		vertices[4 * i].position.y = 0.5f;
-		vertices[4 * i].position.z = startVertex[1];
-		vertices[4 * i].u = startUV[0];
-		vertices[4 * i].v = startUV[1];
-		vertices[4 * i].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i].wallAngle = (float)wall->angle;
-
-		vertices[4 * i + 1].position.x = endVertex[0];
-		vertices[4 * i + 1].position.y = 0.5f;
-		vertices[4 * i + 1].position.z = endVertex[1];
-		vertices[4 * i + 1].u = endUV[0];
-		vertices[4 * i + 1].v = startUV[1];
-		vertices[4 * i + 1].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + 1].wallAngle = (float)wall->angle;
-
-		vertices[4 * i + 2].position.x = endVertex[0];
-		vertices[4 * i + 2].position.y = -0.5f;
-		vertices[4 * i + 2].position.z = endVertex[1];
-		vertices[4 * i + 2].u = endUV[0];
-		vertices[4 * i + 2].v = endUV[1];
-		vertices[4 * i + 2].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + 2].wallAngle = (float)wall->angle;
-
-		vertices[4 * i + 3].position.x = startVertex[0];
-		vertices[4 * i + 3].position.y = -0.5f;
-		vertices[4 * i + 3].position.z = startVertex[1];
-		vertices[4 * i + 3].u = startUV[0];
-		vertices[4 * i + 3].v = endUV[1];
-		vertices[4 * i + 3].textureIndex = TextureIndex(wall->tex);
-		vertices[4 * i + 3].wallAngle = (float)wall->angle;
-
-		indices[6 * i] = i * 4;
-		indices[6 * i + 1] = i * 4 + 1;
-		indices[6 * i + 2] = i * 4 + 2;
-		indices[6 * i + 3] = i * 4;
-		indices[6 * i + 4] = i * 4 + 2;
-		indices[6 * i + 5] = i * 4 + 3;
-	}
+	// for (uint32_t i = 0; i < level->walls.length; i++)
+	// {
+	// 	const Wall *wall = ListGetPointer(level->walls, i);
+	// 	const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
+	// 	const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};
+	// 	const vec2 startUV = {wall->uvOffset, 0};
+	// 	const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
+	//
+	// 	vertices[4 * i].position.x = startVertex[0];
+	// 	vertices[4 * i].position.y = 0.5f;
+	// 	vertices[4 * i].position.z = startVertex[1];
+	// 	vertices[4 * i].u = startUV[0];
+	// 	vertices[4 * i].v = startUV[1];
+	// 	vertices[4 * i].textureIndex = TextureIndex(wall->tex);
+	// 	vertices[4 * i].wallAngle = (float)wall->angle;
+	//
+	// 	vertices[4 * i + 1].position.x = endVertex[0];
+	// 	vertices[4 * i + 1].position.y = 0.5f;
+	// 	vertices[4 * i + 1].position.z = endVertex[1];
+	// 	vertices[4 * i + 1].u = endUV[0];
+	// 	vertices[4 * i + 1].v = startUV[1];
+	// 	vertices[4 * i + 1].textureIndex = TextureIndex(wall->tex);
+	// 	vertices[4 * i + 1].wallAngle = (float)wall->angle;
+	//
+	// 	vertices[4 * i + 2].position.x = endVertex[0];
+	// 	vertices[4 * i + 2].position.y = -0.5f;
+	// 	vertices[4 * i + 2].position.z = endVertex[1];
+	// 	vertices[4 * i + 2].u = endUV[0];
+	// 	vertices[4 * i + 2].v = endUV[1];
+	// 	vertices[4 * i + 2].textureIndex = TextureIndex(wall->tex);
+	// 	vertices[4 * i + 2].wallAngle = (float)wall->angle;
+	//
+	// 	vertices[4 * i + 3].position.x = startVertex[0];
+	// 	vertices[4 * i + 3].position.y = -0.5f;
+	// 	vertices[4 * i + 3].position.z = startVertex[1];
+	// 	vertices[4 * i + 3].u = startUV[0];
+	// 	vertices[4 * i + 3].v = endUV[1];
+	// 	vertices[4 * i + 3].textureIndex = TextureIndex(wall->tex);
+	// 	vertices[4 * i + 3].wallAngle = (float)wall->angle;
+	//
+	// 	indices[6 * i] = i * 4;
+	// 	indices[6 * i + 1] = i * 4 + 1;
+	// 	indices[6 * i + 2] = i * 4 + 2;
+	// 	indices[6 * i + 3] = i * 4;
+	// 	indices[6 * i + 4] = i * 4 + 2;
+	// 	indices[6 * i + 5] = i * 4 + 3;
+	// }
 	lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed, 0);
 	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed, 0);
 }

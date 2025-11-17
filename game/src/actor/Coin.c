@@ -4,6 +4,18 @@
 
 #include "actor/Coin.h"
 #include <cglm/types.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Param.h>
+#include <engine/structs/Vector2.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/SoundSystem.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -19,18 +31,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/KVList.h>
-#include <engine/physics/Physics.h>
-#include <engine/subsystem/SoundSystem.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 
 typedef struct CoinData
 {

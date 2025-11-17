@@ -2,6 +2,7 @@
 // Created by droc101 on 4/22/2024.
 //
 
+#include "gameState/MainState.h"
 #include <cglm/euler.h>
 #include <cglm/quat.h>
 #include <engine/assets/AssetReader.h>
@@ -13,8 +14,8 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
@@ -35,7 +36,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "actor/TestActor.h"
-#include "gameState/MainState.h"
+#include "engine/Engine.h"
 
 #include "engine/physics/PlayerPhysics.h"
 #include "gameState/PauseState.h"
@@ -181,14 +182,16 @@ void MainStateRender(GlobalState *state)
 	const Vector2 realWndSize = ActualWindowSize();
 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
 
-	const Level *level = state->level;
+	const Map *level = state->level;
 
 	RenderLevel(level, state->camera);
 	RenderHUD();
 
+#ifdef BUILDSTYLE_DEBUG
+	DPrintF("Engine " ENGINE_VERSION, COLOR_WHITE, false);
+#endif
 	DPrintPlayer(&level->player);
 
-	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
 	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);
 }
 

@@ -7,7 +7,7 @@
 
 #include <engine/structs/Asset.h>
 #include <engine/structs/Camera.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Discord.h>
@@ -42,7 +42,7 @@ struct SaveData
 struct GlobalState
 {
 	/// Current level
-	Level *level;
+	Map *level;
 	char *levelName;
 
 	JPH_JobSystem *jobSystem;
@@ -131,7 +131,7 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
  * @param level Level to change to
  * @param levelName
  */
-void ChangeLevel(Level *level, char *levelName);
+void ChangeLevel(Map *level, char *levelName);
 
 /**
  * Destroy the global state

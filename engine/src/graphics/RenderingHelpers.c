@@ -2,10 +2,21 @@
 // Created by droc101 on 10/2/24.
 //
 
-#include <engine/graphics/RenderingHelpers.h>
 #include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/gl/GLHelper.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Physics/Body/BodyInterface.h>
@@ -15,17 +26,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Vector2.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/graphics/gl/GLHelper.h>
-#include <engine/graphics/vulkan/Vulkan.h>
 
 Renderer currentRenderer;
 bool lowFPSMode;
@@ -181,7 +181,7 @@ void FrameEnd()
 	}
 }
 
-void LoadLevelWalls(const Level *l)
+void LoadLevelWalls(const Map *l)
 {
 	switch (currentRenderer)
 	{

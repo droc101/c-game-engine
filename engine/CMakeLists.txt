@@ -66,8 +66,8 @@ target_sources(engine INTERFACE
         include/engine/assets/FontLoader.h
         src/assets/GameConfigLoader.c
         include/engine/assets/GameConfigLoader.h
-        src/assets/LevelLoader.c
-        include/engine/assets/LevelLoader.h
+        src/assets/MapLoader.c
+        include/engine/assets/MapLoader.h
         src/assets/ModelLoader.c
         include/engine/assets/ModelLoader.h
         src/assets/ShaderLoader.c
@@ -134,12 +134,13 @@ target_sources(engine INTERFACE
         include/engine/structs/GlobalState.h
         src/structs/KVList.c
         include/engine/structs/KVList.h
-        src/structs/Level.c
-        include/engine/structs/Level.h
+        src/structs/Map.c
+        include/engine/structs/Map.h
         src/structs/List.c
         include/engine/structs/List.h
         src/structs/Options.c
         include/engine/structs/Options.h
+        src/structs/Param.c
         include/engine/structs/Param.h
         src/structs/Player.c
         include/engine/structs/Player.h

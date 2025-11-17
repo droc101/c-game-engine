@@ -7,7 +7,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Param.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/constants.h>

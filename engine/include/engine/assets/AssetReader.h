@@ -42,7 +42,7 @@ void RemoveAssetFromCache(const char *relPath);
 
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")
 #define SOUND(assetName) ("sound/" assetName ".gsnd")
-#define LEVEL(assetName) ("level/" assetName ".gmap")
+#define MAP(assetName) ("map/" assetName ".gmap")
 #define SHADER(assetName) ("shader/" assetName ".gshd")
 #define MODEL(assetName) ("model/" assetName ".gmdl")
 #define FONT(assetName) ("font/" assetName ".gfon")

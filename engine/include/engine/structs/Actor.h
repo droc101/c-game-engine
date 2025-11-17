@@ -42,9 +42,10 @@ struct ActorConnection
 	/// The name of the output on the source actor
 	char *sourceActorOutput;
 	/// The name of the actor firing the output
-	char outActorName[64];
+	char *targetActorName;
 	/// The param to send to the input
 	Param outParamOverride;
+	size_t numRefires;
 };
 
 struct Actor

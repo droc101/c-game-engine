@@ -13,7 +13,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -435,7 +435,7 @@ void RenderHUD()
 				   crosshairColor);
 }
 
-void RenderLevel3D(const Level *l, const Camera *cam)
+void RenderLevel3D(const Map *l, const Camera *cam)
 {
 	switch (currentRenderer)
 	{
