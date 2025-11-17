@@ -45,20 +45,19 @@ static bool lodThreadInitDone = false;
 
 static inline void RotateCamera(const Vector2 cameraMotion)
 {
-	const float currentPitch = JPH_Quat_GetRotationAngle(&GetState()->level->player.transform.rotation,
-														 &Vector3_AxisX) +
+	const float currentPitch = JPH_Quat_GetRotationAngle(&GetState()->map->player.transform.rotation, &Vector3_AxisX) +
 							   GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
 	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
 	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
 	JPH_Quat_Multiply(&newYaw,
-					  &GetState()->level->player.transform.rotation,
-					  &GetState()->level->player.transform.rotation);
-	JPH_Quat_Multiply(&GetState()->level->player.transform.rotation,
+					  &GetState()->map->player.transform.rotation,
+					  &GetState()->map->player.transform.rotation);
+	JPH_Quat_Multiply(&GetState()->map->player.transform.rotation,
 					  &newPitch,
-					  &GetState()->level->player.transform.rotation);
-	JPH_Quat_Normalized(&GetState()->level->player.transform.rotation, &GetState()->level->player.transform.rotation);
+					  &GetState()->map->player.transform.rotation);
+	JPH_Quat_Normalized(&GetState()->map->player.transform.rotation, &GetState()->map->player.transform.rotation);
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -98,7 +97,7 @@ void MainStateUpdate(GlobalState *state)
 void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
 	float distanceTraveled = 0;
-	MovePlayer(&state->level->player, &distanceTraveled);
+	MovePlayer(&state->map->player, &distanceTraveled);
 
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
@@ -139,26 +138,26 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
-	UpdatePlayer(&state->level->player, state->level->physicsSystem, deltaTime);
+	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime);
 
-	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
+	JPH_CharacterVirtual_GetPosition(state->map->player.joltCharacter, &state->map->player.transform.position);
 
-	for (size_t i = 0; i < state->level->actors.length; i++)
+	for (size_t i = 0; i < state->map->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(state->level->actors, i);
+		Actor *a = ListGetPointer(state->map->actors, i);
 		a->definition->Update(a, delta);
 	}
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(&state->level->player.transform,
+		Actor *leaf = CreateActor(&state->map->player.transform,
 								  TEST_ACTOR_NAME,
 								  NULL,
-								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
+								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
 		AddActor(leaf);
 	}
 
-	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
+	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->map->physicsSystem,
 																   deltaTime,
 																   2,
 																   state->jobSystem);
@@ -182,9 +181,9 @@ void MainStateRender(GlobalState *state)
 	const Vector2 realWndSize = ActualWindowSize();
 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
 
-	const Map *level = state->level;
+	const Map *level = state->map;
 
-	RenderLevel(level, state->camera);
+	RenderMap(level, state->camera);
 	RenderHUD();
 
 #ifdef BUILDSTYLE_DEBUG

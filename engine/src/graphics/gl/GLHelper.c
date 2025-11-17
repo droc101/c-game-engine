@@ -818,14 +818,14 @@ void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, const 
 
 #pragma region World Utilities
 
-void GL_SetLevelParams(mat4 *modelViewProjection, const Map *level)
+void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 {
 	GL_SharedUniforms uniforms;
 	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
-	uniforms.fogColor = COLOR(level->fogColor);
+	uniforms.fogColor = COLOR(map->fogColor);
 	uniforms.cameraYaw = JPH_Quat_GetRotationAngle(&GetState()->camera->transform.rotation, &Vector3_AxisY);
-	uniforms.fogStart = (float)level->fogStart;
-	uniforms.fogEnd = (float)level->fogEnd;
+	uniforms.fogStart = (float)map->fogStart;
+	uniforms.fogEnd = (float)map->fogEnd;
 
 	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
@@ -971,7 +971,7 @@ void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
-void GL_RenderLevel(const Map *level, const Camera *camera)
+void GL_RenderMap(const Map *map, const Camera *camera)
 {
 	GL_Enable3D();
 
@@ -983,14 +983,14 @@ void GL_RenderLevel(const Map *level, const Camera *camera)
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translated(skyModelWorldMatrix, VECTOR3_TO_VEC3(camera->transform.position));
 
-	GL_SetLevelParams(&worldViewMatrix, level);
+	GL_SetMapParams(&worldViewMatrix, map);
 
 	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 	GL_ClearDepthOnly(); // prevent sky from clipping into walls
 
-	for (size_t i = 0; i < level->actors.length; i++)
+	for (size_t i = 0; i < map->actors.length; i++)
 	{
-		const Actor *actor = ListGetPointer(level->actors, i);
+		const Actor *actor = ListGetPointer(map->actors, i);
 		if (!actor->actorWall && !actor->actorModel)
 		{
 			continue;
@@ -1070,7 +1070,7 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 	if (shader == SHADER_SKY)
 	{
-		GL_LoadTextureFromAsset(GetState()->level->skyTexture);
+		GL_LoadTextureFromAsset(GetState()->map->skyTexture);
 	} else
 	{
 		GL_LoadTextureFromAsset(mat.texture);

@@ -2,8 +2,8 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#ifndef GAME_LEVELLOADER_H
-#define GAME_LEVELLOADER_H
+#ifndef GAME_MAPLOADER_H
+#define GAME_MAPLOADER_H
 
 #include <engine/structs/Map.h>
 #include <stddef.h>
@@ -11,4 +11,4 @@
 
 Map *LoadMap(const char *path);
 
-#endif //GAME_LEVELLOADER_H
+#endif //GAME_MAPLOADER_H

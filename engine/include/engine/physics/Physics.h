@@ -53,8 +53,8 @@ void PhysicsInitGlobal(GlobalState *state);
 
 void PhysicsDestroyGlobal(const GlobalState *state);
 
-void PhysicsInitLevel(Map *level);
+void PhysicsInitMap(Map *map);
 
-void PhysicsDestroyLevel(const Map *level, JPH_BodyInterface *bodyInterface);
+void PhysicsDestroyMap(const Map *map, JPH_BodyInterface *bodyInterface);
 
 #endif //INIT_H

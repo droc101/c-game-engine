@@ -208,12 +208,12 @@ void RenderInGameMenuBackground();
 void RenderHUD();
 
 /**
- * Render the 3D portion of a level
- * @param l The level to render
+ * Render the 3D portion of a map
+ * @param l The map to render
  * @param cam The camera to render with
  * @note - This does not render the sky
  * @note - This destroys the contents of the depth buffer
  */
-void RenderLevel3D(const Map *l, const Camera *cam);
+void RenderMap3D(const Map *l, const Camera *cam);
 
 #endif //GAME_DRAWING_H

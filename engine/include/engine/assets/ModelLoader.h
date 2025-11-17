@@ -32,7 +32,7 @@ typedef struct ModelStaticCollider ModelStaticCollider;
  */
 enum ModelShader
 {
-	/// The sky shader. Do not use on in-level models.
+	/// The sky shader. Do not use on standard models.
 	SHADER_SKY,
 	/// A basic shader with no lighting
 	SHADER_UNSHADED,

@@ -2,20 +2,20 @@
 // Created by NBT22 on 6/13/25.
 //
 
-#include <engine/subsystem/threads/LodThread.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
+#include <engine/subsystem/threads/LodThread.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/List.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/graphics/vulkan/Vulkan.h>
 
 static bool shouldExit;
 static SDL_Thread *lodThread;
@@ -50,7 +50,7 @@ int LodThreadMain(void * /*data*/)
 		}
 
 		const GlobalState *state = GetState();
-		const LockingList *actors = &state->level->actors;
+		const LockingList *actors = &state->map->actors;
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
 		bool shouldReloadActors = false;
@@ -64,7 +64,7 @@ int LodThreadMain(void * /*data*/)
 				continue;
 			}
 			JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
-			Vector3_Subtract(&actorPosition, &state->level->player.transform.position, &offsetFromPlayer);
+			Vector3_Subtract(&actorPosition, &state->map->player.transform.position, &offsetFromPlayer);
 			const float distanceSquared = Vector3_LengthSquared(&offsetFromPlayer);
 			while (actor->currentLod != 0 &&
 				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)

@@ -41,9 +41,9 @@ struct SaveData
 // Global state of the game
 struct GlobalState
 {
-	/// Current level
-	Map *level;
-	char *levelName;
+	/// Current map
+	Map *map;
+	char *mapName;
 
 	JPH_JobSystem *jobSystem;
 
@@ -56,7 +56,7 @@ struct GlobalState
 	/// The number of physics frames that have passed since the last game state change
 	uint64_t physicsFrame;
 
-	/// The save data (persists between levels)
+	/// The save data (persists between maps)
 	SaveData *saveData;
 
 	/// The camera
@@ -127,11 +127,11 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 					   SDL_bool enableRelativeMouseMode);
 
 /**
- * Change the current level
- * @param level Level to change to
- * @param levelName
+ * Change the current map
+ * @param map Map to change to
+ * @param mapName
  */
-void ChangeLevel(Map *level, char *levelName);
+void ChangeMap(Map *map, char *mapName);
 
 /**
  * Destroy the global state
@@ -139,10 +139,10 @@ void ChangeLevel(Map *level, char *levelName);
 void DestroyGlobalState();
 
 /**
- * Change the level by name
- * @param name Level name to change to
- * @warning Don't use this from GMainState, use @c GLoadingSelectStateSet instead to avoid potential crashes
+ * Change the map by name
+ * @param name Map name to change to
+ * @warning Don't use this from MainState, use @c LoadingSelectStateSet instead to avoid potential crashes
  */
-bool ChangeLevelByName(const char *name);
+bool ChangeMapByName(const char *name);
 
 #endif //LOBALSTATE_H

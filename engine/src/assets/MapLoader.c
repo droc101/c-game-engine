@@ -35,64 +35,64 @@
 
 Map *LoadMap(const char *path)
 {
-	Map *level = CreateLevel();
-	Asset *levelData = DecompressAsset(path, false);
+	Map *map = CreateMap();
+	Asset *mapData = DecompressAsset(path, false);
 	size_t offset = 0;
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
-	snprintf(level->skyTexture, 80, TEXTURE("level/sky_test"));
+	snprintf(map->skyTexture, 80, TEXTURE("level/sky_test"));
 
-	const size_t numActors = ReadSizeT(levelData->data, &offset);
+	const size_t numActors = ReadSizeT(mapData->data, &offset);
 	for (size_t i = 0; i < numActors; i++)
 	{
 		size_t actorClassLength = 0;
-		char *actorClass = ReadStringSafe(levelData->data, &offset, levelData->size, &actorClassLength);
+		char *actorClass = ReadStringSafe(mapData->data, &offset, mapData->size, &actorClassLength);
 		Transform xfm;
-		xfm.position.x = ReadFloat(levelData->data, &offset);
-		xfm.position.y = ReadFloat(levelData->data, &offset);
-		xfm.position.z = ReadFloat(levelData->data, &offset);
-		const float rotX = ReadFloat(levelData->data, &offset);
-		const float rotY = ReadFloat(levelData->data, &offset);
-		const float rotZ = ReadFloat(levelData->data, &offset);
+		xfm.position.x = ReadFloat(mapData->data, &offset);
+		xfm.position.y = ReadFloat(mapData->data, &offset);
+		xfm.position.z = ReadFloat(mapData->data, &offset);
+		const float rotX = ReadFloat(mapData->data, &offset);
+		const float rotY = ReadFloat(mapData->data, &offset);
+		const float rotZ = ReadFloat(mapData->data, &offset);
 		Vector3 eulerAngles = {rotX, rotY, rotZ};
 		JPH_Quat_FromEulerAngles(&eulerAngles, &xfm.rotation);
 		LockingList ioConnections = {0};
 		ListInit(ioConnections, LIST_POINTER);
-		const size_t numConnections = ReadSizeT(levelData->data, &offset);
+		const size_t numConnections = ReadSizeT(mapData->data, &offset);
 		for (size_t j = 0; j < numConnections; j++)
 		{
 			ActorConnection *conn = malloc(sizeof(ActorConnection));
-			conn->sourceActorOutput = ReadStringSafe(levelData->data, &offset, levelData->size, NULL);
-			conn->targetActorName = ReadStringSafe(levelData->data, &offset, levelData->size, NULL);
-			conn->targetActorInput = ReadStringSafe(levelData->data, &offset, levelData->size, NULL);
-			uint8_t hasOverride = ReadByte(levelData->data, &offset);
-			ReadParam(levelData->data, levelData->size, &offset, &conn->outParamOverride);
+			conn->sourceActorOutput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+			conn->targetActorName = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+			conn->targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+			uint8_t hasOverride = ReadByte(mapData->data, &offset);
+			ReadParam(mapData->data, mapData->size, &offset, &conn->outParamOverride);
 			ListAdd(ioConnections, conn);
 		}
 		KvList params;
 		KvListCreate(params);
-		size_t numParams = ReadSizeT(levelData->data, &offset);
+		size_t numParams = ReadSizeT(mapData->data, &offset);
 		for (size_t j = 0; j < numParams; j++)
 		{
-			char *key = ReadStringSafe(levelData->data, &offset, levelData->size, NULL);
+			char *key = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
 			Param p;
-			ReadParam(levelData->data, levelData->size, &offset, &p);
+			ReadParam(mapData->data, mapData->size, &offset, &p);
 			KvSetUnsafe(params, key, p);
 		}
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			level->player.transform = xfm;
+			map->player.transform = xfm;
 			// TODO free stuff
 			continue;
 		}
 
 		Actor *a = CreateActor(&xfm, actorClass, params, bodyInterface);
 		a->ioConnections = ioConnections;
-		ListAdd(level->actors, a);
+		ListAdd(map->actors, a);
 	}
 
-	JPH_PhysicsSystem_OptimizeBroadPhase(level->physicsSystem);
+	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
 
-	return level;
+	return map;
 }

@@ -30,13 +30,13 @@ void LoadingStateUpdate(GlobalState * /*state*/)
 	{
 		loadStateLoadedLevel = true;
 		const uint64_t realLoadStart = GetTimeNs();
-		if (!ChangeLevelByName((char *)&loadStateLevelname))
+		if (!ChangeMapByName((char *)&loadStateLevelname))
 		{
-			LogError("Failed to load level: %s\n", loadStateLevelname);
+			LogError("Failed to load map: %s\n", loadStateLevelname);
 		}
 		const uint64_t realLoadEnd = GetTimeNs();
 		const uint64_t realLoadTime = realLoadEnd - realLoadStart;
-		LogInfo("Loaded level %s in %f ms\n", loadStateLevelname, (double)realLoadTime / 1000000.0);
+		LogInfo("Loaded map %s in %f ms\n", loadStateLevelname, (double)realLoadTime / 1000000.0);
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
@@ -58,11 +58,11 @@ void LoadingStateRender(GlobalState * /*state*/)
 					smallFont);
 }
 
-void LoadingStateSet(const char *levelName)
+void LoadingStateSet(const char *mapName)
 {
 	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
-	strncpy(loadStateLevelname, levelName, 31);
+	strncpy(loadStateLevelname, mapName, 31);
 	StopMusic();
 	SetStateCallbacks(LoadingStateUpdate, NULL, GAME_STATE_LOADING, LoadingStateRender, SDL_FALSE);
 }

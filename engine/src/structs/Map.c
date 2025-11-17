@@ -24,49 +24,49 @@
 #include <stdlib.h>
 #include <string.h>
 
-Map *CreateLevel(void)
+Map *CreateMap(void)
 {
-	Map *level = calloc(1, sizeof(Map));
-	CheckAlloc(level);
-	ListInit(level->actors, LIST_POINTER);
-	PhysicsInitLevel(level);
-	CreatePlayer(&level->player, level->physicsSystem);
-	strncpy(level->skyTexture, TEXTURE("level/sky_test"), 28);
-	level->fogColor = 0xff000000;
-	level->fogStart = 10;
-	level->fogEnd = 30;
-	ListInit(level->namedActorNames, LIST_POINTER);
-	ListInit(level->namedActorPointers, LIST_POINTER);
-	return level;
+	Map *map = calloc(1, sizeof(Map));
+	CheckAlloc(map);
+	ListInit(map->actors, LIST_POINTER);
+	PhysicsInitMap(map);
+	CreatePlayer(&map->player, map->physicsSystem);
+	strncpy(map->skyTexture, TEXTURE("level/sky_test"), 28);
+	map->fogColor = 0xff000000;
+	map->fogStart = 10;
+	map->fogEnd = 30;
+	ListInit(map->namedActorNames, LIST_POINTER);
+	ListInit(map->namedActorPointers, LIST_POINTER);
+	return map;
 }
 
-void DestroyLevel(Map *level)
+void DestroyMap(Map *map)
 {
-	for (size_t i = 0; i < level->actors.length; i++)
+	for (size_t i = 0; i < map->actors.length; i++)
 	{
-		Actor *actor = ListGetPointer(level->actors, i);
+		Actor *actor = ListGetPointer(map->actors, i);
 		FreeActor(actor);
 	}
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
-	PhysicsDestroyLevel(level, bodyInterface);
+	PhysicsDestroyMap(map, bodyInterface);
 
-	ListAndContentsFree(level->namedActorNames);
-	ListFree(level->namedActorPointers);
-	ListFree(level->actors);
-	free(level);
-	level = NULL;
+	ListAndContentsFree(map->namedActorNames);
+	ListFree(map->namedActorPointers);
+	ListFree(map->actors);
+	free(map);
+	map = NULL;
 }
 
 void AddActor(Actor *actor)
 {
-	Map *l = GetState()->level;
+	Map *l = GetState()->map;
 	ListAdd(l->actors, actor);
 }
 
 void RemoveActor(Actor *actor)
 {
-	Map *l = GetState()->level;
+	Map *l = GetState()->map;
 	ActorFireOutput(actor, ACTOR_OUTPUT_KILLED, PARAM_NONE);
 
 	// Remove the actor from the named actor lists if it's there
@@ -95,47 +95,47 @@ void NameActor(Actor *actor, const char *name, Map *l)
 	ListAdd(l->namedActorPointers, actor);
 }
 
-Actor *GetActorByName(const char *name, const Map *l)
+Actor *GetActorByName(const char *name, const Map *mapo)
 {
-	ListLock(l->namedActorNames);
-	for (size_t i = 0; i < l->namedActorNames.length; i++)
+	ListLock(mapo->namedActorNames);
+	for (size_t i = 0; i < mapo->namedActorNames.length; i++)
 	{
-		const char *actorName = ListGetPointer(l->namedActorNames, i);
+		const char *actorName = ListGetPointer(mapo->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
 		{
-			Actor *a = ListGetPointer(l->namedActorPointers, i);
-			ListUnlock(l->namedActorNames);
+			Actor *a = ListGetPointer(mapo->namedActorPointers, i);
+			ListUnlock(mapo->namedActorNames);
 			return a;
 		}
 	}
-	ListUnlock(l->namedActorNames);
+	ListUnlock(mapo->namedActorNames);
 	return NULL;
 }
 
-void GetActorsByName(const char *name, const Map *l, List *actors)
+void GetActorsByName(const char *name, const Map *map, List *actors)
 {
 	ListInit(*actors, LIST_POINTER);
-	ListLock(l->namedActorNames);
-	for (size_t i = 0; i < l->namedActorNames.length; i++)
+	ListLock(map->namedActorNames);
+	for (size_t i = 0; i < map->namedActorNames.length; i++)
 	{
-		const char *actorName = ListGetPointer(l->namedActorNames, i);
+		const char *actorName = ListGetPointer(map->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
 		{
-			Actor *a = ListGetPointer(l->namedActorPointers, i);
+			Actor *a = ListGetPointer(map->namedActorPointers, i);
 			ListAdd(*actors, a);
 		}
 	}
-	ListUnlock(l->namedActorNames);
+	ListUnlock(map->namedActorNames);
 }
 
-void RenderLevel(const Map *level, const Camera *camera)
+void RenderMap(const Map *map, const Camera *camera)
 {
-	JoltDebugRendererDrawBodies(level->physicsSystem);
-	RenderLevel3D(level, camera);
+	JoltDebugRendererDrawBodies(map->physicsSystem);
+	RenderMap3D(map, camera);
 
-	for (size_t i = 0; i < level->actors.length; i++)
+	for (size_t i = 0; i < map->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(level->actors, i);
+		Actor *a = ListGetPointer(map->actors, i);
 		a->definition->RenderUi(a);
 	}
 }

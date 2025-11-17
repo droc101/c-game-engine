@@ -82,7 +82,7 @@ static void OnContactAdded(const JPH_CharacterVirtual *character,
 						   const Vector3 * /*contactNormal*/,
 						   JPH_CharacterContactSettings *ioSettings)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor == NULL)
 	{
@@ -106,7 +106,7 @@ static void OnContactPersisted(const JPH_CharacterVirtual *character,
 							   const Vector3 * /*contactNormal*/,
 							   JPH_CharacterContactSettings *ioSettings)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor == NULL)
 	{
@@ -126,7 +126,7 @@ static void OnContactRemoved(const JPH_CharacterVirtual *character,
 							 const JPH_BodyId bodyId,
 							 JPH_SubShapeId /*subShapeId*/)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor == NULL)
 	{
@@ -159,13 +159,13 @@ static void OnContactSolve(const JPH_CharacterVirtual *character,
 
 static bool BodyFilterShouldCollide(const JPH_BodyId /*bodyId*/)
 {
-	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->level->player.joltCharacter);
+	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	return !player->isNoclipActive;
 }
 
 static bool BodyFilterShouldCollideLocked(const JPH_Body * /*body*/)
 {
-	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->level->player.joltCharacter);
+	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	return !player->isNoclipActive;
 }
 
@@ -294,9 +294,9 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayCastResult *raycastResult)
 {
 	const GlobalState *state = GetState();
-	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->level->physicsSystem);
+	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->map->physicsSystem);
 	if (!JPH_NarrowPhaseQuery_CastRay_GAME(narrowPhaseQuery,
-										   &state->level->player.transform,
+										   &state->map->player.transform,
 										   actorRaycastMaxDistance,
 										   raycastResult,
 										   actorRaycastBroadPhaseLayerFilter,

@@ -93,7 +93,7 @@ void PhysicsDestroyGlobal(const GlobalState *state)
 	JPH_Shutdown();
 }
 
-void PhysicsInitLevel(Map *level)
+void PhysicsInitMap(Map *map)
 {
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
 		.maxContactConstraints = MAX_CONTACT_CONSTRAINTS,
@@ -102,11 +102,11 @@ void PhysicsInitLevel(Map *level)
 		.objectLayerPairFilter = JPH_ObjectLayerPairFilter_Create(&objectLayerPairFilterImpl),
 		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&objectVsBroadPhaseLayerFilterImpl),
 	};
-	level->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
+	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 }
 
-void PhysicsDestroyLevel(const Map *level, JPH_BodyInterface *bodyInterface)
+void PhysicsDestroyMap(const Map *map, JPH_BodyInterface *bodyInterface)
 {
-	JPH_CharacterVirtual_Destroy(level->player.joltCharacter);
-	JPH_PhysicsSystem_Destroy(level->physicsSystem);
+	JPH_CharacterVirtual_Destroy(map->player.joltCharacter);
+	JPH_PhysicsSystem_Destroy(map->physicsSystem);
 }

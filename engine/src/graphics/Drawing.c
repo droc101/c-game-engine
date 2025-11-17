@@ -403,7 +403,7 @@ void RenderMenuBackground()
 void RenderInGameMenuBackground()
 {
 	const GlobalState *state = GetState();
-	RenderLevel(state->level, state->camera);
+	RenderMap(state->map, state->camera);
 	RenderHUD();
 	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0xA0000000));
 }
@@ -435,7 +435,7 @@ void RenderHUD()
 				   crosshairColor);
 }
 
-void RenderLevel3D(const Map *l, const Camera *cam)
+void RenderMap3D(const Map *l, const Camera *cam)
 {
 	switch (currentRenderer)
 	{
@@ -443,7 +443,7 @@ void RenderLevel3D(const Map *l, const Camera *cam)
 			VK_RenderLevel(l, cam, &GetState()->viewmodel);
 			break;
 		case RENDERER_OPENGL:
-			GL_RenderLevel(l, cam);
+			GL_RenderMap(l, cam);
 			break;
 		default:
 			break;

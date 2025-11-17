@@ -69,7 +69,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 		data->laserActor = CreateActor(&data->transform,
 									   LASER_ACTOR_NAME,
 									   laserParams,
-									   JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem));
+									   JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem));
 		AddActor(data->laserActor);
 		data->hasTicked = true;
 	}

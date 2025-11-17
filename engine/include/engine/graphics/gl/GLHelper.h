@@ -187,13 +187,13 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
 void GL_GetViewmodelMatrix(mat4 *out);
 
 /**
- * OpenGL code to render the 3D portion of a level
- * @param level The level to render
+ * OpenGL code to render the 3D portion of a map
+ * @param map The map to render
  * @param camera The camera to render with
  * @note - This does not render the sky
  * @note - This destroys the contents of the depth buffer
  */
-void GL_RenderLevel(const Map *level, const Camera *camera);
+void GL_RenderMap(const Map *map, const Camera *camera);
 
 /**
  * Render a 3D model

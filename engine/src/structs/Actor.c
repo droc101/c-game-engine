@@ -96,7 +96,7 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 		if (strcmp(connection->sourceActorOutput, output) == 0)
 		{
 			List actors;
-			GetActorsByName(connection->targetActorName, GetState()->level, &actors);
+			GetActorsByName(connection->targetActorName, GetState()->map, &actors);
 			if (actors.length == 0)
 			{
 				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->targetActorName);

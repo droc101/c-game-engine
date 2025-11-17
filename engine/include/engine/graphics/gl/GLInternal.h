@@ -154,11 +154,11 @@ void GL_DrawTexture_Internal(Vector2 pos,
 							 Vector2 regionEnd);
 
 /**
- * Set the level parameters for rendering
+ * Set the map parameters for rendering
  * @param modelViewProjection The model -> screen matrix
- * @param level The level
+ * @param map The map
  */
-void GL_SetLevelParams(mat4 *modelViewProjection, const Map *level);
+void GL_SetMapParams(mat4 *modelViewProjection, const Map *map);
 
 /**
  * Enable 3D mode

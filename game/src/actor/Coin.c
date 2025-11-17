@@ -68,8 +68,8 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 
 	Vector3 position = {};
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	const float rotation = atan2f(GetState()->level->player.transform.position.z - position.z,
-								  GetState()->level->player.transform.position.x - position.x) +
+	const float rotation = atan2f(GetState()->map->player.transform.position.z - position.z,
+								  GetState()->map->player.transform.position.x - position.x) +
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
