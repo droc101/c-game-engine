@@ -31,7 +31,6 @@ struct Map
 	float fogEnd;
 
 	JPH_PhysicsSystem *physicsSystem;
-	uint32_t floorBodyId;
 
 	/// The player object
 	Player player;

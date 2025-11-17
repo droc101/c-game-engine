@@ -103,28 +103,10 @@ void PhysicsInitLevel(Map *level)
 		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&objectVsBroadPhaseLayerFilterImpl),
 	};
 	level->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
-
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
-	const JPH_Plane plane = {
-		.normal.y = 1,
-	};
-	JPH_Shape *shape = (JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  (Vector3[]){{0.0f, -0.5f, 0.0f}},
-																					  &JPH_Quat_Identity,
-																					  JPH_MotionType_Static,
-																					  OBJECT_LAYER_STATIC);
-	JPH_BodyCreationSettings_SetFriction(bodyCreationSettings, 4.25f);
-	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
-															bodyCreationSettings,
-															JPH_Activation_DontActivate);
-	JPH_Shape_Destroy(shape);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
 void PhysicsDestroyLevel(const Map *level, JPH_BodyInterface *bodyInterface)
 {
 	JPH_CharacterVirtual_Destroy(level->player.joltCharacter);
-	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
 	JPH_PhysicsSystem_Destroy(level->physicsSystem);
 }
