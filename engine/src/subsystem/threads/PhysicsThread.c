@@ -58,10 +58,10 @@ int PhysicsThreadMain(void * /*data*/)
 		InputPhysicsTickBegin();
 		if (PhysicsThreadFunction == NULL)
 		{
+			GetState()->physicsFrame++;
 			SDL_UnlockMutex(physicsThreadMutex);
 			SDL_UnlockMutex(physicsTickMutex);
 			SDL_Delay(PHYSICS_TARGET_MS); // pls no spin 🥺
-			GetState()->physicsFrame++;
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
@@ -110,6 +110,7 @@ void PhysicsThreadInit()
 void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 {
 	SDL_LockMutex(physicsThreadMutex);
+	GetState()->physicsFrame = 0;
 	PhysicsThreadFunction = function;
 	SDL_UnlockMutex(physicsThreadMutex);
 	if (function)

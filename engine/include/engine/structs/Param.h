@@ -5,10 +5,10 @@
 #ifndef GAME_PARAM_H
 #define GAME_PARAM_H
 
+#include <engine/structs/Color.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/structs/Color.h>
 
 #define PARAM_BYTE(x) ((Param){PARAM_TYPE_BYTE, .byteValue = (x)})
 #define PARAM_INT(x) ((Param){PARAM_TYPE_INTEGER, .intValue = (x)})
@@ -52,7 +52,12 @@ struct Param
 	memset(&(param), 0, sizeof(param)); \
 	(param).type = PARAM_TYPE_NONE;
 #define PARAM_OPL_COPY(param, value) memcpy(&(param), &(value), sizeof(param));
-#define PARAM_OPL_FREE(param) PARAM_OPL_ZERO(param);
+#define PARAM_OPL_FREE(param) \
+	if ((param).type == PARAM_TYPE_STRING) \
+	{ \
+		free((param).stringValue); \
+	} \
+	PARAM_OPL_ZERO(param);
 
 #define PARAM_OPLIST (INIT(PARAM_OPL_ZERO), INIT_SET(PARAM_OPL_COPY), SET(PARAM_OPL_COPY), CLEAR(PARAM_OPL_FREE))
 

@@ -85,7 +85,6 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 					   const FrameRenderFunction RenderGame,
 					   const SDL_bool enableRelativeMouseMode)
 {
-	state.physicsFrame = 0;
 	state.UpdateGame = UpdateGame;
 	state.currentState = currentState;
 	state.RenderGame = RenderGame;
@@ -94,7 +93,7 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	SDL_SetRelativeMouseMode(enableRelativeMouseMode);
 }
 
-void ChangeMap(Map *map, char *mapName)
+void ChangeMap(Map *map)
 {
 	if (!map)
 	{
@@ -148,7 +147,7 @@ bool ChangeMapByName(const char *name)
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
-	ChangeMap(LoadMap(mapPath), strdup(name));
+	ChangeMap(LoadMap(mapPath));
 	free(mapPath);
 	DiscordUpdateRPC();
 	return true;

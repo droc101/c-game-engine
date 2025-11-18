@@ -83,6 +83,8 @@ Map *LoadMap(const char *path)
 		if (strcmp(actorClass, "player") == 0)
 		{
 			map->player.transform = xfm;
+			KvListDestroy(params);
+			ListFree(ioConnections);
 			free(actorClass);
 			// TODO free stuff
 			continue;

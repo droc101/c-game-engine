@@ -2,7 +2,11 @@
 // Created by droc101 on 10/27/24.
 //
 
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -10,14 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/GlobalState.h>
 
 void DefaultOptions(Options *options)
 {
-	options->renderer = RENDERER_VULKAN;
+	options->renderer = RENDERER_OPENGL; // TODO: RENDERER_VULKAN;
 	options->musicVolume = 1.0f;
 	options->sfxVolume = 1.0f;
 	options->masterVolume = 1.0f;

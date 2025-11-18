@@ -128,9 +128,8 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 /**
  * Change the current map
  * @param map Map to change to
- * @param mapName
  */
-void ChangeMap(Map *map, char *mapName);
+void ChangeMap(Map *map);
 
 /**
  * Destroy the global state

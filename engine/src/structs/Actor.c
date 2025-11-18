@@ -40,7 +40,7 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	actor->modColor = COLOR_WHITE;
-	ListInit(actor->ioConnections, LIST_POINTER);
+	// ListInit(actor->ioConnections, LIST_POINTER);
 	actor->extraData = NULL;
 	const ActorDefinition *definition = GetActorDefinition(actorType);
 	actor->definition = definition;
