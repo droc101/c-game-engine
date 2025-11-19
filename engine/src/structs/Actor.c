@@ -40,12 +40,12 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->currentSkinIndex = 0;
 	actor->currentLod = 0;
 	actor->modColor = COLOR_WHITE;
-	// ListInit(actor->ioConnections, LIST_POINTER);
+	ListInit(actor->ioConnections, LIST_POINTER);
 	actor->extraData = NULL;
 	const ActorDefinition *definition = GetActorDefinition(actorType);
 	actor->definition = definition;
 	actor->definition->Init(actor, params, transform); // kindly allow the Actor to initialize itself
-	// ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
+	ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
 	if (params)
 	{
 		KvListDestroy(params);

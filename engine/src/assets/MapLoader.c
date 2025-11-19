@@ -97,6 +97,7 @@ Map *LoadMap(const char *path)
 		}
 
 		Actor *a = CreateActor(&xfm, actorClass, params, bodyInterface);
+		ListFree(a->ioConnections);
 		a->ioConnections = ioConnections;
 		ListAdd(map->actors, a);
 		free(actorClass);
