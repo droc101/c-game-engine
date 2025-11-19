@@ -143,12 +143,19 @@ Map *LoadMap(const char *path)
 	const size_t numCollisionMeshes = ReadSizeT(mapData->data, &offset);
 	for (size_t i = 0; i < numCollisionMeshes; i++)
 	{
-		JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
+
 
 		collisionXfm.position.x = ReadFloat(mapData->data, &offset);
 		collisionXfm.position.y = ReadFloat(mapData->data, &offset);
 		collisionXfm.position.z = ReadFloat(mapData->data, &offset);
 		const size_t numSubShapes = ReadSizeT(mapData->data, &offset);
+		if (numSubShapes == 0)
+		{
+			continue;
+		}
+
+		JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
+
 		for (size_t j = 0; j < numSubShapes; j++)
 		{
 			ModelStaticCollider staticCollider;
