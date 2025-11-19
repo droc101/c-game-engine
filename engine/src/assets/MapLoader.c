@@ -137,33 +137,52 @@ Map *LoadMap(const char *path)
 	}
 
 
-	Transform identity = {0};
-	identity.rotation = JPH_Quat_Identity;
+	Transform collisionXfm = {0};
+	collisionXfm.rotation = JPH_Quat_Identity;
 
 	const size_t numCollisionMeshes = ReadSizeT(mapData->data, &offset);
 	for (size_t i = 0; i < numCollisionMeshes; i++)
 	{
-		ModelStaticCollider staticCollider;
-		staticCollider.numTriangles = ReadSizeT(mapData->data, &offset);
-		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
-		CheckAlloc(staticCollider.tris);
-		for (size_t j = 0; j < staticCollider.numTriangles; j++)
+		JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
+
+		collisionXfm.position.x = ReadFloat(mapData->data, &offset);
+		collisionXfm.position.y = ReadFloat(mapData->data, &offset);
+		collisionXfm.position.z = ReadFloat(mapData->data, &offset);
+		const size_t numSubShapes = ReadSizeT(mapData->data, &offset);
+		for (size_t j = 0; j < numSubShapes; j++)
 		{
-			JPH_Triangle *triangle = &staticCollider.tris[j];
-			triangle->materialIndex = 0;
-			Vector3 *verts[3] = {&triangle->v1, &triangle->v2, &triangle->v3};
-			for (int v = 0; v < 3; v++)
+			ModelStaticCollider staticCollider;
+			staticCollider.numTriangles = ReadSizeT(mapData->data, &offset);
+			staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
+			CheckAlloc(staticCollider.tris);
+			for (size_t k = 0; k < staticCollider.numTriangles; k++)
 			{
-				Vector3 *point = verts[v];
-				point->x = ReadFloat(mapData->data, &offset);
-				point->y = ReadFloat(mapData->data, &offset);
-				point->z = ReadFloat(mapData->data, &offset);
+				JPH_Triangle *triangle = &staticCollider.tris[k];
+				triangle->materialIndex = 0;
+				Vector3 *verts[3] = {&triangle->v1, &triangle->v2, &triangle->v3};
+				for (int l = 0; l < 3; l++)
+				{
+					Vector3 *point = verts[l];
+					point->x = ReadFloat(mapData->data, &offset);
+					point->y = ReadFloat(mapData->data, &offset);
+					point->z = ReadFloat(mapData->data, &offset);
+				}
 			}
+			const JPH_Shape *shape = CreateStaticModelShape(&staticCollider);
+
+			JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings *)compoundShapeSettings,
+												&Vector3_Zero,
+												&JPH_Quat_Identity,
+												shape,
+												0);
+
+			JPH_Shape_Destroy(shape);
+			free(staticCollider.tris);
 		}
-		const JPH_Shape *shape = CreateStaticModelShape(&staticCollider);
+		JPH_Shape *shape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
 
 		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
-																							   &identity,
+																							   &collisionXfm,
 																							   JPH_MotionType_Static,
 																							   OBJECT_LAYER_STATIC,
 																							   0);
@@ -172,7 +191,6 @@ Map *LoadMap(const char *path)
 				bodyCreationSettings,
 				JPH_Activation_Activate); // TODO this will likely need to be freed
 		JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-		free(staticCollider.tris);
 	}
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
