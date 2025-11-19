@@ -35,6 +35,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+
+#include "actor/Physbox.h"
 #include "actor/TestActor.h"
 #include "engine/Engine.h"
 
@@ -152,6 +154,15 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	{
 		Actor *leaf = CreateActor(&state->map->player.transform,
 								  TEST_ACTOR_NAME,
+								  NULL,
+								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
+		AddActor(leaf);
+	}
+
+	if (IsKeyJustPressedPhys(SDL_SCANCODE_C))
+	{
+		Actor *leaf = CreateActor(&state->map->player.transform,
+								  PHYSBOX_ACTOR_NAME,
 								  NULL,
 								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
 		AddActor(leaf);
