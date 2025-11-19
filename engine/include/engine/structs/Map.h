@@ -49,6 +49,8 @@ struct Map
 	size_t numModels;
 	MapModel *models;
 
+	List joltBodies;
+
 	/// The fully qualified texture name of the sky
 	char *skyTexture;
 

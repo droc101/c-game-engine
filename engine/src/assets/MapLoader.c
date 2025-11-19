@@ -143,8 +143,6 @@ Map *LoadMap(const char *path)
 	const size_t numCollisionMeshes = ReadSizeT(mapData->data, &offset);
 	for (size_t i = 0; i < numCollisionMeshes; i++)
 	{
-
-
 		collisionXfm.position.x = ReadFloat(mapData->data, &offset);
 		collisionXfm.position.y = ReadFloat(mapData->data, &offset);
 		collisionXfm.position.z = ReadFloat(mapData->data, &offset);
@@ -175,15 +173,15 @@ Map *LoadMap(const char *path)
 					point->z = ReadFloat(mapData->data, &offset);
 				}
 			}
-			const JPH_Shape *shape = CreateStaticModelShape(&staticCollider);
+			JPH_Shape *subShape = CreateStaticModelShape(&staticCollider);
 
 			JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings *)compoundShapeSettings,
 												&Vector3_Zero,
 												&JPH_Quat_Identity,
-												shape,
+												subShape,
 												0);
 
-			JPH_Shape_Destroy(shape);
+			JPH_Shape_Destroy(subShape);
 			free(staticCollider.tris);
 		}
 		JPH_Shape *shape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
@@ -193,11 +191,13 @@ Map *LoadMap(const char *path)
 																							   JPH_MotionType_Static,
 																							   OBJECT_LAYER_STATIC,
 																							   0);
-		JPH_BodyId body = JPH_BodyInterface_CreateAndAddBody(
-				bodyInterface,
-				bodyCreationSettings,
-				JPH_Activation_Activate); // TODO this will likely need to be freed
+		const JPH_BodyId body = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
+																   bodyCreationSettings,
+																   JPH_Activation_Activate);
+		ListAdd(map->joltBodies, body);
 		JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+		JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
+		JPH_Shape_Destroy(shape);
 	}
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);

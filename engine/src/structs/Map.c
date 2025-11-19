@@ -31,7 +31,6 @@ Map *CreateMap(void)
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
 	CreatePlayer(&map->player, map->physicsSystem);
-	// strncpy(map->skyTexture, TEXTURE("level/sky_test"), 28);
 	map->fogColor = 0xff000000;
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
@@ -40,6 +39,7 @@ Map *CreateMap(void)
 	map->skyTexture = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
+	ListInit(map->joltBodies, LIST_UINT32);
 	return map;
 }
 
@@ -65,6 +65,12 @@ void DestroyMap(Map *map)
 	free(map->discordRpcName);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
+
+	for (size_t i = 0; i < map->joltBodies.length; i++)
+	{
+		JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, ListGetUint32(map->joltBodies, i));
+	}
+	ListFree(map->joltBodies);
 
 	PhysicsDestroyMap(map, bodyInterface);
 
