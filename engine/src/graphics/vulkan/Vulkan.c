@@ -242,7 +242,7 @@ VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel 
 	{
 		VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
 	}
-	if (!level->hasCeiling)
+	if (true) // not has ceiling
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
 													 buffers.sky.indices.buffer,
@@ -260,7 +260,7 @@ VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel 
 							   "Failed to draw floor!");
 	}
 
-	if (level->hasCeiling)
+	if (false) // has ceiling
 	{
 		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
 							   "Failed to draw floor and ceiling!");

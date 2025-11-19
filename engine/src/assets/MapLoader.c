@@ -17,17 +17,23 @@
 #include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "engine/assets/ModelLoader.h"
+#include "engine/physics/Physics.h"
 
 Map *LoadMap(const char *path)
 {
@@ -127,6 +133,45 @@ Map *LoadMap(const char *path)
 		model->numIndices = ReadUint(mapData->data, &offset);
 		model->indices = malloc(sizeof(uint32_t) * model->numIndices);
 		ReadBytes(mapData->data, &offset, sizeof(uint32_t) * model->numIndices, model->indices);
+	}
+
+
+	Transform identity = {0};
+	identity.rotation = JPH_Quat_Identity;
+
+	const size_t numCollisionMeshes = ReadSizeT(mapData->data, &offset);
+	for (size_t i = 0; i < numCollisionMeshes; i++)
+	{
+		ModelStaticCollider staticCollider;
+		staticCollider.numTriangles = ReadSizeT(mapData->data, &offset);
+		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
+		CheckAlloc(staticCollider.tris);
+		for (size_t j = 0; j < staticCollider.numTriangles; j++)
+		{
+			JPH_Triangle *triangle = &staticCollider.tris[j];
+			triangle->materialIndex = 0;
+			Vector3 *verts[3] = {&triangle->v1, &triangle->v2, &triangle->v3};
+			for (int v = 0; v < 3; v++)
+			{
+				Vector3 *point = verts[v];
+				point->x = ReadFloat(mapData->data, &offset);
+				point->y = ReadFloat(mapData->data, &offset);
+				point->z = ReadFloat(mapData->data, &offset);
+			}
+		}
+		const JPH_Shape *shape = CreateStaticModelShape(&staticCollider);
+
+		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+																							   &identity,
+																							   JPH_MotionType_Static,
+																							   OBJECT_LAYER_STATIC,
+																							   0);
+		JPH_BodyId body = JPH_BodyInterface_CreateAndAddBody(
+				bodyInterface,
+				bodyCreationSettings,
+				JPH_Activation_Activate); // TODO this will likely need to be freed
+		JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+		free(staticCollider.tris);
 	}
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);

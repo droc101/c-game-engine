@@ -38,11 +38,11 @@ static inline void CreateTestActorCollider(Actor *this, const Transform *transfo
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
 	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
 													   JPH_OverrideMassProperties_CalculateInertia);
-	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings, 0);
-	// JPH_AllowedDOFs_TranslationX |
-	// 		JPH_AllowedDOFs_TranslationY |
-	// 		JPH_AllowedDOFs_TranslationZ |
-	// 		JPH_AllowedDOFs_RotationY);
+	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings,
+											JPH_AllowedDOFs_TranslationX |
+													JPH_AllowedDOFs_TranslationY |
+													JPH_AllowedDOFs_TranslationZ |
+													JPH_AllowedDOFs_RotationY);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);
