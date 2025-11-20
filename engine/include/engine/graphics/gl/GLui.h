@@ -1,60 +1,17 @@
 //
-// Created by droc101 on 9/30/2024.
+// Created by droc101 on 11/20/25.
 //
 
-#ifndef GAME_GLHELPER_H
-#define GAME_GLHELPER_H
+#ifndef GAME_GLUI_H
+#define GAME_GLUI_H
 
 #include <cglm/types.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
-#include <SDL_video.h>
-#include <joltc/Math/Vector3.h>
-#include <stdbool.h>
+#include <GL/glew.h>
+#include <stddef.h>
 #include <stdint.h>
-
-#define GL_VERSION_MAJOR 3
-#define GL_VERSION_MINOR 3
-#define GL_PROFILE SDL_GL_CONTEXT_PROFILE_CORE
-#define GL_VERSION_CHECK GLEW_VERSION_3_3
-#define GL_VERSION_STRING "OpenGL 3.3 Core Profile"
-#define GL_INIT_FAIL_MSG "Failed to start OpenGL. Your GPU or drivers may not support the " GL_VERSION_STRING "."
-
-/**
- * Set SDL_GL flags (this must be done before the SDL window is created)
- */
-bool GL_PreInit();
-
-/**
- * Initialize OpenGL
- */
-bool GL_Init(SDL_Window *wnd);
-
-bool GL_FrameStart();
-
-/**
- * Clear the screen
- */
-void GL_ClearScreen();
-
-/**
- * Clear only the depth buffer
- */
-void GL_ClearDepthOnly();
-
-/**
- * Swap the buffers
- */
-void GL_Swap();
-
-/**
- * Destroy the GL state
- */
-void GL_DestroyGL();
 
 /**
  * Draw a rectangle
@@ -126,11 +83,6 @@ void GL_DrawTextureRegionMod(Vector2 pos,
 							 Color color);
 
 /**
- * Update the viewport size
- */
-void GL_UpdateViewportSize();
-
-/**
  * Draw arrays using the ui_textured shader
  * @param vertices Vertex data [x, y, u, v] with UVs in NDC
  * @param indices Index data
@@ -162,58 +114,19 @@ void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, Color 
 void GL_DrawColoredArrays(const float *vertices, const uint32_t *indices, uint32_t quadCount, Color color);
 
 /**
- * Convert screen X to NDC
- * @param x X position in pixels
- * @return The NDC position
+ * Draw a textured rectangle to the screen
+ * @param pos The position in pixels
+ * @param size The size in pixels
+ * @param texture The texture name
+ * @param regionStart The start of the region in pixels
+ * @param regionEnd The end of the region in pixels
+ * @param color The modulate color
  */
-#define GL_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
+void GL_DrawTexture_Internal(Vector2 pos,
+							 Vector2 size,
+							 const char *texture,
+							 Color color,
+							 Vector2 regionStart,
+							 Vector2 regionEnd);
 
-/**
- * Convert screen Y to NDC
- * @param y Y position in pixels
- * @return The NDC position
- */
-#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
-
-/**
- * Get the transformation matrix for a camera
- * @param camera The camera
- * @param modelViewProjectionMatrix
- * @return A mat4 MODEL_VIEW_PROJECTION matrix of the camera (World space to screen space)
- */
-void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
-
-/**
- * Get the transform matrix for the viewmodel/held item
- * @param out The destination matrix
- */
-void GL_GetViewmodelMatrix(mat4 *out);
-
-/**
- * OpenGL code to render the 3D portion of a map
- * @param map The map to render
- * @param camera The camera to render with
- * @note - This does not render the sky
- * @note - This destroys the contents of the depth buffer
- */
-void GL_RenderMap(const Map *map, const Camera *camera);
-
-/**
- * Render a 3D model
- * @param model The model to render
- * @param modelWorldMatrix The model -> world matrix
- * @param skin The skin to use
- * @param lod The lod to use
- * @param modColor
- */
-void GL_RenderModel(const ModelDefinition *model,
-					const mat4 modelWorldMatrix,
-					uint32_t skin,
-					uint32_t lod,
-					Color modColor);
-
-void GL_RenderMapModel(const MapModel *model);
-
-void GL_AddDebugLine(Vector3 start, Vector3 end, Color color);
-
-#endif //GAME_GLHELPER_H
+#endif //GAME_GLUI_H

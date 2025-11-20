@@ -6,7 +6,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/graphics/gl/GLHelper.h>
+#include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -28,6 +28,11 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#include "engine/graphics/gl/GLdebug.h"
+#include "engine/graphics/gl/GLframe.h"
+#include "engine/graphics/gl/GLui.h"
+#include "engine/graphics/gl/GLworld.h"
 
 SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
 {

@@ -3,7 +3,7 @@
 //
 
 #include <engine/Engine.h>
-#include <engine/graphics/gl/GLHelper.h>
+#include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>

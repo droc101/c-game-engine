@@ -1,0 +1,420 @@
+//
+// Created by droc101 on 11/20/25.
+//
+
+#include <cglm/cglm.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/graphics/gl/GLdebug.h>
+#include <engine/graphics/gl/GLframe.h>
+#include <engine/graphics/gl/GLobjects.h>
+#include <engine/graphics/gl/GLshaders.h>
+#include <engine/graphics/gl/GLworld.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Vector2.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Logging.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
+{
+	const ActorWall *wall = actor->actorWall;
+
+	glUseProgram(wallShader->program);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
+	GL_LoadTextureFromAsset(wall->tex);
+
+	const float halfHeight = wall->height / 2.0f;
+	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
+	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
+	const Vector2 startUV = v2(wall->uvOffset, 0);
+	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
+	const float vertices[4][6] = {
+		// X Y Z U V A
+		{
+			startVertex.x,
+			halfHeight,
+			startVertex.y,
+			startUV.x,
+			startUV.y,
+			wall->angle,
+		},
+		{
+			endVertex.x,
+			halfHeight,
+			endVertex.y,
+			endUV.x,
+			startUV.y,
+			wall->angle,
+		},
+		{
+			endVertex.x,
+			-halfHeight,
+			endVertex.y,
+			endUV.x,
+			endUV.y,
+			wall->angle,
+		},
+		{
+			startVertex.x,
+			-halfHeight,
+			startVertex.y,
+			startUV.x,
+			endUV.y,
+			wall->angle,
+		},
+	};
+
+	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint angleAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_ANGLE");
+	glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(angleAttrLoc);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+}
+
+void GL_RenderMap(const Map *map, const Camera *camera)
+{
+	GL_Enable3D();
+
+	mat4 worldViewMatrix;
+	GL_GetMatrix(camera, &worldViewMatrix);
+	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_translated(skyModelWorldMatrix, VECTOR3_TO_VEC3(camera->transform.position));
+
+	GL_SetMapParams(&worldViewMatrix, map);
+
+	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
+	GL_ClearDepthOnly(); // prevent sky from clipping into walls
+
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// glLineWidth(2);
+
+	glEnable(GL_CULL_FACE);
+	for (size_t i = 0; i < map->numModels; i++)
+	{
+		GL_RenderMapModel(&map->models[i]);
+	}
+	glDisable(GL_CULL_FACE);
+
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+	for (size_t i = 0; i < map->actors.length; i++)
+	{
+		const Actor *actor = ListGetPointer(map->actors, i);
+		if (!actor->actorWall && !actor->actorModel)
+		{
+			continue;
+		}
+
+		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
+		ActorTransformMatrix(actor, &actorXfm);
+		if (actor->actorModel == NULL)
+		{
+			if (actor->actorWall == NULL)
+			{
+				continue;
+			}
+			GL_DrawActorWall(actor, actorXfm);
+		} else
+		{
+			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
+		}
+	}
+
+	GL_DrawDebugLines();
+
+	if (GetState()->viewmodel.enabled)
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		mat4 viewModelMatrix;
+		GL_GetViewmodelMatrix(&viewModelMatrix);
+
+		GL_SharedUniforms uniforms = {
+			.fogStart = 1000,
+			.fogEnd = 1001,
+		};
+		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
+	}
+	GL_Disable3D();
+}
+
+
+void GL_RenderModelPart(const ModelDefinition *model,
+						const mat4 modelWorldMatrix,
+						const uint32_t lod,
+						const size_t material,
+						const uint32_t skin,
+						Color modColor)
+{
+	const uint32_t realSkin = min(skin, model->skinCount - 1);
+	const uint32_t *skinIndices = model->skins[realSkin];
+	const Material mat = model->materials[skinIndices[material]];
+
+	const ModelShader shader = mat.shader;
+
+	const GL_Shader *glShader = NULL;
+	switch (shader)
+	{
+		case SHADER_SKY:
+			glShader = skyShader;
+			break;
+		case SHADER_SHADED:
+			glShader = modelShadedShader;
+			break;
+		case SHADER_UNSHADED:
+			glShader = modelUnshadedShader;
+			break;
+		default:
+			LogError("Invalid shader for model drawing\n");
+			return;
+	}
+
+	glUseProgram(glShader->program);
+
+	if (shader == SHADER_SKY)
+	{
+		GL_LoadTextureFromAsset(GetState()->map->skyTexture);
+	} else
+	{
+		GL_LoadTextureFromAsset(mat.texture);
+	}
+
+
+	glBindBufferBase(GL_UNIFORM_BUFFER,
+					 glGetUniformBlockIndex(glShader->program, "SharedUniforms"),
+					 sharedUniformBuffer);
+
+	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
+					   1,
+					   GL_FALSE,
+					   *modelWorldMatrix); // model -> world
+
+	GL_LoadModel(model, lod, material);
+
+	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
+	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(colAttrLoc);
+
+	if (shader == SHADER_SHADED) // other shaders do not take normals
+	{
+		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
+		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(normAttrLoc);
+	}
+
+	if (shader != SHADER_SKY)
+	{
+		const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
+		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(mat.color));
+
+		const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
+		glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(modColor));
+	}
+
+	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
+}
+
+void GL_RenderModel(const ModelDefinition *model,
+					const mat4 modelWorldMatrix,
+					const uint32_t skin,
+					const uint32_t lod,
+					const Color modColor)
+{
+	glEnable(GL_CULL_FACE);
+	for (uint32_t material = 0; material < model->materialsPerSkin; material++)
+	{
+		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
+	}
+	glDisable(GL_CULL_FACE);
+}
+
+void GL_RenderMapModel(const MapModel *model)
+{
+	const ModelShader shader = model->material->shader;
+
+	const GL_Shader *glShader = NULL;
+	switch (shader)
+	{
+		case SHADER_SHADED:
+			glShader = modelShadedShader;
+			break;
+		case SHADER_UNSHADED:
+			glShader = modelUnshadedShader;
+			break;
+		default:
+			LogError("Invalid shader for model drawing\n");
+			return;
+	}
+
+	glUseProgram(glShader->program);
+
+	GL_LoadTextureFromAsset(model->material->texture);
+
+	mat4 idty = GLM_MAT4_IDENTITY_INIT;
+
+	glBindBufferBase(GL_UNIFORM_BUFFER,
+					 glGetUniformBlockIndex(glShader->program, "SharedUniforms"),
+					 sharedUniformBuffer);
+
+	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
+					   1,
+					   GL_FALSE,
+					   *idty); // model -> world
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, model->numVerts * sizeof(MapVertex), model->verts, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->numIndices * sizeof(uint32_t), model->indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
+
+	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
+	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(colAttrLoc);
+
+	if (shader == SHADER_SHADED) // other shaders do not take normals
+	{
+		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
+		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(normAttrLoc);
+	}
+
+	const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
+	glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
+
+	const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
+	glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
+
+
+	glDrawElements(GL_TRIANGLES, (int)model->numIndices, GL_UNSIGNED_INT, NULL);
+}
+
+void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
+{
+	GL_SharedUniforms uniforms;
+	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
+	uniforms.fogColor = COLOR(map->fogColor);
+	uniforms.cameraYaw = JPH_Quat_GetRotationAngle(&GetState()->camera->transform.rotation, &Vector3_AxisY);
+	uniforms.fogStart = (float)map->fogStart;
+	uniforms.fogEnd = (float)map->fogEnd;
+
+	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+inline void GL_Enable3D()
+{
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
+	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+inline void GL_Disable3D()
+{
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_MULTISAMPLE);
+	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
+{
+	mat4 perspectiveMatrix;
+	glm_perspective(glm_rad(camera->fov),
+					ScaledWindowWidthFloat() / ScaledWindowHeightFloat(),
+					NEAR_Z,
+					FAR_Z,
+					perspectiveMatrix);
+
+	versor rotationQuat;
+	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
+
+	mat4 viewMatrix;
+	glm_quat_look(VECTOR3_TO_VEC3(camera->transform.position), rotationQuat, viewMatrix);
+
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
+}
+
+void GL_GetViewmodelMatrix(mat4 *out)
+{
+	mat4 perspectiveMatrix;
+	glm_perspective(glm_rad(VIEWMODEL_FOV),
+					ScaledWindowWidthFloat() / ScaledWindowHeightFloat(),
+					NEAR_Z,
+					FAR_Z,
+					perspectiveMatrix);
+
+	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_translate(translationMatrix, VECTOR3_TO_VEC3(GetState()->viewmodel.transform.position));
+
+	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
+	// TODO rotation other than yaw
+	glm_rotate(rotationMatrix,
+			   JPH_Quat_GetRotationAngle(&GetState()->viewmodel.transform.rotation, &Vector3_AxisY),
+			   GLM_YUP);
+
+	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
+	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
+}

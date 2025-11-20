@@ -90,10 +90,19 @@ target_sources(engine INTERFACE
         include/engine/graphics/Drawing.h
         src/graphics/Font.c
         include/engine/graphics/Font.h
-        src/graphics/gl/GLDebug.c
-        src/graphics/gl/GLHelper.c
-        include/engine/graphics/gl/GLHelper.h
-        include/engine/graphics/gl/GLInternal.h
+        src/graphics/gl/GLdebug.c
+        src/graphics/gl/GLinit.c
+        include/engine/graphics/gl/GLinit.h
+        src/graphics/gl/GLobjects.c
+        include/engine/graphics/gl/GLobjects.h
+        src/graphics/gl/GLui.c
+        include/engine/graphics/gl/GLui.h
+        src/graphics/gl/GLworld.c
+        include/engine/graphics/gl/GLdebug.h
+        src/graphics/gl/GLframe.c
+        include/engine/graphics/gl/GLframe.h
+        src/graphics/gl/GLshaders.c
+        include/engine/graphics/gl/GLshaders.h
         src/graphics/RenderingHelpers.c
         include/engine/graphics/RenderingHelpers.h
         src/graphics/vulkan/Vulkan.c

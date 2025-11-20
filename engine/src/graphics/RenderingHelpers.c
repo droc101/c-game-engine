@@ -6,7 +6,7 @@
 #include <cglm/mat4.h>
 #include <cglm/types.h>
 #include <engine/assets/TextureLoader.h>
-#include <engine/graphics/gl/GLHelper.h>
+#include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/helpers/MathEx.h>
@@ -26,6 +26,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
+
+#include "engine/graphics/gl/GLframe.h"
 
 Renderer currentRenderer;
 bool lowFPSMode;
