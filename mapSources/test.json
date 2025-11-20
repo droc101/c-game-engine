@@ -127,8 +127,8 @@
       },
       "lightColor": {
         "r": 1.0,
-        "g": 1.0,
-        "b": 1.0,
+        "g": 0.0,
+        "b": 0.0,
         "a": 1.0
       },
       "wallMaterials": [
@@ -2930,13 +2930,13 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
-        },
         "isBlue": {
           "type": "bool",
           "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -2954,13 +2954,13 @@
       },
       "connections": [],
       "params": {
-        "skin": {
-          "type": "int",
-          "value": 0
-        },
         "model": {
           "type": "string",
           "value": "leafy"
+        },
+        "skin": {
+          "type": "int",
+          "value": 0
         }
       }
     },
