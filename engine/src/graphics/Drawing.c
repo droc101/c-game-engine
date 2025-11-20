@@ -363,6 +363,7 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 			break;
 		default:
 		case RENDERER_OPENGL:
+			GL_AddDebugLine(*from, *to, COLOR(color));
 			break;
 	}
 }
@@ -379,8 +380,8 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 		case RENDERER_VULKAN:
 			VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
 			break;
-		default:
 		case RENDERER_OPENGL:
+		default:
 			break;
 	}
 }

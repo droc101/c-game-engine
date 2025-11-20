@@ -16,13 +16,21 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <GL/glew.h>
+#include <joltc/Math/Vector3.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef BUILDSTYLE_DEBUG
+#define GL_MAX_DEBUG_LINES_PER_FRAME 8192
+#else
+#define GL_MAX_DEBUG_LINES_PER_FRAME 1024
+#endif
 
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
 typedef struct GL_ModelBuffers GL_ModelBuffers;
 typedef struct GL_SharedUniforms GL_SharedUniforms;
+typedef struct GL_DebugLine GL_DebugLine;
 
 struct GL_Shader
 {
@@ -66,6 +74,13 @@ struct __attribute__((aligned(16))) GL_SharedUniforms
 	float fogEnd;
 	/// The yaw of the camera
 	float cameraYaw;
+};
+
+struct GL_DebugLine
+{
+	Vector3 start;
+	Vector3 end;
+	Color color;
 };
 
 /**
@@ -211,5 +226,6 @@ void GL_RenderModelPart(const ModelDefinition *model,
 						uint32_t skin,
 						Color modColor);
 
+void GL_DrawDebugLine(GL_DebugLine *line);
 
 #endif //GLINTERNAL_H

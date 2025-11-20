@@ -13,6 +13,7 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <SDL_video.h>
+#include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -32,6 +33,8 @@ bool GL_PreInit();
  * Initialize OpenGL
  */
 bool GL_Init(SDL_Window *wnd);
+
+bool GL_FrameStart();
 
 /**
  * Clear the screen
@@ -210,5 +213,7 @@ void GL_RenderModel(const ModelDefinition *model,
 					Color modColor);
 
 void GL_RenderMapModel(const MapModel *model);
+
+void GL_AddDebugLine(Vector3 start, Vector3 end, Color color);
 
 #endif //GAME_GLHELPER_H

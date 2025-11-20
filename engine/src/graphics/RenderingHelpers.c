@@ -161,6 +161,7 @@ bool FrameStart()
 		case RENDERER_VULKAN:
 			return VK_FrameStart() == VK_SUCCESS;
 		case RENDERER_OPENGL:
+			return GL_FrameStart();
 		default:
 			return true;
 	}

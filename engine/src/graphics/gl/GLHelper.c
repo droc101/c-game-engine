@@ -41,6 +41,7 @@ GL_Shader *wallShader;
 GL_Shader *skyShader;
 GL_Shader *modelUnshadedShader;
 GL_Shader *modelShadedShader;
+GL_Shader *debugShader;
 
 GL_Buffer *glBuffer;
 
@@ -50,6 +51,9 @@ int glAssetTextureMap[MAX_TEXTURES];
 char glLastError[512];
 
 GL_ModelBuffers *glModels[MAX_MODELS];
+
+GL_DebugLine glDebugLines[GL_MAX_DEBUG_LINES_PER_FRAME];
+size_t numDebugLines = 0;
 
 GLuint sharedUniformBuffer;
 
@@ -71,6 +75,8 @@ GLint wallModelWorldMatrixLoc;
 GLint wallSharedUniformsLoc;
 GLint wallTransformMatrixLoc;
 
+GLint debugColorLoc;
+
 #pragma endregion
 
 
@@ -88,6 +94,8 @@ void LoadShaderLocations()
 	wallModelWorldMatrixLoc = glGetUniformLocation(wallShader->program, "MODEL_WORLD_MATRIX");
 	wallSharedUniformsLoc = glGetUniformBlockIndex(wallShader->program, "SharedUniforms");
 	wallTransformMatrixLoc = glGetUniformLocation(wallShader->program, "transformMatrix");
+
+	debugColorLoc = glGetUniformLocation(debugShader->program, "color");
 }
 
 bool GL_PreInit()
@@ -193,13 +201,15 @@ bool GL_Init(SDL_Window *wnd)
 	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/sky_f"), SHADER("gl/sky_v"));
 	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
 	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"), SHADER("gl/model_unshaded_v"));
+	debugShader = GL_ConstructShaderFromAssets(SHADER("gl/debug_f"), SHADER("gl/debug_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
 		!wallShader ||
 		!skyShader ||
 		!modelShadedShader ||
-		!modelUnshadedShader)
+		!modelUnshadedShader ||
+		!debugShader)
 	{
 		GL_Error("Failed to compile shaders");
 		return false;
@@ -249,6 +259,7 @@ void GL_DestroyGL()
 	GL_DestroyShader(skyShader);
 	GL_DestroyShader(modelShadedShader);
 	GL_DestroyShader(modelUnshadedShader);
+	GL_DestroyShader(debugShader);
 	glUseProgram(0);
 	glDisableVertexAttribArray(0);
 	GL_DestroyBuffer(glBuffer);
@@ -502,6 +513,12 @@ void GL_LoadModel(const ModelDefinition *model, const uint32_t lod, const size_t
 
 
 #pragma region Frame Operations
+
+bool GL_FrameStart()
+{
+	numDebugLines = 0;
+	return true;
+}
 
 inline void GL_ClearScreen()
 {
@@ -1020,6 +1037,11 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		}
 	}
 
+	for (size_t i = 0; i < numDebugLines; i++)
+	{
+		GL_DrawDebugLine(&glDebugLines[i]);
+	}
+
 	if (GetState()->viewmodel.enabled)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -1208,6 +1230,56 @@ void GL_RenderMapModel(const MapModel *model)
 
 
 	glDrawElements(GL_TRIANGLES, (int)model->numIndices, GL_UNSIGNED_INT, NULL);
+}
+
+void GL_DrawDebugLine(GL_DebugLine *line)
+{
+	glDisable(GL_LINE_SMOOTH);
+
+	glUseProgram(debugShader->program);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER,
+					 glGetUniformBlockIndex(debugShader->program, "SharedUniforms"),
+					 sharedUniformBuffer);
+
+	glUniform4fv(debugColorLoc, 1, COLOR_TO_ARR(line->color));
+
+	// Calculate the 2 corner vertices of each point for a thick line
+	const float vertices[2][3] = {
+		{line->start.x, line->start.y, line->start.z},
+		{line->end.x, line->end.y, line->end.z},
+	};
+
+	const uint32_t indices[] = {0, 1};
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	glLineWidth(1.0f);
+	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, NULL);
+}
+
+void GL_AddDebugLine(const Vector3 start, const Vector3 end, const Color color)
+{
+	if (numDebugLines >= GL_MAX_DEBUG_LINES_PER_FRAME)
+	{
+		LogError("Tried to add a GL debug line, but there were no free slots!\n");
+		return;
+	}
+	GL_DebugLine *line = &glDebugLines[numDebugLines];
+	line->start = start;
+	line->end = end;
+	line->color = color;
+	numDebugLines++;
 }
 
 #pragma endregion
