@@ -6,9 +6,15 @@
 
 #ifdef WIN32
 #include <io.h>
+#include <minwindef.h>
 #include <pathcch.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 #include <windows.h>
+#include <winerror.h>
+#include <winnt.h>
 #else
 #include <libgen.h>
 #include <unistd.h>
