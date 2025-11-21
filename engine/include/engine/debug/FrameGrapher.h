@@ -8,8 +8,8 @@
 #include <stdint.h>
 
 // Enable or disable the frame graph (just the rendering)
-#define FRAMEGRAPH_ENABLE
-#define TICKGRAPH_ENABLE
+//#define FRAMEGRAPH_ENABLE
+//#define TICKGRAPH_ENABLE
 
 /// How many frames to store in the graph
 #define FRAMEGRAPH_HISTORY_SIZE 30
