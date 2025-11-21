@@ -6,9 +6,15 @@
 
 #ifdef WIN32
 #include <io.h>
+#include <minwindef.h>
 #include <pathcch.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 #include <windows.h>
+#include <winerror.h>
+#include <winnt.h>
 #else
 #include <libgen.h>
 #include <unistd.h>
@@ -23,6 +29,15 @@ char *GetDirectoryOfFile(char *fileName)
 		return NULL;
 	}
 	mbstowcs(directory, fileName, MAX_PATH);
+
+	for (size_t i = 0; i < wcslen(directory); i++)
+	{
+		if (directory[i] == L'/')
+		{
+			directory[i] = L'\\';
+		}
+	}
+
 	const HRESULT h = PathCchRemoveFileSpec(directory, MAX_PATH);
 	if (!SUCCEEDED(h))
 	{
