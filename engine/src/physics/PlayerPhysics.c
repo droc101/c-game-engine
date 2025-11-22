@@ -12,6 +12,7 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Input.h>
+#include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -207,6 +208,8 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
 	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f);
 	JPH_CharacterVirtualSettings characterSettings = {
+		.base.supportingVolume.normal = Vector3_AxisY,
+		.base.supportingVolume.distance = 0.25f,
 		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
 		.base.enhancedInternalEdgeRemoval = true,
 		.base.shape = shape,

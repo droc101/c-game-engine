@@ -333,16 +333,6 @@ void EngineIteration()
 	}
 #endif
 
-	if (state->map)
-	{
-		// TODO should this be moved somewhere else?
-		state->camera->transform.position.x = state->map->player.transform.position.x;
-		state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
-		state->camera->transform.position.z = state->map->player.transform.position.z;
-		state->camera->transform.rotation = state->map->player.transform.rotation;
-		state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
-	}
-
 	state->RenderGame(state);
 
 	FrameGraphDraw();

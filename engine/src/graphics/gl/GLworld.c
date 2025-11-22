@@ -392,7 +392,14 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
 
 	mat4 viewMatrix;
+#ifdef THIRDPERSON
+	vec3 pos;
+	glm_quat_rotatev(rotationQuat, GLM_ZUP, pos);
+	glm_vec3_add(VECTOR3_TO_VEC3(camera->transform.position), pos, pos);
+	glm_quat_look(pos, rotationQuat, viewMatrix);
+#else
 	glm_quat_look(VECTOR3_TO_VEC3(camera->transform.position), rotationQuat, viewMatrix);
+#endif
 
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }

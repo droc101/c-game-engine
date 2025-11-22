@@ -45,21 +45,23 @@
 
 static bool lodThreadInitDone = false;
 
-static inline void RotateCamera(const Vector2 cameraMotion)
+static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
-	const float currentPitch = JPH_Quat_GetRotationAngle(&GetState()->map->player.transform.rotation, &Vector3_AxisX) +
+	const float currentPitch = JPH_Quat_GetRotationAngle(&state->map->player.transform.rotation, &Vector3_AxisX) +
 							   GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
 	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
 	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-	JPH_Quat_Multiply(&newYaw,
-					  &GetState()->map->player.transform.rotation,
-					  &GetState()->map->player.transform.rotation);
-	JPH_Quat_Multiply(&GetState()->map->player.transform.rotation,
-					  &newPitch,
-					  &GetState()->map->player.transform.rotation);
-	JPH_Quat_Normalized(&GetState()->map->player.transform.rotation, &GetState()->map->player.transform.rotation);
+	JPH_Quat_Multiply(&newYaw, &state->map->player.transform.rotation, &state->map->player.transform.rotation);
+	JPH_Quat_Multiply(&state->map->player.transform.rotation, &newPitch, &state->map->player.transform.rotation);
+	JPH_Quat_Normalized(&state->map->player.transform.rotation, &state->map->player.transform.rotation);
+
+	state->camera->transform.position.x = state->map->player.transform.position.x;
+	state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
+	state->camera->transform.position.z = state->map->player.transform.position.z;
+	state->camera->transform.rotation = state->map->player.transform.rotation;
+	state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -84,7 +86,7 @@ void MainStateUpdate(GlobalState *state)
 		cameraMotion.y *= -1;
 	}
 
-	RotateCamera(cameraMotion);
+	RotateCamera(state, cameraMotion);
 
 	if (state->saveData->coins > 9999)
 	{
@@ -126,7 +128,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		RotateCamera(cameraMotion);
+		RotateCamera(state, cameraMotion);
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
