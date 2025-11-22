@@ -32,6 +32,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+static const double gravity = 9.81 / PHYSICS_TARGET_TPS;
 static const float actorRaycastMaxDistance = 10.0f;
 static const float offset = 1.0f;
 /// Lower values are smoother
@@ -222,7 +223,7 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 	JPH_Shape_Destroy(shape);
 }
 
-void MovePlayer(const Player *player, float *distanceTraveled)
+void MovePlayer(const Player *player, float *distanceTraveled, const double delta)
 {
 	Vector3 moveVec = Vector3_Zero;
 
@@ -284,11 +285,15 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 							  &playerRotation);
 			JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
 		}
-		JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
-	} else
-	{
-		JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &Vector3_Zero);
 	}
+	if (!(player->isNoclipActive ||
+		  JPH_CharacterBase_GetGroundState((JPH_CharacterBase *)player->joltCharacter) == JPH_GroundState_OnGround))
+	{
+		Vector3 oldVelocity;
+		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
+		moveVec.y += oldVelocity.y - (float)(gravity * delta);
+	}
+	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
 }
 
 static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayCastResult *raycastResult)

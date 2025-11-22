@@ -99,7 +99,7 @@ void MainStateUpdate(GlobalState *state)
 void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
 	float distanceTraveled = 0;
-	MovePlayer(&state->map->player, &distanceTraveled);
+	MovePlayer(&state->map->player, &distanceTraveled, delta);
 
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())

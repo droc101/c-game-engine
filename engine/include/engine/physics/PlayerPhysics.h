@@ -21,7 +21,7 @@ void PlayerPersistentStateDestroy();
 
 void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem);
 
-void MovePlayer(const Player *player, float *distanceTraveled);
+void MovePlayer(const Player *player, float *distanceTraveled, double delta);
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime);
 
