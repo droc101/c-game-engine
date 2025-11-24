@@ -157,6 +157,14 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		}
 	}
 
+#ifdef THIRDPERSON
+	mat4 playerXfm = GLM_MAT4_IDENTITY_INIT;
+	JPH_RMat44 matrix;
+	JPH_CharacterVirtual_GetWorldTransform(map->player.joltCharacter, &matrix);
+	memcpy(*playerXfm, &matrix, sizeof(mat4));
+	GL_RenderModel(LoadModel(MODEL("player")), playerXfm, 0, 0, COLOR_WHITE);
+#endif
+
 	GL_DrawDebugLines();
 
 	if (GetState()->viewmodel.enabled)
