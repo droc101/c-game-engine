@@ -9,16 +9,20 @@
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Map.h>
 #include <GL/glew.h>
 #include <joltc/Math/Vector3.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#define GL_MAX_MAP_MODELS 2048
 
 typedef struct GL_Shader GL_Shader;
 typedef struct GL_Buffer GL_Buffer;
 typedef struct GL_ModelBuffers GL_ModelBuffers;
 typedef struct GL_SharedUniforms GL_SharedUniforms;
 typedef struct GL_DebugLine GL_DebugLine;
+typedef struct GL_MapModelBuffer GL_MapModelBuffer;
 
 struct GL_Shader
 {
@@ -50,6 +54,12 @@ struct GL_ModelBuffers
 	GL_Buffer **buffers;
 };
 
+struct GL_MapModelBuffer
+{
+	MapModel *mapModel;
+	GL_Buffer *buffer;
+};
+
 struct __attribute__((aligned(16))) GL_SharedUniforms
 {
 	/// The model -> screen matrix
@@ -77,6 +87,8 @@ extern int glAssetTextureMap[MAX_TEXTURES];
 extern char glLastError[512];
 
 extern GL_ModelBuffers *glModels[MAX_MODELS];
+
+extern GL_MapModelBuffer *mapModels[GL_MAX_MAP_MODELS];
 
 extern GL_Buffer *glBuffer;
 
@@ -137,6 +149,8 @@ int GL_RegisterTexture(const Image *image);
  * @param material The material to load
  */
 void GL_LoadModel(const ModelDefinition *model, uint32_t lod, size_t material);
+
+void GL_DestroyMapModels();
 
 void GL_InitObjects();
 

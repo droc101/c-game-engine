@@ -24,6 +24,8 @@ char glLastError[512];
 
 GL_ModelBuffers *glModels[MAX_MODELS];
 
+GL_MapModelBuffer *mapModels[GL_MAX_MAP_MODELS];
+
 GL_Buffer *glBuffer;
 
 GLuint sharedUniformBuffer;
@@ -246,6 +248,19 @@ void GL_LoadModel(const ModelDefinition *model, const uint32_t lod, const size_t
 	glModels[model->id] = buf;
 }
 
+void GL_DestroyMapModels()
+{
+	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
+	{
+		if (mapModels[i] == NULL)
+		{
+			break;
+		}
+		GL_DestroyBuffer(mapModels[i]->buffer);
+		free(mapModels[i]);
+	}
+}
+
 void GL_InitObjects()
 {
 	memset(glAssetTextureMap, -1, MAX_TEXTURES * sizeof(int));
@@ -280,6 +295,8 @@ void GL_DestroyObjects()
 			}
 			free(glModels[i]->buffers);
 			free(glModels[i]);
+			glModels[i] = NULL;
 		}
 	}
+	GL_DestroyMapModels();
 }

@@ -6,7 +6,9 @@
 #include <cglm/mat4.h>
 #include <cglm/types.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLinit.h>
+#include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/helpers/MathEx.h>
@@ -26,8 +28,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-
-#include "engine/graphics/gl/GLframe.h"
 
 Renderer currentRenderer;
 bool lowFPSMode;
@@ -266,6 +266,20 @@ inline float Y_TO_NDC(const float y)
 			return GL_Y_TO_NDC(y);
 		default:
 			return 0;
+	}
+}
+
+void LoadMapModels(const Map *map)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_OPENGL:
+			GL_LoadMap(map);
+			break;
+		case RENDERER_VULKAN:
+			// TODO
+		default:
+			break;
 	}
 }
 

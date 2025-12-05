@@ -7,6 +7,7 @@
 
 #include <cglm/types.h>
 #include <engine/assets/ModelLoader.h>
+#include <engine/graphics/gl/GLobjects.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -52,8 +53,9 @@ void GL_RenderModel(const ModelDefinition *model,
 					uint32_t lod,
 					Color modColor);
 
-void GL_RenderMapModel(const MapModel *model);
+void GL_RenderMapModel(const GL_MapModelBuffer *model);
 
+void GL_LoadMap(const Map *map);
 
 /**
  * Render a single material of a model

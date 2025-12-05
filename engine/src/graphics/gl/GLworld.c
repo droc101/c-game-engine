@@ -21,6 +21,7 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
@@ -126,9 +127,13 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	// glLineWidth(2);
 
 	glEnable(GL_CULL_FACE);
-	for (size_t i = 0; i < map->numModels; i++)
+	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
 	{
-		GL_RenderMapModel(&map->models[i]);
+		if (mapModels[i] == NULL)
+		{
+			break;
+		}
+		GL_RenderMapModel(mapModels[i]);
 	}
 	glDisable(GL_CULL_FACE);
 
@@ -287,9 +292,9 @@ void GL_RenderModel(const ModelDefinition *model,
 	glDisable(GL_CULL_FACE);
 }
 
-void GL_RenderMapModel(const MapModel *model)
+void GL_RenderMapModel(const GL_MapModelBuffer *model)
 {
-	const ModelShader shader = model->material->shader;
+	const ModelShader shader = model->mapModel->material->shader;
 
 	const GL_Shader *glShader = NULL;
 	switch (shader)
@@ -307,7 +312,7 @@ void GL_RenderMapModel(const MapModel *model)
 
 	glUseProgram(glShader->program);
 
-	GL_LoadTextureFromAsset(model->material->texture);
+	GL_LoadTextureFromAsset(model->mapModel->material->texture);
 
 	mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
@@ -320,13 +325,11 @@ void GL_RenderMapModel(const MapModel *model)
 					   GL_FALSE,
 					   *idty); // model -> world
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	glBindVertexArray(model->buffer->vertexArrayObject);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, model->numVerts * sizeof(MapVertex), model->verts, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, model->buffer->vertexBufferObject);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->numIndices * sizeof(uint32_t), model->indices, GL_STREAM_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->buffer->elementBufferObject);
 
 	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
 	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
@@ -353,8 +356,35 @@ void GL_RenderMapModel(const MapModel *model)
 	const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
 	glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
 
+	glDrawElements(GL_TRIANGLES, (int)model->mapModel->numIndices, GL_UNSIGNED_INT, NULL);
+}
 
-	glDrawElements(GL_TRIANGLES, (int)model->numIndices, GL_UNSIGNED_INT, NULL);
+void GL_LoadMap(const Map *map)
+{
+	GL_DestroyMapModels();
+
+	for (size_t i = 0; i < map->numModels; i++)
+	{
+		GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
+		CheckAlloc(mmb);
+		mapModels[i] = mmb;
+		mmb->mapModel = &map->models[i];
+		mmb->buffer = GL_ConstructBuffer();
+
+		glBindVertexArray(mmb->buffer->vertexArrayObject);
+
+		glBindBuffer(GL_ARRAY_BUFFER, mmb->buffer->vertexBufferObject);
+		glBufferData(GL_ARRAY_BUFFER,
+					 mmb->mapModel->numVerts * sizeof(MapVertex),
+					 mmb->mapModel->verts,
+					 GL_STREAM_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mmb->buffer->elementBufferObject);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+					 mmb->mapModel->numIndices * sizeof(uint32_t),
+					 mmb->mapModel->indices,
+					 GL_STREAM_DRAW);
+	}
 }
 
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)

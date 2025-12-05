@@ -106,6 +106,7 @@ void ChangeMap(Map *map)
 		DestroyMap(state.map);
 	}
 	state.map = map;
+	LoadMapModels(map);
 	// if (strncmp(level->music, "none", 4) != 0)
 	// {
 	// 	char musicPath[80];

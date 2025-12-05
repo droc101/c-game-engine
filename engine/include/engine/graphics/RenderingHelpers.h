@@ -176,6 +176,8 @@ float X_TO_NDC(float x);
  */
 float Y_TO_NDC(float y);
 
+void LoadMapModels(const Map *map);
+
 /**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)
  * @param argb The color uint32_t
