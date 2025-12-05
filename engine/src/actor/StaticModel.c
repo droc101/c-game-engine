@@ -8,6 +8,7 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
@@ -49,6 +50,7 @@ void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 	this->actorModel = LoadModel(modelPath);
 	transform->position.y = KvGetFloat(params, "yPosition", 0.0f);
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
+	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	// ActorCreateEmptyBody(this, transform);
 	CreateStaticModelCollider(this, transform);
 }

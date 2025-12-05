@@ -13,6 +13,13 @@
       "default": 0,
       "type": "int",
       "description": "The skin of the model to use"
+    },
+    "color": {
+      "display": "Color",
+      "type": "color",
+      "showAlpha": true,
+      "default": 4294967295,
+      "description": "The tint color of this model"
     }
   }
 }
