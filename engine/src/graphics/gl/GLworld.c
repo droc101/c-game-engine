@@ -25,6 +25,7 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -111,7 +112,7 @@ void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 
 void GL_RenderMap(const Map *map, const Camera *camera)
 {
-	GL_Enable3D();
+	GL_Enable3D(); // depth should be clear from frame start
 
 	mat4 worldViewMatrix;
 	GL_GetMatrix(camera, &worldViewMatrix);
@@ -401,12 +402,11 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-inline void GL_Enable3D()
+inline void GL_Enable3D(void)
 {
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
-	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 inline void GL_Disable3D()
@@ -414,7 +414,6 @@ inline void GL_Disable3D()
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_MULTISAMPLE);
-	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)

@@ -9,7 +9,7 @@
 
 // Enable or disable the frame graph (just the rendering)
 #define FRAMEGRAPH_ENABLE
-//#define TICKGRAPH_ENABLE
+#define TICKGRAPH_ENABLE
 
 /// How many frames to store in the graph
 #define FRAMEGRAPH_HISTORY_SIZE 30
@@ -41,7 +41,7 @@
 
 /// Disable to draw the graph
 /// Drawing the graph has a significant performance impact
-//#define FRAMEGRAPH_FPS_ONLY
+#define FRAMEGRAPH_FPS_ONLY
 
 /// no touchy please 🥺
 #define FRAMEGRAPH_NSPF (1000000000.0 / FRAMEGRAPH_THRESHOLD_GOOD)
