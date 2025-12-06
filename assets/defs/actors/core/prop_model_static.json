@@ -20,6 +20,13 @@
       "showAlpha": true,
       "default": 4294967295,
       "description": "The tint color of this model"
+    },
+    "collision": {
+      "display": "Collision Type",
+      "description": "What type of collision this static model should use. If the selected collision type is unavailable, collision will not be used.",
+      "default": "Full Collision",
+      "type": "byte",
+      "options": "static_collision_type"
     }
   }
 }

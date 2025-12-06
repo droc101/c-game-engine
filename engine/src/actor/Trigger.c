@@ -25,6 +25,7 @@
 typedef struct TriggerData
 {
 	float width;
+	float height;
 	float depth;
 	bool oneShot;
 	bool enabled;
@@ -33,7 +34,7 @@ typedef struct TriggerData
 static inline void CreateTriggerSensor(Actor *this, const Transform *transform)
 {
 	const TriggerData *data = this->extraData;
-	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, 0.5f, data->depth / 2}},
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, data->height / 2, data->depth / 2}},
 														JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
@@ -103,6 +104,7 @@ void TriggerInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->extraData);
 	TriggerData *data = this->extraData;
 	data->width = KvGetFloat(params, "width", 1.0f);
+	data->height = KvGetFloat(params, "height", 1.0f);
 	data->depth = KvGetFloat(params, "depth", 1.0f);
 	data->oneShot = KvGetBool(params, "oneShot", true);
 	data->enabled = KvGetBool(params, "startEnabled", true);
