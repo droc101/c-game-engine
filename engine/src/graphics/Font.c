@@ -2,9 +2,18 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <engine/graphics/Font.h>
 #include <cglm/types.h>
 #include <ctype.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/FontLoader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <float.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -12,15 +21,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Vector2.h>
-#include <engine/assets/FontLoader.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/RenderingHelpers.h>
 
 Font *smallFont;
 Font *largeFont;

@@ -3,13 +3,13 @@
 //
 
 #include <engine/debug/DPrint.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <engine/subsystem/Logging.h>
 #include <engine/graphics/Font.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Logging.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 int dprintYPosition = 10;
 

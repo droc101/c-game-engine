@@ -2,8 +2,16 @@
 // Created by droc101 on 4/26/2024.
 //
 
-#include <engine/assets/AssetReader.h>
 #include <assert.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/structs/Asset.h>
+#include <engine/structs/Dict.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <errno.h>
 #include <m-core.h>
 #include <stdbool.h>
@@ -14,14 +22,6 @@
 #include <string.h>
 #include <zconf.h>
 #include <zlib.h>
-#include <engine/structs/Asset.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/assets/DataReader.h>
-#include <engine/structs/Dict.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 

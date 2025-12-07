@@ -3,16 +3,16 @@
 //
 
 #include <cglm/types.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ShaderLoader.h>
+#include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanInternal.h>
 #include <luna/luna.h>
 #include <luna/lunaDrawing.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/assets/ShaderLoader.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/graphics/vulkan/VulkanHelpers.h>
-#include <engine/graphics/vulkan/VulkanInternal.h>
 
 #pragma region shared
 static const VkPipelineViewportStateCreateInfo viewportState = {

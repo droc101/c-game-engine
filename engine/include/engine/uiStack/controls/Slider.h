@@ -5,9 +5,9 @@
 #ifndef GAME_SLIDER_H
 #define GAME_SLIDER_H
 
-#include <stdint.h>
 #include <engine/structs/Vector2.h>
 #include <engine/uiStack/UiStack.h>
+#include <stdint.h>
 
 typedef struct SliderData SliderData;
 

@@ -5,10 +5,10 @@
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Vector2.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct NavigationConfig NavigationConfig;
 

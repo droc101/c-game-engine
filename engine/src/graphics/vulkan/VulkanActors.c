@@ -2,10 +2,17 @@
 // Created by NBT22 on 5/8/25.
 //
 
-#include <engine/graphics/vulkan/VulkanActors.h>
 #include <assert.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/VulkanActors.h>
+#include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Wall.h>
 #include <luna/lunaBuffer.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -13,13 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/Wall.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/structs/List.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/graphics/vulkan/VulkanHelpers.h>
-#include <engine/graphics/vulkan/VulkanResources.h>
 
 static size_t loadedActorCount;
 static List loadedLodSkins;

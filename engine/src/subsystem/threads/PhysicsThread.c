@@ -2,7 +2,15 @@
 // Created by droc101 on 12/12/24.
 //
 
+#include <engine/debug/FrameGrapher.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
+#include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
+#include <engine/subsystem/Timing.h>
 #include <SDL_error.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
@@ -10,14 +18,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/debug/FrameGrapher.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Input.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/subsystem/Timing.h>
-#include <engine/physics/Physics.h>
 
 static SDL_Thread *physicsThread;
 static SDL_mutex *physicsThreadMutex;

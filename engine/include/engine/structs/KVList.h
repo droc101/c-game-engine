@@ -5,12 +5,12 @@
 #ifndef KVLIST_H
 #define KVLIST_H
 
+#include <engine/structs/Color.h>
+#include <engine/structs/Dict.h>
+#include <engine/structs/Param.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Dict.h>
 
 // TODO find a way to not leak this into anyone who includes this
 DEFINE_DICT(KvList, const char *, STR_OPLIST, Param, PARAM_OPLIST);

@@ -5,10 +5,10 @@
 #ifndef GAME_DICT_H
 #define GAME_DICT_H
 
+#include <engine/subsystem/Error.h>
 #include <m-core.h>
 #include <m-dict.h>
 #include <stdio.h>
-#include <engine/subsystem/Error.h>
 
 #define DEFINE_DICT(name, keyType, ...) \
 	_Pragma("GCC diagnostic push"); \

@@ -5,12 +5,12 @@
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
 
+#include <engine/structs/GlobalState.h> // NOLINT(*-include-cleaner)
+#include <engine/structs/Vector2.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <engine/structs/GlobalState.h> // NOLINT(*-include-cleaner)
-#include <engine/structs/Vector2.h>
 
 #define STICK_DEADZONE 0.1
 

@@ -2,9 +2,9 @@
 // Created by droc101 on 6/22/25.
 //
 
-#include <engine/helpers/Arguments.h>
 #include <assert.h>
 #include <ctype.h>
+#include <engine/helpers/Arguments.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -35,7 +35,7 @@ int GetCliArgInt(const int argc, const char *argv[], const char *argument, const
 			const char *value = strchr(argv[i], '=');
 			if (value != NULL)
 			{
-				return (int)strtol(value+1, NULL, 10);
+				return (int)strtol(value + 1, NULL, 10);
 			}
 		}
 	}

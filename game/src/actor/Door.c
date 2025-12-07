@@ -3,6 +3,16 @@
 //
 
 #include "actor/Door.h"
+#include <engine/assets/AssetReader.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/Param.h>
+#include <engine/structs/Vector2.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -18,16 +28,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/KVList.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 
 typedef enum
 {

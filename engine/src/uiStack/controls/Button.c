@@ -2,22 +2,22 @@
 // Created by droc101 on 10/7/2024.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
+#include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/UiStack.h>
 #include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Vector2.h>
-#include <engine/uiStack/UiStack.h>
 
 Control *CreateButtonControl(const Vector2 position,
 							 const Vector2 size,

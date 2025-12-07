@@ -2,16 +2,16 @@
 // Created by droc101 on 10/4/25.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/structs/Asset.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/structs/Asset.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 
 GameConfig config = {0};
 

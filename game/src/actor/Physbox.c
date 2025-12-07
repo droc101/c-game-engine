@@ -3,17 +3,17 @@
 //
 
 #include "actor/Physbox.h"
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/KVList.h>
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/structs/KVList.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/ActorDefinition.h>
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {

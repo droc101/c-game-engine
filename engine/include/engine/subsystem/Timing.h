@@ -5,8 +5,8 @@
 #ifndef GAME_TIMING_H
 #define GAME_TIMING_H
 
-#include <stdint.h>
 #include <engine/subsystem/Logging.h>
+#include <stdint.h>
 
 #define TIME(thingToTime) \
 	{ \

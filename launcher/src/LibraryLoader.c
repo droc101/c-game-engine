@@ -5,7 +5,6 @@
 #include "../include/LibraryLoader.h"
 
 #ifdef WIN32
-#include <windows.h>
 #include <errhandlingapi.h>
 #include <libloaderapi.h>
 #include <minwindef.h>
@@ -13,6 +12,7 @@
 #include <stdio.h>
 #include <winbase.h>
 #include <windef.h>
+#include <windows.h>
 
 #include <winnt.h>
 

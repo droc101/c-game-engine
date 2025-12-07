@@ -1,8 +1,17 @@
 // Created by Noah on 11/23/2024.
 //
 
-#include <engine/graphics/vulkan/VulkanInternal.h>
 #include <assert.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Options.h>
+#include <engine/subsystem/Error.h>
 #include <luna/luna.h>
 #include <luna/lunaDevice.h>
 #include <luna/lunaDrawing.h>
@@ -18,15 +27,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Options.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/List.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/graphics/vulkan/Vulkan.h>
-#include <engine/graphics/vulkan/VulkanHelpers.h>
-#include <engine/graphics/vulkan/VulkanResources.h>
 
 static SDL_Window *vulkanWindow;
 static VkSurfaceKHR surface;

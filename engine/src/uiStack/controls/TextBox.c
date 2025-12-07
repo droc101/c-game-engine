@@ -2,7 +2,18 @@
 // Created by droc101 on 1/7/25.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
+#include <engine/subsystem/TextInputSystem.h>
+#include <engine/subsystem/Timing.h>
 #include <engine/uiStack/controls/TextBox.h>
+#include <engine/uiStack/UiStack.h>
 #include <SDL_events.h>
 #include <SDL_scancode.h>
 #include <stdbool.h>
@@ -10,17 +21,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Input.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/subsystem/Timing.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
-#include <engine/subsystem/TextInputSystem.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Vector2.h>
-#include <engine/uiStack/UiStack.h>
 
 Control *CreateTextBoxControl(const char *placeholder,
 							  const Vector2 position,
