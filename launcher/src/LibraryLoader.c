@@ -5,15 +5,17 @@
 #include "../include/LibraryLoader.h"
 
 #ifdef WIN32
+// clang-format off
+#include <windows.h>
 #include <errhandlingapi.h>
+// clang-format on
+
 #include <libloaderapi.h>
 #include <minwindef.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <winbase.h>
 #include <windef.h>
-#include <windows.h>
-
 #include <winnt.h>
 
 void LibraryLoaderSetup()
