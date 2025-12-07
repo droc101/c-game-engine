@@ -94,6 +94,7 @@ Image *LoadImage(const char *asset)
 			img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
 			const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
 			img->pixelData = malloc(pixelDataSize);
+			CheckAlloc(img->pixelData);
 			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
 			uint32_t *pixels32 = (uint32_t *)img->pixelData;
 			for (size_t i = 0; i < img->width * img->height; i++)

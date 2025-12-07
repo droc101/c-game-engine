@@ -8,6 +8,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Param.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
 #include <stddef.h>
@@ -39,6 +40,7 @@ void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/
 		GetState()->map->ioProxy = this;
 	}
 	this->extraData = calloc(1, sizeof(IoProxyData));
+	CheckAlloc(this->extraData);
 }
 
 static ActorDefinition definition = {

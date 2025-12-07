@@ -258,6 +258,7 @@ void GL_DestroyMapModels()
 		}
 		GL_DestroyBuffer(mapModels[i]->buffer);
 		free(mapModels[i]);
+		mapModels[i] = NULL;
 	}
 }
 

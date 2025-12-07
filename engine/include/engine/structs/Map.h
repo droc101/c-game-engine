@@ -8,14 +8,15 @@
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
+#include <engine/structs/Vector2.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-#include "engine/structs/Color.h"
-#include "engine/structs/Vector2.h"
 
 typedef struct Map Map;
 typedef struct MapVertex MapVertex;
@@ -32,9 +33,9 @@ struct MapVertex
 struct MapModel
 {
 	MapMaterial *material;
-	uint32_t numVerts;
-	MapVertex *verts;
-	uint32_t numIndices;
+	uint32_t vertexCount;
+	MapVertex *vertices;
+	uint32_t indexCount;
 	uint32_t *indices;
 };
 
@@ -46,7 +47,7 @@ struct Map
 	/// The list of actors in the map
 	LockingList actors;
 
-	size_t numModels;
+	size_t modelCount;
 	MapModel *models;
 
 	List joltBodies;
@@ -105,19 +106,19 @@ void RemoveActor(Actor *actor);
  * Assign a name to an actor
  * @param actor The actor to name
  * @param name The name to assign
- * @param l
+ * @param map The map within which the actor resides
  */
-void NameActor(Actor *actor, const char *name, Map *l);
+void NameActor(Actor *actor, const char *name, Map *map);
 
 /**
  * Get a single actor by name
  * @param name The name of the actor
- * @param mapo The map to search in
+ * @param map The map to search in
  * @return The actor with the given name, or NULL if not found
  * @note This is slow. Use sparingly.
  * @note If there are multiple actors with the same name, whichever one was loaded first will be returned
  */
-Actor *GetActorByName(const char *name, const Map *mapo);
+Actor *GetActorByName(const char *name, const Map *map);
 
 /**
  * Get all actors with a given name

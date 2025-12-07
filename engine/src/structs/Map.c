@@ -2,7 +2,6 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <engine/assets/AssetReader.h>
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/physics/Physics.h>
@@ -47,15 +46,14 @@ void DestroyMap(Map *map)
 {
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
-		Actor *actor = ListGetPointer(map->actors, i);
-		FreeActor(actor);
+		FreeActor(ListGetPointer(map->actors, i));
 	}
 
-	for (size_t i = 0; i < map->numModels; i++)
+	for (size_t i = 0; i < map->modelCount; i++)
 	{
-		const MapModel *m = &map->models[i];
-		free(m->verts);
-		free(m->indices);
+		const MapModel *model = map->models + i;
+		free(model->vertices);
+		free(model->indices);
 	}
 	free(map->models);
 	map->models = NULL;
@@ -78,60 +76,55 @@ void DestroyMap(Map *map)
 	ListFree(map->namedActorPointers);
 	ListFree(map->actors);
 	free(map);
-	map = NULL;
 }
 
 void AddActor(Actor *actor)
 {
-	Map *l = GetState()->map;
-	ListAdd(l->actors, actor);
+	ListAdd(GetState()->map->actors, actor);
 }
 
 void RemoveActor(Actor *actor)
 {
-	Map *l = GetState()->map;
+	Map *map = GetState()->map;
 	ActorFireOutput(actor, ACTOR_OUTPUT_KILLED, PARAM_NONE);
 
 	// Remove the actor from the named actor lists if it's there
-	const size_t nameIdx = ListFind(l->namedActorPointers, actor);
+	const size_t nameIdx = ListFind(map->namedActorPointers, actor);
 	if (nameIdx != SIZE_MAX)
 	{
-		char *name = ListGetPointer(l->namedActorNames, nameIdx);
-		free(name);
-		ListRemoveAt(l->namedActorNames, nameIdx);
-		ListRemoveAt(l->namedActorPointers, nameIdx);
+		free(ListGetPointer(map->namedActorNames, nameIdx));
+		ListRemoveAt(map->namedActorNames, nameIdx);
+		ListRemoveAt(map->namedActorPointers, nameIdx);
 	}
 
-	const size_t idx = ListFind(l->actors, actor);
+	const size_t idx = ListFind(map->actors, actor);
 	if (idx == SIZE_MAX)
 	{
 		return;
 	}
-	ListRemoveAt(l->actors, idx);
+	ListRemoveAt(map->actors, idx);
 	FreeActor(actor);
 }
 
-void NameActor(Actor *actor, const char *name, Map *l)
+void NameActor(Actor *actor, const char *name, Map *map)
 {
-	char *nameCopy = strdup(name);
-	ListAdd(l->namedActorNames, nameCopy);
-	ListAdd(l->namedActorPointers, actor);
+	ListAdd(map->namedActorNames, strdup(name));
+	ListAdd(map->namedActorPointers, actor);
 }
 
-Actor *GetActorByName(const char *name, const Map *mapo)
+Actor *GetActorByName(const char *name, const Map *map)
 {
-	ListLock(mapo->namedActorNames);
-	for (size_t i = 0; i < mapo->namedActorNames.length; i++)
+	ListLock(map->namedActorNames);
+	for (size_t i = 0; i < map->namedActorNames.length; i++)
 	{
-		const char *actorName = ListGetPointer(mapo->namedActorNames, i);
-		if (strcmp(actorName, name) == 0)
+		if (strcmp(ListGetPointer(map->namedActorNames, i), name) == 0)
 		{
-			Actor *a = ListGetPointer(mapo->namedActorPointers, i);
-			ListUnlock(mapo->namedActorNames);
-			return a;
+			Actor *actor = ListGetPointer(map->namedActorPointers, i);
+			ListUnlock(map->namedActorNames);
+			return actor;
 		}
 	}
-	ListUnlock(mapo->namedActorNames);
+	ListUnlock(map->namedActorNames);
 	return NULL;
 }
 
@@ -144,8 +137,7 @@ void GetActorsByName(const char *name, const Map *map, List *actors)
 		const char *actorName = ListGetPointer(map->namedActorNames, i);
 		if (strcmp(actorName, name) == 0)
 		{
-			Actor *a = ListGetPointer(map->namedActorPointers, i);
-			ListAdd(*actors, a);
+			ListAdd(*actors, ListGetPointer(map->namedActorPointers, i));
 		}
 	}
 	ListUnlock(map->namedActorNames);
@@ -159,8 +151,8 @@ void RenderMap(const Map *map, const Camera *camera)
 	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(map->actors, i);
-		a->definition->RenderUi(a);
+		Actor *actor = ListGetPointer(map->actors, i);
+		actor->definition->RenderUi(actor);
 	}
 	ListUnlock(map->actors);
 }

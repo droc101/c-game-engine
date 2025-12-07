@@ -6,7 +6,11 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
+#include <engine/graphics/gl/GLdebug.h>
+#include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLinit.h>
+#include <engine/graphics/gl/GLui.h>
+#include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -28,11 +32,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include "engine/graphics/gl/GLdebug.h"
-#include "engine/graphics/gl/GLframe.h"
-#include "engine/graphics/gl/GLui.h"
-#include "engine/graphics/gl/GLworld.h"
 
 SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
 {
@@ -352,7 +351,7 @@ inline void DrawUiTriangles(const UiTriangleArray *triangleArray, const char *te
 			GL_DrawUITriangles(triangleArray, texture, color);
 			break;
 		default:
-			LogWarning("DrawUiTriangles not implemented in current renderer!\n");
+			break;
 	}
 }
 
@@ -366,9 +365,10 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 		case RENDERER_VULKAN:
 			VK_DrawJoltDebugRendererLine(from, to, color);
 			break;
-		default:
 		case RENDERER_OPENGL:
 			GL_AddDebugLine(*from, *to, COLOR(color));
+			break;
+		default:
 			break;
 	}
 }
@@ -441,15 +441,15 @@ void RenderHUD()
 				   crosshairColor);
 }
 
-void RenderMap3D(const Map *l, const Camera *cam)
+void RenderMap3D(const Map *map, const Camera *cam)
 {
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_RenderLevel(l, cam, &GetState()->viewmodel);
+			VK_RenderLevel(map, cam, &GetState()->viewmodel);
 			break;
 		case RENDERER_OPENGL:
-			GL_RenderMap(l, cam);
+			GL_RenderMap(map, cam);
 			break;
 		default:
 			break;

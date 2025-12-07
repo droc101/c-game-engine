@@ -5,18 +5,18 @@
 #ifndef GAME_ACTOR_H
 #define GAME_ACTOR_H
 
+#include <engine/assets/ModelLoader.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Param.h>
+#include <engine/structs/Wall.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/types.h>
-#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/structs/KVList.h>
-#include <engine/structs/List.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Wall.h>
 
 typedef struct Actor Actor;
 typedef struct ActorConnection ActorConnection;

@@ -4,6 +4,8 @@
 
 #include "gameState/PauseState.h"
 #include <engine/assets/AssetReader.h>
+#include <engine/debug/DPrint.h>
+#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -19,9 +21,6 @@
 #include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
-
-#include "engine/debug/DPrint.h"
-#include "engine/Engine.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 #include "gameState/OptionsState.h"

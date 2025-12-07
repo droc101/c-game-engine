@@ -2,11 +2,10 @@
 // Created by droc101 on 11/16/25.
 //
 
+#include <engine/assets/DataReader.h>
 #include <engine/structs/Param.h>
 #include <stddef.h>
 #include <stdlib.h>
-
-#include "engine/assets/DataReader.h"
 
 void ReadParam(const void *data, const size_t dataSize, size_t *offset, Param *out)
 {
@@ -39,10 +38,10 @@ void ReadParam(const void *data, const size_t dataSize, size_t *offset, Param *o
 	}
 }
 
-void FreeParam(Param *p)
+void FreeParam(Param *param)
 {
-	if (p->type == PARAM_TYPE_STRING)
+	if (param->type == PARAM_TYPE_STRING)
 	{
-		free(p->stringValue);
+		free(param->stringValue);
 	}
 }

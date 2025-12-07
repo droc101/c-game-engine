@@ -6,6 +6,8 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapLoader.h>
 #include <engine/assets/MapMaterialLoader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Asset.h>
@@ -16,7 +18,6 @@
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -32,8 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "engine/assets/ModelLoader.h"
-#include "engine/physics/Physics.h"
 
 Map *LoadMap(const char *path)
 {
@@ -65,14 +64,15 @@ Map *LoadMap(const char *path)
 		const size_t numConnections = ReadSizeT(mapData->data, &offset);
 		for (size_t j = 0; j < numConnections; j++)
 		{
-			ActorConnection *conn = malloc(sizeof(ActorConnection));
-			conn->sourceActorOutput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
-			conn->targetActorName = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
-			conn->targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+			ActorConnection *connection = malloc(sizeof(ActorConnection));
+			CheckAlloc(connection);
+			connection->sourceActorOutput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+			connection->targetActorName = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
+			connection->targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
 			uint8_t hasOverride = ReadByte(mapData->data, &offset);
-			ReadParam(mapData->data, mapData->size, &offset, &conn->outParamOverride);
-			conn->numRefires = ReadSizeT(mapData->data, &offset);
-			ListAdd(ioConnections, conn);
+			ReadParam(mapData->data, mapData->size, &offset, &connection->outParamOverride);
+			connection->numRefires = ReadSizeT(mapData->data, &offset);
+			ListAdd(ioConnections, connection);
 		}
 		KvList params;
 		KvListCreate(params);
@@ -80,9 +80,9 @@ Map *LoadMap(const char *path)
 		for (size_t j = 0; j < numParams; j++)
 		{
 			char *key = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
-			Param p;
-			ReadParam(mapData->data, mapData->size, &offset, &p);
-			KvSetUnsafe(params, key, p);
+			Param param;
+			ReadParam(mapData->data, mapData->size, &offset, &param);
+			KvSetUnsafe(params, key, param);
 			free(key);
 		}
 
@@ -92,53 +92,55 @@ Map *LoadMap(const char *path)
 			KvListDestroy(params);
 			ListFree(ioConnections);
 			free(actorClass);
-			// TODO free stuff
 			continue;
 		}
 
-		Actor *a = CreateActor(&xfm, actorClass, params, bodyInterface);
-		ListFree(a->ioConnections);
-		a->ioConnections = ioConnections;
-		ListAdd(map->actors, a);
+		Actor *actor = CreateActor(&xfm, actorClass, params, bodyInterface);
+		ListFree(actor->ioConnections);
+		actor->ioConnections = ioConnections;
+		ListAdd(map->actors, actor);
 		free(actorClass);
 	}
 
-	map->numModels = ReadSizeT(mapData->data, &offset);
-	map->models = malloc(sizeof(MapModel) * map->numModels);
+	map->modelCount = ReadSizeT(mapData->data, &offset);
+	map->models = malloc(sizeof(MapModel) * map->modelCount);
 	CheckAlloc(map->models);
-	for (size_t i = 0; i < map->numModels; i++)
+	for (size_t i = 0; i < map->modelCount; i++)
 	{
 		MapModel *model = &map->models[i];
 		char *materialName = ReadStringSafe(mapData->data, &offset, mapData->size, NULL);
 		model->material = LoadMapMaterial(materialName);
 		free(materialName);
 
-		model->numVerts = ReadUint(mapData->data, &offset);
-		model->verts = malloc(sizeof(MapVertex) * model->numVerts);
-		for (uint32_t j = 0; j < model->numVerts; j++)
+		model->vertexCount = ReadUint(mapData->data, &offset);
+		model->vertices = malloc(sizeof(MapVertex) * model->vertexCount);
+		CheckAlloc(model->vertices);
+		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
-			MapVertex *vtx = &model->verts[j];
-			vtx->position.x = ReadFloat(mapData->data, &offset);
-			vtx->position.y = ReadFloat(mapData->data, &offset);
-			vtx->position.z = ReadFloat(mapData->data, &offset);
-			vtx->uv.x = ReadFloat(mapData->data, &offset);
-			vtx->uv.y = ReadFloat(mapData->data, &offset);
-			vtx->color.r = ReadFloat(mapData->data, &offset);
-			vtx->color.g = ReadFloat(mapData->data, &offset);
-			vtx->color.b = ReadFloat(mapData->data, &offset);
-			vtx->color.a = ReadFloat(mapData->data, &offset);
-			vtx->normal.x = ReadFloat(mapData->data, &offset);
-			vtx->normal.y = ReadFloat(mapData->data, &offset);
-			vtx->normal.z = ReadFloat(mapData->data, &offset);
+			MapVertex *vertex = model->vertices + j;
+			vertex->position.x = ReadFloat(mapData->data, &offset);
+			vertex->position.y = ReadFloat(mapData->data, &offset);
+			vertex->position.z = ReadFloat(mapData->data, &offset);
+			vertex->uv.x = ReadFloat(mapData->data, &offset);
+			vertex->uv.y = ReadFloat(mapData->data, &offset);
+			vertex->color.r = ReadFloat(mapData->data, &offset);
+			vertex->color.g = ReadFloat(mapData->data, &offset);
+			vertex->color.b = ReadFloat(mapData->data, &offset);
+			vertex->color.a = ReadFloat(mapData->data, &offset);
+			vertex->normal.x = ReadFloat(mapData->data, &offset);
+			vertex->normal.y = ReadFloat(mapData->data, &offset);
+			vertex->normal.z = ReadFloat(mapData->data, &offset);
 		}
-		model->numIndices = ReadUint(mapData->data, &offset);
-		model->indices = malloc(sizeof(uint32_t) * model->numIndices);
-		ReadBytes(mapData->data, &offset, sizeof(uint32_t) * model->numIndices, model->indices);
+		model->indexCount = ReadUint(mapData->data, &offset);
+		model->indices = malloc(sizeof(uint32_t) * model->indexCount);
+		CheckAlloc(model->indices);
+		ReadBytes(mapData->data, &offset, sizeof(uint32_t) * model->indexCount, model->indices);
 	}
 
 
-	Transform collisionXfm = {0};
-	collisionXfm.rotation = JPH_Quat_Identity;
+	Transform collisionXfm = {
+		.rotation = JPH_Quat_Identity,
+	};
 
 	const size_t numCollisionMeshes = ReadSizeT(mapData->data, &offset);
 	for (size_t i = 0; i < numCollisionMeshes; i++)
@@ -146,15 +148,15 @@ Map *LoadMap(const char *path)
 		collisionXfm.position.x = ReadFloat(mapData->data, &offset);
 		collisionXfm.position.y = ReadFloat(mapData->data, &offset);
 		collisionXfm.position.z = ReadFloat(mapData->data, &offset);
-		const size_t numSubShapes = ReadSizeT(mapData->data, &offset);
-		if (numSubShapes == 0)
+		const size_t subShapeCount = ReadSizeT(mapData->data, &offset);
+		if (subShapeCount == 0)
 		{
 			continue;
 		}
 
 		JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
 
-		for (size_t j = 0; j < numSubShapes; j++)
+		for (size_t j = 0; j < subShapeCount; j++)
 		{
 			ModelStaticCollider staticCollider;
 			staticCollider.numTriangles = ReadSizeT(mapData->data, &offset);
@@ -164,14 +166,18 @@ Map *LoadMap(const char *path)
 			{
 				JPH_Triangle *triangle = &staticCollider.tris[k];
 				triangle->materialIndex = 0;
-				Vector3 *verts[3] = {&triangle->v1, &triangle->v2, &triangle->v3};
-				for (int l = 0; l < 3; l++)
-				{
-					Vector3 *point = verts[l];
-					point->x = ReadFloat(mapData->data, &offset);
-					point->y = ReadFloat(mapData->data, &offset);
-					point->z = ReadFloat(mapData->data, &offset);
-				}
+
+				triangle->v1.x = ReadFloat(mapData->data, &offset);
+				triangle->v1.y = ReadFloat(mapData->data, &offset);
+				triangle->v1.z = ReadFloat(mapData->data, &offset);
+
+				triangle->v2.x = ReadFloat(mapData->data, &offset);
+				triangle->v2.y = ReadFloat(mapData->data, &offset);
+				triangle->v2.z = ReadFloat(mapData->data, &offset);
+
+				triangle->v3.x = ReadFloat(mapData->data, &offset);
+				triangle->v3.y = ReadFloat(mapData->data, &offset);
+				triangle->v3.z = ReadFloat(mapData->data, &offset);
 			}
 			JPH_Shape *subShape = CreateStaticModelShape(&staticCollider);
 

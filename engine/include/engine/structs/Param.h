@@ -63,6 +63,6 @@ struct Param
 
 void ReadParam(const void *data, size_t dataSize, size_t *offset, Param *out);
 
-void FreeParam(Param *p);
+void FreeParam(Param *param);
 
 #endif //GAME_PARAM_H

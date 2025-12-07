@@ -29,6 +29,7 @@
 #include <string.h>
 
 #define MAX_HEALTH 100
+#define MAX_MAP_PATH_LENGTH 80
 
 static GlobalState state;
 
@@ -137,19 +138,14 @@ bool ChangeMapByName(const char *name)
 {
 	LogInfo("Loading map \"%s\"\n", name);
 
-	const int maxPathLength = 80;
-	char *mapPath = calloc(maxPathLength, sizeof(char));
-	CheckAlloc(mapPath);
-
-	if (snprintf(mapPath, maxPathLength, MAP("%s"), name) > maxPathLength)
+	char mapPath[MAX_MAP_PATH_LENGTH];
+	if (snprintf(mapPath, MAX_MAP_PATH_LENGTH, MAP("%s"), name) > MAX_MAP_PATH_LENGTH)
 	{
 		LogError("Failed to load map due to map name %s being too long\n", name);
-		free(mapPath);
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
 	ChangeMap(LoadMap(mapPath));
-	free(mapPath);
 	DiscordUpdateRPC();
 	return true;
 }

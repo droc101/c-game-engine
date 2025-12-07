@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/DataReader.h>
+#include <engine/subsystem/Error.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -85,6 +86,7 @@ char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBuff
 		if (remainingSize >= sizeof(char) * stringLength)
 		{
 			char *string = calloc(stringLength, sizeof(char));
+			CheckAlloc(string);
 			memcpy(string, data + *offset, stringLength);
 			*offset += stringLength * sizeof(char);
 			if (outLength)

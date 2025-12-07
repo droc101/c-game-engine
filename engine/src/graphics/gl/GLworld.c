@@ -140,6 +140,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
+	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(map->actors, i);
@@ -162,6 +163,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
 		}
 	}
+	ListUnlock(map->actors);
 
 #ifdef THIRDPERSON
 	mat4 playerXfm = GLM_MAT4_IDENTITY_INIT;
@@ -357,14 +359,14 @@ void GL_RenderMapModel(const GL_MapModelBuffer *model)
 	const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
 	glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
 
-	glDrawElements(GL_TRIANGLES, (int)model->mapModel->numIndices, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_LoadMap(const Map *map)
 {
 	GL_DestroyMapModels();
 
-	for (size_t i = 0; i < map->numModels; i++)
+	for (size_t i = 0; i < map->modelCount; i++)
 	{
 		GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
 		CheckAlloc(mmb);
@@ -376,13 +378,13 @@ void GL_LoadMap(const Map *map)
 
 		glBindBuffer(GL_ARRAY_BUFFER, mmb->buffer->vertexBufferObject);
 		glBufferData(GL_ARRAY_BUFFER,
-					 mmb->mapModel->numVerts * sizeof(MapVertex),
-					 mmb->mapModel->verts,
+					 mmb->mapModel->vertexCount * sizeof(MapVertex),
+					 mmb->mapModel->vertices,
 					 GL_STREAM_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mmb->buffer->elementBufferObject);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-					 mmb->mapModel->numIndices * sizeof(uint32_t),
+					 mmb->mapModel->indexCount * sizeof(uint32_t),
 					 mmb->mapModel->indices,
 					 GL_STREAM_DRAW);
 	}

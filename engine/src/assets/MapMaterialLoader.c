@@ -8,6 +8,7 @@
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,14 +21,14 @@ MapMaterial *LoadMapMaterial(const char *path)
 {
 	for (int i = 0; i < MAX_MAP_MATERIALS; i++)
 	{
-		MapMaterial *mat = mapMaterials[i];
-		if (mat == NULL)
+		MapMaterial *material = mapMaterials[i];
+		if (material == NULL)
 		{
 			break;
 		}
-		if (strncmp(path, mat->name, 80) == 0)
+		if (strncmp(path, material->name, 80) == 0)
 		{
-			return mat;
+			return material;
 		}
 	}
 
@@ -36,8 +37,8 @@ MapMaterial *LoadMapMaterial(const char *path)
 		Error("Map Material ID heap exhausted. Please increase MAX_MAP_MATERIALS\n");
 	}
 
-	MapMaterial *mat = malloc(sizeof(MapMaterial));
-	CheckAlloc(mat);
+	MapMaterial *material = malloc(sizeof(MapMaterial));
+	CheckAlloc(material);
 
 	Asset *mapMaterialAsset = DecompressAsset(path, false);
 	if (mapMaterialAsset == NULL || mapMaterialAsset->type != ASSET_TYPE_MAP_MATERIAL)
@@ -55,19 +56,19 @@ MapMaterial *LoadMapMaterial(const char *path)
 
 	size_t offset = 0;
 
-	mat->texture = ReadStringSafe(mapMaterialAsset->data, &offset, mapMaterialAsset->size, NULL);
+	material->texture = ReadStringSafe(mapMaterialAsset->data, &offset, mapMaterialAsset->size, NULL);
 	offset += sizeof(float) * 2;
-	mat->shader = ReadByte(mapMaterialAsset->data, &offset);
-	mat->soundClass = ReadByte(mapMaterialAsset->data, &offset);
+	material->shader = ReadByte(mapMaterialAsset->data, &offset);
+	material->soundClass = ReadByte(mapMaterialAsset->data, &offset);
 
-	mat->id = mapMaterialId;
+	material->id = mapMaterialId;
 
-	const size_t nameLength = strlen(path) + 1;
-	mat->name = malloc(nameLength);
-	CheckAlloc(mat->name);
-	strncpy(mat->name, path, nameLength);
+	const size_t nameLength = strlen(path);
+	material->name = malloc(nameLength + 1);
+	CheckAlloc(material->name);
+	strncpy(material->name, path, nameLength);
 
-	mapMaterials[mapMaterialId] = mat;
+	mapMaterials[mapMaterialId] = material;
 
 	mapMaterialId++;
 
@@ -79,5 +80,5 @@ MapMaterial *LoadMapMaterial(const char *path)
 
 	FreeAsset(mapMaterialAsset);
 
-	return mat;
+	return material;
 }

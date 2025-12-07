@@ -7,9 +7,11 @@
 #include <cglm/quat.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Color.h>
@@ -35,12 +37,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-
 #include "actor/Physbox.h"
 #include "actor/TestActor.h"
-#include "engine/Engine.h"
-
-#include "engine/physics/PlayerPhysics.h"
 #include "gameState/PauseState.h"
 
 static bool lodThreadInitDone = false;
@@ -194,17 +192,15 @@ void MainStateRender(GlobalState *state)
 	const Vector2 realWndSize = ActualWindowSize();
 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
 
-	const Map *level = state->map;
-
-	RenderMap(level, state->camera);
+	RenderMap(state->map, state->camera);
 	RenderHUD();
 
 #ifdef BUILDSTYLE_DEBUG
 	DPrintF("Engine " ENGINE_VERSION, COLOR_WHITE, false);
 #endif
-	DPrintPlayer(&level->player);
+	DPrintPlayer(&state->map->player);
 
-	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);
+	DPrintF("Actors: %d", COLOR_WHITE, false, state->map->actors.length);
 }
 
 void MainStateSet()
