@@ -2,7 +2,16 @@
 // Created by droc101 on 10/7/2024.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Slider.h>
+#include <engine/uiStack/UiStack.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>
@@ -12,15 +21,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Input.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Vector2.h>
-#include <engine/uiStack/UiStack.h>
 
 char *DefaultSliderLabelCallback(const Control *slider)
 {

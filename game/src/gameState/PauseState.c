@@ -4,8 +4,9 @@
 
 #include "gameState/PauseState.h"
 #include <engine/assets/AssetReader.h>
+#include <engine/debug/DPrint.h>
+#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
@@ -17,10 +18,9 @@
 #include <engine/uiStack/UiStack.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
-
-#include "engine/Engine.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 #include "gameState/OptionsState.h"
@@ -56,7 +56,7 @@ void PauseStateRender(GlobalState * /*state*/)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	FontDrawString(v2(20, 20), "Engine " ENGINE_VERSION "\nDEBUG BUILD", 16, COLOR_WHITE, smallFont);
+	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", COLOR_WHITE, false);
 #endif
 
 	ProcessUiStack(pauseStack);

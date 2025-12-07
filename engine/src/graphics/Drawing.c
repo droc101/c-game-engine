@@ -6,15 +6,17 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/graphics/gl/GLHelper.h>
+#include <engine/graphics/gl/GLdebug.h>
+#include <engine/graphics/gl/GLframe.h>
+#include <engine/graphics/gl/GLui.h>
+#include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Player.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -298,9 +300,9 @@ void DrawNinePatchTexture(const Vector2 pos,
 
 	const UiTriangleArray tris = {
 		.vertices = vertices,
-		.vertexCount = sizeof(vertices) / sizeof(**vertices),
+		.vertexCount = sizeof(vertices) / (sizeof(float) * 4),
 		.indices = indices,
-		.indexCount = sizeof(indices) / sizeof(**indices),
+		.indexCount = sizeof(indices) / sizeof(uint32_t),
 	};
 
 	DrawUiTriangles(&tris, texture, COLOR_WHITE);
@@ -347,7 +349,7 @@ inline void DrawUiTriangles(const UiTriangleArray *triangleArray, const char *te
 			GL_DrawUITriangles(triangleArray, texture, color);
 			break;
 		default:
-			LogWarning("DrawUiTriangles not implemented in current renderer!\n");
+			break;
 	}
 }
 
@@ -361,8 +363,10 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 		case RENDERER_VULKAN:
 			VK_DrawJoltDebugRendererLine(from, to, color);
 			break;
-		default:
 		case RENDERER_OPENGL:
+			GL_AddDebugLine(*from, *to, COLOR(color));
+			break;
+		default:
 			break;
 	}
 }
@@ -379,8 +383,8 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 		case RENDERER_VULKAN:
 			VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
 			break;
-		default:
 		case RENDERER_OPENGL:
+		default:
 			break;
 	}
 }
@@ -403,7 +407,7 @@ void RenderMenuBackground()
 void RenderInGameMenuBackground()
 {
 	const GlobalState *state = GetState();
-	RenderLevel(state->level, state->camera);
+	RenderMap(state->map, state->camera);
 	RenderHUD();
 	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0xA0000000));
 }
@@ -435,15 +439,15 @@ void RenderHUD()
 				   crosshairColor);
 }
 
-void RenderLevel3D(const Level *l, const Camera *cam)
+void RenderMap3D(const Map *map, const Camera *cam)
 {
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
-			VK_RenderLevel(l, cam, &GetState()->viewmodel);
+			VK_RenderLevel(map, cam, &GetState()->viewmodel);
 			break;
 		case RENDERER_OPENGL:
-			GL_RenderLevel(l, cam);
+			GL_RenderMap(map, cam);
 			break;
 		default:
 			break;

@@ -8,6 +8,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Param.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
 #include <stddef.h>
@@ -15,7 +16,7 @@
 
 typedef struct IoProxyData
 {
-	/// Tick counter for the whole level so it doesn't get reset when pausing
+	/// Tick counter for the whole map so it doesn't get reset when pausing
 	size_t tickCounter;
 } IoProxyData;
 
@@ -31,14 +32,15 @@ static void IoProxyUpdate(Actor *this, double /*delta*/)
 
 void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/)
 {
-	if (GetState()->level->ioProxy != NULL)
+	if (GetState()->map->ioProxy != NULL)
 	{
 		LogError("Attempted to add an I/O proxy actor to level, but it already has one! The new one cannot be used.");
 	} else
 	{
-		GetState()->level->ioProxy = this;
+		GetState()->map->ioProxy = this;
 	}
 	this->extraData = calloc(1, sizeof(IoProxyData));
+	CheckAlloc(this->extraData);
 }
 
 static ActorDefinition definition = {

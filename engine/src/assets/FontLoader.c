@@ -2,19 +2,19 @@
 // Created by droc101 on 7/23/25.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/FontLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/structs/Asset.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/structs/Asset.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/assets/TextureLoader.h>
 
 Font *GenerateFallbackFont()
 {
@@ -87,6 +87,7 @@ Font *LoadFont(const char *asset)
 	}
 	fontTextureLength += strlen(TEXTURE(""));
 	font->texture = calloc(fontTextureLength, sizeof(char));
+	CheckAlloc(font->texture);
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
 	font->image = LoadImage(font->texture);

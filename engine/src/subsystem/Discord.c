@@ -83,14 +83,14 @@ void DiscordUpdateRPC()
 	switch (GetState()->rpcState)
 	{
 		case IN_GAME:
-			snprintf(activity.assets.large_text, 128, "Playing %s", GetState()->levelName);
-			snprintf(activity.details, 128, "Playing %s", GetState()->levelName);
-			snprintf(activity.assets.large_image, 128, "level_%s", GetState()->levelName);
+			snprintf(activity.assets.large_text, 128, "Playing %s", GetState()->map->discordRpcName);
+			snprintf(activity.details, 128, "Playing %s", GetState()->map->discordRpcName);
+			snprintf(activity.assets.large_image, 128, "%s", GetState()->map->discordRpcIcon);
 			break;
 		case PAUSED:
-			snprintf(activity.assets.large_text, 128, "Playing %s", GetState()->levelName);
+			snprintf(activity.assets.large_text, 128, "Playing %s", GetState()->map->discordRpcName);
 			snprintf(activity.details, 128, "Game Paused");
-			snprintf(activity.assets.large_image, 128, "level_%s", GetState()->levelName);
+			snprintf(activity.assets.large_image, 128, "%s", GetState()->map->discordRpcIcon);
 			break;
 		case IN_MENUS:
 		default:

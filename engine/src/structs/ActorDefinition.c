@@ -2,9 +2,7 @@
 // Created by NBT22 on 8/29/25.
 //
 
-#include <engine/structs/ActorDefinition.h>
 #include <assert.h>
-#include <stddef.h>
 #include <engine/actor/IoProxy.h>
 #include <engine/actor/LogicBinary.h>
 #include <engine/actor/LogicCounter.h>
@@ -13,9 +11,11 @@
 #include <engine/actor/Sprite.h>
 #include <engine/actor/StaticModel.h>
 #include <engine/actor/Trigger.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/structs/Actor.h>
+#include <stddef.h>
 
 static ActorDefinitionDict actorDefinitions;
 

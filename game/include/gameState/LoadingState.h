@@ -8,9 +8,9 @@
 #define GAME_STATE_LOADING 5
 
 /**
- * Change to the level loading state
- * @param levelName The name of the level to load
+ * Change to the map loading state
+ * @param mapName The name of the map to load
  */
-void LoadingStateSet(const char *levelName);
+void LoadingStateSet(const char *mapName);
 
 #endif //LOADINGSTATE_H

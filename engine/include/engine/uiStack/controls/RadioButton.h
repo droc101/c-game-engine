@@ -5,10 +5,10 @@
 #ifndef GAME_RADIOBUTTON_H
 #define GAME_RADIOBUTTON_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <engine/structs/Vector2.h>
 #include <engine/uiStack/UiStack.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct RadioButtonData RadioButtonData;
 

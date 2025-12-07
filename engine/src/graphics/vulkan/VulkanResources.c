@@ -2,7 +2,17 @@
 // Created by Noah on 12/18/2024.
 //
 
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/helpers/Realloc.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Viewmodel.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/threads/LodThread.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaImage.h>
@@ -14,16 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Viewmodel.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/List.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/helpers/Realloc.h>
-#include <engine/subsystem/threads/LodThread.h>
-#include <engine/graphics/vulkan/VulkanHelpers.h>
 
 VkResult CreateUiBuffers()
 {
@@ -403,6 +403,7 @@ VkResult ResizeActorModelInstanceDataBuffer()
 		buffers.actorModels.instanceData.data = Recalloc(buffers.actorModels.instanceData.data,
 														 buffers.actorModels.instanceData.allocatedSize,
 														 buffers.actorModels.instanceData.bytesUsed);
+		CheckAlloc(buffers.actorModels.instanceData.data);
 		buffers.actorModels.instanceData.allocatedSize = buffers.actorModels.instanceData.bytesUsed;
 	}
 

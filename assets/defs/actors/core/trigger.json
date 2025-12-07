@@ -30,6 +30,12 @@
       "type": "float",
       "description": "The width of this trigger"
     },
+    "height": {
+      "display": "Height",
+      "default": 1.0,
+      "type": "float",
+      "description": "The height of this trigger"
+    },
     "depth": {
       "display": "Depth",
       "default": 1.0,

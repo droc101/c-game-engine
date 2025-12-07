@@ -79,7 +79,7 @@ static void TestActorRenderUi(Actor *this)
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_BOTTOM,
 					smallFont);
-	if (!GetState()->level->player.hasHeldActor && GetState()->level->player.targetedActor == this)
+	if (!GetState()->map->player.hasHeldActor && GetState()->map->player.targetedActor == this)
 	{
 		DrawTextAligned("please spare me",
 						16,

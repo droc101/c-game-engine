@@ -15,6 +15,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "engine/structs/Asset.h"
 
 struct SoundEffect
 {

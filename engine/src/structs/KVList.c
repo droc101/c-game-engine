@@ -2,14 +2,14 @@
 // Created by droc101 on 5/28/25.
 //
 
-#include <engine/structs/KVList.h>
 #include <assert.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/Param.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Param.h>
 
 #pragma region Private Functions
 

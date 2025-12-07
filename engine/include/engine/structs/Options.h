@@ -5,9 +5,9 @@
 #ifndef GAME_OPTIONS_H
 #define GAME_OPTIONS_H
 
+#include <engine/graphics/RenderingHelpers.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <engine/graphics/RenderingHelpers.h>
 
 typedef enum OptionsMsaa OptionsMsaa;
 

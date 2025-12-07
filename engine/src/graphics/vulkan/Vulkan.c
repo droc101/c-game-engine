@@ -2,9 +2,23 @@
 // Created by Noah on 7/5/2024.
 //
 
-#include <engine/graphics/vulkan/Vulkan.h>
 #include <assert.h>
 #include <cglm/types.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/Drawing.h>
+#include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/graphics/vulkan/VulkanActors.h>
+#include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Viewmodel.h>
+#include <engine/subsystem/Logging.h>
+#include <engine/subsystem/threads/LodThread.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/lunaBuffer.h>
@@ -21,27 +35,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Viewmodel.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/graphics/Drawing.h>
-#include <engine/subsystem/threads/LodThread.h>
-#include <engine/graphics/vulkan/VulkanActors.h>
-#include <engine/graphics/vulkan/VulkanHelpers.h>
-#include <engine/graphics/vulkan/VulkanInternal.h>
-#include <engine/graphics/vulkan/VulkanResources.h>
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/subsystem/Error.h>
 #endif
 
-static const Level *loadedLevel;
+static const Map *loadedLevel;
 static uint8_t currentFrame;
 
 bool VK_Init(SDL_Window *window)
@@ -110,24 +109,21 @@ bool VK_Init(SDL_Window *window)
 	return false;
 }
 
-bool VK_LoadLevelWalls(const Level *level)
+bool VK_LoadLevelWalls(const Map *level)
 {
-	if (!level->hasCeiling)
-	{
-		VulkanTest(LoadSky(LoadModel(MODEL("sky"))), "Failed to load sky!");
-	}
+	VulkanTest(LoadSky(LoadModel(MODEL("sky"))), "Failed to load sky!");
 
-	pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
-	pushConstants.floorTextureIndex = TextureIndex(level->floorTex);
+	// pushConstants.roofTextureIndex = TextureIndex(level->ceilOrSkyTex);
+	// pushConstants.floorTextureIndex = TextureIndex(level->floorTex);
 
 	pushConstants.fogStart = (float)level->fogStart;
 	pushConstants.fogEnd = (float)level->fogEnd;
 	pushConstants.fogColor = COLOR(level->fogColor);
 
-	buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * level->walls.length;
-	buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * level->walls.length;
-	VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
-	LoadWalls(level);
+	// buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * level->walls.length;
+	// buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * level->walls.length;
+	// VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
+	// LoadWalls(level);
 
 	if (LockLodThreadMutex() != 0)
 	{
@@ -184,7 +180,7 @@ VkResult VK_FrameStart()
 	return VK_SUCCESS;
 }
 
-VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmodel *viewmodel)
+VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel *viewmodel)
 {
 	if (loadedLevel != level)
 	{
@@ -245,7 +241,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 	{
 		VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
 	}
-	if (!level->hasCeiling)
+	if (true) // not has ceiling
 	{
 		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
 													 buffers.sky.indices.buffer,
@@ -263,7 +259,7 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw floor!");
 	}
 
-	if (level->hasCeiling)
+	if (false) // has ceiling
 	{
 		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
 							   "Failed to draw floor and ceiling!");
@@ -377,26 +373,19 @@ VkResult VK_RenderLevel(const Level *level, const Camera *camera, const Viewmode
 							   "Failed to draw unshaded model actors!");
 	}
 #else
-	if (level->hasCeiling)
-	{
-		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 12, 1, 0, 0),
-							   "Failed to draw floor and ceiling!");
-	} else
-	{
-		VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
-													 buffers.sky.indices.buffer,
-													 VK_INDEX_TYPE_UINT32,
-													 pipelines.sky,
-													 &pipelineBindInfo,
-													 buffers.sky.indexCount,
-													 1,
-													 0,
-													 0,
-													 0),
-							   "Failed to draw sky!");
-		VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 6, 1, 0, 0),
-							   "Failed to draw floor!");
-	}
+	VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices.buffer,
+												 buffers.sky.indices.buffer,
+												 VK_INDEX_TYPE_UINT32,
+												 pipelines.sky,
+												 &pipelineBindInfo,
+												 buffers.sky.indexCount,
+												 1,
+												 0,
+												 0,
+												 0),
+						   "Failed to draw sky!");
+	VulkanTestReturnResult(lunaDrawBuffer(NULL, pipelines.floorAndCeiling, &pipelineBindInfo, 6, 1, 0, 0),
+						   "Failed to draw floor!");
 
 	if (buffers.walls.indices.bytesUsed)
 	{

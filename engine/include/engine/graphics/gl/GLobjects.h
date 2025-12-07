@@ -1,0 +1,159 @@
+//
+// Created by droc101 on 11/20/25.
+//
+
+#ifndef GAME_GLOBJECTS_H
+#define GAME_GLOBJECTS_H
+
+#include <cglm/types.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Map.h>
+#include <GL/glew.h>
+#include <joltc/Math/Vector3.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#define GL_MAX_MAP_MODELS 2048
+
+typedef struct GL_Shader GL_Shader;
+typedef struct GL_Buffer GL_Buffer;
+typedef struct GL_ModelBuffers GL_ModelBuffers;
+typedef struct GL_SharedUniforms GL_SharedUniforms;
+typedef struct GL_DebugLine GL_DebugLine;
+typedef struct GL_MapModelBuffer GL_MapModelBuffer;
+
+struct GL_Shader
+{
+	/// The ID of the vertex shader
+	GLuint vertexShader;
+	/// The ID of the fragment shader
+	GLuint fragmentShader;
+	/// The ID of the shader program
+	GLuint program;
+};
+
+struct GL_Buffer
+{
+	/// The vertex array object
+	GLuint vertexArrayObject;
+	/// The vertex buffer object
+	GLuint vertexBufferObject;
+	/// The element buffer object
+	GLuint elementBufferObject;
+};
+
+struct GL_ModelBuffers
+{
+	/// The number of LODs in this buffer
+	uint32_t lodCount;
+	/// The number of materials in this buffer
+	uint32_t materialCount;
+	/// The buffers, indexed by LOD then material
+	GL_Buffer **buffers;
+};
+
+struct GL_MapModelBuffer
+{
+	MapModel *mapModel;
+	GL_Buffer *buffer;
+};
+
+struct __attribute__((aligned(16))) GL_SharedUniforms
+{
+	/// The model -> screen matrix
+	mat4 worldViewMatrix;
+	/// The color of the fog
+	Color fogColor;
+	/// The distance from the camera at which the fog starts
+	float fogStart;
+	/// The distance from the camera at which the fog is fully opaque
+	float fogEnd;
+	/// The yaw of the camera
+	float cameraYaw;
+};
+
+struct GL_DebugLine
+{
+	Vector3 start;
+	Vector3 end;
+	Color color;
+};
+
+extern GLuint glTextures[MAX_TEXTURES];
+extern int glNextFreeSlot;
+extern int glAssetTextureMap[MAX_TEXTURES];
+extern char glLastError[512];
+
+extern GL_ModelBuffers *glModels[MAX_MODELS];
+
+extern GL_MapModelBuffer *mapModels[GL_MAX_MAP_MODELS];
+
+extern GL_Buffer *glBuffer;
+
+extern GLuint sharedUniformBuffer;
+
+/**
+ * Create a shader program from assets
+ * @param fsh The fragment shader asset
+ * @param vsh The vertex shader asset
+ * @return The constructed shader or NULLPTR on error
+ */
+GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh);
+
+/**
+ * Create a shader program
+ * @param fsh The fragment shader source
+ * @param vsh The vertex shader source
+ * @return The shader struct or NULLPTR on error
+ */
+GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh);
+
+/**
+ * Create a buffer object
+ * @note This should be reused as much as possible
+ * @return The buffer struct
+ */
+GL_Buffer *GL_ConstructBuffer();
+
+/**
+ * Destroy a GL_Shader struct
+ * @param shd The shader to destroy
+ */
+void GL_DestroyShader(GL_Shader *shd);
+
+/**
+ * Destroy a GL_Buffer struct
+ * @param buffer The buffer to destroy
+ */
+void GL_DestroyBuffer(GL_Buffer *buffer);
+
+/**
+ * Load and register a texture from an asset
+ * @param texture The texture name
+ */
+void GL_LoadTextureFromAsset(const char *texture);
+
+/**
+ * Register a texture from pixel data
+ * @param image The height of the texture
+ * @return The slot the texture was registered in
+ */
+int GL_RegisterTexture(const Image *image);
+
+/**
+ * Load a model into OpenGL
+ * @param model The model definition to load
+ * @param lod The LOD to load
+ * @param material The material to load
+ */
+void GL_LoadModel(const ModelDefinition *model, uint32_t lod, size_t material);
+
+void GL_DestroyMapModels();
+
+void GL_InitObjects();
+
+void GL_DestroyObjects();
+
+#endif //GAME_GLOBJECTS_H

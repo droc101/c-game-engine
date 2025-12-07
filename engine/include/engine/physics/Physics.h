@@ -5,9 +5,9 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include <joltc/Physics/Body/BodyInterface.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60
@@ -53,8 +53,8 @@ void PhysicsInitGlobal(GlobalState *state);
 
 void PhysicsDestroyGlobal(const GlobalState *state);
 
-void PhysicsInitLevel(Level *level);
+void PhysicsInitMap(Map *map);
 
-void PhysicsDestroyLevel(const Level *level, JPH_BodyInterface *bodyInterface);
+void PhysicsDestroyMap(const Map *map, JPH_BodyInterface *bodyInterface);
 
 #endif //INIT_H

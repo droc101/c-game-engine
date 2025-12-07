@@ -20,6 +20,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,7 +90,7 @@ void LoadLevelList()
 {
 	ListInit(levelList, LIST_POINTER);
 	char levelDataPath[300];
-	sprintf(levelDataPath, "%sassets/level/", GetState()->executableFolder);
+	sprintf(levelDataPath, "%sassets/map/", GetState()->executableFolder);
 
 	// Get the name of all gmap files in the level directory
 	DIR *dir = opendir(levelDataPath);

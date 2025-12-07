@@ -12,10 +12,10 @@
 //  through the shader.
 
 #ifdef JPH_DEBUG_RENDERER
+#include <engine/graphics/Drawing.h>
+#include <engine/physics/Physics.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <engine/physics/Physics.h>
-#include <engine/graphics/Drawing.h>
 
 static inline bool ShouldDrawBody(void * /*userData*/, const JPH_Body *body)
 {

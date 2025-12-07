@@ -4,39 +4,23 @@
 
 #include <engine/debug/DPrint.h>
 #include <engine/helpers/MathEx.h>
-#include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
-#include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
 #include <engine/structs/Player.h>
-#include <engine/subsystem/Input.h>
-#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
-#include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/Body.h>
-#include <joltc/Physics/Body/BodyInterface.h>
-#include <joltc/Physics/Collision/PhysicsMaterial.h>
-#include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/Physics/Collision/ShapeFilter.h>
-#include <joltc/types.h>
 #include <math.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
-	memset(player, 0, sizeof(Player));
 	player->transform.rotation = JPH_Quat_Identity;
 	player->canDropHeldActor = true;
+	player->isNoclipActive = true; // TODO remove once physics work
 
 	CreatePlayerPhysics(player, physicsSystem);
 }
@@ -64,8 +48,7 @@ void DPrintPlayer(const Player *player)
 	float angle = NAN;
 	JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
 	JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
-	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)\nRotation Angle: %.4f "
-			"(%.2fdeg)",
+	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
 			COLOR_WHITE,
 			false,
 			player->transform.rotation.x,
@@ -74,8 +57,6 @@ void DPrintPlayer(const Player *player)
 			radToDeg(fabsf(player->transform.rotation.y)),
 			axis.x,
 			axis.y,
-			axis.z,
-			angle,
-			radToDeg(angle));
+			axis.z);
 	DPrintF("%s Actor: %p", COLOR_WHITE, false, player->hasHeldActor ? "Held" : "Targeted", player->targetedActor);
 }

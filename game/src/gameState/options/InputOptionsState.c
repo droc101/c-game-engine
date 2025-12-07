@@ -15,6 +15,7 @@
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/OptionsState.h"

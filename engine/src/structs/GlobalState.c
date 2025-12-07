@@ -3,32 +3,30 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/LevelLoader.h>
+#include <engine/assets/MapLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
-#include <engine/structs/Asset.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
-#include <engine/structs/Player.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL_mouse.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define MAX_HEALTH 100
+#define MAX_MAP_PATH_LENGTH 80
 
 static GlobalState state;
 
@@ -44,8 +42,7 @@ void InitState()
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
-	state.level = CreateLevel(); // empty level so we don't segfault
-	state.levelName = calloc(1, 1);
+	state.map = CreateMap(); // empty map so we don't segfault
 	state.camera = calloc(1, sizeof(Camera));
 	CheckAlloc(state.camera);
 	state.camera->fov = GetState()->options.fov;
@@ -86,7 +83,6 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 					   const FrameRenderFunction RenderGame,
 					   const SDL_bool enableRelativeMouseMode)
 {
-	state.physicsFrame = 0;
 	state.UpdateGame = UpdateGame;
 	state.currentState = currentState;
 	state.RenderGame = RenderGame;
@@ -95,32 +91,30 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	SDL_SetRelativeMouseMode(enableRelativeMouseMode);
 }
 
-void ChangeLevel(Level *level, char *levelName)
+void ChangeMap(Map *map)
 {
-	if (!level)
+	if (!map)
 	{
-		LogError("Cannot change to a NULL level. Something might have gone wrong while loading it.\n");
+		LogError("Cannot change to a NULL map. Something might have gone wrong while loading it.\n");
 		return;
 	}
 	PhysicsThreadLockTickMutex();
-	if (state.level)
+	if (state.map)
 	{
-		DestroyLevel(state.level);
-		free(state.levelName);
+		DestroyMap(state.map);
 	}
-	state.level = level;
-	state.levelName = levelName;
-	if (strncmp(level->music, "none", 4) != 0)
-	{
-		char musicPath[80];
-		snprintf(musicPath, sizeof(musicPath), SOUND("%s"), level->music);
-		ChangeMusic(musicPath);
-	} else
-	{
-		StopMusic();
-	}
+	state.map = map;
+	LoadMapModels(map);
+	// if (strncmp(level->music, "none", 4) != 0)
+	// {
+	// 	char musicPath[80];
+	// 	snprintf(musicPath, sizeof(musicPath), SOUND("%s"), level->music);
+	// 	ChangeMusic(musicPath);
+	// } else
+	// {
+	// 	StopMusic();
+	// }
 
-	LoadLevelWalls(level);
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -128,7 +122,8 @@ void DestroyGlobalState()
 {
 	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
-	DestroyLevel(state.level);
+	DestroyMap(state.map);
+	state.map = NULL;
 	free(state.saveData);
 	free(state.camera);
 
@@ -136,30 +131,18 @@ void DestroyGlobalState()
 	PhysicsDestroyGlobal(&state);
 }
 
-bool ChangeLevelByName(const char *name)
+bool ChangeMapByName(const char *name)
 {
-	LogInfo("Loading level \"%s\"\n", name);
+	LogInfo("Loading map \"%s\"\n", name);
 
-	const int maxPathLength = 80;
-	char *levelPath = calloc(maxPathLength, sizeof(char));
-	CheckAlloc(levelPath);
-
-	if (snprintf(levelPath, maxPathLength, LEVEL("%s"), name) > maxPathLength)
+	char mapPath[MAX_MAP_PATH_LENGTH];
+	if (snprintf(mapPath, MAX_MAP_PATH_LENGTH, MAP("%s"), name) > MAX_MAP_PATH_LENGTH)
 	{
-		LogError("Failed to load level due to level name %s being too long\n", name);
-		free(levelPath);
-		return false;
-	}
-	Asset *levelData = DecompressAsset(levelPath, false);
-	free(levelPath);
-	if (levelData == NULL)
-	{
-		LogError("Failed to load level asset.\n");
+		LogError("Failed to load map due to map name %s being too long\n", name);
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
-	ChangeLevel(LoadLevel(levelData->data, levelData->size), strdup(name));
-	FreeAsset(levelData);
+	ChangeMap(LoadMap(mapPath));
 	DiscordUpdateRPC();
 	return true;
 }

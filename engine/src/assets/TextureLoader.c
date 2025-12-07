@@ -2,18 +2,18 @@
 // Created by droc101 on 7/23/25.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/structs/Asset.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <SDL_endian.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/structs/Asset.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 
 uint32_t textureId;
 Image *images[MAX_TEXTURES];
@@ -81,7 +81,7 @@ Image *LoadImage(const char *asset)
 	{
 		if (textureAsset->typeVersion != TEXTURE_ASSET_VERSION)
 		{
-			LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)",
+			LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)",
 					 textureAsset->typeVersion,
 					 TEXTURE_ASSET_VERSION);
 			GenFallbackImage(img);
@@ -94,6 +94,7 @@ Image *LoadImage(const char *asset)
 			img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
 			const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
 			img->pixelData = malloc(pixelDataSize);
+			CheckAlloc(img->pixelData);
 			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
 			uint32_t *pixels32 = (uint32_t *)img->pixelData;
 			for (size_t i = 0; i < img->width * img->height; i++)

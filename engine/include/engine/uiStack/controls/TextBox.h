@@ -5,12 +5,12 @@
 #ifndef TEXTBOX_H
 #define TEXTBOX_H
 
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/TextInputSystem.h>
+#include <engine/uiStack/UiStack.h>
 #include <SDL_events.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <engine/subsystem/TextInputSystem.h>
-#include <engine/structs/Vector2.h>
-#include <engine/uiStack/UiStack.h>
 
 typedef struct TextBoxData TextBoxData;
 

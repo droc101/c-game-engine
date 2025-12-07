@@ -2,7 +2,12 @@
 // Created by droc101 on 7/23/25.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/ModelLoader.h>
+#include <engine/structs/Asset.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -13,11 +18,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/structs/Asset.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 
 uint32_t modelId;
 uint32_t lodId;

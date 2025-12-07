@@ -5,8 +5,8 @@
 #ifndef GAME_DPRINT_H
 #define GAME_DPRINT_H
 
-#include <stdbool.h>
 #include <engine/structs/Color.h>
+#include <stdbool.h>
 
 // Show debug print statements in the top left corner
 #define ENABLE_DEBUG_PRINT

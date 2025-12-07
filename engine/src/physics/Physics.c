@@ -10,16 +10,12 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
-#include <joltc/enums.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Quat.h>
-#include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "engine/structs/Map.h"
 
 static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 {
@@ -93,7 +89,7 @@ void PhysicsDestroyGlobal(const GlobalState *state)
 	JPH_Shutdown();
 }
 
-void PhysicsInitLevel(Level *level)
+void PhysicsInitMap(Map *map)
 {
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
 		.maxContactConstraints = MAX_CONTACT_CONSTRAINTS,
@@ -102,29 +98,11 @@ void PhysicsInitLevel(Level *level)
 		.objectLayerPairFilter = JPH_ObjectLayerPairFilter_Create(&objectLayerPairFilterImpl),
 		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&objectVsBroadPhaseLayerFilterImpl),
 	};
-	level->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
-
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(level->physicsSystem);
-	const JPH_Plane plane = {
-		.normal.y = 1,
-	};
-	JPH_Shape *shape = (JPH_Shape *)JPH_PlaneShape_Create(&plane, NULL, 100);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create3(shape,
-																					  (Vector3[]){{0.0f, -0.5f, 0.0f}},
-																					  &JPH_Quat_Identity,
-																					  JPH_MotionType_Static,
-																					  OBJECT_LAYER_STATIC);
-	JPH_BodyCreationSettings_SetFriction(bodyCreationSettings, 4.25f);
-	level->floorBodyId = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
-															bodyCreationSettings,
-															JPH_Activation_DontActivate);
-	JPH_Shape_Destroy(shape);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 }
 
-void PhysicsDestroyLevel(const Level *level, JPH_BodyInterface *bodyInterface)
+void PhysicsDestroyMap(const Map *map, JPH_BodyInterface * /*bodyInterface*/)
 {
-	JPH_CharacterVirtual_Destroy(level->player.joltCharacter);
-	JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, level->floorBodyId);
-	JPH_PhysicsSystem_Destroy(level->physicsSystem);
+	JPH_CharacterVirtual_Destroy(map->player.joltCharacter);
+	JPH_PhysicsSystem_Destroy(map->physicsSystem);
 }

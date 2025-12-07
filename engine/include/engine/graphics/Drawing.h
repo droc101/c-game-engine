@@ -5,16 +5,16 @@
 #ifndef GAME_DRAWING_H
 #define GAME_DRAWING_H
 
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Vector2.h>
 #include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/types.h>
 #include <SDL_surface.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Vector2.h>
 
 typedef struct BatchedQuadArray BatchedQuadArray;
 typedef struct UITriangleArray UiTriangleArray;
@@ -208,12 +208,11 @@ void RenderInGameMenuBackground();
 void RenderHUD();
 
 /**
- * Render the 3D portion of a level
- * @param l The level to render
+ * Render the 3D portion of a map
+ * @param map The map to render
  * @param cam The camera to render with
- * @note - This does not render the sky
- * @note - This destroys the contents of the depth buffer
+ * @note - This destroys the contents of the depth buffer in the OpenGL renderer
  */
-void RenderLevel3D(const Level *l, const Camera *cam);
+void RenderMap3D(const Map *map, const Camera *cam);
 
 #endif //GAME_DRAWING_H

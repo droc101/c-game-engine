@@ -2,7 +2,10 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <engine/physics/Physics.h>
+#include <engine/structs/Vector2.h>
 #include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -15,9 +18,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/subsystem/Error.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Vector2.h>
 
 Wall *CreateWall(const Vector2 a, const Vector2 b, const char *texture, const float uvScale, const float uvOffset)
 {

@@ -24,7 +24,7 @@ void SetInitialGameState(const int argc, const char *argv[])
 	if (HasCliArg(argc, argv, "--map"))
 	{
 		const char *mapName = GetCliArgStr(argc, argv, "--map", "");
-		if (ChangeLevelByName(mapName))
+		if (ChangeMapByName(mapName))
 		{
 			loadMap = true;
 		}

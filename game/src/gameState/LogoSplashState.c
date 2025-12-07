@@ -14,6 +14,7 @@
 #include <SDL_gamecontroller.h>
 #include <SDL_rect.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stddef.h>
 #include "gameState/MenuState.h"
 

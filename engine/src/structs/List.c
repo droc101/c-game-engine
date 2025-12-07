@@ -2,9 +2,11 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <engine/structs/List.h>
 #include <assert.h>
-#include <errno.h>
+#include <engine/helpers/Realloc.h>
+#include <engine/structs/List.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <limits.h>
 #include <SDL_error.h>
 #include <SDL_mutex.h>
@@ -13,9 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/Realloc.h>
 
 void _ListInit(List *list, const enum _ListType listType)
 {

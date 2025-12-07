@@ -18,6 +18,7 @@
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -206,7 +207,7 @@ void VideoOptionsStateSet()
 		UiStackPush(videoOptionsStack,
 					CreateRadioButtonControl(v2(0, opY),
 											 v2(480, 40),
-											 "Vulkan",
+											 "Vulkan (unsupported)",
 											 RbOptionsRenderer,
 											 TOP_CENTER,
 											 GetState()->options.renderer == RENDERER_VULKAN,

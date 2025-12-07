@@ -1,0 +1,17 @@
+{
+  "type": "byte",
+  "options": [
+    [
+      0,
+      "None"
+    ],
+    [
+      1,
+      "AABB"
+    ],
+    [
+      2,
+      "Full Collision"
+    ]
+  ]
+}

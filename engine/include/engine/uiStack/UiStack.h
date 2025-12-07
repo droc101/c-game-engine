@@ -5,10 +5,10 @@
 #ifndef GAME_UISTACK_H
 #define GAME_UISTACK_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef enum ControlType ControlType;
 typedef enum ControlState ControlState;

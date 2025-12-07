@@ -5,6 +5,8 @@
 #ifndef GAME_PLAYERPHYSICS_H
 #define GAME_PLAYERPHYSICS_H
 
+#include <engine/structs/Color.h>
+#include <engine/structs/Player.h>
 #include <joltc/joltc.h>
 
 /// Player movement speed (in units per second)
@@ -21,7 +23,7 @@ void PlayerPersistentStateDestroy();
 
 void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem);
 
-void MovePlayer(const Player *player, float *distanceTraveled);
+void MovePlayer(const Player *player, float *distanceTraveled, double delta);
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime);
 

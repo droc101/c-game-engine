@@ -21,7 +21,7 @@ jobs:
             zip_name: game.linux.x86_64.release
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Cache Dependencies
       uses: actions/cache@v4
@@ -36,7 +36,7 @@ jobs:
       run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
 
     - name: Upload results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ matrix.zip_name }}
         path: |

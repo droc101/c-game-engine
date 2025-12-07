@@ -2,19 +2,22 @@
 // Created by droc101 on 4/22/2024.
 //
 
+#include "gameState/MainState.h"
 #include <cglm/euler.h>
 #include <cglm/quat.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
@@ -31,33 +34,34 @@
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include "actor/Physbox.h"
 #include "actor/TestActor.h"
-#include "gameState/MainState.h"
-
-#include "engine/physics/PlayerPhysics.h"
+#include "engine/graphics/RenderingHelpers.h"
 #include "gameState/PauseState.h"
 
 static bool lodThreadInitDone = false;
 
-static inline void RotateCamera(const Vector2 cameraMotion)
+static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
-	const float currentPitch = JPH_Quat_GetRotationAngle(&GetState()->level->player.transform.rotation,
-														 &Vector3_AxisX) +
+	const float currentPitch = JPH_Quat_GetRotationAngle(&state->map->player.transform.rotation, &Vector3_AxisX) +
 							   GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
 	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
 	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-	JPH_Quat_Multiply(&newYaw,
-					  &GetState()->level->player.transform.rotation,
-					  &GetState()->level->player.transform.rotation);
-	JPH_Quat_Multiply(&GetState()->level->player.transform.rotation,
-					  &newPitch,
-					  &GetState()->level->player.transform.rotation);
-	JPH_Quat_Normalized(&GetState()->level->player.transform.rotation, &GetState()->level->player.transform.rotation);
+	JPH_Quat_Multiply(&newYaw, &state->map->player.transform.rotation, &state->map->player.transform.rotation);
+	JPH_Quat_Multiply(&state->map->player.transform.rotation, &newPitch, &state->map->player.transform.rotation);
+	JPH_Quat_Normalized(&state->map->player.transform.rotation, &state->map->player.transform.rotation);
+
+	state->camera->transform.position.x = state->map->player.transform.position.x;
+	state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
+	state->camera->transform.position.z = state->map->player.transform.position.z;
+	state->camera->transform.rotation = state->map->player.transform.rotation;
+	state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -82,7 +86,7 @@ void MainStateUpdate(GlobalState *state)
 		cameraMotion.y *= -1;
 	}
 
-	RotateCamera(cameraMotion);
+	RotateCamera(state, cameraMotion);
 
 	if (state->saveData->coins > 9999)
 	{
@@ -97,7 +101,7 @@ void MainStateUpdate(GlobalState *state)
 void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
 	float distanceTraveled = 0;
-	MovePlayer(&state->level->player, &distanceTraveled);
+	MovePlayer(&state->map->player, &distanceTraveled, delta);
 
 	// TODO: Why is controller rotation handed on the physics thread
 	if (UseController())
@@ -124,7 +128,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		RotateCamera(cameraMotion);
+		RotateCamera(state, cameraMotion);
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
@@ -138,26 +142,35 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
-	UpdatePlayer(&state->level->player, state->level->physicsSystem, deltaTime);
+	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime);
 
-	JPH_CharacterVirtual_GetPosition(state->level->player.joltCharacter, &state->level->player.transform.position);
+	JPH_CharacterVirtual_GetPosition(state->map->player.joltCharacter, &state->map->player.transform.position);
 
-	for (size_t i = 0; i < state->level->actors.length; i++)
+	for (size_t i = 0; i < state->map->actors.length; i++)
 	{
-		Actor *a = ListGetPointer(state->level->actors, i);
+		Actor *a = ListGetPointer(state->map->actors, i);
 		a->definition->Update(a, delta);
 	}
 
 	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(&state->level->player.transform,
+		Actor *leaf = CreateActor(&state->map->player.transform,
 								  TEST_ACTOR_NAME,
 								  NULL,
-								  JPH_PhysicsSystem_GetBodyInterface(state->level->physicsSystem));
+								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
 		AddActor(leaf);
 	}
 
-	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->level->physicsSystem,
+	if (IsKeyJustPressedPhys(SDL_SCANCODE_C))
+	{
+		Actor *leaf = CreateActor(&state->map->player.transform,
+								  PHYSBOX_ACTOR_NAME,
+								  NULL,
+								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
+		AddActor(leaf);
+	}
+
+	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->map->physicsSystem,
 																   deltaTime,
 																   2,
 																   state->jobSystem);
@@ -181,15 +194,15 @@ void MainStateRender(GlobalState *state)
 	const Vector2 realWndSize = ActualWindowSize();
 	SDL_WarpMouseInWindow(GetGameWindow(), (int)realWndSize.x / 2, (int)realWndSize.y / 2);
 
-	const Level *level = state->level;
-
-	RenderLevel(level, state->camera);
+	RenderMap(state->map, state->camera);
 	RenderHUD();
 
-	DPrintPlayer(&level->player);
+#ifdef BUILDSTYLE_DEBUG
+	DPrintF("Engine " ENGINE_VERSION, COLOR_WHITE, false);
+#endif
+	DPrintPlayer(&state->map->player);
 
-	DPrintF("Walls: %d", COLOR_WHITE, false, level->walls.length);
-	DPrintF("Actors: %d", COLOR_WHITE, false, level->actors.length);
+	DPrintF("Actors: %d", COLOR_WHITE, false, state->map->actors.length);
 }
 
 void MainStateSet()

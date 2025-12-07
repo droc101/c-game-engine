@@ -5,9 +5,9 @@
 #ifndef FONTLOADER_H
 #define FONTLOADER_H
 
+#include <engine/assets/TextureLoader.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <engine/assets/TextureLoader.h>
 
 #define FONT_ASSET_VERSION 1
 

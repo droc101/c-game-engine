@@ -2,16 +2,16 @@
 // Created by droc101 on 7/24/25.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/ShaderLoader.h>
+#include <engine/structs/Asset.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <engine/structs/Asset.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 
 Shader *LoadShader(const char *asset)
 {
@@ -35,9 +35,11 @@ Shader *LoadShader(const char *asset)
 	shader->type = ReadByte(assetData->data, &offset);
 	shader->glslLength = ReadSizeT(assetData->data, &offset);
 	shader->glsl = calloc(shader->glslLength, sizeof(char));
+	CheckAlloc(shader->glsl);
 	ReadBytes(assetData->data, &offset, shader->glslLength * sizeof(char), shader->glsl);
 	shader->spirvLength = ReadSizeT(assetData->data, &offset);
 	shader->spirv = calloc(shader->spirvLength, sizeof(uint32_t));
+	CheckAlloc(shader->spirv);
 	ReadBytes(assetData->data, &offset, shader->spirvLength * sizeof(uint32_t), shader->spirv);
 	FreeAsset(assetData);
 

@@ -5,13 +5,13 @@
 #ifndef LOBALSTATE_H
 #define LOBALSTATE_H
 
-#include <engine/structs/Asset.h>
 #include <engine/structs/Camera.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Discord.h>
 #include <joltc/joltc.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -41,9 +41,8 @@ struct SaveData
 // Global state of the game
 struct GlobalState
 {
-	/// Current level
-	Level *level;
-	char *levelName;
+	/// Current map
+	Map *map;
 
 	JPH_JobSystem *jobSystem;
 
@@ -56,7 +55,7 @@ struct GlobalState
 	/// The number of physics frames that have passed since the last game state change
 	uint64_t physicsFrame;
 
-	/// The save data (persists between levels)
+	/// The save data (persists between maps)
 	SaveData *saveData;
 
 	/// The camera
@@ -127,11 +126,10 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 					   SDL_bool enableRelativeMouseMode);
 
 /**
- * Change the current level
- * @param level Level to change to
- * @param levelName
+ * Change the current map
+ * @param map Map to change to
  */
-void ChangeLevel(Level *level, char *levelName);
+void ChangeMap(Map *map);
 
 /**
  * Destroy the global state
@@ -139,10 +137,10 @@ void ChangeLevel(Level *level, char *levelName);
 void DestroyGlobalState();
 
 /**
- * Change the level by name
- * @param name Level name to change to
- * @warning Don't use this from GMainState, use @c GLoadingSelectStateSet instead to avoid potential crashes
+ * Change the map by name
+ * @param name Map name to change to
+ * @warning Don't use this from MainState, use @c LoadingSelectStateSet instead to avoid potential crashes
  */
-bool ChangeLevelByName(const char *name);
+bool ChangeMapByName(const char *name);
 
 #endif //LOBALSTATE_H

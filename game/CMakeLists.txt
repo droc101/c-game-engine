@@ -79,7 +79,6 @@ set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath
 
 if (x86_64)
     if (WIN32)
-        # TODO: I don't like DISCORD_GAME_SDK_LIBRARY_DIR now that we're back to a more simple build structure
         add_custom_command(TARGET game PRE_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${CMAKE_BINARY_DIR}/discord_game_sdk.dll"

@@ -22,25 +22,20 @@ export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
 clean_build_dir() {
   if [ -d "$BUILD_DIR" ]; then
     cd "$BUILD_DIR" # Make sure we don't break things by being in the wrong directory :)
-    rm -rf !(out|_deps) _deps/!(*-src)/
+    rm -rf !(out|_deps|discord_game_sdk.@(so|dll)) _deps/!(*-src)/
   fi
   cd "$SRC_DIR"
 }
 
+clean_build_dir
+
 for i in {1..4}; do
-  clean_build_dir
   echo "---------- CONFIGURING x86_64 v$i ----------"
   cmake -B "$BUILD_DIR" -DX86_64_VERSION=$i -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $3
   echo "---------- BUILDING x86_64 v$i ----------"
   cmake --build "$BUILD_DIR" --target game $4
+  clean_build_dir
 done
-
-if [ -z "$MSYSTEM" ]; then
-  cp "$BUILD_DIR/discord_game_sdk.so" "$BUILD_DIR/out/bin"
-else
-  cp "$BUILD_DIR/discord_game_sdk.dll" "$BUILD_DIR/out/bin"
-fi
-clean_build_dir
 
 echo "---------- CONFIGURING Launcher ----------"
 cmake -B "$BUILD_DIR" -DX86_64_VERSION=$i -DSTANDALONE_LAUNCHER=ON -DCMAKE_BUILD_TYPE="$BUILD_TYPE" $3

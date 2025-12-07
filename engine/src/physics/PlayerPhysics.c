@@ -2,14 +2,13 @@
 // Created by NBT22 on 10/20/25.
 //
 
-#include <engine/debug/DPrint.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Input.h>
 #include <joltc/enums.h>
@@ -32,6 +31,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+static const double gravity = 9.81 / PHYSICS_TARGET_TPS;
 static const float actorRaycastMaxDistance = 10.0f;
 static const float offset = 1.0f;
 /// Lower values are smoother
@@ -82,7 +82,7 @@ static void OnContactAdded(const JPH_CharacterVirtual *character,
 						   const Vector3 * /*contactNormal*/,
 						   JPH_CharacterContactSettings *ioSettings)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor == NULL)
 	{
@@ -106,7 +106,7 @@ static void OnContactPersisted(const JPH_CharacterVirtual *character,
 							   const Vector3 * /*contactNormal*/,
 							   JPH_CharacterContactSettings *ioSettings)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor == NULL)
 	{
@@ -126,7 +126,7 @@ static void OnContactRemoved(const JPH_CharacterVirtual *character,
 							 const JPH_BodyId bodyId,
 							 JPH_SubShapeId /*subShapeId*/)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor == NULL)
 	{
@@ -159,13 +159,13 @@ static void OnContactSolve(const JPH_CharacterVirtual *character,
 
 static bool BodyFilterShouldCollide(const JPH_BodyId /*bodyId*/)
 {
-	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->level->player.joltCharacter);
+	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	return !player->isNoclipActive;
 }
 
 static bool BodyFilterShouldCollideLocked(const JPH_Body * /*body*/)
 {
-	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->level->player.joltCharacter);
+	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	return !player->isNoclipActive;
 }
 
@@ -206,6 +206,8 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
 	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f);
 	JPH_CharacterVirtualSettings characterSettings = {
+		.base.supportingVolume.normal = Vector3_AxisY,
+		.base.supportingVolume.distance = 0.25f,
 		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
 		.base.enhancedInternalEdgeRemoval = true,
 		.base.shape = shape,
@@ -222,7 +224,7 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 	JPH_Shape_Destroy(shape);
 }
 
-void MovePlayer(const Player *player, float *distanceTraveled)
+void MovePlayer(const Player *player, float *distanceTraveled, const double delta)
 {
 	Vector3 moveVec = Vector3_Zero;
 
@@ -284,19 +286,23 @@ void MovePlayer(const Player *player, float *distanceTraveled)
 							  &playerRotation);
 			JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
 		}
-		JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
-	} else
-	{
-		JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &Vector3_Zero);
 	}
+	if (!(player->isNoclipActive ||
+		  JPH_CharacterBase_GetGroundState((JPH_CharacterBase *)player->joltCharacter) == JPH_GroundState_OnGround))
+	{
+		Vector3 oldVelocity;
+		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
+		moveVec.y += oldVelocity.y - (float)(gravity * delta);
+	}
+	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
 }
 
 static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayCastResult *raycastResult)
 {
 	const GlobalState *state = GetState();
-	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->level->physicsSystem);
+	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->map->physicsSystem);
 	if (!JPH_NarrowPhaseQuery_CastRay_GAME(narrowPhaseQuery,
-										   &state->level->player.transform,
+										   &state->map->player.transform,
 										   actorRaycastMaxDistance,
 										   raycastResult,
 										   actorRaycastBroadPhaseLayerFilter,

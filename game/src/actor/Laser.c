@@ -3,6 +3,16 @@
 //
 
 #include "actor/Laser.h"
+#include <engine/assets/AssetReader.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/Param.h>
+#include <engine/structs/Vector2.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
@@ -16,16 +26,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/KVList.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 
 typedef struct LaserData
 {
@@ -69,7 +69,7 @@ static bool TripleLaserObjectLayerShouldCollide(const JPH_ObjectLayer layer)
 
 static bool BodyFilterShouldCollide(const JPH_BodyId bodyId)
 {
-	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->level->physicsSystem);
+	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	const Actor *actor = (const Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	return !actor || ((actor->actorFlags & ACTOR_FLAG_CAN_BLOCK_LASERS) == ACTOR_FLAG_CAN_BLOCK_LASERS);
 }
@@ -126,7 +126,7 @@ static void LaserUpdate(Actor *this, double delta)
 	const LaserData *data = this->extraData;
 	if (data->on)
 	{
-		const JPH_PhysicsSystem *physicsSystem = GetState()->level->physicsSystem;
+		const JPH_PhysicsSystem *physicsSystem = GetState()->map->physicsSystem;
 		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
 		JPH_RayCastResult result = {};
 		Vector3 hitPointOffset = {};

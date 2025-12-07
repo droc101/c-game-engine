@@ -3,11 +3,11 @@
 //
 
 #include <engine/debug/FrameBenchmark.h>
+#include <engine/subsystem/Logging.h>
+#include <engine/subsystem/Timing.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/subsystem/Timing.h>
 
 bool benchRunning = false;
 uint64_t benchStartTime;

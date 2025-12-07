@@ -5,10 +5,10 @@
 #ifndef GAME_CHECKBOX_H
 #define GAME_CHECKBOX_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <engine/structs/Vector2.h>
 #include <engine/uiStack/UiStack.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct CheckBoxData CheckBoxData;
 

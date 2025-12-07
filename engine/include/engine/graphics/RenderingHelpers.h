@@ -8,7 +8,7 @@
 #include <cglm/types.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <SDL_video.h>
 #include <stdbool.h>
@@ -135,8 +135,6 @@ bool FrameStart();
  */
 void FrameEnd();
 
-void LoadLevelWalls(const Level *l);
-
 /**
  * Update the viewport size
  */
@@ -177,6 +175,8 @@ float X_TO_NDC(float x);
  * @return The NDC position
  */
 float Y_TO_NDC(float y);
+
+void LoadMapModels(const Map *map);
 
 /**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)

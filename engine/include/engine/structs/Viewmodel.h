@@ -5,10 +5,10 @@
 #ifndef GAME_VIEWMODEL_H
 #define GAME_VIEWMODEL_H
 
+#include <engine/assets/ModelLoader.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <engine/assets/ModelLoader.h>
 
 typedef struct Viewmodel Viewmodel;
 

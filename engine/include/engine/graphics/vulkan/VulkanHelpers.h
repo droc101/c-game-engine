@@ -6,21 +6,21 @@
 #define VULKANHELPERS_H
 
 #include <cglm/types.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/ShaderLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/List.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Viewmodel.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Camera.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Viewmodel.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/ShaderLoader.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/structs/List.h>
-#include <engine/subsystem/Logging.h>
 
 #pragma region macros
 #define MAX_FRAMES_IN_FLIGHT 1
@@ -318,7 +318,7 @@ uint32_t ImageIndex(const Image *image);
 
 VkResult LoadSky(const ModelDefinition *skyModel);
 
-void LoadWalls(const Level *level);
+void LoadWalls(const Map *level);
 
 void UpdateTransformMatrix(const Camera *camera);
 

@@ -68,5 +68,19 @@ if (WIN32)
                 "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\${DLL}"
         )
     endforeach ()
+
+    if (x86_64)
+        add_custom_command(TARGET copy_libraries POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_BINARY_DIR}/discord_game_sdk.dll"
+                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/discord_game_sdk.dll"
+        )
+    endif ()
+elseif (x86_64) # linux x86
+    add_custom_command(TARGET copy_libraries POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/discord_game_sdk.so"
+            "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/discord_game_sdk.so"
+    )
 endif ()
 add_dependencies(launcher copy_assets copy_libraries game)

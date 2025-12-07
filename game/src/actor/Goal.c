@@ -4,6 +4,17 @@
 
 #include "actor/Goal.h"
 #include <cglm/types.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/physics/Physics.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Param.h>
+#include <engine/structs/Vector2.h>
+#include <engine/structs/Wall.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -17,17 +28,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/structs/KVList.h>
-#include <engine/physics/Physics.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/ActorDefinition.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 
 typedef struct GoalData
 {
@@ -54,8 +54,8 @@ static void GoalUpdate(Actor *this, double /*delta*/)
 {
 	Vector3 position = {};
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	const float rotation = atan2f(GetState()->level->player.transform.position.z - position.z,
-								  GetState()->level->player.transform.position.x - position.x) +
+	const float rotation = atan2f(GetState()->map->player.transform.position.z - position.z,
+								  GetState()->map->player.transform.position.x - position.x) +
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
 	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));

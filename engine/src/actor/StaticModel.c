@@ -8,19 +8,22 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
-static inline void CreateStaticModelCollider(Actor *this, const Transform *transform)
+static inline void CreateStaticModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {
 	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
-	if (this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_STATIC ||
-		this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
+	if (!useAABB)
 	{
 		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
 																	 transform,
@@ -49,8 +52,28 @@ void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 	this->actorModel = LoadModel(modelPath);
 	transform->position.y = KvGetFloat(params, "yPosition", 0.0f);
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
-	// ActorCreateEmptyBody(this, transform);
-	CreateStaticModelCollider(this, transform);
+	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
+	uint8_t collisionType = KvGetByte(params, "collision", 2);
+	if (collisionType == 2 && this->actorModel->collisionModelType == COLLISION_MODEL_TYPE_NONE)
+	{
+		LogWarning("Tried to create a " STATIC_MODEL_ACTOR_NAME
+				   " with full collision, but the model file (\"%s\") does not have any!\n",
+				   KvGetString(params, "model", "leafy"));
+		collisionType = 0;
+	}
+	switch (collisionType)
+	{
+		case 0:
+		default:
+			ActorCreateEmptyBody(this, transform);
+			break;
+		case 1:
+			CreateStaticModelCollider(this, transform, true);
+			break;
+		case 2:
+			CreateStaticModelCollider(this, transform, false);
+			break;
+	}
 }
 
 static ActorDefinition definition = {

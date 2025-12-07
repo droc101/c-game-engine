@@ -2,10 +2,23 @@
 // Created by droc101 on 10/2/24.
 //
 
-#include <engine/graphics/RenderingHelpers.h>
 #include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/graphics/gl/GLframe.h>
+#include <engine/graphics/gl/GLinit.h>
+#include <engine/graphics/gl/GLworld.h>
+#include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Physics/Body/BodyInterface.h>
@@ -15,17 +28,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include <engine/structs/Actor.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/GlobalState.h>
-#include <engine/structs/Level.h>
-#include <engine/structs/Vector2.h>
-#include <engine/assets/TextureLoader.h>
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/helpers/MathEx.h>
-#include <engine/graphics/gl/GLHelper.h>
-#include <engine/graphics/vulkan/Vulkan.h>
 
 Renderer currentRenderer;
 bool lowFPSMode;
@@ -161,6 +163,7 @@ bool FrameStart()
 		case RENDERER_VULKAN:
 			return VK_FrameStart() == VK_SUCCESS;
 		case RENDERER_OPENGL:
+			return GL_FrameStart();
 		default:
 			return true;
 	}
@@ -175,21 +178,6 @@ void FrameEnd()
 			break;
 		case RENDERER_OPENGL:
 			GL_Swap();
-			break;
-		default:
-			break;
-	}
-}
-
-void LoadLevelWalls(const Level *l)
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_LoadLevelWalls(l);
-			break;
-		case RENDERER_OPENGL:
-			GL_LoadLevelWalls(l);
 			break;
 		default:
 			break;
@@ -278,6 +266,20 @@ inline float Y_TO_NDC(const float y)
 			return GL_Y_TO_NDC(y);
 		default:
 			return 0;
+	}
+}
+
+void LoadMapModels(const Map *map)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_OPENGL:
+			GL_LoadMap(map);
+			break;
+		case RENDERER_VULKAN:
+			// TODO
+		default:
+			break;
 	}
 }
 

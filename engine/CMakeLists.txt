@@ -66,14 +66,16 @@ target_sources(engine INTERFACE
         include/engine/assets/FontLoader.h
         src/assets/GameConfigLoader.c
         include/engine/assets/GameConfigLoader.h
-        src/assets/LevelLoader.c
-        include/engine/assets/LevelLoader.h
+        src/assets/MapLoader.c
+        include/engine/assets/MapLoader.h
         src/assets/ModelLoader.c
         include/engine/assets/ModelLoader.h
         src/assets/ShaderLoader.c
         include/engine/assets/ShaderLoader.h
         src/assets/TextureLoader.c
         include/engine/assets/TextureLoader.h
+        src/assets/MapMaterialLoader.c
+        include/engine/assets/MapMaterialLoader.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h
@@ -88,10 +90,19 @@ target_sources(engine INTERFACE
         include/engine/graphics/Drawing.h
         src/graphics/Font.c
         include/engine/graphics/Font.h
-        src/graphics/gl/GLDebug.c
-        src/graphics/gl/GLHelper.c
-        include/engine/graphics/gl/GLHelper.h
-        include/engine/graphics/gl/GLInternal.h
+        src/graphics/gl/GLdebug.c
+        src/graphics/gl/GLinit.c
+        include/engine/graphics/gl/GLinit.h
+        src/graphics/gl/GLobjects.c
+        include/engine/graphics/gl/GLobjects.h
+        src/graphics/gl/GLui.c
+        include/engine/graphics/gl/GLui.h
+        src/graphics/gl/GLworld.c
+        include/engine/graphics/gl/GLdebug.h
+        src/graphics/gl/GLframe.c
+        include/engine/graphics/gl/GLframe.h
+        src/graphics/gl/GLshaders.c
+        include/engine/graphics/gl/GLshaders.h
         src/graphics/RenderingHelpers.c
         include/engine/graphics/RenderingHelpers.h
         src/graphics/vulkan/Vulkan.c
@@ -134,12 +145,13 @@ target_sources(engine INTERFACE
         include/engine/structs/GlobalState.h
         src/structs/KVList.c
         include/engine/structs/KVList.h
-        src/structs/Level.c
-        include/engine/structs/Level.h
+        src/structs/Map.c
+        include/engine/structs/Map.h
         src/structs/List.c
         include/engine/structs/List.h
         src/structs/Options.c
         include/engine/structs/Options.h
+        src/structs/Param.c
         include/engine/structs/Param.h
         src/structs/Player.c
         include/engine/structs/Player.h

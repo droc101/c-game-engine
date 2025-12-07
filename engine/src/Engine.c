@@ -16,7 +16,6 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
@@ -27,14 +26,12 @@
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
 #include <SDL.h>
-#include <SDL_cpuinfo.h>
 #include <SDL_error.h>
 #include <SDL_events.h>
 #include <SDL_filesystem.h>
 #include <SDL_hints.h>
 #include <SDL_keyboard.h>
 #include <SDL_mixer.h>
-#include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <SDL_stdinc.h>
 #include <SDL_surface.h>
@@ -332,16 +329,6 @@ void EngineIteration()
 		BenchToggle();
 	}
 #endif
-
-	if (state->level)
-	{
-		// TODO should this be moved somewhere else?
-		state->camera->transform.position.x = state->level->player.transform.position.x;
-		state->camera->transform.position.y = state->level->player.transform.position.y; // + state->camera->yOffset;
-		state->camera->transform.position.z = state->level->player.transform.position.z;
-		state->camera->transform.rotation = state->level->player.transform.rotation;
-		state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
-	}
 
 	state->RenderGame(state);
 
