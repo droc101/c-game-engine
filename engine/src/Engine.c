@@ -16,7 +16,6 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
@@ -27,14 +26,12 @@
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
 #include <SDL.h>
-#include <SDL_cpuinfo.h>
 #include <SDL_error.h>
 #include <SDL_events.h>
 #include <SDL_filesystem.h>
 #include <SDL_hints.h>
 #include <SDL_keyboard.h>
 #include <SDL_mixer.h>
-#include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <SDL_stdinc.h>
 #include <SDL_surface.h>

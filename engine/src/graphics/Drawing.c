@@ -8,7 +8,6 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/gl/GLdebug.h>
 #include <engine/graphics/gl/GLframe.h>
-#include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/gl/GLui.h>
 #include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -18,7 +17,6 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>

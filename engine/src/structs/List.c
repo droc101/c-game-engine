@@ -4,7 +4,6 @@
 
 #include <engine/structs/List.h>
 #include <assert.h>
-#include <errno.h>
 #include <limits.h>
 #include <SDL_error.h>
 #include <SDL_mutex.h>

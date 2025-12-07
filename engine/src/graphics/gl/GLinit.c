@@ -2,9 +2,6 @@
 // Created by droc101 on 9/30/2024.
 //
 
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/assets/TextureLoader.h>
 #include <engine/graphics/gl/GLdebug.h>
 #include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/gl/GLobjects.h>
@@ -21,8 +18,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <wchar.h>
 
 SDL_GLContext ctx;

@@ -12,7 +12,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 
 uint32_t mapMaterialId;
 MapMaterial *mapMaterials[MAX_MAP_MATERIALS];

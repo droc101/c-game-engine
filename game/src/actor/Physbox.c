@@ -5,7 +5,6 @@
 #include "actor/Physbox.h"
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
-#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>

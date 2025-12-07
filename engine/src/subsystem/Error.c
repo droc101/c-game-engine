@@ -13,10 +13,8 @@
 #include <errno.h>
 #include <SDL_error.h>
 #include <SDL_messagebox.h>
-#include <SDL_mixer.h>
 #include <SDL_mouse.h>
 #include <SDL_stdinc.h>
-#include <SDL_version.h>
 #include <SDL_video.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -25,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <zlib.h>
 
 SDL_MessageBoxColorScheme mbColorScheme;
 

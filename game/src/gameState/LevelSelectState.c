@@ -20,6 +20,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>

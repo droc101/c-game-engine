@@ -5,7 +5,7 @@
 #ifndef GAME_GLFRAME_H
 #define GAME_GLFRAME_H
 
-#include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner) Required for the NDC macros
 #include <stdbool.h>
 
 bool GL_FrameStart();

@@ -10,16 +10,12 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
-#include <joltc/enums.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Quat.h>
-#include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "engine/structs/Map.h"
 
 static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 {
@@ -105,7 +101,7 @@ void PhysicsInitMap(Map *map)
 	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 }
 
-void PhysicsDestroyMap(const Map *map, JPH_BodyInterface *bodyInterface)
+void PhysicsDestroyMap(const Map *map, JPH_BodyInterface * /*bodyInterface*/)
 {
 	JPH_CharacterVirtual_Destroy(map->player.joltCharacter);
 	JPH_PhysicsSystem_Destroy(map->physicsSystem);

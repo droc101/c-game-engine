@@ -8,25 +8,22 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
-#include <engine/structs/Asset.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
-#include <engine/structs/Player.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL_mouse.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80

@@ -12,7 +12,6 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
-#include <engine/graphics/vulkan/VulkanResources.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>

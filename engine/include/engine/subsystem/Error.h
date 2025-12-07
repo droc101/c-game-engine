@@ -18,7 +18,7 @@
 /**
  * Internal error handler for memory allocation failures
  */
-_Noreturn void _GameAllocFailure();
+_Noreturn void _GameAllocFailure(); // NOLINT(*-reserved-identifier)
 
 /**
  * Internal error handler
@@ -28,6 +28,7 @@ _Noreturn void _GameAllocFailure();
  * @param function Function name
  * @warning Do not use this function directly, use the @c Error macro instead
  */
+// NOLINTNEXTLINE(*-reserved-identifier)
 _Noreturn void _ErrorInternal(char *error, const char *file, int line, const char *function);
 
 /**

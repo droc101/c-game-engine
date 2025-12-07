@@ -17,7 +17,6 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Viewmodel.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>

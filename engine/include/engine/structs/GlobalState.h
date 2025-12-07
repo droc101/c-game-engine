@@ -5,13 +5,13 @@
 #ifndef LOBALSTATE_H
 #define LOBALSTATE_H
 
-#include <engine/structs/Asset.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Discord.h>
 #include <joltc/joltc.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdint.h>
 

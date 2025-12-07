@@ -25,7 +25,6 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -378,13 +377,13 @@ void GL_LoadMap(const Map *map)
 
 		glBindBuffer(GL_ARRAY_BUFFER, mmb->buffer->vertexBufferObject);
 		glBufferData(GL_ARRAY_BUFFER,
-					 mmb->mapModel->vertexCount * sizeof(MapVertex),
+					 (GLsizeiptr)(mmb->mapModel->vertexCount * sizeof(MapVertex)),
 					 mmb->mapModel->vertices,
 					 GL_STREAM_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mmb->buffer->elementBufferObject);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-					 mmb->mapModel->indexCount * sizeof(uint32_t),
+					 (GLsizeiptr)(mmb->mapModel->indexCount * sizeof(uint32_t)),
 					 mmb->mapModel->indices,
 					 GL_STREAM_DRAW);
 	}

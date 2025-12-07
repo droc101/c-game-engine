@@ -11,6 +11,7 @@
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/Timing.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

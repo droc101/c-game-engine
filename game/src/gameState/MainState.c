@@ -34,11 +34,13 @@
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include "actor/Physbox.h"
 #include "actor/TestActor.h"
+#include "engine/graphics/RenderingHelpers.h"
 #include "gameState/PauseState.h"
 
 static bool lodThreadInitDone = false;

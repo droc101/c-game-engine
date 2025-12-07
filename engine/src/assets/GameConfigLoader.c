@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <engine/structs/Asset.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>

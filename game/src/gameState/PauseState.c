@@ -7,7 +7,6 @@
 #include <engine/debug/DPrint.h>
 #include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
@@ -19,6 +18,7 @@
 #include <engine/uiStack/UiStack.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_scancode.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MainState.h"

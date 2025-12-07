@@ -3,10 +3,8 @@
 //
 
 #include <engine/debug/FrameGrapher.h>
-#include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Timing.h>

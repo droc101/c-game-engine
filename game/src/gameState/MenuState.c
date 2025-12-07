@@ -16,6 +16,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
+#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>

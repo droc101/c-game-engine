@@ -5,6 +5,8 @@
 #ifndef GAME_PLAYERPHYSICS_H
 #define GAME_PLAYERPHYSICS_H
 
+#include <engine/structs/Color.h>
+#include <engine/structs/Player.h>
 #include <joltc/joltc.h>
 
 /// Player movement speed (in units per second)
