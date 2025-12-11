@@ -2930,13 +2930,13 @@
       },
       "connections": [],
       "params": {
-        "isBlue": {
-          "type": "bool",
-          "value": false
-        },
         "name": {
           "type": "string",
           "value": ""
+        },
+        "isBlue": {
+          "type": "bool",
+          "value": false
         }
       }
     },
@@ -2954,18 +2954,6 @@
       },
       "connections": [],
       "params": {
-        "model": {
-          "type": "string",
-          "value": "leafy"
-        },
-        "skin": {
-          "type": "int",
-          "value": 0
-        },
-        "collision": {
-          "type": "byte",
-          "value": 0
-        },
         "color": {
           "type": "color",
           "value": {
@@ -2974,6 +2962,18 @@
             "b": 0.0,
             "a": 1.0
           }
+        },
+        "collision": {
+          "type": "byte",
+          "value": 0
+        },
+        "skin": {
+          "type": "int",
+          "value": 0
+        },
+        "model": {
+          "type": "string",
+          "value": "leafy"
         }
       }
     },
@@ -2991,6 +2991,118 @@
       },
       "connections": [],
       "params": {}
+    },
+    {
+      "class": "prop_laser_emitter",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 11.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        },
+        "startOn": {
+          "type": "bool",
+          "value": true
+        },
+        "height": {
+          "type": "byte",
+          "value": 1
+        }
+      }
+    },
+    {
+      "class": "prop_laser_emitter",
+      "position": {
+        "x": 4.0,
+        "y": 0.0,
+        "z": 11.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        },
+        "startOn": {
+          "type": "bool",
+          "value": true
+        },
+        "height": {
+          "type": "byte",
+          "value": 0
+        }
+      }
+    },
+    {
+      "class": "prop_laser_emitter",
+      "position": {
+        "x": -5.0,
+        "y": 0.0,
+        "z": 11.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        },
+        "startOn": {
+          "type": "bool",
+          "value": true
+        },
+        "height": {
+          "type": "byte",
+          "value": 2
+        }
+      }
+    },
+    {
+      "class": "prop_laser_emitter",
+      "position": {
+        "x": 16.0,
+        "y": -2.0,
+        "z": 8.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        },
+        "startOn": {
+          "type": "bool",
+          "value": true
+        },
+        "height": {
+          "type": "byte",
+          "value": 1
+        }
+      }
     }
   ]
 }

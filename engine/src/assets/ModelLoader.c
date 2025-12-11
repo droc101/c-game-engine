@@ -46,6 +46,10 @@ ModelDefinition *LoadModelInternal(const char *asset)
 				 MODEL_ASSET_VERSION);
 		return NULL;
 	}
+
+	size_t bytesRemaining = assetData->size;
+	size_t strLength = 0;
+
 	ModelDefinition *model = malloc(sizeof(ModelDefinition));
 	CheckAlloc(model);
 
@@ -59,6 +63,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	strncpy(model->name, asset, nameLength);
 
 	size_t offset = 0;
+	EXPECT_BYTES((sizeof(uint32_t) * 4) + 1, bytesRemaining);
 	model->materialCount = ReadUint(assetData->data, &offset);
 	model->materialsPerSkin = ReadUint(assetData->data, &offset);
 	model->skinCount = ReadUint(assetData->data, &offset);
@@ -70,8 +75,10 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	for (uint32_t i = 0; i < model->materialCount; i++)
 	{
 		Material *mat = &model->materials[i];
-		size_t _ = 0;
-		mat->texture = ReadStringSafe(assetData->data, &offset, assetData->size, &_);
+		mat->texture = ReadStringSafe(assetData->data, &offset, assetData->size, &strLength);
+		bytesRemaining -= sizeof(size_t);
+		bytesRemaining -= strLength;
+		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t), bytesRemaining);
 		mat->color.r = ReadFloat(assetData->data, &offset);
 		mat->color.g = ReadFloat(assetData->data, &offset);
 		mat->color.b = ReadFloat(assetData->data, &offset);
@@ -88,6 +95,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		model->skins[i] = malloc(skinSize);
 		CheckAlloc(model->skins[i]);
 		uint32_t *skin = model->skins[i];
+		EXPECT_BYTES(sizeof(uint32_t) * model->materialsPerSkin, bytesRemaining);
 		for (uint32_t j = 0; j < model->materialsPerSkin; j++)
 		{
 			skin[j] = ReadUint(assetData->data, &offset);
@@ -105,17 +113,20 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		lod->id = lodId;
 		lodId++;
 
+		EXPECT_BYTES(sizeof(float) * 3, bytesRemaining);
 		offset += sizeof(float); // skip non-squared lod distance
 		lod->distanceSquared = ReadFloat(assetData->data, &offset);
 		lod->vertexCount = ReadSizeT(assetData->data, &offset);
 
 		const size_t vertexDataSize = lod->vertexCount * sizeof(float) * 12;
+		EXPECT_BYTES(vertexDataSize, bytesRemaining);
 		lod->vertexData = malloc(vertexDataSize);
 		CheckAlloc(lod->vertexData);
 		ReadBytes(assetData->data, &offset, vertexDataSize, lod->vertexData);
 
 		lod->totalIndexCount = ReadUint(assetData->data, &offset);
 		const size_t indexCountSize = model->materialsPerSkin * sizeof(uint32_t);
+		EXPECT_BYTES(indexCountSize, bytesRemaining);
 		lod->indexCount = malloc(indexCountSize);
 		CheckAlloc(lod->indexCount);
 		ReadBytes(assetData->data, &offset, indexCountSize, lod->indexCount);
@@ -124,6 +135,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		CheckAlloc(lod->indexData);
 		for (uint32_t j = 0; j < model->materialsPerSkin; j++)
 		{
+			EXPECT_BYTES(lod->indexCount[j] * sizeof(uint32_t), bytesRemaining);
 			uint32_t *indexData = malloc(lod->indexCount[j] * sizeof(uint32_t));
 			CheckAlloc(indexData);
 			lod->indexData[j] = indexData;
@@ -131,6 +143,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		}
 	}
 
+	EXPECT_BYTES(sizeof(float) * 6, bytesRemaining);
 	model->boundingBoxOrigin.x = ReadFloat(assetData->data, &offset);
 	model->boundingBoxOrigin.y = ReadFloat(assetData->data, &offset);
 	model->boundingBoxOrigin.z = ReadFloat(assetData->data, &offset);
@@ -141,12 +154,14 @@ ModelDefinition *LoadModelInternal(const char *asset)
 
 	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
+		EXPECT_BYTES(sizeof(size_t), bytesRemaining);
 		const size_t numHulls = ReadSizeT(assetData->data, &offset);
 		ModelConvexHull *hulls = malloc(sizeof(ModelConvexHull) * numHulls);
 		CheckAlloc(hulls);
 		for (size_t i = 0; i < numHulls; i++)
 		{
 			ModelConvexHull *hull = &hulls[i];
+			EXPECT_BYTES(sizeof(size_t) + (sizeof(float) * 3), bytesRemaining);
 			hull->numPoints = ReadSizeT(assetData->data, &offset);
 			hull->offset.x = ReadFloat(assetData->data, &offset);
 			hull->offset.y = ReadFloat(assetData->data, &offset);
@@ -156,6 +171,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 			for (size_t p = 0; p < hull->numPoints; p++)
 			{
 				Vector3 *point = &hull->points[p];
+				EXPECT_BYTES(sizeof(float) * 3, bytesRemaining);
 				point->x = ReadFloat(assetData->data, &offset);
 				point->y = ReadFloat(assetData->data, &offset);
 				point->z = ReadFloat(assetData->data, &offset);
@@ -170,6 +186,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	} else if (model->collisionModelType == COLLISION_MODEL_TYPE_STATIC)
 	{
 		ModelStaticCollider staticCollider;
+		EXPECT_BYTES(sizeof(size_t), bytesRemaining);
 		staticCollider.numTriangles = ReadSizeT(assetData->data, &offset);
 		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
 		CheckAlloc(staticCollider.tris);
@@ -181,6 +198,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 			for (int v = 0; v < 3; v++)
 			{
 				Vector3 *point = verts[v];
+				EXPECT_BYTES(sizeof(float) * 3, bytesRemaining);
 				point->x = ReadFloat(assetData->data, &offset);
 				point->y = ReadFloat(assetData->data, &offset);
 				point->z = ReadFloat(assetData->data, &offset);

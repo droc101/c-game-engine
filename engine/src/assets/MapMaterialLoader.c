@@ -54,9 +54,15 @@ MapMaterial *LoadMapMaterial(const char *path)
 	}
 
 	size_t offset = 0;
+	size_t bytesRemaining = mapMaterialAsset->size;
+	size_t strLength = 0;
 
-	material->texture = ReadStringSafe(mapMaterialAsset->data, &offset, mapMaterialAsset->size, NULL);
-	offset += sizeof(float) * 2;
+	material->texture = ReadStringSafe(mapMaterialAsset->data, &offset, mapMaterialAsset->size, &strLength);
+	bytesRemaining -= sizeof(size_t);
+	bytesRemaining -= strLength;
+	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
+	offset += sizeof(float) * 2; // default scale is lvledit side only
+	EXPECT_BYTES(2, bytesRemaining);
 	material->shader = ReadByte(mapMaterialAsset->data, &offset);
 	material->soundClass = ReadByte(mapMaterialAsset->data, &offset);
 

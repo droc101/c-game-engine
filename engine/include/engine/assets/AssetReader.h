@@ -13,6 +13,22 @@
 #define ASSET_FORMAT_MAGIC 0x454D4147
 
 /**
+ * Prints an error and returns NULL if there are not enough bytes remaining to read
+ * @param expected The number of bytes expected to read
+ * @param bytesRemaining A variable containing the number of bytes remaining in the buffer. This macro will modify it.
+ * @warning This may leak memory due to early returns
+ */
+#define EXPECT_BYTES(expected, bytesRemaining) \
+	{ \
+		if ((bytesRemaining) < (expected)) \
+		{ \
+			LogError("Not enough bytes remaining to read %zu bytes\n", (expected)); \
+			return NULL; \
+		} \
+		(bytesRemaining) -= (expected); \
+	}
+
+/**
  * Initialize the asset cache
  */
 void AssetCacheInit();

@@ -9,6 +9,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

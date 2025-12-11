@@ -69,6 +69,9 @@ Font *LoadFont(const char *asset)
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
 	size_t offset = 0;
+	size_t bytesRemaining = assetData->size;
+	EXPECT_BYTES(8, bytesRemaining);
+
 	font->width = ReadByte(assetData->data, &offset);
 	font->textureHeight = ReadByte(assetData->data, &offset);
 	font->baseline = ReadByte(assetData->data, &offset);
@@ -85,6 +88,8 @@ Font *LoadFont(const char *asset)
 		free(font);
 		return GenerateFallbackFont();
 	}
+	bytesRemaining -= fontTextureLength;
+	bytesRemaining += sizeof(size_t);
 	fontTextureLength += strlen(TEXTURE(""));
 	font->texture = calloc(fontTextureLength, sizeof(char));
 	CheckAlloc(font->texture);
@@ -94,6 +99,7 @@ Font *LoadFont(const char *asset)
 	font->charCount = ReadByte(assetData->data, &offset);
 	memset(font->indices, 0, 255);
 	memset(font->charWidths, 0, 255);
+	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{
 		const char chr = (char)ReadByte(assetData->data, &offset);

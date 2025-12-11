@@ -31,13 +31,18 @@ Shader *LoadShader(const char *asset)
 	Shader *shader = malloc(sizeof(Shader));
 	CheckAlloc(shader);
 	size_t offset = 0;
+	size_t bytesRemaining = assetData->size;
+	EXPECT_BYTES(2 + sizeof(size_t), bytesRemaining);
 	shader->platform = ReadByte(assetData->data, &offset);
 	shader->type = ReadByte(assetData->data, &offset);
 	shader->glslLength = ReadSizeT(assetData->data, &offset);
+	EXPECT_BYTES(shader->glslLength, bytesRemaining);
 	shader->glsl = calloc(shader->glslLength, sizeof(char));
 	CheckAlloc(shader->glsl);
 	ReadBytes(assetData->data, &offset, shader->glslLength * sizeof(char), shader->glsl);
+	EXPECT_BYTES(sizeof(size_t), bytesRemaining);
 	shader->spirvLength = ReadSizeT(assetData->data, &offset);
+	EXPECT_BYTES(shader->spirvLength * sizeof(uint32_t), bytesRemaining);
 	shader->spirv = calloc(shader->spirvLength, sizeof(uint32_t));
 	CheckAlloc(shader->spirv);
 	ReadBytes(assetData->data, &offset, shader->spirvLength * sizeof(uint32_t), shader->spirv);

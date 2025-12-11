@@ -74,6 +74,7 @@ Image *LoadImage(const char *asset)
 
 	Asset *textureAsset = DecompressAsset(asset, false);
 	size_t offset = 0;
+	// TODO something like EXPECT_BYTES but it generates a missing tex instead of returning NULL
 	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
 	{
 		GenFallbackImage(img);
