@@ -233,7 +233,14 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Initializing Engine\n");
 
-	LoadGameConfig();
+	if (HasCliArg(argc, argv, "--game"))
+	{
+		const char *game = GetCliArgStr(argc, argv, "--game", "assets/game");
+		LoadGameConfig(game);
+	} else
+	{
+		LoadGameConfig("assets/game");
+	}
 
 	InitOptions();
 

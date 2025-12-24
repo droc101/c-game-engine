@@ -147,7 +147,7 @@ void ChangeMusic(const char *asset)
 	}
 
 	StopMusic(); // stop the current music and free its data
-	const Asset *music = DecompressAsset(asset, true);
+	const Asset *music = DecompressAsset(asset, true, false);
 	if (music == NULL)
 	{
 		LogError("Failed to load music asset.\n");
@@ -199,7 +199,7 @@ SoundEffect *PlaySoundEffect(const char *asset,
 	{
 		return NULL;
 	}
-	const Asset *wav = DecompressAsset(asset, true);
+	const Asset *wav = DecompressAsset(asset, true, false);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");

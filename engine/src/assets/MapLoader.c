@@ -38,7 +38,7 @@
 Map *LoadMap(const char *path)
 {
 	Map *map = CreateMap();
-	Asset *mapData = DecompressAsset(path, false);
+	Asset *mapData = DecompressAsset(path, false, false);
 	size_t offset = 0;
 	size_t bytesRemaining = mapData->size;
 	size_t strLength = 0;

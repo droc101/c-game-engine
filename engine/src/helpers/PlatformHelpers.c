@@ -2,11 +2,14 @@
 // Created by droc101 on 11/10/2024.
 //
 
+#include <ctype.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <SDL_video.h>
+#include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #ifdef WIN32
@@ -67,4 +70,28 @@ _Noreturn void RestartProgram()
 	execv(GetState()->executablePath, args);
 #endif
 	exit(1);
+}
+
+bool IsPathAbsolute(const char *path)
+{
+	if (path == NULL)
+	{
+		return false;
+	}
+#ifdef WIN32
+	// yes, the drive "letter" doesn't have to be a letter.
+	// no, I'm not accounting for that case.
+	// I have also chosen to not care about UNC paths.
+	if (strlen(path) < 3 && isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\'))
+	{
+		return true;
+	}
+#else
+	if (path[0] == '/')
+	{
+		return true;
+	}
+#endif
+
+	return false;
 }

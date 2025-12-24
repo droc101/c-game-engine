@@ -6,11 +6,39 @@
 #define GAME_ASSETREADER_H
 
 #include <engine/structs/Asset.h>
+#include <engine/structs/List.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #define ASSET_FORMAT_VERSION 2
 #define ASSET_FORMAT_MAGIC 0x454D4147
+
+typedef enum AssetPathType AssetPathType;
+typedef enum AssetPathFlags AssetPathFlags;
+
+typedef struct AssetPath AssetPath;
+
+enum AssetPathType
+{
+	RELATIVE_TO_EXECUTABLE_DIRECTORY,
+	ABSOLUTE_PATH,
+};
+
+enum AssetPathFlags
+{
+	/// Allow loading code assets from this asset path. This should be used with caution.
+	ASSET_PATH_ALLOW_CODE_EXECUTION = 1 << 0,
+	/// This path was added at runtime and is not part of game.game
+	ASSET_PATH_RUNTIME_LOADED = 1 << 1,
+};
+
+struct AssetPath
+{
+	AssetPathType type;
+	AssetPathFlags flags;
+	char *path;
+};
 
 /**
  * Prints an error and returns NULL if there are not enough bytes remaining to read
@@ -39,15 +67,25 @@ void AssetCacheInit();
  */
 void DestroyAssetCache();
 
+void EnumerateAssetsInFolder(const char *folder, List *output);
+
+/**
+ * Create an asset directly from a file handle. This does NOT cache the asset, as it has no associated path.
+ * @param file The file to create the asset from
+ * @return A pointer to an Asset, or NULL on failure
+ */
+Asset *CreateAssetFromFile(FILE *file);
+
 /**
  * Decompress an asset and cache it
  * @param relPath The asset to decompress
  * @param cache Whether the asset should be cached
+ * @param isCodeAsset Whether the asset is considered code, when true it will not search asset paths without @c ASSET_PATH_ALLOW_CODE_EXECUTION set
  * @return Decompressed asset, including header
  * @warning If the asset is not cached, you will have to pass it to @c FreeAsset. Otherwise,
  * it is kept around until program exit and automatically freed.
  */
-Asset *DecompressAsset(const char *relPath, bool cache);
+Asset *DecompressAsset(const char *relPath, bool cache, bool isCodeAsset);
 
 /**
  * Remove an asset from the cache

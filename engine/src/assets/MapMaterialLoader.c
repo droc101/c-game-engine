@@ -39,7 +39,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 	MapMaterial *material = malloc(sizeof(MapMaterial));
 	CheckAlloc(material);
 
-	Asset *mapMaterialAsset = DecompressAsset(path, false);
+	Asset *mapMaterialAsset = DecompressAsset(path, false, false);
 	if (mapMaterialAsset == NULL || mapMaterialAsset->type != ASSET_TYPE_MAP_MATERIAL)
 	{
 		return NULL;

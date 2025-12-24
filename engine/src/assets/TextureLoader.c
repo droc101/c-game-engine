@@ -72,7 +72,7 @@ Image *LoadImage(const char *asset)
 	Image *img = malloc(sizeof(Image));
 	CheckAlloc(img);
 
-	Asset *textureAsset = DecompressAsset(asset, false);
+	Asset *textureAsset = DecompressAsset(asset, false, false);
 	size_t offset = 0;
 	// TODO something like EXPECT_BYTES but it generates a missing tex instead of returning NULL
 	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)

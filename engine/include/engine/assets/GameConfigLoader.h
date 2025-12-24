@@ -22,6 +22,6 @@ extern GameConfig config;
 /**
  * Load the game config asset
  */
-void LoadGameConfig();
+void LoadGameConfig(const char *game);
 
 #endif //GAME_GAMECONFIGLOADER_H
