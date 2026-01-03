@@ -230,7 +230,7 @@ ModelDefinition *LoadModel(const char *asset)
 		{
 			continue;
 		}
-		if (strncmp(asset, model->name, 80) == 0)
+		if (strcmp(asset, model->name) == 0)
 		{
 			return model;
 		}
@@ -318,6 +318,7 @@ void DestroyModelLoader()
 		FreeModel(models[i]);
 	}
 }
+
 JPH_Shape *CreateDynamicModelShape(const size_t numHulls, const ModelConvexHull *hulls)
 {
 	JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();

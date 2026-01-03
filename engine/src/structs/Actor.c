@@ -56,6 +56,10 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 void FreeActor(Actor *actor)
 {
 	actor->definition->Destroy(actor);
+	if (actor->actorWall)
+	{
+		free(actor->actorWall->tex);
+	}
 	free(actor->actorWall);
 	actor->actorWall = NULL;
 	free(actor->extraData);

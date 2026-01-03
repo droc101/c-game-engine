@@ -19,6 +19,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {
@@ -47,9 +49,11 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 
 void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 {
-	char modelPath[80];
-	snprintf(modelPath, 80, MODEL("%s"), KvGetString(params, "model", "leafy"));
+	const char *modelParam = KvGetString(params, "model", "leafy");
+	char *modelPath = malloc(strlen(MODEL("")) + strlen(modelParam) + 1);
+	sprintf(modelPath, MODEL("%s"), modelParam);
 	this->actorModel = LoadModel(modelPath);
+	free(modelPath);
 	transform->position.y = KvGetFloat(params, "yPosition", 0.0f);
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);

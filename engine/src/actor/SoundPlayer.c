@@ -14,10 +14,11 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct SoundPlayerData
 {
-	char asset[80]; // asset name of the sound effect to play
+	char *asset; // asset name of the sound effect to play
 	SoundEffect *effect;
 	int loops;
 	float volume;
@@ -38,6 +39,7 @@ static void SoundPlayerDestroy(Actor *this)
 	{
 		StopSoundEffect(data->effect);
 	}
+	free(data->asset);
 }
 
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
@@ -69,7 +71,9 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
 	data->effect = NULL;
-	snprintf(data->asset, sizeof(data->asset), SOUND("%s"), KvGetString(params, "sound", "sfx/click"));
+	const char *soundAsset = KvGetString(params, "sound", "sfx/click");
+	data->asset = malloc(strlen(SOUND("")) + strlen(soundAsset) + 1);
+	sprintf(data->asset, SOUND("%s"), soundAsset);
 	data->loops = KvGetInt(params, "loops", 0);
 	data->volume = KvGetFloat(params, "volume", 1);
 	this->extraData = data;

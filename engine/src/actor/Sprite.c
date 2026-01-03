@@ -22,7 +22,9 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(halfWidth, 0.0f);
 	this->actorWall->b = v2(-halfWidth, 0.0f);
-	snprintf(this->actorWall->tex, 80, TEXTURE("%s"), KvGetString(params, "texture", "level/uvtest"));
+	const char *wallTexture = KvGetString(params, "texture", "level/uvtest");
+	this->actorWall->tex = malloc(strlen(TEXTURE("")) + strlen(wallTexture));
+	sprintf(this->actorWall->tex, TEXTURE("%s"), wallTexture);
 	this->actorWall->uvScale = KvGetFloat(params, "uvScale", 1.0f);
 	this->actorWall->uvOffset = KvGetFloat(params, "uvOffset", 0.0f);
 	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
