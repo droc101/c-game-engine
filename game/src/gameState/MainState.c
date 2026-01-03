@@ -9,6 +9,7 @@
 #include <engine/debug/DPrint.h>
 #include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -40,7 +41,6 @@
 #include <stdio.h>
 #include "actor/Physbox.h"
 #include "actor/TestActor.h"
-#include "engine/graphics/RenderingHelpers.h"
 #include "gameState/PauseState.h"
 
 static bool lodThreadInitDone = false;

@@ -124,6 +124,7 @@ void WindowAndRenderInit()
 			snprintf(title, titleLen, "%s", config.gameTitle);
 			break;
 	}
+	SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
 	SDL_Window *window = SDL_CreateWindow(&title[0],
 										  SDL_WINDOWPOS_UNDEFINED,
@@ -233,15 +234,17 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Initializing Engine\n");
 
+	InitArguments(argc, argv);
+
 	LoadGameConfig();
 
 	InitOptions();
 
 	InitTimers();
 
-	if (HasCliArg(argc, argv, "--renderer"))
+	if (HasCliArg("--renderer"))
 	{
-		const char *renderer = GetCliArgStr(argc, argv, "--renderer", "gl");
+		const char *renderer = GetCliArgStr("--renderer", "gl");
 		if (strncmp(renderer, "gl", strlen("gl")) == 0)
 		{
 			LogInfo("Forcing OpenGL Renderer\n");
@@ -352,7 +355,7 @@ void EngineIteration()
 
 	if (IsLowFPSModeEnabled())
 	{
-		SDL_Delay(33);
+		SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 	}
 	FrameGraphUpdate(GetTimeNs() - frameStart);
 }

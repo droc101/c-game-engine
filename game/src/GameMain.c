@@ -18,12 +18,12 @@
 
 #undef main // Leaked by SDL_main.h
 
-void SetInitialGameState(const int argc, const char *argv[])
+void SetInitialGameState()
 {
 	bool loadMap = false;
-	if (HasCliArg(argc, argv, "--map"))
+	if (HasCliArg("--map"))
 	{
-		const char *mapName = GetCliArgStr(argc, argv, "--map", "");
+		const char *mapName = GetCliArgStr("--map", "");
 		if (ChangeMapByName(mapName))
 		{
 			loadMap = true;
@@ -34,7 +34,7 @@ void SetInitialGameState(const int argc, const char *argv[])
 		MainStateSet();
 	} else
 	{
-		if (!HasCliArg(argc, argv, "--nosplash"))
+		if (!HasCliArg("--nosplash"))
 		{
 			LogoSplashStateSet();
 		} else
@@ -60,7 +60,7 @@ EXPORT_SYM int GameMain(const int argc, const char *argv[])
 {
 	InitEngine(argc, argv, RegisterGameActors);
 	LaserRaycastFiltersInit();
-	SetInitialGameState(argc, argv);
+	SetInitialGameState();
 	LogInfo("Engine initialized, entering mainloop\n");
 	while (!EngineShouldQuit())
 	{

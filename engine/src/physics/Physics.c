@@ -6,6 +6,7 @@
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -15,7 +16,6 @@
 #include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "engine/structs/Map.h"
 
 static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 {

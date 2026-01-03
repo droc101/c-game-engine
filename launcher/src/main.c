@@ -55,9 +55,7 @@ int main(const int argc, const char *argv[])
 	if (!library_basename)
 	{
 		printf(ANSI_RED "bootstrap: failed to find a compatible game library\n" ANSI_RESET);
-		ErrorDialog(L"Fatal Error",
-					L"Failed to find a game executable compatible with your system's CPU.",
-					L"Fatal Error");
+		ErrorDialog(L"Failed to find a game executable compatible with your system's CPU.", L"Fatal Error");
 		return -1;
 	}
 
@@ -76,7 +74,7 @@ int main(const int argc, const char *argv[])
 		}
 	}
 	printf(ANSI_RED "bootstrap: error loading game library: %s\n" ANSI_RESET, LibraryLoaderError());
-	ErrorDialog(L"Fatal Error", L"Failed to load the game executable.", L"Fatal Error");
+	ErrorDialog(L"Failed to load the game executable.", L"Fatal Error");
 
 	return -1;
 }

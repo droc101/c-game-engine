@@ -16,7 +16,6 @@
 #include <SDL_error.h>
 #include <SDL_video.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <wchar.h>
 
@@ -91,6 +90,8 @@ bool GL_Init(SDL_Window *wnd)
 		return false;
 	}
 
+	TestSDLFunction(SDL_GL_MakeCurrent(wnd, ctx), "Failed to make context current", GL_INIT_FAIL_MSG);
+
 	TestSDLFunction_NonFatal(SDL_GL_SetSwapInterval(GetState()->options.vsync ? 1 : 0), "Failed to set VSync");
 
 	glewExperimental = GL_TRUE; // Please expose OpenGL 3.x+ interfaces
@@ -98,6 +99,7 @@ bool GL_Init(SDL_Window *wnd)
 	if (err != GLEW_OK)
 	{
 		SDL_GL_DeleteContext(ctx);
+		LogError("glewInit Failed with error %d\n", err);
 		GL_Error(GL_INIT_FAIL_MSG);
 		return false;
 	}

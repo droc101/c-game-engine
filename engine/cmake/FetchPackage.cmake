@@ -10,7 +10,7 @@ macro(get_latest_package_version git_repo version_glob)
 endmacro()
 
 function(fetch_package git_repo tag package_name)
-    message("FetchContent_Declare ${package_name}")
+    #    message(STATUS "FetchContent_Declare ${package_name}")
     FetchContent_Declare(
             ${package_name}
             GIT_REPOSITORY ${git_repo}
@@ -20,7 +20,7 @@ function(fetch_package git_repo tag package_name)
             EXCLUDE_FROM_ALL
             SYSTEM
     )
-    message("FetchContent_MakeAvailable ${package_name}")
+    #    message(STATUS "FetchContent_MakeAvailable ${package_name}")
     FetchContent_MakeAvailable(${package_name})
 endfunction()
 
@@ -29,7 +29,28 @@ function(fetch_package_tag git_repo version_glob package_name)
     fetch_package(${git_repo} ${LATEST_RELEASE} ${package_name})
 endfunction()
 
+function(fetch_glew)
+    message(STATUS "Fetching GLEW...")
+    set(GLEW_EGL ON)
+    set(GLEW_GLX OFF)
+    set(BUILD_UTILS OFF)
+    set(BUILD_SHARED_LIBS OFF)
+
+    get_latest_package_version(https://github.com/nigels-com/glew glew-2.3.*)
+
+    FetchContent_Declare(
+            GLEW
+            URL https://github.com/nigels-com/glew/releases/download/${LATEST_RELEASE}/${LATEST_RELEASE}.tgz
+            SOURCE_SUBDIR "build/cmake"
+            DOWNLOAD_EXTRACT_TIMESTAMP
+            EXCLUDE_FROM_ALL
+            SYSTEM
+    )
+    FetchContent_MakeAvailable(GLEW)
+endfunction()
+
 function(fetch_dict)
+    message(STATUS "Fetching mlib dict...")
     set(DICT_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/dict)
     get_latest_package_version(https://github.com/P-p-H-d/mlib.git V0.8.*)
     file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-core.h ${DICT_DIR}/m-core.h)
@@ -42,6 +63,7 @@ function(fetch_dict)
 endfunction()
 
 macro(fetch_discord_sdk)
+    message(STATUS "Fetching Discord Game SDK...")
     if ((NOT DEFINED DISCORD_GAME_SDK_DIR) OR (DISCORD_GAME_SDK_DIR STREQUAL ""))
         set(DISCORD_GAME_SDK_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/discord_game_sdk)
     endif ()

@@ -10,7 +10,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *GetCliArgStr(const int argc, const char *argv[], const char *argument, char *default_value)
+static int argc;
+static const char **argv;
+
+void InitArguments(const int proc_argc, const char **proc_argv)
+{
+	argc = proc_argc;
+	argv = proc_argv;
+}
+
+char *GetCliArgStr(const char *argument, char *default_value)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -26,7 +35,7 @@ char *GetCliArgStr(const int argc, const char *argv[], const char *argument, cha
 	return default_value;
 }
 
-int GetCliArgInt(const int argc, const char *argv[], const char *argument, const int default_value)
+int GetCliArgInt(const char *argument, const int default_value)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -42,7 +51,7 @@ int GetCliArgInt(const int argc, const char *argv[], const char *argument, const
 	return default_value;
 }
 
-bool GetCliArgBool(const int argc, const char *argv[], const char *argument, const bool default_value)
+bool GetCliArgBool(const char *argument, const bool default_value)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -72,7 +81,7 @@ bool GetCliArgBool(const int argc, const char *argv[], const char *argument, con
 	return default_value;
 }
 
-bool HasCliArg(const int argc, const char *argv[], const char *argument)
+bool HasCliArg(const char *argument)
 {
 	for (int i = 0; i < argc; i++)
 	{
