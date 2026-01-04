@@ -59,6 +59,7 @@ static void GoalUpdate(Actor *this, double /*delta*/)
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
 	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
+	ActorWallBake(this);
 }
 
 static void GoalEnableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)

@@ -73,6 +73,7 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
+	ActorWallBake(this);
 }
 
 static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)

@@ -24,7 +24,7 @@ void ActorWallBake(const Actor *this)
 	{
 		JPH_Quat rotation = {};
 		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
-		this->actorWall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY);
+		this->actorWall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY) + atan2f(dy, dx);
 	} else
 	{
 		this->actorWall->angle = atan2f(dy, dx);

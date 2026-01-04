@@ -7,6 +7,7 @@
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/graphics/gl/GLworld.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
@@ -18,8 +19,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <wchar.h>
-
-#include "engine/helpers/MathEx.h"
 
 SDL_GLContext ctx;
 
@@ -143,10 +142,15 @@ bool GL_Init(SDL_Window *wnd)
 		{
 			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
 		}
+		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
 		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
 		if (requestedAnisotropy != anisotropyLevel)
 		{
-			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", anisotropyLevel, requestedAnisotropy, gpuMaxAnisotropy);
+			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
+					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
+					   anisotropyLevel,
+					   requestedAnisotropy,
+					   gpuMaxAnisotropy);
 		}
 	}
 
