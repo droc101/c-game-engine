@@ -95,8 +95,8 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, 0.5f);
 	this->actorWall->b = v2(0, -0.5f);
-	this->actorWall->tex = malloc(strlen(TEXTURE("actor/goal0")));
-	strncpy(this->actorWall->tex, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"), 80);
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/goal0")) + 1);
+	strcpy(this->actorWall->tex, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;

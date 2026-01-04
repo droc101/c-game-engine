@@ -110,7 +110,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, 0.125f);
 	this->actorWall->b = v2(0, -0.125f);
-	this->actorWall->tex = malloc(strlen(TEXTURE("actor/bluecoin")));
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/bluecoin")) + 1);
 	strcpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;

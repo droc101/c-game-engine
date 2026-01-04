@@ -179,10 +179,9 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2s(0);
 	this->actorWall->b = v2s(0);
-	this->actorWall->tex = malloc(strlen(TEXTURE("actor/triplelaser")));
-	strncpy(this->actorWall->tex,
-			data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"),
-			80);
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/triplelaser") + 1));
+	strcpy(this->actorWall->tex,
+		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
