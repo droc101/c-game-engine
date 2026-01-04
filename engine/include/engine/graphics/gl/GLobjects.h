@@ -60,7 +60,7 @@ struct GL_MapModelBuffer
 	GL_Buffer *buffer;
 };
 
-struct __attribute__((aligned(16))) GL_SharedUniforms
+struct GL_SharedUniforms
 {
 	/// The model -> screen matrix
 	mat4 worldViewMatrix;
@@ -70,9 +70,12 @@ struct __attribute__((aligned(16))) GL_SharedUniforms
 	float fogStart;
 	/// The distance from the camera at which the fog is fully opaque
 	float fogEnd;
-	/// The yaw of the camera
-	float cameraYaw;
-};
+	float _padding_1[2];
+	vec3 lightColor;
+	float _padding_2;
+	vec3 lightDirection;
+	float _padding_3;
+}; // __attribute__((aligned(16))); // TODO aligned(16) does not seem to be doing what it should be doing. manually added padding floats for now.
 
 struct GL_DebugLine
 {

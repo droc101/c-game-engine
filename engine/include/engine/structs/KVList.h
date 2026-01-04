@@ -34,6 +34,14 @@ void KvListDestroy(KvList list);
  */
 void KvDelete(KvList list, const char *key);
 
+/**
+ * Check if a key-value list contains a key of a given type
+ * @param list The list to check
+ * @param key The key to check for
+ * @param expectedType The type to check for
+ */
+bool KvHas(KvList list, const char *key, ParamType expectedType);
+
 #pragma region Getters
 
 /**

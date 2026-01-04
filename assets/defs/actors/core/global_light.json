@@ -1,0 +1,25 @@
+{
+  "description": "Directional light",
+  "extends": "actor",
+  "inputs": {
+    "set": {
+      "type": "none",
+      "description": "Set the map's light information from this actor"
+    }
+  },
+  "outputs": {},
+  "params": {
+    "light_color": {
+      "display": "Light Color",
+      "default": -1,
+      "type": "color",
+      "description": "The color of this light"
+    },
+    "start_on": {
+      "display": "Start On",
+      "default": true,
+      "type": "bool",
+      "description": "Whether this light should be enabled when the map loads"
+    }
+  }
+}

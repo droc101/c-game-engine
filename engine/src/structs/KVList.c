@@ -77,6 +77,17 @@ void KvDelete(KvList list, const char *key)
 	KvList_erase(list, key);
 }
 
+bool KvHas(KvList list, const char *key, const ParamType expectedType)
+{
+	assert(list && key);
+	Param *p = KvGet(list, key);
+	if (!p || p->type != expectedType)
+	{
+		return false;
+	}
+	return true;
+}
+
 #pragma region Public Getters
 
 uint8_t KvGetByte(const KvList list, const char *key, const uint8_t defaultValue)

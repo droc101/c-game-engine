@@ -25,6 +25,7 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
+#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -184,6 +185,8 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		GL_SharedUniforms uniforms = {
 			.fogStart = 1000,
 			.fogEnd = 1001,
+			.lightColor = {map->lightColor.r, map->lightColor.g, map->lightColor.b},
+			.lightDirection = {0, -(float)PI, 0},
 		};
 		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
 
@@ -394,9 +397,15 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 	GL_SharedUniforms uniforms;
 	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
 	uniforms.fogColor = COLOR(map->fogColor);
-	uniforms.cameraYaw = JPH_Quat_GetRotationAngle(&GetState()->camera->transform.rotation, &Vector3_AxisY);
 	uniforms.fogStart = (float)map->fogStart;
 	uniforms.fogEnd = (float)map->fogEnd;
+	uniforms.lightColor[0] = map->lightColor.r;
+	uniforms.lightColor[1] = map->lightColor.g;
+	uniforms.lightColor[2] = map->lightColor.b;
+
+	uniforms.lightDirection[0] = cosf(map->lightAngle.x) * sinf(map->lightAngle.y);
+	uniforms.lightDirection[1] = sinf(map->lightAngle.x);
+	uniforms.lightDirection[2] = -cosf(map->lightAngle.x) * cosf(map->lightAngle.y);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);

@@ -80,14 +80,14 @@ void FreeActor(Actor *actor)
 
 void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param)
 {
-	LogInfo("Triggering input %d on actor %p from actor %p\n", input, receiver, sender);
-	const ActorInputHandlerFunction handler = GetActorInputHandler(sender->definition, input);
+	LogDebug("Triggering input \"%s\" on actor %p from actor %p\n", input, receiver, sender);
+	const ActorInputHandlerFunction handler = GetActorInputHandler(receiver->definition, input);
 	if (handler)
 	{
 		handler(receiver, sender, param);
 	} else
 	{
-		LogWarning("Could not send signal %s to actor %p because it has no handler!", input, receiver);
+		LogWarning("Could not send signal %s to actor %p because it has no handler!\n", input, receiver);
 	}
 }
 
@@ -103,7 +103,7 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 			GetActorsByName(connection->targetActorName, GetState()->map, &actors);
 			if (actors.length == 0)
 			{
-				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->targetActorName);
+				LogWarning("Tried to fire signal to actor %s, but it was not found!\n", connection->targetActorName);
 				continue;
 			}
 			for (size_t j = 0; j < actors.length; j++)

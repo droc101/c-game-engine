@@ -8,11 +8,13 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Param.h>
 #include <engine/structs/Player.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
@@ -36,6 +38,8 @@ Map *CreateMap(void)
 	map->discordRpcIcon = NULL;
 	map->discordRpcName = NULL;
 	map->skyTexture = NULL;
+	map->lightAngle = v2s(0);
+	map->lightColor = COLOR_WHITE;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);

@@ -2930,13 +2930,13 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
-        },
         "isBlue": {
           "type": "bool",
           "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -2954,6 +2954,18 @@
       },
       "connections": [],
       "params": {
+        "model": {
+          "type": "string",
+          "value": "leafy"
+        },
+        "skin": {
+          "type": "int",
+          "value": 0
+        },
+        "collision": {
+          "type": "byte",
+          "value": 0
+        },
         "color": {
           "type": "color",
           "value": {
@@ -2962,18 +2974,6 @@
             "b": 0.0,
             "a": 1.0
           }
-        },
-        "collision": {
-          "type": "byte",
-          "value": 0
-        },
-        "skin": {
-          "type": "int",
-          "value": 0
-        },
-        "model": {
-          "type": "string",
-          "value": "leafy"
         }
       }
     },
@@ -3006,17 +3006,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 1
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 1
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3034,17 +3034,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 0
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 0
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3062,17 +3062,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 2
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 2
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3090,17 +3090,118 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 1
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 1
+        "name": {
+          "type": "string",
+          "value": ""
+        }
+      }
+    },
+    {
+      "class": "prop_goal",
+      "position": {
+        "x": -28.0,
+        "y": 0.0,
+        "z": 4.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [
+        {
+          "targetName": "goal_light",
+          "targetInput": "set",
+          "sourceOutput": "collected",
+          "numRefires": 0,
+          "overridesParam": false,
+          "param": {
+            "type": "none"
+          }
+        }
+      ],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        },
+        "startEnabled": {
+          "type": "bool",
+          "value": true
+        }
+      }
+    },
+    {
+      "class": "global_light",
+      "position": {
+        "x": 3.5,
+        "y": 0.0,
+        "z": -4.5
+      },
+      "rotation": {
+        "x": -10.0,
+        "y": 45.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        },
+        "light_color": {
+          "type": "color",
+          "value": {
+            "r": 1.0,
+            "g": 0.8500576615333557,
+            "b": 0.6813725233078003,
+            "a": 1.0
+          }
+        },
+        "start_on": {
+          "type": "bool",
+          "value": true
+        }
+      }
+    },
+    {
+      "class": "global_light",
+      "position": {
+        "x": -29.25,
+        "y": 0.0,
+        "z": 4.75
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "light_color": {
+          "type": "color",
+          "value": {
+            "r": 0.7612456679344177,
+            "g": 1.0,
+            "b": 0.6617647409439087,
+            "a": 1.0
+          }
+        },
+        "start_on": {
+          "type": "bool",
+          "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": "goal_light"
         }
       }
     }

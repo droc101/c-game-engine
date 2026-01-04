@@ -123,11 +123,30 @@ Map *LoadMap(const char *path)
 			continue;
 		}
 
+		const char *actorName = NULL;
+		if (KvHas(params, "name", PARAM_TYPE_STRING))
+		{
+			actorName = KvGetString(params, "name", "");
+			if (actorName[0] != '\0')
+			{
+				actorName = strdup(actorName);
+			} else
+			{
+				actorName = NULL;
+			}
+		}
+
 		Actor *actor = CreateActor(&xfm, actorClass, params, bodyInterface);
 		ListFree(actor->ioConnections);
 		actor->ioConnections = ioConnections;
 		ListAdd(map->actors, actor);
 		free(actorClass);
+
+		if (actorName && actorName[0] != '\0')
+		{
+			ListAdd(map->namedActorNames, actorName);
+			ListAdd(map->namedActorPointers, actor);
+		}
 	}
 
 	EXPECT_BYTES(sizeof(size_t), bytesRemaining);
