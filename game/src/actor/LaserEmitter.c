@@ -91,7 +91,6 @@ static void LaserEmitterTurnOffHandler(Actor *this, const Actor * /*sender*/, co
 
 void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 {
-	// TODO: uncomment once laser emitter collision has holes for where the laser comes out
 	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));

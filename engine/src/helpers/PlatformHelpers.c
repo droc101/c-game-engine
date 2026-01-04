@@ -63,7 +63,7 @@ _Noreturn void RestartProgram()
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #else
-	char *args[] = {GetState()->executablePath, NULL};
+	char *args[] = {GetState()->executablePath, NULL}; // TODO use argv and argc now stored in Argument.c
 	execv(GetState()->executablePath, args);
 #endif
 	exit(1);

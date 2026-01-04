@@ -5,11 +5,7 @@
 #include <engine/debug/JoltDebugRenderer.h>
 #include <joltc/joltc.h>
 
-// TODO: Currently only Vulkan is supported, and only the DrawTriangle calls are supported.
-//  Ideally this should be fixed, with having GL support the debug renderer alongside Vulkan, as well as implementing at
-//  least the DrawLine function if not also the DrawText function. Due to the lack of line drawing, this system cannot
-//  currently draw wireframes, and that REALLY should be fixed, either by simply implementing the DrawLine function or
-//  through the shader.
+// TODO: The OpenGL renderer currently only supports lines/wireframe (and in a very unoptimized manner)
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/graphics/Drawing.h>
