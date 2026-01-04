@@ -124,8 +124,10 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 
 void DestroyActorConnection(ActorConnection *connection)
 {
+	free(connection->targetActorName);
 	free(connection->sourceActorOutput);
 	free(connection->targetActorInput);
+	FreeParam(&connection->outParamOverride);
 	free(connection);
 }
 void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
