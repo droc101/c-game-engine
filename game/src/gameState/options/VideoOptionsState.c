@@ -53,6 +53,16 @@ char *SliderLabelMSAA(const Control *slider)
 	return buf;
 }
 
+char *SliderLabelAnisotropy(const Control *slider)
+{
+	char *labels[] = {"Off", "2X", "4X", "8X", "16X"};
+	const SliderData *data = (SliderData *)slider->controlData;
+	char *buf = malloc(64);
+	CheckAlloc(buf);
+	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
+	return buf;
+}
+
 char *SliderLabelLod(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
@@ -104,6 +114,13 @@ void CbOptionsPreferWayland(const bool value)
 void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
+	hasChangedVideoOptions = true;
+	// Change will happen next restart
+}
+
+void SldOptionsAnisotropy(const float value)
+{
+	GetState()->options.anisotropy = value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
 }
@@ -237,6 +254,20 @@ void VideoOptionsStateSet()
 										1,
 										1,
 										SliderLabelMSAA));
+
+		opY += opSpacing;
+		UiStackPush(videoOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"Anisotropic Filtering",
+										SldOptionsAnisotropy,
+										TOP_CENTER,
+										0.0,
+										4.0,
+										GetState()->options.anisotropy,
+										1,
+										1,
+										SliderLabelAnisotropy));
 
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,

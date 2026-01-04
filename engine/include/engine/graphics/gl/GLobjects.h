@@ -97,6 +97,8 @@ extern GL_Buffer *glBuffer;
 
 extern GLuint sharedUniformBuffer;
 
+extern GLfloat anisotropyLevel;
+
 /**
  * Create a shader program from assets
  * @param fsh The fragment shader asset

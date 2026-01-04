@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 typedef enum OptionsMsaa OptionsMsaa;
+typedef enum OptionsAnisotropy OptionsAnisotropy;
 
 typedef struct Options Options;
 
@@ -22,6 +23,15 @@ enum OptionsMsaa
 	MSAA_2X = 1,
 	MSAA_4X = 2,
 	MSAA_8X = 3
+};
+
+enum OptionsAnisotropy
+{
+	ANISOTROPY_NONE = 0,
+	ANISOTROPY_2X = 1,
+	ANISOTROPY_4X = 2,
+	ANISOTROPY_8X = 3,
+	ANISOTROPY_16X = 4
 };
 
 struct Options
@@ -63,6 +73,8 @@ struct Options
 	float lodMultiplier;
 	// Field of view
 	float fov;
+	/// Anisotropy level
+	OptionsAnisotropy anisotropy;
 
 	/* Audio */
 

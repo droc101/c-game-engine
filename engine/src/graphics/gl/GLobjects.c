@@ -30,6 +30,8 @@ GL_Buffer *glBuffer;
 
 GLuint sharedUniformBuffer;
 
+GLfloat anisotropyLevel = 0;
+
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
 	Shader *fragmentSource = LoadShader(fsh);
@@ -161,6 +163,11 @@ int GL_RegisterTexture(const Image *image)
 				 image->pixelData);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
+
+	if (image->mipmaps && anisotropyLevel != 0)
+	{
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel);
+	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);

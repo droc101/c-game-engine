@@ -35,6 +35,7 @@ void DefaultOptions(Options *options)
 	options->preferWayland = false;
 	options->limitFpsWhenUnfocused = true;
 	options->fov = 90.0f;
+	options->anisotropy = ANISOTROPY_16X;
 }
 
 bool ValidateOptions(const Options *options)
