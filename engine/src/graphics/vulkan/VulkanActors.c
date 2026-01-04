@@ -11,8 +11,8 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/List.h>
-#include <engine/structs/Wall.h>
 #include <luna/lunaBuffer.h>
 #include <stdbool.h>
 #include <stddef.h>

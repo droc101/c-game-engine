@@ -7,11 +7,11 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>

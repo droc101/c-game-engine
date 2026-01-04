@@ -156,8 +156,8 @@ target_sources(engine INTERFACE
         include/engine/structs/Player.h
         include/engine/structs/Vector2.h
         include/engine/structs/Viewmodel.h
-        src/structs/Wall.c
-        include/engine/structs/Wall.h
+        src/structs/ActorWall.c
+        include/engine/structs/ActorWall.h
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h

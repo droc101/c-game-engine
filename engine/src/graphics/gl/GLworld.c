@@ -14,13 +14,13 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Quat.h>

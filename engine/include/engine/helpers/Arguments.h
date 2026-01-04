@@ -10,31 +10,31 @@
 /**
  * Initialize the argument system with argc and argv from the main function.
  */
-void InitArguments(const int proc_argc, const char **proc_argv);
+void InitArguments(int processArgc, const char **processArgv);
 
 /**
  * Get a CLI argument's value as a string
  * @param argument The argument to get the value of (such as "--game")
- * @param default_value The default value to use if the argument is not present
+ * @param defaultValue The default value to use if the argument is not present
  * @return The value of the argument, or the default if needed
  */
-char *GetCliArgStr(const char *argument, char *default_value);
+char *GetCliArgStr(const char *argument, char *defaultValue);
 
 /**
 * Get a CLI argument's value as an integer
  * @param argument The argument to get the value of (such as "--game")
- * @param default_value The default value to use if the argument is not present
+ * @param defaultValue The default value to use if the argument is not present
  * @return The value of the argument, or the default if needed
  */
-int GetCliArgInt(const char *argument, int default_value);
+int GetCliArgInt(const char *argument, int defaultValue);
 
 /**
 * Get a CLI argument's value as a boolean
  * @param argument The argument to get the value of (such as "--game")
- * @param default_value The default value to use if the argument is not present
+ * @param defaultValue The default value to use if the argument is not present
  * @return The value of the argument, or the default if needed
  */
-bool GetCliArgBool(const char *argument, bool default_value);
+bool GetCliArgBool(const char *argument, bool defaultValue);
 
 /**
  * Check if an argument is present

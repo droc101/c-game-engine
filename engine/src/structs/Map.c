@@ -6,13 +6,13 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Param.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>

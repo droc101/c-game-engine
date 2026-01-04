@@ -3,8 +3,8 @@
 //
 
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <joltc/constants.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>

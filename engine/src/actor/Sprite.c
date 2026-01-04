@@ -6,9 +6,9 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Transform.h>
 #include <stdio.h>

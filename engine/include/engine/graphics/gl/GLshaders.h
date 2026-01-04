@@ -7,6 +7,7 @@
 
 #include <engine/graphics/gl/GLobjects.h>
 #include <GL/glew.h>
+#include <stdbool.h>
 
 extern GL_Shader *uiTexturedShader;
 extern GL_Shader *uiColoredShader;

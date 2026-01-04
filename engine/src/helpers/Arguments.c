@@ -13,13 +13,13 @@
 static int argc;
 static const char **argv;
 
-void InitArguments(const int proc_argc, const char **proc_argv)
+void InitArguments(const int processArgc, const char **processArgv)
 {
-	argc = proc_argc;
-	argv = proc_argv;
+	argc = processArgc;
+	argv = processArgv;
 }
 
-char *GetCliArgStr(const char *argument, char *default_value)
+char *GetCliArgStr(const char *argument, char *defaultValue)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -32,10 +32,10 @@ char *GetCliArgStr(const char *argument, char *default_value)
 			}
 		}
 	}
-	return default_value;
+	return defaultValue;
 }
 
-int GetCliArgInt(const char *argument, const int default_value)
+int GetCliArgInt(const char *argument, const int defaultValue)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -48,10 +48,10 @@ int GetCliArgInt(const char *argument, const int default_value)
 			}
 		}
 	}
-	return default_value;
+	return defaultValue;
 }
 
-bool GetCliArgBool(const char *argument, const bool default_value)
+bool GetCliArgBool(const char *argument, const bool defaultValue)
 {
 	for (int i = 0; i < argc; i++)
 	{
@@ -78,7 +78,7 @@ bool GetCliArgBool(const char *argument, const bool default_value)
 			}
 		}
 	}
-	return default_value;
+	return defaultValue;
 }
 
 bool HasCliArg(const char *argument)
