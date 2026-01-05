@@ -2,6 +2,7 @@
 // Created by NBT22 on 10/20/25.
 //
 
+#include <assert.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -75,7 +76,7 @@ static JPH_BroadPhaseLayerFilter *actorRaycastBroadPhaseLayerFilter;
 static JPH_ObjectLayerFilter *actorRaycastObjectLayerFilter;
 
 
-static void OnContactAdded(const JPH_CharacterVirtual *character,
+static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 						   const JPH_BodyId bodyId,
 						   JPH_SubShapeId /*subShapeId*/,
 						   const JPH_RVec3 * /*contactPosition*/,
@@ -84,22 +85,14 @@ static void OnContactAdded(const JPH_CharacterVirtual *character,
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
-	if (actor == NULL)
+	if (actor)
 	{
-		return; // Walls and floor
+		ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
+		actor->definition->OnPlayerContactAdded(actor, bodyId);
 	}
-	Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
-	ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
-	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
-	{
-		player->canDropHeldActor = false;
-		ioSettings->canPushCharacter = false;
-		ioSettings->canReceiveImpulses = false;
-	}
-	actor->definition->OnPlayerContactAdded(actor, bodyId);
 }
 
-static void OnContactPersisted(const JPH_CharacterVirtual *character,
+static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
 							   const JPH_BodyId bodyId,
 							   JPH_SubShapeId /*subShapeId*/,
 							   const JPH_RVec3 * /*contactPosition*/,
@@ -108,36 +101,23 @@ static void OnContactPersisted(const JPH_CharacterVirtual *character,
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
-	if (actor == NULL)
+	if (actor)
 	{
-		return; // Walls and floor
+		ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
+		actor->definition->OnPlayerContactPersisted(actor, bodyId);
 	}
-	const Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
-	ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
-	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
-	{
-		ioSettings->canPushCharacter = false;
-		ioSettings->canReceiveImpulses = false;
-	}
-	actor->definition->OnPlayerContactPersisted(actor, bodyId);
 }
 
-static void OnContactRemoved(const JPH_CharacterVirtual *character,
+static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 							 const JPH_BodyId bodyId,
 							 JPH_SubShapeId /*subShapeId*/)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
-	if (actor == NULL)
+	if (actor)
 	{
-		return; // Walls and floor
+		actor->definition->OnPlayerContactRemoved(actor, bodyId);
 	}
-	Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
-	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
-	{
-		player->canDropHeldActor = true;
-	}
-	actor->definition->OnPlayerContactRemoved(actor, bodyId);
 }
 
 static void OnContactSolve(const JPH_CharacterVirtual *character,
@@ -157,16 +137,18 @@ static void OnContactSolve(const JPH_CharacterVirtual *character,
 	}
 }
 
-static bool BodyFilterShouldCollide(const JPH_BodyId /*bodyId*/)
+static bool BodyFilterShouldCollide(const JPH_BodyId bodyId)
 {
 	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
-	return !player->isNoclipActive;
+	assert(player);
+	return !player->isNoclipActive && (!player->hasHeldActor || bodyId != player->heldActor->bodyId);
 }
 
-static bool BodyFilterShouldCollideLocked(const JPH_Body * /*body*/)
+static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
 {
 	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
-	return !player->isNoclipActive;
+	assert(player);
+	return !player->isNoclipActive && (!player->hasHeldActor || JPH_Body_GetID(body) != player->heldActor->bodyId);
 }
 
 static const JPH_CharacterContactListener_Impl contactListenerImpl = {
