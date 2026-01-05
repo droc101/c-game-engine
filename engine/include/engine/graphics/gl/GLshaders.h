@@ -40,6 +40,9 @@ extern GLint debugColorLoc;
  */
 bool GL_LoadShaders();
 
+/**
+ * Destroy GL shaders
+ */
 void GL_DestroyShaders();
 
 #endif //GAME_GLSHADERS_H

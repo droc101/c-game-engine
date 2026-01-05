@@ -8,6 +8,9 @@
 #include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner) Required for the NDC macros
 #include <stdbool.h>
 
+/**
+ * Performs start of frame tasks
+ */
 bool GL_FrameStart();
 
 /**

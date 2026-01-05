@@ -24,30 +24,43 @@ typedef struct MapModel MapModel;
 
 struct MapVertex
 {
+	/// The world space position of the vertex
 	Vector3 position;
+	/// The UV coordinate
 	Vector2 uv;
+	/// The vertex color
 	Color color;
+	/// The vertex normal
 	Vector3 normal;
 };
 
 struct MapModel
 {
+	/// The material this model uses
 	MapMaterial *material;
+	/// The number of vertices in this model
 	uint32_t vertexCount;
+	/// The vertices in this model
 	MapVertex *vertices;
+	/// The number of indices in this model
 	uint32_t indexCount;
+	/// The indices in this model
 	uint32_t *indices;
 };
 
 struct Map
 {
+	/// The name of the icon this map uses for Discord RPC
 	char *discordRpcIcon;
+	/// The display name this map uses for Discord RPC
 	char *discordRpcName;
 
 	/// The list of actors in the map
 	LockingList actors;
 
+	/// Ths number of map models in this map
 	size_t modelCount;
+	/// The map models
 	MapModel *models;
 
 	List joltBodies;

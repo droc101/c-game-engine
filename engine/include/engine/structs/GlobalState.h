@@ -78,6 +78,7 @@ struct GlobalState
 	/// Request to exit the game
 	bool requestExit;
 
+	/// The Discord RPC state
 	RPCState rpcState;
 };
 

@@ -39,12 +39,28 @@ void GL_DebugMessageCallback(GLenum source,
 							 const GLchar *msg,
 							 const void *data);
 
+/**
+ * Add a debug line for the current frame
+ * @param start The first vertex of the line
+ * @param end The second vertex of the line
+ * @param color The color of the line
+ */
 void GL_AddDebugLine(Vector3 start, Vector3 end, Color color);
 
+/**
+ * Draw a debug line
+ * @param line The line to draw
+ */
 void GL_DrawDebugLine(GL_DebugLine *line);
 
+/**
+ * Clear all debug lines
+ */
 void GL_ResetDebugLines();
 
+/**
+ * Draw all debug lines
+ */
 void GL_DrawDebugLines();
 
 #endif //GAME_GLDEBUG_H

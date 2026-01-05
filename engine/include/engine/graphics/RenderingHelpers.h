@@ -179,6 +179,10 @@ float X_TO_NDC(float x);
  */
 float Y_TO_NDC(float y);
 
+/**
+ * Load the map models from a map
+ * @param map The map to load from
+ */
 void LoadMapModels(const Map *map);
 
 /**

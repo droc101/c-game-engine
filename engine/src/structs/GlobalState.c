@@ -6,6 +6,7 @@
 #include <engine/assets/MapLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
@@ -24,8 +25,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "engine/helpers/Arguments.h"
 
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80

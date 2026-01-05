@@ -61,7 +61,7 @@ void LevelSelectStateRender(GlobalState * /*state*/)
 {
 	RenderMenuBackground();
 
-	FontDrawString(v2(20, 20), config.gameTitle, 128, COLOR_WHITE, largeFont);
+	FontDrawString(v2(20, 20), gameConfig.gameTitle, 128, COLOR_WHITE, largeFont);
 	FontDrawString(v2(20, 150), "Press Space to start.", 32, COLOR(0xFFa0a0a0), largeFont);
 
 	char levelNameBuffer[128];

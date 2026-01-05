@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-GameConfig config = {0};
+GameConfig gameConfig = {0};
 
 void LoadGameConfig()
 {
@@ -25,9 +25,9 @@ void LoadGameConfig()
 		Error("Invalid game configuration");
 	}
 	size_t offset = 0;
-	config.gameTitle = ReadStringSafe(asset->data, &offset, asset->size, NULL);
-	config.gameCopyright = ReadStringSafe(asset->data, &offset, asset->size, NULL);
-	config.discordAppId = ReadSizeT(asset->data, &offset);
+	gameConfig.gameTitle = ReadStringSafe(asset->data, &offset, asset->size, NULL);
+	gameConfig.gameCopyright = ReadStringSafe(asset->data, &offset, asset->size, NULL);
+	gameConfig.discordAppId = ReadSizeT(asset->data, &offset);
 
 	FreeAsset(asset);
 }

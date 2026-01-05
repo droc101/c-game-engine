@@ -155,10 +155,19 @@ int GL_RegisterTexture(const Image *image);
  */
 void GL_LoadModel(const ModelDefinition *model, uint32_t lod, size_t material);
 
+/**
+ * Destroy all loaded map models
+ */
 void GL_DestroyMapModels();
 
+/**
+ * Initialize GL objects
+ */
 void GL_InitObjects();
 
+/**
+ * Destroy GL objects
+ */
 void GL_DestroyObjects();
 
 #endif //GAME_GLOBJECTS_H

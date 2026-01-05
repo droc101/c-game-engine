@@ -87,7 +87,7 @@ void MenuStateRender(GlobalState *state)
 
 	// draw version and copyright info
 	char buffer[256];
-	sprintf(buffer, "Engine %s\n%s", ENGINE_VERSION, config.gameCopyright);
+	sprintf(buffer, "Engine %s\n%s", ENGINE_VERSION, gameConfig.gameCopyright);
 	DrawTextAligned(buffer,
 					16,
 					COLOR_BLACK,

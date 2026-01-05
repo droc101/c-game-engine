@@ -11,13 +11,17 @@ typedef struct GameConfig GameConfig;
 
 struct GameConfig
 {
+	/// The title of the game, used for the window title
 	char *gameTitle;
+	/// The copyright of the game
 	char *gameCopyright;
 
+	/// The Discord developer app ID, used for rich presence
 	size_t discordAppId;
 };
 
-extern GameConfig config;
+/// The loaded game config
+extern GameConfig gameConfig;
 
 /**
  * Load the game config asset

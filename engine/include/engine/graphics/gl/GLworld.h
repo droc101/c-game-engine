@@ -53,8 +53,16 @@ void GL_RenderModel(const ModelDefinition *model,
 					uint32_t lod,
 					Color modColor);
 
+/**
+ * Render a map model
+ * @param model The map model to render
+ */
 void GL_RenderMapModel(const GL_MapModelBuffer *model);
 
+/**
+ * Load a map into OpenGL
+ * @param map the map to load
+ */
 void GL_LoadMap(const Map *map);
 
 /**

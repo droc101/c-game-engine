@@ -44,6 +44,11 @@ void ActorWallBake(const Actor *this);
  */
 JPH_Shape *ActorWallCreateCollider();
 
+/**
+ * Free and actor wall
+ * @param wall The wall to free
+ * @note This does NOT free the wall pointer itself
+ */
 void FreeActorWall(const ActorWall *wall);
 
 #endif //GAME_WALL_H
