@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "engine/helpers/Arguments.h"
+
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80
 
@@ -88,7 +90,10 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	state.RenderGame = RenderGame;
 	PhysicsThreadSetFunction(FixedUpdateGame);
 	DiscordUpdateRPC();
-	SDL_SetRelativeMouseMode(enableRelativeMouseMode);
+	if (!HasCliArg("--no-mouse-capture"))
+	{
+		SDL_SetRelativeMouseMode(enableRelativeMouseMode);
+	}
 }
 
 void ChangeMap(Map *map)
