@@ -50,7 +50,7 @@ function(fetch_glew)
 endfunction()
 
 function(fetch_dict)
-    message(STATUS "Fetching mlib dict...")
+    message(STATUS "Fetching M*LIB dict...")
     set(DICT_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/dict)
     get_latest_package_version(https://github.com/P-p-H-d/mlib.git V0.8.*)
     file(DOWNLOAD https://raw.githubusercontent.com/P-p-H-d/mlib/refs/tags/${LATEST_RELEASE}/m-core.h ${DICT_DIR}/m-core.h)
