@@ -2363,102 +2363,6 @@
       "floorHeight": -1.0,
       "ceilingHeight": 1.0,
       "floorMaterial": {
-        "material": "material/dev/wall_test.gmtl",
-        "uvOffset": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "uvScale": {
-          "x": 1.0,
-          "y": 1.0
-        }
-      },
-      "ceilingMaterial": {
-        "material": "material/dev/wall_test.gmtl",
-        "uvOffset": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "uvScale": {
-          "x": 1.0,
-          "y": 1.0
-        }
-      },
-      "lightColor": {
-        "r": 1.0,
-        "g": 1.0,
-        "b": 1.0,
-        "a": 1.0
-      },
-      "wallMaterials": [
-        {
-          "material": "material/dev/wall_test.gmtl",
-          "uvOffset": {
-            "x": 0.0,
-            "y": 0.0
-          },
-          "uvScale": {
-            "x": 1.0,
-            "y": 1.0
-          }
-        },
-        {
-          "material": "material/dev/wall_test.gmtl",
-          "uvOffset": {
-            "x": 0.0,
-            "y": 0.0
-          },
-          "uvScale": {
-            "x": 1.0,
-            "y": 1.0
-          }
-        },
-        {
-          "material": "material/dev/wall_test.gmtl",
-          "uvOffset": {
-            "x": 0.0,
-            "y": 0.0
-          },
-          "uvScale": {
-            "x": 1.0,
-            "y": 1.0
-          }
-        },
-        {
-          "material": "material/dev/wall_test.gmtl",
-          "uvOffset": {
-            "x": 0.0,
-            "y": 0.0
-          },
-          "uvScale": {
-            "x": 1.0,
-            "y": 1.0
-          }
-        }
-      ],
-      "points": [
-        {
-          "x": -34.0,
-          "z": 6.0
-        },
-        {
-          "x": -34.0,
-          "z": 2.0
-        },
-        {
-          "x": -38.0,
-          "z": 2.0
-        },
-        {
-          "x": -38.0,
-          "z": 6.0
-        }
-      ]
-    },
-    {
-      "floorHeight": -1.0,
-      "ceilingHeight": 1.0,
-      "floorMaterial": {
         "material": "material/bricks.gmtl",
         "uvOffset": {
           "x": 0.0,
@@ -2896,6 +2800,102 @@
         {
           "x": -45.0,
           "z": 0.0
+        }
+      ]
+    },
+    {
+      "floorHeight": -1.0,
+      "ceilingHeight": 1.0,
+      "floorMaterial": {
+        "material": "material/dev/wall_unshaded_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "ceilingMaterial": {
+        "material": "material/dev/wall_unshaded_test.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "lightColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "wallMaterials": [
+        {
+          "material": "material/dev/wall_unshaded_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_unshaded_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_unshaded_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/wall_unshaded_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        }
+      ],
+      "points": [
+        {
+          "x": -38.0,
+          "z": 2.0
+        },
+        {
+          "x": -34.0,
+          "z": 2.0
+        },
+        {
+          "x": -34.0,
+          "z": 6.0
+        },
+        {
+          "x": -38.0,
+          "z": 6.0
         }
       ]
     }
@@ -2930,13 +2930,13 @@
       },
       "connections": [],
       "params": {
-        "isBlue": {
-          "type": "bool",
-          "value": false
-        },
         "name": {
           "type": "string",
           "value": ""
+        },
+        "isBlue": {
+          "type": "bool",
+          "value": false
         }
       }
     },
@@ -2954,18 +2954,6 @@
       },
       "connections": [],
       "params": {
-        "model": {
-          "type": "string",
-          "value": "leafy"
-        },
-        "skin": {
-          "type": "int",
-          "value": 0
-        },
-        "collision": {
-          "type": "byte",
-          "value": 0
-        },
         "color": {
           "type": "color",
           "value": {
@@ -2974,6 +2962,18 @@
             "b": 0.0,
             "a": 1.0
           }
+        },
+        "collision": {
+          "type": "byte",
+          "value": 0
+        },
+        "skin": {
+          "type": "int",
+          "value": 0
+        },
+        "model": {
+          "type": "string",
+          "value": "leafy"
         }
       }
     },
@@ -3006,17 +3006,17 @@
       },
       "connections": [],
       "params": {
-        "height": {
-          "type": "byte",
-          "value": 1
+        "name": {
+          "type": "string",
+          "value": ""
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 1
         }
       }
     },
@@ -3034,17 +3034,17 @@
       },
       "connections": [],
       "params": {
-        "height": {
-          "type": "byte",
-          "value": 0
+        "name": {
+          "type": "string",
+          "value": ""
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 0
         }
       }
     },
@@ -3062,17 +3062,17 @@
       },
       "connections": [],
       "params": {
-        "height": {
-          "type": "byte",
-          "value": 2
+        "name": {
+          "type": "string",
+          "value": ""
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 2
         }
       }
     },
@@ -3090,17 +3090,17 @@
       },
       "connections": [],
       "params": {
-        "height": {
-          "type": "byte",
-          "value": 1
+        "name": {
+          "type": "string",
+          "value": ""
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 1
         }
       }
     },
@@ -3129,13 +3129,13 @@
         }
       ],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
-        },
         "startEnabled": {
           "type": "bool",
           "value": true
+        },
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3153,9 +3153,9 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "start_on": {
+          "type": "bool",
+          "value": true
         },
         "light_color": {
           "type": "color",
@@ -3166,9 +3166,9 @@
             "a": 1.0
           }
         },
-        "start_on": {
-          "type": "bool",
-          "value": true
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3186,6 +3186,14 @@
       },
       "connections": [],
       "params": {
+        "name": {
+          "type": "string",
+          "value": "goal_light"
+        },
+        "start_on": {
+          "type": "bool",
+          "value": false
+        },
         "light_color": {
           "type": "color",
           "value": {
@@ -3194,14 +3202,6 @@
             "b": 0.6617647409439087,
             "a": 1.0
           }
-        },
-        "start_on": {
-          "type": "bool",
-          "value": false
-        },
-        "name": {
-          "type": "string",
-          "value": "goal_light"
         }
       }
     }
