@@ -1,4 +1,8 @@
 {
   "description": "A physics-enabled box the player can pick up",
-  "extends": "actor"
+  "extends": "actor",
+  "display": {
+    "type": "model",
+    "model": "cube"
+  }
 }

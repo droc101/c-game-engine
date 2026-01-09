@@ -2978,21 +2978,6 @@
       }
     },
     {
-      "class": "player",
-      "position": {
-        "x": -26.0,
-        "y": 0.0,
-        "z": -5.0
-      },
-      "rotation": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-      },
-      "connections": [],
-      "params": {}
-    },
-    {
       "class": "prop_laser_emitter",
       "position": {
         "x": 0.0,
@@ -3051,7 +3036,7 @@
     {
       "class": "prop_laser_emitter",
       "position": {
-        "x": -5.0,
+        "x": -4.0,
         "y": 0.0,
         "z": 11.0
       },
@@ -3202,6 +3187,46 @@
             "b": 0.6617647409439087,
             "a": 1.0
           }
+        }
+      }
+    },
+    {
+      "class": "prop_physbox",
+      "position": {
+        "x": 4.0,
+        "y": 0.0,
+        "z": -0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        }
+      }
+    },
+    {
+      "class": "test_actor",
+      "position": {
+        "x": -4.0,
+        "y": 0.0,
+        "z": -0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     }

@@ -1,6 +1,9 @@
 {
   "description": "Directional light",
   "extends": "actor",
+  "display": {
+    "color_param": "light_color"
+  },
   "inputs": {
     "set": {
       "type": "none",

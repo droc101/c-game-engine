@@ -1,6 +1,9 @@
 {
   "description": "Performs numerical comparison logic",
   "extends": "actor",
+  "display": {
+    "color": 4294902015
+  },
   "inputs": {
     "operand_a": {
       "type": "int",

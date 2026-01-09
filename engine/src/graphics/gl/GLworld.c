@@ -114,6 +114,9 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 {
 	GL_Enable3D(); // depth should be clear from frame start
 
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// glLineWidth(2);
+
 	mat4 worldViewMatrix;
 	GL_GetMatrix(camera, &worldViewMatrix);
 	mat4 skyModelWorldMatrix = GLM_MAT4_IDENTITY_INIT;
@@ -123,9 +126,6 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 	GL_ClearDepthOnly(); // prevent sky from clipping into walls
-
-	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	// glLineWidth(2);
 
 	glEnable(GL_CULL_FACE);
 	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
@@ -137,8 +137,6 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		GL_RenderMapModel(mapModels[i]);
 	}
 	glDisable(GL_CULL_FACE);
-
-	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
@@ -196,6 +194,9 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
 	}
+
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
 	GL_Disable3D();
 }
 
