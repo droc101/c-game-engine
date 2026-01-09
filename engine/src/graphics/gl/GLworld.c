@@ -32,15 +32,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
+void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
 	const ActorWall *wall = actor->actorWall;
 
-	glUseProgram(wallShader->program);
+	glUseProgram(shadedWallShader->program);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, wallSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedWallSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(wallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+	glUniformMatrix4fv(shadedWallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
 
 	GL_LoadTextureFromAsset(wall->tex);
 
@@ -95,17 +95,87 @@ void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX");
+	const GLint posAttrLoc = glGetAttribLocation(shadedWallShader->program, "VERTEX");
 	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(posAttrLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_UV");
+	const GLint texAttrLoc = glGetAttribLocation(shadedWallShader->program, "VERTEX_UV");
 	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(texAttrLoc);
 
-	const GLint angleAttrLoc = glGetAttribLocation(wallShader->program, "VERTEX_ANGLE");
+	const GLint angleAttrLoc = glGetAttribLocation(shadedWallShader->program, "VERTEX_ANGLE");
 	glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(angleAttrLoc);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+}
+
+void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
+{
+	const ActorWall *wall = actor->actorWall;
+
+	glUseProgram(unshadedWallShader->program);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedWallSharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(unshadedWallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
+	GL_LoadTextureFromAsset(wall->tex);
+
+	const float halfHeight = wall->height / 2.0f;
+	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
+	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
+	const Vector2 startUV = v2(wall->uvOffset, 0);
+	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
+	const float vertices[4][5] = {
+		// X Y Z U V A
+		{
+			startVertex.x,
+			halfHeight,
+			startVertex.y,
+			startUV.x,
+			startUV.y,
+		},
+		{
+			endVertex.x,
+			halfHeight,
+			endVertex.y,
+			endUV.x,
+			startUV.y,
+		},
+		{
+			endVertex.x,
+			-halfHeight,
+			endVertex.y,
+			endUV.x,
+			endUV.y,
+		},
+		{
+			startVertex.x,
+			-halfHeight,
+			startVertex.y,
+			startUV.x,
+			endUV.y,
+		},
+	};
+
+	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+
+	glBindVertexArray(glBuffer->vertexArrayObject);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+
+	const GLint posAttrLoc = glGetAttribLocation(unshadedWallShader->program, "VERTEX");
+	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(posAttrLoc);
+
+	const GLint texAttrLoc = glGetAttribLocation(unshadedWallShader->program, "VERTEX_UV");
+	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(texAttrLoc);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
@@ -155,7 +225,13 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 			{
 				continue;
 			}
-			GL_DrawActorWall(actor, actorXfm);
+			if (actor->actorWall->unshaded)
+			{
+				GL_DrawUnshadedActorWall(actor, actorXfm);
+			} else
+			{
+				GL_DrawShadedActorWall(actor, actorXfm);
+			}
 		} else
 		{
 			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);

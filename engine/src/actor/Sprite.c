@@ -28,6 +28,7 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvScale = KvGetFloat(params, "uvScale", 1.0f);
 	this->actorWall->uvOffset = KvGetFloat(params, "uvOffset", 0.0f);
 	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
+	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
 	ActorWallBake(this);
 }
 

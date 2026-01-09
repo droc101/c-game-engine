@@ -83,12 +83,20 @@ void GL_RenderModelPart(const ModelDefinition *model,
 
 
 /**
- * Draw an actor wall in 3D
+ * Draw a shaded actor wall in 3D
  * @param actor The actor to draw
  * @param actorXfm
  * @note This expects 3D mode to be enabled
  */
-void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm);
+void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm);
+
+/**
+ * Draw an unshaded actor wall in 3D
+ * @param actor The actor to draw
+ * @param actorXfm
+ * @note This expects 3D mode to be enabled
+ */
+void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm);
 
 /**
  * Set the map parameters for rendering

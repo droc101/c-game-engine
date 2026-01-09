@@ -11,7 +11,8 @@
 
 extern GL_Shader *uiTexturedShader;
 extern GL_Shader *uiColoredShader;
-extern GL_Shader *wallShader;
+extern GL_Shader *shadedWallShader;
+extern GL_Shader *unshadedWallShader;
 extern GL_Shader *skyShader;
 extern GL_Shader *modelUnshadedShader;
 extern GL_Shader *modelShadedShader;
@@ -28,10 +29,15 @@ extern GLint hudTexturedTextureLoc; // TODO: confusing name -- location of the t
 extern GLint hudTexturedColorLoc;
 extern GLint hudTexturedRegionLoc;
 
-extern GLint wallTextureLoc;
-extern GLint wallModelWorldMatrixLoc;
-extern GLint wallSharedUniformsLoc;
-extern GLint wallTransformMatrixLoc;
+extern GLint shadedWallTextureLoc;
+extern GLint shadedWallModelWorldMatrixLoc;
+extern GLint shadedWallSharedUniformsLoc;
+extern GLint shadedWallTransformMatrixLoc;
+
+extern GLint unshadedWallTextureLoc;
+extern GLint unshadedWallModelWorldMatrixLoc;
+extern GLint unshadedWallSharedUniformsLoc;
+extern GLint unshadedWallTransformMatrixLoc;
 
 extern GLint debugColorLoc;
 

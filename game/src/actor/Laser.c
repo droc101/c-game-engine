@@ -185,6 +185,7 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
+	this->actorWall->unshaded = true;
 
 	if (!data->on)
 	{

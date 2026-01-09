@@ -7,6 +7,7 @@
 
 #include <engine/structs/Vector2.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
+#include <stdbool.h>
 
 typedef struct Actor Actor;
 
@@ -30,6 +31,8 @@ struct ActorWall
 	float length;
 	/// The angle of the wall (Call @c WallBake to update)
 	float angle;
+	/// Whether the wall should be rendered without shading
+	bool unshaded;
 };
 
 /**

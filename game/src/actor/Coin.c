@@ -116,6 +116,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 0.25f;
+	this->actorWall->unshaded = false;
 	ActorWallBake(this);
 }
 
