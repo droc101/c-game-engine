@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(game_module C CXX)
 
-#region Game Executable
-
 add_library(game MODULE EXCLUDE_FROM_ALL
         src/actor/Coin.c
         include/actor/Coin.h
@@ -92,5 +90,3 @@ if (x86_64)
         )
     endif ()
 endif ()
-
-#endregion

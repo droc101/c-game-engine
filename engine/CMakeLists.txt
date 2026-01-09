@@ -206,6 +206,12 @@ if (x86_64)
     target_link_libraries(engine INTERFACE discord_game_sdk)
 endif ()
 
+if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    target_compile_definitions(engine INTERFACE BUILDSTYLE_RELEASE)
+else ()
+    target_compile_definitions(engine INTERFACE BUILDSTYLE_DEBUG)
+endif ()
+
 if (JOLT_BUILD_DEBUG_RENDERER)
     target_compile_definitions(engine INTERFACE JPH_DEBUG_RENDERER)
 endif ()
