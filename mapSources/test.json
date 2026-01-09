@@ -175,6 +175,28 @@
             "x": 1.0,
             "y": 1.0
           }
+        },
+        {
+          "material": "material/dev/uv_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/dev/uv_test.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
         }
       ],
       "points": [
@@ -185,6 +207,14 @@
         {
           "x": 24.0,
           "z": -8.0
+        },
+        {
+          "x": 24.0,
+          "z": -2.0
+        },
+        {
+          "x": 24.0,
+          "z": 2.0
         },
         {
           "x": 24.0,
@@ -2898,6 +2928,102 @@
           "z": 6.0
         }
       ]
+    },
+    {
+      "floorHeight": -3.0,
+      "ceilingHeight": -1.0,
+      "floorMaterial": {
+        "material": "material/cross.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "ceilingMaterial": {
+        "material": "material/cross.gmtl",
+        "uvOffset": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "uvScale": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      "lightColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "wallMaterials": [
+        {
+          "material": "material/cross.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/cross.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/cross.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        },
+        {
+          "material": "material/cross.gmtl",
+          "uvOffset": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "uvScale": {
+            "x": 1.0,
+            "y": 1.0
+          }
+        }
+      ],
+      "points": [
+        {
+          "x": 24.0,
+          "z": -2.0
+        },
+        {
+          "x": 28.0,
+          "z": -2.0
+        },
+        {
+          "x": 28.0,
+          "z": 2.0
+        },
+        {
+          "x": 24.0,
+          "z": 2.0
+        }
+      ]
     }
   ],
   "actors": [
@@ -2943,9 +3069,9 @@
     {
       "class": "prop_model_static",
       "position": {
-        "x": -13.25,
+        "x": -13.0,
         "y": 0.0,
-        "z": -0.0
+        "z": 0.0
       },
       "rotation": {
         "x": 0.0,
@@ -2965,7 +3091,7 @@
         },
         "collision": {
           "type": "byte",
-          "value": 0
+          "value": 2
         },
         "skin": {
           "type": "int",
@@ -3077,7 +3203,7 @@
       "params": {
         "name": {
           "type": "string",
-          "value": ""
+          "value": "triple_laser_emitter"
         },
         "startOn": {
           "type": "bool",
@@ -3085,7 +3211,7 @@
         },
         "height": {
           "type": "byte",
-          "value": 1
+          "value": 3
         }
       }
     },
@@ -3224,6 +3350,67 @@
       },
       "connections": [],
       "params": {
+        "name": {
+          "type": "string",
+          "value": ""
+        }
+      }
+    },
+    {
+      "class": "trigger",
+      "position": {
+        "x": 26.0,
+        "y": -2.0,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [
+        {
+          "targetName": "triple_laser_emitter",
+          "targetInput": "turn_off",
+          "sourceOutput": "entered",
+          "numRefires": 0,
+          "overridesParam": false,
+          "param": {
+            "type": "none"
+          }
+        },
+        {
+          "targetName": "triple_laser_emitter",
+          "targetInput": "turn_on",
+          "sourceOutput": "exited",
+          "numRefires": 0,
+          "overridesParam": false,
+          "param": {
+            "type": "none"
+          }
+        }
+      ],
+      "params": {
+        "depth": {
+          "type": "float",
+          "value": 4.0
+        },
+        "height": {
+          "type": "float",
+          "value": 2.0
+        },
+        "oneShot": {
+          "type": "bool",
+          "value": false
+        },
+        "startEnabled": {
+          "type": "bool",
+          "value": true
+        },
+        "width": {
+          "type": "float",
+          "value": 4.0
+        },
         "name": {
           "type": "string",
           "value": ""
