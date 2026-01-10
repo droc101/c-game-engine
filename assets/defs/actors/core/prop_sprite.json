@@ -1,6 +1,10 @@
 {
   "description": "An arbitrary 2D sprite",
   "extends": "actor",
+  "display": {
+    "color": -1,
+    "texture_param": "texture"
+  },
   "params": {
     "width": {
       "display": "Width",

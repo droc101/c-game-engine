@@ -3056,13 +3056,13 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
-        },
         "isBlue": {
           "type": "bool",
           "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3080,6 +3080,18 @@
       },
       "connections": [],
       "params": {
+        "model": {
+          "type": "string",
+          "value": "leafy"
+        },
+        "skin": {
+          "type": "int",
+          "value": 0
+        },
+        "collision": {
+          "type": "byte",
+          "value": 2
+        },
         "color": {
           "type": "color",
           "value": {
@@ -3088,18 +3100,6 @@
             "b": 0.0,
             "a": 1.0
           }
-        },
-        "collision": {
-          "type": "byte",
-          "value": 2
-        },
-        "skin": {
-          "type": "int",
-          "value": 0
-        },
-        "model": {
-          "type": "string",
-          "value": "leafy"
         }
       }
     },
@@ -3117,17 +3117,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 1
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 1
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3145,17 +3145,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 0
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 0
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3173,17 +3173,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": ""
+        "height": {
+          "type": "byte",
+          "value": 2
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 2
+        "name": {
+          "type": "string",
+          "value": ""
         }
       }
     },
@@ -3201,17 +3201,17 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": "triple_laser_emitter"
+        "height": {
+          "type": "byte",
+          "value": 3
         },
         "startOn": {
           "type": "bool",
           "value": true
         },
-        "height": {
-          "type": "byte",
-          "value": 3
+        "name": {
+          "type": "string",
+          "value": "triple_laser_emitter"
         }
       }
     },
@@ -3240,13 +3240,13 @@
         }
       ],
       "params": {
-        "startEnabled": {
-          "type": "bool",
-          "value": true
-        },
         "name": {
           "type": "string",
           "value": ""
+        },
+        "startEnabled": {
+          "type": "bool",
+          "value": true
         }
       }
     },
@@ -3264,9 +3264,9 @@
       },
       "connections": [],
       "params": {
-        "start_on": {
-          "type": "bool",
-          "value": true
+        "name": {
+          "type": "string",
+          "value": ""
         },
         "light_color": {
           "type": "color",
@@ -3277,9 +3277,9 @@
             "a": 1.0
           }
         },
-        "name": {
-          "type": "string",
-          "value": ""
+        "start_on": {
+          "type": "bool",
+          "value": true
         }
       }
     },
@@ -3297,14 +3297,6 @@
       },
       "connections": [],
       "params": {
-        "name": {
-          "type": "string",
-          "value": "goal_light"
-        },
-        "start_on": {
-          "type": "bool",
-          "value": false
-        },
         "light_color": {
           "type": "color",
           "value": {
@@ -3313,6 +3305,14 @@
             "b": 0.6617647409439087,
             "a": 1.0
           }
+        },
+        "start_on": {
+          "type": "bool",
+          "value": false
+        },
+        "name": {
+          "type": "string",
+          "value": "goal_light"
         }
       }
     },
@@ -3391,29 +3391,73 @@
         }
       ],
       "params": {
-        "depth": {
-          "type": "float",
-          "value": 4.0
-        },
-        "height": {
-          "type": "float",
-          "value": 2.0
-        },
-        "oneShot": {
-          "type": "bool",
-          "value": false
-        },
-        "startEnabled": {
-          "type": "bool",
-          "value": true
+        "name": {
+          "type": "string",
+          "value": ""
         },
         "width": {
           "type": "float",
           "value": 4.0
         },
+        "startEnabled": {
+          "type": "bool",
+          "value": true
+        },
+        "oneShot": {
+          "type": "bool",
+          "value": false
+        },
+        "height": {
+          "type": "float",
+          "value": 2.0
+        },
+        "depth": {
+          "type": "float",
+          "value": 4.0
+        }
+      }
+    },
+    {
+      "class": "prop_sprite",
+      "position": {
+        "x": -0.0,
+        "y": 0.0,
+        "z": -6.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "connections": [],
+      "params": {
         "name": {
           "type": "string",
           "value": ""
+        },
+        "width": {
+          "type": "float",
+          "value": 1.0
+        },
+        "uvScale": {
+          "type": "float",
+          "value": 1.0
+        },
+        "uvOffset": {
+          "type": "float",
+          "value": 0.0
+        },
+        "unshaded": {
+          "type": "bool",
+          "value": false
+        },
+        "texture": {
+          "type": "string",
+          "value": "level/uvtest"
+        },
+        "height": {
+          "type": "float",
+          "value": 1.0
         }
       }
     }
