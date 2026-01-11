@@ -85,7 +85,7 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 		},
 	};
 
-	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+	const uint32_t indices[] = {2, 1, 0, 3, 2, 0};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 

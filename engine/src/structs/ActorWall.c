@@ -2,6 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <cglm/types.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Vector2.h>
@@ -29,6 +30,7 @@ void ActorWallBake(const Actor *this)
 	{
 		this->actorWall->angle = atan2f(dy, dx);
 	}
+	this->actorWall->angle += GLM_PI_2f;
 }
 
 JPH_Shape *ActorWallCreateCollider()
