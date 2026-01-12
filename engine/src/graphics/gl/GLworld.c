@@ -541,7 +541,7 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 	uniforms.lightColor[1] = map->lightColor.g;
 	uniforms.lightColor[2] = map->lightColor.b;
 
-	uniforms.lightDirection[0] = cosf(map->lightAngle.x) * sinf(map->lightAngle.y);
+	uniforms.lightDirection[0] = -cosf(map->lightAngle.x) * sinf(map->lightAngle.y);
 	uniforms.lightDirection[1] = sinf(map->lightAngle.x);
 	uniforms.lightDirection[2] = -cosf(map->lightAngle.x) * cosf(map->lightAngle.y);
 
