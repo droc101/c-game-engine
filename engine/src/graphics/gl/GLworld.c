@@ -49,7 +49,8 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
 	const Vector2 startUV = v2(wall->uvOffset, 0);
 	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
-	const float vertices[4][6] = {
+	const float backfaceWallAngle = wall->angle + PIf;
+	const float vertices[8][6] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
@@ -83,9 +84,43 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			endUV.y,
 			wall->angle,
 		},
+
+		// backface
+		{
+			startVertex.x,
+			halfHeight,
+			startVertex.y,
+			endUV.x,
+			startUV.y,
+			backfaceWallAngle,
+		},
+		{
+			endVertex.x,
+			halfHeight,
+			endVertex.y,
+			startUV.x,
+			startUV.y,
+			backfaceWallAngle,
+		},
+		{
+			endVertex.x,
+			-halfHeight,
+			endVertex.y,
+			startUV.x,
+			endUV.y,
+			backfaceWallAngle,
+		},
+		{
+			startVertex.x,
+			-halfHeight,
+			startVertex.y,
+			endUV.x,
+			endUV.y,
+			backfaceWallAngle,
+		},
 	};
 
-	const uint32_t indices[] = {2, 1, 0, 3, 2, 0};
+	const uint32_t indices[] = {2, 1, 0, 3, 2, 0, 4, 5, 6, 4, 6, 7};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -107,7 +142,7 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(angleAttrLoc);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
@@ -127,7 +162,7 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
 	const Vector2 startUV = v2(wall->uvOffset, 0);
 	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
-	const float vertices[4][5] = {
+	const float vertices[8][5] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
@@ -157,9 +192,39 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 			startUV.x,
 			endUV.y,
 		},
+
+		// backface
+		{
+			startVertex.x,
+			halfHeight,
+			startVertex.y,
+			endUV.x,
+			startUV.y,
+		},
+		{
+			endVertex.x,
+			halfHeight,
+			endVertex.y,
+			startUV.x,
+			startUV.y,
+		},
+		{
+			endVertex.x,
+			-halfHeight,
+			endVertex.y,
+			startUV.x,
+			endUV.y,
+		},
+		{
+			startVertex.x,
+			-halfHeight,
+			startVertex.y,
+			endUV.x,
+			endUV.y,
+		},
 	};
 
-	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+	const uint32_t indices[] = {2, 1, 0, 3, 2, 0, 4, 5, 6, 4, 6, 7};
 
 	glBindVertexArray(glBuffer->vertexArrayObject);
 
@@ -177,7 +242,7 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(texAttrLoc);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_RenderMap(const Map *map, const Camera *camera)
@@ -197,7 +262,6 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
 	GL_ClearDepthOnly(); // prevent sky from clipping into walls
 
-	glEnable(GL_CULL_FACE);
 	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
 	{
 		if (mapModels[i] == NULL)
@@ -206,7 +270,6 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		}
 		GL_RenderMapModel(mapModels[i]);
 	}
-	glDisable(GL_CULL_FACE);
 
 	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
@@ -366,12 +429,10 @@ void GL_RenderModel(const ModelDefinition *model,
 					const uint32_t lod,
 					const Color modColor)
 {
-	glEnable(GL_CULL_FACE);
 	for (uint32_t material = 0; material < model->materialsPerSkin; material++)
 	{
 		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
 	}
-	glDisable(GL_CULL_FACE);
 }
 
 void GL_RenderMapModel(const GL_MapModelBuffer *model)
@@ -491,14 +552,12 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 
 inline void GL_Enable3D(void)
 {
-	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 }
 
 inline void GL_Disable3D()
 {
-	glEnable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_MULTISAMPLE);
 }

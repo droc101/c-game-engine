@@ -171,7 +171,7 @@ bool GL_Init(SDL_Window *wnd)
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glDisable(GL_SCISSOR_TEST);
 
