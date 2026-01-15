@@ -15,6 +15,7 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/types.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -55,6 +56,9 @@ struct Actor
 
 	JPH_BodyId bodyId;
 	JPH_BodyInterface *bodyInterface;
+
+	/// Whether the actor is currently visible
+	bool visible;
 
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;

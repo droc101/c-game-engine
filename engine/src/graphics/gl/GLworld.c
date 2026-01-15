@@ -279,6 +279,10 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		{
 			continue;
 		}
+		if (!actor->visible)
+		{
+			continue;
+		}
 
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);

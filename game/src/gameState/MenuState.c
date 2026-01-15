@@ -9,6 +9,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
@@ -21,8 +22,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
-
-#include "engine/helpers/Arguments.h"
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
 

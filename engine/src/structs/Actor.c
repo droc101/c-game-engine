@@ -23,6 +23,7 @@
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +35,7 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->actorFlags = 0;
 	actor->bodyInterface = bodyInterface;
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
+	actor->visible = true;
 	actor->actorWall = NULL;
 	actor->health = 1;
 	actor->actorModel = NULL;
