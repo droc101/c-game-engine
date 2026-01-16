@@ -10,6 +10,7 @@
 #define GLOBAL_LIGHT_ACTOR_NAME "global_light"
 
 #define GLOBAL_LIGHT_INPUT_SET "set"
+#define GLOBAL_LIGHT_INPUT_SET_INSTANT "set_instant"
 
 void RegisterGlobalLight();
 

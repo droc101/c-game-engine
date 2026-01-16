@@ -10,6 +10,7 @@
 #define GLOBAL_FOG_ACTOR_NAME "global_fog"
 
 #define GLOBAL_FOG_INPUT_SET "set"
+#define GLOBAL_FOG_INPUT_SET_INSTANT "set_instant"
 
 void RegisterGlobalFog();
 
