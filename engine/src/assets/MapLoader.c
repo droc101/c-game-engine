@@ -15,7 +15,6 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -100,19 +99,8 @@ Map *LoadMap(const char *path)
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;
-		KvListCreate(params);
-		EXPECT_BYTES(sizeof(size_t), bytesRemaining);
-		const size_t numParams = ReadSizeT(mapData->data, &offset);
-		for (size_t j = 0; j < numParams; j++)
-		{
-			char *key = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
-			bytesRemaining -= sizeof(size_t);
-			bytesRemaining -= strLength;
-			Param param;
-			bytesRemaining -= ReadParam(mapData->data, mapData->size, &offset, &param);
-			KvSetUnsafe(params, key, param);
-			free(key);
-		}
+		// TODO: Add EXPECT_BYTES for this
+		bytesRemaining -= ReadKvList(mapData->data, mapData->size, &offset, params);
 
 		if (strcmp(actorClass, "player") == 0)
 		{

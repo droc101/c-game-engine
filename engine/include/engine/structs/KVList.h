@@ -7,10 +7,94 @@
 
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
-#include <engine/structs/Param.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#pragma region Param
+
+#define PARAM_BYTE(x) ((Param){.type = PARAM_TYPE_BYTE, .byteValue = (x)})
+#define PARAM_INT(x) ((Param){.type = PARAM_TYPE_INTEGER, .intValue = (x)})
+#define PARAM_FLOAT(x) ((Param){.type = PARAM_TYPE_FLOAT, .floatValue = (x)})
+#define PARAM_BOOL(x) ((Param){.type = PARAM_TYPE_BOOL, .boolValue = (x)})
+#define PARAM_STRING(x) ((Param){.type = PARAM_TYPE_STRING, .stringValue = (x)})
+#define PARAM_COLOR(x) ((Param){.type = PARAM_TYPE_COLOR, .colorValue = (x)})
+#define PARAM_ARRAY(s, d) ((Param){.type = PARAM_TYPE_ARRAY, .arrayValue.length = (s), .arrayValue.data = (d)})
+#define PARAM_KV_LIST(x) ((Param){.type = PARAM_TYPE_KV_LIST, .kvListValue = (x)})
+#define PARAM_NONE ((Param){.type = PARAM_TYPE_NONE})
+
+typedef enum ParamType ParamType;
+
+typedef struct Param Param;
+
+enum ParamType
+{
+	PARAM_TYPE_BYTE,
+	PARAM_TYPE_INTEGER,
+	PARAM_TYPE_FLOAT,
+	PARAM_TYPE_BOOL,
+	PARAM_TYPE_STRING,
+	PARAM_TYPE_NONE,
+	PARAM_TYPE_COLOR,
+	PARAM_TYPE_KV_LIST,
+	PARAM_TYPE_ARRAY
+};
+
+struct Param
+{
+	/// The type contained in this param
+	ParamType type;
+	union
+	{
+		uint8_t byteValue;
+		int intValue;
+		float floatValue;
+		bool boolValue;
+		char *stringValue;
+		Color colorValue;
+		struct KvList_s *kvListValue;
+		struct
+		{
+			size_t length;
+			Param *data;
+		} arrayValue;
+	};
+};
+
+#define PARAM_OPL_ZERO(param) \
+	memset(&(param), 0, sizeof(param)); \
+	(param).type = PARAM_TYPE_NONE;
+#define PARAM_OPL_COPY(param, value) CopyParam(&(value), &(param));
+#define PARAM_OPL_FREE(param) \
+	FreeParam(&(param)); \
+	PARAM_OPL_ZERO(param);
+
+#define PARAM_OPLIST (INIT(PARAM_OPL_ZERO), INIT_SET(PARAM_OPL_COPY), SET(PARAM_OPL_COPY), CLEAR(PARAM_OPL_FREE))
+
+/**
+ * Read a param from bytes
+ * @param data Data to read from
+ * @param dataSize Total size of the data
+ * @param offset Offset into the data (will be updated)
+ * @param out The param to read to
+ * @return Number of bytes read
+ */
+size_t ReadParam(const void *data, size_t dataSize, size_t *offset, Param *out);
+
+/**
+ * Copy param @c source into @c dest
+ */
+void CopyParam(const Param *source, Param *dest);
+
+/**
+ * Free a param
+ * @param param The param to free
+ */
+void FreeParam(Param *param);
+
+#pragma endregion
 
 // TODO find a way to not leak this into anyone who includes this
 DEFINE_DICT(KvList, const char *, STR_OPLIST, Param, PARAM_OPLIST);
@@ -20,6 +104,21 @@ DEFINE_DICT(KvList, const char *, STR_OPLIST, Param, PARAM_OPLIST);
  * @param list The list to create.
  */
 void KvListCreate(KvList list);
+
+/**
+ * Copy KvList @c source to @c dest
+ */
+void KvListCopy(const KvList source, KvList dest);
+
+/**
+ * Read a KvList from bytes
+ * @param data Data to read from
+ * @param dataSize Total size of the data
+ * @param offset Offset into the data (will be updated)
+ * @param out The KvList to read to (will be created)
+ * @return Number of bytes read
+ */
+size_t ReadKvList(const void *data, size_t dataSize, size_t *offset, KvList out);
 
 /**
  * Destroys a key-value list, freeing all memory associated with it.

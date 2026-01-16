@@ -152,8 +152,6 @@ target_sources(engine INTERFACE
         include/engine/structs/List.h
         src/structs/Options.c
         include/engine/structs/Options.h
-        src/structs/Param.c
-        include/engine/structs/Param.h
         src/structs/Player.c
         include/engine/structs/Player.h
         include/engine/structs/Vector2.h
