@@ -16,6 +16,7 @@
       "display": "Light Color",
       "default": -1,
       "type": "color",
+      "showAlpha": false,
       "description": "The color of this light"
     },
     "start_on": {

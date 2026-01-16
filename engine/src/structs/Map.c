@@ -31,7 +31,7 @@ Map *CreateMap(void)
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
 	CreatePlayer(&map->player, map->physicsSystem);
-	map->fogColor = 0xff000000;
+	map->fogColor = COLOR(0xff000000);
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
 	map->discordRpcIcon = NULL;

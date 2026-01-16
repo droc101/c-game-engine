@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/actor/GlobalFog.h>
 #include <engine/actor/GlobalLight.h>
 #include <engine/actor/IoProxy.h>
 #include <engine/actor/LogicBinary.h>
@@ -83,6 +84,7 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterStaticModel();
 	RegisterTrigger();
 	RegisterGlobalLight();
+	RegisterGlobalFog();
 	RegisterGameActors();
 }
 

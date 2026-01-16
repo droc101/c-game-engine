@@ -118,7 +118,7 @@ bool VK_LoadLevelWalls(const Map *level)
 
 	pushConstants.fogStart = (float)level->fogStart;
 	pushConstants.fogEnd = (float)level->fogEnd;
-	pushConstants.fogColor = COLOR(level->fogColor);
+	pushConstants.fogColor = level->fogColor;
 
 	// buffers.walls.vertices.bytesUsed = sizeof(WallVertex) * 4 * level->walls.length;
 	// buffers.walls.indices.bytesUsed = sizeof(uint32_t) * 6 * level->walls.length;

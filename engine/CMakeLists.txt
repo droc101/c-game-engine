@@ -58,6 +58,8 @@ target_sources(engine INTERFACE
         include/engine/actor/Trigger.h
         src/actor/GlobalLight.c
         include/engine/actor/GlobalLight.h
+        src/actor/GlobalFog.c
+        include/engine/actor/GlobalFog.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
