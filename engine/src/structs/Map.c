@@ -2,8 +2,11 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
@@ -16,8 +19,11 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -40,9 +46,16 @@ Map *CreateMap(void)
 	map->lightAngle = v2s(0);
 	map->lightColor = COLOR_WHITE;
 	map->physicsTick = 0;
+	map->changeFlags = 0;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
+
+	map->viewmodel.enabled = true;
+	map->viewmodel.model = LoadModel(MODEL("eraser"));
+	map->viewmodel.transform.position.x = 0.5f;
+	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &map->viewmodel.transform.rotation);
+
 	return map;
 }
 

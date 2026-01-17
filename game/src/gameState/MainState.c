@@ -61,7 +61,7 @@ static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
 	state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
 	state->camera->transform.position.z = state->map->player.transform.position.z;
 	state->camera->transform.rotation = state->map->player.transform.rotation;
-	state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
+	state->map->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef

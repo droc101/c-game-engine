@@ -316,12 +316,12 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	GL_DrawDebugLines();
 
-	if (GetState()->viewmodel.enabled)
+	if (map->viewmodel.enabled)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		mat4 viewModelMatrix;
-		GL_GetViewmodelMatrix(&viewModelMatrix);
+		GL_GetViewmodelMatrix(map, &viewModelMatrix);
 
 		GL_SharedUniforms uniforms = {
 			.fogColor = map->fogColor,
@@ -336,7 +336,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		GL_RenderModel(GetState()->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
+		GL_RenderModel(map->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
 	}
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -592,7 +592,7 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
 
-void GL_GetViewmodelMatrix(mat4 *out)
+void GL_GetViewmodelMatrix(const Map *map, mat4 *out)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(VIEWMODEL_FOV),
@@ -602,13 +602,11 @@ void GL_GetViewmodelMatrix(mat4 *out)
 					perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix, VECTOR3_TO_VEC3(GetState()->viewmodel.transform.position));
+	glm_translate(translationMatrix, VECTOR3_TO_VEC3(map->viewmodel.transform.position));
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	// TODO rotation other than yaw
-	glm_rotate(rotationMatrix,
-			   JPH_Quat_GetRotationAngle(&GetState()->viewmodel.transform.rotation, &Vector3_AxisY),
-			   GLM_YUP);
+	glm_rotate(rotationMatrix, JPH_Quat_GetRotationAngle(&map->viewmodel.transform.rotation, &Vector3_AxisY), GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);

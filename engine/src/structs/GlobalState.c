@@ -4,10 +4,8 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/MapLoader.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/GlobalState.h>
@@ -17,8 +15,6 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
-#include <joltc/Math/Quat.h>
-#include <joltc/Math/Vector3.h>
 #include <SDL_mouse.h>
 #include <SDL_stdinc.h>
 #include <stdbool.h>
@@ -48,11 +44,6 @@ void InitState()
 	CheckAlloc(state.camera);
 	state.camera->fov = GetState()->options.fov;
 	state.rpcState = IN_MENUS;
-
-	state.viewmodel.enabled = true;
-	state.viewmodel.model = LoadModel(MODEL("eraser"));
-	state.viewmodel.transform.position.x = 0.5f;
-	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &state.viewmodel.transform.rotation);
 }
 
 inline GlobalState *GetState()

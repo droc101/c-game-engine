@@ -12,6 +12,7 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
+#include <engine/structs/Viewmodel.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
@@ -21,6 +22,15 @@
 typedef struct Map Map;
 typedef struct MapVertex MapVertex;
 typedef struct MapModel MapModel;
+
+typedef enum MapChangeFlags MapChangeFlags;
+
+enum MapChangeFlags
+{
+	MAP_LIGHT_CHANGED = 1 << 1,
+	MAP_FOG_CHANGED = 1 << 2,
+	MAP_VIEWMODEL_CHANGED = 1 << 3
+};
 
 struct MapVertex
 {
@@ -93,6 +103,11 @@ struct Map
 
 	/// A pointer to the I/O proxy actor, if it exists
 	Actor *ioProxy;
+
+	MapChangeFlags changeFlags;
+
+	/// The view model
+	Viewmodel viewmodel;
 };
 
 /**

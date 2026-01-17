@@ -10,6 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
+#include <engine/structs/Map.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
@@ -57,6 +58,7 @@ static void GlobalFogUpdate(Actor *this, double /*delta*/)
 		GetState()->map->fogColor = data->fogColor;
 		GetState()->map->fogStart = data->fogStart;
 		GetState()->map->fogEnd = data->fogEnd;
+		GetState()->map->changeFlags |= MAP_FOG_CHANGED;
 		data->startOn = false;
 	}
 
@@ -70,6 +72,7 @@ static void GlobalFogUpdate(Actor *this, double /*delta*/)
 		GetState()->map->fogColor.g = lerp(interpolationPreviousColor.g, data->fogColor.g, interpolationFactor);
 		GetState()->map->fogColor.b = lerp(interpolationPreviousColor.b, data->fogColor.b, interpolationFactor);
 		GetState()->map->fogColor.a = lerp(interpolationPreviousColor.a, data->fogColor.a, interpolationFactor);
+		GetState()->map->changeFlags |= MAP_FOG_CHANGED;
 		if (ticksIntoInterpolation == data->interpolationTicks)
 		{
 			interpolatingActor = NULL;
@@ -86,6 +89,7 @@ static void GlobalFogSetHandler(Actor *this, const Actor * /*sender*/, const Par
 		GetState()->map->fogColor = data->fogColor;
 		GetState()->map->fogStart = data->fogStart;
 		GetState()->map->fogEnd = data->fogEnd;
+		GetState()->map->changeFlags |= MAP_FOG_CHANGED;
 	} else
 	{
 		interpolatingActor = this;
@@ -103,6 +107,7 @@ static void GlobalFogSetInstantHandler(Actor *this, const Actor * /*sender*/, co
 	GetState()->map->fogColor = data->fogColor;
 	GetState()->map->fogStart = data->fogStart;
 	GetState()->map->fogEnd = data->fogEnd;
+	GetState()->map->changeFlags |= MAP_FOG_CHANGED;
 }
 
 void GlobalFogDestroy(Actor *this)
