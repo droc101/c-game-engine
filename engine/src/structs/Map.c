@@ -39,6 +39,7 @@ Map *CreateMap(void)
 	map->skyTexture = NULL;
 	map->lightAngle = v2s(0);
 	map->lightColor = COLOR_WHITE;
+	map->physicsTick = 0;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);

@@ -81,6 +81,7 @@ struct Map
 	Color lightColor;
 
 	JPH_PhysicsSystem *physicsSystem;
+	uint64_t physicsTick;
 
 	/// The player object
 	Player player;

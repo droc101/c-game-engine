@@ -62,7 +62,7 @@ static void GlobalFogUpdate(Actor *this, double /*delta*/)
 
 	if (interpolatingActor == this)
 	{
-		const int ticksIntoInterpolation = (int)(GetState()->physicsFrame - interpolationStartTick);
+		const int ticksIntoInterpolation = (int)(GetState()->map->physicsTick - interpolationStartTick);
 		const float interpolationFactor = (1.0f / (float)data->interpolationTicks) * (float)ticksIntoInterpolation;
 		GetState()->map->fogStart = lerp(interpolationPreviousStart, data->fogStart, interpolationFactor);
 		GetState()->map->fogEnd = lerp(interpolationPreviousEnd, data->fogEnd, interpolationFactor);
@@ -89,7 +89,7 @@ static void GlobalFogSetHandler(Actor *this, const Actor * /*sender*/, const Par
 	} else
 	{
 		interpolatingActor = this;
-		interpolationStartTick = GetState()->physicsFrame;
+		interpolationStartTick = GetState()->map->physicsTick;
 		interpolationPreviousColor = GetState()->map->fogColor;
 		interpolationPreviousStart = GetState()->map->fogStart;
 		interpolationPreviousEnd = GetState()->map->fogEnd;

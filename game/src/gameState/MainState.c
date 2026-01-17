@@ -179,6 +179,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		LogError("Failed to update Jolt physics system with error %d\n", result);
 		Error("Failed to update physics!");
 	}
+	GetState()->map->physicsTick++;
 
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
 	if (SignalLodThreadCanStart() != 0)

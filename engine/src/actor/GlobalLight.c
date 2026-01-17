@@ -61,7 +61,7 @@ static void GlobalLightUpdate(Actor *this, double /*delta*/)
 
 	if (interpolatingActor == this)
 	{
-		const int ticksIntoInterpolation = (int)(GetState()->physicsFrame - interpolationStartTick);
+		const int ticksIntoInterpolation = (int)(GetState()->map->physicsTick - interpolationStartTick);
 		const float interpolationFactor = (1.0f / (float)data->interpolationTicks) * (float)ticksIntoInterpolation;
 		GetState()->map->lightAngle.x = lerp(interpolationPreviousPitch, data->lightAngle.x, interpolationFactor);
 		GetState()->map->lightAngle.y = lerp(interpolationPreviousYaw, data->lightAngle.y, interpolationFactor);
@@ -87,7 +87,7 @@ static void GlobalLightSetHandler(Actor *this, const Actor * /*sender*/, const P
 	} else
 	{
 		interpolatingActor = this;
-		interpolationStartTick = GetState()->physicsFrame;
+		interpolationStartTick = GetState()->map->physicsTick;
 		interpolationPreviousColor = GetState()->map->lightColor;
 		interpolationPreviousPitch = GetState()->map->lightAngle.x;
 		interpolationPreviousYaw = GetState()->map->lightAngle.y;

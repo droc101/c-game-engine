@@ -13,20 +13,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-typedef struct IoProxyData
-{
-	/// Tick counter for the whole map so it doesn't get reset when pausing
-	size_t tickCounter;
-} IoProxyData;
-
 static void IoProxyUpdate(Actor *this, double /*delta*/)
 {
-	IoProxyData *data = this->extraData;
-	if (data->tickCounter == 1)
+	if (GetState()->map->physicsTick == 1)
 	{
 		ActorFireOutput(this, IO_PROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
 	}
-	data->tickCounter++;
 }
 
 void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/)
@@ -38,7 +30,6 @@ void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/
 	{
 		GetState()->map->ioProxy = this;
 	}
-	this->extraData = calloc(1, sizeof(IoProxyData));
 	CheckAlloc(this->extraData);
 }
 
