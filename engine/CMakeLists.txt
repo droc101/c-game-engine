@@ -33,8 +33,6 @@ if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 message(STATUS "Fetching JoltC/Jolt...")
 fetch_package(https://github.com/NBT22/joltc main joltc)
-set_target_properties(Jolt PROPERTIES POSITION_INDEPENDENT_CODE ON)
-set_target_properties(joltc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 #endregion
 
