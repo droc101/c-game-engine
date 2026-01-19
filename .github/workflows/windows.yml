@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
+    inputs:
+      buildForDistribution:
+        description: "Build all four x86 ABI versions"
+        required: true
+        default: true
+        type: boolean
 
 jobs:
   build:
@@ -16,22 +22,22 @@ jobs:
         build_type: [ Debug, Release ]
         include:
           - build_type: Debug
-            zip_name: game.windows.debug
+            zip_name: ${{ inputs.buildForDistribution && 'game.windows.debug.dist' || 'game.windows.debug' }}
           - build_type: Release
-            zip_name: game.windows.release
+            zip_name: ${{ inputs.buildForDistribution && 'game.windows.release.dist' || 'game.windows.release' }}
 
     steps:
-    - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-    - name: Cache Dependencies
-      uses: actions/cache@v5
-      with:
-        path: build-${{ matrix.build_type }}/_deps
-        key: ${{ matrix.build_type }}-deps-${{ hashFiles('**/.git/HEAD') }}
+      - name: Cache Dependencies
+        uses: actions/cache@v5
+        with:
+          path: build-${{ matrix.build_type }}/_deps
+          key: ${{ matrix.build_type }}-deps-${{ hashFiles('**/.git/HEAD') }}
 
-    - name: Setup MSYS2
-      uses: msys2/setup-msys2@v2.30.0
-      with:
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2.30.0
+        with:
           msystem: UCRT64
           install: >-
             git
@@ -44,18 +50,27 @@ jobs:
             mingw-w64-ucrt-x86_64-cglm
           update: true
 
-    - name: Convert github.workspace to mingw path
-      shell: msys2 {0}
-      run: echo "MINGW_WORKSPACE=$(cygpath -u '${{github.workspace}}')" >> $GITHUB_ENV
+      - name: Convert github.workspace to mingw path
+        shell: msys2 {0}
+        run: echo "MINGW_WORKSPACE=$(cygpath -u '${{github.workspace}}')" >> $GITHUB_ENV
 
-    - name: Configure & Build
-      shell: msys2 {0}
-      run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
+      - name: Configure CMake
+        if: ${{ !inputs.buildForDistribution }}
+        run: cmake -B build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
-    - name: Upload results
-      uses: actions/upload-artifact@v5
-      with:
-        name: ${{ matrix.zip_name }}
-        path: |
-          build-${{ matrix.build_type }}/out/
-        retention-days: 90
+      - name: Build
+        if: ${{ !inputs.buildForDistribution }}
+        run: cmake --build build-${{ matrix.build_type }} --target launcher -j $(nproc)
+
+      - name: Configure & Build For Distribution
+        if: ${{ inputs.buildForDistribution }}
+        shell: msys2 {0}
+        run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
+
+      - name: Upload results
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.zip_name }}
+          path: |
+            build-${{ matrix.build_type }}/out/
+          retention-days: 90

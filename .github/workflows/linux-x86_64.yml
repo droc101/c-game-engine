@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
+    inputs:
+      buildForDistribution:
+        description: "Build all four x86 ABI versions"
+        required: true
+        default: true
+        type: boolean
 
 jobs:
   build:
@@ -16,30 +22,39 @@ jobs:
         build_type: [ Debug, Release ]
         include:
           - build_type: Debug
-            zip_name: game.linux.x86_64.debug
+            zip_name: ${{ inputs.buildForDistribution && 'game.linux.x86_64.debug.dist' || 'game.linux.x86_64.debug' }}
           - build_type: Release
-            zip_name: game.linux.x86_64.release
+            zip_name: ${{ inputs.buildForDistribution && 'game.linux.x86_64.release.dist' || 'game.linux.x86_64.release' }}
 
     steps:
-    - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-    - name: Cache Dependencies
-      uses: actions/cache@v5
-      with:
-        path: build-${{ matrix.build_type }}/_deps
-        key: ${{ matrix.build_type }}-x86_64-deps-${{ hashFiles('**/.git/HEAD') }}
+      - name: Cache Dependencies
+        uses: actions/cache@v5
+        with:
+          path: build-${{ matrix.build_type }}/_deps
+          key: ${{ matrix.build_type }}-x86_64-deps-${{ hashFiles('**/.git/HEAD') }}
 
-    - name: Install Packages
-      run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev cmake gcc g++ git
+      - name: Install Packages
+        run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev cmake gcc g++ git
 
-    - name: Configure & Build
-      run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
+      - name: Configure CMake
+        if: ${{ !inputs.buildForDistribution }}
+        run: cmake -B build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
-    - name: Upload results
-      uses: actions/upload-artifact@v5
-      with:
-        name: ${{ matrix.zip_name }}
-        path: |
-          build-${{ matrix.build_type }}/out/
-        retention-days: 90
+      - name: Build
+        if: ${{ !inputs.buildForDistribution }}
+        run: cmake --build build-${{ matrix.build_type }} --target launcher -j $(nproc)
+
+      - name: Configure & Build For Distribution
+        if: ${{ inputs.buildForDistribution }}
+        run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
+
+      - name: Upload results
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.zip_name }}
+          path: |
+            build-${{ matrix.build_type }}/out/
+          retention-days: 90
 
