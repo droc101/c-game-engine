@@ -56,10 +56,12 @@ jobs:
 
       - name: Configure CMake
         if: ${{ !inputs.buildForDistribution }}
+        shell: msys2 {0}
         run: cmake -B build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
         if: ${{ !inputs.buildForDistribution }}
+        shell: msys2 {0}
         run: cmake --build build-${{ matrix.build_type }} --target launcher -j $(nproc)
 
       - name: Configure & Build For Distribution
