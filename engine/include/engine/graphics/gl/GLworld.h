@@ -55,10 +55,16 @@ void GL_RenderModel(const ModelDefinition *model,
 					Color modColor);
 
 /**
- * Render a map model
+ * Render a map model using the shaded model shader
  * @param model The map model to render
  */
-void GL_RenderMapModel(const GL_MapModelBuffer *model);
+void GL_RenderShadedMapModel(const GL_MapModelBuffer *model);
+
+/**
+ * Render a map model using the unshaded model shader
+ * @param model The map model to render
+ */
+void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model);
 
 /**
  * Load a map into OpenGL
@@ -67,21 +73,48 @@ void GL_RenderMapModel(const GL_MapModelBuffer *model);
 void GL_LoadMap(const Map *map);
 
 /**
- * Render a single material of a model
+ * Render a single material of a model with the shaded model shader
  * @param model The model to render
  * @param modelWorldMatrix The model -> world matrix
  * @param lod The level of detail to render
- * @param material The material to render
- * @param skin The skin to use for the model
- * @param modColor
+ * @param materialIndex The material index to render
+ * @param modColor The mod color to use
+ * @param mat The material to render
  */
-void GL_RenderModelPart(const ModelDefinition *model,
-						const mat4 modelWorldMatrix,
-						uint32_t lod,
-						size_t material,
-						uint32_t skin,
-						Color modColor);
+void GL_RenderShadedModelPart(const ModelDefinition *model,
+							  const mat4 modelWorldMatrix,
+							  uint32_t lod,
+							  size_t materialIndex,
+							  Color modColor,
+							  const Material *mat);
 
+/**
+ * Render a single material of a model with the unshaded model shader
+ * @param model The model to render
+ * @param modelWorldMatrix The model -> world matrix
+ * @param lod The level of detail to render
+ * @param materialIndex The material index to render
+ * @param modColor The mod color to use
+ * @param mat The material to render
+ */
+void GL_RenderUnshadedModelPart(const ModelDefinition *model,
+								const mat4 modelWorldMatrix,
+								uint32_t lod,
+								size_t materialIndex,
+								Color modColor,
+								const Material *mat);
+
+/**
+ * Render a single material of a model with the sky shader
+ * @param model The model to render
+ * @param modelWorldMatrix The model -> world matrix
+ * @param lod The level of detail to render
+ * @param materialIndex The material index to render
+ */
+void GL_RenderSkyModelPart(const ModelDefinition *model,
+						   const mat4 modelWorldMatrix,
+						   uint32_t lod,
+						   size_t materialIndex);
 
 /**
  * Draw a shaded actor wall in 3D

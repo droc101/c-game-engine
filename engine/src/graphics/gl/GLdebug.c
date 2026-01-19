@@ -135,11 +135,9 @@ void GL_DrawDebugLine(GL_DebugLine *line)
 {
 	glDisable(GL_LINE_SMOOTH);
 
-	glUseProgram(debugShader->program);
+	GL_UseShader(debugShader);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER,
-					 glGetUniformBlockIndex(debugShader->program, "SharedUniforms"),
-					 sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, debugSharedUniformsLoc, sharedUniformBuffer);
 
 	glUniform4fv(debugColorLoc, 1, COLOR_TO_ARR(line->color));
 
@@ -151,17 +149,14 @@ void GL_DrawDebugLine(GL_DebugLine *line)
 
 	const uint32_t indices[] = {0, 1};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
 	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(debugVertexLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(debugVertexLoc);
 
 	glLineWidth(2.0f);
 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, NULL);
@@ -197,5 +192,4 @@ void GL_ResetDebugLines()
 void GL_Error(const char *error)
 {
 	LogError("OpenGL Error: %s\n", error);
-	strcpy(glLastError, error);
 }

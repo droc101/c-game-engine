@@ -36,11 +36,11 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
 	const ActorWall *wall = actor->actorWall;
 
-	glUseProgram(shadedWallShader->program);
+	GL_UseShader(actorWallShadedShader);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, shadedWallSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallShadedSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(shadedWallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+	glUniformMatrix4fv(actorWallShadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
 
 	GL_LoadTextureFromAsset(wall->tex);
 
@@ -122,25 +122,29 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 	const uint32_t indices[] = {2, 1, 0, 3, 2, 0, 4, 5, 6, 4, 6, 7};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(shadedWallShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(actorWallShadedVertexLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(actorWallShadedVertexLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(shadedWallShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(actorWallShadedUvLoc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  6 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(actorWallShadedUvLoc);
 
-	const GLint angleAttrLoc = glGetAttribLocation(shadedWallShader->program, "VERTEX_ANGLE");
-	glVertexAttribPointer(angleAttrLoc, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(angleAttrLoc);
+	glVertexAttribPointer(actorWallShadedAngleLoc,
+						  1,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  6 * sizeof(GLfloat),
+						  (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(actorWallShadedAngleLoc);
 
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, NULL);
 }
@@ -149,11 +153,11 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
 	const ActorWall *wall = actor->actorWall;
 
-	glUseProgram(unshadedWallShader->program);
+	GL_UseShader(actorWallUnshadedShader);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedWallSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallUnshadedSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(unshadedWallTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+	glUniformMatrix4fv(actorWallUnshadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
 
 	GL_LoadTextureFromAsset(wall->tex);
 
@@ -226,21 +230,21 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 	const uint32_t indices[] = {2, 1, 0, 3, 2, 0, 4, 5, 6, 4, 6, 7};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(unshadedWallShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(actorWallUnshadedVertexLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(actorWallUnshadedVertexLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(unshadedWallShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(actorWallUnshadedUvLoc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  5 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(actorWallUnshadedUvLoc);
 
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, NULL);
 }
@@ -268,7 +272,13 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		{
 			break;
 		}
-		GL_RenderMapModel(mapModels[i]);
+		if (mapModels[i]->mapModel->material->shader == SHADER_SHADED)
+		{
+			GL_RenderShadedMapModel(mapModels[i]);
+		} else
+		{
+			GL_RenderUnshadedMapModel(mapModels[i]);
+		}
 	}
 
 	ListLock(map->actors);
@@ -344,88 +354,117 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	GL_Disable3D();
 }
 
-
-void GL_RenderModelPart(const ModelDefinition *model,
-						const mat4 modelWorldMatrix,
-						const uint32_t lod,
-						const size_t material,
-						const uint32_t skin,
-						Color modColor)
+void GL_RenderShadedModelPart(const ModelDefinition *model,
+							  const mat4 modelWorldMatrix,
+							  const uint32_t lod,
+							  const size_t materialIndex,
+							  Color modColor,
+							  const Material *mat)
 {
-	const uint32_t realSkin = min(skin, model->skinCount - 1);
-	const uint32_t *skinIndices = model->skins[realSkin];
-	const Material mat = model->materials[skinIndices[material]];
+	GL_UseShader(modelShadedShader);
+	GL_LoadTextureFromAsset(mat->texture);
 
-	const ModelShader shader = mat.shader;
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
 
-	const GL_Shader *glShader = NULL;
-	switch (shader)
-	{
-		case SHADER_SKY:
-			glShader = skyShader;
-			break;
-		case SHADER_SHADED:
-			glShader = modelShadedShader;
-			break;
-		case SHADER_UNSHADED:
-			glShader = modelUnshadedShader;
-			break;
-		default:
-			LogError("Invalid shader for model drawing\n");
-			return;
-	}
+	glUniformMatrix4fv(shadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+					   *modelWorldMatrix); // model -> world
+	glUniform4fv(shadedModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
+	glUniform4fv(shadedModelModColorLoc, 1, COLOR_TO_ARR(modColor));
 
-	glUseProgram(glShader->program);
+	GL_LoadModel(model, lod, materialIndex);
 
-	if (shader == SHADER_SKY)
-	{
-		GL_LoadTextureFromAsset(GetState()->map->skyTexture);
-	} else
-	{
-		GL_LoadTextureFromAsset(mat.texture);
-	}
+	glVertexAttribPointer(shadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(shadedModelVertexLoc);
 
+	glVertexAttribPointer(shadedModelUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedModelUvLoc);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER,
-					 glGetUniformBlockIndex(glShader->program, "SharedUniforms"),
-					 sharedUniformBuffer);
+	glVertexAttribPointer(shadedModelColorLoc,
+						  4,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedModelColorLoc);
 
-	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
-					   1,
-					   GL_FALSE,
+	glVertexAttribPointer(shadedModelNormalLoc,
+						  3,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(9 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedModelNormalLoc);
+
+	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
+}
+
+void GL_RenderUnshadedModelPart(const ModelDefinition *model,
+								const mat4 modelWorldMatrix,
+								const uint32_t lod,
+								const size_t materialIndex,
+								Color modColor,
+								const Material *mat)
+{
+	GL_UseShader(modelUnshadedShader);
+	GL_LoadTextureFromAsset(mat->texture);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(unshadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+					   *modelWorldMatrix); // model -> world
+	glUniform4fv(unshadedModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
+	glUniform4fv(unshadedModelModColorLoc, 1, COLOR_TO_ARR(modColor));
+
+	GL_LoadModel(model, lod, materialIndex);
+
+	glVertexAttribPointer(unshadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(unshadedModelVertexLoc);
+
+	glVertexAttribPointer(unshadedModelUvLoc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(unshadedModelUvLoc);
+
+	glVertexAttribPointer(unshadedModelColorLoc,
+						  4,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(unshadedModelColorLoc);
+
+	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
+}
+
+void GL_RenderSkyModelPart(const ModelDefinition *model,
+						   const mat4 modelWorldMatrix,
+						   const uint32_t lod,
+						   const size_t materialIndex)
+{
+	GL_UseShader(skyShader);
+
+	GL_LoadTextureFromAsset(GetState()->map->skyTexture);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, skySharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(skyModelWorldMatrixLoc, 1, GL_FALSE,
 					   *modelWorldMatrix); // model -> world
 
-	GL_LoadModel(model, lod, material);
+	GL_LoadModel(model, lod, materialIndex);
 
-	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(skyVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(skyVertexLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(skyUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(skyUvLoc);
 
-	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
-	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(colAttrLoc);
+	glVertexAttribPointer(skyColorLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(skyColorLoc);
 
-	if (shader == SHADER_SHADED) // other shaders do not take normals
-	{
-		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
-		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(normAttrLoc);
-	}
-
-	if (shader != SHADER_SKY)
-	{
-		const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
-		glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(mat.color));
-
-		const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
-		glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(modColor));
-	}
-
-	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[material], GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
 }
 
 void GL_RenderModel(const ModelDefinition *model,
@@ -436,73 +475,105 @@ void GL_RenderModel(const ModelDefinition *model,
 {
 	for (uint32_t material = 0; material < model->materialsPerSkin; material++)
 	{
-		GL_RenderModelPart(model, modelWorldMatrix, lod, material, skin, modColor);
+		const uint32_t realSkin = min(skin, model->skinCount - 1);
+		const uint32_t *skinIndices = model->skins[realSkin];
+		const Material mat = model->materials[skinIndices[material]];
+		switch (mat.shader)
+		{
+			case SHADER_SKY:
+				GL_RenderSkyModelPart(model, modelWorldMatrix, lod, material);
+				break;
+			case SHADER_UNSHADED:
+				GL_RenderUnshadedModelPart(model, modelWorldMatrix, lod, material, modColor, &mat);
+				break;
+			case SHADER_SHADED:
+				GL_RenderShadedModelPart(model, modelWorldMatrix, lod, material, modColor, &mat);
+				break;
+		}
 	}
 }
 
-void GL_RenderMapModel(const GL_MapModelBuffer *model)
+void GL_RenderShadedMapModel(const GL_MapModelBuffer *model)
 {
-	const ModelShader shader = model->mapModel->material->shader;
-
-	const GL_Shader *glShader = NULL;
-	switch (shader)
-	{
-		case SHADER_SHADED:
-			glShader = modelShadedShader;
-			break;
-		case SHADER_UNSHADED:
-			glShader = modelUnshadedShader;
-			break;
-		default:
-			LogError("Invalid shader for model drawing\n");
-			return;
-	}
-
-	glUseProgram(glShader->program);
+	GL_UseShader(modelShadedShader);
 
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
 
 	mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
-	glBindBufferBase(GL_UNIFORM_BUFFER,
-					 glGetUniformBlockIndex(glShader->program, "SharedUniforms"),
-					 sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(glGetUniformLocation(glShader->program, "MODEL_WORLD_MATRIX"),
-					   1,
-					   GL_FALSE,
+	glUniformMatrix4fv(shadedModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *idty); // model -> world
 
-	glBindVertexArray(model->buffer->vertexArrayObject);
+	GL_BindBuffer(model->buffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, model->buffer->vertexBufferObject);
+	glVertexAttribPointer(shadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(shadedModelVertexLoc);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->buffer->elementBufferObject);
+	glVertexAttribPointer(shadedModelUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedModelUvLoc);
 
-	const GLint posAttrLoc = glGetAttribLocation(glShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(shadedModelColorLoc,
+						  4,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedModelColorLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(shadedModelNormalLoc,
+						  3,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(9 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedModelNormalLoc);
 
-	const GLint colAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_COLOR");
-	glVertexAttribPointer(colAttrLoc, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(colAttrLoc);
+	glUniform4fv(shadedModelAlbColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
 
-	if (shader == SHADER_SHADED) // other shaders do not take normals
-	{
-		const GLint normAttrLoc = glGetAttribLocation(glShader->program, "VERTEX_NORMAL");
-		glVertexAttribPointer(normAttrLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(9 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(normAttrLoc);
-	}
+	glUniform4fv(shadedModelModColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
 
-	const GLint colUniformLocation = glGetUniformLocation(glShader->program, "albColor");
-	glUniform4fv(colUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
+	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
+}
 
-	const GLint modColUniformLocation = glGetUniformLocation(glShader->program, "modColor");
-	glUniform4fv(modColUniformLocation, 1, COLOR_TO_ARR(COLOR_WHITE));
+void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
+{
+	GL_UseShader(modelUnshadedShader);
+
+	GL_LoadTextureFromAsset(model->mapModel->material->texture);
+
+	mat4 idty = GLM_MAT4_IDENTITY_INIT;
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
+
+	glUniformMatrix4fv(unshadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+					   *idty); // model -> world
+
+	GL_BindBuffer(model->buffer);
+
+	glVertexAttribPointer(unshadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(unshadedModelVertexLoc);
+
+	glVertexAttribPointer(unshadedModelUvLoc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(unshadedModelUvLoc);
+
+	glVertexAttribPointer(unshadedModelColorLoc,
+						  4,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(unshadedModelColorLoc);
+
+	glUniform4fv(unshadedModelAlbColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
+
+	glUniform4fv(unshadedModelModColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
 
 	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
 }
@@ -518,16 +589,11 @@ void GL_LoadMap(const Map *map)
 		mapModels[i] = mmb;
 		mmb->mapModel = &map->models[i];
 		mmb->buffer = GL_ConstructBuffer();
-
-		glBindVertexArray(mmb->buffer->vertexArrayObject);
-
-		glBindBuffer(GL_ARRAY_BUFFER, mmb->buffer->vertexBufferObject);
+		GL_BindBuffer(mmb->buffer);
 		glBufferData(GL_ARRAY_BUFFER,
 					 (GLsizeiptr)(mmb->mapModel->vertexCount * sizeof(MapVertex)),
 					 mmb->mapModel->vertices,
 					 GL_STREAM_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mmb->buffer->elementBufferObject);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 					 (GLsizeiptr)(mmb->mapModel->indexCount * sizeof(uint32_t)),
 					 mmb->mapModel->indices,

@@ -15,13 +15,12 @@
 
 void GL_DrawRect(const Vector2 pos, const Vector2 size, const Color color)
 {
-	glUseProgram(uiColoredShader->program);
+	GL_UseShader(uiColoredShader);
 
-	glUniform4fv(hudColoredColorLoc, 1, COLOR_TO_ARR(color));
+	glUniform4fv(uiColoredColorLoc, 1, COLOR_TO_ARR(color));
 
 	const Vector2 ndcStartPos = v2(GL_X_TO_NDC(pos.x), GL_Y_TO_NDC(pos.y));
 	const Vector2 ncdEndPos = v2(GL_X_TO_NDC(pos.x + size.x), GL_Y_TO_NDC(pos.y + size.y));
-
 
 	const float vertices[4][2] = {
 		{(float)ndcStartPos.x, (float)ndcStartPos.y},
@@ -32,17 +31,12 @@ void GL_DrawRect(const Vector2 pos, const Vector2 size, const Color color)
 
 	const uint32_t indices[] = {0, 2, 1, 0, 3, 2};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	GL_BindBuffer(glBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiColoredVertexLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiColoredVertexLoc);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
@@ -59,9 +53,9 @@ void GL_DrawRectOutline(const Vector2 pos, const Vector2 size, const Color color
 
 	glLineWidth(thickness);
 
-	glUseProgram(uiColoredShader->program);
+	GL_UseShader(uiColoredShader);
 
-	glUniform4fv(hudColoredColorLoc, 1, COLOR_TO_ARR(color));
+	glUniform4fv(uiColoredColorLoc, 1, COLOR_TO_ARR(color));
 
 	const Vector2 ndcStartPos = v2(GL_X_TO_NDC(pos.x), GL_Y_TO_NDC(pos.y));
 	const Vector2 ndcEndPos = v2(GL_X_TO_NDC(pos.x + size.x), GL_Y_TO_NDC(pos.y + size.y));
@@ -76,17 +70,12 @@ void GL_DrawRectOutline(const Vector2 pos, const Vector2 size, const Color color
 
 	const uint32_t indices[] = {0, 1, 2, 3};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	GL_BindBuffer(glBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiColoredVertexLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiColoredVertexLoc);
 
 	glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, NULL);
 }
@@ -98,13 +87,13 @@ void GL_DrawTexture_Internal(const Vector2 pos,
 							 const Vector2 regionStart,
 							 const Vector2 regionEnd)
 {
-	glUseProgram(uiTexturedShader->program);
+	GL_UseShader(uiTexturedShader);
 
 	GL_LoadTextureFromAsset(texture);
 
-	glUniform4fv(hudTexturedColorLoc, 1, COLOR_TO_ARR(color));
+	glUniform4fv(uiTexturedColorLoc, 1, COLOR_TO_ARR(color));
 
-	glUniform4f(hudTexturedRegionLoc,
+	glUniform4f(uiTexturedRegionLoc,
 				(GLfloat)regionStart.x,
 				(GLfloat)regionStart.y,
 				(GLfloat)regionEnd.x,
@@ -123,21 +112,16 @@ void GL_DrawTexture_Internal(const Vector2 pos,
 
 	const uint32_t indices[] = {0, 2, 1, 0, 3, 2};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiTexturedVertexLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiTexturedVertexLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(uiTexturedUvLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(uiTexturedUvLoc);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
@@ -181,9 +165,9 @@ void GL_DrawLine(const Vector2 start, const Vector2 end, const Color color, cons
 		glDisable(GL_LINE_SMOOTH);
 	}
 
-	glUseProgram(uiColoredShader->program);
+	GL_UseShader(uiColoredShader);
 
-	glUniform4fv(hudColoredColorLoc, 1, COLOR_TO_ARR(color));
+	glUniform4fv(uiColoredColorLoc, 1, COLOR_TO_ARR(color));
 
 	const Vector2 ndcStartPos = v2(GL_X_TO_NDC(start.x), GL_Y_TO_NDC(start.y));
 	const Vector2 ndcEndPos = v2(GL_X_TO_NDC(end.x), GL_Y_TO_NDC(end.y));
@@ -196,17 +180,13 @@ void GL_DrawLine(const Vector2 start, const Vector2 end, const Color color, cons
 
 	const uint32_t indices[] = {0, 1};
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiColoredVertexLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiColoredVertexLoc);
 
 	glLineWidth(thickness);
 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, NULL);
@@ -214,21 +194,17 @@ void GL_DrawLine(const Vector2 start, const Vector2 end, const Color color, cons
 
 void GL_DrawColoredArrays(const float *vertices, const uint32_t *indices, const uint32_t quadCount, const Color color)
 {
-	glUseProgram(uiColoredShader->program);
+	GL_UseShader(uiColoredShader);
 
-	glUniform4fv(hudColoredColorLoc, 1, COLOR_TO_ARR(color));
+	glUniform4fv(uiColoredColorLoc, 1, COLOR_TO_ARR(color));
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint32_t)), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiColoredVertexLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiColoredVertexLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)(quadCount * 6), GL_UNSIGNED_INT, NULL);
 }
@@ -239,58 +215,48 @@ void GL_DrawTexturedArrays(const float *vertices,
 						   const char *texture,
 						   const Color color)
 {
-	glUseProgram(uiTexturedShader->program);
+	GL_UseShader(uiTexturedShader);
 
 	GL_LoadTextureFromAsset(texture);
 
-	glUniform4fv(hudTexturedColorLoc, 1, COLOR_TO_ARR(color));
+	glUniform4fv(uiTexturedColorLoc, 1, COLOR_TO_ARR(color));
 
-	glUniform4f(hudTexturedRegionLoc, -1, 0, 0, 0);
+	glUniform4f(uiTexturedRegionLoc, -1, 0, 0, 0);
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, (long)(quadCount * 16 * sizeof(float)), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(quadCount * 6 * sizeof(uint32_t)), indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiTexturedVertexLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiTexturedVertexLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(uiTexturedUvLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(uiTexturedUvLoc);
 
 	glDrawElements(GL_TRIANGLES, quadCount * 6, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, const Color col)
 {
-	glUseProgram(uiTexturedShader->program);
+	GL_UseShader(uiTexturedShader);
 
 	GL_LoadTextureFromAsset(texture);
 
-	glUniform4fv(hudTexturedColorLoc, 1, COLOR_TO_ARR(col));
+	glUniform4fv(uiTexturedColorLoc, 1, COLOR_TO_ARR(col));
 
-	glUniform4f(hudTexturedRegionLoc, -1, 0, 0, 0);
+	glUniform4f(uiTexturedRegionLoc, -1, 0, 0, 0);
 
-	glBindVertexArray(glBuffer->vertexArrayObject);
+	GL_BindBuffer(glBuffer);
 
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, (long)(tris->vertexCount * 4 * sizeof(float)), tris->vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (long)(tris->indexCount * sizeof(uint32_t)), tris->indices, GL_STREAM_DRAW);
 
-	const GLint posAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
-	glVertexAttribPointer(posAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(posAttrLoc);
+	glVertexAttribPointer(uiTexturedVertexLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(uiTexturedVertexLoc);
 
-	const GLint texAttrLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
-	glVertexAttribPointer(texAttrLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(texAttrLoc);
+	glVertexAttribPointer(uiTexturedUvLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(uiTexturedUvLoc);
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)tris->indexCount, GL_UNSIGNED_INT, NULL);
 }
