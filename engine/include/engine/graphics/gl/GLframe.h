@@ -9,6 +9,16 @@
 #include <stdbool.h>
 
 /**
+ * Create the OpenGL framebuffer and related data
+ */
+bool GL_InitFramebuffer();
+
+/**
+ * Destroy the OpenGL framebuffer and related data
+ */
+void GL_DestroyFramebuffer();
+
+/**
  * Performs start of frame tasks
  */
 bool GL_FrameStart();
@@ -24,12 +34,12 @@ void GL_ClearScreen();
 void GL_ClearDepthOnly();
 
 /**
- * Swap the buffers
+ * Copy the internal framebuffer and swap buffers
  */
-void GL_Swap();
+void GL_FrameEnd();
 
 /**
- * Update the viewport size
+ * Update the viewport and framebuffer sizes
  */
 void GL_UpdateViewportSize();
 

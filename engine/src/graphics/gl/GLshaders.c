@@ -18,6 +18,11 @@ GL_Shader *skyShader;
 GL_Shader *modelUnshadedShader;
 GL_Shader *modelShadedShader;
 GL_Shader *debugShader;
+GL_Shader *framebufferShader;
+
+GLuint framebufferPositionLoc;
+GLuint framebufferUvLoc;
+GLint framebufferTextureLoc;
 
 GLint uiColoredColorLoc;
 GLint uiColoredVertexLoc;
@@ -82,6 +87,7 @@ bool GL_LoadShaders()
 	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
 	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"), SHADER("gl/model_unshaded_v"));
 	debugShader = GL_ConstructShaderFromAssets(SHADER("gl/debug_f"), SHADER("gl/debug_v"));
+	framebufferShader = GL_ConstructShaderFromAssets(SHADER("gl/framebuffer_f"), SHADER("gl/framebuffer_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
@@ -90,11 +96,16 @@ bool GL_LoadShaders()
 		!skyShader ||
 		!modelShadedShader ||
 		!modelUnshadedShader ||
-		!debugShader)
+		!debugShader ||
+		!framebufferShader)
 	{
 		GL_Error("Failed to compile shaders");
 		return false;
 	}
+
+	framebufferPositionLoc = glGetAttribLocation(framebufferShader->program, "VERTEX");
+	framebufferUvLoc = glGetAttribLocation(framebufferShader->program, "VERTEX_UV");
+	framebufferTextureLoc = glGetUniformLocation(framebufferShader->program, "screenTexture");
 
 	uiColoredColorLoc = glGetUniformLocation(uiColoredShader->program, "col");
 	uiColoredVertexLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");

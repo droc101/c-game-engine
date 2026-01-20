@@ -3,6 +3,7 @@
 //
 
 #include <engine/graphics/gl/GLdebug.h>
+#include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
@@ -68,13 +69,7 @@ bool GL_PreInit()
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1),
 					"Failed to set OpenGL double buffer",
 					GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8), "Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8), "Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8), "Failed to set OpenGL alpha-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24),
-					"Failed to set OpenGL depth buffer size",
-					GL_INIT_FAIL_MSG);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
 
 	return true;
 }
@@ -158,6 +153,13 @@ bool GL_Init(SDL_Window *wnd)
 #ifdef BUILDSTYLE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(GL_DebugMessageCallback, NULL);
+
+	int redSize, greenSize, blueSize, alphaSize;
+	SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &redSize);
+	SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &greenSize);
+	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blueSize);
+	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alphaSize);
+	LogDebug("Window Framebuffer: R:%d G:%d B:%d A:%d\n", redSize, greenSize, blueSize, alphaSize);
 #endif
 
 	if (!GL_LoadShaders())
@@ -166,6 +168,11 @@ bool GL_Init(SDL_Window *wnd)
 	}
 
 	GL_InitObjects();
+
+	if (!GL_InitFramebuffer())
+	{
+		return false;
+	}
 
 	glClearColor(0, 0, 0, 1);
 
@@ -196,6 +203,7 @@ bool GL_Init(SDL_Window *wnd)
 void GL_DestroyGL()
 {
 	LogDebug("Cleaning up OpenGL renderer...\n");
+	GL_DestroyFramebuffer();
 	GL_DestroyShaders();
 	GL_DestroyObjects();
 	SDL_GL_DeleteContext(ctx);

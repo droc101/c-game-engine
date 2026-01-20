@@ -177,7 +177,7 @@ void FrameEnd()
 			VK_FrameEnd();
 			break;
 		case RENDERER_OPENGL:
-			GL_Swap();
+			GL_FrameEnd();
 			break;
 		default:
 			break;
