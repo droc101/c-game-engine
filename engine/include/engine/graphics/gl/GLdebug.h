@@ -15,13 +15,6 @@
 #define GL_MAX_DEBUG_LINES_PER_FRAME 8192
 
 /**
- * Log an OpenGL error
- * @param error the error message
- */
-void GL_Error(const char *error);
-
-
-/**
  * Debug message callback for OpenGL
  * @param source The source of the message
  * @param type The type of the message

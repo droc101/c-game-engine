@@ -188,8 +188,3 @@ void GL_ResetDebugLines()
 {
 	numDebugLines = 0;
 }
-
-void GL_Error(const char *error)
-{
-	LogError("OpenGL Error: %s\n", error);
-}

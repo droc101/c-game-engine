@@ -46,7 +46,7 @@ bool GL_PreInit()
 				mssaValue = 8;
 				break;
 			default:
-				GL_Error("Invalid MSAA value!");
+				LogError("OpenGL: Invalid MSAA value!");
 				return false;
 		}
 		if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mssaValue) != 0)
@@ -82,7 +82,6 @@ bool GL_Init(SDL_Window *wnd)
 	if (ctx == NULL)
 	{
 		LogError("SDL_GL_CreateContext Error: %s\n", SDL_GetError());
-		GL_Error("Failed to create OpenGL context");
 		return false;
 	}
 
@@ -96,7 +95,6 @@ bool GL_Init(SDL_Window *wnd)
 	{
 		SDL_GL_DeleteContext(ctx);
 		LogError("glewInit Failed with error %d\n", err);
-		GL_Error(GL_INIT_FAIL_MSG);
 		return false;
 	}
 
@@ -104,7 +102,7 @@ bool GL_Init(SDL_Window *wnd)
 	if (!GL_VERSION_CHECK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error(GL_INIT_FAIL_MSG);
+		LogError("OpenGL: GL_VERSION_CHECK failed\n");
 		return false;
 	}
 
@@ -126,7 +124,7 @@ bool GL_Init(SDL_Window *wnd)
 				requestedAnisotropy = 16;
 				break;
 			default:
-				GL_Error("Invalid anisotropy level!");
+				LogError("OpenGL: Invalid anisotropy level!");
 				return false;
 		}
 		GLfloat gpuMaxAnisotropy = 0;

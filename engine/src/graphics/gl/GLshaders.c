@@ -7,6 +7,7 @@
 #include <engine/graphics/gl/GLdebug.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -99,7 +100,7 @@ bool GL_LoadShaders()
 		!debugShader ||
 		!framebufferShader)
 	{
-		GL_Error("Failed to compile shaders");
+		LogError("OpenGL: Failed to compile shaders");
 		return false;
 	}
 
