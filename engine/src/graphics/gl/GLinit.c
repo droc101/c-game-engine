@@ -49,11 +49,14 @@ bool GL_PreInit()
 				LogError("OpenGL: Invalid MSAA value!");
 				return false;
 		}
-		if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mssaValue) != 0)
-		{
-			LogError("Failed to set MSAA samples attribute: %s\n", SDL_GetError());
-		}
+		glMsaaSamples = mssaValue;
 	}
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0),
+					"Failed to set OpenGL MSAA buffers",
+					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0),
+					"Failed to set OpenGL MSAA samples",
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, GL_VERSION_MAJOR),
 					"Failed to set OpenGL major version",
 					GL_INIT_FAIL_MSG);

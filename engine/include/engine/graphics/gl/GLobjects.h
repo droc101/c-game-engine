@@ -110,6 +110,9 @@ extern GLuint sharedUniformBuffer;
 /// Texture anisotropy level
 extern GLfloat anisotropyLevel;
 
+/// Number of MSAA samples
+extern GLint glMsaaSamples;
+
 /**
  * Create a shader program from assets
  * @param fsh The fragment shader asset

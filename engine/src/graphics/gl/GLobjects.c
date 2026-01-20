@@ -31,6 +31,8 @@ GLuint sharedUniformBuffer;
 
 GLfloat anisotropyLevel = 0;
 
+GLint glMsaaSamples = 0;
+
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
 	Shader *fragmentSource = LoadShader(fsh);

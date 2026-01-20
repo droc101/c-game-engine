@@ -25,17 +25,8 @@ extern GL_Shader *modelUnshadedShader;
 extern GL_Shader *modelShadedShader;
 /// The shader used for the debug renderer
 extern GL_Shader *debugShader;
-/// The shader used to copy the internal framebuffer to the window
-extern GL_Shader *framebufferShader;
 
 #pragma region Uniform/Attribute Locations
-
-/// The location of the vertex position attribute in the framebuffer shader
-extern GLuint framebufferPositionLoc;
-/// The location of the vertex UV attribute in the framebuffer shader
-extern GLuint framebufferUvLoc;
-/// The location of the texture uniform in the framebuffer shader
-extern GLint framebufferTextureLoc;
 
 /// The location of the color uniform in the UI colored shader
 extern GLint uiColoredColorLoc;
