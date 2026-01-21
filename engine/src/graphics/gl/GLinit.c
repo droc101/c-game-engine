@@ -109,6 +109,12 @@ bool GL_Init(SDL_Window *wnd)
 		return false;
 	}
 
+	if (!GLEW_ARB_framebuffer_object)
+	{
+		LogError("OpenGL device does not support GLEW_ARB_framebuffer_object!\n");
+		return false;
+	}
+
 	if (GetState()->options.anisotropy != ANISOTROPY_NONE)
 	{
 		GLfloat requestedAnisotropy = 0;
@@ -155,7 +161,10 @@ bool GL_Init(SDL_Window *wnd)
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(GL_DebugMessageCallback, NULL);
 
-	int redSize, greenSize, blueSize, alphaSize;
+	int redSize = 0;
+	int greenSize = 0;
+	int blueSize = 0;
+	int alphaSize = 0;
 	SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &redSize);
 	SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &greenSize);
 	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blueSize);

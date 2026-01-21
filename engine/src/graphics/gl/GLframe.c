@@ -6,7 +6,6 @@
 #include <engine/graphics/gl/GLdebug.h>
 #include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLobjects.h>
-#include <engine/graphics/gl/GLshaders.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/subsystem/Logging.h>
 #include <SDL_video.h>
@@ -87,7 +86,12 @@ bool GL_InitFramebuffer()
 	}
 
 #ifdef BUILDSTYLE_DEBUG
-	int redSize, greenSize, blueSize, alphaSize, depthSize, stencilSize;
+	int redSize = 0;
+	int greenSize = 0;
+	int blueSize = 0;
+	int alphaSize = 0;
+	int depthSize = 0;
+	int stencilSize = 0;
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
 										  GL_COLOR_ATTACHMENT0,
 										  GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE,
@@ -123,8 +127,6 @@ bool GL_InitFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
-
-	const uint32_t indices[] = {0, 1, 2, 0, 2, 3};
 
 	return true;
 }
@@ -180,7 +182,7 @@ inline void GL_UpdateViewportSize()
 	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
 	glViewport(0, 0, vpWidth, vpHeight);
 
-	GLint boundRbo = 0;
+	GLint boundRbo = GL_NONE;
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &boundRbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
 
