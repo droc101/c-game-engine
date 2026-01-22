@@ -70,36 +70,39 @@ static SDL_Haptic *haptic;
 
 bool FindGameController()
 {
-	// TODO reimplement
+	int numGamepads = 0;
+	SDL_JoystickID *gamepads = SDL_GetGamepads(&numGamepads);
+	for (int i = 0; i < numGamepads; i++)
+	{
+		const SDL_JoystickID gamepad = gamepads[i];
+		if (SDL_IsGamepad(gamepad))
+		{
+			controller = SDL_OpenGamepad(gamepad);
+			stick = SDL_GetGamepadJoystick(controller);
+			if (SDL_IsJoystickHaptic(stick)) // TODO my controller HAS haptics WHY is this false
+			{
+				haptic = SDL_OpenHapticFromJoystick(stick);
+				if (!haptic)
+				{
+					LogError("Failed to open haptic: %s\n",
+							 SDL_GetError()); // This should never happen (if it does, SDL lied to us)
+					haptic = NULL;
+				} else if (!SDL_InitHapticRumble(haptic))
+				{
+					LogError("Failed to initialize rumble: %s\n", SDL_GetError());
+					haptic = NULL;
+				}
+			} else
+			{
+				haptic = NULL;
+			}
+			LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(controller));
+			SDL_free(gamepads);
+			return true;
+		}
+	}
+	SDL_free(gamepads);
 	return false;
-	// for (int i = 0; i < SDL_NumJoysticks(); i++)
-	// {
-	// 	if (SDL_IsGameController(i))
-	// 	{
-	// 		controller = SDL_GameControllerOpen(i);
-	// 		stick = SDL_GameControllerGetJoystick(controller);
-	// 		if (SDL_JoystickIsHaptic(stick))
-	// 		{
-	// 			haptic = SDL_HapticOpenFromJoystick(stick);
-	// 			if (!haptic)
-	// 			{
-	// 				LogError("Failed to open haptic: %s\n",
-	// 						 SDL_GetError()); // This should never happen (if it does, SDL lied to us)
-	// 				haptic = NULL;
-	// 			} else if (SDL_HapticRumbleInit(haptic) != 0)
-	// 			{
-	// 				LogError("Failed to initialize rumble: %s\n", SDL_GetError());
-	// 				haptic = NULL;
-	// 			}
-	// 		} else
-	// 		{
-	// 			haptic = NULL;
-	// 		}
-	// 		LogInfo("Using controller \"%s\"\n", SDL_GameControllerName(controller));
-	// 		return true;
-	// 	}
-	// }
-	// return false;
 }
 
 void Rumble(const float strength, const uint32_t time)
@@ -112,21 +115,20 @@ void Rumble(const float strength, const uint32_t time)
 
 void HandleControllerDisconnect(const SDL_JoystickID which)
 {
-	// TODO reimpement
-	// if (controller == NULL)
-	// {
-	// 	return;
-	// }
-	// if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)) != which)
-	// {
-	// 	return;
-	// }
-	// SDL_GameControllerClose(controller);
-	// SDL_JoystickClose(stick);
-	// if (haptic)
-	// {
-	// 	SDL_HapticClose(haptic);
-	// }
+	if (controller == NULL)
+	{
+		return;
+	}
+	if (SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)) != which)
+	{
+		return;
+	}
+	SDL_CloseGamepad(controller);
+	SDL_CloseJoystick(stick);
+	if (haptic)
+	{
+		SDL_CloseHaptic(haptic);
+	}
 	controller = NULL;
 	stick = NULL;
 	haptic = NULL;
