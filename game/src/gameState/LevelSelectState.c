@@ -124,7 +124,6 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
-	StopMusic();
 	SetStateCallbacks(LevelSelectStateUpdate,
 					  NULL,
 					  GAME_STATE_LEVEL_SELECT,

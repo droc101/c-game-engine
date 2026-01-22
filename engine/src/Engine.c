@@ -25,13 +25,11 @@
 #include <engine/subsystem/threads/LodThread.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_hints.h>
-#include <SDL3/SDL_keyboard.h>
-#include <SDL3_mixer/SDL_mixer.h>
+#include <SDL3/SDL_init.h>
 #include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_surface.h>
@@ -86,13 +84,13 @@ void InitSDL()
 {
 	LogDebug("Initializing SDL...\n");
 	SDL_SetHint(SDL_HINT_APP_NAME, gameConfig.gameTitle);
-#ifdef __LINUX__
+#ifdef SDL_PLATFORM_LINUX
 	if (GetState()->options.preferWayland)
 	{
-		SDL_SetHint(SDL_HINT_VIDEODRIVER, "wayland,x11"); // TODO: seems to be ignored with sdl2-compat
+		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11"); // TODO: seems to be ignored with sdl2-compat
 	} else
 	{
-		SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11,wayland");
+		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11,wayland");
 	}
 #endif
 
@@ -126,10 +124,7 @@ void WindowAndRenderInit()
 	}
 	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
-	SDL_Window *window = SDL_CreateWindow(&title[0],
-										  DEF_WIDTH,
-										  DEF_HEIGHT,
-										  rendererFlags | SDL_WINDOW_RESIZABLE);
+	SDL_Window *window = SDL_CreateWindow(&title[0], DEF_WIDTH, DEF_HEIGHT, rendererFlags | SDL_WINDOW_RESIZABLE);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -168,7 +163,7 @@ void HandleEvent(void)
 			HandleKeyDown(event.key.scancode);
 			break;
 		case SDL_EVENT_MOUSE_MOTION:
-			HandleMouseMotion(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+			HandleMouseMotion((int)event.motion.x, (int)event.motion.y, (int)event.motion.xrel, (int)event.motion.yrel);
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_UP:
 			HandleMouseUp(event.button.button);
@@ -366,9 +361,6 @@ void DestroyEngine()
 	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
 	// TODO reimplement
-	// LogDebug("Cleaning up SDL_Mixer...\n");
-	// Mix_CloseAudio();
-	// Mix_Quit();
 	LogDebug("Cleaning up SDL...\n");
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();

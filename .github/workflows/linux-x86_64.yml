@@ -36,7 +36,7 @@ jobs:
           key: ${{ matrix.build_type }}-x86_64-deps-${{ hashFiles('**/.git/HEAD') }}
 
       - name: Install Packages
-        run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev cmake gcc g++ git
+        run: sudo apt-get update && sudo apt install -y libcglm-dev libglew-dev cmake gcc g++ git
 
       - name: Configure CMake
         if: ${{ !inputs.buildForDistribution }}

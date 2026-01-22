@@ -282,7 +282,7 @@ void VideoOptionsStateSet()
 										0.5,
 										1,
 										SliderLabelLod));
-#ifdef __LINUX__
+#ifdef SDL_PLATFORM_LINUX
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(0, opY),

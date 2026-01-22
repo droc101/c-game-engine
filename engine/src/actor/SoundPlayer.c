@@ -18,7 +18,7 @@
 typedef struct SoundPlayerData
 {
 	char *asset; // asset name of the sound effect to play
-	SoundEffect *effect;
+	SoundChannel *effect;
 	int loops;
 	float volume;
 } SoundPlayerData;
@@ -36,7 +36,7 @@ static void SoundPlayerDestroy(Actor *this)
 	const SoundPlayerData *data = this->extraData;
 	if (data->effect)
 	{
-		StopSoundEffect(data->effect);
+		StopSound(data->effect);
 	}
 	free(data->asset);
 }
@@ -44,25 +44,25 @@ static void SoundPlayerDestroy(Actor *this)
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	SoundPlayerData *data = this->extraData;
-	data->effect = PlaySoundEffect(data->asset, data->loops, data->volume, SoundPlayerSoundDone, data);
+	data->effect = PlaySound(data->asset, data->loops, data->volume, SoundPlayerSoundDone, data);
 }
 
 static void SoundPlayerPauseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	PauseSoundEffect(data->effect);
+	PauseSound(data->effect);
 }
 
 static void SoundPlayerResumeHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	ResumeSoundEffect(data->effect);
+	ResumeSound(data->effect);
 }
 
 static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	StopSoundEffect(data->effect);
+	StopSound(data->effect);
 }
 
 void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/)

@@ -65,7 +65,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 		}
 
 
-		(void)PlaySoundEffect(SOUND("sfx/click"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/click"), 0, 1, NULL, NULL);
 		data->checked = true;
 
 		// Find all radio buttons with the same group id and uncheck them

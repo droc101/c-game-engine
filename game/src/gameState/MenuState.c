@@ -145,7 +145,6 @@ void MenuStateSet()
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
-	StopMusic();
 
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);

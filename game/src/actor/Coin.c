@@ -86,7 +86,7 @@ static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 		GetState()->saveData->blueCoins++;
 		GetState()->saveData->coins += 5;
 	}
-	(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
+	(void)PlaySound(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
 	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
 	RemoveActor(this);
 }

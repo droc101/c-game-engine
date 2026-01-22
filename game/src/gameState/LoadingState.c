@@ -64,6 +64,5 @@ void LoadingStateSet(const char *mapName)
 	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
 	strncpy(loadStateLevelname, mapName, 31);
-	StopMusic();
 	SetStateCallbacks(LoadingStateUpdate, NULL, GAME_STATE_LOADING, LoadingStateRender, false);
 }

@@ -34,7 +34,7 @@ jobs:
           key: ${{ matrix.build_type }}-arm64-deps-${{ hashFiles('**/.git/HEAD') }}
 
       - name: Install Packages
-        run: sudo apt-get update && sudo apt install -y libsdl2-dev libsdl2-mixer-dev libcglm-dev libglew-dev cmake gcc g++ git
+        run: sudo apt-get update && sudo apt install -y libcglm-dev libglew-dev cmake gcc g++ git
 
       - name: Configure CMake
         run: cmake -B build-${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}

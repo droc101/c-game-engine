@@ -37,7 +37,7 @@ void PauseStateUpdate(GlobalState * /*state*/)
 		IsButtonJustPressed(CONTROLLER_CANCEL) ||
 		IsButtonJustPressed(SDL_GAMEPAD_BUTTON_START))
 	{
-		(void)PlaySoundEffect(SOUND("sfx/popdown"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/popdown"), 0, 1, NULL, NULL);
 		MainStateSet();
 	}
 }

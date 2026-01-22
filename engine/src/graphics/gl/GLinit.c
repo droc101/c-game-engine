@@ -27,10 +27,6 @@ bool GL_PreInit()
 {
 	LogDebug("Pre-initializing OpenGL...\n");
 	const bool msaaEnabled = GetState()->options.msaa != MSAA_NONE;
-	if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, msaaEnabled) != 0)
-	{
-		LogError("Failed to set MSAA buffers attribute: %s\n", SDL_GetError());
-	}
 	if (msaaEnabled)
 	{
 		int mssaValue = 0;
