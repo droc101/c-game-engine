@@ -9,6 +9,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Input.h>
@@ -354,28 +355,41 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 		player->targetedActor = GetTargetedActor(JPH_PhysicsSystem_GetBodyInterface(physicsSystem), &raycastResult);
 		if (player->targetedActor)
 		{
-			if ((player->targetedActor->actorFlags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
+			Item *item = GetItem();
+			bool itemTarget = false;
+			if (item)
 			{
-				crosshairColor = COLOR(0xFFFF0000);
-				if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
+				itemTarget = item->definition->CanTarget(item, player->targetedActor, &crosshairColor);
+				if (itemTarget)
 				{
-					RemoveActor(player->targetedActor);
-					player->targetedActor = NULL;
+					if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) ||
+						IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
+					{
+						item->definition->PrimaryAction(item);
+					} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) ||
+							   IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_Y))
+					{
+						item->definition->SecondaryAction(item);
+					}
+				}
+			}
+
+			if (player->targetedActor && !itemTarget) // condition is NOT always true it is LYING to you
+			{
+				if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
+					(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
+				{
+					crosshairColor = COLOR(0xFF006600);
+					if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_A))
+					{
+						player->heldActor = player->targetedActor;
+						player->hasHeldActor = true;
+						crosshairColor = COLOR(0x00FF0000);
+					}
+				} else
+				{
 					crosshairColor = COLOR(0xFFFFCCCC);
 				}
-			} else if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
-					   (raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
-			{
-				crosshairColor = COLOR(0xFF006600);
-				if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_A))
-				{
-					player->heldActor = player->targetedActor;
-					player->hasHeldActor = true;
-					crosshairColor = COLOR(0x00FF0000);
-				}
-			} else
-			{
-				crosshairColor = COLOR(0xFFFFCCCC);
 			}
 		} else
 		{

@@ -17,6 +17,7 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Item.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
@@ -61,7 +62,6 @@ static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
 	state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
 	state->camera->transform.position.z = state->map->player.transform.position.z;
 	state->camera->transform.rotation = state->map->player.transform.rotation;
-	state->map->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -87,6 +87,12 @@ void MainStateUpdate(GlobalState *state)
 	}
 
 	RotateCamera(state, cameraMotion);
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->Update(item, state);
+	}
 
 	if (state->saveData->coins > 9999)
 	{
@@ -129,6 +135,12 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		}
 
 		RotateCamera(state, cameraMotion);
+	}
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->FixedUpdate(item, state, delta);
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
@@ -197,6 +209,12 @@ void MainStateRender(GlobalState *state)
 
 	RenderMap(state->map, state->camera);
 	RenderHUD();
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->RenderHud(item);
+	}
 
 #ifdef BUILDSTYLE_DEBUG
 	DPrintF("Engine " ENGINE_VERSION, COLOR_WHITE, false);

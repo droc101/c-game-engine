@@ -2,25 +2,21 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Item.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Quat.h>
-#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -51,10 +47,14 @@ Map *CreateMap(void)
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
 
-	map->viewmodel.enabled = true;
-	map->viewmodel.model = LoadModel(MODEL("eraser"));
-	map->viewmodel.transform.position.x = 0.5f;
-	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &map->viewmodel.transform.rotation);
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->Switch(item, &map->viewmodel);
+	} else
+	{
+		map->viewmodel.enabled = false;
+	}
 
 	return map;
 }

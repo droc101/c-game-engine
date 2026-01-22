@@ -158,6 +158,8 @@ target_sources(engine INTERFACE
         include/engine/structs/Viewmodel.h
         src/structs/ActorWall.c
         include/engine/structs/ActorWall.h
+        include/engine/structs/Item.h
+        engine/src/structs/Item.c
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h
