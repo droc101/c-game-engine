@@ -12,8 +12,8 @@
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MenuState.h"
@@ -94,7 +94,7 @@ void OptionsStateSet(const bool inGame)
 					  NULL,
 					  GAME_STATE_OPTIONS,
 					  OptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void OptionsStateDestroy()

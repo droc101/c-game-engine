@@ -6,7 +6,7 @@
 #define GAME_GLHELPER_H
 
 #include <cglm/types.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 
 /// The major OpenGL version to use

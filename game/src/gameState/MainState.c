@@ -33,10 +33,10 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <math.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -67,7 +67,7 @@ static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void MainStateUpdate(GlobalState *state)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
+	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_START))
 	{
 		(void)PlaySoundEffect(SOUND("sfx/popup"), 0, 1, NULL, NULL);
 		PauseStateSet();
@@ -114,7 +114,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	{
 		Vector2 cameraMotion = v2s(0);
 
-		float cx = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+		float cx = -GetAxis(SDL_GAMEPAD_AXIS_RIGHTX);
 		if (state->options.invertHorizontalCamera)
 		{
 			cx *= -1;
@@ -124,7 +124,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.x = cx * state->options.cameraSpeed / 11.25f;
 		}
 
-		float cy = -GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+		float cy = -GetAxis(SDL_GAMEPAD_AXIS_RIGHTY);
 		if (state->options.invertVerticalCamera)
 		{
 			cy *= -1;
@@ -146,10 +146,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
 	state->camera->yOffset = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
-	if (WaitForLodThreadToEnd() != 0)
-	{
-		Error("Failed to wait for LOD thread end semaphore!");
-	}
+	WaitForLodThreadToEnd();
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
@@ -203,10 +200,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	GetState()->map->physicsTick++;
 
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
-	if (SignalLodThreadCanStart() != 0)
-	{
-		Error("Failed to signal LOD thread start semaphore!");
-	}
+	SignalLodThreadCanStart();
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -241,5 +235,5 @@ void MainStateSet()
 		LodThreadInit();
 		lodThreadInitDone = true;
 	}
-	SetStateCallbacks(MainStateUpdate, MainStateFixedUpdate, GAME_STATE_MAIN, MainStateRender, SDL_TRUE);
+	SetStateCallbacks(MainStateUpdate, MainStateFixedUpdate, GAME_STATE_MAIN, MainStateRender, true);
 }

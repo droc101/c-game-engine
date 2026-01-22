@@ -26,9 +26,9 @@
 #include <joltc/Physics/Collision/ShapeFilter.h>
 #include <joltc/types.h>
 #include <math.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -213,8 +213,8 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 
 	if (UseController())
 	{
-		moveVec.z = GetAxis(SDL_CONTROLLER_AXIS_LEFTY);
-		moveVec.x = GetAxis(SDL_CONTROLLER_AXIS_LEFTX);
+		moveVec.z = GetAxis(SDL_GAMEPAD_AXIS_LEFTY);
+		moveVec.x = GetAxis(SDL_GAMEPAD_AXIS_LEFTX);
 		if (fabsf(moveVec.x) < STICK_DEADZONE)
 		{
 			moveVec.x = 0;
@@ -246,7 +246,7 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 	{
 		Vector3_Normalized(&moveVec, &moveVec);
 		*distanceTraveled = MOVE_SPEED;
-		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0.5)
+		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
 		} else if (player->isNoclipActive && (IsKeyPressed(SDL_SCANCODE_LSHIFT) || IsKeyPressed(SDL_SCANCODE_RSHIFT)))
@@ -300,7 +300,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 {
 	if (player->hasHeldActor)
 	{
-		if ((IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_A)) &&
+		if ((IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH)) &&
 			player->canDropHeldActor)
 		{
 			player->heldActor = NULL;
@@ -363,19 +363,19 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				if (itemTarget)
 				{
 					if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) ||
-						IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
+						IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_WEST))
 					{
 						item->definition->PrimaryActionDown(item);
 					} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_LEFT) ||
-							   IsButtonJustReleasedPhys(SDL_CONTROLLER_BUTTON_X))
+							   IsButtonJustReleasedPhys(SDL_GAMEPAD_BUTTON_WEST))
 					{
 						item->definition->PrimaryActionUp(item);
 					} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) ||
-							   IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_Y))
+							   IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_NORTH))
 					{
 						item->definition->SecondaryActionDown(item);
 					} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_RIGHT) ||
-							   IsButtonJustReleasedPhys(SDL_CONTROLLER_BUTTON_Y))
+							   IsButtonJustReleasedPhys(SDL_GAMEPAD_BUTTON_NORTH))
 					{
 
 					}
@@ -388,7 +388,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 					(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
 				{
 					crosshairColor = CROSSHAIR_COLOR_HOLDABLE;
-					if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_A))
+					if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH))
 					{
 						player->heldActor = player->targetedActor;
 						player->hasHeldActor = true;

@@ -14,8 +14,8 @@
 #include <engine/subsystem/Timing.h>
 #include <engine/uiStack/controls/TextBox.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_events.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

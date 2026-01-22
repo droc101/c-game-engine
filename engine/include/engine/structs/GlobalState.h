@@ -12,7 +12,7 @@
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Discord.h>
 #include <joltc/joltc.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -124,7 +124,7 @@ void SetStateCallbacks(FrameUpdateFunction UpdateGame,
 					   FixedUpdateFunction FixedUpdateGame,
 					   GameStateId currentState,
 					   FrameRenderFunction RenderGame,
-					   SDL_bool enableRelativeMouseMode);
+					   bool enableRelativeMouseMode);
 
 /**
  * Change the current map

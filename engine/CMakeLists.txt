@@ -9,8 +9,8 @@ detect_platform()
 
 #region Dependencies
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2_mixer REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -219,8 +219,8 @@ if (JOLT_BUILD_ENABLE_ASSERTS)
     target_compile_definitions(engine INTERFACE JPH_ENABLE_ASSERTS)
 endif ()
 target_link_libraries(engine INTERFACE
-        SDL2::SDL2
-        SDL2_mixer
+        SDL3::SDL3
+        SDL3_mixer
         ZLIB::ZLIB
         joltc
         cglm

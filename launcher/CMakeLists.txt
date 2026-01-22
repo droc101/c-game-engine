@@ -43,8 +43,8 @@ if (WIN32)
     )
 
     set(DLLS
-            SDL2.dll
-            SDL2_mixer.dll
+            SDL3.dll
+            SDL3_mixer.dll
             zlib1.dll
             libmpg123-0.dll
             libFLAC.dll

@@ -11,7 +11,7 @@
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/Timing.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -65,5 +65,5 @@ void LoadingStateSet(const char *mapName)
 	levelLoadStartTime = GetTimeMs();
 	strncpy(loadStateLevelname, mapName, 31);
 	StopMusic();
-	SetStateCallbacks(LoadingStateUpdate, NULL, GAME_STATE_LOADING, LoadingStateRender, SDL_FALSE);
+	SetStateCallbacks(LoadingStateUpdate, NULL, GAME_STATE_LOADING, LoadingStateRender, false);
 }

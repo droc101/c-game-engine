@@ -16,9 +16,9 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MainState.h"
@@ -35,7 +35,7 @@ void PauseStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(CONTROLLER_CANCEL) ||
-		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
+		IsButtonJustPressed(SDL_GAMEPAD_BUTTON_START))
 	{
 		(void)PlaySoundEffect(SOUND("sfx/popdown"), 0, 1, NULL, NULL);
 		MainStateSet();
@@ -99,7 +99,7 @@ void PauseStateSet()
 					  NULL,
 					  GAME_STATE_PAUSE,
 					  PauseStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void PauseStateDestroy()

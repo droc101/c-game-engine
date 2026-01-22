@@ -11,18 +11,18 @@
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
-#include <SDL_error.h>
-#include <SDL_mutex.h>
-#include <SDL_thread.h>
-#include <SDL_timer.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_mutex.h>
+#include <SDL3/SDL_thread.h>
+#include <SDL3/SDL_timer.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 static SDL_Thread *physicsThread;
-static SDL_mutex *physicsThreadMutex;
-static SDL_mutex *physicsTickMutex;
-static SDL_sem *physicsTickHasEnded;
+static SDL_Mutex *physicsThreadMutex;
+static SDL_Mutex *physicsTickMutex;
+static SDL_Semaphore *physicsTickHasEnded;
 
 /**
  * The function to run in the physics thread
@@ -46,7 +46,7 @@ int PhysicsThreadMain(void * /*data*/)
 	while (true)
 	{
 		const uint64_t timeStart = GetTimeNs();
-		SDL_SemTryWait(physicsTickHasEnded);
+		SDL_TryWaitSemaphore(physicsTickHasEnded); // TODO this returns something
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
 		if (physicsThreadPostQuit)
@@ -74,7 +74,7 @@ int PhysicsThreadMain(void * /*data*/)
 		UpdateFunction(GetState(), delta);
 		GetState()->physicsFrame++;
 		SDL_UnlockMutex(physicsTickMutex);
-		SDL_SemPost(physicsTickHasEnded);
+		SDL_SignalSemaphore(physicsTickHasEnded);
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
@@ -115,8 +115,8 @@ void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 	SDL_UnlockMutex(physicsThreadMutex);
 	if (function)
 	{
-		if (SDL_SemTryWait(physicsTickHasEnded) == SDL_MUTEX_TIMEDOUT &&
-			SDL_SemWaitTimeout(physicsTickHasEnded, 1000) < 0)
+		if (SDL_TryWaitSemaphore(physicsTickHasEnded) &&
+			SDL_WaitSemaphoreTimeout(physicsTickHasEnded, 1000)) // TODO are these checks correct
 		{
 			LogError("Failed to wait for physics tick semaphore with error %s", SDL_GetError());
 			Error("Failed to wait for physics tick semaphore!");

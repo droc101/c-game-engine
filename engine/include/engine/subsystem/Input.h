@@ -7,8 +7,8 @@
 
 #include <engine/structs/GlobalState.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Vector2.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -17,16 +17,17 @@
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
 
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons
-#define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_B : SDL_CONTROLLER_BUTTON_A)
+// TODO did i choose the right directions
+#define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_EAST : SDL_GAMEPAD_BUTTON_SOUTH)
 /// Use this for the "Cancel" button in place of hardcoding controller A or B buttons
 #define CONTROLLER_CANCEL \
-	(GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_A : SDL_CONTROLLER_BUTTON_B)
+	(GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_SOUTH : SDL_GAMEPAD_BUTTON_EAST)
 
 /**
  * Handles controller disconnect event
  * @param which The controller that was disconnected
  */
-void HandleControllerDisconnect(Sint32 which);
+void HandleControllerDisconnect(SDL_JoystickID which);
 
 /**
  * Handles controller connect event
@@ -37,20 +38,20 @@ void HandleControllerConnect();
  * Handles controller button up event
  * @param button The button code
  */
-void HandleControllerButtonUp(SDL_GameControllerButton button);
+void HandleControllerButtonUp(SDL_GamepadButton button);
 
 /**
  * Handles controller button down event
  * @param button The button code
  */
-void HandleControllerButtonDown(SDL_GameControllerButton button);
+void HandleControllerButtonDown(SDL_GamepadButton button);
 
 /**
  * Handles controller axis event
  * @param axis The axis code
  * @param value The value of the axis
  */
-void HandleControllerAxis(SDL_GameControllerAxis axis, Sint16 value);
+void HandleControllerAxis(SDL_GamepadAxis axis, Sint16 value);
 
 /**
  * Handles key down event
@@ -207,7 +208,7 @@ void ConsumeAllMouseButtons();
  * @param axis The axis to get the value of
  * @return The value of the axis (between -1 and 1)
  */
-float GetAxis(SDL_GameControllerAxis axis);
+float GetAxis(SDL_GamepadAxis axis);
 
 /**
  * Checks if a controller is being used

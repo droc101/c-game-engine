@@ -22,7 +22,7 @@
 #include <joltc/constants.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

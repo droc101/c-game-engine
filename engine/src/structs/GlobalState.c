@@ -17,8 +17,8 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
-#include <SDL_mouse.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -133,7 +133,7 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 					   const FixedUpdateFunction FixedUpdateGame,
 					   const GameStateId currentState,
 					   const FrameRenderFunction RenderGame,
-					   const SDL_bool enableRelativeMouseMode)
+					   const bool enableRelativeMouseMode)
 {
 	state.UpdateGame = UpdateGame;
 	state.currentState = currentState;
@@ -142,7 +142,7 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	DiscordUpdateRPC();
 	if (!HasCliArg("--no-mouse-capture"))
 	{
-		SDL_SetRelativeMouseMode(enableRelativeMouseMode);
+		SDL_SetWindowRelativeMouseMode(GetGameWindow(), enableRelativeMouseMode);
 	}
 }
 

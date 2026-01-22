@@ -10,7 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
 

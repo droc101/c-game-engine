@@ -17,7 +17,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -155,7 +155,7 @@ void MenuStateSet()
 					  NULL,
 					  GAME_STATE_MENU,
 					  MenuStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void MenuStateDestroy()

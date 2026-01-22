@@ -5,6 +5,8 @@
 #ifndef GAME_ERROR_H
 #define GAME_ERROR_H
 
+#include <stdbool.h>
+
 /// Throw a fatal error
 #define Error(error) _ErrorInternal(error, __FILE_NAME__, __LINE__, __PRETTY_FUNCTION__) // NOLINT(*-include-cleaner)
 
@@ -70,7 +72,7 @@ void ErrorHandlerInit();
  * @param result The result of the SDL function
  * @param message The message to log (%s: sdl error)
  */
-void TestSDLFunction_NonFatal(int result, const char *message);
+void TestSDLFunction_NonFatal(bool result, const char *message);
 
 /**
  * Test an SDL function for failure and log the error, terminating the program if it failed
@@ -78,6 +80,6 @@ void TestSDLFunction_NonFatal(int result, const char *message);
  * @param message The log message
  * @param userMessage The user-facing crash message
  */
-void TestSDLFunction(int result, const char *message, const char *userMessage);
+void TestSDLFunction(bool result, const char *message, const char *userMessage);
 
 #endif //GAME_ERROR_H

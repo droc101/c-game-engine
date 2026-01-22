@@ -27,8 +27,8 @@
 #include <luna/lunaInstance.h>
 #include <luna/lunaTypes.h>
 #include <math.h>
-#include <SDL_error.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -125,21 +125,13 @@ bool VK_LoadLevelWalls(const Map *level)
 	// VulkanTest(ResizeWallBuffers(), "Failed to resize wall buffers!");
 	// LoadWalls(level);
 
-	if (LockLodThreadMutex() != 0)
-	{
-		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
-		return false;
-	}
+	LockLodThreadMutex();
 	loadedLevel = level;
 	if (!VK_UpdateActors(&level->actors, true))
 	{
 		VulkanLogError("Failed to load actors!");
 	}
-	if (UnlockLodThreadMutex() != 0)
-	{
-		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
-		return false;
-	}
+	UnlockLodThreadMutex();
 	return true;
 }
 
@@ -150,11 +142,7 @@ VkResult VK_FrameStart()
 		return VK_NOT_READY;
 	}
 
-	if (LockLodThreadMutex() != 0)
-	{
-		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
+	LockLodThreadMutex();
 
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = swapChainExtent,
@@ -162,11 +150,7 @@ VkResult VK_FrameStart()
 	};
 	VulkanTestResizeSwapchain(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
 
-	if (UnlockLodThreadMutex() != 0)
-	{
-		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
+	UnlockLodThreadMutex();
 
 	buffers.ui.vertices.bytesUsed = 0;
 	buffers.ui.indices.bytesUsed = 0;
@@ -195,11 +179,7 @@ VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel 
 	pushConstants.yaw = JPH_Quat_GetRotationAngle(&camera->transform.rotation, &Vector3_AxisY) + 1.5f * PIf;
 	UpdateTransformMatrix(camera);
 
-	if (LockLodThreadMutex() != 0)
-	{
-		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
+	LockLodThreadMutex();
 
 	VulkanTestReturnResult(lunaPushConstants(pipelines.walls), "Failed to push constants!");
 
@@ -483,11 +463,7 @@ VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel 
 	}
 #endif
 
-	if (UnlockLodThreadMutex() != 0)
-	{
-		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
+	UnlockLodThreadMutex();
 
 	return VK_SUCCESS;
 }
@@ -521,11 +497,7 @@ VkResult VK_FrameEnd()
 		lunaWriteDataToBuffer(buffers.ui.indices.buffer, buffers.ui.indices.data, buffers.ui.indices.bytesUsed, 0);
 	}
 
-	if (LockLodThreadMutex() != 0)
-	{
-		LogError("Failed to lock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
+	LockLodThreadMutex();
 
 	if (buffers.ui.indices.bytesUsed > 0)
 	{
@@ -577,11 +549,7 @@ VkResult VK_FrameEnd()
 	lunaEndRenderPass();
 
 	VulkanTestResizeSwapchain(lunaPresentSwapchain(), "Failed to present swapchain!");
-	if (UnlockLodThreadMutex() != 0)
-	{
-		LogError("Failed to unlock LOD thread mutex with error: %s", SDL_GetError());
-		return VK_ERROR_UNKNOWN;
-	}
+	UnlockLodThreadMutex();
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return VK_SUCCESS;

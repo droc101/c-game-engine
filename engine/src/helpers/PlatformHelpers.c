@@ -5,7 +5,7 @@
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdlib.h>
 #include <unistd.h>
 

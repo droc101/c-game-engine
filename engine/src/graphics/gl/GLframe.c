@@ -8,7 +8,7 @@
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -179,7 +179,7 @@ inline void GL_UpdateViewportSize()
 {
 	int vpWidth = 0;
 	int vpHeight = 0;
-	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
+	SDL_GetWindowSizeInPixels(GetGameWindow(), &vpWidth, &vpHeight);
 	glViewport(0, 0, vpWidth, vpHeight);
 
 	GLint boundRbo = GL_NONE;

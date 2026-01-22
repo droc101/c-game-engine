@@ -9,12 +9,12 @@ void LodThreadInit();
 
 void LodThreadDestroy();
 
-int SignalLodThreadCanStart();
+void SignalLodThreadCanStart();
 
-int WaitForLodThreadToEnd();
+void WaitForLodThreadToEnd();
 
-int LockLodThreadMutex();
+void LockLodThreadMutex();
 
-int UnlockLodThreadMutex();
+void UnlockLodThreadMutex();
 
 #endif //LODTHREAD_H

@@ -18,9 +18,9 @@
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,11 +39,11 @@ void LevelSelectStateUpdate(GlobalState * /*state*/)
 	}
 	if (levelList.length > 1)
 	{
-		if (IsKeyJustPressed(SDL_SCANCODE_DOWN) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
+		if (IsKeyJustPressed(SDL_SCANCODE_DOWN) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_DOWN))
 		{
 			selectedLevel--;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
-		} else if (IsKeyJustPressed(SDL_SCANCODE_UP) || IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_UP))
+		} else if (IsKeyJustPressed(SDL_SCANCODE_UP) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_UP))
 		{
 			selectedLevel++;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
@@ -129,7 +129,7 @@ void LevelSelectStateSet()
 					  NULL,
 					  GAME_STATE_LEVEL_SELECT,
 					  LevelSelectStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void LevelSelectStateDestroy()

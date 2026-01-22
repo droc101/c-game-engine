@@ -14,8 +14,8 @@
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "gameState/OptionsState.h"
@@ -133,7 +133,7 @@ void SoundOptionsStateSet()
 					  NULL,
 					  GAME_STATE_SOUND_OPTIONS,
 					  SoundOptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void SoundOptionsStateDestroy()

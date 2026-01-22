@@ -11,11 +11,11 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <errno.h>
-#include <SDL_error.h>
-#include <SDL_messagebox.h>
-#include <SDL_mouse.h>
-#include <SDL_stdinc.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_messagebox.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_video.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -41,7 +41,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	if (GetGameWindow() != NULL)
 	{
 		GetState()->freezeEvents = true;
-		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_SetWindowRelativeMouseMode(GetGameWindow(), false);
 	}
 
 	char messageBuffer[256];
@@ -66,14 +66,14 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 #endif
 
 	SDL_MessageBoxButtonData buttons[buttonCount];
-	buttons[0].buttonid = 0;
+	buttons[0].buttonID = 0;
 	buttons[0].text = "Exit";
 	buttons[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-	buttons[1].buttonid = 1;
+	buttons[1].buttonID = 1;
 	buttons[1].text = "Restart";
 	buttons[1].flags = 0;
 #ifdef BUILDSTYLE_DEBUG
-	buttons[2].buttonid = 2;
+	buttons[2].buttonID = 2;
 	buttons[2].text = "Debug";
 	buttons[2].flags = 0;
 #endif
@@ -133,10 +133,10 @@ void PromptRelaunch(const char *title, const char *description, const char *yesB
 	mb.title = title;
 
 	SDL_MessageBoxButtonData buttons[2];
-	buttons[0].buttonid = 0;
+	buttons[0].buttonID = 0;
 	buttons[0].text = noBtn;
 	buttons[0].flags = 0;
-	buttons[1].buttonid = 1;
+	buttons[1].buttonID = 1;
 	buttons[1].text = yesBtn;
 	buttons[1].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
 
@@ -174,10 +174,10 @@ _Noreturn void RenderInitError()
 
 	mb.numbuttons = 2;
 	SDL_MessageBoxButtonData buttons[2];
-	buttons[0].buttonid = 0;
+	buttons[0].buttonID = 0;
 	buttons[0].text = GetState()->options.renderer == RENDERER_OPENGL ? "Try Vulkan" : "Try OpenGL";
 	buttons[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-	buttons[1].buttonid = 1;
+	buttons[1].buttonID = 1;
 	buttons[1].text = "Exit";
 	buttons[1].flags = 0;
 
@@ -253,17 +253,17 @@ void ErrorHandlerInit()
 #endif
 }
 
-inline void TestSDLFunction_NonFatal(const int result, const char *message)
+inline void TestSDLFunction_NonFatal(const bool result, const char *message)
 {
-	if (result != 0)
+	if (!result)
 	{
 		LogError("%s: %s\n", message, SDL_GetError());
 	}
 }
 
-inline void TestSDLFunction(const int result, const char *message, const char *userMessage)
+inline void TestSDLFunction(const bool result, const char *message, const char *userMessage)
 {
-	if (result != 0)
+	if (!result)
 	{
 		LogError("%s: %s\n", message, SDL_GetError());
 		Error((char *)userMessage);

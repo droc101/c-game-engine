@@ -6,7 +6,7 @@
 #define GAME_LIST_H
 
 #include <assert.h>
-#include <SDL_mutex.h>
+#include <SDL3/SDL_mutex.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -49,7 +49,7 @@ struct LockingList
 	/// The number of slots that are actually in use
 	size_t length;
 	/// The mutex used to ensure synchronization across threads
-	SDL_mutex *mutex;
+	SDL_Mutex *mutex;
 };
 
 

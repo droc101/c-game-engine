@@ -8,8 +8,8 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <limits.h>
-#include <SDL_error.h>
-#include <SDL_mutex.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_mutex.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -382,22 +382,14 @@ void _ListLock(const LockingList *list)
 {
 	assert(list);
 	// TODO: Explodes on arm64 when the quit button is pressed
-	if (SDL_LockMutex(list->mutex) < 0)
-	{
-		LogError("Failed to lock list mutex with error: %s\n", SDL_GetError());
-		Error("Failed to lock list mutex!");
-	}
+	SDL_LockMutex(list->mutex); // SDL3: this function cannot fail
 }
 
 
 void _ListUnlock(const LockingList *list)
 {
 	assert(list);
-	if (SDL_UnlockMutex(list->mutex) < 0)
-	{
-		LogError("Failed to unlock list mutex with error: %s\n", SDL_GetError());
-		Error("Failed to unlock list mutex!");
-	}
+	SDL_UnlockMutex(list->mutex); // SDL3: this function cannot fail
 }
 
 

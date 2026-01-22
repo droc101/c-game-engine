@@ -10,9 +10,9 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -189,7 +189,7 @@ bool ProcessUiStack(UiStack *stack)
 
 	// process tab and shift+tab to cycle through controls
 	if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && !IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
-		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
+		IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_DOWN))
 	{
 		if (stack->focusedControl == -1u)
 		{
@@ -199,7 +199,7 @@ bool ProcessUiStack(UiStack *stack)
 			SetFocusedControl(stack, (stack->focusedControl + 1) % stack->controls.length);
 		}
 	} else if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
-			   IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_UP))
+			   IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_UP))
 	{
 		if (stack->focusedControl == -1u || stack->focusedControl == 0)
 		{
