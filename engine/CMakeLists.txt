@@ -159,7 +159,7 @@ target_sources(engine INTERFACE
         src/structs/ActorWall.c
         include/engine/structs/ActorWall.h
         include/engine/structs/Item.h
-        engine/src/structs/Item.c
+        src/structs/Item.c
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h
