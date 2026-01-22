@@ -182,6 +182,15 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		AddActor(leaf);
 	}
 
+	// TODO proper UI for switching items
+	if (IsKeyJustPressedPhys(SDL_SCANCODE_Q))
+	{
+		PreviousItem();
+	} else if (IsKeyJustPressedPhys(SDL_SCANCODE_E))
+	{
+		NextItem();
+	}
+
 	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->map->physicsSystem,
 																   deltaTime,
 																   2,

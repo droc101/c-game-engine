@@ -95,15 +95,38 @@ void SwitchToItem(const ItemDefinition *definition)
 		Item *item = ListGetPointer(state.saveData->items, i);
 		if (item->definition == definition)
 		{
+			Item *previousItem = GetItem();
+			if (previousItem)
+			{
+				previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
+			}
 			state.saveData->currentItem = i;
 			if (state.map)
 			{
-				definition->Switch(item, &state.map->viewmodel);
+				definition->SwitchTo(item, &state.map->viewmodel);
 			}
 			return;
 		}
 	}
 	LogWarning("Was instructed to switch to an item that the player does not have!\n");
+}
+
+void NextItem()
+{
+	if (state.saveData->currentItem < state.saveData->items.length - 1)
+	{
+		const Item *next = ListGetPointer(state.saveData->items, state.saveData->currentItem + 1);
+		SwitchToItem(next->definition);
+	}
+}
+
+void PreviousItem()
+{
+	if (state.saveData->currentItem > 0)
+	{
+		const Item *next = ListGetPointer(state.saveData->items, state.saveData->currentItem - 1);
+		SwitchToItem(next->definition);
+	}
 }
 
 void SetStateCallbacks(const FrameUpdateFunction UpdateGame,

@@ -305,7 +305,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 		{
 			player->heldActor = NULL;
 			player->hasHeldActor = false;
-			crosshairColor = COLOR(0xFFFFCCCC);
+			crosshairColor = CROSSHAIR_COLOR_NORMAL;
 		} else
 		{
 			Vector3 heldActorPosition;
@@ -318,7 +318,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
-				crosshairColor = COLOR(0xFFFFCCCC);
+				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			} else
 			{
 				Vector3 forward;
@@ -365,11 +365,19 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 					if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) ||
 						IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
 					{
-						item->definition->PrimaryAction(item);
+						item->definition->PrimaryActionDown(item);
+					} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_LEFT) ||
+							   IsButtonJustReleasedPhys(SDL_CONTROLLER_BUTTON_X))
+					{
+						item->definition->PrimaryActionUp(item);
 					} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) ||
 							   IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_Y))
 					{
-						item->definition->SecondaryAction(item);
+						item->definition->SecondaryActionDown(item);
+					} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_RIGHT) ||
+							   IsButtonJustReleasedPhys(SDL_CONTROLLER_BUTTON_Y))
+					{
+
 					}
 				}
 			}
@@ -379,21 +387,21 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
 					(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
 				{
-					crosshairColor = COLOR(0xFF006600);
+					crosshairColor = CROSSHAIR_COLOR_HOLDABLE;
 					if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_A))
 					{
 						player->heldActor = player->targetedActor;
 						player->hasHeldActor = true;
-						crosshairColor = COLOR(0x00FF0000);
+						crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
 					}
 				} else
 				{
-					crosshairColor = COLOR(0xFFFFCCCC);
+					crosshairColor = CROSSHAIR_COLOR_NORMAL;
 				}
 			}
 		} else
 		{
-			crosshairColor = COLOR(0xFFFFCCCC);
+			crosshairColor = CROSSHAIR_COLOR_NORMAL;
 		}
 	}
 	if (IsKeyJustReleasedPhys(SDL_SCANCODE_V))

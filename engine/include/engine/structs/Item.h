@@ -28,18 +28,37 @@ typedef bool (*ItemUseFunction)(Item *this);
 
 struct ItemDefinition
 {
+	/// The display name of this item type
+	const char *name;
+
+	/// Called when the player is given this item
 	ItemConstructFunction Construct;
+	/// TODO: call this when global state is being destroyed
 	ItemDestructFunction Destruct;
 
+	/// Called once per tick when this item is active
 	ItemFixedUpdateFunction FixedUpdate;
+	/// Called once per frame when this item is active
 	ItemUpdateFunction Update;
+	/// Called once per frame when this item is active, during HUD drawing
 	ItemHudRenderFunction RenderHud;
 
+	/// Called to check if this item can handle the targeted actor. Set the crosshair color if it can.
 	ItemCanTargetFunction CanTarget;
 
-	ItemSwitchFunction Switch;
-	ItemUseFunction PrimaryAction;
-	ItemUseFunction SecondaryAction;
+	/// Called when the player switches to this item (including on map load)
+	ItemSwitchFunction SwitchTo;
+	/// Called when the player switches away from this item
+	ItemSwitchFunction SwitchFrom;
+
+	/// Called when the player begins to press the primary action (lclick)
+	ItemUseFunction PrimaryActionDown;
+	/// Called when the player releases the primary action (does NOT get called if the item is switched away during action)
+	ItemUseFunction PrimaryActionUp;
+	/// Called when the player begins to press the secondary action (rclick)
+	ItemUseFunction SecondaryActionDown;
+	/// Called when the player releases the secondary action (does NOT get called if the item is switched away during action)
+	ItemUseFunction SecondaryActionUp;
 };
 
 struct Item
@@ -60,7 +79,9 @@ bool DefaultItemCanTargetFunction(Item *this, Actor *targetedActor, Color *cross
 
 void DefaultItemHudRenderFunction(Item *this);
 
-void DefaultItemSwitchFunction(Item *this, Viewmodel *viewmodel);
+void DefaultItemSwitchToFunction(Item *this, Viewmodel *viewmodel);
+
+void DefaultItemSwitchFromFunction(Item *this, Viewmodel *viewmodel);
 
 bool DefaultItemUseFunction(Item *this);
 

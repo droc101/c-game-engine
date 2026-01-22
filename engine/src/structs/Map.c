@@ -50,7 +50,7 @@ Map *CreateMap(void)
 	Item *item = GetItem();
 	if (item)
 	{
-		item->definition->Switch(item, &map->viewmodel);
+		item->definition->SwitchTo(item, &map->viewmodel);
 	} else
 	{
 		map->viewmodel.enabled = false;

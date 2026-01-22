@@ -46,10 +46,16 @@ void DefaultItemHudRenderFunction(Item *this)
 	(void)this;
 }
 
-void DefaultItemSwitchFunction(Item *this, Viewmodel *viewmodel)
+void DefaultItemSwitchToFunction(Item *this, Viewmodel *viewmodel)
 {
 	(void)this;
 	viewmodel->enabled = false;
+}
+
+void DefaultItemSwitchFromFunction(Item *this, Viewmodel *viewmodel)
+{
+	(void)this;
+	(void)viewmodel;
 }
 
 bool DefaultItemUseFunction(Item *this)

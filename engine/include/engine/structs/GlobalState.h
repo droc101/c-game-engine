@@ -108,6 +108,10 @@ void GiveItem(const ItemDefinition *definition, bool switchToItem);
 
 void SwitchToItem(const ItemDefinition *definition);
 
+void PreviousItem();
+
+void NextItem();
+
 /**
  * Set game state callbacks
  * @param UpdateGame update callback

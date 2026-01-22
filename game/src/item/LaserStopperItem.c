@@ -1,7 +1,8 @@
 //
-// Created by droc101 on 1/21/26.
+// Created by droc101 on 1/22/26.
 //
 
+#include <actor/LaserEmitter.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/helpers/MathEx.h>
@@ -10,26 +11,22 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
-#include <item/EraserItem.h>
+#include <item/LaserStopperItem.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <wchar.h>
 
-static void EraserItemSwitchFunction(Item *this, Viewmodel *viewmodel)
+static void LaserStopperItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 {
 	(void)this;
-	viewmodel->enabled = true;
-	viewmodel->transform.position.x = 0.5f;
-	viewmodel->enabled = true;
-	viewmodel->model = LoadModel(MODEL("eraser"));
-	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &viewmodel->transform.rotation);
+	viewmodel->enabled = false;
 }
 
-static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor)
+static bool LaserStopperItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor)
 {
 	(void)this;
-	if ((targetedActor->actorFlags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
+	if (targetedActor->definition->actorType == ACTOR_TYPE_LASER_EMITTER)
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 		return true;
@@ -37,18 +34,17 @@ static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color 
 	return false;
 }
 
-static bool EraserItemPrimaryAction(Item *this)
+static bool LaserStopperItemPrimaryAction(Item *this)
 {
 	(void)this;
 	const GlobalState *state = GetState();
-	RemoveActor(state->map->player.targetedActor);
-	state->map->player.targetedActor = NULL;
+	ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_OFF, &PARAM_NONE);
 	// crosshairColor = CROSSHAIR_COLOR_NORMAL;
 	return true;
 }
 
-const ItemDefinition eraserItemDefinition = {
-	.name = "Eraser",
+const ItemDefinition laserStopperItemDefinition = {
+	.name = "Laser Stopper 3000",
 	.Construct = DefaultItemConstruct,
 	.Destruct = DefaultItemDestruct,
 
@@ -56,12 +52,12 @@ const ItemDefinition eraserItemDefinition = {
 	.Update = DefaultItemUpdateFunction,
 	.RenderHud = DefaultItemHudRenderFunction,
 
-	.CanTarget = EraserItemCanTargetFunction,
+	.CanTarget = LaserStopperItemCanTargetFunction,
 
-	.SwitchTo = EraserItemSwitchFunction,
+	.SwitchTo = LaserStopperItemSwitchFunction,
 	.SwitchFrom = DefaultItemSwitchFromFunction,
 
-	.PrimaryActionDown = EraserItemPrimaryAction,
+	.PrimaryActionDown = LaserStopperItemPrimaryAction,
 	.PrimaryActionUp = DefaultItemUseFunction,
 	.SecondaryActionDown = DefaultItemUseFunction,
 	.SecondaryActionUp = DefaultItemUseFunction,
