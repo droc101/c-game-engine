@@ -9,8 +9,15 @@ detect_platform()
 
 #region Dependencies
 
-find_package(SDL3 CONFIG REQUIRED)
-find_package(SDL3_mixer REQUIRED)
+disable_options(SDL_GPU_DEFAULT SDL_Render_DEFAULT SDL_Camera_DEFAULT SDL_Haptic_DEFAULT SDL_Hidapi_DEFAULT
+        SDL_Power_DEFAULT SDL_Sensor_DEFAULT SDL_Dialog_DEFAULT SDL_Tray_DEFAULT)
+fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
+disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
+        SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK SDL_AVX
+        SDL_AVX2 SDL_AVX512F SDL_SSE3 SDL_SSE4_1 SDL_SSE4_2 SDL_DISKAUDIO SDL_DUMMYAUDIO SDL_DUMMYVIDEO
+        SDL_OPENGLES SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK)
+enable_options(SDL_CCACHE)
+fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git prerelease-3.*.* SDL3_mixer)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -24,12 +31,12 @@ if (x86_64)
 endif ()
 
 message(STATUS "Fetching CGLM...")
-set(CGLM_SHARED OFF)
-set(CGLM_STATIC ON)
+option(CGLM_SHARED OFF)
+option(CGLM_STATIC ON)
 fetch_package_tag(https://github.com/recp/cglm.git v0.*.* cglm)
 
 if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(JPH_BUILD_TYPE RelWithDebInfo)
+    option(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
 message(STATUS "Fetching JoltC/Jolt...")
 fetch_package(https://github.com/NBT22/joltc main joltc)
@@ -220,7 +227,7 @@ if (JOLT_BUILD_ENABLE_ASSERTS)
 endif ()
 target_link_libraries(engine INTERFACE
         SDL3::SDL3
-        SDL3_mixer
+        SDL3_mixer::SDL3_mixer
         ZLIB::ZLIB
         joltc
         cglm

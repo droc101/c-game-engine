@@ -1,16 +1,16 @@
 macro(enable_options)
     foreach (OPTION_TO_SET IN ITEMS ${ARGN})
-        set(${OPTION_TO_SET} ON CACHE BOOL "" FORCE)
+        option(${OPTION_TO_SET} ON)
     endforeach ()
 endmacro()
 
 macro(disable_options)
     foreach (OPTION_TO_SET IN ITEMS ${ARGN})
-        set(${OPTION_TO_SET} OFF CACHE BOOL "" FORCE)
+        option(${OPTION_TO_SET} OFF)
     endforeach ()
 endmacro()
 
-macro(detect_platform)
+function(detect_platform)
     include(CheckCSourceCompiles)
     set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
     check_c_source_compiles("
@@ -34,7 +34,7 @@ macro(detect_platform)
     if (NOT CMAKE_C_BYTE_ORDER STREQUAL "LITTLE_ENDIAN")
         message(FATAL_ERROR "GAME only supports little endian systems")
     endif ()
-endmacro()
+endfunction()
 
 function(enable_lto)
     include(CheckIPOSupported)
