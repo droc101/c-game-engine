@@ -36,6 +36,19 @@
       "minimum": 0.0,
       "maximum": 1.0,
       "description": "The volume of this sound, where 0 is silent and 1 is maximum volume"
+    },
+    "preload": {
+      "display": "Predecode sound",
+      "description": "Decode the entire sound before playing it. This should be set to false for music or other long sounds.",
+      "type": "bool",
+      "default": true
+    },
+    "category": {
+      "display": "Sound Category",
+      "description": "This determines what volume slider this sound respects",
+      "default": "Sound Effect",
+      "type": "byte",
+      "options": "sound_category"
     }
   }
 }

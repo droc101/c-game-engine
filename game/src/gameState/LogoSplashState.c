@@ -22,7 +22,7 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 {
 	if (state->physicsFrame == 20)
 	{
-		(void)PlaySound(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/coincling"), SOUND_CATEGORY_SFX);
 	}
 
 	if (state->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_GAMEPAD_BUTTON_START))

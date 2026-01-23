@@ -12,22 +12,31 @@
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_stdinc.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-// TODO it doesnt work. completely silent.
-
 struct SoundChannel
 {
-	MIX_Audio *chunk;
+	/// The audio playing on this channel
+	MIX_Audio *audio;
+	/// The track this audio is playing on
 	MIX_Track *track;
+	/// The index of the channel this audio is playing on
 	uint8_t channelIndex;
+
+	/// The function to call when this channel finishes
 	SoundFinishedCallback callback;
+	/// The data to pass to @c callback
 	void *callbackData;
+
+	/// The original volume of this channel, unmodified by user volume settings
 	float originalVolume;
+	/// The sound category of this channel
+	SoundCategory category;
 };
 
 struct SoundSystem
@@ -37,11 +46,9 @@ struct SoundSystem
 	/// Whether the audio system has been started successfully
 	bool isAudioStarted;
 	/// sound tracks/channels
-	MIX_Track *tracks[SFX_CHANNEL_COUNT];
+	MIX_Track *tracks[SOUND_SYSTEM_CHANNEL_COUNT];
 	/// currently playing sounds
-	SoundChannel *sounds[SFX_CHANNEL_COUNT];
-	/// The user's chosen sound effect volume
-	float sfxVolume;
+	SoundChannel *channels[SOUND_SYSTEM_CHANNEL_COUNT];
 };
 
 SoundSystem soundSys;
@@ -49,7 +56,7 @@ SoundSystem soundSys;
 /**
  * callback for when a channel finishes playing (so we can free it)
  */
-void ChannelFinished(void *userdata, MIX_Track *track)
+void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 {
 	if (!userdata)
 	{
@@ -61,8 +68,8 @@ void ChannelFinished(void *userdata, MIX_Track *track)
 	{
 		effect->callback(effect->callbackData);
 	}
-	MIX_DestroyAudio(effect->chunk);
-	soundSys.sounds[effect->channelIndex] = NULL;
+	MIX_DestroyAudio(effect->audio);
+	soundSys.channels[effect->channelIndex] = NULL;
 	free(effect);
 }
 
@@ -75,27 +82,30 @@ void InitSoundSystem()
 		soundSys.isAudioStarted = false;
 		return;
 	}
+
 	int numAudioDevices = 0;
-	SDL_GetAudioPlaybackDevices(&numAudioDevices);
+	SDL_AudioDeviceID *devices = SDL_GetAudioPlaybackDevices(&numAudioDevices);
+	SDL_free(devices); // SDL, why did you remove the function that just got the count with no funny stuff
 	if (numAudioDevices == 0)
 	{
 		soundSys.isAudioStarted = false;
 		LogWarning("Not starting sound system because there are no output devices.\n");
 		return;
 	}
+
 	soundSys.mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
 	if (!soundSys.mixer)
 	{
 		soundSys.isAudioStarted = false;
-		LogError("Mix_OpenAudio Error: %s\n", SDL_GetError());
+		LogError("MIX_CreateMixerDevice Error: %s\n", SDL_GetError());
 	} else
 	{
 		soundSys.isAudioStarted = true;
 	}
 
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
+	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		soundSys.sounds[i] = NULL;
+		soundSys.channels[i] = NULL;
 		soundSys.tracks[i] = MIX_CreateTrack(soundSys.mixer);
 		if (!soundSys.tracks[i])
 		{
@@ -105,6 +115,7 @@ void InitSoundSystem()
 		}
 		MIX_SetTrackStoppedCallback(soundSys.tracks[i], NULL, NULL);
 	}
+
 	UpdateVolume();
 }
 
@@ -115,14 +126,14 @@ void DestroySoundSystem()
 	// free sound effects
 	if (soundSys.isAudioStarted)
 	{
-		for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
+		for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 		{
-			SoundChannel *channel = soundSys.sounds[i];
+			SoundChannel *channel = soundSys.channels[i];
 			if (channel)
 			{
 				MIX_SetTrackStoppedCallback(channel->track, NULL, NULL);
 				MIX_StopTrack(channel->track, 0);
-				MIX_DestroyAudio(channel->chunk);
+				MIX_DestroyAudio(channel->audio);
 				free(channel);
 			}
 		}
@@ -132,17 +143,33 @@ void DestroySoundSystem()
 	MIX_Quit();
 }
 
+float GetCategoryVolume(const SoundCategory category)
+{
+	float categoryVolumeMultiplier = 1.0f;
+	switch (category)
+	{
+		case SOUND_CATEGORY_MUSIC:
+			categoryVolumeMultiplier = GetState()->options.musicVolume;
+			break;
+		case SOUND_CATEGORY_SFX:
+			categoryVolumeMultiplier = GetState()->options.sfxVolume;
+			break;
+		case SOUND_CATEGORY_UI:
+			categoryVolumeMultiplier = GetState()->options.uiVolume;
+			break;
+	}
+
+	return categoryVolumeMultiplier * GetState()->options.masterVolume;
+}
+
 void UpdateVolume()
 {
-	const float sfxVol = GetState()->options.sfxVolume * GetState()->options.masterVolume;
-	const float musicVol = GetState()->options.musicVolume * GetState()->options.masterVolume;
-	soundSys.sfxVolume = sfxVol;
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
+	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		const SoundChannel *effect = soundSys.sounds[i];
+		const SoundChannel *effect = soundSys.channels[i];
 		if (effect)
 		{
-			const float mixedVolume = effect->originalVolume * sfxVol;
+			const float mixedVolume = effect->originalVolume * GetCategoryVolume(effect->category);
 			MIX_SetTrackGain(effect->track, mixedVolume);
 		}
 	}
@@ -150,11 +177,11 @@ void UpdateVolume()
 
 MIX_Track *FindAvailableTrack(uint8_t *index)
 {
-	for (int i = 0; i < SFX_CHANNEL_COUNT; i++)
+	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		if (!MIX_TrackPlaying(soundSys.tracks[i]))
 		{
-			if (soundSys.sounds[i] != NULL)
+			if (soundSys.channels[i] != NULL)
 			{
 				LogWarning("SoundSystem: MIX_TrackPlaying desynced with soundSys.effects NULL slots!\n");
 				continue;
@@ -169,17 +196,27 @@ MIX_Track *FindAvailableTrack(uint8_t *index)
 	return NULL;
 }
 
-SoundChannel *PlaySound(const char *asset,
-						const int loops,
-							 const float volume,
-							 const SoundFinishedCallback callback,
-							 void *callbackData)
+SoundChannel *PlaySound(const char *soundAsset, const SoundCategory category)
+{
+	const SoundRequest request = {
+		.soundAsset = soundAsset,
+		.category = category,
+		.volume = 1.0f,
+		.completionCallback = NULL,
+		.completionCallbackData = NULL,
+		.numLoops = 0,
+		.preload = false,
+	};
+	return PlaySoundEx(&request);
+}
+
+SoundChannel *PlaySoundEx(const SoundRequest *request)
 {
 	if (!soundSys.isAudioStarted)
 	{
 		return NULL;
 	}
-	const Asset *wav = DecompressAsset(asset, true);
+	const Asset *wav = DecompressAsset(request->soundAsset, true);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");
@@ -187,19 +224,16 @@ SoundChannel *PlaySound(const char *asset,
 	}
 	if (wav->type != ASSET_TYPE_WAV)
 	{
-		LogError("PlaySoundEffect Error: Asset is not a sound effect file.\n");
+		LogError("PlaySoundEx Error: Asset is not a sound effect file.\n");
 		return NULL;
 	}
-	SDL_IOStream *stream = SDL_IOFromMem(wav->data, wav->size);
+	SDL_IOStream *stream = SDL_IOFromConstMem(wav->data, wav->size);
 	if (!stream)
 	{
 		LogError("SDL_IOFromConstMem Error: %s\n", SDL_GetError());
 		return NULL;
 	}
-	MIX_Audio *audio = MIX_LoadAudio_IO(soundSys.mixer,
-										stream,
-										true,
-										true); // TODO predecode should be an arg to PlaySoundEffect
+	MIX_Audio *audio = MIX_LoadAudio_IO(soundSys.mixer, stream, request->preload, true);
 	if (audio == NULL)
 	{
 		LogError("MIX_LoadAudio_IO Error: %s\n", SDL_GetError());
@@ -209,25 +243,26 @@ SoundChannel *PlaySound(const char *asset,
 	MIX_Track *track = FindAvailableTrack(&index);
 	if (!track)
 	{
-		LogError("PlaySoundEffect Error: No available channels.\n");
+		LogError("PlaySoundEffect Error: No available tracks.\n");
 		MIX_DestroyAudio(audio);
 		return NULL;
 	}
 
 	SoundChannel *effect = malloc(sizeof(SoundChannel));
 	CheckAlloc(effect);
-	soundSys.sounds[index] = effect;
-	effect->chunk = audio;
+	soundSys.channels[index] = effect;
+	effect->audio = audio;
 	effect->track = track;
 	effect->channelIndex = index;
-	effect->callback = callback;
-	effect->callbackData = callbackData;
-	effect->originalVolume = volume;
-	SDL_PropertiesID props = SDL_CreateProperties();
-	SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, loops);
+	effect->category = request->category;
+	effect->callback = request->completionCallback;
+	effect->callbackData = request->completionCallbackData;
+	effect->originalVolume = request->volume;
+	const SDL_PropertiesID props = SDL_CreateProperties();
+	SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, request->numLoops);
 	MIX_SetTrackAudio(track, audio);
-	MIX_SetTrackGain(track,
-					 volume * soundSys.sfxVolume); // TODO distinction between sound categories (music vs sfx right now)
+	const float volume = request->volume * GetCategoryVolume(request->category);
+	MIX_SetTrackGain(track, volume);
 	MIX_SetTrackStoppedCallback(track, ChannelFinished, effect);
 	if (!MIX_PlayTrack(track, props))
 	{
@@ -252,6 +287,6 @@ inline void StopSound(const SoundChannel *effect)
 {
 	if (!MIX_StopTrack(effect->track, 0)) // TODO argument for fade_out_frames?
 	{
-		LogError("Mix_HaltChannel failed: %s", SDL_GetError());
+		LogError("MIX_StopTrack failed: %s", SDL_GetError());
 	}
 }

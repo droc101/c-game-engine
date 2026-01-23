@@ -69,7 +69,7 @@ void MainStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_START))
 	{
-		(void)PlaySound(SOUND("sfx/popup"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/popup"), SOUND_CATEGORY_UI);
 		PauseStateSet();
 		return;
 	}

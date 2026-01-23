@@ -52,7 +52,7 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_
 	const ButtonData *data = (ButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
-		(void)PlaySound(SOUND("sfx/click"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		ConsumeMouseButton(SDL_BUTTON_LEFT);
 		ConsumeKey(SDL_SCANCODE_SPACE);
 		ConsumeButton(CONTROLLER_OK);

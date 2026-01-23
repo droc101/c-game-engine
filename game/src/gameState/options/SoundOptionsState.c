@@ -45,6 +45,12 @@ void SldOptionsSfxVolume(const float value)
 	UpdateVolume();
 }
 
+void SldOptionsUiVolume(const float value)
+{
+	GetState()->options.uiVolume = value;
+	UpdateVolume();
+}
+
 void SoundOptionsStateUpdate(GlobalState * /*state*/)
 {
 	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
@@ -118,6 +124,19 @@ void SoundOptionsStateSet()
 										0.0,
 										1.0,
 										GetState()->options.sfxVolume,
+										0.01,
+										0.1,
+										SliderLabelPercent));
+		opY += opSpacing;
+		UiStackPush(soundOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"UI Volume",
+										SldOptionsUiVolume,
+										TOP_CENTER,
+										0.0,
+										1.0,
+										GetState()->options.uiVolume,
 										0.01,
 										0.1,
 										SliderLabelPercent));

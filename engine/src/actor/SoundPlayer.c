@@ -10,6 +10,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <joltc/Math/Transform.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +22,8 @@ typedef struct SoundPlayerData
 	SoundChannel *effect;
 	int loops;
 	float volume;
+	bool preload;
+	SoundCategory category;
 } SoundPlayerData;
 
 static void SoundPlayerSoundDone(void *pData)
@@ -44,7 +47,16 @@ static void SoundPlayerDestroy(Actor *this)
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	SoundPlayerData *data = this->extraData;
-	data->effect = PlaySound(data->asset, data->loops, data->volume, SoundPlayerSoundDone, data);
+	const SoundRequest request = {
+		.soundAsset = data->asset,
+		.category = data->category,
+		.volume = data->volume,
+		.completionCallback = SoundPlayerSoundDone,
+		.completionCallbackData = data,
+		.numLoops = data->loops,
+		.preload = data->preload,
+	};
+	data->effect = PlaySoundEx(&request);
 }
 
 static void SoundPlayerPauseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
@@ -75,6 +87,8 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	sprintf(data->asset, SOUND("%s"), soundAsset);
 	data->loops = KvGetInt(params, "loops", 0);
 	data->volume = KvGetFloat(params, "volume", 1);
+	data->preload = KvGetBool(params, "preload", false);
+	data->category = KvGetByte(params, "category", SOUND_CATEGORY_SFX);
 	this->extraData = data;
 }
 

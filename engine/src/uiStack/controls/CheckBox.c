@@ -54,7 +54,7 @@ void UpdateCheckbox(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint3
 
 	if (HasActivation(stack, c))
 	{
-		(void)PlaySound(SOUND("sfx/click"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		data->checked = !data->checked;
 
 		ConsumeMouseButton(SDL_BUTTON_LEFT);

@@ -33,7 +33,7 @@ struct ItemDefinition
 
 	/// Called when the player is given this item
 	ItemConstructFunction Construct;
-	/// TODO: call this when global state is being destroyed
+	/// Called when global state is being destroyed
 	ItemDestructFunction Destruct;
 
 	/// Called once per tick when this item is active

@@ -82,6 +82,8 @@ struct Options
 	float musicVolume;
 	/// The volume of the sound effects
 	float sfxVolume;
+	/// The volume of UI sounds
+	float uiVolume;
 	/// The master volume
 	float masterVolume;
 } __attribute__((packed)); // This is packed because it is saved to disk
