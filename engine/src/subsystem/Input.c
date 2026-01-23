@@ -8,10 +8,9 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_haptic.h>
 #include <SDL3/SDL_joystick.h>
+#include <SDL3/SDL_properties.h>
 #include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
@@ -64,11 +63,12 @@ static Vector2 leftStick;
 static Vector2 rightStick;
 static Vector2 triggers;
 
-static SDL_Gamepad *controller;
-static SDL_Joystick *stick;
-static SDL_Haptic *haptic;
+static SDL_Gamepad *currentGamepad;
+static SDL_Joystick *currentJoystick;
+static bool gamepadHasBasicHaptics;
+static bool gamepadHasTriggerHaptics;
 
-bool FindGameController()
+bool FindGamepad()
 {
 	int numGamepads = 0;
 	SDL_JoystickID *gamepads = SDL_GetGamepads(&numGamepads);
@@ -77,26 +77,18 @@ bool FindGameController()
 		const SDL_JoystickID gamepad = gamepads[i];
 		if (SDL_IsGamepad(gamepad))
 		{
-			controller = SDL_OpenGamepad(gamepad);
-			stick = SDL_GetGamepadJoystick(controller);
-			if (SDL_IsJoystickHaptic(stick)) // TODO my controller HAS haptics WHY is this false
-			{
-				haptic = SDL_OpenHapticFromJoystick(stick);
-				if (!haptic)
-				{
-					LogError("Failed to open haptic: %s\n",
-							 SDL_GetError()); // This should never happen (if it does, SDL lied to us)
-					haptic = NULL;
-				} else if (!SDL_InitHapticRumble(haptic))
-				{
-					LogError("Failed to initialize rumble: %s\n", SDL_GetError());
-					haptic = NULL;
-				}
-			} else
-			{
-				haptic = NULL;
-			}
-			LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(controller));
+			currentGamepad = SDL_OpenGamepad(gamepad);
+			currentJoystick = SDL_GetGamepadJoystick(currentGamepad);
+			const SDL_PropertiesID gamepadProps = SDL_GetGamepadProperties(currentGamepad);
+			gamepadHasBasicHaptics = SDL_GetBooleanProperty(gamepadProps, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false);
+			gamepadHasTriggerHaptics = SDL_GetBooleanProperty(gamepadProps,
+															  SDL_PROP_GAMEPAD_CAP_TRIGGER_RUMBLE_BOOLEAN,
+															  false);
+
+			LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(currentGamepad));
+			LogDebug("Controller features basic haptics: %s\n", gamepadHasBasicHaptics ? "yes" : "no");
+			LogDebug("Controller features trigger haptics: %s\n", gamepadHasTriggerHaptics ? "yes" : "no");
+
 			SDL_free(gamepads);
 			return true;
 		}
@@ -107,42 +99,38 @@ bool FindGameController()
 
 void Rumble(const float strength, const uint32_t time)
 {
-	if (UseController() && haptic != NULL)
+	if (UseController() && gamepadHasBasicHaptics)
 	{
-		SDL_PlayHapticRumble(haptic, strength * GetState()->options.rumbleStrength, time);
+		const uint16_t uintStrength = (uint16_t)((strength * GetState()->options.rumbleStrength) * UINT16_MAX);
+		SDL_RumbleGamepad(currentGamepad, uintStrength, uintStrength, time);
 	}
 }
 
-void HandleControllerDisconnect(const SDL_JoystickID which)
+void HandleGamepadDisconnect(const SDL_JoystickID which)
 {
-	if (controller == NULL)
+	if (currentGamepad == NULL)
 	{
 		return;
 	}
-	if (SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)) != which)
+	if (SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)) != which)
 	{
 		return;
 	}
-	SDL_CloseGamepad(controller);
-	SDL_CloseJoystick(stick);
-	if (haptic)
-	{
-		SDL_CloseHaptic(haptic);
-	}
-	controller = NULL;
-	stick = NULL;
-	haptic = NULL;
-	FindGameController(); // try to find another controller
+	SDL_CloseGamepad(currentGamepad);
+	SDL_CloseJoystick(currentJoystick);
+	currentGamepad = NULL;
+	currentJoystick = NULL;
+	FindGamepad(); // try to find another controller
 }
 
-void HandleControllerConnect()
+void HandleGamepadConnect()
 {
-	if (controller)
+	if (currentGamepad)
 	{
 		// disconnect the current controller to use the new one
-		HandleControllerDisconnect(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)));
+		HandleGamepadDisconnect(SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)));
 	}
-	FindGameController();
+	FindGamepad();
 }
 
 void HandleControllerButtonUp(const SDL_GamepadButton button)
@@ -383,7 +371,7 @@ float GetAxis(const SDL_GamepadAxis axis)
 
 inline bool UseController()
 {
-	return GetState()->options.controllerMode && controller != NULL;
+	return GetState()->options.controllerMode && currentGamepad != NULL;
 }
 
 const char *GetControllerName()
@@ -392,7 +380,7 @@ const char *GetControllerName()
 	{
 		return NULL;
 	}
-	return SDL_GetGamepadName(controller);
+	return SDL_GetGamepadName(currentGamepad);
 }
 
 void InputInit()

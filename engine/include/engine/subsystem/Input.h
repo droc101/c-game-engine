@@ -27,12 +27,12 @@
  * Handles controller disconnect event
  * @param which The controller that was disconnected
  */
-void HandleControllerDisconnect(SDL_JoystickID which);
+void HandleGamepadDisconnect(SDL_JoystickID which);
 
 /**
  * Handles controller connect event
  */
-void HandleControllerConnect();
+void HandleGamepadConnect();
 
 /**
  * Handles controller button up event

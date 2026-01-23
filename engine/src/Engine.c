@@ -187,10 +187,10 @@ void HandleEvent(void)
 			SetLowFPS(false);
 			break;
 		case SDL_EVENT_GAMEPAD_ADDED:
-			HandleControllerConnect();
+			HandleGamepadConnect();
 			break;
 		case SDL_EVENT_GAMEPAD_REMOVED:
-			HandleControllerDisconnect(event.cdevice.which);
+			HandleGamepadDisconnect(event.cdevice.which);
 			break;
 		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 			HandleControllerButtonDown(event.gbutton.button);
