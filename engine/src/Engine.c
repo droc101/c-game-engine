@@ -87,7 +87,7 @@ void InitSDL()
 #ifdef SDL_PLATFORM_LINUX
 	if (GetState()->options.preferWayland)
 	{
-		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11"); // TODO: seems to be ignored with sdl2-compat
+		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11");
 	} else
 	{
 		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11,wayland");
@@ -101,8 +101,6 @@ void InitSDL()
 	}
 
 	LogInfo("SDL Video Driver: %s\n", SDL_GetCurrentVideoDriver());
-
-	// SDL_StopTextInput(GetGameWindow()); // is enabled by default on desktop TODO not anymore?
 }
 
 void WindowAndRenderInit()
@@ -132,6 +130,7 @@ void WindowAndRenderInit()
 	}
 	SetDwmWindowAttribs(window);
 	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen); // TODO exclusive vs not?
+	SDL_StopTextInput(window);
 	SetGameWindow(window);
 
 	if (!RenderInit())
@@ -360,7 +359,6 @@ void DestroyEngine()
 	SDL_DestroySurface(windowIcon);
 	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
-	// TODO reimplement
 	LogDebug("Cleaning up SDL...\n");
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();

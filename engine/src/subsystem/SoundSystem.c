@@ -83,8 +83,7 @@ void InitSoundSystem()
 		LogWarning("Not starting sound system because there are no output devices.\n");
 		return;
 	}
-	const SDL_AudioSpec spec = {.channels = 2, .freq = 48000, .format = SDL_AUDIO_S16LE};
-	soundSys.mixer = MIX_CreateMixer(&spec);
+	soundSys.mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
 	if (!soundSys.mixer)
 	{
 		soundSys.isAudioStarted = false;
