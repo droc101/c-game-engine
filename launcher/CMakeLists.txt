@@ -43,19 +43,8 @@ if (WIN32)
     )
 
     set(DLLS
-            SDL3.dll
-            SDL3_mixer.dll
             zlib1.dll
-            libmpg123-0.dll
-            libFLAC.dll
-            libopusfile-0.dll
-            libvorbisfile-3.dll
-            libwavpack-1.dll
-            libxmp.dll
-            libvorbis-0.dll
-            libogg-0.dll
             libwinpthread-1.dll
-            libopus-0.dll
             libgcc_s_seh-1.dll
             libstdc++-6.dll
     )

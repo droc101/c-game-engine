@@ -7,6 +7,7 @@
 #include <cglm/quat.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
