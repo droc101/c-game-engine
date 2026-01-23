@@ -33,7 +33,7 @@ void DefaultOptions(Options *options)
 	options->invertHorizontalCamera = false;
 	options->invertVerticalCamera = false;
 	options->controllerSwapOkCancel = false;
-	options->preferWayland = false;
+	options->preferWayland = true;
 	options->limitFpsWhenUnfocused = true;
 	options->fov = 90.0f;
 	options->anisotropy = ANISOTROPY_16X;

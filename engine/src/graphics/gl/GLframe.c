@@ -158,7 +158,7 @@ inline void GL_ClearDepthOnly()
 
 inline void GL_FrameEnd()
 {
-	const Vector2 wndSize = ActualWindowSize();
+	const Vector2 wndSize = ActualWindowSizeIgnoreDPI();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBufferObject);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_NONE);
 	glBlitFramebuffer(0,
@@ -177,10 +177,8 @@ inline void GL_FrameEnd()
 
 inline void GL_UpdateViewportSize()
 {
-	int vpWidth = 0;
-	int vpHeight = 0;
-	SDL_GetWindowSizeInPixels(GetGameWindow(), &vpWidth, &vpHeight);
-	glViewport(0, 0, vpWidth, vpHeight);
+	Vector2 windowSize = ActualWindowSizeIgnoreDPI();
+	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 
 	GLint boundRbo = GL_NONE;
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &boundRbo);
@@ -192,25 +190,25 @@ inline void GL_UpdateViewportSize()
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 								glMsaaSamples,
 								GL_COLOR_INTERNAL_FORMAT,
-								vpWidth,
-								vpHeight,
+								(GLsizei)windowSize.x,
+								(GLsizei)windowSize.y,
 								GL_TRUE);
 
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, glMsaaSamples, GL_DEPTH_FORMAT, vpWidth, vpHeight);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, glMsaaSamples, GL_DEPTH_FORMAT, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 	} else
 	{
 		glBindTexture(GL_TEXTURE_2D, framebufferColorTexture);
 		glTexImage2D(GL_TEXTURE_2D,
 					 0,
 					 GL_COLOR_INTERNAL_FORMAT,
-					 vpWidth,
-					 vpHeight,
+					 (GLsizei)windowSize.x,
+					 (GLsizei)windowSize.y,
 					 0,
 					 GL_COLOR_FORMAT,
 					 GL_COLOR_TYPE,
 					 NULL);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, vpWidth, vpHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 	}
 	glBindRenderbuffer(GL_RENDERBUFFER, boundRbo);
 }

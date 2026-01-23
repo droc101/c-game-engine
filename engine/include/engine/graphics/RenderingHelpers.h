@@ -99,6 +99,12 @@ void UpdateWindowSize();
 Vector2 ActualWindowSize();
 
 /**
+ * Get the actual size of the window, ignoring UI scale AND SYSTEM DPI SCALE
+ * @return The actual size of the window
+ */
+Vector2 ActualWindowSizeIgnoreDPI();
+
+/**
  * Get the size of a texture
  * @param texture The texture name
  * @return The size of the texture
