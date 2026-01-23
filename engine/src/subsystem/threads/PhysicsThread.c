@@ -61,7 +61,7 @@ int PhysicsThreadMain(void * /*data*/)
 			GetState()->physicsFrame++;
 			SDL_UnlockMutex(physicsThreadMutex);
 			SDL_UnlockMutex(physicsTickMutex);
-			SDL_DelayNS(PHYSICS_TARGET_NS); // pls no spin 🥺
+			SDL_DelayPrecise(PHYSICS_TARGET_NS); // pls no spin 🥺
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
@@ -81,7 +81,7 @@ int PhysicsThreadMain(void * /*data*/)
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
 			const uint64_t delayNs = (PHYSICS_TARGET_NS - timeElapsed);
-			SDL_DelayNS(delayNs);
+			SDL_DelayPrecise(delayNs);
 		}
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
