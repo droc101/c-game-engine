@@ -159,11 +159,12 @@ void WindowObscured();
  */
 void WindowRestored();
 
+void SetWindowFocused(bool val);
+
 /**
- * Enable or disable low FPS mode
- * @param val A boolean representing if low FPS mode should be enabled
+ * Check if the window is focused
  */
-void SetLowFPS(bool val);
+bool IsWindowFocused();
 
 /**
  * Check if low FPS mode is enabled

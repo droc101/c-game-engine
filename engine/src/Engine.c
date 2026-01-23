@@ -146,6 +146,8 @@ void WindowAndRenderInit()
 	LogDebug("Setting window icon...\n");
 	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
 	SDL_SetWindowIcon(window, windowIcon);
+
+	SetWindowFocused((SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS) != 0);
 }
 
 void HandleEvent(void)
@@ -181,10 +183,10 @@ void HandleEvent(void)
 			WindowObscured();
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_LOST:
-			SetLowFPS(true);
+			SetWindowFocused(false);
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_GAINED:
-			SetLowFPS(false);
+			SetWindowFocused(true);
 			break;
 		case SDL_EVENT_GAMEPAD_ADDED:
 			HandleGamepadConnect();

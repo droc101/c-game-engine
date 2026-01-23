@@ -30,7 +30,7 @@
 #include <vulkan/vulkan_core.h>
 
 Renderer currentRenderer;
-bool lowFPSMode;
+bool windowFocused;
 
 SDL_Window *window;
 int windowWidth;
@@ -216,7 +216,7 @@ inline void UpdateViewportSize()
 
 inline void WindowObscured()
 {
-	lowFPSMode = true;
+	windowFocused = true;
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
@@ -230,7 +230,7 @@ inline void WindowObscured()
 
 inline void WindowRestored()
 {
-	lowFPSMode = false;
+	windowFocused = false;
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
@@ -242,14 +242,19 @@ inline void WindowRestored()
 	}
 }
 
-inline void SetLowFPS(const bool val)
+inline void SetWindowFocused(const bool val)
 {
-	lowFPSMode = val;
+	windowFocused = val;
+}
+
+inline bool IsWindowFocused()
+{
+	return windowFocused;
 }
 
 inline bool IsLowFPSModeEnabled()
 {
-	return lowFPSMode && GetState()->options.limitFpsWhenUnfocused;
+	return !windowFocused && GetState()->options.limitFpsWhenUnfocused;
 }
 
 inline float X_TO_NDC(const float x)
