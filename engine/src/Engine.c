@@ -122,7 +122,10 @@ void WindowAndRenderInit()
 	}
 	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
-	SDL_Window *window = SDL_CreateWindow(&title[0], DEF_WIDTH, DEF_HEIGHT, rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+	SDL_Window *window = SDL_CreateWindow(&title[0],
+										  DEF_WIDTH,
+										  DEF_HEIGHT,
+										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -298,7 +301,7 @@ void EngineIteration()
 		}
 		if (IsLowFPSModeEnabled())
 		{
-			SDL_Delay(33);
+			SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 		}
 		return;
 	}
