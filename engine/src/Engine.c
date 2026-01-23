@@ -30,6 +30,7 @@
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_init.h>
+#include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_surface.h>
@@ -76,7 +77,6 @@ void ExecPathInit(const int argc, const char *argv[])
 	}
 
 	strncpy(GetState()->executableFolder, folder, 260);
-	// SDL_free(folder); // TODO needed?
 	LogInfo("Executable folder: %s\n", GetState()->executableFolder);
 }
 
@@ -132,7 +132,7 @@ void WindowAndRenderInit()
 		Error("Failed to create window.");
 	}
 	SetDwmWindowAttribs(window);
-	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen); // TODO exclusive vs not?
+	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen);
 	SDL_StopTextInput(window);
 	SetGameWindow(window);
 

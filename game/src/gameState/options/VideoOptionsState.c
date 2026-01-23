@@ -75,7 +75,7 @@ char *SliderLabelLod(const Control *slider)
 void CbOptionsFullscreen(const bool value)
 {
 	GetState()->options.fullscreen = value;
-	SDL_SetWindowFullscreen(GetGameWindow(), value); // TODO should check for exclusive vs not evil fullscreen
+	SDL_SetWindowFullscreen(GetGameWindow(), value);
 }
 
 void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const uint8_t id)
