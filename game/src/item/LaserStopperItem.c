@@ -26,7 +26,7 @@ static void LaserStopperItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 static bool LaserStopperItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor)
 {
 	(void)this;
-	if (targetedActor->definition->actorType == ACTOR_TYPE_LASER_EMITTER)
+	if (targetedActor->definition == &laserEmitterActorDefinition)
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 		return true;

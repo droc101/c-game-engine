@@ -33,8 +33,7 @@ void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/
 	CheckAlloc(this->extraData);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_IO_PROXY,
+ActorDefinition ioProxyActorDefinition = {
 	.Update = IoProxyUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -46,7 +45,7 @@ static ActorDefinition definition = {
 
 void RegisterIoProxy()
 {
-	RegisterDefaultActorInputs(&definition);
-	UnregisterActorInput(&definition, ACTOR_INPUT_KILL);
-	RegisterActor(IO_PROXY_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&ioProxyActorDefinition);
+	UnregisterActorInput(&ioProxyActorDefinition, ACTOR_INPUT_KILL);
+	RegisterActor(IO_PROXY_ACTOR_NAME, &ioProxyActorDefinition);
 }

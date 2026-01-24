@@ -5,7 +5,9 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#define ACTOR_TYPE_SPRITE 5
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition spriteActorDefinition;
 
 #define SPRITE_ACTOR_NAME "prop_sprite"
 

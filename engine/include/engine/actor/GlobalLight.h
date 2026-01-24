@@ -5,7 +5,9 @@
 #ifndef GAME_GLOBALLIGHT_H
 #define GAME_GLOBALLIGHT_H
 
-#define ACTOR_TYPE_GLOBAL_LIGHT 8
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition globalLightActorDefinition;
 
 #define GLOBAL_LIGHT_ACTOR_NAME "global_light"
 

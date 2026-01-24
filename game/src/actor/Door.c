@@ -335,19 +335,20 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	ActorWallBake(this);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_DOOR,
-									 .Update = DoorUpdate,
-									 .OnPlayerContactAdded = DoorOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DoorDestroy,
-									 .Init = DoorInit};
+ActorDefinition doorActorDefinition = {
+	.Update = DoorUpdate,
+	.OnPlayerContactAdded = DoorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DoorDestroy,
+	.Init = DoorInit,
+};
 
 void RegisterDoor()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, DOOR_INPUT_OPEN, DoorOpenHandler);
-	RegisterActorInput(&definition, DOOR_INPUT_CLOSE, DoorCloseHandler);
-	RegisterActor(DOOR_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&doorActorDefinition);
+	RegisterActorInput(&doorActorDefinition, DOOR_INPUT_OPEN, DoorOpenHandler);
+	RegisterActorInput(&doorActorDefinition, DOOR_INPUT_CLOSE, DoorCloseHandler);
+	RegisterActor(DOOR_ACTOR_NAME, &doorActorDefinition);
 }

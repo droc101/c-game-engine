@@ -7,7 +7,7 @@
 
 #include <engine/structs/ActorDefinition.h>
 
-#define ACTOR_TYPE_COIN (0 + FIRST_GAME_ACTOR_TYPE_ID)
+extern ActorDefinition coinActorDefinition;
 
 #define COIN_ACTOR_NAME "prop_coin"
 

@@ -140,8 +140,7 @@ void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 	navigationConfig->lastKnownTarget.y = transform->position.z;
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_TEST_ACTOR,
+ActorDefinition testActorDefinition = {
 	.Update = TestActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -153,6 +152,6 @@ static ActorDefinition definition = {
 
 void RegisterTestActor()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActor(TEST_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&testActorDefinition);
+	RegisterActor(TEST_ACTOR_NAME, &testActorDefinition);
 }

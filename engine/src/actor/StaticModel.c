@@ -79,8 +79,7 @@ void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 	}
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_STATIC_MODEL,
+ActorDefinition staticModelActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -92,6 +91,6 @@ static ActorDefinition definition = {
 
 void RegisterStaticModel()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActor(STATIC_MODEL_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&staticModelActorDefinition);
+	RegisterActor(STATIC_MODEL_ACTOR_NAME, &staticModelActorDefinition);
 }

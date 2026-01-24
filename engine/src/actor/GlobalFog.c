@@ -118,8 +118,7 @@ void GlobalFogDestroy(Actor *this)
 	}
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_GLOBAL_FOG,
+ActorDefinition globalFogActorDefinition = {
 	.Update = GlobalFogUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -131,8 +130,8 @@ static ActorDefinition definition = {
 
 void RegisterGlobalFog()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, GLOBAL_FOG_INPUT_SET, GlobalFogSetHandler);
-	RegisterActorInput(&definition, GLOBAL_FOG_INPUT_SET_INSTANT, GlobalFogSetInstantHandler);
-	RegisterActor(GLOBAL_FOG_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&globalFogActorDefinition);
+	RegisterActorInput(&globalFogActorDefinition, GLOBAL_FOG_INPUT_SET, GlobalFogSetHandler);
+	RegisterActorInput(&globalFogActorDefinition, GLOBAL_FOG_INPUT_SET_INSTANT, GlobalFogSetInstantHandler);
+	RegisterActor(GLOBAL_FOG_ACTOR_NAME, &globalFogActorDefinition);
 }

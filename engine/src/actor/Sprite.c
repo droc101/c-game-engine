@@ -32,8 +32,7 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	ActorWallBake(this);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_SPRITE,
+ActorDefinition spriteActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -45,6 +44,6 @@ static ActorDefinition definition = {
 
 void RegisterSprite()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActor(SPRITE_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&spriteActorDefinition);
+	RegisterActor(SPRITE_ACTOR_NAME, &spriteActorDefinition);
 }

@@ -5,7 +5,9 @@
 #ifndef LOGICBINARY_H
 #define LOGICBINARY_H
 
-#define ACTOR_TYPE_LOGIC_BINARY 1
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition logicBinaryActorDefinition;
 
 #define LOGIC_BINARY_ACTOR_NAME "logic_binary"
 

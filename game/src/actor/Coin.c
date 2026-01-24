@@ -119,17 +119,18 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	ActorWallBake(this);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_COIN,
-									 .Update = CoinUpdate,
-									 .OnPlayerContactAdded = CoinOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DefaultActorDestroy,
-									 .Init = CoinInit};
+ActorDefinition coinActorDefinition = {
+	.Update = CoinUpdate,
+	.OnPlayerContactAdded = CoinOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+	.Init = CoinInit,
+};
 
 void RegisterCoin()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActor(COIN_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&coinActorDefinition);
+	RegisterActor(COIN_ACTOR_NAME, &coinActorDefinition);
 }

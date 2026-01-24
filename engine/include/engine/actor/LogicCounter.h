@@ -5,7 +5,9 @@
 #ifndef LOGICCOUNTER_H
 #define LOGICCOUNTER_H
 
-#define ACTOR_TYPE_LOGIC_COUNTER 2
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition logicCounterActorDefinition;
 
 #define LOGIC_COUNTER_ACTOR_NAME "logic_counter"
 

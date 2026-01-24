@@ -12,8 +12,6 @@
 #include <m-core.h>
 #include <stdint.h>
 
-#define FIRST_GAME_ACTOR_TYPE_ID (1 << 16)
-
 typedef struct Actor Actor;
 
 typedef struct ActorDefinition ActorDefinition;
@@ -44,9 +42,6 @@ DEFINE_DICT(ActorDefinitionDict, const char *, M_CSTR_OPLIST, ActorDefinition *,
 
 struct ActorDefinition
 {
-	/// The actor type index
-	/// @warning Do not change this after creation
-	uint64_t actorType;
 	/// The function to call when the actor is updated
 	/// @note This should be called every tick
 	ActorUpdateFunction Update;
