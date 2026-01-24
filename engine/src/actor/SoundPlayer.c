@@ -9,7 +9,9 @@
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -24,6 +26,7 @@ typedef struct SoundPlayerData
 	float volume;
 	bool preload;
 	SoundCategory category;
+	bool positional;
 } SoundPlayerData;
 
 static void SoundPlayerSoundDone(void *pData)
@@ -46,6 +49,8 @@ static void SoundPlayerDestroy(Actor *this)
 
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
+	JPH_RVec3 position;
+	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
 	SoundPlayerData *data = this->extraData;
 	const SoundRequest request = {
 		.soundAsset = data->asset,
@@ -55,7 +60,8 @@ static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const 
 		.completionCallbackData = data,
 		.numLoops = data->loops,
 		.preload = data->preload,
-	};
+								  .positional = data->positional,
+								  .position = {.x = position.x, .y = position.y, .z = position.z}};
 	data->effect = PlaySoundEx(&request);
 }
 
@@ -89,6 +95,7 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	data->volume = KvGetFloat(params, "volume", 1);
 	data->preload = KvGetBool(params, "preload", false);
 	data->category = KvGetByte(params, "category", SOUND_CATEGORY_SFX);
+	data->positional = false; //KvGetBool(params, "positional", false);
 	this->extraData = data;
 }
 

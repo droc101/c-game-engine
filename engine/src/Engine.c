@@ -295,6 +295,7 @@ void EngineIteration()
 		{
 			state->UpdateGame(state);
 		}
+		UpdateSoundSystem();
 		if (state->requestExit)
 		{
 			shouldQuit = true;
@@ -328,6 +329,8 @@ void EngineIteration()
 	TickGraphDraw();
 
 	FrameEnd();
+
+	UpdateSoundSystem();
 
 	UpdateInputStates();
 

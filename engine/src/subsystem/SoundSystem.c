@@ -8,6 +8,8 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <engine/subsystem/threads/PhysicsThread.h>
+#include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_iostream.h>
@@ -37,6 +39,11 @@ struct SoundChannel
 	float originalVolume;
 	/// The sound category of this channel
 	SoundCategory category;
+
+	/// The original position in 3D space, as specified in the sound request
+	Vector3 originalPosition;
+	/// The SDL point associated with the track, or NULL if this channel is not positioned
+	MIX_Point3D *position;
 };
 
 struct SoundSystem
@@ -67,6 +74,10 @@ void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 	if (effect->callback)
 	{
 		effect->callback(effect->callbackData);
+	}
+	if (effect->position)
+	{
+		free(effect->position);
 	}
 	MIX_DestroyAudio(effect->audio);
 	soundSys.channels[effect->channelIndex] = NULL;
@@ -123,7 +134,6 @@ void DestroySoundSystem()
 {
 	LogDebug("Cleaning up sound system...\n");
 
-	// free sound effects
 	if (soundSys.isAudioStarted)
 	{
 		for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
@@ -141,6 +151,39 @@ void DestroySoundSystem()
 
 	MIX_DestroyMixer(soundSys.mixer);
 	MIX_Quit();
+}
+
+void UpdateSoundSystem()
+{
+	Vector3 listener = Vector3_Zero;
+	if (GetState()->map)
+	{
+		PhysicsThreadLockTickMutex();
+		listener = GetState()->map->player.transform.position;
+		PhysicsThreadUnlockTickMutex();
+	}
+	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
+	{
+		if (MIX_TrackPlaying(soundSys.tracks[i]))
+		{
+			if (soundSys.channels[i] == NULL)
+			{
+				LogWarning("SoundSystem: MIX_TrackPlaying desynced with soundSys.effects NULL slots!\n");
+				continue;
+			}
+			const SoundChannel *channel = soundSys.channels[i];
+			if (channel->position)
+			{
+				Vector3 relPosition;
+				// TODO calculation seems wrong
+				Vector3_Subtract(&listener, &channel->originalPosition, &relPosition);
+				channel->position->x = relPosition.x;
+				channel->position->y = relPosition.y;
+				channel->position->z = relPosition.z;
+				MIX_SetTrack3DPosition(channel->track, channel->position);
+			}
+		}
+	}
 }
 
 float GetCategoryVolume(const SoundCategory category)
@@ -258,11 +301,25 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	effect->callback = request->completionCallback;
 	effect->callbackData = request->completionCallbackData;
 	effect->originalVolume = request->volume;
+	if (request->positional)
+	{
+		MIX_Point3D *point = malloc(sizeof(MIX_Point3D));
+		CheckAlloc(point);
+		point->x = request->position.x;
+		point->y = request->position.y;
+		point->z = request->position.z;
+		effect->position = point;
+		effect->originalPosition = request->position;
+	} else
+	{
+		effect->position = NULL;
+	}
 	const SDL_PropertiesID props = SDL_CreateProperties();
 	SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, request->numLoops);
 	MIX_SetTrackAudio(track, audio);
 	const float volume = request->volume * GetCategoryVolume(request->category);
 	MIX_SetTrackGain(track, volume);
+	MIX_SetTrack3DPosition(track, effect->position);
 	MIX_SetTrackStoppedCallback(track, ChannelFinished, effect);
 	if (!MIX_PlayTrack(track, props))
 	{

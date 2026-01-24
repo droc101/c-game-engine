@@ -160,16 +160,6 @@ void ChangeMap(Map *map)
 	}
 	state.map = map;
 	LoadMapModels(map);
-	// if (strncmp(level->music, "none", 4) != 0)
-	// {
-	// 	char musicPath[80];
-	// 	snprintf(musicPath, sizeof(musicPath), SOUND("%s"), level->music);
-	// 	ChangeMusic(musicPath);
-	// } else
-	// {
-	// 	StopMusic();
-	// }
-
 	PhysicsThreadUnlockTickMutex();
 }
 

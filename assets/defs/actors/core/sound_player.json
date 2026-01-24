@@ -27,6 +27,7 @@
       "display": "# of loops",
       "default": 0,
       "type": "int",
+      "minimum": -1,
       "description": "How many times this sound should loop"
     },
     "volume": {
@@ -49,6 +50,12 @@
       "default": "Sound Effect",
       "type": "byte",
       "options": "sound_category"
+    },
+    "positional": {
+      "display": "Positional Sound",
+      "description": "Whether or not the sound should play as if it is in 3D space",
+      "type": "bool",
+      "default": false
     }
   }
 }

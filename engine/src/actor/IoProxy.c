@@ -30,7 +30,6 @@ void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/
 	{
 		GetState()->map->ioProxy = this;
 	}
-	CheckAlloc(this->extraData);
 }
 
 ActorDefinition ioProxyActorDefinition = {

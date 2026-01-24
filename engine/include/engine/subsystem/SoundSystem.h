@@ -30,18 +30,25 @@ struct SoundRequest
 {
 	/// The path to the sound asset to play
 	const char *soundAsset;
+
 	/// The number of times to loop the sound, -1 to loop forever
 	int64_t numLoops;
 	/// The volume of this sound
 	float volume;
+	/// Whether to decode the sound fully ahead of time (false streams it instead)
+	bool preload;
+	/// The sound category
+	SoundCategory category;
+
 	/// The function to call when the sound finishes
 	SoundFinishedCallback completionCallback;
 	/// Data to pass to @c completionCallback
 	void *completionCallbackData;
-	/// The sound category
-	SoundCategory category;
-	/// Whether to decode the sound fully ahead of time (false streams it instead)
-	bool preload;
+
+	/// Whether this sound should be positional
+	bool positional;
+	/// The 3D position of this sound
+	Vector3 position;
 };
 
 /**
@@ -53,6 +60,11 @@ void InitSoundSystem();
  * Clean up the sound system
  */
 void DestroySoundSystem();
+
+/**
+ * Update the sound system
+ */
+void UpdateSoundSystem();
 
 /**
  * Update the volume from the options
