@@ -5,7 +5,9 @@
 #ifndef SOUND_PLAYER_H
 #define SOUND_PLAYER_H
 
-#define ACTOR_TYPE_SOUND_PLAYER 4
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition soundPlayerActorDefinition;
 
 #define SOUND_PLAYER_ACTOR_NAME "sound_player"
 

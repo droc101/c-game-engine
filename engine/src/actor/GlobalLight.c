@@ -115,8 +115,7 @@ void GlobalLightDestroy(Actor *this)
 	}
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_GLOBAL_LIGHT,
+ActorDefinition globalLightActorDefinition = {
 	.Update = GlobalLightUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -128,8 +127,8 @@ static ActorDefinition definition = {
 
 void RegisterGlobalLight()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, GLOBAL_LIGHT_INPUT_SET, GlobalLightSetHandler);
-	RegisterActorInput(&definition, GLOBAL_LIGHT_INPUT_SET_INSTANT, GlobalLightSetInstantHandler);
-	RegisterActor(GLOBAL_LIGHT_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&globalLightActorDefinition);
+	RegisterActorInput(&globalLightActorDefinition, GLOBAL_LIGHT_INPUT_SET, GlobalLightSetHandler);
+	RegisterActorInput(&globalLightActorDefinition, GLOBAL_LIGHT_INPUT_SET_INSTANT, GlobalLightSetInstantHandler);
+	RegisterActor(GLOBAL_LIGHT_ACTOR_NAME, &globalLightActorDefinition);
 }

@@ -5,7 +5,9 @@
 #ifndef GAME_GLOBALFOG_H
 #define GAME_GLOBALFOG_H
 
-#define ACTOR_TYPE_GLOBAL_FOG 9
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition globalFogActorDefinition;
 
 #define GLOBAL_FOG_ACTOR_NAME "global_fog"
 

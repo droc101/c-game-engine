@@ -7,7 +7,7 @@
 
 #include <engine/structs/ActorDefinition.h>
 
-#define ACTOR_TYPE_LASER_EMITTER (4 + FIRST_GAME_ACTOR_TYPE_ID)
+extern ActorDefinition laserEmitterActorDefinition;
 
 #define LASER_EMITTER_ACTOR_NAME "prop_laser_emitter"
 

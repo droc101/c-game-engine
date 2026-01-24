@@ -7,7 +7,7 @@
 
 #include <engine/structs/ActorDefinition.h>
 
-#define ACTOR_TYPE_GOAL (2 + FIRST_GAME_ACTOR_TYPE_ID)
+extern ActorDefinition goalActorDefinition;
 
 #define GOAL_ACTOR_NAME "prop_goal"
 

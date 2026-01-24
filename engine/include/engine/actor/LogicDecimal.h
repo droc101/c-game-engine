@@ -5,7 +5,9 @@
 #ifndef LOGICDECIMAL_H
 #define LOGICDECIMAL_H
 
-#define ACTOR_TYPE_LOGIC_DECIMAL 3
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition logicDecimalActorDefinition;
 
 #define LOGIC_DECIMAL_ACTOR_NAME "logic_decimal"
 

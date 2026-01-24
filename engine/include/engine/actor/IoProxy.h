@@ -5,7 +5,9 @@
 #ifndef IOPROXY_H
 #define IOPROXY_H
 
-#define ACTOR_TYPE_IO_PROXY 0
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition ioProxyActorDefinition;
 
 #define IO_PROXY_ACTOR_NAME "io_proxy"
 

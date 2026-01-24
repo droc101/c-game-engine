@@ -112,8 +112,7 @@ void TriggerInit(Actor *this, const KvList params, Transform *transform)
 	CreateTriggerSensor(this, transform);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_TRIGGER,
+ActorDefinition triggerActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = TriggerOnPlayerContactAdded,
 	.OnPlayerContactPersisted = TriggerOnPlayerContactPersisted,
@@ -125,9 +124,9 @@ static ActorDefinition definition = {
 
 void RegisterTrigger()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, TRIGGER_INPUT_FORCE_TRIGGER, TriggerForceTriggerHandler);
-	RegisterActorInput(&definition, TRIGGER_INPUT_ENABLE, TriggerEnableHandler);
-	RegisterActorInput(&definition, TRIGGER_INPUT_DISABLE, TriggerDisableHandler);
-	RegisterActor(TRIGGER_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&triggerActorDefinition);
+	RegisterActorInput(&triggerActorDefinition, TRIGGER_INPUT_FORCE_TRIGGER, TriggerForceTriggerHandler);
+	RegisterActorInput(&triggerActorDefinition, TRIGGER_INPUT_ENABLE, TriggerEnableHandler);
+	RegisterActorInput(&triggerActorDefinition, TRIGGER_INPUT_DISABLE, TriggerDisableHandler);
+	RegisterActor(TRIGGER_ACTOR_NAME, &triggerActorDefinition);
 }

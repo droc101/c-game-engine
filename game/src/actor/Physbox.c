@@ -43,17 +43,18 @@ void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transform)
 	CreatePhysboxCollider(this, transform);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_PHYSBOX,
-									 .Update = DefaultActorUpdate,
-									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DefaultActorDestroy,
-									 .Init = PhysboxInit};
+ActorDefinition physboxActorDefinition = {
+	.Update = DefaultActorUpdate,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+	.Init = PhysboxInit,
+};
 
 void RegisterPhysbox()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActor(PHYSBOX_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&physboxActorDefinition);
+	RegisterActor(PHYSBOX_ACTOR_NAME, &physboxActorDefinition);
 }

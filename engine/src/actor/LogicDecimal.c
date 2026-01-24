@@ -91,8 +91,7 @@ void LogicDecimalInit(Actor *this, const KvList params, Transform * /*transform*
 	data->operation = KvGetByte(params, "operation", DECIMAL_OP_EQUAL);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LOGIC_DECIMAL,
+ActorDefinition logicDecimalActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -104,9 +103,9 @@ static ActorDefinition definition = {
 
 void RegisterLogicDecimal()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, LOGIC_DECIMAL_INPUT_OPERAND_A, LogicDecimalOperandAHandler);
-	RegisterActorInput(&definition, LOGIC_DECIMAL_INPUT_OPERAND_B, LogicDecimalOperandBHandler);
-	RegisterActorInput(&definition, LOGIC_DECIMAL_INPUT_EXECUTE, LogicDecimalExecuteHandler);
-	RegisterActor(LOGIC_DECIMAL_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&logicDecimalActorDefinition);
+	RegisterActorInput(&logicDecimalActorDefinition, LOGIC_DECIMAL_INPUT_OPERAND_A, LogicDecimalOperandAHandler);
+	RegisterActorInput(&logicDecimalActorDefinition, LOGIC_DECIMAL_INPUT_OPERAND_B, LogicDecimalOperandBHandler);
+	RegisterActorInput(&logicDecimalActorDefinition, LOGIC_DECIMAL_INPUT_EXECUTE, LogicDecimalExecuteHandler);
+	RegisterActor(LOGIC_DECIMAL_ACTOR_NAME, &logicDecimalActorDefinition);
 }

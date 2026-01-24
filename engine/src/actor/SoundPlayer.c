@@ -78,8 +78,7 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	this->extraData = data;
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_SOUND_PLAYER,
+ActorDefinition soundPlayerActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -91,10 +90,10 @@ static ActorDefinition definition = {
 
 void RegisterSoundPlayer()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_PLAY, SoundPlayerPlayHandler);
-	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_PAUSE, SoundPlayerPauseHandler);
-	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_RESUME, SoundPlayerResumeHandler);
-	RegisterActorInput(&definition, SOUND_PLAYER_INPUT_STOP, SoundPlayerStopHandler);
-	RegisterActor(SOUND_PLAYER_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&soundPlayerActorDefinition);
+	RegisterActorInput(&soundPlayerActorDefinition, SOUND_PLAYER_INPUT_PLAY, SoundPlayerPlayHandler);
+	RegisterActorInput(&soundPlayerActorDefinition, SOUND_PLAYER_INPUT_PAUSE, SoundPlayerPauseHandler);
+	RegisterActorInput(&soundPlayerActorDefinition, SOUND_PLAYER_INPUT_RESUME, SoundPlayerResumeHandler);
+	RegisterActorInput(&soundPlayerActorDefinition, SOUND_PLAYER_INPUT_STOP, SoundPlayerStopHandler);
+	RegisterActor(SOUND_PLAYER_ACTOR_NAME, &soundPlayerActorDefinition);
 }
