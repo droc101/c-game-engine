@@ -46,7 +46,8 @@ int PhysicsThreadMain(void * /*data*/)
 	while (true)
 	{
 		const uint64_t timeStart = GetTimeNs();
-		SDL_TryWaitSemaphore(physicsTickHasEnded); // TODO this returns something
+		// I don't remember why this needs to be a TryWaitSemaphore, but everything breaks if it isn't.
+		(void)SDL_TryWaitSemaphore(physicsTickHasEnded);
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
 		if (physicsThreadPostQuit)
@@ -61,7 +62,7 @@ int PhysicsThreadMain(void * /*data*/)
 			GetState()->physicsFrame++;
 			SDL_UnlockMutex(physicsThreadMutex);
 			SDL_UnlockMutex(physicsTickMutex);
-			SDL_DelayPrecise(PHYSICS_TARGET_NS); // pls no spin 🥺
+			SDL_DelayPrecise(PHYSICS_TARGET_NS); // pls only spin if needed 🥺
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
@@ -115,8 +116,7 @@ void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 	SDL_UnlockMutex(physicsThreadMutex);
 	if (function)
 	{
-		if (SDL_TryWaitSemaphore(physicsTickHasEnded) &&
-			SDL_WaitSemaphoreTimeout(physicsTickHasEnded, 1000)) // TODO are these checks correct
+		if (!SDL_TryWaitSemaphore(physicsTickHasEnded) && !SDL_WaitSemaphoreTimeout(physicsTickHasEnded, 1000))
 		{
 			LogError("Failed to wait for physics tick semaphore with error %s", SDL_GetError());
 			Error("Failed to wait for physics tick semaphore!");
