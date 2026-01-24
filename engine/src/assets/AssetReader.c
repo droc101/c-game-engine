@@ -112,6 +112,13 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 
 	fclose(file);
 
+	if (fileSize < ASSET_HEADER_SIZE)
+	{
+		LogError("Trying to read asset file of size %zu, which is too small. Refusing to read this asset.\n", fileSize);
+		free(assetData);
+		return NULL;
+	}
+
 	size_t offset = 0;
 	// Read the first 4 bytes of the asset to get the size of the compressed data
 	const uint32_t magic = ReadUint(assetData, &offset);
@@ -133,6 +140,13 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	const size_t decompressedSize = ReadSizeT(assetData, &offset);
 	const size_t compressedSize = ReadSizeT(assetData, &offset);
 
+	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
+	{
+		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read this asset.\n", fileSize - ASSET_HEADER_SIZE, compressedSize);
+		free(assetData);
+		return NULL;
+	}
+
 	// Allocate memory for the decompressed data
 	uint8_t *decompressedData = malloc(decompressedSize);
 	CheckAlloc(decompressedData);
@@ -140,7 +154,7 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 	z_stream stream = {0};
 
 	// Initialize the zlib stream
-	stream.next_in = assetData + offset; // skip header
+	stream.next_in = assetData + ASSET_HEADER_SIZE;
 	stream.avail_in = compressedSize;
 	stream.next_out = decompressedData;
 	stream.avail_out = decompressedSize;

@@ -11,6 +11,7 @@
 
 #define ASSET_FORMAT_VERSION 2
 #define ASSET_FORMAT_MAGIC 0x454D4147
+#define ASSET_HEADER_SIZE (sizeof(uint32_t) + (sizeof(uint8_t) * 3) + (sizeof(size_t) * 4))
 
 /**
  * Prints an error and returns NULL if there are not enough bytes remaining to read
