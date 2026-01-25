@@ -409,8 +409,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 		player->isNoclipActive = !player->isNoclipActive;
 	}
 	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
-		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.1f,
-		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.1f,
+		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.25f,
+		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.25f,
 		.walkStairsMinStepForward = 0.02f,
 		.walkStairsStepForwardTest = 0.15f,
 		.walkStairsCosAngleForwardContact = cosf(degToRad(75)),
