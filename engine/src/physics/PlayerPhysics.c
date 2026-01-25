@@ -207,6 +207,13 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 	JPH_Shape_Destroy(shape);
 }
 
+void TeleportPlayer(Player *player, const Transform *transform)
+{
+	JPH_CharacterVirtual_SetPosition(player->joltCharacter, &transform->position);
+	JPH_CharacterVirtual_SetRotation(player->joltCharacter, &transform->rotation);
+	player->transform = *transform;
+}
+
 void MovePlayer(const Player *player, float *distanceTraveled, const double delta)
 {
 	Vector3 moveVec = Vector3_Zero;
