@@ -7,8 +7,8 @@
 
 #include <engine/structs/Color.h>
 #include <engine/structs/Player.h>
-#include <joltc/Math/Transform.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Transform.h>
 
 /// Player movement speed (in units per second)
 static const float MOVE_SPEED = 6.0f;
