@@ -29,6 +29,8 @@
 		(bytesRemaining) -= (expected); \
 	}
 
+void SetAssetsPath(const char *newPath);
+
 /**
  * Initialize the asset cache
  */

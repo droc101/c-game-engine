@@ -14,11 +14,29 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "engine/helpers/Arguments.h"
+#include "engine/structs/GlobalState.h"
+
 GameConfig gameConfig = {0};
 
 void LoadGameConfig()
 {
 	LogDebug("Loading game configuration...\n");
+
+	if (HasCliArg("--game"))
+	{
+		const char *gameArg = GetCliArgStr("--game", "assets");
+		SetAssetsPath(gameArg);
+	} else
+	{
+		const size_t pathLen = strlen(GetState()->executableFolder) + strlen("assets") + 1;
+		char *path = calloc(pathLen, 1);
+		CheckAlloc(path);
+		snprintf(path, pathLen, "%sassets", GetState()->executableFolder);
+		SetAssetsPath(path);
+		free(path);
+	}
+
 	Asset *asset = DecompressAsset("game.game", false);
 	if (!asset || asset->type != ASSET_TYPE_GAME_CONFIG || asset->typeVersion != 1)
 	{

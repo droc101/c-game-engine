@@ -27,25 +27,23 @@ DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
 AssetCache assetCache;
 
+char *assetsPath = NULL;
+size_t assetPathLen = 0;
+
+void SetAssetsPath(const char *newPath)
+{
+	assetsPath = strdup(newPath);
+	CheckAlloc(assetsPath);
+	assetPathLen = strlen(assetsPath);
+	LogInfo("Assets path: %s\n", assetsPath);
+}
+
 FILE *OpenAssetFile(const char *relPath)
 {
-	const size_t maxPathLength = 300;
-	char *path = calloc(maxPathLength, sizeof(char));
+	const size_t pathLen = assetPathLen + strlen("/") + strlen(relPath) + 1;
+	char *path = calloc(pathLen, sizeof(char));
 	CheckAlloc(path);
-
-	const size_t pathLen = strlen(GetState()->executableFolder) + strlen("assets/") + strlen(relPath) + 1;
-	if (pathLen >= maxPathLength)
-	{
-		LogError("Path is too long: %s\n", relPath);
-		free(path);
-		return NULL;
-	}
-	if (snprintf(path, maxPathLength, "%sassets/%s", GetState()->executableFolder, relPath) > 300)
-	{
-		LogError("Asset path too long!\n");
-		free(path);
-		return NULL;
-	}
+	snprintf(path, pathLen, "%s/%s", assetsPath, relPath);
 
 	FILE *file = fopen(path, "rb");
 	if (file == NULL)
@@ -71,6 +69,10 @@ void DestroyAssetCache()
 {
 	LogDebug("Cleaning up asset cache...\n");
 	AssetCache_clear(assetCache);
+	if (assetsPath)
+	{
+		free(assetsPath);
+	}
 
 	DestroyTextureLoader();
 	DestroyModelLoader();
