@@ -42,6 +42,12 @@
       "default": false,
       "type": "bool",
       "description": "Whether or not the sprite should be rendered without shading (glowing)"
+    },
+    "solid": {
+      "display": "Solid",
+      "default": false,
+      "type": "bool",
+      "description": "Whether or not the sprite have solid collision"
     }
   }
 }

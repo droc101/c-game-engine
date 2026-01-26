@@ -33,28 +33,28 @@ void ActorWallBake(const Actor *this)
 	this->actorWall->angle += GLM_PI_2f;
 }
 
-JPH_Shape *ActorWallCreateCollider()
+JPH_Shape *ActorWallCreateCollider(const ActorWall *wall)
 {
-	static const Vector3 points[4] = {
+	const Vector3 points[4] = {
 		{
-			0.0f,
-			-0.5f,
-			0.5f,
+			wall->a.x,
+			-(wall->height / 2),
+			wall->a.y,
 		},
 		{
-			0.0f,
-			-0.5f,
-			-0.5f,
+			wall->b.x,
+			-(wall->height / 2),
+			wall->b.y,
 		},
 		{
-			0.0f,
-			0.5f,
-			0.5f,
+			wall->a.x,
+			(wall->height / 2),
+			wall->a.y,
 		},
 		{
-			0.0f,
-			0.5f,
-			-0.5f,
+			wall->b.x,
+			(wall->height / 2),
+			wall->b.y,
 		},
 	};
 	return (JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DefaultConvexRadius);
