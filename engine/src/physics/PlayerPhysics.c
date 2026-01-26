@@ -197,6 +197,7 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 		.mass = 10.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
+	characterSettings.characterPadding = 0.0f;
 	player->joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
 														&player->transform.position,
 														NULL,
@@ -205,6 +206,13 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 	JPH_CharacterVirtual_SetUserData(player->joltCharacter, (uint64_t)player);
 	JPH_CharacterVirtual_SetListener(player->joltCharacter, contactListener);
 	JPH_Shape_Destroy(shape);
+}
+
+void TeleportPlayer(Player *player, const Transform *transform)
+{
+	JPH_CharacterVirtual_SetPosition(player->joltCharacter, &transform->position);
+	JPH_CharacterVirtual_SetRotation(player->joltCharacter, &transform->rotation);
+	player->transform = *transform;
 }
 
 void MovePlayer(const Player *player, float *distanceTraveled, const double delta)
@@ -409,8 +417,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 		player->isNoclipActive = !player->isNoclipActive;
 	}
 	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
-		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.1f,
-		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.1f,
+		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.25f,
+		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.25f,
 		.walkStairsMinStepForward = 0.02f,
 		.walkStairsStepForwardTest = 0.15f,
 		.walkStairsCosAngleForwardContact = cosf(degToRad(75)),

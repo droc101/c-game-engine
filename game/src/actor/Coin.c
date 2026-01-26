@@ -100,7 +100,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 
 	const Transform adjustedTransform = {
 		.position.x = transform->position.x,
-		.position.y = -0.25f,
+		.position.y = transform->position.y,
 		.position.z = transform->position.z,
 		.rotation.w = 1.0f,
 	};

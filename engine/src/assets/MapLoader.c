@@ -8,6 +8,7 @@
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ActorWall.h>
@@ -17,7 +18,6 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -104,7 +104,7 @@ Map *LoadMap(const char *path)
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			map->player.transform = xfm;
+			TeleportPlayer(&map->player, &xfm);
 			KvListDestroy(params);
 			ListFree(ioConnections);
 			free(actorClass);

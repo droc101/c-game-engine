@@ -6,6 +6,7 @@
 #define GAME_ASSETREADER_H
 
 #include <engine/structs/Asset.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
 
