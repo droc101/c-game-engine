@@ -12,7 +12,7 @@
 #include <joltc/Math/Vector3.h>
 #include <stddef.h>
 
-#define GL_MAX_DEBUG_LINES_PER_FRAME 8192
+#define GL_MAX_DEBUG_LINES_PER_FRAME 65536
 
 /**
  * Debug message callback for OpenGL

@@ -45,7 +45,7 @@ void ActorWallBake(const Actor *this);
  * Create a collider for an actor wall
  * @return The shape for the collider
  */
-JPH_Shape *ActorWallCreateCollider();
+JPH_Shape *ActorWallCreateCollider(const ActorWall *wall);
 
 /**
  * Free and actor wall

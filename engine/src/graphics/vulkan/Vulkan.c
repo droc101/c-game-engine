@@ -219,7 +219,7 @@ VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel 
 #ifdef JPH_DEBUG_RENDERER
 	if (buffers.debugDrawLines.shouldResize || buffers.debugDrawTriangles.shouldResize)
 	{
-		VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
+		// VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
 	}
 	if (true) // not has ceiling
 	{
