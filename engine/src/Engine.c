@@ -327,7 +327,7 @@ void EngineIteration()
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
-	if (IsKeyJustPressed(SDL_SCANCODE_F8))
+	if (IsKeyJustPressed(SDL_SCANCODE_F10))
 	{
 		BenchToggle();
 	}

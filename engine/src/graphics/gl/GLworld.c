@@ -23,7 +23,9 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
+#include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <stddef.h>
@@ -316,13 +318,14 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	}
 	ListUnlock(map->actors);
 
-#ifdef THIRDPERSON
-	mat4 playerXfm = GLM_MAT4_IDENTITY_INIT;
-	JPH_RMat44 matrix;
-	JPH_CharacterVirtual_GetWorldTransform(map->player.joltCharacter, &matrix);
-	memcpy(*playerXfm, &matrix, sizeof(mat4));
-	GL_RenderModel(LoadModel(MODEL("player")), playerXfm, 0, 0, COLOR_WHITE);
-#endif
+	if (map->player.isFreecamActive)
+	{
+		mat4 playerXfm = GLM_MAT4_IDENTITY_INIT;
+		JPH_RMat44 matrix;
+		JPH_CharacterVirtual_GetWorldTransform(map->player.joltCharacter, &matrix);
+		memcpy(*playerXfm, &matrix, sizeof(mat4));
+		GL_RenderModel(LoadModel(MODEL("player")), playerXfm, 0, 0, COLOR_WHITE);
+	}
 
 	GL_DrawDebugLines();
 
@@ -646,14 +649,7 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
 
 	mat4 viewMatrix;
-#ifdef THIRDPERSON
-	vec3 pos;
-	glm_quat_rotatev(rotationQuat, GLM_ZUP, pos);
-	glm_vec3_add(VECTOR3_TO_VEC3(camera->transform.position), pos, pos);
-	glm_quat_look(pos, rotationQuat, viewMatrix);
-#else
 	glm_quat_look(VECTOR3_TO_VEC3(camera->transform.position), rotationQuat, viewMatrix);
-#endif
 
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
