@@ -150,7 +150,7 @@ void WindowAndRenderInit()
 	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
 	SDL_SetWindowIcon(window, windowIcon);
 
-	SetWindowFocused((SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS) != 0);
+	SetWindowFocused(true);
 }
 
 void HandleEvent(void)
