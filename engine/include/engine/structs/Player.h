@@ -35,6 +35,7 @@ struct Player
 	bool hasHeldActor;
 	bool canDropHeldActor;
 	bool isNoclipActive;
+	bool isFreecamActive;
 };
 
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem);

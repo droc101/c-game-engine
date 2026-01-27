@@ -32,6 +32,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "engine/structs/Viewmodel.h"
 
 static const double gravity = 9.81 / PHYSICS_TARGET_TPS;
 static const float actorRaycastMaxDistance = 10.0f;
@@ -40,7 +41,8 @@ static const float offset = 1.0f;
 static const float smoothFactor = 17.5f;
 static const float heldActorMaxDistanceSquared = 6.0f;
 
-static Color crosshairColor = COLOR(0xFFFFCCCC);
+static Color crosshairColor = CROSSHAIR_COLOR_NORMAL;
+static bool enableViewmodelAfterFreecam = false;
 
 
 static bool ActorRaycastBroadPhaseLayerShouldCollide(const JPH_BroadPhaseLayer layer)
@@ -187,7 +189,7 @@ void PlayerPersistentStateDestroy()
 
 void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
-	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f);
+	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.2f, 0.25f);
 	JPH_CharacterVirtualSettings characterSettings = {
 		.base.supportingVolume.normal = Vector3_AxisY,
 		.base.supportingVolume.distance = 0.25f,
@@ -197,7 +199,6 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 		.mass = 10.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
-	characterSettings.characterPadding = 0.0f;
 	player->joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
 														&player->transform.position,
 														NULL,
@@ -257,7 +258,8 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
-		} else if (player->isNoclipActive && (IsKeyPressed(SDL_SCANCODE_LSHIFT) || IsKeyPressed(SDL_SCANCODE_RSHIFT)))
+		} else if ((player->isFreecamActive || player->isNoclipActive) &&
+				   (IsKeyPressed(SDL_SCANCODE_LSHIFT) || IsKeyPressed(SDL_SCANCODE_RSHIFT)))
 		{
 			*distanceTraveled = MOVE_SPEED * 2;
 		} else
@@ -266,7 +268,10 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 		}
 		Vector3_MultiplyScalar(&moveVec, *distanceTraveled, &moveVec);
 
-		if (player->isNoclipActive)
+		if (player->isFreecamActive)
+		{
+			JPH_Quat_Rotate(&GetState()->camera->transform.rotation, &moveVec, &moveVec);
+		} else if (player->isNoclipActive)
 		{
 			JPH_Quat_Rotate(&player->transform.rotation, &moveVec, &moveVec);
 		} else
@@ -277,6 +282,13 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 							  &playerRotation);
 			JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
 		}
+	}
+	if (player->isFreecamActive)
+	{
+		Vector3 *cameraPosition = &GetState()->camera->transform.position;
+		Vector3_MultiplyScalar(&moveVec, (float)delta / PHYSICS_TARGET_TPS, &moveVec);
+		Vector3_Add(cameraPosition, &moveVec, cameraPosition);
+		return;
 	}
 	if (!(player->isNoclipActive ||
 		  JPH_CharacterBase_GetGroundState((JPH_CharacterBase *)player->joltCharacter) == JPH_GroundState_OnGround))
@@ -291,6 +303,10 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayCastResult *raycastResult)
 {
 	const GlobalState *state = GetState();
+	if (state->map->player.isFreecamActive)
+	{
+		return NULL;
+	}
 	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->map->physicsSystem);
 	if (!JPH_NarrowPhaseQuery_CastRay_GAME(narrowPhaseQuery,
 										   &state->map->player.transform,
@@ -306,115 +322,130 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime)
 {
-	if (player->hasHeldActor)
+	if (IsKeyJustReleasedPhys(SDL_SCANCODE_F8))
 	{
-		if ((IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH)) &&
-			player->canDropHeldActor)
+		player->isFreecamActive = !player->isFreecamActive;
+		Viewmodel *viewmodel = &GetState()->map->viewmodel;
+		if (player->isFreecamActive)
 		{
-			player->heldActor = NULL;
-			player->hasHeldActor = false;
-			crosshairColor = CROSSHAIR_COLOR_NORMAL;
+			crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
+			enableViewmodelAfterFreecam = viewmodel->enabled;
+			viewmodel->enabled = false;
 		} else
 		{
-			Vector3 heldActorPosition;
-			JPH_BodyInterface_GetPosition(player->heldActor->bodyInterface,
-										  player->heldActor->bodyId,
-										  &heldActorPosition);
-			Vector3 heldActorPositionOffset;
-			Vector3_Subtract(&heldActorPosition, &player->transform.position, &heldActorPositionOffset);
-			if (Vector3_LengthSquared(&heldActorPositionOffset) > heldActorMaxDistanceSquared)
+			viewmodel->enabled = enableViewmodelAfterFreecam;
+		}
+	}
+	if (!player->isFreecamActive)
+	{
+		if (player->hasHeldActor)
+		{
+			if ((IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH)) &&
+				player->canDropHeldActor)
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
 				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			} else
 			{
-				Vector3 forward;
-				JPH_Quat_Rotate(&player->transform.rotation, (Vector3[]){{0.0f, 0.0f, -offset}}, &forward);
-				Vector3 offsetFromTarget;
-				Vector3_Subtract(&forward, &heldActorPositionOffset, &offsetFromTarget);
-				Vector3 heldActorLinearVelocity;
-				Vector3_MultiplyScalar(&offsetFromTarget, smoothFactor, &heldActorLinearVelocity);
-
-				JPH_Quat heldActorRotation;
-				JPH_BodyInterface_GetRotation(player->heldActor->bodyInterface,
+				Vector3 heldActorPosition;
+				JPH_BodyInterface_GetPosition(player->heldActor->bodyInterface,
 											  player->heldActor->bodyId,
-											  &heldActorRotation);
-				JPH_Quat targetRotation = {
-					.y = player->transform.rotation.y,
-					.w = player->transform.rotation.w,
-				};
-				JPH_Quat_Lerp(&heldActorRotation, &targetRotation, 0.2f, &targetRotation);
-				JPH_Quat_Normalized(&targetRotation, &targetRotation);
-
-				JPH_BodyInterface_SetLinearAndAngularVelocity(player->heldActor->bodyInterface,
-															  player->heldActor->bodyId,
-															  &heldActorLinearVelocity,
-															  &Vector3_Zero);
-				JPH_BodyInterface_SetRotation(player->heldActor->bodyInterface,
-											  player->heldActor->bodyId,
-											  &targetRotation,
-											  JPH_Activation_DontActivate);
-			}
-		}
-	} else
-	{
-		JPH_RayCastResult raycastResult = {};
-		player->targetedActor = GetTargetedActor(JPH_PhysicsSystem_GetBodyInterface(physicsSystem), &raycastResult);
-		if (player->targetedActor)
-		{
-			Item *item = GetItem();
-			bool itemTarget = false;
-			if (item)
-			{
-				itemTarget = item->definition->CanTarget(item, player->targetedActor, &crosshairColor);
-				if (itemTarget)
+											  &heldActorPosition);
+				Vector3 heldActorPositionOffset;
+				Vector3_Subtract(&heldActorPosition, &player->transform.position, &heldActorPositionOffset);
+				if (Vector3_LengthSquared(&heldActorPositionOffset) > heldActorMaxDistanceSquared)
 				{
-					if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) ||
-						IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_WEST))
-					{
-						item->definition->PrimaryActionDown(item);
-					} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_LEFT) ||
-							   IsButtonJustReleasedPhys(SDL_GAMEPAD_BUTTON_WEST))
-					{
-						item->definition->PrimaryActionUp(item);
-					} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) ||
-							   IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_NORTH))
-					{
-						item->definition->SecondaryActionDown(item);
-					} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_RIGHT) ||
-							   IsButtonJustReleasedPhys(SDL_GAMEPAD_BUTTON_NORTH))
-					{
-
-					}
-				}
-			}
-
-			if (player->targetedActor && !itemTarget) // condition is NOT always true it is LYING to you
-			{
-				if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
-					(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
-				{
-					crosshairColor = CROSSHAIR_COLOR_HOLDABLE;
-					if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH))
-					{
-						player->heldActor = player->targetedActor;
-						player->hasHeldActor = true;
-						crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
-					}
+					player->heldActor = NULL;
+					player->hasHeldActor = false;
+					crosshairColor = CROSSHAIR_COLOR_NORMAL;
 				} else
 				{
-					crosshairColor = CROSSHAIR_COLOR_NORMAL;
+					Vector3 forward;
+					JPH_Quat_Rotate(&player->transform.rotation, (Vector3[]){{0.0f, 0.0f, -offset}}, &forward);
+					Vector3 offsetFromTarget;
+					Vector3_Subtract(&forward, &heldActorPositionOffset, &offsetFromTarget);
+					Vector3 heldActorLinearVelocity;
+					Vector3_MultiplyScalar(&offsetFromTarget, smoothFactor, &heldActorLinearVelocity);
+
+					JPH_Quat heldActorRotation;
+					JPH_BodyInterface_GetRotation(player->heldActor->bodyInterface,
+												  player->heldActor->bodyId,
+												  &heldActorRotation);
+					JPH_Quat targetRotation = {
+						.y = player->transform.rotation.y,
+						.w = player->transform.rotation.w,
+					};
+					JPH_Quat_Lerp(&heldActorRotation, &targetRotation, 0.2f, &targetRotation);
+					JPH_Quat_Normalized(&targetRotation, &targetRotation);
+
+					JPH_BodyInterface_SetLinearAndAngularVelocity(player->heldActor->bodyInterface,
+																  player->heldActor->bodyId,
+																  &heldActorLinearVelocity,
+																  &Vector3_Zero);
+					JPH_BodyInterface_SetRotation(player->heldActor->bodyInterface,
+												  player->heldActor->bodyId,
+												  &targetRotation,
+												  JPH_Activation_DontActivate);
 				}
 			}
 		} else
 		{
-			crosshairColor = CROSSHAIR_COLOR_NORMAL;
+			JPH_RayCastResult raycastResult = {};
+			player->targetedActor = GetTargetedActor(JPH_PhysicsSystem_GetBodyInterface(physicsSystem), &raycastResult);
+			if (player->targetedActor)
+			{
+				Item *item = GetItem();
+				bool itemTarget = false;
+				if (item)
+				{
+					itemTarget = item->definition->CanTarget(item, player->targetedActor, &crosshairColor);
+					if (itemTarget)
+					{
+						if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) ||
+							IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_WEST))
+						{
+							item->definition->PrimaryActionDown(item);
+						} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_LEFT) ||
+								   IsButtonJustReleasedPhys(SDL_GAMEPAD_BUTTON_WEST))
+						{
+							item->definition->PrimaryActionUp(item);
+						} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) ||
+								   IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_NORTH))
+						{
+							item->definition->SecondaryActionDown(item);
+						} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_RIGHT) ||
+								   IsButtonJustReleasedPhys(SDL_GAMEPAD_BUTTON_NORTH))
+						{}
+					}
+				}
+
+				if (player->targetedActor && !itemTarget) // condition is NOT always true it is LYING to you
+				{
+					if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
+						(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
+					{
+						crosshairColor = CROSSHAIR_COLOR_HOLDABLE;
+						if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH))
+						{
+							player->heldActor = player->targetedActor;
+							player->hasHeldActor = true;
+							crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
+						}
+					} else
+					{
+						crosshairColor = CROSSHAIR_COLOR_NORMAL;
+					}
+				}
+			} else
+			{
+				crosshairColor = CROSSHAIR_COLOR_NORMAL;
+			}
 		}
-	}
-	if (IsKeyJustReleasedPhys(SDL_SCANCODE_V))
-	{
-		player->isNoclipActive = !player->isNoclipActive;
+		if (IsKeyJustReleasedPhys(SDL_SCANCODE_V))
+		{
+			player->isNoclipActive = !player->isNoclipActive;
+		}
 	}
 	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
 		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.25f,

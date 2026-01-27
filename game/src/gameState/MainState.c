@@ -31,6 +31,7 @@
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
+#include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
@@ -45,22 +46,23 @@
 
 static bool lodThreadInitDone = false;
 
-static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
+static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
-	const float currentPitch = JPH_Quat_GetRotationAngle(&state->map->player.transform.rotation, &Vector3_AxisX) +
-							   GLM_PI_2f;
+	Transform *transform = state->map->player.isFreecamActive ? &state->camera->transform
+															  : &state->map->player.transform;
+	const float currentPitch = JPH_Quat_GetRotationAngle(&transform->rotation, &Vector3_AxisX) + GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
 	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
 	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-	JPH_Quat_Multiply(&newYaw, &state->map->player.transform.rotation, &state->map->player.transform.rotation);
-	JPH_Quat_Multiply(&state->map->player.transform.rotation, &newPitch, &state->map->player.transform.rotation);
-	JPH_Quat_Normalized(&state->map->player.transform.rotation, &state->map->player.transform.rotation);
+	JPH_Quat_Multiply(&newYaw, &transform->rotation, &transform->rotation);
+	JPH_Quat_Multiply(&transform->rotation, &newPitch, &transform->rotation);
+	JPH_Quat_Normalized(&transform->rotation, &transform->rotation);
 
-	state->camera->transform.position.x = state->map->player.transform.position.x;
-	state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
-	state->camera->transform.position.z = state->map->player.transform.position.z;
-	state->camera->transform.rotation = state->map->player.transform.rotation;
+	state->camera->transform.position.x = transform->position.x;
+	state->camera->transform.position.y = transform->position.y; // + state->camera->yOffset;
+	state->camera->transform.position.z = transform->position.z;
+	state->camera->transform.rotation = transform->rotation;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -85,7 +87,7 @@ void MainStateUpdate(GlobalState *state)
 		cameraMotion.y *= -1;
 	}
 
-	RotateCamera(state, cameraMotion);
+	UpdateCamera(state, cameraMotion);
 
 	Item *item = GetItem();
 	if (item)
@@ -133,7 +135,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		RotateCamera(state, cameraMotion);
+		UpdateCamera(state, cameraMotion);
 	}
 
 	Item *item = GetItem();
