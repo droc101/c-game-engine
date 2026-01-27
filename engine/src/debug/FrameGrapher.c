@@ -9,6 +9,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Timing.h>
 #include <limits.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -292,12 +293,13 @@ void TickGraphDraw()
 #endif
 	const double currentNs = tickrates[FRAMEGRAPH_HISTORY_SIZE - 1];
 	const double currentF = 1000000000.0 / currentNs;
+	const int currentFInt = round(currentF);
 	const double currentMs = currentNs / 1000000.0;
 
-	if (currentF >= TICKGRAPH_THRESHOLD_GOOD)
+	if (currentFInt >= TICKGRAPH_THRESHOLD_GOOD)
 	{
 		lineColor = COLOR(0xff00ff00);
-	} else if (currentF < TICKGRAPH_THRESHOLD_BAD)
+	} else if (currentFInt < TICKGRAPH_THRESHOLD_BAD)
 	{
 		lineColor = COLOR(0xffff0000);
 	} else
