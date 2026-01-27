@@ -189,7 +189,7 @@ void PlayerPersistentStateDestroy()
 
 void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
-	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.25f, 0.25f);
+	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.2f, 0.25f);
 	JPH_CharacterVirtualSettings characterSettings = {
 		.base.supportingVolume.normal = Vector3_AxisY,
 		.base.supportingVolume.distance = 0.25f,
@@ -199,7 +199,6 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 		.mass = 10.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
-	characterSettings.characterPadding = 0.0f;
 	player->joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
 														&player->transform.position,
 														NULL,
