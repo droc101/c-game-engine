@@ -216,7 +216,7 @@ inline void UpdateViewportSize()
 
 inline void WindowObscured()
 {
-	windowFocused = true;
+	windowFocused = false;
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
@@ -230,7 +230,7 @@ inline void WindowObscured()
 
 inline void WindowRestored()
 {
-	windowFocused = false;
+	windowFocused = true;
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
