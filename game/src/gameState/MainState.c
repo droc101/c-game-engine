@@ -51,7 +51,7 @@ static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
 	Transform *transform = state->map->player.isFreecamActive ? &state->camera->transform
 															  : &state->map->player.transform;
-	const float currentPitch = JPH_Quat_GetRotationAngle(&state->map->player.transform.rotation, &Vector3_AxisX) +
+	const float currentPitch = JPH_Quat_GetRotationAngle(&transform->rotation, &Vector3_AxisX) +
 							   GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
