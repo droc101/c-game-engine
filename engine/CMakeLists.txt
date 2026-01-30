@@ -206,6 +206,8 @@ if (x86_64)
     target_link_libraries(engine INTERFACE discord_game_sdk)
 endif ()
 
+target_include_directories(engine INTERFACE ${FETCHCONTENT_BASE_DIR}/glew-src/include)
+
 if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
     target_compile_definitions(engine INTERFACE BUILDSTYLE_RELEASE)
 else ()
