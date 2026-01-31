@@ -20,24 +20,18 @@ void DefaultItemDestruct(Item *this)
 	free(this->data);
 }
 
-void DefaultItemFixedUpdateFunction(Item *this, GlobalState *state, double delta)
-{
-	(void)this;
-	(void)state;
-	(void)delta;
-}
-
 void DefaultItemUpdateFunction(Item *this, GlobalState *state)
 {
 	(void)this;
 	state->map->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
 }
 
-bool DefaultItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor)
+bool DefaultItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, double delta)
 {
 	(void)this;
 	(void)targetedActor;
 	(void)crosshairColor;
+	(void)delta;
 	return false;
 }
 
@@ -56,10 +50,4 @@ void DefaultItemSwitchFromFunction(Item *this, Viewmodel *viewmodel)
 {
 	(void)this;
 	(void)viewmodel;
-}
-
-bool DefaultItemUseFunction(Item *this)
-{
-	(void)this;
-	return false;
 }

@@ -126,7 +126,7 @@ void WindowAndRenderInit()
 	}
 	SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
-	SDL_Window *window = SDL_CreateWindow(&title[0],
+	SDL_Window *window = SDL_CreateWindow(title,
 										  SDL_WINDOWPOS_UNDEFINED,
 										  SDL_WINDOWPOS_UNDEFINED,
 										  DEF_WIDTH,

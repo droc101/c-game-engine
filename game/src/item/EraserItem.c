@@ -10,9 +10,13 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
+#include <engine/structs/Player.h>
+#include <engine/subsystem/Input.h>
 #include <item/EraserItem.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_mouse.h>
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -26,25 +30,24 @@ static void EraserItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &viewmodel->transform.rotation);
 }
 
-static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor)
+static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, double delta)
 {
 	(void)this;
-	if ((targetedActor->actorFlags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
+	(void)delta;
+	if (targetedActor && (targetedActor->actorFlags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
+
+		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
+		{
+			const GlobalState *state = GetState();
+			RemoveActor(state->map->player.targetedActor);
+			state->map->player.targetedActor = NULL;
+		}
+
 		return true;
 	}
 	return false;
-}
-
-static bool EraserItemPrimaryAction(Item *this)
-{
-	(void)this;
-	const GlobalState *state = GetState();
-	RemoveActor(state->map->player.targetedActor);
-	state->map->player.targetedActor = NULL;
-	// crosshairColor = CROSSHAIR_COLOR_NORMAL;
-	return true;
 }
 
 const ItemDefinition eraserItemDefinition = {
@@ -52,17 +55,10 @@ const ItemDefinition eraserItemDefinition = {
 	.Construct = DefaultItemConstruct,
 	.Destruct = DefaultItemDestruct,
 
-	.FixedUpdate = DefaultItemFixedUpdateFunction,
 	.Update = DefaultItemUpdateFunction,
 	.RenderHud = DefaultItemHudRenderFunction,
-
-	.CanTarget = EraserItemCanTargetFunction,
+	.FixedUpdate = EraserItemCanTargetFunction,
 
 	.SwitchTo = EraserItemSwitchFunction,
 	.SwitchFrom = DefaultItemSwitchFromFunction,
-
-	.PrimaryActionDown = EraserItemPrimaryAction,
-	.PrimaryActionUp = DefaultItemUseFunction,
-	.SecondaryActionDown = DefaultItemUseFunction,
-	.SecondaryActionUp = DefaultItemUseFunction,
 };

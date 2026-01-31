@@ -393,34 +393,17 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 		{
 			JPH_RayCastResult raycastResult = {};
 			player->targetedActor = GetTargetedActor(JPH_PhysicsSystem_GetBodyInterface(physicsSystem), &raycastResult);
+
+			Item *item = GetItem();
+			bool itemTarget = false;
+			if (item)
+			{
+				itemTarget = item->definition->FixedUpdate(item, player->targetedActor, &crosshairColor, deltaTime);
+			}
+
 			if (player->targetedActor)
 			{
-				Item *item = GetItem();
-				bool itemTarget = false;
-				if (item)
-				{
-					itemTarget = item->definition->CanTarget(item, player->targetedActor, &crosshairColor);
-					if (itemTarget)
-					{
-						if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) ||
-							IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
-						{
-							item->definition->PrimaryActionDown(item);
-						} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_LEFT) ||
-								   IsButtonJustReleasedPhys(SDL_CONTROLLER_BUTTON_X))
-						{
-							item->definition->PrimaryActionUp(item);
-						} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) ||
-								   IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_Y))
-						{
-							item->definition->SecondaryActionDown(item);
-						} else if (IsMouseButtonJustReleasedPhys(SDL_BUTTON_RIGHT) ||
-								   IsButtonJustReleasedPhys(SDL_CONTROLLER_BUTTON_Y))
-						{}
-					}
-				}
-
-				if (player->targetedActor && !itemTarget) // condition is NOT always true it is LYING to you
+				if (!itemTarget)
 				{
 					if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
 						(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
