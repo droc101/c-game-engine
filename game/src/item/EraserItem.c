@@ -15,8 +15,8 @@
 #include <item/EraserItem.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_mouse.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -38,7 +38,7 @@ static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color 
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
+		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_WEST))
 		{
 			const GlobalState *state = GetState();
 			RemoveActor(state->map->player.targetedActor);
