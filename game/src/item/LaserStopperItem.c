@@ -3,17 +3,17 @@
 //
 
 #include <actor/LaserEmitter.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/ModelLoader.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
+#include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
+#include <engine/structs/Player.h>
+#include <engine/subsystem/Input.h>
 #include <item/LaserStopperItem.h>
-#include <joltc/Math/Quat.h>
-#include <joltc/Math/Vector3.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_mouse.h>
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -23,24 +23,27 @@ static void LaserStopperItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 	viewmodel->enabled = false;
 }
 
-static bool LaserStopperItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor)
+static bool LaserStopperItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, double delta)
 {
 	(void)this;
-	if (targetedActor->definition == &laserEmitterActorDefinition)
+	(void)delta;
+	if (targetedActor && targetedActor->definition == &laserEmitterActorDefinition)
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
+
+		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_X))
+		{
+			const GlobalState *state = GetState();
+			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_OFF, &PARAM_NONE);
+		} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) || IsButtonJustPressedPhys(SDL_CONTROLLER_BUTTON_Y))
+		{
+			const GlobalState *state = GetState();
+			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_ON, &PARAM_NONE);
+		}
+
 		return true;
 	}
 	return false;
-}
-
-static bool LaserStopperItemPrimaryAction(Item *this)
-{
-	(void)this;
-	const GlobalState *state = GetState();
-	ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_OFF, &PARAM_NONE);
-	// crosshairColor = CROSSHAIR_COLOR_NORMAL;
-	return true;
 }
 
 const ItemDefinition laserStopperItemDefinition = {
@@ -48,17 +51,10 @@ const ItemDefinition laserStopperItemDefinition = {
 	.Construct = DefaultItemConstruct,
 	.Destruct = DefaultItemDestruct,
 
-	.FixedUpdate = DefaultItemFixedUpdateFunction,
 	.Update = DefaultItemUpdateFunction,
 	.RenderHud = DefaultItemHudRenderFunction,
-
-	.CanTarget = LaserStopperItemCanTargetFunction,
+	.FixedUpdate = LaserStopperItemCanTargetFunction,
 
 	.SwitchTo = LaserStopperItemSwitchFunction,
 	.SwitchFrom = DefaultItemSwitchFromFunction,
-
-	.PrimaryActionDown = LaserStopperItemPrimaryAction,
-	.PrimaryActionUp = DefaultItemUseFunction,
-	.SecondaryActionDown = DefaultItemUseFunction,
-	.SecondaryActionUp = DefaultItemUseFunction,
 };

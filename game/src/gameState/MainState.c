@@ -138,12 +138,6 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		UpdateCamera(state, cameraMotion);
 	}
 
-	Item *item = GetItem();
-	if (item)
-	{
-		item->definition->FixedUpdate(item, state, delta);
-	}
-
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
 	state->camera->yOffset = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
