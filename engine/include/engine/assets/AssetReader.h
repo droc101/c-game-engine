@@ -30,6 +30,9 @@
 		(bytesRemaining) -= (expected); \
 	}
 
+/**
+ * Set the base path that assets will be loaded from
+ */
 void SetAssetsPath(const char *newPath);
 
 /**

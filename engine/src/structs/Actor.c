@@ -138,11 +138,11 @@ void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*para
 	RemoveActor(this);
 }
 
-void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
 
-void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
 
-void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
 
 void DefaultActorRenderUi(Actor * /*this*/) {}
 

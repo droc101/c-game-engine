@@ -72,10 +72,7 @@ static const JPH_BroadPhaseLayerInterface_Impl broadPhaseLayerInterfaceImpl = {
 void PhysicsInitGlobal(GlobalState *state)
 {
 	LogDebug("Initializing physics...\n");
-	if (!JPH_Init())
-	{
-		Error("Failed to initialize Jolt Physics!");
-	}
+	JPH_Init();
 	state->jobSystem = JPH_JobSystemThreadPool_Create(NULL);
 	JoltDebugRendererInit();
 	PlayerPersistentStateInit();

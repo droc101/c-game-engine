@@ -80,8 +80,8 @@ static JPH_ObjectLayerFilter *actorRaycastObjectLayerFilter;
 
 
 static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
-						   const JPH_BodyId bodyId,
-						   JPH_SubShapeId /*subShapeId*/,
+						   const JPH_BodyID bodyId,
+						   JPH_SubShapeID /*subShapeId*/,
 						   const JPH_RVec3 * /*contactPosition*/,
 						   const Vector3 * /*contactNormal*/,
 						   JPH_CharacterContactSettings *ioSettings)
@@ -96,8 +96,8 @@ static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 }
 
 static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
-							   const JPH_BodyId bodyId,
-							   JPH_SubShapeId /*subShapeId*/,
+							   const JPH_BodyID bodyId,
+							   JPH_SubShapeID /*subShapeId*/,
 							   const JPH_RVec3 * /*contactPosition*/,
 							   const Vector3 * /*contactNormal*/,
 							   JPH_CharacterContactSettings *ioSettings)
@@ -112,8 +112,8 @@ static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
 }
 
 static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
-							 const JPH_BodyId bodyId,
-							 JPH_SubShapeId /*subShapeId*/)
+							 const JPH_BodyID bodyId,
+							 JPH_SubShapeID /*subShapeId*/)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
@@ -124,8 +124,8 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 }
 
 static void OnContactSolve(const JPH_CharacterVirtual *character,
-						   const JPH_BodyId bodyId,
-						   const JPH_SubShapeId /*subShapeId*/,
+						   const JPH_BodyID bodyId,
+						   const JPH_SubShapeID /*subShapeId*/,
 						   const JPH_RVec3 * /*contactPosition*/,
 						   const Vector3 * /*contactNormal*/,
 						   const Vector3 * /*contactVelocity*/,
@@ -140,7 +140,7 @@ static void OnContactSolve(const JPH_CharacterVirtual *character,
 	}
 }
 
-static bool BodyFilterShouldCollide(const JPH_BodyId bodyId)
+static bool BodyFilterShouldCollide(const JPH_BodyID bodyId)
 {
 	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	assert(player);

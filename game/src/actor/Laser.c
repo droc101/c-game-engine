@@ -66,7 +66,7 @@ static bool TripleLaserObjectLayerShouldCollide(const JPH_ObjectLayer layer)
 	return layer == OBJECT_LAYER_STATIC;
 }
 
-static bool BodyFilterShouldCollide(const JPH_BodyId bodyId)
+static bool BodyFilterShouldCollide(const JPH_BodyID bodyId)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	const Actor *actor = (const Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);

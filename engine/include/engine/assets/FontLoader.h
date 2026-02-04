@@ -45,6 +45,9 @@ struct Font
 	Image *image;
 } __attribute__((packed));
 
+/**
+ * Generate a generic fallback font
+ */
 Font *GenerateFallbackFont();
 
 /**

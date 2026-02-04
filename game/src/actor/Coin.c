@@ -75,7 +75,7 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 	ActorWallBake(this);
 }
 
-static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const CoinData *data = this->extraData;
 	if (!data->isBlue)

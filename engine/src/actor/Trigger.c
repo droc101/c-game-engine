@@ -66,7 +66,7 @@ static void TriggerDisableHandler(Actor *this, const Actor * /*sender*/, const P
 	data->enabled = false;
 }
 
-static void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+static void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (data->enabled)
@@ -76,7 +76,7 @@ static void TriggerOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-static void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyId /*bodyId*/)
+static void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (!data->oneShot && data->enabled)
@@ -85,7 +85,7 @@ static void TriggerOnPlayerContactPersisted(Actor *this, JPH_BodyId /*bodyId*/)
 	}
 }
 
-static void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyId /*bodyId*/)
+static void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const TriggerData *data = this->extraData;
 	if (data->enabled)
