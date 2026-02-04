@@ -73,7 +73,7 @@ static void GoalDisableHandler(Actor *this, const Actor * /*sender*/, const Para
 	data->enabled = false;
 }
 
-static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const GoalData *data = this->extraData;
 	if (data->enabled)

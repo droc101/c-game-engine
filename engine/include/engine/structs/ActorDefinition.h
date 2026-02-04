@@ -8,9 +8,8 @@
 #include <engine/structs/Dict.h>
 #include <engine/structs/KVList.h>
 #include <joltc/Math/Transform.h>
-#include <joltc/types.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <m-core.h>
-#include <stdint.h>
 
 typedef struct Actor Actor;
 
@@ -26,11 +25,11 @@ typedef void (*ActorUIRenderFunction)(Actor *this);
 
 typedef void (*ActorInputHandlerFunction)(Actor *this, const Actor *sender, const Param *param);
 
-typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyId bodyId);
+typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyID bodyId);
 
-typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyId bodyId);
+typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyID bodyId);
 
-typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId);
+typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyID bodyId);
 
 typedef void (*ActorRegisterFunction)();
 

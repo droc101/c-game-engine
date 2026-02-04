@@ -42,7 +42,7 @@ typedef struct DoorData
 	bool shouldClose;
 	bool stayOpen;
 	double animationTime;
-	JPH_BodyId sensorBodyId;
+	JPH_BodyID sensorBodyId;
 	Vector3 closedPosition;
 	Vector3 openPosition;
 } DoorData;
@@ -233,7 +233,7 @@ static void DoorCloseHandler(Actor *this, const Actor * /*sender*/, const Param 
 	}
 }
 
-static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyId bodyId)
+static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyID bodyId)
 {
 	DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
@@ -258,7 +258,7 @@ static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyId bodyId)
 	}
 }
 
-static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyId bodyId)
+static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyID bodyId)
 {
 	const DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
@@ -281,7 +281,7 @@ static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyId bodyId)
 	}
 }
 
-static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyId bodyId)
+static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 {
 	DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
