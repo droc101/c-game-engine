@@ -14,7 +14,6 @@ See the [wiki page](https://wiki.droc101.dev/index.php/Building_GAME) for instru
 
 ## Minimum System Requirements
 ### CPU
-
 - This project aims to be compatible with all x86_64 CPUs, however, we recommend a CPU that meets x86_64-v3 (Intel
   Haswell/AMD Excavator or newer)
   - If your x86_64 CPU is not compatible, please let us know!
