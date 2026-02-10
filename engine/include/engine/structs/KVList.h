@@ -23,6 +23,7 @@
 #define PARAM_COLOR(x) ((Param){.type = PARAM_TYPE_COLOR, .colorValue = (x)})
 #define PARAM_ARRAY(s, d) ((Param){.type = PARAM_TYPE_ARRAY, .arrayValue.length = (s), .arrayValue.data = (d)})
 #define PARAM_KV_LIST(x) ((Param){.type = PARAM_TYPE_KV_LIST, .kvListValue = (x)})
+#define PARAM_UINT_64(x) ((Param){.type = PARAM_TYPE_UINT_64, .uint64value = (x)})
 #define PARAM_NONE ((Param){.type = PARAM_TYPE_NONE})
 
 typedef enum ParamType ParamType;
@@ -39,7 +40,8 @@ enum ParamType
 	PARAM_TYPE_NONE,
 	PARAM_TYPE_COLOR,
 	PARAM_TYPE_KV_LIST,
-	PARAM_TYPE_ARRAY
+	PARAM_TYPE_ARRAY,
+	PARAM_TYPE_UINT_64
 };
 
 struct Param
@@ -60,6 +62,7 @@ struct Param
 			size_t length;
 			Param *data;
 		} arrayValue;
+		uint64_t uint64value;
 	};
 };
 
@@ -197,6 +200,8 @@ const char *KvGetString(const KvList list, const char *key, const char *defaultV
  */
 Color KvGetColor(const KvList list, const char *key, Color defaultValue);
 
+uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
+
 #pragma endregion
 
 #pragma region Setters
@@ -248,6 +253,8 @@ void KvSetString(KvList list, const char *key, const char *value);
  * @param value The Color value to set.
  */
 void KvSetColor(KvList list, const char *key, Color value);
+
+void KvSetUint64(KvList list, const char *key, uint64_t value);
 
 /**
  * Perform a type-unsafe set of a value in the key-value list.

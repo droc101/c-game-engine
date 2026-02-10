@@ -55,6 +55,8 @@ size_t ReadParam(const void *data, const size_t dataSize, size_t *offset, Param 
 		case PARAM_TYPE_KV_LIST:
 			out->kvListValue = malloc(sizeof(KvList));
 			(void)ReadKvList(data, dataSize, offset, out->kvListValue);
+		case PARAM_TYPE_UINT_64:
+			out->uint64value = ReadSizeT(data, offset);
 		default:
 			break;
 	}
@@ -271,6 +273,16 @@ Color KvGetColor(const KvList list, const char *key, const Color defaultValue)
 	return p->colorValue;
 }
 
+uint64_t KvGetUint64(const KvList list, const char *key, const uint64_t defaultValue)
+{
+	const Param *p = KvGetTypeWithDefault(list,
+										  key,
+										  PARAM_TYPE_UINT_64,
+										  (Param[]){{PARAM_TYPE_UINT_64, .uint64value = defaultValue}});
+	assert(p);
+	return p->uint64value;
+}
+
 #pragma endregion
 
 #pragma region Public Setters
@@ -309,6 +321,11 @@ void KvSetString(KvList list, const char *key, const char *value)
 inline void KvSetColor(KvList list, const char *key, const Color value)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_COLOR, .colorValue = value});
+}
+
+inline void KvSetUint64(KvList list, const char *key, const uint64_t value)
+{
+	KvSet(list, key, (Param){PARAM_TYPE_UINT_64, .uint64value = value});
 }
 
 void KvSetUnsafe(KvList list, const char *key, const Param value)
