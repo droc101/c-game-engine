@@ -382,6 +382,7 @@ void DestroyEngine()
 	SDL_FreeSurface(windowIcon);
 	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
+	DestroyGameConfig();
 	LogDebug("Cleaning up SDL_Mixer...\n");
 	Mix_CloseAudio();
 	Mix_Quit();

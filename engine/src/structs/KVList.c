@@ -55,8 +55,10 @@ size_t ReadParam(const void *data, const size_t dataSize, size_t *offset, Param 
 		case PARAM_TYPE_KV_LIST:
 			out->kvListValue = malloc(sizeof(KvList));
 			(void)ReadKvList(data, dataSize, offset, out->kvListValue);
+			break;
 		case PARAM_TYPE_UINT_64:
 			out->uint64value = ReadSizeT(data, offset);
+			break;
 		default:
 			break;
 	}
@@ -80,6 +82,9 @@ void CopyParam(const Param *source, Param *dest)
 		}
 	} else if (source->type == PARAM_TYPE_KV_LIST)
 	{
+		dest->kvListValue = malloc(sizeof(*dest->kvListValue));
+		CheckAlloc(dest->kvListValue);
+		KvListCreate(dest->kvListValue);
 		KvListCopy(source->kvListValue, dest->kvListValue);
 	} else
 	{
@@ -148,7 +153,7 @@ Param *KvGet(const KvList list, const char *key)
  */
 Param *KvGetTypeWithDefault(const KvList list, const char *key, const ParamType expectedType, Param *defaultValue)
 {
-	assert(list && key && defaultValue);
+	assert(list && key);
 	Param *param = KvGet(list, key);
 	if (!param || param->type != expectedType)
 	{
@@ -283,6 +288,16 @@ uint64_t KvGetUint64(const KvList list, const char *key, const uint64_t defaultV
 	return p->uint64value;
 }
 
+ParamArray *KvGetArray(const KvList list, const char *key)
+{
+	Param *p = KvGetTypeWithDefault(list, key, PARAM_TYPE_ARRAY, NULL);
+	if (!p)
+	{
+		return NULL;
+	}
+	return &p->arrayValue;
+}
+
 #pragma endregion
 
 #pragma region Public Setters
@@ -326,6 +341,11 @@ inline void KvSetColor(KvList list, const char *key, const Color value)
 inline void KvSetUint64(KvList list, const char *key, const uint64_t value)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_UINT_64, .uint64value = value});
+}
+
+void KvSetParamArray(KvList list, const char *key, const ParamArray array)
+{
+	KvSet(list, key, (Param){PARAM_TYPE_ARRAY, .arrayValue = array});
 }
 
 void KvSetUnsafe(KvList list, const char *key, const Param value)

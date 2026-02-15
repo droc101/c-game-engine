@@ -25,10 +25,11 @@
 #include <zconf.h>
 #include <zlib.h>
 
+#include "engine/assets/GameConfigLoader.h"
+
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
 AssetCache assetCache;
-List assetPaths;
 
 FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
@@ -36,9 +37,9 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 	// const size_t pathLen = assetPathLen + strlen("/") + strlen(relPath) + 1;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
-	for (size_t i = 0; i < assetPaths.length; i++)
+	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
 	{
-		const AssetPath *assetPath = ListGetPointer(assetPaths, i);
+		const AssetPath *assetPath = ListGetPointer(gameConfig.assetPaths, i);
 		if (isCodeAsset && !(assetPath->flags & ASSET_PATH_ALLOW_CODE_EXECUTION))
 		{
 			continue;
@@ -75,9 +76,9 @@ void EnumerateAssetsInFolder(const char *folder, List *output)
 {
 	// TODO don't add duplicates (assets overwritten in another asset path)
 	ListClear(*output);
-	for (size_t i = 0; i < assetPaths.length; i++)
+	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
 	{
-		const AssetPath *assetPath = ListGetPointer(assetPaths, i);
+		const AssetPath *assetPath = ListGetPointer(gameConfig.assetPaths, i);
 		char levelDataPath[300];
 		sprintf(levelDataPath, "%s/%s/", assetPath->path, folder);
 
@@ -107,35 +108,10 @@ void EnumerateAssetsInFolder(const char *folder, List *output)
 	}
 }
 
-AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags, char *path)
-{
-	AssetPath *assetPath = malloc(sizeof(AssetPath));
-	CheckAlloc(assetPath);
-	assetPath->flags = flags;
-	assetPath->type = type;
-	if (type == ABSOLUTE_PATH)
-	{
-		assetPath->path = strdup(path);
-	} else if (type == RELATIVE_TO_EXECUTABLE_DIRECTORY)
-	{
-		const size_t pathLen = strlen(GetState()->executableFolder) + 1 + strlen(path) + 1;
-		assetPath->path = malloc(pathLen);
-		snprintf(assetPath->path, pathLen, "%s/%s", GetState()->executableFolder, path);
-	}
-	return assetPath;
-}
-
 void AssetCacheInit()
 {
 	LogDebug("Initializing asset cache...\n");
 	AssetCache_init(assetCache);
-	ListInit(assetPaths, LIST_POINTER);
-
-	// TODO don't hardcode this
-	ListAdd(assetPaths, CreateAssetPath(RELATIVE_TO_EXECUTABLE_DIRECTORY, 0, "assets/game"));
-	ListAdd(assetPaths,
-			CreateAssetPath(RELATIVE_TO_EXECUTABLE_DIRECTORY, ASSET_PATH_ALLOW_CODE_EXECUTION, "assets/engine"));
-
 	InitModelLoader();
 }
 
@@ -143,13 +119,6 @@ void DestroyAssetCache()
 {
 	LogDebug("Cleaning up asset cache...\n");
 	AssetCache_clear(assetCache);
-	for (size_t i = 0; i < assetPaths.length; i++)
-	{
-		AssetPath *assetPath = ListGetPointer(assetPaths, i);
-		free(assetPath->path);
-		free(assetPath);
-	}
-	ListFree(assetPaths);
 	DestroyTextureLoader();
 	DestroyModelLoader();
 }

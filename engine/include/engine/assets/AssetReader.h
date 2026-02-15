@@ -16,32 +16,6 @@
 #define ASSET_FORMAT_MAGIC 0x454D4147
 #define ASSET_HEADER_SIZE (sizeof(uint32_t) + (sizeof(uint8_t) * 3) + (sizeof(size_t) * 2))
 
-typedef enum AssetPathType AssetPathType;
-typedef enum AssetPathFlags AssetPathFlags;
-
-typedef struct AssetPath AssetPath;
-
-enum AssetPathType
-{
-	RELATIVE_TO_EXECUTABLE_DIRECTORY,
-	ABSOLUTE_PATH,
-};
-
-enum AssetPathFlags
-{
-	/// Allow loading code assets from this asset path. This should be used with caution.
-	ASSET_PATH_ALLOW_CODE_EXECUTION = 1 << 0,
-	/// This path was added at runtime and is not part of game.game
-	ASSET_PATH_RUNTIME_LOADED = 1 << 1,
-};
-
-struct AssetPath
-{
-	AssetPathType type;
-	AssetPathFlags flags;
-	char *path;
-};
-
 /**
  * Prints an error and returns NULL if there are not enough bytes remaining to read
  * @param expected The number of bytes expected to read

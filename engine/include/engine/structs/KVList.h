@@ -29,6 +29,7 @@
 typedef enum ParamType ParamType;
 
 typedef struct Param Param;
+typedef struct ParamArray ParamArray;
 
 enum ParamType
 {
@@ -44,6 +45,12 @@ enum ParamType
 	PARAM_TYPE_UINT_64
 };
 
+struct ParamArray
+{
+	size_t length;
+	Param *data;
+};
+
 struct Param
 {
 	/// The type contained in this param
@@ -57,11 +64,7 @@ struct Param
 		char *stringValue;
 		Color colorValue;
 		struct KvList_s *kvListValue;
-		struct
-		{
-			size_t length;
-			Param *data;
-		} arrayValue;
+		ParamArray arrayValue;
 		uint64_t uint64value;
 	};
 };
@@ -202,6 +205,8 @@ Color KvGetColor(const KvList list, const char *key, Color defaultValue);
 
 uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
 
+ParamArray *KvGetArray(const KvList list, const char *key);
+
 #pragma endregion
 
 #pragma region Setters
@@ -255,6 +260,8 @@ void KvSetString(KvList list, const char *key, const char *value);
 void KvSetColor(KvList list, const char *key, Color value);
 
 void KvSetUint64(KvList list, const char *key, uint64_t value);
+
+void KvSetParamArray(KvList list, const char *key, const ParamArray array);
 
 /**
  * Perform a type-unsafe set of a value in the key-value list.
