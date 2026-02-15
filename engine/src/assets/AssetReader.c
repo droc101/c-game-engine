@@ -32,8 +32,9 @@ List assetPaths;
 
 FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	const size_t pathLen = assetPathLen + strlen("/") + strlen(relPath) + 1;
-	char *path = calloc(pathLen, sizeof(char));
+	const size_t maxPathLength = 300;
+	// const size_t pathLen = assetPathLen + strlen("/") + strlen(relPath) + 1;
+	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
 	for (size_t i = 0; i < assetPaths.length; i++)
 	{

@@ -236,9 +236,9 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitArguments(argc, argv);
 
-	if (HasCliArg(argc, argv, "--game"))
+	if (HasCliArg("--game"))
 	{
-		const char *game = GetCliArgStr(argc, argv, "--game", "assets/game");
+		const char *game = GetCliArgStr("--game", "assets/game");
 		LoadGameConfig(game);
 	} else
 	{
