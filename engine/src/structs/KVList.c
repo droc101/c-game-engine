@@ -84,7 +84,6 @@ void CopyParam(const Param *source, Param *dest)
 	{
 		dest->kvListValue = malloc(sizeof(*dest->kvListValue));
 		CheckAlloc(dest->kvListValue);
-		KvListCreate(dest->kvListValue);
 		KvListCopy(source->kvListValue, dest->kvListValue);
 	} else
 	{

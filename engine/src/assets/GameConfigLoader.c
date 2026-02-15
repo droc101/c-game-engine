@@ -3,9 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
-#include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/GlobalState.h>
@@ -56,7 +54,7 @@ void LoadGameConfig(const char *game)
 		}
 	} else
 	{
-		configPath = malloc(strlen(GetState()->executableFolder) + strlen(game) + 1 + strlen("game.game") + 1);
+		configPath = malloc(strlen(GetState()->executableFolder) + strlen(game) + 1 + strlen("game.gkvl") + 1);
 		CheckAlloc(configPath);
 		sprintf(configPath, "%s%s/game.gkvl", GetState()->executableFolder, game);
 	}
@@ -105,7 +103,8 @@ void LoadGameConfig(const char *game)
 			ListAdd(gameConfig.assetPaths, CreateAssetPath(type, flags, searchPath));
 		} else if (searchPathParam->type == PARAM_TYPE_STRING)
 		{
-			ListAdd(gameConfig.assetPaths, CreateAssetPath(RELATIVE_TO_EXECUTABLE_DIRECTORY, 0, searchPathParam->stringValue));
+			ListAdd(gameConfig.assetPaths,
+					CreateAssetPath(RELATIVE_TO_EXECUTABLE_DIRECTORY, 0, searchPathParam->stringValue));
 		} else
 		{
 			Error("Invalid search path in game.gkvl");

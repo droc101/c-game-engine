@@ -5,8 +5,8 @@
 #ifndef GAME_GAMECONFIGLOADER_H
 #define GAME_GAMECONFIGLOADER_H
 
-#include <stddef.h>
 #include <engine/structs/List.h>
+#include <stddef.h>
 
 typedef struct GameConfig GameConfig;
 

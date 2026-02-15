@@ -6,15 +6,14 @@
 #include <dirent.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
+#include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Dict.h>
-#include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <errno.h>
 #include <m-core.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -24,8 +23,6 @@
 #include <string.h>
 #include <zconf.h>
 #include <zlib.h>
-
-#include "engine/assets/GameConfigLoader.h"
 
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
@@ -287,7 +284,10 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 
 	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
 	{
-		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read this asset.\n", fileSize - ASSET_HEADER_SIZE, compressedSize);
+		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read "
+				 "this asset.\n",
+				 fileSize - ASSET_HEADER_SIZE,
+				 compressedSize);
 		free(assetData);
 		return NULL;
 	}
