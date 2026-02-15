@@ -1,5 +1,9 @@
 {
   "description": "An arbitrary model that cannot move or change in any way.",
+  "display": {
+    "model_param": "model",
+    "color_param": "color"
+  },
   "params": {
     "model": {
       "display": "Model",

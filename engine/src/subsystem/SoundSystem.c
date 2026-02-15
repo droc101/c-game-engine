@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
+#include <engine/structs/Asset.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -15,7 +16,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "engine/structs/Asset.h"
 
 struct SoundEffect
 {

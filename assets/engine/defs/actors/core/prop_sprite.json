@@ -1,6 +1,10 @@
 {
   "description": "An arbitrary 2D sprite",
   "extends": "actor",
+  "display": {
+    "color": -1,
+    "texture_param": "texture"
+  },
   "params": {
     "width": {
       "display": "Width",
@@ -32,6 +36,18 @@
       "type": "string",
       "string_hint": "texture",
       "description": "The texture of the sprite"
+    },
+    "unshaded": {
+      "display": "Unshaded",
+      "default": false,
+      "type": "bool",
+      "description": "Whether or not the sprite should be rendered without shading (glowing)"
+    },
+    "solid": {
+      "display": "Solid",
+      "default": false,
+      "type": "bool",
+      "description": "Whether or not the sprite have solid collision"
     }
   }
 }

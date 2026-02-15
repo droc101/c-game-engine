@@ -7,40 +7,78 @@
 #include <engine/graphics/gl/GLdebug.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
 
 GL_Shader *uiTexturedShader;
 GL_Shader *uiColoredShader;
-GL_Shader *wallShader;
+GL_Shader *actorWallShadedShader;
+GL_Shader *actorWallUnshadedShader;
 GL_Shader *skyShader;
 GL_Shader *modelUnshadedShader;
 GL_Shader *modelShadedShader;
 GL_Shader *debugShader;
 
-GLint floorTextureLoc;
-GLint floorShadeLoc;
-GLint floorHeightLoc;
-GLint floorSharedUniformsLoc;
+GLint uiColoredColorLoc;
+GLint uiColoredVertexLoc;
 
-GLint hudColoredColorLoc; // TODO: confusing name -- location of the color uniform in the colored shader
+GLint uiTexturedTextureLoc;
+GLint uiTexturedColorLoc;
+GLint uiTexturedRegionLoc;
+GLint uiTexturedVertexLoc;
+GLint uiTexturedUvLoc;
 
-GLint hudTexturedTextureLoc; // TODO: confusing name -- location of the texture uniform in the textured shader
-GLint hudTexturedColorLoc;
-GLint hudTexturedRegionLoc;
+GLint actorWallShadedTextureLoc;
+GLint actorWallShadedModelWorldMatrixLoc;
+GLint actorWallShadedSharedUniformsLoc;
+GLint actorWallShadedTransformMatrixLoc;
+GLint actorWallShadedVertexLoc;
+GLint actorWallShadedUvLoc;
+GLint actorWallShadedAngleLoc;
 
-GLint wallTextureLoc;
-GLint wallModelWorldMatrixLoc;
-GLint wallSharedUniformsLoc;
-GLint wallTransformMatrixLoc;
+GLint actorWallUnshadedTextureLoc;
+GLint actorWallUnshadedModelWorldMatrixLoc;
+GLint actorWallUnshadedSharedUniformsLoc;
+GLint actorWallUnshadedTransformMatrixLoc;
+GLint actorWallUnshadedVertexLoc;
+GLint actorWallUnshadedUvLoc;
 
 GLint debugColorLoc;
+GLint debugSharedUniformsLoc;
+GLint debugVertexLoc;
+
+GLint skySharedUniformsLoc;
+GLint skyModelWorldMatrixLoc;
+GLint skyVertexLoc;
+GLint skyUvLoc;
+GLint skyColorLoc;
+
+GLint shadedModelSharedUniformsLoc;
+GLint shadedModelModelWorldMatrixLoc;
+GLint shadedModelAlbColorLoc;
+GLint shadedModelModColorLoc;
+GLint shadedModelVertexLoc;
+GLint shadedModelUvLoc;
+GLint shadedModelNormalLoc;
+GLint shadedModelColorLoc;
+
+GLint unshadedModelSharedUniformsLoc;
+GLint unshadedModelModelWorldMatrixLoc;
+GLint unshadedModelAlbColorLoc;
+GLint unshadedModelModColorLoc;
+GLint unshadedModelVertexLoc;
+GLint unshadedModelUvLoc;
+GLint unshadedModelColorLoc;
 
 bool GL_LoadShaders()
 {
 	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_textured_f"), SHADER("gl/hud_textured_v"));
 	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_color_f"), SHADER("gl/hud_color_v"));
-	wallShader = GL_ConstructShaderFromAssets(SHADER("gl/wall_f"), SHADER("gl/wall_v"));
+	actorWallShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor_wall_shaded_f"),
+														 SHADER("gl/actor_wall_shaded_v"));
+	actorWallUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor_wall_unshaded_f"),
+														   SHADER("gl/actor_wall_unshaded_v"));
 	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/sky_f"), SHADER("gl/sky_v"));
 	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
 	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"), SHADER("gl/model_unshaded_v"));
@@ -48,28 +86,67 @@ bool GL_LoadShaders()
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
-		!wallShader ||
+		!actorWallShadedShader ||
+		!actorWallUnshadedShader ||
 		!skyShader ||
 		!modelShadedShader ||
 		!modelUnshadedShader ||
 		!debugShader)
 	{
-		GL_Error("Failed to compile shaders");
+		LogError("OpenGL: Failed to compile shaders");
 		return false;
 	}
 
-	hudColoredColorLoc = glGetUniformLocation(uiColoredShader->program, "col");
+	uiColoredColorLoc = glGetUniformLocation(uiColoredShader->program, "col");
+	uiColoredVertexLoc = glGetAttribLocation(uiColoredShader->program, "VERTEX");
 
-	hudTexturedTextureLoc = glGetUniformLocation(uiTexturedShader->program, "alb");
-	hudTexturedColorLoc = glGetUniformLocation(uiTexturedShader->program, "col");
-	hudTexturedRegionLoc = glGetUniformLocation(uiTexturedShader->program, "region");
+	uiTexturedTextureLoc = glGetUniformLocation(uiTexturedShader->program, "alb");
+	uiTexturedColorLoc = glGetUniformLocation(uiTexturedShader->program, "col");
+	uiTexturedRegionLoc = glGetUniformLocation(uiTexturedShader->program, "region");
+	uiTexturedVertexLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
+	uiTexturedUvLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
 
-	wallTextureLoc = glGetUniformLocation(wallShader->program, "alb");
-	wallModelWorldMatrixLoc = glGetUniformLocation(wallShader->program, "MODEL_WORLD_MATRIX");
-	wallSharedUniformsLoc = glGetUniformBlockIndex(wallShader->program, "SharedUniforms");
-	wallTransformMatrixLoc = glGetUniformLocation(wallShader->program, "transformMatrix");
+	actorWallShadedTextureLoc = glGetUniformLocation(actorWallShadedShader->program, "alb");
+	actorWallShadedModelWorldMatrixLoc = glGetUniformLocation(actorWallShadedShader->program, "MODEL_WORLD_MATRIX");
+	actorWallShadedSharedUniformsLoc = glGetUniformBlockIndex(actorWallShadedShader->program, "SharedUniforms");
+	actorWallShadedTransformMatrixLoc = glGetUniformLocation(actorWallShadedShader->program, "transformMatrix");
+	actorWallShadedVertexLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX");
+	actorWallShadedUvLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX_UV");
+	actorWallShadedAngleLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX_ANGLE");
+
+	actorWallUnshadedTextureLoc = glGetUniformLocation(actorWallUnshadedShader->program, "alb");
+	actorWallUnshadedModelWorldMatrixLoc = glGetUniformLocation(actorWallUnshadedShader->program, "MODEL_WORLD_MATRIX");
+	actorWallUnshadedSharedUniformsLoc = glGetUniformBlockIndex(actorWallUnshadedShader->program, "SharedUniforms");
+	actorWallUnshadedTransformMatrixLoc = glGetUniformLocation(actorWallUnshadedShader->program, "transformMatrix");
+	actorWallUnshadedVertexLoc = glGetAttribLocation(actorWallUnshadedShader->program, "VERTEX");
+	actorWallUnshadedUvLoc = glGetAttribLocation(actorWallUnshadedShader->program, "VERTEX_UV");
 
 	debugColorLoc = glGetUniformLocation(debugShader->program, "color");
+	debugSharedUniformsLoc = glGetUniformBlockIndex(debugShader->program, "SharedUniforms");
+	debugVertexLoc = glGetAttribLocation(debugShader->program, "VERTEX");
+
+	skySharedUniformsLoc = glGetUniformBlockIndex(skyShader->program, "SharedUniforms");
+	skyModelWorldMatrixLoc = glGetUniformLocation(skyShader->program, "MODEL_WORLD_MATRIX");
+	skyVertexLoc = glGetAttribLocation(skyShader->program, "VERTEX");
+	skyUvLoc = glGetAttribLocation(skyShader->program, "VERTEX_UV");
+	skyColorLoc = glGetAttribLocation(skyShader->program, "VERTEX_COLOR");
+
+	shadedModelSharedUniformsLoc = glGetUniformBlockIndex(modelShadedShader->program, "SharedUniforms");
+	shadedModelModelWorldMatrixLoc = glGetUniformLocation(modelShadedShader->program, "MODEL_WORLD_MATRIX");
+	shadedModelAlbColorLoc = glGetUniformLocation(modelShadedShader->program, "albColor");
+	shadedModelModColorLoc = glGetUniformLocation(modelShadedShader->program, "modColor");
+	shadedModelVertexLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX");
+	shadedModelUvLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX_UV");
+	shadedModelNormalLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX_NORMAL");
+	shadedModelColorLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX_COLOR");
+
+	unshadedModelSharedUniformsLoc = glGetUniformBlockIndex(modelUnshadedShader->program, "SharedUniforms");
+	unshadedModelModelWorldMatrixLoc = glGetUniformLocation(modelUnshadedShader->program, "MODEL_WORLD_MATRIX");
+	unshadedModelAlbColorLoc = glGetUniformLocation(modelUnshadedShader->program, "albColor");
+	unshadedModelModColorLoc = glGetUniformLocation(modelUnshadedShader->program, "modColor");
+	unshadedModelVertexLoc = glGetAttribLocation(modelUnshadedShader->program, "VERTEX");
+	unshadedModelUvLoc = glGetAttribLocation(modelUnshadedShader->program, "VERTEX_UV");
+	unshadedModelColorLoc = glGetAttribLocation(modelUnshadedShader->program, "VERTEX_COLOR");
 
 	return true;
 }
@@ -78,7 +155,8 @@ void GL_DestroyShaders()
 {
 	GL_DestroyShader(uiTexturedShader);
 	GL_DestroyShader(uiColoredShader);
-	GL_DestroyShader(wallShader);
+	GL_DestroyShader(actorWallShadedShader);
+	GL_DestroyShader(actorWallUnshadedShader);
 	GL_DestroyShader(skyShader);
 	GL_DestroyShader(modelShadedShader);
 	GL_DestroyShader(modelUnshadedShader);

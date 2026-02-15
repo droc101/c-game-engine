@@ -3,10 +3,12 @@
 //
 
 #include <engine/graphics/gl/GLdebug.h>
+#include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/graphics/gl/GLworld.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
@@ -16,7 +18,6 @@
 #include <SDL_error.h>
 #include <SDL_video.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <wchar.h>
 
@@ -45,14 +46,17 @@ bool GL_PreInit()
 				mssaValue = 8;
 				break;
 			default:
-				GL_Error("Invalid MSAA value!");
+				LogError("OpenGL: Invalid MSAA value!");
 				return false;
 		}
-		if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mssaValue) != 0)
-		{
-			LogError("Failed to set MSAA samples attribute: %s\n", SDL_GetError());
-		}
+		glMsaaSamples = mssaValue;
 	}
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0),
+					"Failed to set OpenGL MSAA buffers",
+					GL_INIT_FAIL_MSG);
+	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0),
+					"Failed to set OpenGL MSAA samples",
+					GL_INIT_FAIL_MSG);
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, GL_VERSION_MAJOR),
 					"Failed to set OpenGL major version",
 					GL_INIT_FAIL_MSG);
@@ -68,13 +72,10 @@ bool GL_PreInit()
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1),
 					"Failed to set OpenGL double buffer",
 					GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8), "Failed to set OpenGL red-size", "Failed to start OpenGL");
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8), "Failed to set OpenGL green-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8), "Failed to set OpenGL blue-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8), "Failed to set OpenGL alpha-size", GL_INIT_FAIL_MSG);
-	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24),
-					"Failed to set OpenGL depth buffer size",
-					GL_INIT_FAIL_MSG);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 
 	return true;
 }
@@ -87,9 +88,10 @@ bool GL_Init(SDL_Window *wnd)
 	if (ctx == NULL)
 	{
 		LogError("SDL_GL_CreateContext Error: %s\n", SDL_GetError());
-		GL_Error("Failed to create OpenGL context");
 		return false;
 	}
+
+	TestSDLFunction(SDL_GL_MakeCurrent(wnd, ctx), "Failed to make context current", GL_INIT_FAIL_MSG);
 
 	TestSDLFunction_NonFatal(SDL_GL_SetSwapInterval(GetState()->options.vsync ? 1 : 0), "Failed to set VSync");
 
@@ -98,7 +100,7 @@ bool GL_Init(SDL_Window *wnd)
 	if (err != GLEW_OK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error(GL_INIT_FAIL_MSG);
+		LogError("glewInit Failed with error %d\n", err);
 		return false;
 	}
 
@@ -106,14 +108,71 @@ bool GL_Init(SDL_Window *wnd)
 	if (!GL_VERSION_CHECK)
 	{
 		SDL_GL_DeleteContext(ctx);
-		GL_Error(GL_INIT_FAIL_MSG);
+		LogError("OpenGL: GL_VERSION_CHECK failed\n");
 		return false;
+	}
+
+	if (!GLEW_ARB_framebuffer_object)
+	{
+		LogError("OpenGL device does not support GLEW_ARB_framebuffer_object!\n");
+		return false;
+	}
+
+	if (GetState()->options.anisotropy != ANISOTROPY_NONE)
+	{
+		GLfloat requestedAnisotropy = 0;
+		switch (GetState()->options.anisotropy)
+		{
+			case ANISOTROPY_2X:
+				requestedAnisotropy = 2;
+				break;
+			case ANISOTROPY_4X:
+				requestedAnisotropy = 4;
+				break;
+			case ANISOTROPY_8X:
+				requestedAnisotropy = 8;
+				break;
+			case ANISOTROPY_16X:
+				requestedAnisotropy = 16;
+				break;
+			default:
+				LogError("OpenGL: Invalid anisotropy level!");
+				return false;
+		}
+		GLfloat gpuMaxAnisotropy = 0;
+		if (GLEW_EXT_texture_filter_anisotropic)
+		{
+			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &gpuMaxAnisotropy);
+		} else
+		{
+			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
+		}
+		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
+		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
+		if (requestedAnisotropy != anisotropyLevel)
+		{
+			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
+					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
+					   anisotropyLevel,
+					   requestedAnisotropy,
+					   gpuMaxAnisotropy);
+		}
 	}
 
 
 #ifdef BUILDSTYLE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(GL_DebugMessageCallback, NULL);
+
+	int redSize = 0;
+	int greenSize = 0;
+	int blueSize = 0;
+	int alphaSize = 0;
+	SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &redSize);
+	SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &greenSize);
+	SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blueSize);
+	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alphaSize);
+	LogDebug("Window Framebuffer: R:%d G:%d B:%d A:%d\n", redSize, greenSize, blueSize, alphaSize);
 #endif
 
 	if (!GL_LoadShaders())
@@ -123,11 +182,16 @@ bool GL_Init(SDL_Window *wnd)
 
 	GL_InitObjects();
 
+	if (!GL_InitFramebuffer())
+	{
+		return false;
+	}
+
 	glClearColor(0, 0, 0, 1);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glDisable(GL_SCISSOR_TEST);
 
@@ -152,6 +216,7 @@ bool GL_Init(SDL_Window *wnd)
 void GL_DestroyGL()
 {
 	LogDebug("Cleaning up OpenGL renderer...\n");
+	GL_DestroyFramebuffer();
 	GL_DestroyShaders();
 	GL_DestroyObjects();
 	SDL_GL_DeleteContext(ctx);

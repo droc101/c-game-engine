@@ -7,10 +7,9 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
@@ -43,7 +42,7 @@ typedef struct DoorData
 	bool shouldClose;
 	bool stayOpen;
 	double animationTime;
-	JPH_BodyId sensorBodyId;
+	JPH_BodyID sensorBodyId;
 	Vector3 closedPosition;
 	Vector3 openPosition;
 } DoorData;
@@ -104,7 +103,7 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 
 static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 {
-	JPH_Shape *shape = ActorWallCreateCollider();
+	JPH_Shape *shape = ActorWallCreateCollider(this->actorWall);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Kinematic,
@@ -234,7 +233,7 @@ static void DoorCloseHandler(Actor *this, const Actor * /*sender*/, const Param 
 	}
 }
 
-static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyId bodyId)
+static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyID bodyId)
 {
 	DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
@@ -259,7 +258,7 @@ static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyId bodyId)
 	}
 }
 
-static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyId bodyId)
+static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyID bodyId)
 {
 	const DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
@@ -282,7 +281,7 @@ static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyId bodyId)
 	}
 }
 
-static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyId bodyId)
+static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 {
 	DoorData *data = this->extraData;
 	if (bodyId != data->sensorBodyId)
@@ -321,32 +320,35 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	DoorData *data = this->extraData;
 	data->stayOpen = KvGetBool(params, "stayOpen", false);
 
-	CreateDoorBodies(this, transform, KvGetBool(params, "preventPlayerOpen", false));
-
 	this->actorWall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, -0.5f);
 	this->actorWall->b = v2(0, 0.5f);
-	strncpy(this->actorWall->tex, TEXTURE("actor/door"), 80);
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/door")) + 1);
+	strcpy(this->actorWall->tex, TEXTURE("actor/door"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
+	this->actorWall->unshaded = false;
 	ActorWallBake(this);
+
+	CreateDoorBodies(this, transform, KvGetBool(params, "preventPlayerOpen", false));
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_DOOR,
-									 .Update = DoorUpdate,
-									 .OnPlayerContactAdded = DoorOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DoorDestroy,
-									 .Init = DoorInit};
+ActorDefinition doorActorDefinition = {
+	.Update = DoorUpdate,
+	.OnPlayerContactAdded = DoorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DoorDestroy,
+	.Init = DoorInit,
+};
 
 void RegisterDoor()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, DOOR_INPUT_OPEN, DoorOpenHandler);
-	RegisterActorInput(&definition, DOOR_INPUT_CLOSE, DoorCloseHandler);
-	RegisterActor(DOOR_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&doorActorDefinition);
+	RegisterActorInput(&doorActorDefinition, DOOR_INPUT_OPEN, DoorOpenHandler);
+	RegisterActorInput(&doorActorDefinition, DOOR_INPUT_CLOSE, DoorCloseHandler);
+	RegisterActor(DOOR_ACTOR_NAME, &doorActorDefinition);
 }

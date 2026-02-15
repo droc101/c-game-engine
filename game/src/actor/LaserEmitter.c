@@ -11,7 +11,6 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -91,7 +90,6 @@ static void LaserEmitterTurnOffHandler(Actor *this, const Actor * /*sender*/, co
 
 void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 {
-	// TODO: uncomment once laser emitter collision has holes for where the laser comes out
 	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
@@ -115,19 +113,20 @@ void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 	data->startOn = KvGetBool(params, "startOn", true);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_LASER_EMITTER,
-									 .Update = LaserEmitterUpdate,
-									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DefaultActorDestroy,
-									 .Init = LaserEmitterInit};
+ActorDefinition laserEmitterActorDefinition = {
+	.Update = LaserEmitterUpdate,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+	.Init = LaserEmitterInit,
+};
 
 void RegisterLaserEmitter()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, LASER_EMITTER_INPUT_TURN_ON, LaserEmitterTurnOnHandler);
-	RegisterActorInput(&definition, LASER_EMITTER_INPUT_TURN_OFF, LaserEmitterTurnOffHandler);
-	RegisterActor(LASER_EMITTER_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&laserEmitterActorDefinition);
+	RegisterActorInput(&laserEmitterActorDefinition, LASER_EMITTER_INPUT_TURN_ON, LaserEmitterTurnOnHandler);
+	RegisterActorInput(&laserEmitterActorDefinition, LASER_EMITTER_INPUT_TURN_OFF, LaserEmitterTurnOffHandler);
+	RegisterActor(LASER_EMITTER_ACTOR_NAME, &laserEmitterActorDefinition);
 }

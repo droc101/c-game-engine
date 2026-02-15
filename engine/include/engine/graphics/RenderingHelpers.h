@@ -19,7 +19,7 @@
 /// Near clipping plane
 #define NEAR_Z 0.01
 /// Far clipping plane
-#define FAR_Z 1000
+#define FAR_Z 2000
 
 // Default window size
 #define DEF_WIDTH 1280
@@ -32,6 +32,9 @@
 // Maximum window size
 #define MAX_WIDTH 9999
 #define MAX_HEIGHT 9999
+
+/// The number of milliseconds to sleep for when in low FPS mode
+#define LOW_FPS_MODE_SLEEP_MS 33
 
 typedef enum Renderer Renderer;
 
@@ -176,6 +179,10 @@ float X_TO_NDC(float x);
  */
 float Y_TO_NDC(float y);
 
+/**
+ * Load the map models from a map
+ * @param map The map to load from
+ */
 void LoadMapModels(const Map *map);
 
 /**

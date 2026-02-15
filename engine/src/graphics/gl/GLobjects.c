@@ -18,9 +18,8 @@
 #include <string.h>
 
 GLuint glTextures[MAX_TEXTURES];
-int glNextFreeSlot = 0;
 int glAssetTextureMap[MAX_TEXTURES];
-char glLastError[512];
+int glNextFreeSlot = 0;
 
 GL_ModelBuffers *glModels[MAX_MODELS];
 
@@ -29,6 +28,10 @@ GL_MapModelBuffer *mapModels[GL_MAX_MAP_MODELS];
 GL_Buffer *glBuffer;
 
 GLuint sharedUniformBuffer;
+
+GLfloat anisotropyLevel = 0;
+
+GLint glMsaaSamples = 0;
 
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
@@ -95,6 +98,11 @@ GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
 	return shader;
 }
 
+void GL_UseShader(const GL_Shader *shd)
+{
+	glUseProgram(shd->program);
+}
+
 void GL_DestroyShader(GL_Shader *shd)
 {
 	glDeleteShader(shd->vertexShader);
@@ -114,6 +122,13 @@ GL_Buffer *GL_ConstructBuffer()
 	glGenBuffers(1, &buffer->elementBufferObject);
 
 	return buffer;
+}
+
+void GL_BindBuffer(const GL_Buffer *buffer)
+{
+	glBindVertexArray(buffer->vertexArrayObject);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer->vertexBufferObject);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->elementBufferObject);
 }
 
 void GL_DestroyBuffer(GL_Buffer *buffer)
@@ -162,6 +177,11 @@ int GL_RegisterTexture(const Image *image)
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
+	if (image->mipmaps && anisotropyLevel != 0)
+	{
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel);
+	}
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 
@@ -205,9 +225,7 @@ void GL_LoadModel(const ModelDefinition *model, const uint32_t lod, const size_t
 		const GL_ModelBuffers *modelBuffer = glModels[model->id];
 		const GL_Buffer *lodBuffer = modelBuffer->buffers[lod];
 		const GL_Buffer materialBuffer = lodBuffer[material];
-		glBindVertexArray(materialBuffer.vertexArrayObject);
-		glBindBuffer(GL_ARRAY_BUFFER, materialBuffer.vertexBufferObject);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, materialBuffer.elementBufferObject);
+		GL_BindBuffer(&materialBuffer);
 		return;
 	}
 	GL_ModelBuffers *buf = malloc(sizeof(GL_ModelBuffers));
@@ -229,15 +247,11 @@ void GL_LoadModel(const ModelDefinition *model, const uint32_t lod, const size_t
 			glGenBuffers(1, &modelBuffer->vertexBufferObject);
 			glGenBuffers(1, &modelBuffer->elementBufferObject);
 
-			glBindVertexArray(modelBuffer->vertexArrayObject);
-
-			glBindBuffer(GL_ARRAY_BUFFER, modelBuffer->vertexBufferObject);
+			GL_BindBuffer(modelBuffer);
 			glBufferData(GL_ARRAY_BUFFER,
 						 (long)(model->lods[l]->vertexCount * sizeof(float) * 12),
 						 model->lods[l]->vertexData,
 						 GL_STATIC_DRAW);
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelBuffer->elementBufferObject);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 						 (long)(model->lods[l]->indexCount[m] * sizeof(uint32_t)),
 						 model->lods[l]->indexData[m],

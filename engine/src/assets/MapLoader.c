@@ -8,17 +8,16 @@
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -100,27 +99,29 @@ Map *LoadMap(const char *path)
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;
-		KvListCreate(params);
-		EXPECT_BYTES(sizeof(size_t), bytesRemaining);
-		const size_t numParams = ReadSizeT(mapData->data, &offset);
-		for (size_t j = 0; j < numParams; j++)
-		{
-			char *key = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
-			bytesRemaining -= sizeof(size_t);
-			bytesRemaining -= strLength;
-			Param param;
-			bytesRemaining -= ReadParam(mapData->data, mapData->size, &offset, &param);
-			KvSetUnsafe(params, key, param);
-			free(key);
-		}
+		// TODO: Add EXPECT_BYTES for this
+		bytesRemaining -= ReadKvList(mapData->data, mapData->size, &offset, params);
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			map->player.transform = xfm;
+			TeleportPlayer(&map->player, &xfm);
 			KvListDestroy(params);
 			ListFree(ioConnections);
 			free(actorClass);
 			continue;
+		}
+
+		const char *actorName = NULL;
+		if (KvHas(params, "name", PARAM_TYPE_STRING))
+		{
+			actorName = KvGetString(params, "name", "");
+			if (actorName[0] != '\0')
+			{
+				actorName = strdup(actorName);
+			} else
+			{
+				actorName = NULL;
+			}
 		}
 
 		Actor *actor = CreateActor(&xfm, actorClass, params, bodyInterface);
@@ -128,6 +129,12 @@ Map *LoadMap(const char *path)
 		actor->ioConnections = ioConnections;
 		ListAdd(map->actors, actor);
 		free(actorClass);
+
+		if (actorName && actorName[0] != '\0')
+		{
+			ListAdd(map->namedActorNames, actorName);
+			ListAdd(map->namedActorPointers, actor);
+		}
 	}
 
 	EXPECT_BYTES(sizeof(size_t), bytesRemaining);
@@ -237,7 +244,7 @@ Map *LoadMap(const char *path)
 																							   OBJECT_LAYER_STATIC,
 																							   0);
 		JPH_BodyCreationSettings_SetFriction(bodyCreationSettings, 4.25f);
-		const JPH_BodyId body = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
+		const JPH_BodyID body = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
 																   bodyCreationSettings,
 																   JPH_Activation_Activate);
 		ListAdd(map->joltBodies, body);

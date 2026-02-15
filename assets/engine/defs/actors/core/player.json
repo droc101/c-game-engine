@@ -1,3 +1,6 @@
 {
-  "description": "The spawn point for the player"
+  "description": "The spawn point for the player",
+  "display": {
+    "model": "player"
+  }
 }

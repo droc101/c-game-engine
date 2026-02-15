@@ -7,7 +7,6 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Param.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
@@ -103,8 +102,7 @@ void LogicCounterInit(Actor *this, const KvList params, Transform * /*transform*
 	data->clampToMin = KvGetBool(params, "clampToMin", true);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LOGIC_COUNTER,
+ActorDefinition logicCounterActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -116,10 +114,10 @@ static ActorDefinition definition = {
 
 void RegisterLogicCounter()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_ADD, LogicCounterAddHandler);
-	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_SUBTRACT, LogicCounterSubtractHandler);
-	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_INCREMENT, LogicCounterIncrementHandler);
-	RegisterActorInput(&definition, LOGIC_COUNTER_INPUT_DECREMENT, LogicCounterDecrementHandler);
-	RegisterActor(LOGIC_COUNTER_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&logicCounterActorDefinition);
+	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_ADD, LogicCounterAddHandler);
+	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_SUBTRACT, LogicCounterSubtractHandler);
+	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_INCREMENT, LogicCounterIncrementHandler);
+	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_DECREMENT, LogicCounterDecrementHandler);
+	RegisterActor(LOGIC_COUNTER_ACTOR_NAME, &logicCounterActorDefinition);
 }

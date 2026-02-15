@@ -6,6 +6,7 @@
 #define GAME_ASSETREADER_H
 
 #include <engine/structs/Asset.h>
+#include <engine/subsystem/Logging.h>
 #include <engine/structs/List.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -13,6 +14,7 @@
 
 #define ASSET_FORMAT_VERSION 2
 #define ASSET_FORMAT_MAGIC 0x454D4147
+#define ASSET_HEADER_SIZE (sizeof(uint32_t) + (sizeof(uint8_t) * 3) + (sizeof(size_t) * 2))
 
 typedef enum AssetPathType AssetPathType;
 typedef enum AssetPathFlags AssetPathFlags;

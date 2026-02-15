@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(game_module C CXX)
 
-#region Game Executable
-
 add_library(game MODULE EXCLUDE_FROM_ALL
         src/actor/Coin.c
         include/actor/Coin.h
@@ -44,6 +42,11 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         include/helpers/GameActorRegistration.h
 
         src/GameMain.c
+
+        include/item/EraserItem.h
+        src/item/EraserItem.c
+        include/item/LaserStopperItem.h
+        src/item/LaserStopperItem.c
 )
 
 if (x86_64)
@@ -92,5 +95,3 @@ if (x86_64)
         )
     endif ()
 endif ()
-
-#endregion

@@ -15,6 +15,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// The maximum number of map models OpenGL can store
 #define GL_MAX_MAP_MODELS 2048
 
 typedef struct GL_Shader GL_Shader;
@@ -56,11 +57,13 @@ struct GL_ModelBuffers
 
 struct GL_MapModelBuffer
 {
+	/// The map model in this buffer
 	MapModel *mapModel;
+	/// The OpenGL buffer storing this model
 	GL_Buffer *buffer;
 };
 
-struct __attribute__((aligned(16))) GL_SharedUniforms
+struct GL_SharedUniforms
 {
 	/// The model -> screen matrix
 	mat4 worldViewMatrix;
@@ -70,9 +73,14 @@ struct __attribute__((aligned(16))) GL_SharedUniforms
 	float fogStart;
 	/// The distance from the camera at which the fog is fully opaque
 	float fogEnd;
-	/// The yaw of the camera
-	float cameraYaw;
-};
+	float _padding_1[2];
+	/// The global light color
+	vec3 lightColor;
+	float _padding_2;
+	/// The global light direction
+	vec3 lightDirection;
+	float _padding_3;
+}; // __attribute__((aligned(16))); // TODO aligned(16) does not seem to be doing what it should be doing. manually added padding floats for now.
 
 struct GL_DebugLine
 {
@@ -81,18 +89,29 @@ struct GL_DebugLine
 	Color color;
 };
 
+/// Loaded textures
 extern GLuint glTextures[MAX_TEXTURES];
-extern int glNextFreeSlot;
 extern int glAssetTextureMap[MAX_TEXTURES];
-extern char glLastError[512];
+/// The next available texture slot
+extern int glNextFreeSlot;
 
+/// Loaded models
 extern GL_ModelBuffers *glModels[MAX_MODELS];
 
+/// Loaded map models
 extern GL_MapModelBuffer *mapModels[GL_MAX_MAP_MODELS];
 
+/// General purpose buffer
 extern GL_Buffer *glBuffer;
 
+/// Shared uniform buffer
 extern GLuint sharedUniformBuffer;
+
+/// Texture anisotropy level
+extern GLfloat anisotropyLevel;
+
+/// Number of MSAA samples
+extern GLint glMsaaSamples;
 
 /**
  * Create a shader program from assets
@@ -124,6 +143,16 @@ GL_Buffer *GL_ConstructBuffer();
 void GL_DestroyShader(GL_Shader *shd);
 
 /**
+ * Bind/use a GL shader
+ */
+void GL_UseShader(const GL_Shader *shd);
+
+/**
+ * Bind/use a GL buffer
+ */
+void GL_BindBuffer(const GL_Buffer *buffer);
+
+/**
  * Destroy a GL_Buffer struct
  * @param buffer The buffer to destroy
  */
@@ -150,10 +179,19 @@ int GL_RegisterTexture(const Image *image);
  */
 void GL_LoadModel(const ModelDefinition *model, uint32_t lod, size_t material);
 
+/**
+ * Destroy all loaded map models
+ */
 void GL_DestroyMapModels();
 
+/**
+ * Initialize GL objects
+ */
 void GL_InitObjects();
 
+/**
+ * Destroy GL objects
+ */
 void GL_DestroyObjects();
 
 #endif //GAME_GLOBJECTS_H

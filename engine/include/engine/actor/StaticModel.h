@@ -5,7 +5,9 @@
 #ifndef STATICMODEL_H
 #define STATICMODEL_H
 
-#define ACTOR_TYPE_STATIC_MODEL 6
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition staticModelActorDefinition;
 
 #define STATIC_MODEL_ACTOR_NAME "prop_model_static"
 

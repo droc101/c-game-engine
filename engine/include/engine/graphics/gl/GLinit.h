@@ -9,11 +9,17 @@
 #include <SDL_video.h>
 #include <stdbool.h>
 
+/// The major OpenGL version to use
 #define GL_VERSION_MAJOR 3
+/// The minor OpenGL version to use
 #define GL_VERSION_MINOR 3
+/// The OpenGL profile to use
 #define GL_PROFILE SDL_GL_CONTEXT_PROFILE_CORE
+/// The GLEW macro to use when checking for GL version support
 #define GL_VERSION_CHECK GLEW_VERSION_3_3
+/// A string describing the GL version
 #define GL_VERSION_STRING "OpenGL 3.3 Core Profile"
+/// The error message to show when OpenGL fails to start
 #define GL_INIT_FAIL_MSG "Failed to start OpenGL. Your GPU or drivers may not support the " GL_VERSION_STRING "."
 
 /**

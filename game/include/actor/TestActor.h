@@ -7,7 +7,7 @@
 
 #include <engine/structs/ActorDefinition.h>
 
-#define ACTOR_TYPE_TEST_ACTOR (6 + FIRST_GAME_ACTOR_TYPE_ID)
+extern ActorDefinition testActorDefinition;
 
 #define TEST_ACTOR_NAME "test_actor"
 

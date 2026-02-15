@@ -1,0 +1,54 @@
+{
+  "description": "Gof",
+  "extends": "actor",
+  "display": {
+    "color_param": "fog_color"
+  },
+  "inputs": {
+    "set": {
+      "type": "none",
+      "description": "Set the map's fog information from this actor"
+    },
+    "set_instant": {
+      "type": "none",
+      "description": "Immediately set the map's fog information from this actor without interpolation"
+    }
+  },
+  "outputs": {},
+  "params": {
+    "fog_color": {
+      "display": "Fog Color",
+      "default": -1,
+      "type": "color",
+      "showAlpha": false,
+      "description": "The color of this fog"
+    },
+    "fog_start": {
+      "display": "Fog Start Depth",
+      "default": 10.0,
+      "type": "float",
+      "min": 0.0,
+      "description": "How far away from the camera the fog should start (be at 0% opacity)"
+    },
+    "fog_end": {
+      "display": "Fog End Depth",
+      "default": 20.0,
+      "type": "float",
+      "min": 0.0,
+      "description": "How far away from the camera the fog should end (be at 100% opacity)"
+    },
+    "start_on": {
+      "display": "Start On",
+      "default": true,
+      "type": "bool",
+      "description": "Whether this light should be enabled when the map loads"
+    },
+    "interpolation_ticks": {
+      "display": "Interpolation Ticks",
+      "default": 60,
+      "type": "int",
+      "min": 0,
+      "description": "The number of physics ticks (60 per second) the fog color and distance transition should take"
+    }
+  }
+}

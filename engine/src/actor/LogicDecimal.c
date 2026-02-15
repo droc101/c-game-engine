@@ -6,7 +6,6 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Param.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
@@ -92,8 +91,7 @@ void LogicDecimalInit(Actor *this, const KvList params, Transform * /*transform*
 	data->operation = KvGetByte(params, "operation", DECIMAL_OP_EQUAL);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LOGIC_DECIMAL,
+ActorDefinition logicDecimalActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -105,9 +103,9 @@ static ActorDefinition definition = {
 
 void RegisterLogicDecimal()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, LOGIC_DECIMAL_INPUT_OPERAND_A, LogicDecimalOperandAHandler);
-	RegisterActorInput(&definition, LOGIC_DECIMAL_INPUT_OPERAND_B, LogicDecimalOperandBHandler);
-	RegisterActorInput(&definition, LOGIC_DECIMAL_INPUT_EXECUTE, LogicDecimalExecuteHandler);
-	RegisterActor(LOGIC_DECIMAL_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&logicDecimalActorDefinition);
+	RegisterActorInput(&logicDecimalActorDefinition, LOGIC_DECIMAL_INPUT_OPERAND_A, LogicDecimalOperandAHandler);
+	RegisterActorInput(&logicDecimalActorDefinition, LOGIC_DECIMAL_INPUT_OPERAND_B, LogicDecimalOperandBHandler);
+	RegisterActorInput(&logicDecimalActorDefinition, LOGIC_DECIMAL_INPUT_EXECUTE, LogicDecimalExecuteHandler);
+	RegisterActor(LOGIC_DECIMAL_ACTOR_NAME, &logicDecimalActorDefinition);
 }

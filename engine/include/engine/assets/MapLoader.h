@@ -9,6 +9,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * Load a map asset
+ * @param path The asset path
+ * @return The loaded map
+ */
 Map *LoadMap(const char *path);
 
 #endif //GAME_MAPLOADER_H

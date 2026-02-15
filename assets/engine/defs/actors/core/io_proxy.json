@@ -1,5 +1,8 @@
 {
   "description": "Communication between the core engine and the map",
+  "display": {
+    "color": 4294902015
+  },
   "outputs": {
     "first_tick": {
       "description": "Emitted on the first physics tick of the map"

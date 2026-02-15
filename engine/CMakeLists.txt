@@ -13,29 +13,26 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-message("fetch dict")
+
+fetch_glew()
 fetch_dict()
-message("fetch luna")
-fetch_package_tag(https://github.com/NBT22/Luna v0.2.* Luna)
+
+message(STATUS "Fetching Luna...")
+fetch_package_tag(https://github.com/NBT22/Luna "v0.2.*" Luna)
 if (x86_64)
-    message("fetch discord sdk")
     fetch_discord_sdk()
 endif ()
-check_include_file("cglm/cglm.h" cglm_FOUND)
-if (NOT cglm_FOUND)
-    fetch_package_tag(https://github.com/recp/cglm.git v0.*.* cglm)
-else ()
-    add_library(cglm INTERFACE)
-endif ()
+
+message(STATUS "Fetching CGLM...")
+set(CGLM_SHARED OFF)
+set(CGLM_STATIC ON)
+fetch_package_tag(https://github.com/recp/cglm.git v0.*.* cglm)
 
 if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
-message("fetch jolt")
+message(STATUS "Fetching JoltC/Jolt...")
 fetch_package(https://github.com/NBT22/joltc main joltc)
-set_target_properties(Jolt PROPERTIES POSITION_INDEPENDENT_CODE ON)
-set_target_properties(joltc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 #endregion
 
@@ -57,6 +54,10 @@ target_sources(engine INTERFACE
         include/engine/actor/StaticModel.h
         src/actor/Trigger.c
         include/engine/actor/Trigger.h
+        src/actor/GlobalLight.c
+        include/engine/actor/GlobalLight.h
+        src/actor/GlobalFog.c
+        include/engine/actor/GlobalFog.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -151,14 +152,14 @@ target_sources(engine INTERFACE
         include/engine/structs/List.h
         src/structs/Options.c
         include/engine/structs/Options.h
-        src/structs/Param.c
-        include/engine/structs/Param.h
         src/structs/Player.c
         include/engine/structs/Player.h
         include/engine/structs/Vector2.h
         include/engine/structs/Viewmodel.h
-        src/structs/Wall.c
-        include/engine/structs/Wall.h
+        src/structs/ActorWall.c
+        include/engine/structs/ActorWall.h
+        include/engine/structs/Item.h
+        src/structs/Item.c
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h
@@ -197,12 +198,22 @@ target_sources(engine INTERFACE
         src/Engine.c
         include/engine/Engine.h
 )
+set_target_properties(engine PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
 target_include_directories(engine INTERFACE include)
 if (x86_64)
     target_compile_definitions(engine INTERFACE ENABLE_DISCORD_SDK)
     target_include_directories(engine INTERFACE ${DISCORD_GAME_SDK_DIR}/c/)
     target_link_libraries(engine INTERFACE discord_game_sdk)
 endif ()
+
+target_include_directories(engine INTERFACE ${FETCHCONTENT_BASE_DIR}/glew-src/include)
+
+if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    target_compile_definitions(engine INTERFACE BUILDSTYLE_RELEASE)
+else ()
+    target_compile_definitions(engine INTERFACE BUILDSTYLE_DEBUG)
+endif ()
+
 if (JOLT_BUILD_DEBUG_RENDERER)
     target_compile_definitions(engine INTERFACE JPH_DEBUG_RENDERER)
 endif ()
@@ -218,7 +229,7 @@ target_link_libraries(engine INTERFACE
         dict
         Luna
         OpenGL::GL
-        GLEW::GLEW
+        glew_s
 )
 
 if (UNIX)

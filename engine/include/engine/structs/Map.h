@@ -12,6 +12,7 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
+#include <engine/structs/Viewmodel.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
@@ -22,32 +23,54 @@ typedef struct Map Map;
 typedef struct MapVertex MapVertex;
 typedef struct MapModel MapModel;
 
+typedef enum MapChangeFlags MapChangeFlags;
+
+enum MapChangeFlags
+{
+	MAP_LIGHT_CHANGED = 1 << 1,
+	MAP_FOG_CHANGED = 1 << 2,
+	MAP_VIEWMODEL_CHANGED = 1 << 3
+};
+
 struct MapVertex
 {
+	/// The world space position of the vertex
 	Vector3 position;
+	/// The UV coordinate
 	Vector2 uv;
+	/// The vertex color
 	Color color;
+	/// The vertex normal
 	Vector3 normal;
 };
 
 struct MapModel
 {
+	/// The material this model uses
 	MapMaterial *material;
+	/// The number of vertices in this model
 	uint32_t vertexCount;
+	/// The vertices in this model
 	MapVertex *vertices;
+	/// The number of indices in this model
 	uint32_t indexCount;
+	/// The indices in this model
 	uint32_t *indices;
 };
 
 struct Map
 {
+	/// The name of the icon this map uses for Discord RPC
 	char *discordRpcIcon;
+	/// The display name this map uses for Discord RPC
 	char *discordRpcName;
 
 	/// The list of actors in the map
 	LockingList actors;
 
+	/// Ths number of map models in this map
 	size_t modelCount;
+	/// The map models
 	MapModel *models;
 
 	List joltBodies;
@@ -56,13 +79,19 @@ struct Map
 	char *skyTexture;
 
 	/// The color of the fog
-	uint32_t fogColor;
+	Color fogColor;
 	/// The distance from the player at which the fog begins to fade in
 	float fogStart;
 	/// The distance from the player at which the fog is fully opaque
 	float fogEnd;
 
+	/// The pitch and yaw of the directional light. The roll is always zero as it has no effect.
+	Vector2 lightAngle;
+	/// The light color. The alpha channel is ignored.
+	Color lightColor;
+
 	JPH_PhysicsSystem *physicsSystem;
+	uint64_t physicsTick;
 
 	/// The player object
 	Player player;
@@ -74,6 +103,11 @@ struct Map
 
 	/// A pointer to the I/O proxy actor, if it exists
 	Actor *ioProxy;
+
+	MapChangeFlags changeFlags;
+
+	/// The view model
+	Viewmodel viewmodel;
 };
 
 /**

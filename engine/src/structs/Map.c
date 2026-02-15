@@ -6,17 +6,20 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Item.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Wall.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -30,15 +33,29 @@ Map *CreateMap(void)
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
 	CreatePlayer(&map->player, map->physicsSystem);
-	map->fogColor = 0xff000000;
+	map->fogColor = COLOR(0xff000000);
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
 	map->discordRpcIcon = NULL;
 	map->discordRpcName = NULL;
 	map->skyTexture = NULL;
+	map->lightAngle = v2s(0);
+	map->lightColor = COLOR_WHITE;
+	map->physicsTick = 0;
+	map->changeFlags = 0;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->SwitchTo(item, &map->viewmodel);
+	} else
+	{
+		map->viewmodel.enabled = false;
+	}
+
 	return map;
 }
 

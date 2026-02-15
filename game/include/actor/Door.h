@@ -7,7 +7,7 @@
 
 #include <engine/structs/ActorDefinition.h>
 
-#define ACTOR_TYPE_DOOR (1 + FIRST_GAME_ACTOR_TYPE_ID)
+extern ActorDefinition doorActorDefinition;
 
 #define DOOR_ACTOR_NAME "prop_door"
 

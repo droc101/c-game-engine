@@ -7,13 +7,9 @@
 
 #include <engine/structs/Dict.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Param.h>
 #include <joltc/Math/Transform.h>
-#include <joltc/types.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <m-core.h>
-#include <stdint.h>
-
-#define FIRST_GAME_ACTOR_TYPE_ID (1 << 16)
 
 typedef struct Actor Actor;
 
@@ -29,11 +25,11 @@ typedef void (*ActorUIRenderFunction)(Actor *this);
 
 typedef void (*ActorInputHandlerFunction)(Actor *this, const Actor *sender, const Param *param);
 
-typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyId bodyId);
+typedef void (*ActorPlayerContactAddedFunction)(Actor *this, JPH_BodyID bodyId);
 
-typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyId bodyId);
+typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyID bodyId);
 
-typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyId bodyId);
+typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyID bodyId);
 
 typedef void (*ActorRegisterFunction)();
 
@@ -45,9 +41,6 @@ DEFINE_DICT(ActorDefinitionDict, const char *, M_CSTR_OPLIST, ActorDefinition *,
 
 struct ActorDefinition
 {
-	/// The actor type index
-	/// @warning Do not change this after creation
-	uint64_t actorType;
 	/// The function to call when the actor is updated
 	/// @note This should be called every tick
 	ActorUpdateFunction Update;

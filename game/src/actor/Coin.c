@@ -8,12 +8,11 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <joltc/constants.h>
@@ -73,9 +72,10 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
 	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
+	ActorWallBake(this);
 }
 
-static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const CoinData *data = this->extraData;
 	if (!data->isBlue)
@@ -100,7 +100,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 
 	const Transform adjustedTransform = {
 		.position.x = transform->position.x,
-		.position.y = -0.25f,
+		.position.y = transform->position.y,
 		.position.z = transform->position.z,
 		.rotation.w = 1.0f,
 	};
@@ -110,24 +110,27 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, 0.125f);
 	this->actorWall->b = v2(0, -0.125f);
-	strncpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"), 80);
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/bluecoin")) + 1);
+	strcpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 0.25f;
+	this->actorWall->unshaded = false;
 	ActorWallBake(this);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_COIN,
-									 .Update = CoinUpdate,
-									 .OnPlayerContactAdded = CoinOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DefaultActorDestroy,
-									 .Init = CoinInit};
+ActorDefinition coinActorDefinition = {
+	.Update = CoinUpdate,
+	.OnPlayerContactAdded = CoinOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+	.Init = CoinInit,
+};
 
 void RegisterCoin()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActor(COIN_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&coinActorDefinition);
+	RegisterActor(COIN_ACTOR_NAME, &coinActorDefinition);
 }

@@ -58,7 +58,7 @@ Image *LoadImage(const char *asset)
 		{
 			break;
 		}
-		if (strncmp(asset, img->name, 80) == 0)
+		if (strcmp(asset, img->name) == 0)
 		{
 			return img;
 		}
@@ -139,7 +139,7 @@ Image *RegisterFallbackImage()
 		{
 			break;
 		}
-		if (strncmp(asset, img->name, 80) == 0)
+		if (strcmp(asset, img->name) == 0)
 		{
 			return img;
 		}

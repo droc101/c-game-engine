@@ -18,8 +18,6 @@ typedef void *LibraryHandle;
 #define LIB_SUFFIX ".so"
 #endif
 
-#endif //GAME_LIBRARYLOADER_H
-
 /**
  * Initialize the library loader
  */
@@ -52,3 +50,5 @@ int CloseLibrary(LibraryHandle library);
  * @return
  */
 const char *LibraryLoaderError();
+
+#endif //GAME_LIBRARYLOADER_H

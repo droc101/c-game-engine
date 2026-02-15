@@ -1,6 +1,9 @@
 {
   "description": "Simple counter with increment/decrement/add/subtract operations, as well as optional clamping",
   "extends": "actor",
+  "display": {
+    "color": 4294902015
+  },
   "inputs": {
     "increment": {
       "description": "Add 1 to the counter"

@@ -20,7 +20,6 @@ void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
 	player->transform.rotation = JPH_Quat_Identity;
 	player->canDropHeldActor = true;
-	player->isNoclipActive = true; // TODO remove once physics work
 
 	CreatePlayerPhysics(player, physicsSystem);
 }

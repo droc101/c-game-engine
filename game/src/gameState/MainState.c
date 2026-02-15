@@ -9,6 +9,7 @@
 #include <engine/debug/DPrint.h>
 #include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -16,6 +17,7 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Item.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
@@ -29,6 +31,7 @@
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
+#include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <math.h>
 #include <SDL_gamecontroller.h>
@@ -40,28 +43,27 @@
 #include <stdio.h>
 #include "actor/Physbox.h"
 #include "actor/TestActor.h"
-#include "engine/graphics/RenderingHelpers.h"
 #include "gameState/PauseState.h"
 
 static bool lodThreadInitDone = false;
 
-static inline void RotateCamera(GlobalState *state, const Vector2 cameraMotion)
+static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
-	const float currentPitch = JPH_Quat_GetRotationAngle(&state->map->player.transform.rotation, &Vector3_AxisX) +
-							   GLM_PI_2f;
+	Transform *transform = state->map->player.isFreecamActive ? &state->camera->transform
+															  : &state->map->player.transform;
+	const float currentPitch = JPH_Quat_GetRotationAngle(&transform->rotation, &Vector3_AxisX) + GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
 	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
 	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-	JPH_Quat_Multiply(&newYaw, &state->map->player.transform.rotation, &state->map->player.transform.rotation);
-	JPH_Quat_Multiply(&state->map->player.transform.rotation, &newPitch, &state->map->player.transform.rotation);
-	JPH_Quat_Normalized(&state->map->player.transform.rotation, &state->map->player.transform.rotation);
+	JPH_Quat_Multiply(&newYaw, &transform->rotation, &transform->rotation);
+	JPH_Quat_Multiply(&transform->rotation, &newPitch, &transform->rotation);
+	JPH_Quat_Normalized(&transform->rotation, &transform->rotation);
 
-	state->camera->transform.position.x = state->map->player.transform.position.x;
-	state->camera->transform.position.y = state->map->player.transform.position.y; // + state->camera->yOffset;
-	state->camera->transform.position.z = state->map->player.transform.position.z;
-	state->camera->transform.rotation = state->map->player.transform.rotation;
-	state->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
+	state->camera->transform.position.x = transform->position.x;
+	state->camera->transform.position.y = transform->position.y; // + state->camera->yOffset;
+	state->camera->transform.position.z = transform->position.z;
+	state->camera->transform.rotation = transform->rotation;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -86,7 +88,13 @@ void MainStateUpdate(GlobalState *state)
 		cameraMotion.y *= -1;
 	}
 
-	RotateCamera(state, cameraMotion);
+	UpdateCamera(state, cameraMotion);
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->Update(item, state);
+	}
 
 	if (state->saveData->coins > 9999)
 	{
@@ -128,7 +136,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
 		}
 
-		RotateCamera(state, cameraMotion);
+		UpdateCamera(state, cameraMotion);
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
@@ -170,6 +178,15 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		AddActor(leaf);
 	}
 
+	// TODO proper UI for switching items
+	if (IsKeyJustPressedPhys(SDL_SCANCODE_Q))
+	{
+		PreviousItem();
+	} else if (IsKeyJustPressedPhys(SDL_SCANCODE_E))
+	{
+		NextItem();
+	}
+
 	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->map->physicsSystem,
 																   deltaTime,
 																   2,
@@ -179,6 +196,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		LogError("Failed to update Jolt physics system with error %d\n", result);
 		Error("Failed to update physics!");
 	}
+	GetState()->map->physicsTick++;
 
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
 	if (SignalLodThreadCanStart() != 0)
@@ -196,6 +214,12 @@ void MainStateRender(GlobalState *state)
 
 	RenderMap(state->map, state->camera);
 	RenderHUD();
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->RenderHud(item);
+	}
 
 #ifdef BUILDSTYLE_DEBUG
 	DPrintF("Engine " ENGINE_VERSION, COLOR_WHITE, false);

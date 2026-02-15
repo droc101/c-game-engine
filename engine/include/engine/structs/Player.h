@@ -10,6 +10,11 @@
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
 
+#define CROSSHAIR_COLOR_NORMAL COLOR(0xFFFFCCCC)
+#define CROSSHAIR_COLOR_HOLDABLE COLOR(0xFF006600)
+#define CROSSHAIR_COLOR_ENEMY COLOR(0xffff0000)
+#define CROSSHAIR_COLOR_INVISIBLE COLOR(0x00ff0000)
+
 typedef struct Player Player;
 
 struct Player
@@ -30,6 +35,7 @@ struct Player
 	bool hasHeldActor;
 	bool canDropHeldActor;
 	bool isNoclipActive;
+	bool isFreecamActive;
 };
 
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem);

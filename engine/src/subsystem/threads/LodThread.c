@@ -55,7 +55,7 @@ int LodThreadMain(void * /*data*/)
 		const float lodMultiplier = state->options.lodMultiplier;
 		bool shouldReloadActors = false;
 		Vector3 actorPosition = {};
-		Vector3 offsetFromPlayer = {};
+		Vector3 offsetFromCamera = {};
 		for (size_t i = 0; i < actorCount; i++)
 		{
 			Actor *actor = ListGetPointer(*actors, i);
@@ -64,8 +64,8 @@ int LodThreadMain(void * /*data*/)
 				continue;
 			}
 			JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
-			Vector3_Subtract(&actorPosition, &state->map->player.transform.position, &offsetFromPlayer);
-			const float distanceSquared = Vector3_LengthSquared(&offsetFromPlayer);
+			Vector3_Subtract(&actorPosition, &state->camera->transform.position, &offsetFromCamera);
+			const float distanceSquared = Vector3_LengthSquared(&offsetFromCamera);
 			while (actor->currentLod != 0 &&
 				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)
 			{

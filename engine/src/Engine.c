@@ -85,7 +85,7 @@ void ExecPathInit(const int argc, const char *argv[])
 void InitSDL()
 {
 	LogDebug("Initializing SDL...\n");
-	SDL_SetHint(SDL_HINT_APP_NAME, config.gameTitle);
+	SDL_SetHint(SDL_HINT_APP_NAME, gameConfig.gameTitle);
 #ifdef __LINUX__
 	if (GetState()->options.preferWayland)
 	{
@@ -110,22 +110,23 @@ void InitSDL()
 void WindowAndRenderInit()
 {
 	LogDebug("Creating window...\n");
-	const size_t titleLen = strlen(config.gameTitle) + strlen(" - Vulkan") + 1;
+	const size_t titleLen = strlen(gameConfig.gameTitle) + strlen(" - Vulkan") + 1;
 	char title[titleLen];
 	switch (currentRenderer)
 	{
 		case RENDERER_OPENGL:
-			snprintf(title, titleLen, "%s - OpenGL", config.gameTitle);
+			snprintf(title, titleLen, "%s - OpenGL", gameConfig.gameTitle);
 			break;
 		case RENDERER_VULKAN:
-			snprintf(title, titleLen, "%s - Vulkan", config.gameTitle);
+			snprintf(title, titleLen, "%s - Vulkan", gameConfig.gameTitle);
 			break;
 		default:
-			snprintf(title, titleLen, "%s", config.gameTitle);
+			snprintf(title, titleLen, "%s", gameConfig.gameTitle);
 			break;
 	}
+	SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
-	SDL_Window *window = SDL_CreateWindow(&title[0],
+	SDL_Window *window = SDL_CreateWindow(title,
 										  SDL_WINDOWPOS_UNDEFINED,
 										  SDL_WINDOWPOS_UNDEFINED,
 										  DEF_WIDTH,
@@ -233,6 +234,8 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Initializing Engine\n");
 
+	InitArguments(argc, argv);
+
 	if (HasCliArg(argc, argv, "--game"))
 	{
 		const char *game = GetCliArgStr(argc, argv, "--game", "assets/game");
@@ -246,9 +249,9 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitTimers();
 
-	if (HasCliArg(argc, argv, "--renderer"))
+	if (HasCliArg("--renderer"))
 	{
-		const char *renderer = GetCliArgStr(argc, argv, "--renderer", "gl");
+		const char *renderer = GetCliArgStr("--renderer", "gl");
 		if (strncmp(renderer, "gl", strlen("gl")) == 0)
 		{
 			LogInfo("Forcing OpenGL Renderer\n");
@@ -331,7 +334,7 @@ void EngineIteration()
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
-	if (IsKeyJustPressed(SDL_SCANCODE_F8))
+	if (IsKeyJustPressed(SDL_SCANCODE_F10))
 	{
 		BenchToggle();
 	}
@@ -359,7 +362,7 @@ void EngineIteration()
 
 	if (IsLowFPSModeEnabled())
 	{
-		SDL_Delay(33);
+		SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 	}
 	FrameGraphUpdate(GetTimeNs() - frameStart);
 }

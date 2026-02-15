@@ -26,14 +26,14 @@ void DiscordInit()
 {
 	memset(&app, 0, sizeof(app));
 
-	if (config.discordAppId == 0)
+	if (gameConfig.discordAppId == 0)
 	{
 		return;
 	}
 
 	struct DiscordCreateParams params;
 	DiscordCreateParamsSetDefault(&params);
-	params.client_id = (DiscordClientId)config.discordAppId;
+	params.client_id = (DiscordClientId)gameConfig.discordAppId;
 	params.flags = DiscordCreateFlags_NoRequireDiscord;
 	params.event_data = &app;
 
@@ -51,7 +51,7 @@ void DiscordInit()
 
 	DiscordUpdateRPC();
 
-	LogInfo("Discord Game SDK started with App ID %zu\n", config.discordAppId);
+	LogInfo("Discord Game SDK started with App ID %zu\n", gameConfig.discordAppId);
 }
 
 void DiscordUpdate()
@@ -78,7 +78,7 @@ void DiscordUpdateRPC()
 		return;
 	}
 	struct DiscordActivity activity = {0};
-	activity.application_id = (DiscordClientId)config.discordAppId;
+	activity.application_id = (DiscordClientId)gameConfig.discordAppId;
 	activity.type = DiscordActivityType_Playing;
 	switch (GetState()->rpcState)
 	{

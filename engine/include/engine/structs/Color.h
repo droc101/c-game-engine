@@ -38,9 +38,13 @@ typedef struct Color Color;
 
 struct Color
 {
+	/// The red component
 	float r;
+	/// The green component
 	float g;
+	/// The blue component
 	float b;
+	/// The alpha component
 	float a;
 };
 

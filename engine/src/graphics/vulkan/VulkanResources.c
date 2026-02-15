@@ -50,7 +50,7 @@ VkResult CreateUiBuffers()
 
 VkResult CreateViewModelBuffers()
 {
-	const Viewmodel *viewmodel = &GetState()->viewmodel;
+	const Viewmodel *viewmodel = &GetState()->map->viewmodel;
 	const ModelDefinition *model = viewmodel->model;
 	const size_t vertexSize = sizeof(ModelVertex) * model->lods[0]->vertexCount;
 	const size_t indexSize = sizeof(uint32_t) * model->lods[0]->totalIndexCount;

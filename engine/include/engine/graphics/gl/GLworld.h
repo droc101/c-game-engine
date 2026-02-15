@@ -26,9 +26,10 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
 
 /**
  * Get the transform matrix for the viewmodel/held item
+ * @param map The map containing the viewmodel
  * @param out The destination matrix
  */
-void GL_GetViewmodelMatrix(mat4 *out);
+void GL_GetViewmodelMatrix(const Map *map, mat4 *out);
 
 /**
  * OpenGL code to render the 3D portion of a map
@@ -53,34 +54,83 @@ void GL_RenderModel(const ModelDefinition *model,
 					uint32_t lod,
 					Color modColor);
 
-void GL_RenderMapModel(const GL_MapModelBuffer *model);
+/**
+ * Render a map model using the shaded model shader
+ * @param model The map model to render
+ */
+void GL_RenderShadedMapModel(const GL_MapModelBuffer *model);
 
+/**
+ * Render a map model using the unshaded model shader
+ * @param model The map model to render
+ */
+void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model);
+
+/**
+ * Load a map into OpenGL
+ * @param map the map to load
+ */
 void GL_LoadMap(const Map *map);
 
 /**
- * Render a single material of a model
+ * Render a single material of a model with the shaded model shader
  * @param model The model to render
  * @param modelWorldMatrix The model -> world matrix
  * @param lod The level of detail to render
- * @param material The material to render
- * @param skin The skin to use for the model
- * @param modColor
+ * @param materialIndex The material index to render
+ * @param modColor The mod color to use
+ * @param mat The material to render
  */
-void GL_RenderModelPart(const ModelDefinition *model,
-						const mat4 modelWorldMatrix,
-						uint32_t lod,
-						size_t material,
-						uint32_t skin,
-						Color modColor);
-
+void GL_RenderShadedModelPart(const ModelDefinition *model,
+							  const mat4 modelWorldMatrix,
+							  uint32_t lod,
+							  size_t materialIndex,
+							  Color modColor,
+							  const Material *mat);
 
 /**
- * Draw an actor wall in 3D
+ * Render a single material of a model with the unshaded model shader
+ * @param model The model to render
+ * @param modelWorldMatrix The model -> world matrix
+ * @param lod The level of detail to render
+ * @param materialIndex The material index to render
+ * @param modColor The mod color to use
+ * @param mat The material to render
+ */
+void GL_RenderUnshadedModelPart(const ModelDefinition *model,
+								const mat4 modelWorldMatrix,
+								uint32_t lod,
+								size_t materialIndex,
+								Color modColor,
+								const Material *mat);
+
+/**
+ * Render a single material of a model with the sky shader
+ * @param model The model to render
+ * @param modelWorldMatrix The model -> world matrix
+ * @param lod The level of detail to render
+ * @param materialIndex The material index to render
+ */
+void GL_RenderSkyModelPart(const ModelDefinition *model,
+						   const mat4 modelWorldMatrix,
+						   uint32_t lod,
+						   size_t materialIndex);
+
+/**
+ * Draw a shaded actor wall in 3D
  * @param actor The actor to draw
  * @param actorXfm
  * @note This expects 3D mode to be enabled
  */
-void GL_DrawActorWall(const Actor *actor, const mat4 actorXfm);
+void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm);
+
+/**
+ * Draw an unshaded actor wall in 3D
+ * @param actor The actor to draw
+ * @param actorXfm
+ * @note This expects 3D mode to be enabled
+ */
+void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm);
 
 /**
  * Set the map parameters for rendering

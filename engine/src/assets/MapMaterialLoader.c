@@ -9,6 +9,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,7 +26,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 		{
 			break;
 		}
-		if (strncmp(path, material->name, 80) == 0)
+		if (strcmp(path, material->name) == 0)
 		{
 			return material;
 		}

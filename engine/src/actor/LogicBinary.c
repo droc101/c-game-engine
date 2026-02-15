@@ -6,7 +6,6 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Param.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
@@ -84,8 +83,7 @@ void LogicBinaryInit(Actor *this, const KvList params, Transform * /*transform*/
 	data->operation = KvGetByte(params, "operation", LOGIC_OP_AND);
 }
 
-static ActorDefinition definition = {
-	.actorType = ACTOR_TYPE_LOGIC_BINARY,
+ActorDefinition logicBinaryActorDefinition = {
 	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
@@ -97,9 +95,9 @@ static ActorDefinition definition = {
 
 void RegisterLogicBinary()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, LOGIC_BINARY_INPUT_OPERAND_A, LogicBinaryOperandAHandler);
-	RegisterActorInput(&definition, LOGIC_BINARY_INPUT_OPERAND_B, LogicBinaryOperandBHandler);
-	RegisterActorInput(&definition, LOGIC_BINARY_INPUT_EXECUTE, LogicBinaryExecuteHandler);
-	RegisterActor(LOGIC_BINARY_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&logicBinaryActorDefinition);
+	RegisterActorInput(&logicBinaryActorDefinition, LOGIC_BINARY_INPUT_OPERAND_A, LogicBinaryOperandAHandler);
+	RegisterActorInput(&logicBinaryActorDefinition, LOGIC_BINARY_INPUT_OPERAND_B, LogicBinaryOperandBHandler);
+	RegisterActorInput(&logicBinaryActorDefinition, LOGIC_BINARY_INPUT_EXECUTE, LogicBinaryExecuteHandler);
+	RegisterActor(LOGIC_BINARY_ACTOR_NAME, &logicBinaryActorDefinition);
 }

@@ -8,12 +8,11 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
@@ -59,6 +58,7 @@ static void GoalUpdate(Actor *this, double /*delta*/)
 						   GLM_PI_2f;
 	this->actorWall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
 	this->actorWall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
+	ActorWallBake(this);
 }
 
 static void GoalEnableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
@@ -73,7 +73,7 @@ static void GoalDisableHandler(Actor *this, const Actor * /*sender*/, const Para
 	data->enabled = false;
 }
 
-static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyId /*bodyId*/)
+static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const GoalData *data = this->extraData;
 	if (data->enabled)
@@ -95,10 +95,12 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2(0, 0.5f);
 	this->actorWall->b = v2(0, -0.5f);
-	strncpy(this->actorWall->tex, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"), 80);
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/goal0")) + 1);
+	strcpy(this->actorWall->tex, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
+	this->actorWall->unshaded = false;
 	ActorWallBake(this);
 
 	const Transform adjustedTransform = {
@@ -108,19 +110,20 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	CreateGoalSensor(this, &adjustedTransform);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_GOAL,
-									 .Update = GoalUpdate,
-									 .OnPlayerContactAdded = GoalOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DefaultActorDestroy,
-									 .Init = GoalInit};
+ActorDefinition goalActorDefinition = {
+	.Update = GoalUpdate,
+	.OnPlayerContactAdded = GoalOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+	.Init = GoalInit,
+};
 
 void RegisterGoal()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, GOAL_INPUT_ENABLE, GoalEnableHandler);
-	RegisterActorInput(&definition, GOAL_INPUT_DISABLE, GoalDisableHandler);
-	RegisterActor(GOAL_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&goalActorDefinition);
+	RegisterActorInput(&goalActorDefinition, GOAL_INPUT_ENABLE, GoalEnableHandler);
+	RegisterActorInput(&goalActorDefinition, GOAL_INPUT_DISABLE, GoalDisableHandler);
+	RegisterActor(GOAL_ACTOR_NAME, &goalActorDefinition);
 }

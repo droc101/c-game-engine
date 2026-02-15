@@ -1,6 +1,10 @@
 {
   "description": "A prop that emits a prop_laser actor",
   "extends": "actor",
+  "display": {
+    "type": "model",
+    "model": "laseremitter"
+  },
   "inputs": {
     "turn_on": {
       "description": "Turn on this laser emitter"

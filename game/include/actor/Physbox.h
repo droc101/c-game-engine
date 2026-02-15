@@ -7,7 +7,7 @@
 
 #include <engine/structs/ActorDefinition.h>
 
-#define ACTOR_TYPE_PHYSBOX (5 + FIRST_GAME_ACTOR_TYPE_ID)
+extern ActorDefinition physboxActorDefinition;
 
 #define PHYSBOX_ACTOR_NAME "prop_physbox"
 

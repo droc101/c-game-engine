@@ -7,14 +7,14 @@
 
 #include <engine/assets/ModelLoader.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
-#include <engine/structs/Param.h>
-#include <engine/structs/Wall.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/types.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -53,8 +53,11 @@ struct Actor
 	/// Flags used to provide more information about the actor
 	uint32_t actorFlags;
 
-	JPH_BodyId bodyId;
+	JPH_BodyID bodyId;
 	JPH_BodyInterface *bodyInterface;
+
+	/// Whether the actor is currently visible
+	bool visible;
 
 	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
 	ModelDefinition *actorModel;
@@ -141,17 +144,17 @@ void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*para
 /**
  * Default actor on player contact added function
  */
-void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/);
+void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyID /*bodyId*/);
 
 /**
  * Default actor on player contact persisted function
  */
-void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyId /*bodyId*/);
+void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyID /*bodyId*/);
 
 /**
  * Default actor on player contact removed function
  */
-void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyId /*bodyId*/);
+void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/);
 
 /**
  * Default actor render ui function

@@ -11,7 +11,6 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Param.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
@@ -23,6 +22,7 @@
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/types.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +34,7 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->actorFlags = 0;
 	actor->bodyInterface = bodyInterface;
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
+	actor->visible = true;
 	actor->actorWall = NULL;
 	actor->health = 1;
 	actor->actorModel = NULL;
@@ -56,6 +57,10 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 void FreeActor(Actor *actor)
 {
 	actor->definition->Destroy(actor);
+	if (actor->actorWall)
+	{
+		free(actor->actorWall->tex);
+	}
 	free(actor->actorWall);
 	actor->actorWall = NULL;
 	free(actor->extraData);
@@ -76,14 +81,14 @@ void FreeActor(Actor *actor)
 
 void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param)
 {
-	LogInfo("Triggering input %d on actor %p from actor %p\n", input, receiver, sender);
-	const ActorInputHandlerFunction handler = GetActorInputHandler(sender->definition, input);
+	LogDebug("Triggering input \"%s\" on actor %p from actor %p\n", input, receiver, sender);
+	const ActorInputHandlerFunction handler = GetActorInputHandler(receiver->definition, input);
 	if (handler)
 	{
 		handler(receiver, sender, param);
 	} else
 	{
-		LogWarning("Could not send signal %s to actor %p because it has no handler!", input, receiver);
+		LogWarning("Could not send signal %s to actor %p because it has no handler!\n", input, receiver);
 	}
 }
 
@@ -99,7 +104,7 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 			GetActorsByName(connection->targetActorName, GetState()->map, &actors);
 			if (actors.length == 0)
 			{
-				LogWarning("Tried to fire signal to actor %s, but it was not found!", connection->targetActorName);
+				LogWarning("Tried to fire signal to actor %s, but it was not found!\n", connection->targetActorName);
 				continue;
 			}
 			for (size_t j = 0; j < actors.length; j++)
@@ -120,8 +125,10 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 
 void DestroyActorConnection(ActorConnection *connection)
 {
+	free(connection->targetActorName);
 	free(connection->sourceActorOutput);
 	free(connection->targetActorInput);
+	FreeParam(&connection->outParamOverride);
 	free(connection);
 }
 void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
@@ -131,11 +138,11 @@ void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*para
 	RemoveActor(this);
 }
 
-void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
 
-void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
 
-void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyId /*bodyId*/) {}
+void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
 
 void DefaultActorRenderUi(Actor * /*this*/) {}
 

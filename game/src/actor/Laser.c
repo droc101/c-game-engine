@@ -7,11 +7,10 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ActorWall.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Param.h>
 #include <engine/structs/Vector2.h>
-#include <engine/structs/Wall.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -67,7 +66,7 @@ static bool TripleLaserObjectLayerShouldCollide(const JPH_ObjectLayer layer)
 	return layer == OBJECT_LAYER_STATIC;
 }
 
-static bool BodyFilterShouldCollide(const JPH_BodyId bodyId)
+static bool BodyFilterShouldCollide(const JPH_BodyID bodyId)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	const Actor *actor = (const Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
@@ -179,12 +178,13 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->actorWall);
 	this->actorWall->a = v2s(0);
 	this->actorWall->b = v2s(0);
-	strncpy(this->actorWall->tex,
-			data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"),
-			80);
+	this->actorWall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
+	strcpy(this->actorWall->tex,
+		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
 	this->actorWall->uvScale = 1.0f;
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
+	this->actorWall->unshaded = true;
 
 	if (!data->on)
 	{
@@ -230,19 +230,20 @@ void LaserRaycastFiltersDestroy()
 	JPH_BodyFilter_Destroy(bodyFilter);
 }
 
-static ActorDefinition definition = {.actorType = ACTOR_TYPE_LASER,
-									 .Update = LaserUpdate,
-									 .OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-									 .OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-									 .OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-									 .RenderUi = DefaultActorRenderUi,
-									 .Destroy = DefaultActorDestroy,
-									 .Init = LaserInit};
+ActorDefinition laserActorDefinition = {
+	.Update = LaserUpdate,
+	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
+	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
+	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
+	.RenderUi = DefaultActorRenderUi,
+	.Destroy = DefaultActorDestroy,
+	.Init = LaserInit,
+};
 
 void RegisterLaser()
 {
-	RegisterDefaultActorInputs(&definition);
-	RegisterActorInput(&definition, LASER_INPUT_TURN_ON, LaserTurnOnHandler);
-	RegisterActorInput(&definition, LASER_INPUT_TURN_OFF, LaserTurnOffHandler);
-	RegisterActor(LASER_ACTOR_NAME, &definition);
+	RegisterDefaultActorInputs(&laserActorDefinition);
+	RegisterActorInput(&laserActorDefinition, LASER_INPUT_TURN_ON, LaserTurnOnHandler);
+	RegisterActorInput(&laserActorDefinition, LASER_INPUT_TURN_OFF, LaserTurnOffHandler);
+	RegisterActor(LASER_ACTOR_NAME, &laserActorDefinition);
 }

@@ -6,13 +6,15 @@
 #define LOBALSTATE_H
 
 #include <engine/structs/Camera.h>
+#include <engine/structs/Item.h>
+#include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
-#include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Discord.h>
 #include <joltc/joltc.h>
 #include <SDL_stdinc.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define GAME_STATE_UNKNOWN 0
@@ -36,6 +38,9 @@ struct SaveData
 	int coins;
 	/// The number of blue coins the player has
 	int blueCoins;
+	/// The items the player has
+	List items;
+	size_t currentItem;
 };
 
 // Global state of the game
@@ -63,9 +68,6 @@ struct GlobalState
 	/// The scale of the UI.
 	double uiScale;
 
-	/// The view model
-	Viewmodel viewmodel;
-
 	/// Game options
 	Options options;
 
@@ -78,6 +80,7 @@ struct GlobalState
 	/// Request to exit the game
 	bool requestExit;
 
+	/// The Discord RPC state
 	RPCState rpcState;
 };
 
@@ -99,17 +102,15 @@ void InitState();
  */
 GlobalState *GetState();
 
-/**
- * Damage the player
- * @param damage Damage to deal
- */
-void TakeDamage(int damage);
+Item *GetItem();
 
-/**
- * Heal the player
- * @param amount Amount to heal
- */
-void Heal(int amount);
+void GiveItem(const ItemDefinition *definition, bool switchToItem);
+
+void SwitchToItem(const ItemDefinition *definition);
+
+void PreviousItem();
+
+void NextItem();
 
 /**
  * Set game state callbacks

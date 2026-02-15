@@ -5,7 +5,9 @@
 #ifndef TRIGGER_H
 #define TRIGGER_H
 
-#define ACTOR_TYPE_TRIGGER 7
+#include <engine/structs/ActorDefinition.h>
+
+extern ActorDefinition triggerActorDefinition;
 
 #define TRIGGER_ACTOR_NAME "trigger"
 
