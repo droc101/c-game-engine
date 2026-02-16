@@ -5,6 +5,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/debug/DPrintConsole.h>
 #include <engine/debug/FrameBenchmark.h>
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
@@ -281,6 +282,8 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	InitCommonFonts();
 
 	DiscordInit();
+
+	InitDPrintConsole();
 }
 
 void EngineIteration()
@@ -338,12 +341,13 @@ void EngineIteration()
 	FrameGraphDraw();
 	TickGraphDraw();
 
+	ProcessDPrintConsole();
+
 	FrameEnd();
 
 	UpdateInputStates();
 
 	DiscordUpdate();
-
 	if (state->requestExit)
 	{
 		shouldQuit = true;
@@ -362,6 +366,7 @@ void EngineIteration()
 
 void DestroyEngine()
 {
+	DestroyDPrintConsole();
 	DiscordDestroy();
 	PhysicsThreadTerminate();
 	LodThreadDestroy();

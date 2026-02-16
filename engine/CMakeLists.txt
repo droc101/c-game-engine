@@ -86,6 +86,8 @@ target_sources(engine INTERFACE
         include/engine/debug/FrameGrapher.h
         src/debug/JoltDebugRenderer.c
         include/engine/debug/JoltDebugRenderer.h
+        src/debug/DPrintConsole.c
+        include/engine/debug/DPrintConsole.h
 
         src/graphics/Drawing.c
         include/engine/graphics/Drawing.h
