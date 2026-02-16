@@ -132,7 +132,7 @@ void WindowAndRenderInit()
 										  SDL_WINDOWPOS_UNDEFINED,
 										  DEF_WIDTH,
 										  DEF_HEIGHT,
-										  rendererFlags | SDL_WINDOW_RESIZABLE);
+										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -284,6 +284,8 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	DiscordInit();
 
 	InitDPrintConsole();
+
+	SDL_ShowWindow(GetGameWindow());
 }
 
 void EngineIteration()
@@ -366,6 +368,7 @@ void EngineIteration()
 
 void DestroyEngine()
 {
+	SDL_HideWindow(GetGameWindow());
 	DestroyDPrintConsole();
 	DiscordDestroy();
 	PhysicsThreadTerminate();

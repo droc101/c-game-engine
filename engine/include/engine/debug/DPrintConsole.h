@@ -5,8 +5,8 @@
 #ifndef GAME_DPRINTCONSOLE_H
 #define GAME_DPRINTCONSOLE_H
 
-#include <stddef.h>
 #include <engine/structs/Color.h>
+#include <stddef.h>
 
 void AddConsoleMessage(const char *msg, Color color);
 
