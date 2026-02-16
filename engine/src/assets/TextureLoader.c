@@ -8,7 +8,6 @@
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL3/SDL_endian.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -98,10 +97,6 @@ Image *LoadImage(const char *asset)
 			CheckAlloc(img->pixelData);
 			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
 			uint32_t *pixels32 = (uint32_t *)img->pixelData;
-			for (size_t i = 0; i < img->width * img->height; i++)
-			{
-				pixels32[i] = SDL_Swap32BE(pixels32[i]); // endianness is SO fun
-			}
 		}
 	}
 
