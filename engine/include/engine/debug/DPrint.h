@@ -17,6 +17,8 @@
  */
 void ResetDPrintYPos();
 
+void DPrint(const char *str, Color color);
+
 /**
  * Prints a string to the screen and optionally to the console (stdout)
  * @param str Format string

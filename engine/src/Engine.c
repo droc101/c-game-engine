@@ -5,6 +5,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/debug/DPrintConsole.h>
 #include <engine/debug/FrameBenchmark.h>
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
@@ -125,7 +126,7 @@ void WindowAndRenderInit()
 	SDL_Window *window = SDL_CreateWindow(title,
 										  DEF_WIDTH,
 										  DEF_HEIGHT,
-										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -270,6 +271,10 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	InitCommonFonts();
 
 	DiscordInit();
+
+	InitDPrintConsole();
+
+	SDL_ShowWindow(GetGameWindow());
 }
 
 void EngineIteration()
@@ -328,6 +333,8 @@ void EngineIteration()
 	FrameGraphDraw();
 	TickGraphDraw();
 
+	ProcessDPrintConsole();
+
 	FrameEnd();
 
 	UpdateSoundSystem();
@@ -335,7 +342,6 @@ void EngineIteration()
 	UpdateInputStates();
 
 	DiscordUpdate();
-
 	if (state->requestExit)
 	{
 		shouldQuit = true;
@@ -354,6 +360,8 @@ void EngineIteration()
 
 void DestroyEngine()
 {
+	SDL_HideWindow(GetGameWindow());
+	DestroyDPrintConsole();
 	DiscordDestroy();
 	PhysicsThreadTerminate();
 	LodThreadDestroy();

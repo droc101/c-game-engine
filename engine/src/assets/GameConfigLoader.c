@@ -37,15 +37,20 @@ void LoadGameConfig()
 		free(path);
 	}
 
-	Asset *asset = DecompressAsset("game.game", false);
-	if (!asset || asset->type != ASSET_TYPE_GAME_CONFIG || asset->typeVersion != 1)
+	Asset *asset = DecompressAsset("game.gkvl", false);
+	if (!asset || asset->type != ASSET_TYPE_KV_LIST || asset->typeVersion != 1)
 	{
 		Error("Invalid game configuration");
 	}
 	size_t offset = 0;
-	gameConfig.gameTitle = ReadStringSafe(asset->data, &offset, asset->size, NULL);
-	gameConfig.gameCopyright = ReadStringSafe(asset->data, &offset, asset->size, NULL);
-	gameConfig.discordAppId = ReadSizeT(asset->data, &offset);
+	KvList configList = {};
+	ReadKvList(asset->data, asset->size, &offset, configList);
+
+	gameConfig.gameTitle = strdup(KvGetString(configList, "game_title", "Untitled"));
+	gameConfig.gameCopyright = strdup(KvGetString(configList, "game_copyright", ""));
+	gameConfig.discordAppId = KvGetUint64(configList, "discord_app_id", 0);
+
+	KvListDestroy(configList);
 
 	FreeAsset(asset);
 }

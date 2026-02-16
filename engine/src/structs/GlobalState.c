@@ -176,6 +176,13 @@ void DestroyGlobalState()
 	}
 	ListFree(state.saveData->items);
 	state.map = NULL;
+	for (size_t i = 0; i < state.saveData->items.length; i++)
+	{
+		Item *item = ListGetPointer(state.saveData->items, i);
+		item->definition->Destruct(item);
+		free(item);
+	}
+	ListFree(state.saveData->items);
 	free(state.saveData);
 	free(state.camera);
 
