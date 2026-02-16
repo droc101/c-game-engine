@@ -98,10 +98,6 @@ Image *LoadImage(const char *asset)
 			CheckAlloc(img->pixelData);
 			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
 			uint32_t *pixels32 = (uint32_t *)img->pixelData;
-			for (size_t i = 0; i < img->width * img->height; i++)
-			{
-				pixels32[i] = SDL_SwapBE32(pixels32[i]); // endianness is SO fun
-			}
 		}
 	}
 
