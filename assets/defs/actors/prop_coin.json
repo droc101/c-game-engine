@@ -13,6 +13,10 @@
       "type": "bool",
       "default": "Yellow",
       "options": "coin_type"
+    },
+    "testthing": {
+      "type": "string",
+      "string_hint": "actor"
     }
   }
 }

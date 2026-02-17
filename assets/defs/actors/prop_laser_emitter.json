@@ -3,7 +3,7 @@
   "extends": "actor",
   "display": {
     "type": "model",
-    "model": "laseremitter"
+    "model": "model/laseremitter.gmdl"
   },
   "inputs": {
     "turn_on": {
