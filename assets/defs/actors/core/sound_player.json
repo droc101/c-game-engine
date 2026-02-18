@@ -1,6 +1,9 @@
 {
   "description": "Plays a sound with the ability to control volume and looping",
   "extends": "actor",
+  "display": {
+    "directional": false
+  },
   "inputs": {
     "play": {
       "description": "Play this sound from the start"
