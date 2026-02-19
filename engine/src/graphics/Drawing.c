@@ -2,7 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <SDL_pixels.h>
+#include <SDL3/SDL_pixels.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
@@ -26,7 +26,6 @@
 #include <joltc/Math/Vector3.h>
 #include <joltc/types.h>
 #include <SDL3/SDL_error.h>
-#include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_surface.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -36,7 +35,11 @@ SDL_Surface *ToSDLSurface(const char *texture)
 {
 	const Image *img = LoadImage(texture);
 
-	SDL_Surface *surface = SDL_CreateSurfaceFrom((int)img->width, (int)img->height, SDL_PIXELFORMAT_ARGB8888, img->pixelData, (int)img->width * sizeof(uint32_t));
+	SDL_Surface *surface = SDL_CreateSurfaceFrom((int)img->width,
+												 (int)img->height,
+												 SDL_PIXELFORMAT_ABGR8888,
+												 img->pixelData,
+												 (int)(img->width * sizeof(uint32_t)));
 
 	if (surface == NULL)
 	{
