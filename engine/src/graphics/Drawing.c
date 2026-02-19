@@ -2,6 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <SDL_pixels.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
@@ -36,16 +37,12 @@ SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
 	const Image *img = LoadImage(texture);
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, filterMode);
-
-	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(img->pixelData,
-													(int)img->width,
-													(int)img->height,
-													32,
-													(int)img->width * 4,
-													0x00ff0000,
-													0x0000ff00,
-													0x000000ff,
-													0xff000000);
+	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(img->pixelData,
+															  (int)img->width,
+															  (int)img->height,
+															  32,
+															  (int)img->width * 4,
+															  SDL_PIXELFORMAT_ABGR8888);
 	if (surface == NULL)
 	{
 		LogError("Failed to create surface: %s\n", SDL_GetError());
