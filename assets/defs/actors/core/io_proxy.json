@@ -1,7 +1,8 @@
 {
   "description": "Communication between the core engine and the map",
   "display": {
-    "color": 4294902015
+    "color": 4294902015,
+    "directional": false
   },
   "outputs": {
     "first_tick": {
