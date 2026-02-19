@@ -9,6 +9,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin)
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
+set(CMAKE_PLATFORM_NO_VERSIONED_SONAME ON)
+
 #region Options
 
 option(JOLT_BUILD_DEBUG_RENDERER "Whether or not to enable the Jolt debug renderer. Note that this has a performance impact even if the renderer is not visible." OFF)
