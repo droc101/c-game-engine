@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <engine/helpers/MathEx.h>
 
 #define GL_COLOR_INTERNAL_FORMAT GL_RGB8
 #define GL_COLOR_FORMAT GL_RGB
@@ -22,8 +23,41 @@ GLuint frameBufferObject;
 GLuint renderBufferObject;
 GLuint framebufferColorTexture;
 
-bool GL_InitFramebuffer()
+int GetActualMsaaSamples(const OptionsMsaa requested)
 {
+	const bool msaaEnabled = requested != MSAA_NONE;
+	if (msaaEnabled)
+	{
+		int msaaValue = 0;
+		switch (requested)
+		{
+			case MSAA_2X:
+				msaaValue = 2;
+				break;
+			case MSAA_4X:
+				msaaValue = 4;
+				break;
+			case MSAA_8X:
+				msaaValue = 8;
+				break;
+			default:
+				LogError("OpenGL: Invalid MSAA value!");
+				return false;
+		}
+		return msaaValue;
+	}
+	return 1;
+}
+
+void GL_SetVsyncEnabled(const bool enable)
+{
+	SDL_GL_SetSwapInterval(enable ? 1 : 0);
+}
+
+bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
+{
+	glMsaaSamples = GetActualMsaaSamples(msaaSamples);
+
 	glGenFramebuffers(1, &frameBufferObject);
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
 	glGenRenderbuffers(1, &renderBufferObject);
@@ -213,4 +247,11 @@ inline void GL_UpdateViewportSize()
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, vpWidth, vpHeight);
 	}
 	glBindRenderbuffer(GL_RENDERBUFFER, boundRbo);
+}
+
+void GL_RecreateFramebuffer(const OptionsMsaa msaaSamples)
+{
+	GL_DestroyFramebuffer();
+	GL_InitFramebuffer(msaaSamples);
+	GL_UpdateViewportSize();
 }
