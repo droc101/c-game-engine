@@ -237,7 +237,8 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 		if (IsKeyPressed(SDL_SCANCODE_W))
 		{
 			moveVec.z -= 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_S))
+		}
+		if (IsKeyPressed(SDL_SCANCODE_S))
 		{
 			moveVec.z += 1;
 		}
@@ -245,7 +246,8 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 		if (IsKeyPressed(SDL_SCANCODE_D))
 		{
 			moveVec.x += 1;
-		} else if (IsKeyPressed(SDL_SCANCODE_A))
+		}
+		if (IsKeyPressed(SDL_SCANCODE_A))
 		{
 			moveVec.x -= 1;
 		}

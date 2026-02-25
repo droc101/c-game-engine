@@ -26,27 +26,6 @@ SDL_GLContext ctx;
 bool GL_PreInit()
 {
 	LogDebug("Pre-initializing OpenGL...\n");
-	const bool msaaEnabled = GetState()->options.msaa != MSAA_NONE;
-	if (msaaEnabled)
-	{
-		int mssaValue = 0;
-		switch (GetState()->options.msaa)
-		{
-			case MSAA_2X:
-				mssaValue = 2;
-				break;
-			case MSAA_4X:
-				mssaValue = 4;
-				break;
-			case MSAA_8X:
-				mssaValue = 8;
-				break;
-			default:
-				LogError("OpenGL: Invalid MSAA value!");
-				return false;
-		}
-		glMsaaSamples = mssaValue;
-	}
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0),
 					"Failed to set OpenGL MSAA buffers",
 					GL_INIT_FAIL_MSG);
@@ -89,7 +68,7 @@ bool GL_Init(SDL_Window *wnd)
 
 	TestSDLFunction(SDL_GL_MakeCurrent(wnd, ctx), "Failed to make context current", GL_INIT_FAIL_MSG);
 
-	TestSDLFunction_NonFatal(SDL_GL_SetSwapInterval(GetState()->options.vsync ? 1 : 0), "Failed to set VSync");
+	GL_SetVsyncEnabled(GetState()->options.vsync);
 
 	glewExperimental = GL_TRUE; // Please expose OpenGL 3.x+ interfaces
 	const GLenum err = glewInit();
@@ -178,7 +157,7 @@ bool GL_Init(SDL_Window *wnd)
 
 	GL_InitObjects();
 
-	if (!GL_InitFramebuffer())
+	if (!GL_InitFramebuffer(GetState()->options.msaa))
 	{
 		return false;
 	}

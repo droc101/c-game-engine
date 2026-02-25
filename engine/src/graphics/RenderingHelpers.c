@@ -297,6 +297,34 @@ void LoadMapModels(const Map *map)
 	}
 }
 
+void SetVsyncEnabled(bool enabled)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_OPENGL:
+			GL_SetVsyncEnabled(enabled);
+			break;
+		case RENDERER_VULKAN:
+			// TODO
+		default:
+			break;
+	}
+}
+
+void RecreateFramebuffers()
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_OPENGL:
+			GL_RecreateFramebuffer(GetState()->options.msaa);
+			break;
+		case RENDERER_VULKAN:
+			// TODO
+		default:
+			break;
+	}
+}
+
 inline void GetColor(const uint32_t argb, Color *color)
 {
 	color->r = (float)(argb >> 16 & 0xFF) / 255.0f;

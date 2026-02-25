@@ -193,6 +193,13 @@ float Y_TO_NDC(float y);
 void LoadMapModels(const Map *map);
 
 /**
+ * Set whether vertical sync is enabled
+ */
+void SetVsyncEnabled(bool enabled);
+
+void RecreateFramebuffers();
+
+/**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)
  * @param argb The color uint32_t
  * @param color The output color

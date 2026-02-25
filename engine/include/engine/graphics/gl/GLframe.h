@@ -6,12 +6,20 @@
 #define GAME_GLFRAME_H
 
 #include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner) Required for the NDC macros
+#include <engine/structs/Options.h>
 #include <stdbool.h>
+
+int GetActualMsaaSamples(OptionsMsaa requested);
+
+/**
+ * Set whether vsync is enabled
+ */
+void GL_SetVsyncEnabled(bool enable);
 
 /**
  * Create the OpenGL framebuffer and related data
  */
-bool GL_InitFramebuffer();
+bool GL_InitFramebuffer(OptionsMsaa msaaSamples);
 
 /**
  * Destroy the OpenGL framebuffer and related data
@@ -42,6 +50,8 @@ void GL_FrameEnd();
  * Update the viewport and framebuffer sizes
  */
 void GL_UpdateViewportSize();
+
+void GL_RecreateFramebuffer(OptionsMsaa msaaSamples);
 
 /**
  * Convert screen X to NDC

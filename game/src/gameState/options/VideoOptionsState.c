@@ -88,8 +88,7 @@ void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const ui
 void CbOptionsVsync(const bool value)
 {
 	GetState()->options.vsync = value;
-	hasChangedVideoOptions = true;
-	// VSync change will happen on next restart
+	SetVsyncEnabled(GetState()->options.vsync);
 }
 
 void CbOptionsLimitFpsWhenUnfocused(const bool value)
@@ -116,6 +115,8 @@ void SldOptionsMsaa(const float value)
 	GetState()->options.msaa = value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
+	// TODO: GL can now runtime recreate framebuffers,
+	//  but doing it in the middle of the frame is...not the greatest idea
 }
 
 void SldOptionsAnisotropy(const float value)
