@@ -75,6 +75,7 @@ struct Map
 
 	List joltBodies;
 
+	bool renderSky;
 	/// The fully qualified texture name of the sky
 	char *skyTexture;
 

@@ -265,8 +265,11 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	GL_SetMapParams(&worldViewMatrix, map);
 
-	GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
-	GL_ClearDepthOnly(); // prevent sky from clipping into walls
+	if (map->renderSky)
+	{
+		GL_RenderModel(LoadModel(MODEL("sky")), skyModelWorldMatrix, 0, 0, COLOR_WHITE);
+		GL_ClearDepthOnly(); // prevent sky from clipping into walls
+	}
 
 	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
 	{
