@@ -4,7 +4,6 @@
 
 #include <cglm/cglm.h>
 #include <engine/assets/AssetReader.h>
-#include <engine/graphics/gl/GLdebug.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/subsystem/Logging.h>

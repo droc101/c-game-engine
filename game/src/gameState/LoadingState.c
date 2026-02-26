@@ -9,9 +9,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/Timing.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

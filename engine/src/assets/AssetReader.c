@@ -9,7 +9,6 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Dict.h>
-#include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <errno.h>

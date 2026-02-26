@@ -6,9 +6,7 @@
 #include <engine/helpers/Realloc.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <limits.h>
-#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_mutex.h>
 #include <stddef.h>
 #include <stdint.h>

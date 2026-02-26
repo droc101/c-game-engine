@@ -10,11 +10,11 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Logging.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define GL_COLOR_INTERNAL_FORMAT GL_RGB8
 #define GL_COLOR_FORMAT GL_RGB
@@ -243,7 +243,7 @@ inline void GL_FrameEnd()
 
 inline void GL_UpdateViewportSize()
 {
-	Vector2 windowSize = ActualWindowSizeIgnoreDPI();
+	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
 	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 
 	GLint boundRbo = GL_NONE;
@@ -260,7 +260,11 @@ inline void GL_UpdateViewportSize()
 								(GLsizei)windowSize.y,
 								GL_TRUE);
 
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, glMsaaSamples, GL_DEPTH_FORMAT, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+										 glMsaaSamples,
+										 GL_DEPTH_FORMAT,
+										 (GLsizei)windowSize.x,
+										 (GLsizei)windowSize.y);
 	} else
 	{
 		glBindTexture(GL_TEXTURE_2D, framebufferColorTexture);

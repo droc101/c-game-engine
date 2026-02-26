@@ -12,6 +12,7 @@
 #include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
+#include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Input.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -20,19 +21,23 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/Body.h>
+#include <joltc/Physics/Body/BodyFilter.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <joltc/Physics/Collision/CastResult.h>
+#include <joltc/Physics/Collision/NarrowPhaseQuery.h>
+#include <joltc/Physics/Collision/ObjectLayer.h>
 #include <joltc/Physics/Collision/PhysicsMaterial.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
+#include <joltc/Physics/Collision/Shape/SubShapeID.h>
 #include <joltc/Physics/Collision/ShapeFilter.h>
-#include <joltc/types.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "engine/structs/Viewmodel.h"
 
 static const double gravity = 9.81 / PHYSICS_TARGET_TPS;
 static const float actorRaycastMaxDistance = 10.0f;

@@ -8,12 +8,11 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <joltc/constants.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <joltc/types.h>
+#include <joltc/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <joltc/Physics/Collision/ObjectLayer.h>
 #include <stdbool.h>
 #include <stddef.h>
 

@@ -27,7 +27,6 @@
 #include <luna/lunaInstance.h>
 #include <luna/lunaTypes.h>
 #include <math.h>
-#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>

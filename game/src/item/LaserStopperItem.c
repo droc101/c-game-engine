@@ -10,6 +10,7 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
+#include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Input.h>
 #include <item/LaserStopperItem.h>
 #include <SDL3/SDL_gamepad.h>

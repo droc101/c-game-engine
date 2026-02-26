@@ -96,7 +96,6 @@ Image *LoadImage(const char *asset)
 			img->pixelData = malloc(pixelDataSize);
 			CheckAlloc(img->pixelData);
 			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
-			uint32_t *pixels32 = (uint32_t *)img->pixelData;
 		}
 	}
 

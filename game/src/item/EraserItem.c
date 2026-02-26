@@ -11,6 +11,7 @@
 #include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
+#include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Input.h>
 #include <item/EraserItem.h>
 #include <joltc/Math/Quat.h>
@@ -18,7 +19,7 @@
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
-#include <wchar.h>
+#include <stddef.h>
 
 static void EraserItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 {

@@ -293,7 +293,7 @@ void TickGraphDraw()
 #endif
 	const double currentNs = tickrates[FRAMEGRAPH_HISTORY_SIZE - 1];
 	const double currentF = 1000000000.0 / currentNs;
-	const int currentFInt = round(currentF);
+	const int currentFInt = (int)round(currentF);
 	const double currentMs = currentNs / 1000000.0;
 
 	if (currentFInt >= TICKGRAPH_THRESHOLD_GOOD)

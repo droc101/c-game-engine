@@ -18,9 +18,14 @@
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/Body.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyFilter.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <joltc/Physics/Collision/CastResult.h>
+#include <joltc/Physics/Collision/NarrowPhaseQuery.h>
+#include <joltc/Physics/Collision/ObjectLayer.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -129,11 +134,12 @@ static void LaserUpdate(Actor *this, double delta)
 		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
 		JPH_RayCastResult result = {};
 		Vector3 hitPointOffset = {};
-		JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter = data->height == LASER_HEIGHT_TRIPLE
-																   ? tripleLaserBroadPhaseLayerFilter
-																   : normalLaserBroadPhaseLayerFilter;
-		JPH_ObjectLayerFilter *objectLayerFilter = data->height == LASER_HEIGHT_TRIPLE ? tripleLaserObjectLayerFilter
-																					   : normalLaserObjectLayerFilter;
+		const JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter = data->height == LASER_HEIGHT_TRIPLE
+																		 ? tripleLaserBroadPhaseLayerFilter
+																		 : normalLaserBroadPhaseLayerFilter;
+		const JPH_ObjectLayerFilter *objectLayerFilter = data->height == LASER_HEIGHT_TRIPLE
+																 ? tripleLaserObjectLayerFilter
+																 : normalLaserObjectLayerFilter;
 		const bool hit = JPH_NarrowPhaseQuery_CastRay2_GAME(narrowPhaseQuery,
 															this->bodyInterface,
 															this->bodyId,

@@ -14,7 +14,6 @@
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_messagebox.h>
 #include <SDL3/SDL_mouse.h>
-#include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_video.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -87,7 +86,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	mb.flags = SDL_MESSAGEBOX_ERROR;
 
 	int pressedButtonID = 0;
-	if (SDL_ShowMessageBox(&mb, &pressedButtonID) < 0)
+	if (!SDL_ShowMessageBox(&mb, &pressedButtonID))
 	{
 		LogError("Failed to show error dialog: %s\n", SDL_GetError());
 	}

@@ -3,7 +3,6 @@
 //
 
 #include <engine/actor/StaticModel.h>
-#include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
@@ -18,9 +17,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {

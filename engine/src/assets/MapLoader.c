@@ -24,9 +24,9 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -34,13 +34,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static MapMaterial fallbackMaterial = {
-	.id = -1,
-	.name = "_fallback",
-	.shader = SHADER_SHADED,
-	.soundClass = SOUND_CLASS_DEFAULT,
-	.texture = "_generic_fallback"
-};
+static MapMaterial fallbackMaterial = {.id = -1,
+									   .name = "_fallback",
+									   .shader = SHADER_SHADED,
+									   .soundClass = SOUND_CLASS_DEFAULT,
+									   .texture = "_generic_fallback"};
 
 Map *LoadMap(const char *path)
 {

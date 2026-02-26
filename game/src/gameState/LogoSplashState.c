@@ -14,7 +14,7 @@
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_scancode.h>
-#include <SDL3/SDL_stdinc.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MenuState.h"
 

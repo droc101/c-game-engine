@@ -14,7 +14,6 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
