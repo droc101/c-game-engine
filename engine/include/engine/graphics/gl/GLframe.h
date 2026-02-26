@@ -51,8 +51,6 @@ void GL_FrameEnd();
  */
 void GL_UpdateViewportSize();
 
-void GL_RecreateFramebuffer(OptionsMsaa msaaSamples);
-
 /**
  * Convert screen X to NDC
  * @param x X position in pixels

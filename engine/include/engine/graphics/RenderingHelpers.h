@@ -38,6 +38,8 @@
 
 typedef enum Renderer Renderer;
 
+typedef enum RendererQueuedAction RendererQueuedAction;
+
 /**
  * Used to check which renderer the game is using
  */
@@ -48,8 +50,15 @@ enum Renderer
 	RENDERER_MAX
 };
 
+enum RendererQueuedAction
+{
+	QUEUED_ACTION_RECREATE_FRAMEBUFFERS = 1 << 0,
+	QUEUED_ACTION_CLEAR_ALL_TEXTURES = 1 << 1,
+};
+
 extern Renderer currentRenderer;
 
+extern RendererQueuedAction rendererQueuedActions;
 
 /**
  * Set the main window
@@ -196,8 +205,6 @@ void LoadMapModels(const Map *map);
  * Set whether vertical sync is enabled
  */
 void SetVsyncEnabled(bool enabled);
-
-void RecreateFramebuffers();
 
 /**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)

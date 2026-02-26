@@ -32,7 +32,7 @@
     },
     "texture": {
       "display": "Texture",
-      "default": "level/uvtest",
+      "default": "texture/level/uvtest.gtex",
       "type": "string",
       "string_hint": "texture",
       "description": "The texture of the sprite"
