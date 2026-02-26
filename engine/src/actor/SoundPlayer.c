@@ -52,14 +52,13 @@ static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const 
 	JPH_RVec3 position;
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
 	SoundPlayerData *data = this->extraData;
-	const SoundRequest request = {
-		.soundAsset = data->asset,
-		.category = data->category,
-		.volume = data->volume,
-		.completionCallback = SoundPlayerSoundDone,
-		.completionCallbackData = data,
-		.numLoops = data->loops,
-		.preload = data->preload,
+	const SoundRequest request = {.soundAsset = data->asset,
+								  .category = data->category,
+								  .volume = data->volume,
+								  .completionCallback = SoundPlayerSoundDone,
+								  .completionCallbackData = data,
+								  .numLoops = data->loops,
+								  .preload = data->preload,
 								  .positional = data->positional,
 								  .position = {.x = position.x, .y = position.y, .z = position.z}};
 	data->effect = PlaySoundEx(&request);
@@ -83,7 +82,7 @@ static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const 
 	StopSound(data->effect);
 }
 
-void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/)
+void SoundPlayerInit(Actor *this, const KvList params, Transform *transform)
 {
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
@@ -95,7 +94,8 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	data->volume = KvGetFloat(params, "volume", 1);
 	data->preload = KvGetBool(params, "preload", false);
 	data->category = KvGetByte(params, "category", SOUND_CATEGORY_SFX);
-	data->positional = false; //KvGetBool(params, "positional", false);
+	data->positional = KvGetBool(params, "positional", false);
+	ActorCreateEmptyBody(this, transform);
 	this->extraData = data;
 }
 

@@ -2,13 +2,15 @@
 // Created by droc101 on 8/4/25.
 //
 
+#include <cglm/quat.h>
+#include <cglm/vec3.h>
 #include <engine/assets/AssetReader.h>
+#include <engine/physics/Physics.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
-#include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_error.h>
@@ -20,6 +22,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct SoundChannel
 {
@@ -41,7 +44,7 @@ struct SoundChannel
 	SoundCategory category;
 
 	/// The original position in 3D space, as specified in the sound request
-	Vector3 originalPosition;
+	vec3 originalPosition;
 	/// The SDL point associated with the track, or NULL if this channel is not positioned
 	MIX_Point3D *position;
 };
@@ -155,12 +158,12 @@ void DestroySoundSystem()
 
 void UpdateSoundSystem()
 {
-	Vector3 listener = Vector3_Zero;
+	vec3 listenerPosition = GLM_VEC3_ZERO_INIT;
+	versor listenerRotation = GLM_VEC3_ZERO_INIT;
 	if (GetState()->map)
 	{
-		PhysicsThreadLockTickMutex();
-		listener = GetState()->map->player.transform.position;
-		PhysicsThreadUnlockTickMutex();
+		memcpy(&listenerPosition, VECTOR3_TO_VEC3(GetState()->camera->transform.position), sizeof(vec3));
+		QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
 	}
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
@@ -171,15 +174,19 @@ void UpdateSoundSystem()
 				LogWarning("SoundSystem: MIX_TrackPlaying desynced with soundSys.effects NULL slots!\n");
 				continue;
 			}
-			const SoundChannel *channel = soundSys.channels[i];
+			SoundChannel *channel = soundSys.channels[i];
 			if (channel->position)
 			{
-				Vector3 relPosition;
-				// TODO calculation seems wrong
-				Vector3_Subtract(&listener, &channel->originalPosition, &relPosition);
-				channel->position->x = relPosition.x;
-				channel->position->y = relPosition.y;
-				channel->position->z = relPosition.z;
+				vec3 delta;
+				glm_vec3_sub(channel->originalPosition, listenerPosition, delta);
+				versor inverse;
+				glm_quat_conjugate(listenerRotation, inverse);
+				vec3 relPosition;
+				glm_quat_rotatev(inverse, delta, relPosition);
+
+				channel->position->x = relPosition[0];
+				channel->position->y = relPosition[1];
+				channel->position->z = relPosition[2];
 				MIX_SetTrack3DPosition(channel->track, channel->position);
 			}
 		}
@@ -309,7 +316,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 		point->y = request->position.y;
 		point->z = request->position.z;
 		effect->position = point;
-		effect->originalPosition = request->position;
+		memcpy(effect->originalPosition, VECTOR3_TO_VEC3(request->position), sizeof(vec3));
 	} else
 	{
 		effect->position = NULL;
