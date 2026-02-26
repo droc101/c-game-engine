@@ -38,6 +38,7 @@ Map *CreateMap(void)
 	map->fogEnd = 2500;
 	map->discordRpcIcon = NULL;
 	map->discordRpcName = NULL;
+	map->renderSky = false;
 	map->skyTexture = NULL;
 	map->lightAngle = v2s(0);
 	map->lightColor = COLOR_WHITE;

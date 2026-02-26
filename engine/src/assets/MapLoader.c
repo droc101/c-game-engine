@@ -52,9 +52,17 @@ Map *LoadMap(const char *path)
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
-	map->skyTexture = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
-	bytesRemaining -= strLength;
-	bytesRemaining += sizeof(size_t);
+	EXPECT_BYTES(1, bytesRemaining);
+	map->renderSky = ReadByte(mapData->data, &offset);
+	if (map->renderSky)
+	{
+		map->skyTexture = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+		bytesRemaining -= strLength;
+		bytesRemaining += sizeof(size_t);
+	} else
+	{
+		map->skyTexture = NULL;
+	}
 	map->discordRpcIcon = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
 	bytesRemaining -= strLength;
 	bytesRemaining += sizeof(size_t);
