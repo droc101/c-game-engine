@@ -10,6 +10,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
@@ -18,7 +19,6 @@
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_scancode.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MainState.h"
@@ -75,6 +75,7 @@ void BtnOptions()
 
 void BtnPauseExit()
 {
+	ChangeMap(CreateMap());
 #ifdef USE_LEVEL_SELECT
 	LevelSelectStateSet();
 #else
