@@ -99,8 +99,7 @@ void CbOptionsLimitFpsWhenUnfocused(const bool value)
 void CbOptionsMipmaps(const bool value)
 {
 	GetState()->options.mipmaps = value;
-	hasChangedVideoOptions = true;
-	// Mipmaps change will happen on next restart
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
 void CbOptionsPreferWayland(const bool value)
@@ -113,17 +112,13 @@ void CbOptionsPreferWayland(const bool value)
 void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
-	hasChangedVideoOptions = true;
-	// Change will happen next restart
-	// TODO: GL can now runtime recreate framebuffers,
-	//  but doing it in the middle of the frame is...not the greatest idea
+	rendererQueuedActions |= QUEUED_ACTION_RECREATE_FRAMEBUFFERS;
 }
 
 void SldOptionsAnisotropy(const float value)
 {
 	GetState()->options.anisotropy = value;
-	hasChangedVideoOptions = true;
-	// Change will happen next restart
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
 void SldOptionsLod(const float value)

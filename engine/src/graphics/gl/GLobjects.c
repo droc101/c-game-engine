@@ -7,6 +7,7 @@
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/gl/GLobjects.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
@@ -32,6 +33,50 @@ GLuint sharedUniformBuffer;
 GLfloat anisotropyLevel = 0;
 
 GLint glMsaaSamples = 0;
+
+void GL_UpdateAnisotropyLevel()
+{
+	if (GetState()->options.anisotropy != ANISOTROPY_NONE)
+	{
+		GLfloat requestedAnisotropy = 0;
+		switch (GetState()->options.anisotropy)
+		{
+			case ANISOTROPY_2X:
+				requestedAnisotropy = 2;
+				break;
+			case ANISOTROPY_4X:
+				requestedAnisotropy = 4;
+				break;
+			case ANISOTROPY_8X:
+				requestedAnisotropy = 8;
+				break;
+			case ANISOTROPY_16X:
+				requestedAnisotropy = 16;
+				break;
+			default:
+				LogError("OpenGL: Invalid anisotropy level!");
+				return;
+		}
+		GLfloat gpuMaxAnisotropy = 0;
+		if (GLEW_EXT_texture_filter_anisotropic)
+		{
+			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &gpuMaxAnisotropy);
+		} else
+		{
+			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
+		}
+		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
+		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
+		if (requestedAnisotropy != anisotropyLevel)
+		{
+			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
+					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
+					   anisotropyLevel,
+					   requestedAnisotropy,
+					   gpuMaxAnisotropy);
+		}
+	}
+}
 
 GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
 {
@@ -293,13 +338,7 @@ void GL_DestroyObjects()
 {
 	GL_DestroyBuffer(glBuffer);
 	glDeleteBuffers(1, &sharedUniformBuffer);
-	for (int i = 0; i < MAX_TEXTURES; i++)
-	{
-		if (glTextures[i] != 0)
-		{
-			glDeleteTextures(1, &glTextures[i]);
-		}
-	}
+	GL_DeleteAllTextures();
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		if (glModels[i] != NULL)
@@ -314,4 +353,18 @@ void GL_DestroyObjects()
 		}
 	}
 	GL_DestroyMapModels();
+}
+
+void GL_DeleteAllTextures()
+{
+	for (int i = 0; i < MAX_TEXTURES; i++)
+	{
+		if (glTextures[i] != 0)
+		{
+			glDeleteTextures(1, &glTextures[i]);
+		}
+	}
+	memset(glAssetTextureMap, -1, MAX_TEXTURES * sizeof(int));
+	memset(glTextures, 0, sizeof(glTextures));
+	glNextFreeSlot = 0;
 }

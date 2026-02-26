@@ -97,47 +97,7 @@ bool GL_Init(SDL_Window *wnd)
 		return false;
 	}
 
-	if (GetState()->options.anisotropy != ANISOTROPY_NONE)
-	{
-		GLfloat requestedAnisotropy = 0;
-		switch (GetState()->options.anisotropy)
-		{
-			case ANISOTROPY_2X:
-				requestedAnisotropy = 2;
-				break;
-			case ANISOTROPY_4X:
-				requestedAnisotropy = 4;
-				break;
-			case ANISOTROPY_8X:
-				requestedAnisotropy = 8;
-				break;
-			case ANISOTROPY_16X:
-				requestedAnisotropy = 16;
-				break;
-			default:
-				LogError("OpenGL: Invalid anisotropy level!");
-				return false;
-		}
-		GLfloat gpuMaxAnisotropy = 0;
-		if (GLEW_EXT_texture_filter_anisotropic)
-		{
-			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &gpuMaxAnisotropy);
-		} else
-		{
-			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
-		}
-		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
-		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
-		if (requestedAnisotropy != anisotropyLevel)
-		{
-			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
-					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
-					   anisotropyLevel,
-					   requestedAnisotropy,
-					   gpuMaxAnisotropy);
-		}
-	}
-
+	GL_UpdateAnisotropyLevel();
 
 #ifdef BUILDSTYLE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);

@@ -16,6 +16,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -35,6 +36,9 @@ bool lowFPSMode;
 SDL_Window *window;
 int windowWidth;
 int windowHeight;
+
+RendererQueuedAction rendererQueuedActions = 0;
+OptionsMsaa qaNewFrameufferMsaaValue = MSAA_NONE;
 
 void SetGameWindow(SDL_Window *w)
 {
@@ -290,20 +294,6 @@ void SetVsyncEnabled(bool enabled)
 	{
 		case RENDERER_OPENGL:
 			GL_SetVsyncEnabled(enabled);
-			break;
-		case RENDERER_VULKAN:
-			// TODO
-		default:
-			break;
-	}
-}
-
-void RecreateFramebuffers()
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_OPENGL:
-			GL_RecreateFramebuffer(GetState()->options.msaa);
 			break;
 		case RENDERER_VULKAN:
 			// TODO

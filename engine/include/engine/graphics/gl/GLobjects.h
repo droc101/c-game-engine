@@ -113,6 +113,8 @@ extern GLfloat anisotropyLevel;
 /// Number of MSAA samples
 extern GLint glMsaaSamples;
 
+void GL_UpdateAnisotropyLevel();
+
 /**
  * Create a shader program from assets
  * @param fsh The fragment shader asset
@@ -193,5 +195,7 @@ void GL_InitObjects();
  * Destroy GL objects
  */
 void GL_DestroyObjects();
+
+void GL_DeleteAllTextures();
 
 #endif //GAME_GLOBJECTS_H
