@@ -24,8 +24,8 @@ typedef struct SoundPlayerData
 	SoundChannel *effect;
 	int loops;
 	float volume;
-	bool preload;
 	SoundCategory category;
+	bool preload;
 	bool positional;
 } SoundPlayerData;
 
@@ -52,15 +52,17 @@ static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const 
 	JPH_RVec3 position;
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
 	SoundPlayerData *data = this->extraData;
-	const SoundRequest request = {.soundAsset = data->asset,
-								  .category = data->category,
-								  .volume = data->volume,
-								  .completionCallback = SoundPlayerSoundDone,
-								  .completionCallbackData = data,
-								  .numLoops = data->loops,
-								  .preload = data->preload,
-								  .positional = data->positional,
-								  .position = {.x = position.x, .y = position.y, .z = position.z}};
+	const SoundRequest request = {
+		.soundAsset = data->asset,
+		.category = data->category,
+		.volume = data->volume,
+		.completionCallback = SoundPlayerSoundDone,
+		.completionCallbackData = data,
+		.numLoops = data->loops,
+		.preload = data->preload,
+		.positional = data->positional,
+		.position = position,
+	};
 	data->effect = PlaySoundEx(&request);
 }
 

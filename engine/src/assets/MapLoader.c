@@ -34,11 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-static MapMaterial fallbackMaterial = {.id = -1,
-									   .name = "_fallback",
-									   .shader = SHADER_SHADED,
-									   .soundClass = SOUND_CLASS_DEFAULT,
-									   .texture = "_generic_fallback"};
+static MapMaterial fallbackMaterial = {
+	.id = -1,
+	.name = "_fallback",
+	.shader = SHADER_SHADED,
+	.soundClass = SOUND_CLASS_DEFAULT,
+	.texture = "_generic_fallback",
+};
 
 Map *LoadMap(const char *path)
 {

@@ -17,7 +17,6 @@
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
 
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons
-// TODO did i choose the right directions
 #define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_EAST : SDL_GAMEPAD_BUTTON_SOUTH)
 /// Use this for the "Cancel" button in place of hardcoding controller A or B buttons
 #define CONTROLLER_CANCEL \
