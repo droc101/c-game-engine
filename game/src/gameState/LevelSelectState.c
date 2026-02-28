@@ -40,12 +40,14 @@ void LevelSelectStateUpdate(GlobalState * /*state*/)
 	if (levelList.length > 1)
 	{
 		if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_DOWN) ||
-			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN))
+			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN) ||
+			GetMouseWheel(mainThreadInput).y < 0)
 		{
 			selectedLevel--;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
 		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_UP) ||
-				   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP))
+				   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP) ||
+				   GetMouseWheel(mainThreadInput).y > 0)
 		{
 			selectedLevel++;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
