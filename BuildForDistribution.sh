@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefailv
+set -eo pipefail
 
 shopt -s globstar
 shopt -s extglob
