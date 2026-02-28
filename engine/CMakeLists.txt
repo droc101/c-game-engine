@@ -9,8 +9,20 @@ detect_platform()
 
 #region Dependencies
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2_mixer REQUIRED)
+set(BUILD_SHARED_LIBS ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin) # TODO SDL3 seems to put its DLLs in the RUNTIME output dir for some reason
+disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI_DEFAULT SDL_POWER_DEFAULT
+        SDL_SENSOR_DEFAULT SDL_DIALOG_DEFAULT SDL_TRAY_DEFAULT SDL_DISKAUDIO SDL_DUMMYAUDIO SDL_DUMMYVIDEO SDL_OPENGLES
+        SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM)
+enable_options(SDL_CCACHE)
+fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
+
+disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
+        SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK)
+fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git prerelease-3.*.* SDL3_mixer)
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
+
 find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -223,8 +235,8 @@ if (JOLT_BUILD_ENABLE_ASSERTS)
     target_compile_definitions(engine INTERFACE JPH_ENABLE_ASSERTS)
 endif ()
 target_link_libraries(engine INTERFACE
-        SDL2::SDL2
-        SDL2_mixer
+        SDL3::SDL3
+        SDL3_mixer::SDL3_mixer-shared
         ZLIB::ZLIB
         joltc
         cglm

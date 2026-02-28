@@ -20,6 +20,7 @@ void DefaultOptions(Options *options)
 	options->renderer = RENDERER_OPENGL; // TODO: RENDERER_VULKAN;
 	options->musicVolume = 1.0f;
 	options->sfxVolume = 1.0f;
+	options->uiVolume = 1.0f;
 	options->masterVolume = 1.0f;
 	options->fullscreen = false;
 	options->vsync = false;
@@ -32,7 +33,7 @@ void DefaultOptions(Options *options)
 	options->invertHorizontalCamera = false;
 	options->invertVerticalCamera = false;
 	options->controllerSwapOkCancel = false;
-	options->preferWayland = false;
+	options->preferWayland = true;
 	options->limitFpsWhenUnfocused = true;
 	options->fov = 90.0f;
 	options->anisotropy = ANISOTROPY_16X;

@@ -9,6 +9,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Timing.h>
 #include <limits.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -139,7 +140,7 @@ void FrameGraphDraw()
 		const double x2 = (i + 1) * FRAMEGRAPH_H_SCALE + 10;
 		double y2 = ScaledWindowHeight() - nextF * FRAMEGRAPH_V_SCALE - 10;
 
-		if (f > FRAMEGRAPH_THRESHOLD_GOOD)
+		if (f >= FRAMEGRAPH_THRESHOLD_GOOD)
 		{
 			lineColor = COLOR(0xff00ff00);
 		} else if (f < FRAMEGRAPH_THRESHOLD_BAD)
@@ -165,7 +166,7 @@ void FrameGraphDraw()
 	const double currentF = 1000000000.0 / currentNs;
 	const double currentMs = currentNs / 1000000.0;
 
-	if (currentF > FRAMEGRAPH_THRESHOLD_GOOD)
+	if (currentF >= FRAMEGRAPH_THRESHOLD_GOOD)
 	{
 		lineColor = COLOR(0xff00ff00);
 	} else if (currentF < FRAMEGRAPH_THRESHOLD_BAD)
@@ -268,7 +269,7 @@ void TickGraphDraw()
 		x2 += start_x;
 		double y2 = ScaledWindowHeight() - nextF * TICKGRAPH_V_SCALE - 10;
 
-		if (f > TICKGRAPH_THRESHOLD_GOOD)
+		if (f >= TICKGRAPH_THRESHOLD_GOOD)
 		{
 			lineColor = COLOR(0xff00ff00);
 		} else if (f < TICKGRAPH_THRESHOLD_BAD)
@@ -292,12 +293,13 @@ void TickGraphDraw()
 #endif
 	const double currentNs = tickrates[FRAMEGRAPH_HISTORY_SIZE - 1];
 	const double currentF = 1000000000.0 / currentNs;
+	const int currentFInt = (int)round(currentF);
 	const double currentMs = currentNs / 1000000.0;
 
-	if (currentF > TICKGRAPH_THRESHOLD_GOOD)
+	if (currentFInt >= TICKGRAPH_THRESHOLD_GOOD)
 	{
 		lineColor = COLOR(0xff00ff00);
-	} else if (currentF < TICKGRAPH_THRESHOLD_BAD)
+	} else if (currentFInt < TICKGRAPH_THRESHOLD_BAD)
 	{
 		lineColor = COLOR(0xffff0000);
 	} else

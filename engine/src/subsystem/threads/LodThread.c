@@ -12,42 +12,33 @@
 #include <engine/subsystem/threads/LodThread.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <SDL_mutex.h>
-#include <SDL_thread.h>
+#include <SDL3/SDL_mutex.h>
+#include <SDL3/SDL_thread.h>
 #include <stdbool.h>
 #include <stddef.h>
 
 static bool shouldExit;
 static SDL_Thread *lodThread;
-static SDL_sem *canStart;
-static SDL_sem *hasEnded;
-static SDL_mutex *mutex;
+static SDL_Semaphore *canStart;
+static SDL_Semaphore *hasEnded;
+static SDL_Mutex *mutex;
 
 // ReSharper disable once CppDFAConstantFunctionResult
 int LodThreadMain(void * /*data*/)
 {
 	while (!shouldExit)
 	{
-		int waitResult = SDL_SemWaitTimeout(canStart, 16);
-		while (waitResult != 0)
+		bool waitResult = SDL_WaitSemaphoreTimeout(canStart, 16);
+		while (!waitResult)
 		{
 			if (shouldExit)
 			{
 				return 0;
 			}
-			if (waitResult == SDL_MUTEX_TIMEDOUT)
-			{
-				waitResult = SDL_SemWaitTimeout(canStart, 16);
-			} else
-			{
-				Error("Failed to wait for LOD thread start semaphore!");
-			}
+			waitResult = SDL_WaitSemaphoreTimeout(canStart, 16);
 		}
 
-		if (SDL_LockMutex(mutex) != 0)
-		{
-			Error("Failed to lock LOD thread mutex!");
-		}
+		SDL_LockMutex(mutex);
 
 		const GlobalState *state = GetState();
 		const LockingList *actors = &state->map->actors;
@@ -84,15 +75,8 @@ int LodThreadMain(void * /*data*/)
 			Error("Failed to load actors!");
 		}
 
-		if (SDL_UnlockMutex(mutex) != 0)
-		{
-			Error("Failed to unlock LOD thread mutex!");
-		}
-
-		if (SDL_SemPost(hasEnded) != 0)
-		{
-			Error("Failed to signal LOD thread end semaphore!");
-		}
+		SDL_UnlockMutex(mutex);
+		SDL_SignalSemaphore(hasEnded);
 	}
 	return 0;
 }
@@ -119,22 +103,22 @@ void LodThreadDestroy()
 	SDL_DestroyMutex(mutex);
 }
 
-int SignalLodThreadCanStart()
+void SignalLodThreadCanStart()
 {
-	return SDL_SemPost(canStart);
+	return SDL_SignalSemaphore(canStart);
 }
 
-int WaitForLodThreadToEnd()
+void WaitForLodThreadToEnd()
 {
-	return SDL_SemWait(hasEnded);
+	return SDL_WaitSemaphore(hasEnded);
 }
 
-int LockLodThreadMutex()
+void LockLodThreadMutex()
 {
 	return SDL_LockMutex(mutex);
 }
 
-int UnlockLodThreadMutex()
+void UnlockLodThreadMutex()
 {
 	return SDL_UnlockMutex(mutex);
 }

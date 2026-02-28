@@ -7,11 +7,14 @@
 #include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define GL_COLOR_INTERNAL_FORMAT GL_RGB8
 #define GL_COLOR_FORMAT GL_RGB
@@ -22,8 +25,55 @@ GLuint frameBufferObject;
 GLuint renderBufferObject;
 GLuint framebufferColorTexture;
 
-bool GL_InitFramebuffer()
+int GetActualMsaaSamples(const OptionsMsaa requested)
 {
+	const bool msaaEnabled = requested != MSAA_NONE;
+	if (msaaEnabled)
+	{
+		int requestedMsaaValue = 0;
+		switch (requested)
+		{
+			case MSAA_2X:
+				requestedMsaaValue = 2;
+				break;
+			case MSAA_4X:
+				requestedMsaaValue = 4;
+				break;
+			case MSAA_8X:
+				requestedMsaaValue = 8;
+				break;
+			default:
+				LogError("OpenGL: Invalid MSAA value!");
+				return false;
+		}
+
+		GLint gpuMaxSamples = 0;
+		glGetIntegerv(GL_MAX_SAMPLES, &gpuMaxSamples);
+		LogDebug("GL: GL_MAX_SAMPLES=%d\n", gpuMaxSamples);
+		const int msaaValue = min(requestedMsaaValue, gpuMaxSamples);
+		if (msaaValue != requestedMsaaValue)
+		{
+			LogWarning("GL: Actual MSAA samples of %d differs from requested value of %d. "
+					   "GL_MAX_SAMPLES=%d\n",
+					   msaaValue,
+					   requestedMsaaValue,
+					   gpuMaxSamples);
+		}
+
+		return msaaValue;
+	}
+	return 1;
+}
+
+void GL_SetVsyncEnabled(const bool enable)
+{
+	SDL_GL_SetSwapInterval(enable ? 1 : 0);
+}
+
+bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
+{
+	glMsaaSamples = GetActualMsaaSamples(msaaSamples);
+
 	glGenFramebuffers(1, &frameBufferObject);
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
 	glGenRenderbuffers(1, &renderBufferObject);
@@ -141,6 +191,22 @@ void GL_DestroyFramebuffer()
 bool GL_FrameStart()
 {
 	GL_ResetDebugLines();
+
+	if ((rendererQueuedActions & QUEUED_ACTION_RECREATE_FRAMEBUFFERS) != 0)
+	{
+		GL_DestroyFramebuffer();
+		GL_InitFramebuffer(GetState()->options.msaa);
+		GL_UpdateViewportSize();
+		rendererQueuedActions &= ~QUEUED_ACTION_RECREATE_FRAMEBUFFERS;
+	}
+
+	if ((rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_TEXTURES) != 0)
+	{
+		GL_DeleteAllTextures();
+		GL_UpdateAnisotropyLevel();
+		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
 	return true;
@@ -158,7 +224,7 @@ inline void GL_ClearDepthOnly()
 
 inline void GL_FrameEnd()
 {
-	const Vector2 wndSize = ActualWindowSize();
+	const Vector2 wndSize = ActualWindowSizeIgnoreDPI();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBufferObject);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_NONE);
 	glBlitFramebuffer(0,
@@ -177,10 +243,8 @@ inline void GL_FrameEnd()
 
 inline void GL_UpdateViewportSize()
 {
-	int vpWidth = 0;
-	int vpHeight = 0;
-	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
-	glViewport(0, 0, vpWidth, vpHeight);
+	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
+	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 
 	GLint boundRbo = GL_NONE;
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &boundRbo);
@@ -192,25 +256,29 @@ inline void GL_UpdateViewportSize()
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 								glMsaaSamples,
 								GL_COLOR_INTERNAL_FORMAT,
-								vpWidth,
-								vpHeight,
+								(GLsizei)windowSize.x,
+								(GLsizei)windowSize.y,
 								GL_TRUE);
 
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, glMsaaSamples, GL_DEPTH_FORMAT, vpWidth, vpHeight);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+										 glMsaaSamples,
+										 GL_DEPTH_FORMAT,
+										 (GLsizei)windowSize.x,
+										 (GLsizei)windowSize.y);
 	} else
 	{
 		glBindTexture(GL_TEXTURE_2D, framebufferColorTexture);
 		glTexImage2D(GL_TEXTURE_2D,
 					 0,
 					 GL_COLOR_INTERNAL_FORMAT,
-					 vpWidth,
-					 vpHeight,
+					 (GLsizei)windowSize.x,
+					 (GLsizei)windowSize.y,
 					 0,
 					 GL_COLOR_FORMAT,
 					 GL_COLOR_TYPE,
 					 NULL);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, vpWidth, vpHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 	}
 	glBindRenderbuffer(GL_RENDERBUFFER, boundRbo);
 }

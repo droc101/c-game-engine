@@ -7,207 +7,192 @@
 
 #include <engine/structs/GlobalState.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Vector2.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_joystick.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+typedef struct InputSystem InputSystem;
+
+extern InputSystem *physicsThreadInput;
+extern InputSystem *mainThreadInput;
 
 #define STICK_DEADZONE 0.1
 
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
 
 /// Use this for the "OK/Accept" button in place of hardcoding controller A or B buttons
-#define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_B : SDL_CONTROLLER_BUTTON_A)
+#define CONTROLLER_OK (GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_EAST : SDL_GAMEPAD_BUTTON_SOUTH)
 /// Use this for the "Cancel" button in place of hardcoding controller A or B buttons
 #define CONTROLLER_CANCEL \
-	(GetState()->options.controllerSwapOkCancel ? SDL_CONTROLLER_BUTTON_A : SDL_CONTROLLER_BUTTON_B)
+	(GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_SOUTH : SDL_GAMEPAD_BUTTON_EAST)
 
 /**
  * Handles controller disconnect event
  * @param which The controller that was disconnected
  */
-void HandleControllerDisconnect(Sint32 which);
+void HandleGamepadDisconnect(SDL_JoystickID which);
 
 /**
  * Handles controller connect event
  */
-void HandleControllerConnect();
+void HandleGamepadConnect();
 
 /**
- * Handles controller button up event
- * @param button The button code
+ * Process an input event
+ * @param system The input system to modify
+ * @param event The event to process
+ * @return Whether the event was processed
  */
-void HandleControllerButtonUp(SDL_GameControllerButton button);
-
-/**
- * Handles controller button down event
- * @param button The button code
- */
-void HandleControllerButtonDown(SDL_GameControllerButton button);
-
-/**
- * Handles controller axis event
- * @param axis The axis code
- * @param value The value of the axis
- */
-void HandleControllerAxis(SDL_GameControllerAxis axis, Sint16 value);
-
-/**
- * Handles key down event
- * @param code Key code
- */
-void HandleKeyDown(int code);
-
-/**
- * Handles key up event
- * @param code Key code
- */
-void HandleKeyUp(int code);
-
-/**
- * Handles mouse motion event
- * @param x X position
- * @param y Y position
- * @param xRel Relative X position
- * @param yRel Relative Y position
- */
-void HandleMouseMotion(int x, int y, int xRel, int yRel);
-
-/**
- * Handles mouse down event
- * @param button Button code
- */
-void HandleMouseDown(int button);
-
-/**
- * Handles mouse up event
- * @param button Button code
- */
-void HandleMouseUp(int button);
+bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event);
 
 /**
  * Updates input states
- * @note Only call this once per physicsFrame
  */
-void UpdateInputStates();
+void UpdateInputStates(InputSystem *system);
 
 // Exposed methods
 
 /**
  * Checks if a controller button is pressed
+ * @param system The input system to check
  * @param button The button code
  * @return Whether the button is pressed
  */
-bool IsButtonPressed(int button);
+bool IsButtonPressed(const InputSystem *system, int button);
 
 /**
  * Checks if a controller button is just pressed
+ * @param system The input system to check
  * @param button The button code
  * @return Whether the button is just pressed
  * @warning Do not use this in the physics thread, use IsButtonJustPressedPhys instead
  */
-bool IsButtonJustPressed(int button);
+bool IsButtonJustPressed(const InputSystem *system, int button);
 
 /**
  * Checks if a controller button is just released
+ * @param system The input system to check
  * @param button The button code
  * @return Whether the button is just released
  * @warning Do not use this in the physics thread, use IsButtonJustReleasedPhys instead
  */
-bool IsButtonJustReleased(int button);
+bool IsButtonJustReleased(const InputSystem *system, int button);
 
 /**
  * Checks if a key is pressed
+ * @param system The input system to check
  * @param code Key code
  * @return Whether the key is pressed
  */
-bool IsKeyPressed(int code);
+bool IsKeyPressed(const InputSystem *system, int code);
 
 /**
  * Checks if a key is just pressed
+ * @param system The input system to check
  * @param code Key code
  * @return Whether the key is just pressed
  * @warning Do not use this in the physics thread, use IsKeyJustPressedPhys instead
  */
-bool IsKeyJustPressed(int code);
+bool IsKeyJustPressed(const InputSystem *system, int code);
 
 /**
  * Checks if a key is just released
+ * @param system The input system to check
  * @param code Key code
  * @return Whether the key is just released
  * @warning Do not use this in the physics thread, use IsKeyJustReleasedPhys instead
  */
-bool IsKeyJustReleased(int code);
+bool IsKeyJustReleased(const InputSystem *system, int code);
 
 /**
  * Checks if a mouse button is pressed
+ * @param system The input system to check
  * @param button Button code
  * @return Whether the button is pressed
  */
-bool IsMouseButtonPressed(int button);
+bool IsMouseButtonPressed(const InputSystem *system, int button);
 
 /**
  * Checks if a mouse button is just pressed
+ * @param system The input system to check
  * @param button Button code
  * @return Whether the button is just pressed
  * @warning Do not use this in the physics thread, use IsMouseButtonJustPressedPhys instead
  */
-bool IsMouseButtonJustPressed(int button);
+bool IsMouseButtonJustPressed(const InputSystem *system, int button);
 
 /**
  * Checks if a mouse button is just released
+ * @param system The input system to check
  * @param button Button code
  * @return Whether the button is just released
  * @warning Do not use this in the physics thread, use IsMouseButtonJustReleasedPhys instead
  */
-bool IsMouseButtonJustReleased(int button);
+bool IsMouseButtonJustReleased(const InputSystem *system, int button);
 
 /**
  * Gets the mouse position
+ * @param system The input system to check
  * @return The current mouse position
  */
-Vector2 GetMousePos();
+Vector2 GetMousePos(const InputSystem *system);
 
 /**
  * Gets the relative mouse movement
+ * @param system The input system to check
  * @return relative mouse movement
  */
-Vector2 GetMouseRel();
+Vector2 GetMouseRel(const InputSystem *system);
+
+/**
+ * Get the relative mouse wheel movement
+ * @param system The input system to check
+ * @return relative mouse wheel movement
+ */
+Vector2 GetMouseWheel(const InputSystem *system);
 
 /**
  * Consumes a key press state, so no other input check can see it
+ * @param system The input system to modify
  * @param code The key code
  */
-void ConsumeKey(int code);
+void ConsumeKey(InputSystem *system, int code);
 
 /**
  * Consumes a controller button press state, so no other input check can see it
+ * @param system The input system to modify
  * @param btn The button code
  */
-void ConsumeButton(int btn);
+void ConsumeButton(InputSystem *system, int btn);
 
 /**
  * Consumes a mouse button press state, so no other input check can see it
+ * @param system The input system to modify
  * @param button The button code
  */
-void ConsumeMouseButton(int button);
+void ConsumeMouseButton(InputSystem *system, int button);
 
 /**
  * Consumes all key press states, so no other input check can see them
+ * @param system The input system to modify
  */
-void ConsumeAllKeys();
+void ConsumeAllKeys(InputSystem *system);
 
 /**
  * Consumes all mouse button press states, so no other input check can see them
+ * @param system The input system to modify
  */
-void ConsumeAllMouseButtons();
+void ConsumeAllMouseButtons(InputSystem *system);
 
 /**
  * Gets the value of a controller axis
+ * @param system The input system to check
  * @param axis The axis to get the value of
  * @return The value of the axis (between -1 and 1)
  */
-float GetAxis(SDL_GameControllerAxis axis);
+float GetAxis(const InputSystem *system, SDL_GamepadAxis axis);
 
 /**
  * Checks if a controller is being used
@@ -237,64 +222,5 @@ void InputInit();
  * Destroys the input system
  */
 void InputDestroy();
-
-/**
- * Swap input buffers for the physics thread
- */
-void InputPhysicsTickBegin();
-
-/**
- * Check if a key was just pressed since the last physics tick
- * @param code The key code to check
- * @return Whether the key was just pressed
- * @warning A key can be just pressed AND just released in the same tick, so check both if you need to
- * @warning Do not use this outside of the physics thread, use IsKeyJustPressed instead
- */
-bool IsKeyJustPressedPhys(int code);
-
-/**
- * Check if a key was just released since the last physics tick
- * @param code The key code to check
- * @return Whether the key was just released
- * @warning A key can be just pressed AND just released in the same tick, so check both if you need to
- * @warning Do not use this outside of the physics thread, use IsKeyJustReleased instead
- */
-bool IsKeyJustReleasedPhys(int code);
-
-/**
- * Check if a controller button was just pressed since the last physics tick
- * @param button The button code to check
- * @return Whether the button was just pressed
- * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
- * @warning Do not use this outside of the physics thread, use IsButtonJustPressed instead
- */
-bool IsButtonJustPressedPhys(int button);
-
-/**
- * Check if a controller button was just released since the last physics tick
- * @param button The button code to check
- * @return Whether the button was just released
- * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
- * @warning Do not use this outside of the physics thread, use IsButtonJustReleased instead
- */
-bool IsButtonJustReleasedPhys(int button);
-
-/**
- * Check if a mouse button was just pressed since the last physics tick
- * @param button The button code to check
- * @return Whether the button was just pressed
- * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
- * @warning Do not use this outside of the physics thread, use IsMouseButtonJustPressed instead
- */
-bool IsMouseButtonJustPressedPhys(int button);
-
-/**
- * Check if a mouse button was just released since the last physics tick
- * @param button The button code to check
- * @return Whether the button was just released
- * @warning A button can be just pressed AND just released in the same tick, so check both if you need to
- * @warning Do not use this outside of the physics thread, use IsMouseButtonJustReleased instead
- */
-bool IsMouseButtonJustReleasedPhys(int button);
 
 #endif //GAME_INPUT_H

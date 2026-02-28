@@ -6,23 +6,29 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
-#include <SDL_error.h>
-#include <SDL_mutex.h>
-#include <SDL_thread.h>
-#include <SDL_timer.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_mutex.h>
+#include <SDL3/SDL_thread.h>
+#include <SDL3/SDL_timer.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 static SDL_Thread *physicsThread;
-static SDL_mutex *physicsThreadMutex;
-static SDL_mutex *physicsTickMutex;
-static SDL_sem *physicsTickHasEnded;
+static SDL_Mutex *physicsThreadMutex;
+static SDL_Mutex *physicsTickMutex;
+static SDL_Semaphore *physicsTickHasEnded;
+
+static List physicsThreadInputEventQueue;
 
 /**
  * The function to run in the physics thread
@@ -36,6 +42,16 @@ FixedUpdateFunction PhysicsThreadFunction;
  */
 bool physicsThreadPostQuit = false;
 
+void PhysicsThreadQueueInputEvent(const SDL_Event *event)
+{
+	SDL_Event *copiedEvent = malloc(sizeof(SDL_Event));
+	CheckAlloc(copiedEvent);
+	memcpy(copiedEvent, event, sizeof(SDL_Event));
+	SDL_LockMutex(physicsThreadMutex);
+	ListAdd(physicsThreadInputEventQueue, copiedEvent);
+	SDL_UnlockMutex(physicsThreadMutex);
+}
+
 /**
  * The main function for the physics thread
  * @return 0
@@ -46,7 +62,8 @@ int PhysicsThreadMain(void * /*data*/)
 	while (true)
 	{
 		const uint64_t timeStart = GetTimeNs();
-		SDL_SemTryWait(physicsTickHasEnded);
+		// I don't remember why this needs to be a TryWaitSemaphore, but everything breaks if it isn't.
+		(void)SDL_TryWaitSemaphore(physicsTickHasEnded);
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
 		if (physicsThreadPostQuit)
@@ -55,13 +72,21 @@ int PhysicsThreadMain(void * /*data*/)
 			SDL_UnlockMutex(physicsTickMutex);
 			return 0;
 		}
-		InputPhysicsTickBegin();
+
+		for (size_t i = 0; i < physicsThreadInputEventQueue.length; i++)
+		{
+			SDL_Event *event = ListGetPointer(physicsThreadInputEventQueue, i);
+			InputSystemProcessEvent(physicsThreadInput, event);
+			free(event);
+		}
+		ListClear(physicsThreadInputEventQueue);
+
 		if (PhysicsThreadFunction == NULL)
 		{
 			GetState()->physicsFrame++;
 			SDL_UnlockMutex(physicsThreadMutex);
 			SDL_UnlockMutex(physicsTickMutex);
-			SDL_Delay(PHYSICS_TARGET_MS); // pls no spin 🥺
+			SDL_DelayPrecise(PHYSICS_TARGET_NS); // pls only spin if needed 🥺
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
@@ -72,16 +97,17 @@ int PhysicsThreadMain(void * /*data*/)
 		// ticks should be around 1/60th of a second
 		const double delta = lastTickTime / PHYSICS_TARGET_NS_D;
 		UpdateFunction(GetState(), delta);
+		UpdateInputStates(physicsThreadInput);
 		GetState()->physicsFrame++;
 		SDL_UnlockMutex(physicsTickMutex);
-		SDL_SemPost(physicsTickHasEnded);
+		SDL_SignalSemaphore(physicsTickHasEnded);
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
-			const uint64_t delayMs = (PHYSICS_TARGET_NS - timeElapsed) / 1000000;
-			SDL_Delay(delayMs);
+			const uint64_t delayNs = (PHYSICS_TARGET_NS - timeElapsed);
+			SDL_DelayPrecise(delayNs);
 		}
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
@@ -93,6 +119,7 @@ int PhysicsThreadMain(void * /*data*/)
 void PhysicsThreadInit()
 {
 	LogDebug("Initializing physics thread...\n");
+	ListInit(physicsThreadInputEventQueue, LIST_POINTER);
 	PhysicsThreadFunction = NULL;
 	physicsThreadPostQuit = false;
 	physicsThreadMutex = SDL_CreateMutex();
@@ -115,8 +142,7 @@ void PhysicsThreadSetFunction(const FixedUpdateFunction function)
 	SDL_UnlockMutex(physicsThreadMutex);
 	if (function)
 	{
-		if (SDL_SemTryWait(physicsTickHasEnded) == SDL_MUTEX_TIMEDOUT &&
-			SDL_SemWaitTimeout(physicsTickHasEnded, 1000) < 0)
+		if (!SDL_TryWaitSemaphore(physicsTickHasEnded) && !SDL_WaitSemaphoreTimeout(physicsTickHasEnded, 1000))
 		{
 			LogError("Failed to wait for physics tick semaphore with error %s", SDL_GetError());
 			Error("Failed to wait for physics tick semaphore!");
@@ -131,6 +157,7 @@ void PhysicsThreadTerminate()
 	physicsThreadPostQuit = true;
 	SDL_UnlockMutex(physicsThreadMutex);
 	SDL_WaitThread(physicsThread, NULL);
+	ListAndContentsFree(physicsThreadInputEventQueue);
 	SDL_DestroyMutex(physicsThreadMutex);
 	SDL_DestroyMutex(physicsTickMutex);
 	SDL_DestroySemaphore(physicsTickHasEnded);

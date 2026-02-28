@@ -12,8 +12,7 @@
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MenuState.h"
@@ -38,7 +37,8 @@ void BtnOptionsBack()
 
 void OptionsStateUpdate(GlobalState * /*state*/)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnOptionsBack();
 	}
@@ -94,7 +94,7 @@ void OptionsStateSet(const bool inGame)
 					  NULL,
 					  GAME_STATE_OPTIONS,
 					  OptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void OptionsStateDestroy()

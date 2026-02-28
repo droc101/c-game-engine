@@ -14,8 +14,7 @@
 #include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/OptionsState.h"
@@ -29,7 +28,8 @@ void BtnInputOptionsBack()
 
 void InputOptionsStateUpdate(GlobalState * /*state*/)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnInputOptionsBack();
 	}
@@ -200,7 +200,7 @@ void InputOptionsStateSet()
 					  NULL,
 					  GAME_STATE_INPUT_OPTIONS,
 					  InputOptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void InputOptionsStateDestroy()

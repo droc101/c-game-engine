@@ -9,7 +9,10 @@
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,9 +21,12 @@
 typedef struct SoundPlayerData
 {
 	char *asset; // asset name of the sound effect to play
-	SoundEffect *effect;
+	SoundChannel *effect;
 	int loops;
 	float volume;
+	SoundCategory category;
+	bool preload;
+	bool positional;
 } SoundPlayerData;
 
 static void SoundPlayerSoundDone(void *pData)
@@ -36,36 +42,49 @@ static void SoundPlayerDestroy(Actor *this)
 	const SoundPlayerData *data = this->extraData;
 	if (data->effect)
 	{
-		StopSoundEffect(data->effect);
+		StopSound(data->effect);
 	}
 	free(data->asset);
 }
 
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
+	JPH_RVec3 position;
+	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
 	SoundPlayerData *data = this->extraData;
-	data->effect = PlaySoundEffect(data->asset, data->loops, data->volume, SoundPlayerSoundDone, data);
+	const SoundRequest request = {
+		.soundAsset = data->asset,
+		.category = data->category,
+		.volume = data->volume,
+		.completionCallback = SoundPlayerSoundDone,
+		.completionCallbackData = data,
+		.numLoops = data->loops,
+		.preload = data->preload,
+		.positional = data->positional,
+		.position = position,
+	};
+	data->effect = PlaySoundEx(&request);
 }
 
 static void SoundPlayerPauseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	PauseSoundEffect(data->effect);
+	PauseSound(data->effect);
 }
 
 static void SoundPlayerResumeHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	ResumeSoundEffect(data->effect);
+	ResumeSound(data->effect);
 }
 
 static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	StopSoundEffect(data->effect);
+	StopSound(data->effect);
 }
 
-void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/)
+void SoundPlayerInit(Actor *this, const KvList params, Transform *transform)
 {
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
@@ -75,6 +94,10 @@ void SoundPlayerInit(Actor *this, const KvList params, Transform * /*transform*/
 	sprintf(data->asset, SOUND("%s"), soundAsset);
 	data->loops = KvGetInt(params, "loops", 0);
 	data->volume = KvGetFloat(params, "volume", 1);
+	data->preload = KvGetBool(params, "preload", false);
+	data->category = KvGetByte(params, "category", SOUND_CATEGORY_SFX);
+	data->positional = KvGetBool(params, "positional", false);
+	ActorCreateEmptyBody(this, transform);
 	this->extraData = data;
 }
 

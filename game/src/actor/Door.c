@@ -19,10 +19,10 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -45,6 +45,8 @@ typedef struct DoorData
 	JPH_BodyID sensorBodyId;
 	Vector3 closedPosition;
 	Vector3 openPosition;
+	float width;
+	float stayOpenTime;
 } DoorData;
 
 static inline void DoorSetOpenVector(const Actor *this)
@@ -126,7 +128,9 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 {
 	DoorData *data = this->extraData;
 
-	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}}, JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)
+			JPH_BoxShape_Create((Vector3[]){{0.5f, this->actorWall->height / 2.0f, data->width / 2.0f}},
+								JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -146,9 +150,9 @@ static inline void CreateDoorBodies(Actor *this, const Transform *transform, con
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&transform->rotation, &forwardVector);
 	Vector3 offsetVector = {};
-	Vector3_MultiplyScalar(&forwardVector, 0.5f, &offsetVector);
+	Vector3_MultiplyScalar(&forwardVector, data->width / 2.0f, &offsetVector);
 	Vector3_Subtract(&transform->position, &offsetVector, &data->closedPosition);
-	Vector3_Add(&data->closedPosition, &forwardVector, &data->openPosition);
+	Vector3_Add(&transform->position, &offsetVector, &data->openPosition);
 
 	Transform calculatedTransform = *transform;
 	calculatedTransform.position = data->closedPosition;
@@ -170,20 +174,20 @@ static void DoorUpdate(Actor *this, const double delta)
 	switch (data->state)
 	{
 		case DOOR_OPENING:
-			if (data->animationTime >= 1)
+			if (data->animationTime >= data->width)
 			{
 				DoorSetState(this, DOOR_OPEN, 0);
 			}
 			break;
 		case DOOR_OPEN:
-			if (data->animationTime >= 1 && data->shouldClose)
+			if (data->animationTime >= data->stayOpenTime && data->shouldClose)
 			{
 				DoorSetState(this, DOOR_CLOSING, 0);
 				data->shouldClose = false;
 			}
 			break;
 		case DOOR_CLOSING:
-			if (data->animationTime >= 1)
+			if (data->animationTime >= data->width)
 			{
 				DoorSetState(this, DOOR_CLOSED, 0);
 				data->shouldClose = false;
@@ -214,7 +218,7 @@ static void DoorOpenHandler(Actor *this, const Actor * /*sender*/, const Param *
 			DoorSetState(this, DOOR_OPENING, 0);
 			return;
 		case DOOR_CLOSING:
-			DoorSetState(this, DOOR_OPENING, 1 - data->animationTime);
+			DoorSetState(this, DOOR_OPENING, data->width - data->animationTime);
 		default:
 	}
 }
@@ -228,7 +232,7 @@ static void DoorCloseHandler(Actor *this, const Actor * /*sender*/, const Param 
 			DoorSetState(this, DOOR_CLOSING, 0);
 			return;
 		case DOOR_OPENING:
-			DoorSetState(this, DOOR_CLOSING, 1 - data->animationTime);
+			DoorSetState(this, DOOR_CLOSING, data->width - data->animationTime);
 		default:
 	}
 }
@@ -247,7 +251,7 @@ static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyID bodyId)
 			DoorSetState(this, DOOR_OPENING, 0);
 			break;
 		case DOOR_CLOSING:
-			DoorSetState(this, DOOR_OPENING, 1 - data->animationTime);
+			DoorSetState(this, DOOR_OPENING, data->width - data->animationTime);
 			break;
 		case DOOR_OPEN:
 		case DOOR_OPENING:
@@ -268,7 +272,7 @@ static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyID bodyId)
 	switch (data->state)
 	{
 		case DOOR_OPENING:
-			if (data->animationTime >= 1)
+			if (data->animationTime >= data->width)
 			{
 				DoorSetState(this, DOOR_OPEN, 0);
 			}
@@ -291,7 +295,7 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 	switch (data->state)
 	{
 		case DOOR_OPEN:
-			if (!data->stayOpen && data->animationTime >= 1)
+			if (!data->stayOpen && data->animationTime >= data->width)
 			{
 				DoorSetState(this, DOOR_CLOSING, 0);
 			} else
@@ -319,17 +323,19 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->extraData);
 	DoorData *data = this->extraData;
 	data->stayOpen = KvGetBool(params, "stayOpen", false);
+	data->width = KvGetFloat(params, "width", 1.0f);
+	data->stayOpenTime = KvGetFloat(params, "delay_until_close", 1.0f);
 
 	this->actorWall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->actorWall);
-	this->actorWall->a = v2(0, -0.5f);
-	this->actorWall->b = v2(0, 0.5f);
-	this->actorWall->tex = malloc(strlen(TEXTURE("actor/door")) + 1);
-	strcpy(this->actorWall->tex, TEXTURE("actor/door"));
-	this->actorWall->uvScale = 1.0f;
-	this->actorWall->uvOffset = 0.0f;
-	this->actorWall->height = 1.0f;
-	this->actorWall->unshaded = false;
+	const float width = data->width;
+	this->actorWall->a = v2(0, -width / 2.0f);
+	this->actorWall->b = v2(0, width / 2.0f);
+	this->actorWall->tex = strdup(KvGetString(params, "texture", TEXTURE("actor/door")));
+	this->actorWall->uvScale = KvGetFloat(params, "uvScale", 1.0f);
+	this->actorWall->uvOffset = KvGetFloat(params, "uvOffset", 0.0f);
+	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
+	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
 	ActorWallBake(this);
 
 	CreateDoorBodies(this, transform, KvGetBool(params, "preventPlayerOpen", false));

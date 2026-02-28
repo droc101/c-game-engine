@@ -1,7 +1,8 @@
 {
   "description": "Performs boolean logic operations",
   "display": {
-    "color": 4294902015
+    "color": 4294902015,
+    "directional": false
   },
   "extends": "actor",
   "inputs": {

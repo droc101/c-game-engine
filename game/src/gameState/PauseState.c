@@ -10,15 +10,15 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MainState.h"
@@ -33,11 +33,11 @@ UiStack *pauseStack = NULL;
 
 void PauseStateUpdate(GlobalState * /*state*/)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) ||
-		IsButtonJustPressed(CONTROLLER_CANCEL) ||
-		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_START))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL) ||
+		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
-		(void)PlaySoundEffect(SOUND("sfx/popdown"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/popdown"), SOUND_CATEGORY_UI);
 		MainStateSet();
 	}
 }
@@ -75,6 +75,7 @@ void BtnOptions()
 
 void BtnPauseExit()
 {
+	ChangeMap(CreateMap());
 #ifdef USE_LEVEL_SELECT
 	LevelSelectStateSet();
 #else
@@ -99,7 +100,7 @@ void PauseStateSet()
 					  NULL,
 					  GAME_STATE_PAUSE,
 					  PauseStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void PauseStateDestroy()

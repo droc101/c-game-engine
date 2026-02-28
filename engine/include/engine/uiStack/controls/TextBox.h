@@ -8,7 +8,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/TextInputSystem.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_events.h>
+#include <SDL3/SDL_events.h>
 #include <stdbool.h>
 #include <stdint.h>
 

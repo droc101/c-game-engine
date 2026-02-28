@@ -4,9 +4,11 @@
 
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/TextInputSystem.h>
-#include <SDL_events.h>
-#include <SDL_keyboard.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_keyboard.h>
 #include <stddef.h>
+
+#include "engine/graphics/RenderingHelpers.h"
 
 TextInput *CurrentTextInput = NULL;
 
@@ -17,7 +19,7 @@ void SetTextInput(TextInput *input)
 		LogError("Failed to set text input as one was already active!");
 	}
 	CurrentTextInput = input;
-	SDL_StartTextInput();
+	SDL_StartTextInput(GetGameWindow());
 }
 
 void StopTextInput()
@@ -26,7 +28,7 @@ void StopTextInput()
 	{
 		LogError("Failed to stop text input as none was active!");
 	}
-	SDL_StopTextInput();
+	SDL_StopTextInput(GetGameWindow());
 	CurrentTextInput = NULL;
 }
 

@@ -5,6 +5,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapMaterialLoader.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -16,6 +17,14 @@
 
 uint32_t mapMaterialId;
 MapMaterial *mapMaterials[MAX_MAP_MATERIALS];
+
+static MapMaterial fallbackMaterial = {
+	.id = -1,
+	.name = "_fallback",
+	.shader = SHADER_SHADED,
+	.soundClass = SOUND_CLASS_DEFAULT,
+	.texture = "_generic_fallback",
+};
 
 MapMaterial *LoadMapMaterial(const char *path)
 {
@@ -43,7 +52,8 @@ MapMaterial *LoadMapMaterial(const char *path)
 	Asset *mapMaterialAsset = DecompressAsset(path, false, false);
 	if (mapMaterialAsset == NULL || mapMaterialAsset->type != ASSET_TYPE_MAP_MATERIAL)
 	{
-		return NULL;
+		free(material);
+		return &fallbackMaterial;
 	}
 
 	if (mapMaterialAsset->typeVersion != MAP_MATERIAL_ASSET_VERSION)
@@ -51,7 +61,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 		LogError("Failed to load map material from asset due to version mismatch (got %d, expected %d)",
 				 mapMaterialAsset->typeVersion,
 				 MAP_MATERIAL_ASSET_VERSION);
-		return NULL;
+		return &fallbackMaterial;
 	}
 
 	size_t offset = 0;

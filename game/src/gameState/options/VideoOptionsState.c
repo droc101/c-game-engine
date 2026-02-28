@@ -17,9 +17,8 @@
 #include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -75,7 +74,7 @@ char *SliderLabelLod(const Control *slider)
 void CbOptionsFullscreen(const bool value)
 {
 	GetState()->options.fullscreen = value;
-	SDL_SetWindowFullscreen(GetGameWindow(), value ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+	SDL_SetWindowFullscreen(GetGameWindow(), value);
 }
 
 void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const uint8_t id)
@@ -88,8 +87,7 @@ void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const ui
 void CbOptionsVsync(const bool value)
 {
 	GetState()->options.vsync = value;
-	hasChangedVideoOptions = true;
-	// VSync change will happen on next restart
+	SetVsyncEnabled(GetState()->options.vsync);
 }
 
 void CbOptionsLimitFpsWhenUnfocused(const bool value)
@@ -100,8 +98,7 @@ void CbOptionsLimitFpsWhenUnfocused(const bool value)
 void CbOptionsMipmaps(const bool value)
 {
 	GetState()->options.mipmaps = value;
-	hasChangedVideoOptions = true;
-	// Mipmaps change will happen on next restart
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
 void CbOptionsPreferWayland(const bool value)
@@ -114,15 +111,13 @@ void CbOptionsPreferWayland(const bool value)
 void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
-	hasChangedVideoOptions = true;
-	// Change will happen next restart
+	rendererQueuedActions |= QUEUED_ACTION_RECREATE_FRAMEBUFFERS;
 }
 
 void SldOptionsAnisotropy(const float value)
 {
 	GetState()->options.anisotropy = value;
-	hasChangedVideoOptions = true;
-	// Change will happen next restart
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
 void SldOptionsLod(const float value)
@@ -138,7 +133,8 @@ void SldOptionsFov(const float value)
 
 void VideoOptionsStateUpdate(GlobalState * /*state*/)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnVideoOptionsBack();
 	}
@@ -282,7 +278,7 @@ void VideoOptionsStateSet()
 										0.5,
 										1,
 										SliderLabelLod));
-#ifdef __LINUX__
+#ifdef SDL_PLATFORM_LINUX
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
@@ -305,7 +301,7 @@ void VideoOptionsStateSet()
 					  NULL,
 					  GAME_STATE_VIDEO_OPTIONS,
 					  VideoOptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void VideoOptionsStateDestroy()

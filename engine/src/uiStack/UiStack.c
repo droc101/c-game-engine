@@ -10,9 +10,9 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -111,7 +111,7 @@ void DestroyUiStack(UiStack *stack)
 
 bool ProcessUiStack(UiStack *stack)
 {
-	const Vector2 mousePos = GetMousePos();
+	const Vector2 mousePos = GetMousePos(mainThreadInput);
 
 	if (stack->focusedControl != -1u)
 	{
@@ -138,7 +138,7 @@ bool ProcessUiStack(UiStack *stack)
 		c->anchoredPosition = CalculateControlPosition(c);
 	}
 
-	if (IsMouseButtonPressed(SDL_BUTTON_LEFT) || IsButtonPressed(CONTROLLER_OK))
+	if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT) || IsButtonPressed(mainThreadInput, CONTROLLER_OK))
 	{
 		SetFocusedControl(stack, stack->activeControl);
 		//stack->focusedControl = stack->activeControl;
@@ -153,7 +153,7 @@ bool ProcessUiStack(UiStack *stack)
 	{
 		stack->activeControl = stack->focusedControl;
 		stack->activeControlState = HOVER;
-		if (IsButtonPressed(CONTROLLER_OK))
+		if (IsButtonPressed(mainThreadInput, CONTROLLER_OK))
 		{
 			stack->activeControlState = ACTIVE;
 		}
@@ -171,9 +171,9 @@ bool ProcessUiStack(UiStack *stack)
 				localMousePos.y <= c->size.y)
 			{
 				stack->activeControl = i;
-				if (IsMouseButtonPressed(SDL_BUTTON_LEFT) ||
-					IsKeyJustPressed(SDL_SCANCODE_SPACE) ||
-					IsButtonJustPressed(CONTROLLER_OK))
+				if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT) ||
+					IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_SPACE) ||
+					IsButtonJustPressed(mainThreadInput, CONTROLLER_OK))
 				{
 					stack->activeControlState = ACTIVE;
 					// make this control the focused control
@@ -188,8 +188,8 @@ bool ProcessUiStack(UiStack *stack)
 	}
 
 	// process tab and shift+tab to cycle through controls
-	if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && !IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
-		IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
+	if ((IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_TAB) && !IsKeyPressed(mainThreadInput, SDL_SCANCODE_LSHIFT)) ||
+		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN))
 	{
 		if (stack->focusedControl == -1u)
 		{
@@ -198,8 +198,9 @@ bool ProcessUiStack(UiStack *stack)
 		{
 			SetFocusedControl(stack, (stack->focusedControl + 1) % stack->controls.length);
 		}
-	} else if ((IsKeyJustPressed(SDL_SCANCODE_TAB) && IsKeyPressed(SDL_SCANCODE_LSHIFT)) ||
-			   IsButtonJustPressed(SDL_CONTROLLER_BUTTON_DPAD_UP))
+	} else if ((IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_TAB) &&
+				IsKeyPressed(mainThreadInput, SDL_SCANCODE_LSHIFT)) ||
+			   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP))
 	{
 		if (stack->focusedControl == -1u || stack->focusedControl == 0)
 		{
@@ -336,20 +337,21 @@ void UiStackRemove(UiStack *stack, const Control *control)
 
 bool IsMouseInRect(const Vector2 pos, const Vector2 size)
 {
-	const Vector2 mousePos = GetMousePos();
+	const Vector2 mousePos = GetMousePos(mainThreadInput);
 	return mousePos.x >= pos.x && mousePos.x <= pos.x + size.x && mousePos.y >= pos.y && mousePos.y <= pos.y + size.y;
 }
 
 bool HasMouseActivation(UiStack * /*stack*/, const Control *Control)
 {
-	return IsMouseInRect(Control->anchoredPosition, Control->size) && IsMouseButtonJustReleased(SDL_BUTTON_LEFT);
+	return IsMouseInRect(Control->anchoredPosition, Control->size) &&
+		   IsMouseButtonJustReleased(mainThreadInput, SDL_BUTTON_LEFT);
 }
 
 bool HasKeyboardActivation(UiStack * /*stack*/, Control * /*Control*/)
 {
-	return IsKeyJustPressed(SDL_SCANCODE_RETURN) ||
-		   IsKeyJustPressed(SDL_SCANCODE_SPACE) ||
-		   IsButtonJustReleased(CONTROLLER_OK);
+	return IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_RETURN) ||
+		   IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_SPACE) ||
+		   IsButtonJustReleased(mainThreadInput, CONTROLLER_OK);
 }
 
 bool HasActivation(UiStack *stack, Control *Control)

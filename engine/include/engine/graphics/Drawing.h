@@ -12,7 +12,7 @@
 #include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/types.h>
-#include <SDL_surface.h>
+#include <SDL3/SDL_surface.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -57,10 +57,9 @@ void DrawRect(int x, int y, int w, int h, Color color);
 /**
  * Convert a texture asset to an SDL_Surface
  * @param texture The texture name
- * @param filterMode Texture filtering mode
  * @return The @c SDL_Surface
  */
-SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode);
+SDL_Surface *ToSDLSurface(const char *texture);
 
 /**
  * Draw a line from start to end

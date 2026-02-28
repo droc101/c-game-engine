@@ -2,7 +2,8 @@
   "description": "Performs numerical comparison logic",
   "extends": "actor",
   "display": {
-    "color": 4294902015
+    "color": 4294902015,
+    "directional": false
   },
   "inputs": {
     "operand_a": {

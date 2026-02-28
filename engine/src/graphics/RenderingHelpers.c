@@ -16,13 +16,14 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <joltc/constants.h>
 #include <joltc/Math/RMat44.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -30,11 +31,14 @@
 #include <vulkan/vulkan_core.h>
 
 Renderer currentRenderer;
-bool lowFPSMode;
+bool windowFocused;
 
 SDL_Window *window;
 int windowWidth;
 int windowHeight;
+
+RendererQueuedAction rendererQueuedActions = 0;
+OptionsMsaa qaNewFrameufferMsaaValue = MSAA_NONE;
 
 void SetGameWindow(SDL_Window *w)
 {
@@ -71,6 +75,14 @@ inline void UpdateWindowSize()
 	SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 	windowWidth = (int)(windowWidth / GetState()->uiScale);
 	windowHeight = (int)(windowHeight / GetState()->uiScale);
+}
+
+inline Vector2 ActualWindowSizeIgnoreDPI()
+{
+	int w = 0;
+	int h = 0;
+	SDL_GetWindowSizeInPixels(window, &w, &h);
+	return v2((float)w, (float)h);
 }
 
 inline Vector2 ActualWindowSize()
@@ -208,7 +220,7 @@ inline void UpdateViewportSize()
 
 inline void WindowObscured()
 {
-	lowFPSMode = true;
+	windowFocused = false;
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
@@ -222,7 +234,7 @@ inline void WindowObscured()
 
 inline void WindowRestored()
 {
-	lowFPSMode = false;
+	windowFocused = true;
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:
@@ -234,14 +246,19 @@ inline void WindowRestored()
 	}
 }
 
-inline void SetLowFPS(const bool val)
+inline void SetWindowFocused(const bool val)
 {
-	lowFPSMode = val;
+	windowFocused = val;
+}
+
+inline bool IsWindowFocused()
+{
+	return windowFocused;
 }
 
 inline bool IsLowFPSModeEnabled()
 {
-	return lowFPSMode && GetState()->options.limitFpsWhenUnfocused;
+	return !windowFocused && GetState()->options.limitFpsWhenUnfocused;
 }
 
 inline float X_TO_NDC(const float x)
@@ -276,6 +293,20 @@ void LoadMapModels(const Map *map)
 	{
 		case RENDERER_OPENGL:
 			GL_LoadMap(map);
+			break;
+		case RENDERER_VULKAN:
+			// TODO
+		default:
+			break;
+	}
+}
+
+void SetVsyncEnabled(bool enabled)
+{
+	switch (currentRenderer)
+	{
+		case RENDERER_OPENGL:
+			GL_SetVsyncEnabled(enabled);
 			break;
 		case RENDERER_VULKAN:
 			// TODO

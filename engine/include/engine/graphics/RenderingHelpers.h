@@ -10,7 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -38,6 +38,8 @@
 
 typedef enum Renderer Renderer;
 
+typedef enum RendererQueuedAction RendererQueuedAction;
+
 /**
  * Used to check which renderer the game is using
  */
@@ -48,8 +50,15 @@ enum Renderer
 	RENDERER_MAX
 };
 
+enum RendererQueuedAction
+{
+	QUEUED_ACTION_RECREATE_FRAMEBUFFERS = 1 << 0,
+	QUEUED_ACTION_CLEAR_ALL_TEXTURES = 1 << 1,
+};
+
 extern Renderer currentRenderer;
 
+extern RendererQueuedAction rendererQueuedActions;
 
 /**
  * Set the main window
@@ -97,6 +106,12 @@ void UpdateWindowSize();
  * @return The actual size of the window
  */
 Vector2 ActualWindowSize();
+
+/**
+ * Get the actual size of the window, ignoring UI scale AND SYSTEM DPI SCALE
+ * @return The actual size of the window
+ */
+Vector2 ActualWindowSizeIgnoreDPI();
 
 /**
  * Get the size of a texture
@@ -153,11 +168,12 @@ void WindowObscured();
  */
 void WindowRestored();
 
+void SetWindowFocused(bool val);
+
 /**
- * Enable or disable low FPS mode
- * @param val A boolean representing if low FPS mode should be enabled
+ * Check if the window is focused
  */
-void SetLowFPS(bool val);
+bool IsWindowFocused();
 
 /**
  * Check if low FPS mode is enabled
@@ -184,6 +200,11 @@ float Y_TO_NDC(float y);
  * @param map The map to load from
  */
 void LoadMapModels(const Map *map);
+
+/**
+ * Set whether vertical sync is enabled
+ */
+void SetVsyncEnabled(bool enabled);
 
 /**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)

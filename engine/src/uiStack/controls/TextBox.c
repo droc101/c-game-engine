@@ -14,8 +14,8 @@
 #include <engine/subsystem/Timing.h>
 #include <engine/uiStack/controls/TextBox.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_events.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -90,16 +90,16 @@ void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePositio
 	}
 	data->isActive = true;
 
-	if (IsKeyPressed(SDL_SCANCODE_LCTRL) || IsKeyPressed(SDL_SCANCODE_RCTRL))
+	if (IsKeyPressed(mainThreadInput, SDL_SCANCODE_LCTRL) || IsKeyPressed(mainThreadInput, SDL_SCANCODE_RCTRL))
 	{
 		int dir = 0;
-		if (IsKeyJustPressed(SDL_SCANCODE_LEFT))
+		if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_LEFT))
 		{
-			ConsumeKey(SDL_SCANCODE_LEFT);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_LEFT);
 			dir = -1;
-		} else if (IsKeyJustPressed(SDL_SCANCODE_RIGHT))
+		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_RIGHT))
 		{
-			ConsumeKey(SDL_SCANCODE_RIGHT);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_RIGHT);
 			dir = 1;
 		}
 		if (dir != 0)
@@ -118,35 +118,35 @@ void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePositio
 		}
 	} else
 	{
-		if (IsKeyJustPressed(SDL_SCANCODE_LEFT))
+		if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_LEFT))
 		{
-			ConsumeKey(SDL_SCANCODE_LEFT);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_LEFT);
 			data->input.cursor -= 1;
-		} else if (IsKeyJustPressed(SDL_SCANCODE_RIGHT))
+		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_RIGHT))
 		{
-			ConsumeKey(SDL_SCANCODE_RIGHT);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_RIGHT);
 			data->input.cursor += 1;
 		}
 	}
 
 	data->input.cursor = min(data->input.cursor, strlen(data->text));
 
-	if (IsKeyJustPressed(SDL_SCANCODE_HOME))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_HOME))
 	{
-		ConsumeKey(SDL_SCANCODE_HOME);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_HOME);
 		data->input.cursor = 0;
-	} else if (IsKeyJustPressed(SDL_SCANCODE_END))
+	} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_END))
 	{
-		ConsumeKey(SDL_SCANCODE_END);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_END);
 		data->input.cursor = (int)strlen(data->text);
 	}
 
 	// handle backspace
-	if (IsKeyJustPressed(SDL_SCANCODE_BACKSPACE))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_BACKSPACE))
 	{
 		if (data->input.cursor > 0)
 		{
-			ConsumeKey(SDL_SCANCODE_BACKSPACE);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_BACKSPACE);
 			memmove(data->text + data->input.cursor - 1,
 					data->text + data->input.cursor,
 					strlen(data->text) - data->input.cursor + 1);
@@ -156,9 +156,9 @@ void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePositio
 				data->callback(data->text);
 			}
 		}
-	} else if (IsKeyJustPressed(SDL_SCANCODE_DELETE) && data->input.cursor < strlen(data->text))
+	} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_DELETE) && data->input.cursor < strlen(data->text))
 	{
-		ConsumeKey(SDL_SCANCODE_DELETE);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_DELETE);
 		memmove(data->text + data->input.cursor,
 				data->text + data->input.cursor + 1,
 				strlen(data->text) - data->input.cursor);

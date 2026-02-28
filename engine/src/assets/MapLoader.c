@@ -2,6 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <assert.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapLoader.h>
@@ -24,9 +25,9 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -44,9 +45,17 @@ Map *LoadMap(const char *path)
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
-	map->skyTexture = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
-	bytesRemaining -= strLength;
-	bytesRemaining += sizeof(size_t);
+	EXPECT_BYTES(1, bytesRemaining);
+	map->renderSky = ReadByte(mapData->data, &offset);
+	if (map->renderSky)
+	{
+		map->skyTexture = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+		bytesRemaining -= strLength;
+		bytesRemaining += sizeof(size_t);
+	} else
+	{
+		map->skyTexture = NULL;
+	}
 	map->discordRpcIcon = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
 	bytesRemaining -= strLength;
 	bytesRemaining += sizeof(size_t);
@@ -148,6 +157,7 @@ Map *LoadMap(const char *path)
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
+		assert(model->material);
 		free(materialName);
 
 		EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);

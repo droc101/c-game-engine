@@ -3,6 +3,6 @@
   "extends": "actor",
   "display": {
     "type": "model",
-    "model": "cube"
+    "model": "model/cube.gmdl"
   }
 }

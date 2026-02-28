@@ -6,7 +6,7 @@
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,17 +17,18 @@
 #include <handleapi.h>
 #include <minwindef.h>
 #include <processthreadsapi.h>
-#include <SDL_syswm.h>
+#include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_video.h>
 #include <winbase.h>
 #endif
 
 void SetDwmWindowAttribs(SDL_Window *window)
 {
 #ifdef WIN32
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(window, &info);
-	const HWND hWnd = info.info.win.window; // NOLINT(*-misplaced-const)
+
+	const HWND hWnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window),
+												   SDL_PROP_WINDOW_WIN32_HWND_POINTER,
+												   NULL);
 	const BOOL enable = true;
 	HRESULT res = DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &enable, sizeof(BOOL));
 	if (res != S_OK)

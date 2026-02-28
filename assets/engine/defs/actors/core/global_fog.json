@@ -2,7 +2,8 @@
   "description": "Gof",
   "extends": "actor",
   "display": {
-    "color_param": "fog_color"
+    "color_param": "fog_color",
+    "directional": false
   },
   "inputs": {
     "set": {

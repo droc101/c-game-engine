@@ -8,19 +8,18 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_error.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_haptic.h>
-#include <SDL_joystick.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_joystick.h>
+#include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 
-typedef enum InputState
+typedef enum InputState : uint8_t
 {
 	/// The input is not pressed
 	INP_RELEASED,
@@ -29,356 +28,342 @@ typedef enum InputState
 	/// The input is currently pressed
 	INP_PRESSED,
 	/// The input was just released on this frame
-	INP_JUST_RELEASED
+	INP_JUST_RELEASED,
 } InputState;
 
-typedef struct PhysicsStateBuffer
+struct InputSystem
 {
-	bool physKeysJustPressed[SDL_NUM_SCANCODES];
-	bool physKeysJustReleased[SDL_NUM_SCANCODES];
-	bool physControllerButtonsJustPressed[SDL_CONTROLLER_BUTTON_MAX];
-	bool physControllerButtonsJustReleased[SDL_CONTROLLER_BUTTON_MAX];
-	bool physMouseButtonsJustPressed[MAX_RECOGNIZED_MOUSE_BUTTONS];
-	bool physMouseButtonsJustReleased[MAX_RECOGNIZED_MOUSE_BUTTONS];
-} PhysicsStateBuffer;
+	// every key is tracked, even if it's not used
+	// this *could* be optimized, but it's not necessary
+	// on modern systems where memory is not a concern
+	InputState keys[SDL_SCANCODE_COUNT];
+	bool queueReleaseKeys[SDL_SCANCODE_COUNT];
 
-// every key is tracked, even if it's not used
-// this *could* be optimized, but it's not necessary
-// on modern systems where memory is not a concern
-static InputState keys[SDL_NUM_SCANCODES];
-static InputState controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
-static InputState mouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
+	InputState controllerButtons[SDL_GAMEPAD_BUTTON_COUNT];
+	bool queueReleaseControllerButtons[SDL_GAMEPAD_BUTTON_COUNT];
+	float gamepadAxes[SDL_GAMEPAD_AXIS_COUNT];
 
-/// The buffer that is actively being written to by the render thread.
-static PhysicsStateBuffer *physicsInputWorkingBuffer;
-/// The buffer that is for the physics thread to read from.
-static PhysicsStateBuffer *physicsInputReadBuffer;
+	InputState mouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
+	bool queueReleaseMouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
+	int mouseX;
+	int mouseY;
+	int mouseRelativeX;
+	int mouseRelativeY;
 
-static int mouseX;
-static int mouseY;
-static int mouseRelativeX;
-static int mouseRelativeY;
+	float mouseWheelRelativeX;
+	float mouseWheelRelativeY;
+};
 
-// 0 is left, 1 is right for axes (not 🪓)
-static Vector2 leftStick;
-static Vector2 rightStick;
-static Vector2 triggers;
+SDL_Gamepad *currentGamepad;
+SDL_Joystick *currentJoystick;
+bool gamepadHasBasicHaptics;
+bool gamepadHasTriggerHaptics;
 
-static SDL_GameController *controller;
-static SDL_Joystick *stick;
-static SDL_Haptic *haptic;
+InputSystem *physicsThreadInput = NULL;
+InputSystem *mainThreadInput = NULL;
 
-bool FindGameController()
+bool FindGamepad()
 {
-	for (int i = 0; i < SDL_NumJoysticks(); i++)
+	int numGamepads = 0;
+	SDL_JoystickID *gamepads = SDL_GetGamepads(&numGamepads);
+	for (int i = 0; i < numGamepads; i++)
 	{
-		if (SDL_IsGameController(i))
+		const SDL_JoystickID gamepad = gamepads[i];
+		if (SDL_IsGamepad(gamepad))
 		{
-			controller = SDL_GameControllerOpen(i);
-			stick = SDL_GameControllerGetJoystick(controller);
-			if (SDL_JoystickIsHaptic(stick))
-			{
-				haptic = SDL_HapticOpenFromJoystick(stick);
-				if (!haptic)
-				{
-					LogError("Failed to open haptic: %s\n",
-							 SDL_GetError()); // This should never happen (if it does, SDL lied to us)
-					haptic = NULL;
-				} else if (SDL_HapticRumbleInit(haptic) != 0)
-				{
-					LogError("Failed to initialize rumble: %s\n", SDL_GetError());
-					haptic = NULL;
-				}
-			} else
-			{
-				haptic = NULL;
-			}
-			LogInfo("Using controller \"%s\"\n", SDL_GameControllerName(controller));
+			currentGamepad = SDL_OpenGamepad(gamepad);
+			currentJoystick = SDL_GetGamepadJoystick(currentGamepad);
+			const SDL_PropertiesID gamepadProps = SDL_GetGamepadProperties(currentGamepad);
+			gamepadHasBasicHaptics = SDL_GetBooleanProperty(gamepadProps, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false);
+			gamepadHasTriggerHaptics = SDL_GetBooleanProperty(gamepadProps,
+															  SDL_PROP_GAMEPAD_CAP_TRIGGER_RUMBLE_BOOLEAN,
+															  false);
+
+			LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(currentGamepad));
+			LogDebug("Controller features basic haptics: %s\n", gamepadHasBasicHaptics ? "yes" : "no");
+			LogDebug("Controller features trigger haptics: %s\n", gamepadHasTriggerHaptics ? "yes" : "no");
+
+			SDL_free(gamepads);
 			return true;
 		}
 	}
+	SDL_free(gamepads);
 	return false;
 }
 
 void Rumble(const float strength, const uint32_t time)
 {
-	if (UseController() && haptic != NULL)
+	if (UseController() && gamepadHasBasicHaptics)
 	{
-		SDL_HapticRumblePlay(haptic, strength * GetState()->options.rumbleStrength, time);
+		const uint16_t uintStrength = (uint16_t)((strength * GetState()->options.rumbleStrength) * UINT16_MAX);
+		SDL_RumbleGamepad(currentGamepad, uintStrength, uintStrength, time);
 	}
 }
 
-void HandleControllerDisconnect(const Sint32 which)
+void HandleGamepadDisconnect(const SDL_JoystickID which)
 {
-	if (controller == NULL)
+	if (currentGamepad == NULL)
 	{
 		return;
 	}
-	if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)) != which)
+	if (SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)) != which)
 	{
 		return;
 	}
-	SDL_GameControllerClose(controller);
-	SDL_JoystickClose(stick);
-	if (haptic)
-	{
-		SDL_HapticClose(haptic);
-	}
-	controller = NULL;
-	stick = NULL;
-	haptic = NULL;
-	FindGameController(); // try to find another controller
+	SDL_CloseGamepad(currentGamepad);
+	SDL_CloseJoystick(currentJoystick);
+	currentGamepad = NULL;
+	currentJoystick = NULL;
+	FindGamepad(); // try to find another controller
 }
 
-void HandleControllerConnect()
+void HandleGamepadConnect()
 {
-	if (controller)
+	if (currentGamepad)
 	{
 		// disconnect the current controller to use the new one
-		HandleControllerDisconnect(SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)));
+		HandleGamepadDisconnect(SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)));
 	}
-	FindGameController();
+	FindGamepad();
 }
 
-void HandleControllerButtonUp(const SDL_GameControllerButton button)
+void UpdateInputState(InputState *statePtr, bool *queueReleasePtr, const InputState newState)
 {
-	controllerButtons[button] = INP_JUST_RELEASED;
-	physicsInputWorkingBuffer->physControllerButtonsJustReleased[button] = true;
-}
-
-void HandleControllerButtonDown(const SDL_GameControllerButton button)
-{
-	controllerButtons[button] = INP_JUST_PRESSED;
-	physicsInputWorkingBuffer->physControllerButtonsJustPressed[button] = true;
-}
-
-void HandleControllerAxis(const SDL_GameControllerAxis axis, const Sint16 value)
-{
-	const float dValue = (float)value / 32767.0f;
-	switch (axis)
+	if (*statePtr == INP_JUST_PRESSED && newState == INP_JUST_RELEASED)
 	{
-		case SDL_CONTROLLER_AXIS_LEFTX:
-			leftStick.x = dValue;
+		*queueReleasePtr = true;
+	} else
+	{
+		*statePtr = newState;
+		*queueReleasePtr = false;
+	}
+}
+
+bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
+{
+	switch (event->type)
+	{
+		case SDL_EVENT_KEY_UP:
+			UpdateInputState(&system->keys[event->key.scancode],
+							 &system->queueReleaseKeys[event->key.scancode],
+							 INP_JUST_RELEASED);
 			break;
-		case SDL_CONTROLLER_AXIS_LEFTY:
-			leftStick.y = dValue;
+		case SDL_EVENT_KEY_DOWN:
+			UpdateInputState(&system->keys[event->key.scancode],
+							 &system->queueReleaseKeys[event->key.scancode],
+							 INP_JUST_PRESSED);
 			break;
-		case SDL_CONTROLLER_AXIS_RIGHTX:
-			rightStick.x = dValue;
+		case SDL_EVENT_MOUSE_MOTION:
+			system->mouseX = (int)event->motion.x;
+			system->mouseY = (int)event->motion.y;
+			system->mouseRelativeX += (int)event->motion.xrel;
+			system->mouseRelativeY += (int)event->motion.yrel;
 			break;
-		case SDL_CONTROLLER_AXIS_RIGHTY:
-			rightStick.y = dValue;
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+			if (event->button.button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
+			{
+				LogError("Received mouse event for button %d, which is greater than the maximum of %d that is "
+						 "supported.\n",
+						 event->button.button,
+						 MAX_RECOGNIZED_MOUSE_BUTTONS);
+				break;
+			}
+			UpdateInputState(&system->mouseButtons[event->button.button],
+							 &system->queueReleaseMouseButtons[event->button.button],
+							 INP_JUST_RELEASED);
 			break;
-		case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-			triggers.x = dValue;
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+			if (event->button.button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
+			{
+				LogError("Received mouse event for button %d, which is greater than the maximum of %d that is "
+						 "supported.\n",
+						 event->button.button,
+						 MAX_RECOGNIZED_MOUSE_BUTTONS);
+				break;
+			}
+			UpdateInputState(&system->mouseButtons[event->button.button],
+							 &system->queueReleaseMouseButtons[event->button.button],
+							 INP_JUST_PRESSED);
 			break;
-		case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-			triggers.y = dValue;
+		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+			UpdateInputState(&system->controllerButtons[event->gbutton.button],
+							 &system->queueReleaseControllerButtons[event->gbutton.button],
+							 INP_JUST_PRESSED);
+			break;
+		case SDL_EVENT_GAMEPAD_BUTTON_UP:
+			UpdateInputState(&system->controllerButtons[event->gbutton.button],
+							 &system->queueReleaseControllerButtons[event->gbutton.button],
+							 INP_JUST_RELEASED);
+			break;
+		case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+			system->gamepadAxes[event->gaxis.axis] = (float)event->gaxis.value / 32767.0f;
+			break;
+		case SDL_EVENT_MOUSE_WHEEL:
+			system->mouseWheelRelativeX += event->wheel.x;
+			system->mouseWheelRelativeY += event->wheel.y;
 			break;
 		default:
-			break;
+			return false;
 	}
+	return true;
 }
 
-void HandleMouseMotion(const int x, const int y, const int xRel, const int yRel)
+void UpdateInputStates(InputSystem *system)
 {
-	mouseX = x;
-	mouseY = y;
-	mouseRelativeX += xRel;
-	mouseRelativeY += yRel;
-}
-
-void HandleMouseDown(const int button)
-{
-	if (button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
+	for (int i = 0; i < SDL_SCANCODE_COUNT; i++)
 	{
-		LogError("Received mouse event for button %d, which is greater than the maximum of %d that is supported.\n",
-				 button,
-				 MAX_RECOGNIZED_MOUSE_BUTTONS);
-		return;
-	}
-	mouseButtons[button] = INP_JUST_PRESSED;
-	physicsInputWorkingBuffer->physMouseButtonsJustPressed[button] = true;
-}
-
-void HandleMouseUp(const int button)
-{
-	if (button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
-	{
-		LogError("Received mouse event for button %d, which is greater than the maximum of %d that is supported.\n",
-				 button,
-				 MAX_RECOGNIZED_MOUSE_BUTTONS);
-		return;
-	}
-	mouseButtons[button] = INP_JUST_RELEASED;
-	physicsInputWorkingBuffer->physMouseButtonsJustReleased[button] = true;
-}
-
-void HandleKeyDown(const int code)
-{
-	keys[code] = INP_JUST_PRESSED;
-	physicsInputWorkingBuffer->physKeysJustPressed[code] = true;
-}
-
-void HandleKeyUp(const int code)
-{
-	keys[code] = INP_JUST_RELEASED;
-	physicsInputWorkingBuffer->physKeysJustReleased[code] = true;
-}
-
-void UpdateInputStates()
-{
-	for (int i = 0; i < SDL_NUM_SCANCODES; i++)
-	{
-		if (keys[i] == INP_JUST_RELEASED)
+		if (system->queueReleaseKeys[i])
 		{
-			keys[i] = INP_RELEASED;
-		} else if (keys[i] == INP_JUST_PRESSED)
+			system->keys[i] = INP_JUST_RELEASED;
+			system->queueReleaseKeys[i] = false;
+		} else if (system->keys[i] == INP_JUST_RELEASED)
 		{
-			keys[i] = INP_PRESSED;
+			system->keys[i] = INP_RELEASED;
+		} else if (system->keys[i] == INP_JUST_PRESSED)
+		{
+			system->keys[i] = INP_PRESSED;
 		}
 	}
 
 	for (int i = 0; i < MAX_RECOGNIZED_MOUSE_BUTTONS; i++)
 	{
-		if (mouseButtons[i] == INP_JUST_RELEASED)
+		if (system->queueReleaseMouseButtons[i])
 		{
-			mouseButtons[i] = INP_RELEASED;
-		} else if (mouseButtons[i] == INP_JUST_PRESSED)
+			system->mouseButtons[i] = INP_JUST_RELEASED;
+			system->queueReleaseMouseButtons[i] = false;
+		} else if (system->mouseButtons[i] == INP_JUST_RELEASED)
 		{
-			mouseButtons[i] = INP_PRESSED;
+			system->mouseButtons[i] = INP_RELEASED;
+		} else if (system->mouseButtons[i] == INP_JUST_PRESSED)
+		{
+			system->mouseButtons[i] = INP_PRESSED;
 		}
 	}
 
-	for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+	for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; i++)
 	{
-		if (controllerButtons[i] == INP_JUST_RELEASED)
+		if (system->queueReleaseControllerButtons[i])
 		{
-			controllerButtons[i] = INP_RELEASED;
-		} else if (controllerButtons[i] == INP_JUST_PRESSED)
+			system->controllerButtons[i] = INP_JUST_RELEASED;
+			system->queueReleaseControllerButtons[i] = false;
+		} else if (system->controllerButtons[i] == INP_JUST_RELEASED)
 		{
-			controllerButtons[i] = INP_PRESSED;
+			system->controllerButtons[i] = INP_RELEASED;
+		} else if (system->controllerButtons[i] == INP_JUST_PRESSED)
+		{
+			system->controllerButtons[i] = INP_PRESSED;
 		}
 	}
 
-	mouseRelativeX = 0;
-	mouseRelativeY = 0;
+	system->mouseRelativeX = 0;
+	system->mouseRelativeY = 0;
+	system->mouseWheelRelativeX = 0;
+	system->mouseWheelRelativeY = 0;
 }
 
-bool IsButtonPressed(const int button)
+bool IsButtonPressed(const InputSystem *system, const int button)
 {
-	return controllerButtons[button] == INP_PRESSED || controllerButtons[button] == INP_JUST_PRESSED;
+	return system->controllerButtons[button] == INP_PRESSED || system->controllerButtons[button] == INP_JUST_PRESSED;
 }
 
-bool IsButtonJustPressed(const int button)
+bool IsButtonJustPressed(const InputSystem *system, const int button)
 {
-	return controllerButtons[button] == INP_JUST_PRESSED;
+	return system->controllerButtons[button] == INP_JUST_PRESSED;
 }
 
-bool IsButtonJustReleased(const int button)
+bool IsButtonJustReleased(const InputSystem *system, const int button)
 {
-	return controllerButtons[button] == INP_JUST_RELEASED;
+	return system->controllerButtons[button] == INP_JUST_RELEASED;
 }
 
-bool IsKeyPressed(const int code)
+bool IsKeyPressed(const InputSystem *system, const int code)
 {
-	return keys[code] == INP_PRESSED || keys[code] == INP_JUST_PRESSED;
+	return system->keys[code] == INP_PRESSED || system->keys[code] == INP_JUST_PRESSED;
 }
 
-bool IsKeyJustPressed(const int code)
+bool IsKeyJustPressed(const InputSystem *system, const int code)
 {
-	return keys[code] == INP_JUST_PRESSED;
+	return system->keys[code] == INP_JUST_PRESSED;
 }
 
-bool IsKeyJustReleased(const int code)
+bool IsKeyJustReleased(const InputSystem *system, const int code)
 {
-	return keys[code] == INP_JUST_RELEASED;
+	return system->keys[code] == INP_JUST_RELEASED;
 }
 
-bool IsMouseButtonPressed(const int button)
-{
-	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
-	return mouseButtons[button] == INP_PRESSED || mouseButtons[button] == INP_JUST_PRESSED;
-}
-
-bool IsMouseButtonJustPressed(const int button)
+bool IsMouseButtonPressed(const InputSystem *system, const int button)
 {
 	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
-	return mouseButtons[button] == INP_JUST_PRESSED;
+	return system->mouseButtons[button] == INP_PRESSED || system->mouseButtons[button] == INP_JUST_PRESSED;
 }
 
-bool IsMouseButtonJustReleased(const int button)
+bool IsMouseButtonJustPressed(const InputSystem *system, const int button)
 {
 	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
-	return mouseButtons[button] == INP_JUST_RELEASED;
+	return system->mouseButtons[button] == INP_JUST_PRESSED;
 }
 
-Vector2 GetMousePos()
-{
-	return Vector2Scale(v2((float)mouseX, (float)mouseY), (float)(1.0 / GetState()->uiScale));
-}
-
-Vector2 GetMouseRel()
-{
-	return v2((float)mouseRelativeX, (float)mouseRelativeY);
-}
-
-void ConsumeKey(const int code)
-{
-	keys[code] = INP_RELEASED;
-}
-
-void ConsumeButton(const int btn)
-{
-	controllerButtons[btn] = INP_RELEASED;
-}
-
-void ConsumeMouseButton(const int button)
+bool IsMouseButtonJustReleased(const InputSystem *system, const int button)
 {
 	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
-	mouseButtons[button] = INP_RELEASED;
+	return system->mouseButtons[button] == INP_JUST_RELEASED;
 }
 
-void ConsumeAllKeys()
+Vector2 GetMousePos(const InputSystem *system)
 {
-	for (int i = 0; i < SDL_NUM_SCANCODES; i++)
+	return Vector2Scale(v2((float)system->mouseX, (float)system->mouseY), (float)(1.0 / GetState()->uiScale));
+}
+
+Vector2 GetMouseRel(const InputSystem *system)
+{
+	return v2((float)system->mouseRelativeX, (float)system->mouseRelativeY);
+}
+
+Vector2 GetMouseWheel(const InputSystem *system)
+{
+	return v2(system->mouseWheelRelativeX, system->mouseWheelRelativeY);
+}
+
+void ConsumeKey(InputSystem *system, const int code)
+{
+	system->keys[code] = INP_RELEASED;
+}
+
+void ConsumeButton(InputSystem *system, const int btn)
+{
+	system->controllerButtons[btn] = INP_RELEASED;
+}
+
+void ConsumeMouseButton(InputSystem *system, const int button)
+{
+	assert(button < MAX_RECOGNIZED_MOUSE_BUTTONS);
+	system->mouseButtons[button] = INP_RELEASED;
+}
+
+void ConsumeAllKeys(InputSystem *system)
+{
+	for (int i = 0; i < SDL_SCANCODE_COUNT; i++)
 	{
-		keys[i] = INP_RELEASED;
+		system->keys[i] = INP_RELEASED;
 	}
 }
 
-void ConsumeAllMouseButtons()
+void ConsumeAllMouseButtons(InputSystem *system)
 {
 	for (int i = 0; i < MAX_RECOGNIZED_MOUSE_BUTTONS; i++)
 	{
-		mouseButtons[i] = INP_RELEASED;
+		system->mouseButtons[i] = INP_RELEASED;
 	}
 }
 
-float GetAxis(const SDL_GameControllerAxis axis)
+float GetAxis(const InputSystem *system, const SDL_GamepadAxis axis)
 {
-	switch (axis)
-	{
-		case SDL_CONTROLLER_AXIS_LEFTX:
-			return leftStick.x;
-		case SDL_CONTROLLER_AXIS_LEFTY:
-			return leftStick.y;
-		case SDL_CONTROLLER_AXIS_RIGHTX:
-			return rightStick.x;
-		case SDL_CONTROLLER_AXIS_RIGHTY:
-			return rightStick.y;
-		case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-			return triggers.x;
-		case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-			return triggers.y;
-		default:
-			return 0;
-	}
+	return system->gamepadAxes[axis];
 }
 
 inline bool UseController()
 {
-	return GetState()->options.controllerMode && controller != NULL;
+	return GetState()->options.controllerMode && currentGamepad != NULL;
 }
 
 const char *GetControllerName()
@@ -387,59 +372,21 @@ const char *GetControllerName()
 	{
 		return NULL;
 	}
-	return SDL_GameControllerName(controller);
+	return SDL_GetGamepadName(currentGamepad);
 }
 
 void InputInit()
 {
 	LogDebug("Initializing input system...\n");
-	physicsInputReadBuffer = calloc(1, sizeof(PhysicsStateBuffer));
-	CheckAlloc(physicsInputReadBuffer);
-	physicsInputWorkingBuffer = calloc(1, sizeof(PhysicsStateBuffer));
-	CheckAlloc(physicsInputWorkingBuffer);
+	mainThreadInput = calloc(1, sizeof(InputSystem));
+	CheckAlloc(mainThreadInput);
+	physicsThreadInput = calloc(1, sizeof(InputSystem));
+	CheckAlloc(physicsThreadInput);
 }
 
 void InputDestroy()
 {
 	LogDebug("Cleaning up input system...\n");
-	free(physicsInputWorkingBuffer);
-	free(physicsInputReadBuffer);
-}
-
-void InputPhysicsTickBegin()
-{
-	PhysicsStateBuffer *temp = physicsInputWorkingBuffer;
-	physicsInputWorkingBuffer = physicsInputReadBuffer;
-	physicsInputReadBuffer = temp;
-	memset(physicsInputWorkingBuffer, 0, sizeof(PhysicsStateBuffer));
-}
-
-bool IsKeyJustPressedPhys(const int code)
-{
-	return physicsInputReadBuffer->physKeysJustPressed[code];
-}
-
-bool IsKeyJustReleasedPhys(const int code)
-{
-	return physicsInputReadBuffer->physKeysJustReleased[code];
-}
-
-bool IsButtonJustPressedPhys(const int button)
-{
-	return physicsInputReadBuffer->physControllerButtonsJustPressed[button];
-}
-
-bool IsButtonJustReleasedPhys(const int button)
-{
-	return physicsInputReadBuffer->physControllerButtonsJustReleased[button];
-}
-
-bool IsMouseButtonJustPressedPhys(const int button)
-{
-	return physicsInputReadBuffer->physMouseButtonsJustPressed[button];
-}
-
-bool IsMouseButtonJustReleasedPhys(const int button)
-{
-	return physicsInputReadBuffer->physMouseButtonsJustReleased[button];
+	free(mainThreadInput);
+	free(physicsThreadInput);
 }

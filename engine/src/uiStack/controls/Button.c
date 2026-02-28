@@ -12,8 +12,8 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -52,10 +52,10 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_
 	const ButtonData *data = (ButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
-		(void)PlaySoundEffect(SOUND("sfx/click"), 0, 1, NULL, NULL);
-		ConsumeMouseButton(SDL_BUTTON_LEFT);
-		ConsumeKey(SDL_SCANCODE_SPACE);
-		ConsumeButton(CONTROLLER_OK);
+		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
+		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
+		ConsumeButton(mainThreadInput, CONTROLLER_OK);
 		data->callback();
 	}
 }

@@ -8,15 +8,14 @@
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/graphics/gl/GLworld.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <GL/gl.h>
 #include <GL/glew.h>
-#include <SDL_error.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <wchar.h>
@@ -26,31 +25,6 @@ SDL_GLContext ctx;
 bool GL_PreInit()
 {
 	LogDebug("Pre-initializing OpenGL...\n");
-	const bool msaaEnabled = GetState()->options.msaa != MSAA_NONE;
-	if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, msaaEnabled) != 0)
-	{
-		LogError("Failed to set MSAA buffers attribute: %s\n", SDL_GetError());
-	}
-	if (msaaEnabled)
-	{
-		int mssaValue = 0;
-		switch (GetState()->options.msaa)
-		{
-			case MSAA_2X:
-				mssaValue = 2;
-				break;
-			case MSAA_4X:
-				mssaValue = 4;
-				break;
-			case MSAA_8X:
-				mssaValue = 8;
-				break;
-			default:
-				LogError("OpenGL: Invalid MSAA value!");
-				return false;
-		}
-		glMsaaSamples = mssaValue;
-	}
 	TestSDLFunction(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0),
 					"Failed to set OpenGL MSAA buffers",
 					GL_INIT_FAIL_MSG);
@@ -93,13 +67,13 @@ bool GL_Init(SDL_Window *wnd)
 
 	TestSDLFunction(SDL_GL_MakeCurrent(wnd, ctx), "Failed to make context current", GL_INIT_FAIL_MSG);
 
-	TestSDLFunction_NonFatal(SDL_GL_SetSwapInterval(GetState()->options.vsync ? 1 : 0), "Failed to set VSync");
+	GL_SetVsyncEnabled(GetState()->options.vsync);
 
 	glewExperimental = GL_TRUE; // Please expose OpenGL 3.x+ interfaces
 	const GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
-		SDL_GL_DeleteContext(ctx);
+		SDL_GL_DestroyContext(ctx);
 		LogError("glewInit Failed with error %d\n", err);
 		return false;
 	}
@@ -107,7 +81,7 @@ bool GL_Init(SDL_Window *wnd)
 	// Ensure we have GL 3.3 or higher
 	if (!GL_VERSION_CHECK)
 	{
-		SDL_GL_DeleteContext(ctx);
+		SDL_GL_DestroyContext(ctx);
 		LogError("OpenGL: GL_VERSION_CHECK failed\n");
 		return false;
 	}
@@ -118,47 +92,7 @@ bool GL_Init(SDL_Window *wnd)
 		return false;
 	}
 
-	if (GetState()->options.anisotropy != ANISOTROPY_NONE)
-	{
-		GLfloat requestedAnisotropy = 0;
-		switch (GetState()->options.anisotropy)
-		{
-			case ANISOTROPY_2X:
-				requestedAnisotropy = 2;
-				break;
-			case ANISOTROPY_4X:
-				requestedAnisotropy = 4;
-				break;
-			case ANISOTROPY_8X:
-				requestedAnisotropy = 8;
-				break;
-			case ANISOTROPY_16X:
-				requestedAnisotropy = 16;
-				break;
-			default:
-				LogError("OpenGL: Invalid anisotropy level!");
-				return false;
-		}
-		GLfloat gpuMaxAnisotropy = 0;
-		if (GLEW_EXT_texture_filter_anisotropic)
-		{
-			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &gpuMaxAnisotropy);
-		} else
-		{
-			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
-		}
-		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
-		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
-		if (requestedAnisotropy != anisotropyLevel)
-		{
-			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
-					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
-					   anisotropyLevel,
-					   requestedAnisotropy,
-					   gpuMaxAnisotropy);
-		}
-	}
-
+	GL_UpdateAnisotropyLevel();
 
 #ifdef BUILDSTYLE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
@@ -182,7 +116,7 @@ bool GL_Init(SDL_Window *wnd)
 
 	GL_InitObjects();
 
-	if (!GL_InitFramebuffer())
+	if (!GL_InitFramebuffer(GetState()->options.msaa))
 	{
 		return false;
 	}
@@ -219,5 +153,5 @@ void GL_DestroyGL()
 	GL_DestroyFramebuffer();
 	GL_DestroyShaders();
 	GL_DestroyObjects();
-	SDL_GL_DeleteContext(ctx);
+	SDL_GL_DestroyContext(ctx);
 }

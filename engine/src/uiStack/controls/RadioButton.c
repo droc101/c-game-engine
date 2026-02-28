@@ -13,8 +13,8 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_mouse.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -65,7 +65,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 		}
 
 
-		(void)PlaySoundEffect(SOUND("sfx/click"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		data->checked = true;
 
 		// Find all radio buttons with the same group id and uncheck them
@@ -82,9 +82,9 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 			}
 		}
 
-		ConsumeMouseButton(SDL_BUTTON_LEFT);
-		ConsumeKey(SDL_SCANCODE_SPACE);
-		ConsumeButton(CONTROLLER_OK);
+		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
+		ConsumeButton(mainThreadInput, CONTROLLER_OK);
 
 		if (data->callback != NULL)
 		{

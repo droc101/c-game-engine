@@ -11,10 +11,10 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_rect.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MenuState.h"
 
@@ -22,10 +22,12 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 {
 	if (state->physicsFrame == 20)
 	{
-		(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
+		(void)PlaySound(SOUND("sfx/coincling"), SOUND_CATEGORY_SFX);
 	}
 
-	if (state->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_CONTROLLER_BUTTON_START))
+	if (state->physicsFrame == 120 ||
+		IsKeyPressed(physicsThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
 		MenuStateSetWithFade();
 	}
@@ -65,5 +67,5 @@ void LogoSplashStateSet()
 					  LogoSplashStateFixedUpdate,
 					  GAME_STATE_LOGO_SPLASH,
 					  LogoSplashStateRender,
-					  SDL_FALSE); // Non-fixed is not needed for this state
+					  false); // Non-fixed is not needed for this state
 }
