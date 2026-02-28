@@ -39,7 +39,7 @@ struct MapMaterial
 /**
  * Load a map material from an asset
  * @param path The asset path
- * @return The map material, or NULL on error
+ * @return The map material, or a fallback on error
  */
 MapMaterial *LoadMapMaterial(const char *path);
 
