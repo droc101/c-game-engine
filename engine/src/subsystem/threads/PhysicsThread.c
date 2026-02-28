@@ -6,23 +6,29 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_thread.h>
 #include <SDL3/SDL_timer.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 static SDL_Thread *physicsThread;
 static SDL_Mutex *physicsThreadMutex;
 static SDL_Mutex *physicsTickMutex;
 static SDL_Semaphore *physicsTickHasEnded;
+
+static List physicsThreadInputEventQueue;
 
 /**
  * The function to run in the physics thread
@@ -35,6 +41,16 @@ FixedUpdateFunction PhysicsThreadFunction;
  * @warning Only touch this when you have a lock on the mutex
  */
 bool physicsThreadPostQuit = false;
+
+void PhysicsThreadQueueInputEvent(const SDL_Event *event)
+{
+	SDL_Event *copiedEvent = malloc(sizeof(SDL_Event));
+	CheckAlloc(copiedEvent);
+	memcpy(copiedEvent, event, sizeof(SDL_Event));
+	SDL_LockMutex(physicsThreadMutex);
+	ListAdd(physicsThreadInputEventQueue, copiedEvent);
+	SDL_UnlockMutex(physicsThreadMutex);
+}
 
 /**
  * The main function for the physics thread
@@ -56,7 +72,15 @@ int PhysicsThreadMain(void * /*data*/)
 			SDL_UnlockMutex(physicsTickMutex);
 			return 0;
 		}
-		InputPhysicsTickBegin();
+
+		for (size_t i = 0; i < physicsThreadInputEventQueue.length; i++)
+		{
+			SDL_Event *event = ListGetPointer(physicsThreadInputEventQueue, i);
+			InputSystemProcessEvent(physicsThreadInput, event);
+			free(event);
+		}
+		ListClear(physicsThreadInputEventQueue);
+
 		if (PhysicsThreadFunction == NULL)
 		{
 			GetState()->physicsFrame++;
@@ -73,6 +97,7 @@ int PhysicsThreadMain(void * /*data*/)
 		// ticks should be around 1/60th of a second
 		const double delta = lastTickTime / PHYSICS_TARGET_NS_D;
 		UpdateFunction(GetState(), delta);
+		UpdateInputStates(physicsThreadInput);
 		GetState()->physicsFrame++;
 		SDL_UnlockMutex(physicsTickMutex);
 		SDL_SignalSemaphore(physicsTickHasEnded);
@@ -94,6 +119,7 @@ int PhysicsThreadMain(void * /*data*/)
 void PhysicsThreadInit()
 {
 	LogDebug("Initializing physics thread...\n");
+	ListInit(physicsThreadInputEventQueue, LIST_POINTER);
 	PhysicsThreadFunction = NULL;
 	physicsThreadPostQuit = false;
 	physicsThreadMutex = SDL_CreateMutex();
@@ -131,6 +157,7 @@ void PhysicsThreadTerminate()
 	physicsThreadPostQuit = true;
 	SDL_UnlockMutex(physicsThreadMutex);
 	SDL_WaitThread(physicsThread, NULL);
+	ListAndContentsFree(physicsThreadInputEventQueue);
 	SDL_DestroyMutex(physicsThreadMutex);
 	SDL_DestroyMutex(physicsTickMutex);
 	SDL_DestroySemaphore(physicsTickHasEnded);

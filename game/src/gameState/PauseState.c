@@ -33,9 +33,9 @@ UiStack *pauseStack = NULL;
 
 void PauseStateUpdate(GlobalState * /*state*/)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) ||
-		IsButtonJustPressed(CONTROLLER_CANCEL) ||
-		IsButtonJustPressed(SDL_GAMEPAD_BUTTON_START))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL) ||
+		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
 		(void)PlaySound(SOUND("sfx/popdown"), SOUND_CATEGORY_UI);
 		MainStateSet();

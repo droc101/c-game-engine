@@ -32,26 +32,30 @@ List levelList;
 
 void LevelSelectStateUpdate(GlobalState * /*state*/)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(CONTROLLER_CANCEL))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		MenuStateSet();
 	}
 	if (levelList.length > 1)
 	{
-		if (IsKeyJustPressed(SDL_SCANCODE_DOWN) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_DOWN))
+		if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_DOWN) ||
+			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN))
 		{
 			selectedLevel--;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
-		} else if (IsKeyJustPressed(SDL_SCANCODE_UP) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_UP))
+		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_UP) ||
+				   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP))
 		{
 			selectedLevel++;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
 		}
 	}
-	if (levelList.length != 0 && (IsKeyJustReleased(SDL_SCANCODE_SPACE) || IsButtonJustReleased(CONTROLLER_OK)))
+	if (levelList.length != 0 && (IsKeyJustReleased(mainThreadInput, SDL_SCANCODE_SPACE) ||
+								  IsButtonJustReleased(mainThreadInput, CONTROLLER_OK)))
 	{
-		ConsumeKey(SDL_SCANCODE_SPACE);
-		ConsumeButton(CONTROLLER_OK);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
+		ConsumeButton(mainThreadInput, CONTROLLER_OK);
 		LoadingStateSet(ListGetPointer(levelList, selectedLevel));
 	}
 }

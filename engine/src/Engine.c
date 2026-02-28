@@ -126,7 +126,10 @@ void WindowAndRenderInit()
 	SDL_Window *window = SDL_CreateWindow(title,
 										  DEF_WIDTH,
 										  DEF_HEIGHT,
-										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
+										  rendererFlags |
+												  SDL_WINDOW_RESIZABLE |
+												  SDL_WINDOW_HIGH_PIXEL_DENSITY |
+												  SDL_WINDOW_HIDDEN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -156,25 +159,15 @@ void WindowAndRenderInit()
 
 void HandleEvent(void)
 {
+	if (InputSystemProcessEvent(mainThreadInput, &event))
+	{
+		PhysicsThreadQueueInputEvent(&event);
+		return;
+	}
 	switch (event.type)
 	{
 		case SDL_EVENT_QUIT:
 			shouldQuit = true;
-			break;
-		case SDL_EVENT_KEY_UP:
-			HandleKeyUp(event.key.scancode);
-			break;
-		case SDL_EVENT_KEY_DOWN:
-			HandleKeyDown(event.key.scancode);
-			break;
-		case SDL_EVENT_MOUSE_MOTION:
-			HandleMouseMotion((int)event.motion.x, (int)event.motion.y, (int)event.motion.xrel, (int)event.motion.yrel);
-			break;
-		case SDL_EVENT_MOUSE_BUTTON_UP:
-			HandleMouseUp(event.button.button);
-			break;
-		case SDL_EVENT_MOUSE_BUTTON_DOWN:
-			HandleMouseDown(event.button.button);
 			break;
 		case SDL_EVENT_WINDOW_RESIZED:
 		case SDL_EVENT_WINDOW_MAXIMIZED:
@@ -197,15 +190,6 @@ void HandleEvent(void)
 			break;
 		case SDL_EVENT_GAMEPAD_REMOVED:
 			HandleGamepadDisconnect(event.cdevice.which);
-			break;
-		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-			HandleControllerButtonDown(event.gbutton.button);
-			break;
-		case SDL_EVENT_GAMEPAD_BUTTON_UP:
-			HandleControllerButtonUp(event.gbutton.button);
-			break;
-		case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-			HandleControllerAxis(event.gaxis.axis, event.gaxis.value);
 			break;
 		case SDL_EVENT_TEXT_INPUT:
 			HandleTextInput(&event.text);
@@ -322,7 +306,7 @@ void EngineIteration()
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
-	if (IsKeyJustPressed(SDL_SCANCODE_F10))
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F10))
 	{
 		BenchToggle();
 	}
@@ -339,7 +323,7 @@ void EngineIteration()
 
 	UpdateSoundSystem();
 
-	UpdateInputStates();
+	UpdateInputStates(mainThreadInput);
 
 	DiscordUpdate();
 	if (state->requestExit)

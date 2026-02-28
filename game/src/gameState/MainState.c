@@ -68,14 +68,16 @@ static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 void MainStateUpdate(GlobalState *state)
 {
-	if (IsKeyJustPressed(SDL_SCANCODE_ESCAPE) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_START) || !IsWindowFocused())
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START) ||
+		!IsWindowFocused())
 	{
 		(void)PlaySound(SOUND("sfx/popup"), SOUND_CATEGORY_UI);
 		PauseStateSet();
 		return;
 	}
 
-	Vector2 cameraMotion = GetMouseRel();
+	Vector2 cameraMotion = GetMouseRel(mainThreadInput);
 	cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
 	cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
 	if (state->options.invertHorizontalCamera)
@@ -115,7 +117,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	{
 		Vector2 cameraMotion = v2s(0);
 
-		float cx = -GetAxis(SDL_GAMEPAD_AXIS_RIGHTX);
+		float cx = -GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_RIGHTX);
 		if (state->options.invertHorizontalCamera)
 		{
 			cx *= -1;
@@ -125,7 +127,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 			cameraMotion.x = cx * state->options.cameraSpeed / 11.25f;
 		}
 
-		float cy = -GetAxis(SDL_GAMEPAD_AXIS_RIGHTY);
+		float cy = -GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_RIGHTY);
 		if (state->options.invertVerticalCamera)
 		{
 			cy *= -1;
@@ -156,7 +158,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		a->definition->Update(a, delta);
 	}
 
-	if (IsKeyJustPressedPhys(SDL_SCANCODE_L))
+	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_L))
 	{
 		Actor *leaf = CreateActor(&state->map->player.transform,
 								  TEST_ACTOR_NAME,
@@ -165,7 +167,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 		AddActor(leaf);
 	}
 
-	if (IsKeyJustPressedPhys(SDL_SCANCODE_C))
+	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_C))
 	{
 		Actor *leaf = CreateActor(&state->map->player.transform,
 								  PHYSBOX_ACTOR_NAME,
@@ -175,10 +177,11 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	// TODO proper UI for switching items
-	if (IsKeyJustPressedPhys(SDL_SCANCODE_Q))
+	const float scroll = GetMouseWheel(physicsThreadInput).y;
+	if (scroll > 0)
 	{
 		PreviousItem();
-	} else if (IsKeyJustPressedPhys(SDL_SCANCODE_E))
+	} else if (scroll < 0)
 	{
 		NextItem();
 	}

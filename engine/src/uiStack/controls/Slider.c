@@ -103,10 +103,11 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 	// handle l and r arrow keys
 	if (stack->focusedControl == ctlIndex)
 	{
-		if (IsKeyJustPressed(SDL_SCANCODE_LEFT) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_LEFT))
+		if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_LEFT) ||
+			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_LEFT))
 		{
-			ConsumeKey(SDL_SCANCODE_LEFT);
-			ConsumeButton(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_LEFT);
+			ConsumeButton(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
 			data->value -= data->step;
 			if (data->value < data->min)
 			{
@@ -116,10 +117,11 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 			{
 				data->callback((float)data->value);
 			}
-		} else if (IsKeyJustPressed(SDL_SCANCODE_RIGHT) || IsButtonJustPressed(SDL_GAMEPAD_BUTTON_DPAD_RIGHT))
+		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_RIGHT) ||
+				   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_RIGHT))
 		{
-			ConsumeKey(SDL_SCANCODE_RIGHT);
-			ConsumeButton(SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+			ConsumeKey(mainThreadInput, SDL_SCANCODE_RIGHT);
+			ConsumeButton(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 			data->value += data->step;
 			if (data->value > data->max)
 			{
@@ -142,16 +144,20 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 		return;
 	}
 
-	const bool pressed = IsMouseButtonPressed(SDL_BUTTON_LEFT);
+	const bool pressed = IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT);
 
 	if (pressed)
 	{
-		const double newVal = remap(GetMousePos().x - c->anchoredPosition.x, 0.0, c->size.x, data->min, data->max);
+		const double newVal = remap(GetMousePos(mainThreadInput).x - c->anchoredPosition.x,
+									0.0,
+									c->size.x,
+									data->min,
+									data->max);
 		data->value = newVal;
 
 		// snap to step
 		double step = data->step;
-		if (IsKeyPressed(SDL_SCANCODE_LSHIFT) || IsKeyPressed(SDL_SCANCODE_RSHIFT))
+		if (IsKeyPressed(mainThreadInput, SDL_SCANCODE_LSHIFT) || IsKeyPressed(mainThreadInput, SDL_SCANCODE_RSHIFT))
 		{
 			step = data->altStep;
 		}

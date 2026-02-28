@@ -39,7 +39,8 @@ static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color 
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_WEST))
+		if (IsMouseButtonJustPressed(physicsThreadInput, SDL_BUTTON_LEFT) ||
+			IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_WEST))
 		{
 			const GlobalState *state = GetState();
 			RemoveActor(state->map->player.targetedActor);

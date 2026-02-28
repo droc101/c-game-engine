@@ -25,7 +25,9 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 		(void)PlaySound(SOUND("sfx/coincling"), SOUND_CATEGORY_SFX);
 	}
 
-	if (state->physicsFrame == 120 || IsKeyPressed(SDL_SCANCODE_ESCAPE) || IsButtonPressed(SDL_GAMEPAD_BUTTON_START))
+	if (state->physicsFrame == 120 ||
+		IsKeyPressed(physicsThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
 		MenuStateSetWithFade();
 	}

@@ -227,8 +227,8 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 
 	if (UseController())
 	{
-		moveVec.z = GetAxis(SDL_GAMEPAD_AXIS_LEFTY);
-		moveVec.x = GetAxis(SDL_GAMEPAD_AXIS_LEFTX);
+		moveVec.z = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTY);
+		moveVec.x = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTX);
 		if (fabsf(moveVec.x) < STICK_DEADZONE)
 		{
 			moveVec.x = 0;
@@ -239,20 +239,20 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 		}
 	} else
 	{
-		if (IsKeyPressed(SDL_SCANCODE_W))
+		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_W))
 		{
 			moveVec.z -= 1;
 		}
-		if (IsKeyPressed(SDL_SCANCODE_S))
+		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_S))
 		{
 			moveVec.z += 1;
 		}
 
-		if (IsKeyPressed(SDL_SCANCODE_D))
+		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_D))
 		{
 			moveVec.x += 1;
 		}
-		if (IsKeyPressed(SDL_SCANCODE_A))
+		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_A))
 		{
 			moveVec.x -= 1;
 		}
@@ -262,11 +262,13 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 	{
 		Vector3_Normalized(&moveVec, &moveVec);
 		*distanceTraveled = MOVE_SPEED;
-		if (IsKeyPressed(SDL_SCANCODE_LCTRL) || GetAxis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
+		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LCTRL) ||
+			GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
 		{
 			*distanceTraveled = SLOW_MOVE_SPEED;
 		} else if ((player->isFreecamActive || player->isNoclipActive) &&
-				   (IsKeyPressed(SDL_SCANCODE_LSHIFT) || IsKeyPressed(SDL_SCANCODE_RSHIFT)))
+				   (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LSHIFT) ||
+					IsKeyPressed(physicsThreadInput, SDL_SCANCODE_RSHIFT)))
 		{
 			*distanceTraveled = MOVE_SPEED * 2;
 		} else
@@ -329,7 +331,7 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime)
 {
-	if (IsKeyJustReleasedPhys(SDL_SCANCODE_F8))
+	if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_F8))
 	{
 		player->isFreecamActive = !player->isFreecamActive;
 		Viewmodel *viewmodel = &GetState()->map->viewmodel;
@@ -347,7 +349,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 	{
 		if (player->hasHeldActor)
 		{
-			if ((IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH)) &&
+			if ((IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
+				 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH)) &&
 				player->canDropHeldActor)
 			{
 				player->heldActor = NULL;
@@ -416,7 +419,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 						(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_HOLDABLE;
-						if (IsKeyJustPressedPhys(SDL_SCANCODE_E) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_SOUTH))
+						if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
+							IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH))
 						{
 							player->heldActor = player->targetedActor;
 							player->hasHeldActor = true;
@@ -432,7 +436,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			}
 		}
-		if (IsKeyJustReleasedPhys(SDL_SCANCODE_V))
+		if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_V))
 		{
 			player->isNoclipActive = !player->isNoclipActive;
 		}

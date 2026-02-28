@@ -53,9 +53,9 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_
 	if (data->enabled && HasActivation(stack, c))
 	{
 		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
-		ConsumeMouseButton(SDL_BUTTON_LEFT);
-		ConsumeKey(SDL_SCANCODE_SPACE);
-		ConsumeButton(CONTROLLER_OK);
+		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
+		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
+		ConsumeButton(mainThreadInput, CONTROLLER_OK);
 		data->callback();
 	}
 }

@@ -32,11 +32,13 @@ static bool LaserStopperItemCanTargetFunction(Item *this, Actor *targetedActor, 
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsMouseButtonJustPressedPhys(SDL_BUTTON_LEFT) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_WEST))
+		if (IsMouseButtonJustPressed(physicsThreadInput, SDL_BUTTON_LEFT) ||
+			IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_WEST))
 		{
 			const GlobalState *state = GetState();
 			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_OFF, &PARAM_NONE);
-		} else if (IsMouseButtonJustPressedPhys(SDL_BUTTON_RIGHT) || IsButtonJustPressedPhys(SDL_GAMEPAD_BUTTON_NORTH))
+		} else if (IsMouseButtonJustPressed(physicsThreadInput, SDL_BUTTON_RIGHT) ||
+				   IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_NORTH))
 		{
 			const GlobalState *state = GetState();
 			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_ON, &PARAM_NONE);
