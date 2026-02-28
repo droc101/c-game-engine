@@ -87,6 +87,7 @@ int PhysicsThreadMain(void * /*data*/)
 			SDL_UnlockMutex(physicsThreadMutex);
 			SDL_UnlockMutex(physicsTickMutex);
 			SDL_DelayPrecise(PHYSICS_TARGET_NS); // pls only spin if needed 🥺
+			UpdateInputStates(physicsThreadInput);
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
