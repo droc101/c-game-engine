@@ -10,11 +10,11 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define GL_COLOR_INTERNAL_FORMAT GL_RGB8
 #define GL_COLOR_FORMAT GL_RGB
@@ -224,7 +224,7 @@ inline void GL_ClearDepthOnly()
 
 inline void GL_FrameEnd()
 {
-	const Vector2 wndSize = ActualWindowSize();
+	const Vector2 wndSize = ActualWindowSizeIgnoreDPI();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBufferObject);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_NONE);
 	glBlitFramebuffer(0,
@@ -243,10 +243,8 @@ inline void GL_FrameEnd()
 
 inline void GL_UpdateViewportSize()
 {
-	int vpWidth = 0;
-	int vpHeight = 0;
-	SDL_GL_GetDrawableSize(GetGameWindow(), &vpWidth, &vpHeight);
-	glViewport(0, 0, vpWidth, vpHeight);
+	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
+	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 
 	GLint boundRbo = GL_NONE;
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &boundRbo);
@@ -258,25 +256,29 @@ inline void GL_UpdateViewportSize()
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 								glMsaaSamples,
 								GL_COLOR_INTERNAL_FORMAT,
-								vpWidth,
-								vpHeight,
+								(GLsizei)windowSize.x,
+								(GLsizei)windowSize.y,
 								GL_TRUE);
 
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, glMsaaSamples, GL_DEPTH_FORMAT, vpWidth, vpHeight);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+										 glMsaaSamples,
+										 GL_DEPTH_FORMAT,
+										 (GLsizei)windowSize.x,
+										 (GLsizei)windowSize.y);
 	} else
 	{
 		glBindTexture(GL_TEXTURE_2D, framebufferColorTexture);
 		glTexImage2D(GL_TEXTURE_2D,
 					 0,
 					 GL_COLOR_INTERNAL_FORMAT,
-					 vpWidth,
-					 vpHeight,
+					 (GLsizei)windowSize.x,
+					 (GLsizei)windowSize.y,
 					 0,
 					 GL_COLOR_FORMAT,
 					 GL_COLOR_TYPE,
 					 NULL);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, vpWidth, vpHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 	}
 	glBindRenderbuffer(GL_RENDERBUFFER, boundRbo);
 }

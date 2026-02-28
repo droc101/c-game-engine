@@ -5,16 +5,51 @@
 #ifndef SOUNDSYSTEM_H
 #define SOUNDSYSTEM_H
 
-/// Number of sound effect channels
-/// (sound effects that can play at the same time)
-#define SFX_CHANNEL_COUNT 32
+/// Number of sound channels
+/// (sounds that can play at the same time)
+#define SOUND_SYSTEM_CHANNEL_COUNT 32
+
+typedef enum SoundCategory SoundCategory;
 
 typedef void (*SoundFinishedCallback)(void *data);
 
 typedef struct SoundSystem SoundSystem;
-typedef struct SoundEffect SoundEffect;
+typedef struct SoundChannel SoundChannel;
+typedef struct SoundRequest SoundRequest;
 
 extern SoundSystem soundSys;
+
+enum SoundCategory
+{
+	SOUND_CATEGORY_MUSIC,
+	SOUND_CATEGORY_SFX,
+	SOUND_CATEGORY_UI,
+};
+
+struct SoundRequest
+{
+	/// The path to the sound asset to play
+	const char *soundAsset;
+
+	/// The number of times to loop the sound, -1 to loop forever
+	int64_t numLoops;
+	/// The volume of this sound
+	float volume;
+	/// Whether to decode the sound fully ahead of time (false streams it instead)
+	bool preload;
+	/// The sound category
+	SoundCategory category;
+
+	/// The function to call when the sound finishes
+	SoundFinishedCallback completionCallback;
+	/// Data to pass to @c completionCallback
+	void *completionCallbackData;
+
+	/// Whether this sound should be positional
+	bool positional;
+	/// The 3D position of this sound
+	Vector3 position;
+};
 
 /**
  * Set up the sound system
@@ -27,55 +62,50 @@ void InitSoundSystem();
 void DestroySoundSystem();
 
 /**
+ * Update the sound system
+ */
+void UpdateSoundSystem();
+
+/**
  * Update the volume from the options
  * @note This function should be called whenever the options are changed
  */
 void UpdateVolume();
 
 /**
- * Change the bgm
- * @param asset Asset to change to
+ * Attempt to play a sound
+ * @param soundAsset The path to the sound asset
+ * @param category The sound category
+ * @return A SoundChannel handle, or NULL on failure
+ * @warning If there are no free channels, the sound will not play.
  */
-void ChangeMusic(const char *asset);
+SoundChannel *PlaySound(const char *soundAsset, SoundCategory category);
 
 /**
- * Stop the bgm
+ * Attempt to play a sound
+ * @param request The sound request
+ * @return A SoundChannel handle, or NULL on failure
+ * @warning If there are no free channels, the sound will not play.
  */
-void StopMusic();
+SoundChannel *PlaySoundEx(const SoundRequest *request);
 
 /**
- * Attempt to play a sound effect
- * @param asset Sound effect to play
- * @param loops How many times to loop the sound, playing @code loops + 1@endcode times in total (or -1 to loop "forever")
- * @param volume The volume of the sound (float 0 - 1)
- * @param callback A function to call when the sound finishes (or NULL to not call one)
- * @param callbackData Data to pass to the callback function (ignored if callback is NULL)
- * @return A SoundEffect handle, or NULL on failure
- * @warning If there are no free channels, the sound effect will not play.
+ * Pause a sound
+ * @param effect The sound to pause
+ * @warning Make sure to either stop or resume it at some point, or it will forever occupy a sound channel
  */
-SoundEffect *PlaySoundEffect(const char *asset,
-							 int loops,
-							 float volume,
-							 SoundFinishedCallback callback,
-							 void *callbackData);
+void PauseSound(const SoundChannel *effect);
 
 /**
- * Pause a sound effect
- * @param effect The effect to pause
- * @warning Make sure to either stop or resume it at some point or it will forever occupy a sound channel
+ * Resume a sound
+ * @param effect The sound to resume
  */
-void PauseSoundEffect(const SoundEffect *effect);
+void ResumeSound(const SoundChannel *effect);
 
 /**
- * Resume a sound effect
- * @param effect The effect to resume
+ * Stop a sound
+ * @param effect The sound to stop
  */
-void ResumeSoundEffect(const SoundEffect *effect);
-
-/**
- * Stop a sound effect
- * @param effect The effect to stop
- */
-void StopSoundEffect(const SoundEffect *effect);
+void StopSound(const SoundChannel *effect);
 
 #endif //SOUNDSYSTEM_H

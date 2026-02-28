@@ -26,18 +26,17 @@
 #include <engine/subsystem/threads/LodThread.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
-#include <SDL.h>
-#include <SDL_error.h>
-#include <SDL_events.h>
-#include <SDL_filesystem.h>
-#include <SDL_hints.h>
-#include <SDL_keyboard.h>
-#include <SDL_mixer.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
-#include <SDL_surface.h>
-#include <SDL_timer.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_filesystem.h>
+#include <SDL3/SDL_hints.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_surface.h>
+#include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -68,7 +67,7 @@ void ExecPathInit(const int argc, const char *argv[])
 	strncpy(GetState()->executablePath, argv[0], 260); // we do not mess around with user data in c.
 	LogInfo("Executable path: %s\n", GetState()->executablePath);
 
-	char *folder = SDL_GetBasePath();
+	const char *folder = SDL_GetBasePath();
 	if (folder == NULL)
 	{
 		Error("Failed to get base path");
@@ -79,7 +78,6 @@ void ExecPathInit(const int argc, const char *argv[])
 	}
 
 	strncpy(GetState()->executableFolder, folder, 260);
-	SDL_free(folder);
 	LogInfo("Executable folder: %s\n", GetState()->executableFolder);
 }
 
@@ -87,25 +85,23 @@ void InitSDL()
 {
 	LogDebug("Initializing SDL...\n");
 	SDL_SetHint(SDL_HINT_APP_NAME, gameConfig.gameTitle);
-#ifdef __LINUX__
+#ifdef SDL_PLATFORM_LINUX
 	if (GetState()->options.preferWayland)
 	{
-		SDL_SetHint(SDL_HINT_VIDEODRIVER, "wayland,x11"); // TODO: seems to be ignored with sdl2-compat
+		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11");
 	} else
 	{
-		SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11,wayland");
+		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11,wayland");
 	}
 #endif
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) != 0)
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC))
 	{
 		LogError("SDL_Init Error: %s\n", SDL_GetError());
 		Error("Failed to initialize SDL");
 	}
 
 	LogInfo("SDL Video Driver: %s\n", SDL_GetCurrentVideoDriver());
-
-	SDL_StopTextInput(); // is enabled by default on desktop
 }
 
 void WindowAndRenderInit()
@@ -125,21 +121,20 @@ void WindowAndRenderInit()
 			snprintf(title, titleLen, "%s", gameConfig.gameTitle);
 			break;
 	}
-	SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
+	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
 	SDL_Window *window = SDL_CreateWindow(title,
-										  SDL_WINDOWPOS_UNDEFINED,
-										  SDL_WINDOWPOS_UNDEFINED,
 										  DEF_WIDTH,
 										  DEF_HEIGHT,
-										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
+										  rendererFlags | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		Error("Failed to create window.");
 	}
 	SetDwmWindowAttribs(window);
-	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen);
+	SDL_StopTextInput(window);
 	SetGameWindow(window);
 
 	if (!RenderInit())
@@ -153,72 +148,66 @@ void WindowAndRenderInit()
 	SDL_SetWindowMaximumSize(window, MAX_WIDTH, MAX_HEIGHT);
 
 	LogDebug("Setting window icon...\n");
-	windowIcon = ToSDLSurface(TEXTURE("interface/icon"), "1");
+	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
 	SDL_SetWindowIcon(window, windowIcon);
+
+	SetWindowFocused(true);
 }
 
 void HandleEvent(void)
 {
 	switch (event.type)
 	{
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 			shouldQuit = true;
 			break;
-		case SDL_KEYUP:
-			HandleKeyUp(event.key.keysym.scancode);
+		case SDL_EVENT_KEY_UP:
+			HandleKeyUp(event.key.scancode);
 			break;
-		case SDL_KEYDOWN:
-			HandleKeyDown(event.key.keysym.scancode);
+		case SDL_EVENT_KEY_DOWN:
+			HandleKeyDown(event.key.scancode);
 			break;
-		case SDL_MOUSEMOTION:
-			HandleMouseMotion(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+		case SDL_EVENT_MOUSE_MOTION:
+			HandleMouseMotion((int)event.motion.x, (int)event.motion.y, (int)event.motion.xrel, (int)event.motion.yrel);
 			break;
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 			HandleMouseUp(event.button.button);
 			break;
-		case SDL_MOUSEBUTTONDOWN:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			HandleMouseDown(event.button.button);
 			break;
-		case SDL_WINDOWEVENT:
-			switch (event.window.event)
-			{
-				case SDL_WINDOWEVENT_RESIZED:
-				case SDL_WINDOWEVENT_SIZE_CHANGED:
-				case SDL_WINDOWEVENT_MAXIMIZED:
-					UpdateViewportSize();
-					break;
-				case SDL_WINDOWEVENT_RESTORED:
-					WindowRestored();
-					break;
-				case SDL_WINDOWEVENT_MINIMIZED:
-					WindowObscured();
-					break;
-				case SDL_WINDOWEVENT_FOCUS_LOST:
-					SetLowFPS(true);
-					break;
-				case SDL_WINDOWEVENT_FOCUS_GAINED:
-					SetLowFPS(false);
-					break;
-				default:
-					break;
-			}
+		case SDL_EVENT_WINDOW_RESIZED:
+		case SDL_EVENT_WINDOW_MAXIMIZED:
+			UpdateViewportSize();
 			break;
-		case SDL_CONTROLLERDEVICEADDED:
-			HandleControllerConnect();
+		case SDL_EVENT_WINDOW_RESTORED:
+			WindowRestored();
 			break;
-		case SDL_CONTROLLERDEVICEREMOVED:
-			HandleControllerDisconnect(event.cdevice.which);
+		case SDL_EVENT_WINDOW_MINIMIZED:
+			WindowObscured();
 			break;
-		case SDL_CONTROLLERBUTTONDOWN:
-			HandleControllerButtonDown(event.cbutton.button);
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+			SetWindowFocused(false);
 			break;
-		case SDL_CONTROLLERBUTTONUP:
-			HandleControllerButtonUp(event.cbutton.button);
+		case SDL_EVENT_WINDOW_FOCUS_GAINED:
+			SetWindowFocused(true);
 			break;
-		case SDL_CONTROLLERAXISMOTION:
-			HandleControllerAxis(event.caxis.axis, event.caxis.value);
+		case SDL_EVENT_GAMEPAD_ADDED:
+			HandleGamepadConnect();
 			break;
-		case SDL_TEXTINPUT:
+		case SDL_EVENT_GAMEPAD_REMOVED:
+			HandleGamepadDisconnect(event.cdevice.which);
+			break;
+		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+			HandleControllerButtonDown(event.gbutton.button);
+			break;
+		case SDL_EVENT_GAMEPAD_BUTTON_UP:
+			HandleControllerButtonUp(event.gbutton.button);
+			break;
+		case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+			HandleControllerAxis(event.gaxis.axis, event.gaxis.value);
+			break;
+		case SDL_EVENT_TEXT_INPUT:
 			HandleTextInput(&event.text);
 			break;
 		default:
@@ -311,13 +300,14 @@ void EngineIteration()
 		{
 			state->UpdateGame(state);
 		}
+		UpdateSoundSystem();
 		if (state->requestExit)
 		{
 			shouldQuit = true;
 		}
 		if (IsLowFPSModeEnabled())
 		{
-			SDL_Delay(33);
+			SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 		}
 		return;
 	}
@@ -346,6 +336,8 @@ void EngineIteration()
 	ProcessDPrintConsole();
 
 	FrameEnd();
+
+	UpdateSoundSystem();
 
 	UpdateInputStates();
 
@@ -380,14 +372,11 @@ void DestroyEngine()
 	LogDebug("Cleaning up window...\n");
 	SDL_DestroyWindow(GetGameWindow());
 	LogDebug("Cleaning up icon...\n");
-	SDL_FreeSurface(windowIcon);
+	SDL_DestroySurface(windowIcon);
 	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
-	LogDebug("Cleaning up SDL_Mixer...\n");
-	Mix_CloseAudio();
-	Mix_Quit();
 	LogDebug("Cleaning up SDL...\n");
-	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
+	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();
 	LogDestroy();
 }

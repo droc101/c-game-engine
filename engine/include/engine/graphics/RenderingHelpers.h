@@ -10,7 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -108,6 +108,12 @@ void UpdateWindowSize();
 Vector2 ActualWindowSize();
 
 /**
+ * Get the actual size of the window, ignoring UI scale AND SYSTEM DPI SCALE
+ * @return The actual size of the window
+ */
+Vector2 ActualWindowSizeIgnoreDPI();
+
+/**
  * Get the size of a texture
  * @param texture The texture name
  * @return The size of the texture
@@ -162,11 +168,12 @@ void WindowObscured();
  */
 void WindowRestored();
 
+void SetWindowFocused(bool val);
+
 /**
- * Enable or disable low FPS mode
- * @param val A boolean representing if low FPS mode should be enabled
+ * Check if the window is focused
  */
-void SetLowFPS(bool val);
+bool IsWindowFocused();
 
 /**
  * Check if low FPS mode is enabled

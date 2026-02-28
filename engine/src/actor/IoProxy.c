@@ -7,11 +7,9 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
 #include <stddef.h>
-#include <stdlib.h>
 
 static void IoProxyUpdate(Actor *this, double /*delta*/)
 {
@@ -30,7 +28,6 @@ void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/
 	{
 		GetState()->map->ioProxy = this;
 	}
-	CheckAlloc(this->extraData);
 }
 
 ActorDefinition ioProxyActorDefinition = {

@@ -2,7 +2,7 @@
 
 [![Windows Build](https://github.com/droc101/c-game-engine/actions/workflows/windows.yml/badge.svg)](https://github.com/droc101/c-game-engine/actions/workflows/windows.yml)[![Linux (x86_64) Build](https://github.com/droc101/c-game-engine/actions/workflows/linux-x86_64.yml/badge.svg)](https://github.com/droc101/c-game-engine/actions/workflows/linux-x86_64.yml)[![Linux (ARM64) Build](https://github.com/droc101/c-game-engine/actions/workflows/linux-arm.yml/badge.svg)](https://github.com/droc101/c-game-engine/actions/workflows/linux-arm.yml)
 
-Old-School FPS game (and engine) written in C using [SDL2](https://www.libsdl.org/) for platform
+Old-School FPS game (and engine) written in C using [SDL3](https://www.libsdl.org/) for platform
 abstraction, [OpenGL/Vulkan](https://www.khronos.org/) for graphics, [Jolt](https://github.com/jrouwe/JoltPhysics) for
 physics,
 and [zlib](https://www.zlib.net/) for compression.

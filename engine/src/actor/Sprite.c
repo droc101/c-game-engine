@@ -3,7 +3,6 @@
 //
 
 #include <engine/actor/Sprite.h>
-#include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
@@ -18,7 +17,6 @@
 #include <joltc/Physics/Body/MassProperties.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 

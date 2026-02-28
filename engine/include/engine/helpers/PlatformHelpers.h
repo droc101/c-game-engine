@@ -5,7 +5,7 @@
 #ifndef PLATFORMHELPERS_H
 #define PLATFORMHELPERS_H
 
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 
 /**
  * Attempt to set Win32 DWM window attributes (dark mode, square corners)

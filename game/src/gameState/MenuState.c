@@ -14,10 +14,8 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -145,7 +143,6 @@ void MenuStateSet()
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
-	StopMusic();
 
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);
@@ -155,7 +152,7 @@ void MenuStateSet()
 					  NULL,
 					  GAME_STATE_MENU,
 					  MenuStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void MenuStateDestroy()

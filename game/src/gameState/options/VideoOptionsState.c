@@ -17,9 +17,8 @@
 #include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -75,7 +74,7 @@ char *SliderLabelLod(const Control *slider)
 void CbOptionsFullscreen(const bool value)
 {
 	GetState()->options.fullscreen = value;
-	SDL_SetWindowFullscreen(GetGameWindow(), value ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+	SDL_SetWindowFullscreen(GetGameWindow(), value);
 }
 
 void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const uint8_t id)
@@ -278,7 +277,7 @@ void VideoOptionsStateSet()
 										0.5,
 										1,
 										SliderLabelLod));
-#ifdef __LINUX__
+#ifdef SDL_PLATFORM_LINUX
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
@@ -301,7 +300,7 @@ void VideoOptionsStateSet()
 					  NULL,
 					  GAME_STATE_VIDEO_OPTIONS,
 					  VideoOptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void VideoOptionsStateDestroy()

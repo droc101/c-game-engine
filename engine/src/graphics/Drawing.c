@@ -2,7 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
-#include <SDL_pixels.h>
+#include <SDL3/SDL_pixels.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
@@ -25,24 +25,22 @@
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/types.h>
-#include <SDL_error.h>
-#include <SDL_hints.h>
-#include <SDL_surface.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_surface.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
-SDL_Surface *ToSDLSurface(const char *texture, const char *filterMode)
+SDL_Surface *ToSDLSurface(const char *texture)
 {
 	const Image *img = LoadImage(texture);
 
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, filterMode);
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(img->pixelData,
-															  (int)img->width,
-															  (int)img->height,
-															  32,
-															  (int)img->width * 4,
-															  SDL_PIXELFORMAT_ABGR8888);
+	SDL_Surface *surface = SDL_CreateSurfaceFrom((int)img->width,
+												 (int)img->height,
+												 SDL_PIXELFORMAT_ABGR8888,
+												 img->pixelData,
+												 (int)(img->width * sizeof(uint32_t)));
+
 	if (surface == NULL)
 	{
 		LogError("Failed to create surface: %s\n", SDL_GetError());

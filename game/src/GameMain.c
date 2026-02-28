@@ -3,7 +3,6 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include "actor/Laser.h"
 #include "gameState/LevelSelectState.h"
 #include "gameState/LogoSplashState.h"

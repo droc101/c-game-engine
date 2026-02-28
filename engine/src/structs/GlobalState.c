@@ -17,8 +17,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
-#include <SDL_mouse.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -133,7 +132,7 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 					   const FixedUpdateFunction FixedUpdateGame,
 					   const GameStateId currentState,
 					   const FrameRenderFunction RenderGame,
-					   const SDL_bool enableRelativeMouseMode)
+					   const bool enableRelativeMouseMode)
 {
 	state.UpdateGame = UpdateGame;
 	state.currentState = currentState;
@@ -142,7 +141,7 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 	DiscordUpdateRPC();
 	if (!HasCliArg("--no-mouse-capture"))
 	{
-		SDL_SetRelativeMouseMode(enableRelativeMouseMode);
+		SDL_SetWindowRelativeMouseMode(GetGameWindow(), enableRelativeMouseMode);
 	}
 }
 
@@ -160,7 +159,6 @@ void ChangeMap(Map *map)
 	}
 	state.map = map;
 	LoadMapModels(map);
-
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -169,6 +167,13 @@ void DestroyGlobalState()
 	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
 	DestroyMap(state.map);
+	for (size_t i = 0; i < state.saveData->items.length; i++)
+	{
+		Item *item = ListGetPointer(state.saveData->items, i);
+		item->definition->Destruct(item);
+		free(item);
+	}
+	ListFree(state.saveData->items);
 	state.map = NULL;
 	for (size_t i = 0; i < state.saveData->items.length; i++)
 	{

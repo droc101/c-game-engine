@@ -3,9 +3,11 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
@@ -13,9 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "engine/helpers/Arguments.h"
-#include "engine/structs/GlobalState.h"
 
 GameConfig gameConfig = {0};
 

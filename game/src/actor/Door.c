@@ -23,7 +23,6 @@
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>

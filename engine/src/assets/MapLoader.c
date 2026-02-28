@@ -2,6 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <assert.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapLoader.h>
@@ -24,23 +25,15 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static MapMaterial fallbackMaterial = {
-	.id = -1,
-	.name = "_fallback",
-	.shader = SHADER_SHADED,
-	.soundClass = SOUND_CLASS_DEFAULT,
-	.texture = "_generic_fallback"
-};
 
 Map *LoadMap(const char *path)
 {
@@ -164,10 +157,7 @@ Map *LoadMap(const char *path)
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
-		if (!model->material)
-		{
-			model->material = &fallbackMaterial;
-		}
+		assert(model->material);
 		free(materialName);
 
 		EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);

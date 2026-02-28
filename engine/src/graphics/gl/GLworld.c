@@ -22,7 +22,6 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
@@ -505,7 +504,7 @@ void GL_RenderShadedMapModel(const GL_MapModelBuffer *model)
 
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
 
-	mat4 idty = GLM_MAT4_IDENTITY_INIT;
+	const mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
 
@@ -549,7 +548,7 @@ void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
 
-	mat4 idty = GLM_MAT4_IDENTITY_INIT;
+	const mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
 

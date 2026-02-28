@@ -8,12 +8,11 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
-#include <SDL_error.h>
-#include <SDL_gamecontroller.h>
-#include <SDL_haptic.h>
-#include <SDL_joystick.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_joystick.h>
+#include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -34,10 +33,10 @@ typedef enum InputState
 
 typedef struct PhysicsStateBuffer
 {
-	bool physKeysJustPressed[SDL_NUM_SCANCODES];
-	bool physKeysJustReleased[SDL_NUM_SCANCODES];
-	bool physControllerButtonsJustPressed[SDL_CONTROLLER_BUTTON_MAX];
-	bool physControllerButtonsJustReleased[SDL_CONTROLLER_BUTTON_MAX];
+	bool physKeysJustPressed[SDL_SCANCODE_COUNT];
+	bool physKeysJustReleased[SDL_SCANCODE_COUNT];
+	bool physControllerButtonsJustPressed[SDL_GAMEPAD_BUTTON_COUNT];
+	bool physControllerButtonsJustReleased[SDL_GAMEPAD_BUTTON_COUNT];
 	bool physMouseButtonsJustPressed[MAX_RECOGNIZED_MOUSE_BUTTONS];
 	bool physMouseButtonsJustReleased[MAX_RECOGNIZED_MOUSE_BUTTONS];
 } PhysicsStateBuffer;
@@ -45,8 +44,8 @@ typedef struct PhysicsStateBuffer
 // every key is tracked, even if it's not used
 // this *could* be optimized, but it's not necessary
 // on modern systems where memory is not a concern
-static InputState keys[SDL_NUM_SCANCODES];
-static InputState controllerButtons[SDL_CONTROLLER_BUTTON_MAX];
+static InputState keys[SDL_SCANCODE_COUNT];
+static InputState controllerButtons[SDL_GAMEPAD_BUTTON_COUNT];
 static InputState mouseButtons[MAX_RECOGNIZED_MOUSE_BUTTONS];
 
 /// The buffer that is actively being written to by the render thread.
@@ -64,115 +63,109 @@ static Vector2 leftStick;
 static Vector2 rightStick;
 static Vector2 triggers;
 
-static SDL_GameController *controller;
-static SDL_Joystick *stick;
-static SDL_Haptic *haptic;
+static SDL_Gamepad *currentGamepad;
+static SDL_Joystick *currentJoystick;
+static bool gamepadHasBasicHaptics;
+static bool gamepadHasTriggerHaptics;
 
-bool FindGameController()
+bool FindGamepad()
 {
-	for (int i = 0; i < SDL_NumJoysticks(); i++)
+	int numGamepads = 0;
+	SDL_JoystickID *gamepads = SDL_GetGamepads(&numGamepads);
+	for (int i = 0; i < numGamepads; i++)
 	{
-		if (SDL_IsGameController(i))
+		const SDL_JoystickID gamepad = gamepads[i];
+		if (SDL_IsGamepad(gamepad))
 		{
-			controller = SDL_GameControllerOpen(i);
-			stick = SDL_GameControllerGetJoystick(controller);
-			if (SDL_JoystickIsHaptic(stick))
-			{
-				haptic = SDL_HapticOpenFromJoystick(stick);
-				if (!haptic)
-				{
-					LogError("Failed to open haptic: %s\n",
-							 SDL_GetError()); // This should never happen (if it does, SDL lied to us)
-					haptic = NULL;
-				} else if (SDL_HapticRumbleInit(haptic) != 0)
-				{
-					LogError("Failed to initialize rumble: %s\n", SDL_GetError());
-					haptic = NULL;
-				}
-			} else
-			{
-				haptic = NULL;
-			}
-			LogInfo("Using controller \"%s\"\n", SDL_GameControllerName(controller));
+			currentGamepad = SDL_OpenGamepad(gamepad);
+			currentJoystick = SDL_GetGamepadJoystick(currentGamepad);
+			const SDL_PropertiesID gamepadProps = SDL_GetGamepadProperties(currentGamepad);
+			gamepadHasBasicHaptics = SDL_GetBooleanProperty(gamepadProps, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false);
+			gamepadHasTriggerHaptics = SDL_GetBooleanProperty(gamepadProps,
+															  SDL_PROP_GAMEPAD_CAP_TRIGGER_RUMBLE_BOOLEAN,
+															  false);
+
+			LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(currentGamepad));
+			LogDebug("Controller features basic haptics: %s\n", gamepadHasBasicHaptics ? "yes" : "no");
+			LogDebug("Controller features trigger haptics: %s\n", gamepadHasTriggerHaptics ? "yes" : "no");
+
+			SDL_free(gamepads);
 			return true;
 		}
 	}
+	SDL_free(gamepads);
 	return false;
 }
 
 void Rumble(const float strength, const uint32_t time)
 {
-	if (UseController() && haptic != NULL)
+	if (UseController() && gamepadHasBasicHaptics)
 	{
-		SDL_HapticRumblePlay(haptic, strength * GetState()->options.rumbleStrength, time);
+		const uint16_t uintStrength = (uint16_t)((strength * GetState()->options.rumbleStrength) * UINT16_MAX);
+		SDL_RumbleGamepad(currentGamepad, uintStrength, uintStrength, time);
 	}
 }
 
-void HandleControllerDisconnect(const Sint32 which)
+void HandleGamepadDisconnect(const SDL_JoystickID which)
 {
-	if (controller == NULL)
+	if (currentGamepad == NULL)
 	{
 		return;
 	}
-	if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)) != which)
+	if (SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)) != which)
 	{
 		return;
 	}
-	SDL_GameControllerClose(controller);
-	SDL_JoystickClose(stick);
-	if (haptic)
-	{
-		SDL_HapticClose(haptic);
-	}
-	controller = NULL;
-	stick = NULL;
-	haptic = NULL;
-	FindGameController(); // try to find another controller
+	SDL_CloseGamepad(currentGamepad);
+	SDL_CloseJoystick(currentJoystick);
+	currentGamepad = NULL;
+	currentJoystick = NULL;
+	FindGamepad(); // try to find another controller
 }
 
-void HandleControllerConnect()
+void HandleGamepadConnect()
 {
-	if (controller)
+	if (currentGamepad)
 	{
 		// disconnect the current controller to use the new one
-		HandleControllerDisconnect(SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)));
+		HandleGamepadDisconnect(SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)));
 	}
-	FindGameController();
+	FindGamepad();
 }
 
-void HandleControllerButtonUp(const SDL_GameControllerButton button)
+void HandleControllerButtonUp(const SDL_GamepadButton button)
 {
 	controllerButtons[button] = INP_JUST_RELEASED;
 	physicsInputWorkingBuffer->physControllerButtonsJustReleased[button] = true;
 }
 
-void HandleControllerButtonDown(const SDL_GameControllerButton button)
+void HandleControllerButtonDown(const SDL_GamepadButton button)
 {
 	controllerButtons[button] = INP_JUST_PRESSED;
 	physicsInputWorkingBuffer->physControllerButtonsJustPressed[button] = true;
 }
 
-void HandleControllerAxis(const SDL_GameControllerAxis axis, const Sint16 value)
+void HandleControllerAxis(const SDL_GamepadAxis axis, const Sint16 value)
 {
 	const float dValue = (float)value / 32767.0f;
 	switch (axis)
 	{
-		case SDL_CONTROLLER_AXIS_LEFTX:
+		case SDL_GAMEPAD_AXIS_LEFTX:
 			leftStick.x = dValue;
 			break;
-		case SDL_CONTROLLER_AXIS_LEFTY:
+		case SDL_GAMEPAD_AXIS_LEFTY:
 			leftStick.y = dValue;
 			break;
-		case SDL_CONTROLLER_AXIS_RIGHTX:
+		case SDL_GAMEPAD_AXIS_RIGHTX:
 			rightStick.x = dValue;
 			break;
-		case SDL_CONTROLLER_AXIS_RIGHTY:
+		case SDL_GAMEPAD_AXIS_RIGHTY:
 			rightStick.y = dValue;
 			break;
-		case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+		case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:
 			triggers.x = dValue;
 			break;
-		case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+		case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:
 			triggers.y = dValue;
 			break;
 		default:
@@ -228,7 +221,7 @@ void HandleKeyUp(const int code)
 
 void UpdateInputStates()
 {
-	for (int i = 0; i < SDL_NUM_SCANCODES; i++)
+	for (int i = 0; i < SDL_SCANCODE_COUNT; i++)
 	{
 		if (keys[i] == INP_JUST_RELEASED)
 		{
@@ -250,7 +243,7 @@ void UpdateInputStates()
 		}
 	}
 
-	for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+	for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; i++)
 	{
 		if (controllerButtons[i] == INP_JUST_RELEASED)
 		{
@@ -341,7 +334,7 @@ void ConsumeMouseButton(const int button)
 
 void ConsumeAllKeys()
 {
-	for (int i = 0; i < SDL_NUM_SCANCODES; i++)
+	for (int i = 0; i < SDL_SCANCODE_COUNT; i++)
 	{
 		keys[i] = INP_RELEASED;
 	}
@@ -355,21 +348,21 @@ void ConsumeAllMouseButtons()
 	}
 }
 
-float GetAxis(const SDL_GameControllerAxis axis)
+float GetAxis(const SDL_GamepadAxis axis)
 {
 	switch (axis)
 	{
-		case SDL_CONTROLLER_AXIS_LEFTX:
+		case SDL_GAMEPAD_AXIS_LEFTX:
 			return leftStick.x;
-		case SDL_CONTROLLER_AXIS_LEFTY:
+		case SDL_GAMEPAD_AXIS_LEFTY:
 			return leftStick.y;
-		case SDL_CONTROLLER_AXIS_RIGHTX:
+		case SDL_GAMEPAD_AXIS_RIGHTX:
 			return rightStick.x;
-		case SDL_CONTROLLER_AXIS_RIGHTY:
+		case SDL_GAMEPAD_AXIS_RIGHTY:
 			return rightStick.y;
-		case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+		case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:
 			return triggers.x;
-		case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+		case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:
 			return triggers.y;
 		default:
 			return 0;
@@ -378,7 +371,7 @@ float GetAxis(const SDL_GameControllerAxis axis)
 
 inline bool UseController()
 {
-	return GetState()->options.controllerMode && controller != NULL;
+	return GetState()->options.controllerMode && currentGamepad != NULL;
 }
 
 const char *GetControllerName()
@@ -387,7 +380,7 @@ const char *GetControllerName()
 	{
 		return NULL;
 	}
-	return SDL_GameControllerName(controller);
+	return SDL_GetGamepadName(currentGamepad);
 }
 
 void InputInit()

@@ -21,9 +21,9 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <joltc/types.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -86,7 +86,7 @@ static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 		GetState()->saveData->blueCoins++;
 		GetState()->saveData->coins += 5;
 	}
-	(void)PlaySoundEffect(SOUND("sfx/coincling"), 0, 1, NULL, NULL);
+	(void)PlaySound(SOUND("sfx/coincling"), SOUND_CATEGORY_SFX);
 	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
 	RemoveActor(this);
 }

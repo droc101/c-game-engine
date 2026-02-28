@@ -14,8 +14,8 @@
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
-#include <SDL_scancode.h>
-#include <SDL_stdinc.h>
+#include <SDL3/SDL_scancode.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "gameState/OptionsState.h"
@@ -42,6 +42,12 @@ void SldOptionsMusicVolume(const float value)
 void SldOptionsSfxVolume(const float value)
 {
 	GetState()->options.sfxVolume = value;
+	UpdateVolume();
+}
+
+void SldOptionsUiVolume(const float value)
+{
+	GetState()->options.uiVolume = value;
 	UpdateVolume();
 }
 
@@ -122,6 +128,19 @@ void SoundOptionsStateSet()
 										0.1,
 										SliderLabelPercent));
 		opY += opSpacing;
+		UiStackPush(soundOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"UI Volume",
+										SldOptionsUiVolume,
+										TOP_CENTER,
+										0.0,
+										1.0,
+										GetState()->options.uiVolume,
+										0.01,
+										0.1,
+										SliderLabelPercent));
+		opY += opSpacing;
 
 
 		UiStackPush(soundOptionsStack,
@@ -133,7 +152,7 @@ void SoundOptionsStateSet()
 					  NULL,
 					  GAME_STATE_SOUND_OPTIONS,
 					  SoundOptionsStateRender,
-					  SDL_FALSE); // Fixed update is not needed for this state
+					  false); // Fixed update is not needed for this state
 }
 
 void SoundOptionsStateDestroy()
