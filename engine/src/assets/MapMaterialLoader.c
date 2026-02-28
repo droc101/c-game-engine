@@ -52,6 +52,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 	Asset *mapMaterialAsset = DecompressAsset(path, false);
 	if (mapMaterialAsset == NULL || mapMaterialAsset->type != ASSET_TYPE_MAP_MATERIAL)
 	{
+		free(material);
 		return &fallbackMaterial;
 	}
 
