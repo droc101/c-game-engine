@@ -146,14 +146,20 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 	switch (event->type)
 	{
 		case SDL_EVENT_KEY_UP:
-			UpdateInputState(&system->keys[event->key.scancode],
-							 &system->queueReleaseKeys[event->key.scancode],
-							 INP_JUST_RELEASED);
+			if (!event->key.repeat)
+			{
+				UpdateInputState(&system->keys[event->key.scancode],
+								 &system->queueReleaseKeys[event->key.scancode],
+								 INP_JUST_RELEASED);
+			}
 			break;
 		case SDL_EVENT_KEY_DOWN:
-			UpdateInputState(&system->keys[event->key.scancode],
-							 &system->queueReleaseKeys[event->key.scancode],
-							 INP_JUST_PRESSED);
+			if (!event->key.repeat)
+			{
+				UpdateInputState(&system->keys[event->key.scancode],
+								 &system->queueReleaseKeys[event->key.scancode],
+								 INP_JUST_PRESSED);
+			}
 			break;
 		case SDL_EVENT_MOUSE_MOTION:
 			system->mouseX = (int)event->motion.x;
