@@ -162,14 +162,14 @@ static void LaserTurnOnHandler(Actor *this, const Actor * /*sender*/, const Para
 {
 	LaserData *data = this->extraData;
 	data->on = true;
+	this->visible = true;
 }
 
 static void LaserTurnOffHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	LaserData *data = this->extraData;
 	data->on = false;
-	this->actorWall->b = v2(0.01, 0);
-	ActorWallBake(this);
+	this->visible = false;
 }
 
 void LaserInit(Actor *this, const KvList params, Transform *transform)
@@ -191,12 +191,7 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvOffset = 0.0f;
 	this->actorWall->height = 1.0f;
 	this->actorWall->unshaded = true;
-
-	if (!data->on)
-	{
-		this->actorWall->b = v2(0.01, 0);
-		ActorWallBake(this);
-	}
+	this->visible = data->on;
 
 	switch (data->height)
 	{
