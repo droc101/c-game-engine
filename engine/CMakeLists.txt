@@ -70,6 +70,8 @@ target_sources(engine INTERFACE
         include/engine/actor/GlobalLight.h
         src/actor/GlobalFog.c
         include/engine/actor/GlobalFog.h
+        include/engine/actor/PhysicsModel.h
+        src/actor/PhysicsModel.c
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

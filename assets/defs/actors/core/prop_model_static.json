@@ -7,7 +7,7 @@
   "params": {
     "model": {
       "display": "Model",
-      "default": "leafy",
+      "default": "model/quad.gmdl",
       "type": "string",
       "string_hint": "model",
       "description": "The model to use"

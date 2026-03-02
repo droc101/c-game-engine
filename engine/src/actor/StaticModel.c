@@ -45,7 +45,7 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 
 void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->actorModel = LoadModel(KvGetString(params, "model", "leafy"));
+	this->actorModel = LoadModel(KvGetString(params, "model", "model/quad.gmdl"));
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	uint8_t collisionType = KvGetByte(params, "collision", 2);
