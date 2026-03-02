@@ -88,17 +88,17 @@ void MenuStateRender(GlobalState *state)
 	DrawTextAligned(buffer,
 					16,
 					COLOR_BLACK,
-					v2(ScaledWindowWidthFloat() - 208, ScaledWindowHeightFloat() - 208),
-					v2(200, 200),
-					FONT_HALIGN_RIGHT,
+					v2(12, ScaledWindowHeightFloat() - 218),
+					v2(ScaledWindowWidthFloat() - 10, 200),
+					FONT_HALIGN_CENTER,
 					FONT_VALIGN_BOTTOM,
 					smallFont);
 	DrawTextAligned(buffer,
 					16,
 					COLOR(0xFFa0a0a0),
-					v2(ScaledWindowWidthFloat() - 210, ScaledWindowHeightFloat() - 210),
-					v2(200, 200),
-					FONT_HALIGN_RIGHT,
+					v2(10, ScaledWindowHeightFloat() - 220),
+					v2(ScaledWindowWidthFloat() - 10, 200),
+					FONT_HALIGN_CENTER,
 					FONT_VALIGN_BOTTOM,
 					smallFont);
 
