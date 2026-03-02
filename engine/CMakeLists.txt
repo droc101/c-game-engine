@@ -253,3 +253,13 @@ if (UNIX)
 elseif (WIN32)
     target_link_libraries(engine INTERFACE opengl32 dwmapi)
 endif ()
+
+file(WRITE ${CMAKE_BINARY_DIR}/generated/engine/Commit.h)
+
+add_custom_target(
+        generate_commit_header ALL
+        COMMAND ${CMAKE_COMMAND} -DIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/Commit.h.in -DOUT_FILE=${CMAKE_BINARY_DIR}/generated/engine/Commit.h -DREPO_DIR=${CMAKE_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateCommitHashes.cmake
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+add_dependencies(engine generate_commit_header)
+target_include_directories(engine INTERFACE ${CMAKE_BINARY_DIR}/generated)
