@@ -5,7 +5,7 @@ set(GIT_HASH "unknown")
 
 if (${GIT_FOUND})
     execute_process(
-            COMMAND ${GIT_EXECUTABLE} status --porcelain=1 --untracked-files=no
+            COMMAND ${GIT_EXECUTABLE} status --short --porcelain=1 --untracked-files=no
             WORKING_DIRECTORY ${REPO_DIR}
             OUTPUT_VARIABLE GIT_STATUS
             RESULT_VARIABLE GIT_STATUS_RETURN_CODE
