@@ -44,7 +44,7 @@ if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
 message(STATUS "Fetching JoltC/Jolt...")
-fetch_package(https://github.com/NBT22/joltc main joltc)
+fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14ecd27 joltc)
 
 #endregion
 
