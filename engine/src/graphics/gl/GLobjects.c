@@ -212,7 +212,7 @@ int GL_RegisterTexture(const Image *image)
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
 	glTexImage2D(GL_TEXTURE_2D,
 				 0,
-				 GL_RGBA,
+				 GL_RGBA8,
 				 (GLsizei)image->width,
 				 (GLsizei)image->height,
 				 0,
@@ -222,17 +222,19 @@ int GL_RegisterTexture(const Image *image)
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
-	if (image->mipmaps && anisotropyLevel != 0)
-	{
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel);
-	}
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, image->repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 
 	if (GetState()->options.mipmaps && image->mipmaps)
 	{
-		glGenerateMipmap(GL_TEXTURE_2D);
+		if (anisotropyLevel != 0 && image->filter)
+		{
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel);
+		} else
+		{
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.0f);
+		}
+
 		if (image->filter)
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -242,21 +244,13 @@ int GL_RegisterTexture(const Image *image)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
+
+		glGenerateMipmap(GL_TEXTURE_2D);
 	} else
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, image->filter ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->filter ? GL_LINEAR : GL_NEAREST);
 	}
-
-	glTexSubImage2D(GL_TEXTURE_2D,
-					0,
-					0,
-					0,
-					(GLsizei)image->width,
-					(GLsizei)image->height,
-					GL_RGBA,
-					GL_UNSIGNED_INT_8_8_8_8_REV,
-					image->pixelData);
 
 	glNextFreeSlot++;
 
