@@ -319,11 +319,13 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 
+	Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
+
 	this->extraData = calloc(1, sizeof(DoorData));
 	CheckAlloc(this->extraData);
 	DoorData *data = this->extraData;
 	data->stayOpen = KvGetBool(params, "stayOpen", false);
-	data->width = KvGetFloat(params, "width", 1.0f);
+	data->width = size.x;
 	data->stayOpenTime = KvGetFloat(params, "delay_until_close", 1.0f);
 
 	this->actorWall = malloc(sizeof(ActorWall));
@@ -332,11 +334,9 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->a = v2(0, -width / 2.0f);
 	this->actorWall->b = v2(0, width / 2.0f);
 	this->actorWall->tex = strdup(KvGetString(params, "texture", TEXTURE("actor/door")));
-	this->actorWall->uvScale.y = 1.0f;
-	this->actorWall->uvOffset.y = 0.0f;
-	this->actorWall->uvScale.x = KvGetFloat(params, "uvScale", 1.0f);
-	this->actorWall->uvOffset.x = KvGetFloat(params, "uvOffset", 0.0f);
-	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
+	this->actorWall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
+	this->actorWall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
+	this->actorWall->height = size.y;
 	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
 	ActorWallBake(this);
 
