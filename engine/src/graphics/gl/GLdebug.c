@@ -15,7 +15,10 @@
 
 #define BREAK_ON_ERROR
 
-GL_DebugLine glDebugLines[GL_MAX_DEBUG_LINES_PER_FRAME];
+#define GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT 8192
+
+GL_DebugLine *glDebugLines = NULL;
+size_t debugLinesCapacity = 0;
 size_t numDebugLines = 0;
 
 void GL_DebugMessageCallback(const GLenum source,
@@ -131,43 +134,14 @@ void GL_DebugMessageCallback(const GLenum source,
 #endif
 }
 
-void GL_DrawDebugLine(GL_DebugLine *line)
-{
-	glDisable(GL_LINE_SMOOTH);
-
-	GL_UseShader(debugShader);
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, debugSharedUniformsLoc, sharedUniformBuffer);
-
-	glUniform4fv(debugColorLoc, 1, COLOR_TO_ARR(line->color));
-
-	// Calculate the 2 corner vertices of each point for a thick line
-	const float vertices[2][3] = {
-		{line->start.x, line->start.y, line->start.z},
-		{line->end.x, line->end.y, line->end.z},
-	};
-
-	const uint32_t indices[] = {0, 1};
-
-	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer->elementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
-
-	glVertexAttribPointer(debugVertexLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(debugVertexLoc);
-
-	glLineWidth(2.0f);
-	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, NULL);
-}
-
 void GL_AddDebugLine(const Vector3 start, const Vector3 end, const Color color)
 {
-	if (numDebugLines >= GL_MAX_DEBUG_LINES_PER_FRAME)
+	if (numDebugLines >= debugLinesCapacity)
 	{
-		LogError("Tried to add a GL debug line, but there were no free slots!\n");
-		return;
+		LogDebug("Resizing GL debug lines buffer from %zu to %zu\n", debugLinesCapacity, debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT);
+		glDebugLines = realloc(glDebugLines, sizeof(GL_DebugLine) * (debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT));
+		CheckAlloc(glDebugLines);
+		debugLinesCapacity += GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT;
 	}
 	GL_DebugLine *line = &glDebugLines[numDebugLines];
 	line->start = start;
@@ -178,10 +152,47 @@ void GL_AddDebugLine(const Vector3 start, const Vector3 end, const Color color)
 
 void GL_DrawDebugLines()
 {
+	const size_t lineSize = (sizeof(float) * 6) * 2;
+	const size_t linesBufferSize = lineSize * numDebugLines;
+	float *linesBuffer = malloc(linesBufferSize);
+	CheckAlloc(linesBuffer);
 	for (size_t i = 0; i < numDebugLines; i++)
 	{
-		GL_DrawDebugLine(&glDebugLines[i]);
+		const GL_DebugLine *line = &glDebugLines[i];
+		float *buf = &linesBuffer[i*12];
+		buf[0] = line->start.x;
+		buf[1] = line->start.y;
+		buf[2] = line->start.z;
+		buf[3] = line->color.r;
+		buf[4] = line->color.g;
+		buf[5] = line->color.b;
+
+		buf[6] = line->end.x;
+		buf[7] = line->end.y;
+		buf[8] = line->end.z;
+		buf[9] = line->color.r;
+		buf[10] = line->color.g;
+		buf[11] = line->color.b;
 	}
+
+	glDisable(GL_LINE_SMOOTH);
+
+	GL_UseShader(debugShader);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, debugSharedUniformsLoc, sharedUniformBuffer);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)linesBufferSize, linesBuffer, GL_STREAM_DRAW);
+
+	glVertexAttribPointer(debugVertexLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(debugVertexLoc);
+	glVertexAttribPointer(debugColorLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(debugColorLoc);
+
+	glLineWidth(2.0f);
+	glDrawArrays(GL_LINES, 0, (GLsizei)numDebugLines * 2);
+
+	free(linesBuffer);
 }
 
 void GL_ResetDebugLines()

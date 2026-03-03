@@ -43,8 +43,8 @@ GLint actorWallUnshadedTransformMatrixLoc;
 GLint actorWallUnshadedVertexLoc;
 GLint actorWallUnshadedUvLoc;
 
-GLint debugColorLoc;
 GLint debugSharedUniformsLoc;
+GLint debugColorLoc;
 GLint debugVertexLoc;
 
 GLint skySharedUniformsLoc;
@@ -120,9 +120,9 @@ bool GL_LoadShaders()
 	actorWallUnshadedVertexLoc = glGetAttribLocation(actorWallUnshadedShader->program, "VERTEX");
 	actorWallUnshadedUvLoc = glGetAttribLocation(actorWallUnshadedShader->program, "VERTEX_UV");
 
-	debugColorLoc = glGetUniformLocation(debugShader->program, "color");
 	debugSharedUniformsLoc = glGetUniformBlockIndex(debugShader->program, "SharedUniforms");
 	debugVertexLoc = glGetAttribLocation(debugShader->program, "VERTEX");
+	debugColorLoc = glGetAttribLocation(debugShader->program, "VERTEX_COLOR");
 
 	skySharedUniformsLoc = glGetUniformBlockIndex(skyShader->program, "SharedUniforms");
 	skyModelWorldMatrixLoc = glGetUniformLocation(skyShader->program, "MODEL_WORLD_MATRIX");

@@ -185,7 +185,7 @@ void DestroyGlobalState()
 	free(state.saveData);
 	free(state.camera);
 
-	LogDebug("Cleaning up game states...\n");
+	LogDebug("Cleaning up physics...\n");
 	PhysicsDestroyGlobal(&state);
 }
 
