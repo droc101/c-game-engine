@@ -62,7 +62,7 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 		data->currentAnimationFrame %= 4;
 
 		const float uvo = 0.25f * (float)data->currentAnimationFrame;
-		this->actorWall->uvOffset = uvo;
+		this->actorWall->uvOffset.x = uvo;
 	}
 
 	Vector3 position = {};
@@ -112,8 +112,8 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->b = v2(0, -0.125f);
 	this->actorWall->tex = malloc(strlen(TEXTURE("actor/bluecoin")) + 1);
 	strcpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
-	this->actorWall->uvScale = 1.0f;
-	this->actorWall->uvOffset = 0.0f;
+	this->actorWall->uvScale = v2(1.0f, 4.0f);
+	this->actorWall->uvOffset = v2s(0.0f);
 	this->actorWall->height = 0.25f;
 	this->actorWall->unshaded = false;
 	ActorWallBake(this);

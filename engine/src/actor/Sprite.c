@@ -49,8 +49,10 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->a = v2(halfWidth, 0.0f);
 	this->actorWall->b = v2(-halfWidth, 0.0f);
 	this->actorWall->tex = strdup(KvGetString(params, "texture", "level/uvtest"));
-	this->actorWall->uvScale = KvGetFloat(params, "uvScale", 1.0f);
-	this->actorWall->uvOffset = KvGetFloat(params, "uvOffset", 0.0f);
+	this->actorWall->uvScale.y = 1.0f;
+	this->actorWall->uvOffset.y = 0.0f;
+	this->actorWall->uvScale.x = KvGetFloat(params, "uvScale", 1.0f);
+	this->actorWall->uvOffset.x = KvGetFloat(params, "uvOffset", 0.0f);
 	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
 	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
 	if (KvGetBool(params, "solid", false))

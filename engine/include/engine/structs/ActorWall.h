@@ -21,10 +21,10 @@ struct ActorWall
 	Vector2 b;
 	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
 	char *tex;
-	/// The X scale of the texture
-	float uvScale;
-	/// The X offset of the texture
-	float uvOffset;
+	/// The UV scale of the wall
+	Vector2 uvScale;
+	/// The UV offset of the wall
+	Vector2 uvOffset;
 	/// height of the wall for rendering. Does not affect collision
 	float height;
 	/// The length of the wall (Call @c WallBake to update)

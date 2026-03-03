@@ -48,8 +48,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	const float halfHeight = wall->height / 2.0f;
 	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
 	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
-	const Vector2 startUV = v2(wall->uvOffset, 0);
-	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
+	const Vector2 startUV = v2(wall->uvOffset.x, wall->uvOffset.y);
+	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
+							 wall->uvScale.y * wall->height + wall->uvOffset.y);
 	const float backfaceWallAngle = wall->angle + PIf;
 	const float vertices[8][6] = {
 		// X Y Z U V A
@@ -165,8 +166,9 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 	const float halfHeight = wall->height / 2.0f;
 	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
 	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
-	const Vector2 startUV = v2(wall->uvOffset, 0);
-	const Vector2 endUV = v2(wall->uvScale * wall->length + wall->uvOffset, 1);
+	const Vector2 startUV = v2(wall->uvOffset.x, wall->uvOffset.y);
+	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
+							 wall->uvScale.y * wall->height + wall->uvOffset.y);
 	const float vertices[8][5] = {
 		// X Y Z U V A
 		{

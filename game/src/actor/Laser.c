@@ -154,7 +154,7 @@ static void LaserUpdate(Actor *this, double delta)
 			this->actorWall->b = v2(hitPointOffset.x, hitPointOffset.z);
 			ActorWallBake(this);
 		}
-		this->actorWall->uvOffset = (float)fmod(this->actorWall->uvOffset + delta / 8, 1.0);
+		this->actorWall->uvOffset.x = (float)fmod(this->actorWall->uvOffset.x + delta / 8, 1.0);
 	}
 }
 
@@ -187,8 +187,8 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
 	strcpy(this->actorWall->tex,
 		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
-	this->actorWall->uvScale = 1.0f;
-	this->actorWall->uvOffset = 0.0f;
+	this->actorWall->uvScale = v2s(1.0f);
+	this->actorWall->uvOffset = v2s(0.0f);
 	this->actorWall->height = 1.0f;
 	this->actorWall->unshaded = true;
 	this->visible = data->on;

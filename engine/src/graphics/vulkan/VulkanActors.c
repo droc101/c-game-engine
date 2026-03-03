@@ -384,8 +384,8 @@ static inline VkResult LoadActorWalls(const LockingList *actors)
 		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {wall->a.x, wall->a.y};
 		const vec2 endVertex = {wall->b.x, wall->b.y};
-		const vec2 startUV = {wall->uvOffset, 0};
-		const vec2 endUV = {wall->uvScale * wall->length + wall->uvOffset, 1};
+		const vec2 startUV = {wall->uvOffset.x, 0};
+		const vec2 endUV = {wall->uvScale.x * wall->length + wall->uvOffset.x, 1};
 
 		vertices[4 * wallCount].position.x = startVertex[0];
 		vertices[4 * wallCount].position.y = halfHeight;
