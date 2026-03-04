@@ -1,0 +1,9 @@
+#ifndef GAME_COMMIT_H
+#define GAME_COMMIT_H
+
+// Automatically generated header file
+
+#define ENGINE_GIT_SHORT_HASH "@GIT_SHORT_HASH@"
+#define ENGINE_GIT_HASH "@GIT_HASH@"
+
+#endif

@@ -73,7 +73,6 @@ Image *LoadImage(const char *asset)
 
 	Asset *textureAsset = DecompressAsset(asset, false, false);
 	size_t offset = 0;
-	// TODO something like EXPECT_BYTES but it generates a missing tex instead of returning NULL
 	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
 	{
 		GenFallbackImage(img);
@@ -87,15 +86,30 @@ Image *LoadImage(const char *asset)
 			GenFallbackImage(img);
 		} else
 		{
-			img->width = ReadSizeT(textureAsset->data, &offset);
-			img->height = ReadSizeT(textureAsset->data, &offset);
-			img->filter = ReadByte(textureAsset->data, &offset) != 0;
-			img->repeat = ReadByte(textureAsset->data, &offset) != 0;
-			img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
-			const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
-			img->pixelData = malloc(pixelDataSize);
-			CheckAlloc(img->pixelData);
-			memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
+			const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 3);
+			if (textureAsset->size < headerSize)
+			{
+				LogError("Failed to load texture asset as it was the wrong size.\n");
+				GenFallbackImage(img);
+			} else
+			{
+				img->width = ReadSizeT(textureAsset->data, &offset);
+				img->height = ReadSizeT(textureAsset->data, &offset);
+				img->filter = ReadByte(textureAsset->data, &offset) != 0;
+				img->repeat = ReadByte(textureAsset->data, &offset) != 0;
+				img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
+				const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
+				if (textureAsset->size < headerSize + pixelDataSize)
+				{
+					LogError("Failed to load texture asset as it was the wrong size.\n");
+					GenFallbackImage(img);
+				} else
+				{
+					img->pixelData = malloc(pixelDataSize);
+					CheckAlloc(img->pixelData);
+					memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
+				}
+			}
 		}
 	}
 

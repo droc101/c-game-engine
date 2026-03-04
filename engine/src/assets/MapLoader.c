@@ -102,8 +102,14 @@ Map *LoadMap(const char *path)
 			bytesRemaining += sizeof(size_t);
 			uint8_t hasOverride = ReadByte(mapData->data, &offset);
 			// TODO data size validation for params
-			size_t paramSize = ReadParam(mapData->data, mapData->size, &offset, &connection->outParamOverride);
-			bytesRemaining -= paramSize;
+			if (hasOverride)
+			{
+				size_t paramSize = ReadParam(mapData->data, mapData->size, &offset, &connection->outParamOverride);
+				bytesRemaining -= paramSize;
+			} else
+			{
+				connection->outParamOverride.type = PARAM_TYPE_NONE;
+			}
 			connection->numRefires = ReadSizeT(mapData->data, &offset);
 			ListAdd(ioConnections, connection);
 		}

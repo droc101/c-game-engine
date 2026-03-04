@@ -154,6 +154,13 @@ Vector2 GetMouseRel(const InputSystem *system);
 Vector2 GetMouseWheel(const InputSystem *system);
 
 /**
+ * Get the relative mouse wheel movement in integer ticks
+ * @param system The input system to check
+ * @return relative mouse wheel movement in ticks
+ */
+Vector2 GetMouseWheelTicks(const InputSystem *system);
+
+/**
  * Consumes a key press state, so no other input check can see it
  * @param system The input system to modify
  * @param code The key code

@@ -154,7 +154,7 @@ static void LaserUpdate(Actor *this, double delta)
 			this->actorWall->b = v2(hitPointOffset.x, hitPointOffset.z);
 			ActorWallBake(this);
 		}
-		this->actorWall->uvOffset = (float)fmod(this->actorWall->uvOffset + delta / 8, 1.0);
+		this->actorWall->uvOffset.x = (float)fmod(this->actorWall->uvOffset.x + delta / 8, 1.0);
 	}
 }
 
@@ -162,14 +162,14 @@ static void LaserTurnOnHandler(Actor *this, const Actor * /*sender*/, const Para
 {
 	LaserData *data = this->extraData;
 	data->on = true;
+	this->visible = true;
 }
 
 static void LaserTurnOffHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	LaserData *data = this->extraData;
 	data->on = false;
-	this->actorWall->b = v2(0.01, 0);
-	ActorWallBake(this);
+	this->visible = false;
 }
 
 void LaserInit(Actor *this, const KvList params, Transform *transform)
@@ -187,16 +187,11 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
 	strcpy(this->actorWall->tex,
 		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
-	this->actorWall->uvScale = 1.0f;
-	this->actorWall->uvOffset = 0.0f;
+	this->actorWall->uvScale = v2s(1.0f);
+	this->actorWall->uvOffset = v2s(0.0f);
 	this->actorWall->height = 1.0f;
 	this->actorWall->unshaded = true;
-
-	if (!data->on)
-	{
-		this->actorWall->b = v2(0.01, 0);
-		ActorWallBake(this);
-	}
+	this->visible = data->on;
 
 	switch (data->height)
 	{

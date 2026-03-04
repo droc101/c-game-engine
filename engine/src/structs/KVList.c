@@ -59,6 +59,15 @@ size_t ReadParam(const void *data, const size_t dataSize, size_t *offset, Param 
 		case PARAM_TYPE_UINT_64:
 			out->uint64value = ReadSizeT(data, offset);
 			break;
+		case PARAM_TYPE_VEC2:
+			out->vec2value.x = ReadFloat(data, offset);
+			out->vec2value.y = ReadFloat(data, offset);
+			break;
+		case PARAM_TYPE_VEC3:
+			out->vec3value.x = ReadFloat(data, offset);
+			out->vec3value.y = ReadFloat(data, offset);
+			out->vec3value.z = ReadFloat(data, offset);
+			break;
 		default:
 			break;
 	}
@@ -297,6 +306,26 @@ ParamArray *KvGetArray(const KvList list, const char *key)
 	return &p->arrayValue;
 }
 
+Vector2 KvGetVec2(const KvList list, const char *key, const Vector2 defaultValue)
+{
+	const Param *p = KvGetTypeWithDefault(list,
+										  key,
+										  PARAM_TYPE_VEC2,
+										  (Param[]){{PARAM_TYPE_VEC2, .vec2value = defaultValue}});
+	assert(p);
+	return p->vec2value;
+}
+
+Vector3 KvGetVec3(const KvList list, const char *key, const Vector3 defaultValue)
+{
+	const Param *p = KvGetTypeWithDefault(list,
+										  key,
+										  PARAM_TYPE_VEC3,
+										  (Param[]){{PARAM_TYPE_VEC3, .vec3value = defaultValue}});
+	assert(p);
+	return p->vec3value;
+}
+
 #pragma endregion
 
 #pragma region Public Setters
@@ -345,6 +374,16 @@ inline void KvSetUint64(KvList list, const char *key, const uint64_t value)
 void KvSetParamArray(KvList list, const char *key, const ParamArray array)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_ARRAY, .arrayValue = array});
+}
+
+inline void KvSetVec2(KvList list, const char *key, const Vector2 value)
+{
+	KvSet(list, key, (Param){PARAM_TYPE_VEC2, .vec2value = value});
+}
+
+inline void KvSetVec3(KvList list, const char *key, const Vector3 value)
+{
+	KvSet(list, key, (Param){PARAM_TYPE_VEC3, .vec3value = value});
 }
 
 void KvSetUnsafe(KvList list, const char *key, const Param value)

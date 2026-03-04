@@ -52,6 +52,8 @@ struct InputSystem
 
 	float mouseWheelRelativeX;
 	float mouseWheelRelativeY;
+	int mouseWheelRelativeTicksX;
+	int mouseWheelRelativeTicksY;
 };
 
 SDL_Gamepad *currentGamepad;
@@ -144,14 +146,20 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 	switch (event->type)
 	{
 		case SDL_EVENT_KEY_UP:
-			UpdateInputState(&system->keys[event->key.scancode],
-							 &system->queueReleaseKeys[event->key.scancode],
-							 INP_JUST_RELEASED);
+			if (!event->key.repeat)
+			{
+				UpdateInputState(&system->keys[event->key.scancode],
+								 &system->queueReleaseKeys[event->key.scancode],
+								 INP_JUST_RELEASED);
+			}
 			break;
 		case SDL_EVENT_KEY_DOWN:
-			UpdateInputState(&system->keys[event->key.scancode],
-							 &system->queueReleaseKeys[event->key.scancode],
-							 INP_JUST_PRESSED);
+			if (!event->key.repeat)
+			{
+				UpdateInputState(&system->keys[event->key.scancode],
+								 &system->queueReleaseKeys[event->key.scancode],
+								 INP_JUST_PRESSED);
+			}
 			break;
 		case SDL_EVENT_MOUSE_MOTION:
 			system->mouseX = (int)event->motion.x;
@@ -201,6 +209,8 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 		case SDL_EVENT_MOUSE_WHEEL:
 			system->mouseWheelRelativeX += event->wheel.x;
 			system->mouseWheelRelativeY += event->wheel.y;
+			system->mouseWheelRelativeTicksX += event->wheel.integer_x;
+			system->mouseWheelRelativeTicksY += event->wheel.integer_y;
 			break;
 		default:
 			return false;
@@ -259,6 +269,8 @@ void UpdateInputStates(InputSystem *system)
 	system->mouseRelativeY = 0;
 	system->mouseWheelRelativeX = 0;
 	system->mouseWheelRelativeY = 0;
+	system->mouseWheelRelativeTicksX = 0;
+	system->mouseWheelRelativeTicksY = 0;
 }
 
 bool IsButtonPressed(const InputSystem *system, const int button)
@@ -322,6 +334,11 @@ Vector2 GetMouseRel(const InputSystem *system)
 Vector2 GetMouseWheel(const InputSystem *system)
 {
 	return v2(system->mouseWheelRelativeX, system->mouseWheelRelativeY);
+}
+
+Vector2 GetMouseWheelTicks(const InputSystem *system)
+{
+	return v2(system->mouseWheelRelativeTicksX, system->mouseWheelRelativeTicksY);
 }
 
 void ConsumeKey(InputSystem *system, const int code)

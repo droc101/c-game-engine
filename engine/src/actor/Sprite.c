@@ -43,15 +43,15 @@ static inline void CreateSpriteCollider(Actor *this, const Transform *transform)
 
 void SpriteInit(Actor *this, const KvList params, Transform *transform)
 {
-	const float halfWidth = KvGetFloat(params, "width", 1.0f) * 0.5f;
+	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
 	this->actorWall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->actorWall);
-	this->actorWall->a = v2(halfWidth, 0.0f);
-	this->actorWall->b = v2(-halfWidth, 0.0f);
+	this->actorWall->a = v2(size.x * 0.5f, 0.0f);
+	this->actorWall->b = v2(-size.x * 0.5f, 0.0f);
+	this->actorWall->height = size.y;
 	this->actorWall->tex = strdup(KvGetString(params, "texture", "level/uvtest"));
-	this->actorWall->uvScale = KvGetFloat(params, "uvScale", 1.0f);
-	this->actorWall->uvOffset = KvGetFloat(params, "uvOffset", 0.0f);
-	this->actorWall->height = KvGetFloat(params, "height", 1.0f);
+	this->actorWall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
+	this->actorWall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
 	if (KvGetBool(params, "solid", false))
 	{

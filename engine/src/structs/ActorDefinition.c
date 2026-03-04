@@ -9,6 +9,7 @@
 #include <engine/actor/LogicBinary.h>
 #include <engine/actor/LogicCounter.h>
 #include <engine/actor/LogicDecimal.h>
+#include <engine/actor/PhysicsModel.h>
 #include <engine/actor/SoundPlayer.h>
 #include <engine/actor/Sprite.h>
 #include <engine/actor/StaticModel.h>
@@ -85,6 +86,7 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterTrigger();
 	RegisterGlobalLight();
 	RegisterGlobalFog();
+	RegisterPhysicsModel();
 	RegisterGameActors();
 }
 

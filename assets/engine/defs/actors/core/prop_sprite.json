@@ -6,29 +6,26 @@
     "texture_param": "texture"
   },
   "params": {
-    "width": {
-      "display": "Width",
-      "default": 1.0,
-      "type": "float",
-      "description": "The in-game width of the sprite"
+    "size": {
+      "display": "Size",
+      "type": "vec2",
+      "default_x": 1.0,
+      "default_y": 1.0,
+      "description": "The in-game size of the sprite"
     },
-    "height": {
-      "display": "Height",
-      "default": 1.0,
-      "type": "float",
-      "description": "The in-game height of the sprite"
-    },
-    "uvScale": {
+    "uv_scale": {
       "display": "UV Scale",
-      "default": 1.0,
-      "type": "float",
-      "description": "The horizontal UV scale factor"
+      "type": "vec2",
+      "default_x": 1.0,
+      "default_y": 1.0,
+      "description": "The UV scale factor"
     },
-    "uvOffset": {
+    "uv_offset": {
       "display": "UV Offset",
-      "default": 0.0,
-      "type": "float",
-      "description": "The horizontal UV offset"
+      "type": "vec2",
+      "default_x": 0.0,
+      "default_y": 0.0,
+      "description": "The UV offset"
     },
     "texture": {
       "display": "Texture",

@@ -22,6 +22,13 @@ int main(const int argc, const char *argv[])
 {
 	InitDialogSystem();
 
+	if (argc < 1)
+	{
+		printf(ANSI_RED "bootstrap: argc < 1\n" ANSI_RESET);
+		ErrorDialog(L"Missing executable path argument", L"Fatal Error");
+		return -1;
+	}
+
 	char *argvZero = strdup(argv[0]); // This gets modified on Linux
 	const char *directory = GetDirectoryOfFile(argvZero);
 	if (directory)

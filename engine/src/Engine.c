@@ -206,6 +206,7 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	LogInit();
 	LogInfo("Build time: %s at %s\n", __DATE__, __TIME__);
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
+	LogInfo("Full Engine Commit: %s\n", ENGINE_GIT_HASH);
 	LogInfo("Initializing Engine\n");
 
 	InitArguments(argc, argv);

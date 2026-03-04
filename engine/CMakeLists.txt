@@ -44,7 +44,7 @@ if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
 message(STATUS "Fetching JoltC/Jolt...")
-fetch_package(https://github.com/NBT22/joltc main joltc)
+fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14ecd27 joltc)
 
 #endregion
 
@@ -70,6 +70,8 @@ target_sources(engine INTERFACE
         include/engine/actor/GlobalLight.h
         src/actor/GlobalFog.c
         include/engine/actor/GlobalFog.h
+        include/engine/actor/PhysicsModel.h
+        src/actor/PhysicsModel.c
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -251,3 +253,14 @@ if (UNIX)
 elseif (WIN32)
     target_link_libraries(engine INTERFACE opengl32 dwmapi)
 endif ()
+
+file(WRITE ${CMAKE_BINARY_DIR}/generated/include/engine/Commit.h)
+
+add_custom_target(
+        generate_commit_header ALL
+        COMMAND ${CMAKE_COMMAND} -DIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/Commit.h.in -DOUT_FILE=${CMAKE_BINARY_DIR}/generated/include/engine/Commit.h -DREPO_DIR=${CMAKE_SOURCE_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateCommitHashes.cmake
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        BYPRODUCTS ${CMAKE_BINARY_DIR}/generated/include/engine/Commit.h
+)
+add_dependencies(engine generate_commit_header)
+target_include_directories(engine INTERFACE ${CMAKE_BINARY_DIR}/generated/include/)

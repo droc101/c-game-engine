@@ -1,0 +1,53 @@
+{
+  "extends": "actor",
+  "description": "An arbitrary model with physics",
+  "display": {
+    "model_param": "model",
+    "color_param": "color"
+  },
+  "inputs": {
+    "set_color": {
+      "type": "color",
+      "description": "Set this actor's tint color"
+    },
+    "set_skin": {
+      "type": "int",
+      "description": "Set this actor's skin index"
+    }
+  },
+  "params": {
+    "model": {
+      "display": "Model",
+      "default": "model/quad.gmdl",
+      "type": "string",
+      "string_hint": "model",
+      "description": "The model to use"
+    },
+    "skin": {
+      "display": "Skin",
+      "default": 0,
+      "type": "int",
+      "description": "The skin of the model to use"
+    },
+    "color": {
+      "display": "Color",
+      "type": "color",
+      "showAlpha": true,
+      "default": 4294967295,
+      "description": "The tint color of this model"
+    },
+    "allow_pickup": {
+      "display": "Allow Pickup",
+      "type": "bool",
+      "default": true,
+      "description": "Whether the player should be allowed to pick up this actor"
+    },
+    "mass_override": {
+      "display": "Mass Override",
+      "type":"float",
+      "minimum": 0.0,
+      "default": 0.0,
+      "description": "How much mass this actor should have. Set to zero to autocalculate based on the model."
+    }
+  }
+}

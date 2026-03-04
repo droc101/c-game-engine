@@ -6,6 +6,7 @@
 #define GAME_ENGINE_H
 
 #include <engine/structs/ActorDefinition.h>
+#include <engine/Commit.h>
 #include <stdbool.h>
 
 #define STR(x) #x
@@ -17,7 +18,7 @@
 #define ENGINE_VERSION_SUFFIX "-dev"
 #define ENGINE_VERSION \
 	TO_STR(ENGINE_VERSION_MAJOR) \
-	"." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX "-" CPU_TYPE
+	"." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX "-" CPU_TYPE " (" ENGINE_GIT_SHORT_HASH ")"
 
 #ifdef WIN32
 /// Make this symbol exported (in the symbol table)

@@ -12,8 +12,6 @@
 #include <joltc/Math/Vector3.h>
 #include <stddef.h>
 
-#define GL_MAX_DEBUG_LINES_PER_FRAME 65536
-
 /**
  * Debug message callback for OpenGL
  * @param source The source of the message
@@ -39,12 +37,6 @@ void GL_DebugMessageCallback(GLenum source,
  * @param color The color of the line
  */
 void GL_AddDebugLine(Vector3 start, Vector3 end, Color color);
-
-/**
- * Draw a debug line
- * @param line The line to draw
- */
-void GL_DrawDebugLine(GL_DebugLine *line);
 
 /**
  * Clear all debug lines

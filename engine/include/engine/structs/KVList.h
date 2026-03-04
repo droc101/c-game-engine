@@ -7,6 +7,8 @@
 
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
+#include <engine/structs/Vector2.h>
+#include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -24,6 +26,8 @@
 #define PARAM_ARRAY(s, d) ((Param){.type = PARAM_TYPE_ARRAY, .arrayValue.length = (s), .arrayValue.data = (d)})
 #define PARAM_KV_LIST(x) ((Param){.type = PARAM_TYPE_KV_LIST, .kvListValue = (x)})
 #define PARAM_UINT_64(x) ((Param){.type = PARAM_TYPE_UINT_64, .uint64value = (x)})
+#define PARAM_VEC2(x) ((Param){.type = PARAM_TYPE_VEC2, .vec2value = (x)})
+#define PARAM_VEC3(x) ((Param){.type = PARAM_TYPE_VEC3, .vec3value = (x)})
 #define PARAM_NONE ((Param){.type = PARAM_TYPE_NONE})
 
 typedef enum ParamType ParamType;
@@ -42,7 +46,9 @@ enum ParamType
 	PARAM_TYPE_COLOR,
 	PARAM_TYPE_KV_LIST,
 	PARAM_TYPE_ARRAY,
-	PARAM_TYPE_UINT_64
+	PARAM_TYPE_UINT_64,
+	PARAM_TYPE_VEC2,
+	PARAM_TYPE_VEC3
 };
 
 struct ParamArray
@@ -66,6 +72,8 @@ struct Param
 		struct KvList_s *kvListValue;
 		ParamArray arrayValue;
 		uint64_t uint64value;
+		Vector2 vec2value;
+		Vector3 vec3value;
 	};
 };
 
@@ -207,6 +215,10 @@ uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
 
 ParamArray *KvGetArray(const KvList list, const char *key);
 
+Vector2 KvGetVec2(const KvList list, const char *key, Vector2 defaultValue);
+
+Vector3 KvGetVec3(const KvList list, const char *key, Vector3 defaultValue);
+
 #pragma endregion
 
 #pragma region Setters
@@ -262,6 +274,10 @@ void KvSetColor(KvList list, const char *key, Color value);
 void KvSetUint64(KvList list, const char *key, uint64_t value);
 
 void KvSetParamArray(KvList list, const char *key, const ParamArray array);
+
+void KvSetVec2(KvList list, const char *key, Vector2 value);
+
+void KvSetVec3(KvList list, const char *key, Vector3 value);
 
 /**
  * Perform a type-unsafe set of a value in the key-value list.
