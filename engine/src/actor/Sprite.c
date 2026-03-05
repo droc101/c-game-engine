@@ -7,6 +7,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ActorWall.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -53,6 +54,7 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	this->actorWall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
 	this->actorWall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
+	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	if (KvGetBool(params, "solid", false))
 	{
 		CreateSpriteCollider(this, transform);

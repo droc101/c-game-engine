@@ -43,6 +43,8 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 	glUniformMatrix4fv(actorWallShadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
 
+	glUniform4fv(actorWallShadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
+
 	GL_LoadTextureFromAsset(wall->tex);
 
 	const float halfHeight = wall->height / 2.0f;
@@ -160,6 +162,8 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallUnshadedSharedUniformsLoc, sharedUniformBuffer);
 
 	glUniformMatrix4fv(actorWallUnshadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
+	glUniform4fv(actorWallUnshadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
 	GL_LoadTextureFromAsset(wall->tex);
 

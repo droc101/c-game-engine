@@ -3,6 +3,7 @@
   "extends": "actor",
   "display": {
     "color": -1,
+    "color_param": "color",
     "texture_param": "texture"
   },
   "params": {
@@ -45,6 +46,12 @@
       "default": false,
       "type": "bool",
       "description": "Whether or not the sprite have solid collision"
+    },
+    "color": {
+      "display": "Tint Color",
+      "default": -1,
+      "type": "color",
+      "description": "The tint color of this sprite"
     }
   }
 }

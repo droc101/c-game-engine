@@ -76,6 +76,12 @@
       "type": "float",
       "minimum": 0.0,
       "description": "How long the door will stay open. Ignored if \"Stay Open\" is set."
+    },
+    "color": {
+      "display": "Tint Color",
+      "default": -1,
+      "type": "color",
+      "description": "The tint color of this door"
     }
   }
 }
