@@ -85,8 +85,9 @@ struct GL_SharedUniforms
 struct GL_DebugLine
 {
 	Vector3 start;
+	Vector3 startColor;
 	Vector3 end;
-	Color color;
+	Vector3 endColor;
 };
 
 /// Loaded textures
