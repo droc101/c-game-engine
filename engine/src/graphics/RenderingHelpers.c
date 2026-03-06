@@ -30,6 +30,8 @@
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
+#include "engine/assets/AssetReader.h"
+
 Renderer currentRenderer;
 bool windowFocused;
 
@@ -170,6 +172,12 @@ void RenderDestroy()
 
 bool FrameStart()
 {
+	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
+	{
+		HotReloadAssets();
+		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	}
+
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:

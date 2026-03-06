@@ -79,6 +79,8 @@ Asset *DecompressAsset(const char *relPath, bool cache, bool isCodeAsset);
  */
 void RemoveAssetFromCache(const char *relPath);
 
+void HotReloadAssets();
+
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")
 #define SOUND(assetName) ("sound/" assetName ".gsnd")
 #define MAP(assetName) ("map/" assetName ".gmap")

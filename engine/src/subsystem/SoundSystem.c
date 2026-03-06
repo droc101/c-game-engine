@@ -351,3 +351,15 @@ inline void StopSound(const SoundChannel *effect)
 		LogError("MIX_StopTrack failed: %s", SDL_GetError());
 	}
 }
+
+void StopAllSounds()
+{
+	for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
+	{
+		const SoundChannel *channel = soundSys.channels[i];
+		if (channel)
+		{
+			StopSound(channel);
+		}
+	}
+}

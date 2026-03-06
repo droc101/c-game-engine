@@ -316,6 +316,7 @@ void DestroyModelLoader()
 	for (int i = 0; i < MAX_MODELS; i++)
 	{
 		FreeModel(models[i]);
+		models[i] = NULL;
 	}
 }
 

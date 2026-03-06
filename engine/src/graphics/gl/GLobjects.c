@@ -333,19 +333,7 @@ void GL_DestroyObjects()
 	GL_DestroyBuffer(glBuffer);
 	glDeleteBuffers(1, &sharedUniformBuffer);
 	GL_DeleteAllTextures();
-	for (int i = 0; i < MAX_MODELS; i++)
-	{
-		if (glModels[i] != NULL)
-		{
-			for (uint32_t j = 0; j < glModels[i]->lodCount; j++)
-			{
-				GL_DestroyBuffer(glModels[i]->buffers[j]);
-			}
-			free(glModels[i]->buffers);
-			free(glModels[i]);
-			glModels[i] = NULL;
-		}
-	}
+	GL_DestroyAllModels();
 	GL_DestroyMapModels();
 }
 
@@ -361,4 +349,21 @@ void GL_DeleteAllTextures()
 	memset(glAssetTextureMap, -1, MAX_TEXTURES * sizeof(int));
 	memset(glTextures, 0, sizeof(glTextures));
 	glNextFreeSlot = 0;
+}
+
+void GL_DestroyAllModels()
+{
+	for (int i = 0; i < MAX_MODELS; i++)
+	{
+		if (glModels[i] != NULL)
+		{
+			for (uint32_t j = 0; j < glModels[i]->lodCount; j++)
+			{
+				GL_DestroyBuffer(glModels[i]->buffers[j]);
+			}
+			free(glModels[i]->buffers);
+			free(glModels[i]);
+			glModels[i] = NULL;
+		}
+	}
 }

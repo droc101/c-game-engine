@@ -191,6 +191,8 @@ void DestroyTextureLoader()
 			free(images[i]->name);
 			free(images[i]->pixelData);
 			free(images[i]);
+			images[i] = NULL;
 		}
 	}
+	textureId = 0;
 }

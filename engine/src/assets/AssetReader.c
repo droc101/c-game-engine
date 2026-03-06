@@ -9,8 +9,11 @@
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/graphics/Font.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Dict.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -23,6 +26,8 @@
 #include <string.h>
 #include <zconf.h>
 #include <zlib.h>
+
+#include "engine/subsystem/SoundSystem.h"
 
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
@@ -361,4 +366,19 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 void RemoveAssetFromCache(const char *relPath)
 {
 	AssetCache_erase(assetCache, relPath);
+}
+
+void HotReloadAssets()
+{
+	assert(GetState()->map == NULL);
+	StopAllSounds();
+	DestroyTextureLoader();
+	DestroyCommonFonts();
+	DestroyModelLoader();
+	AssetCache_clear(assetCache);
+
+	AssetCache_init(assetCache);
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
+	InitCommonFonts();
+	InitModelLoader();
 }

@@ -54,6 +54,8 @@ enum RendererQueuedAction
 {
 	QUEUED_ACTION_RECREATE_FRAMEBUFFERS = 1 << 0,
 	QUEUED_ACTION_CLEAR_ALL_TEXTURES = 1 << 1,
+	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
+	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
 };
 
 extern Renderer currentRenderer;

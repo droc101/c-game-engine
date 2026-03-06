@@ -108,4 +108,6 @@ void ResumeSound(const SoundChannel *effect);
  */
 void StopSound(const SoundChannel *effect);
 
+void StopAllSounds();
+
 #endif //SOUNDSYSTEM_H

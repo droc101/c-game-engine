@@ -20,7 +20,7 @@
 
 GameConfig gameConfig = {0};
 
-AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags, char *path)
+AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags, const char *path)
 {
 	AssetPath *assetPath = malloc(sizeof(AssetPath));
 	CheckAlloc(assetPath);
@@ -94,7 +94,7 @@ void LoadGameConfig(const char *game)
 		{
 			const bool allowCodeExec = KvGetBool(searchPathParam->kvListValue, "allow_code_execution", false);
 			const bool pathIsAbsolute = KvGetBool(searchPathParam->kvListValue, "path_is_absolute", false);
-			char *searchPath = strdup(KvGetString(searchPathParam->kvListValue, "search_path", ""));
+			const char *searchPath = KvGetString(searchPathParam->kvListValue, "search_path", "");
 			const AssetPathType type = pathIsAbsolute ? ABSOLUTE_PATH : RELATIVE_TO_EXECUTABLE_DIRECTORY;
 			AssetPathFlags flags = 0;
 			if (allowCodeExec)
