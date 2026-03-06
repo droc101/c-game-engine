@@ -195,6 +195,9 @@ void HandleEvent(void)
 		case SDL_EVENT_TEXT_INPUT:
 			HandleTextInput(&event.text);
 			break;
+		case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+			UpdateViewportSize();
+			break;
 		default:
 			break;
 	}
