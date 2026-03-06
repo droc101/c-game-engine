@@ -17,6 +17,8 @@
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/SoundSystem.h>
+#include <errno.h>
 #include <m-core.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -26,8 +28,6 @@
 #include <string.h>
 #include <zconf.h>
 #include <zlib.h>
-
-#include "engine/subsystem/SoundSystem.h"
 
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
@@ -88,7 +88,10 @@ void EnumerateAssetsInFolder(const char *folder, List *output)
 		DIR *dir = opendir(levelDataPath);
 		if (dir == NULL)
 		{
-			LogError("Failed to open level directory: %s\n", levelDataPath);
+			if (errno != ENOENT)
+			{
+				LogError("Failed to open directory: %s\n", levelDataPath);
+			}
 			return;
 		}
 
