@@ -124,8 +124,7 @@ static inline void LaserCreateBody(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
-static void LaserUpdate(Actor *this, double delta)
+static void LaserUpdate(Actor *this, const double delta)
 {
 	const LaserData *data = this->extraData;
 	if (data->on)

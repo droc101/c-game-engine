@@ -31,10 +31,11 @@ static void EraserItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &viewmodel->transform.rotation);
 }
 
-static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, double delta)
+static bool EraserItemCanTargetFunction(Item * /*this*/,
+										Actor *targetedActor,
+										Color *crosshairColor,
+										const double /*delta*/)
 {
-	(void)this;
-	(void)delta;
 	if (targetedActor && (targetedActor->flags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;

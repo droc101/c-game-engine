@@ -63,16 +63,16 @@ Item *GetItem()
 
 void GiveItem(const ItemDefinition *definition, const bool switchToItem)
 {
-	for (size_t i = 0; i < state.saveData->items.length; i++)
+	if (switchToItem)
 	{
-		const Item *item = ListGetPointer(state.saveData->items, i);
-		if (item->definition == definition)
+		for (size_t i = 0; i < state.saveData->items.length; i++)
 		{
-			if (switchToItem)
+			const Item *item = ListGetPointer(state.saveData->items, i);
+			if (item->definition == definition)
 			{
 				SwitchToItem(definition);
+				return;
 			}
-			break;
 		}
 	}
 	Item *item = malloc(sizeof(Item));
@@ -94,13 +94,13 @@ void SwitchToItem(const ItemDefinition *definition)
 		if (item->definition == definition)
 		{
 			Item *previousItem = GetItem();
-			if (previousItem)
-			{
-				previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
-			}
 			state.saveData->currentItem = i;
 			if (state.map)
 			{
+				if (previousItem)
+				{
+					previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
+				}
 				definition->SwitchTo(item, &state.map->viewmodel);
 			}
 			return;

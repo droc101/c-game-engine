@@ -33,7 +33,6 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 	}
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void LogoSplashStateRender(GlobalState *State)
 {
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)

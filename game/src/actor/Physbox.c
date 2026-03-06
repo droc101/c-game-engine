@@ -14,6 +14,7 @@
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
+#include <stdbool.h>
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {

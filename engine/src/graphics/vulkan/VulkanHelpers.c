@@ -203,10 +203,10 @@ VkResult LoadSky(const ModelDefinition *skyModel)
 	return VK_SUCCESS;
 }
 
-void LoadWalls(const Map *level)
+void LoadWalls(const Map * /*level*/)
 {
-	WallVertex *vertices = buffers.walls.vertices.data;
-	uint32_t *indices = buffers.walls.indices.data;
+	// WallVertex *vertices = buffers.walls.vertices.data;
+	// uint32_t *indices = buffers.walls.indices.data;
 
 	// for (uint32_t i = 0; i < level->walls.length; i++)
 	// {
@@ -255,8 +255,8 @@ void LoadWalls(const Map *level)
 	// 	indices[6 * i + 4] = i * 4 + 2;
 	// 	indices[6 * i + 5] = i * 4 + 3;
 	// }
-	lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed, 0);
-	lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed, 0);
+	// lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed, 0);
+	// lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed, 0);
 }
 
 void UpdateTransformMatrix(const Camera *camera)

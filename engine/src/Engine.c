@@ -42,6 +42,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include "engine/Commit.h"
 
 // Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems
 // I do not know if these do anything on Linux, but they are here just in case.

@@ -23,7 +23,7 @@ void ExecuteCommand(const char *command)
 	}
 	free(rwCommand);
 
-	char *commandName = ListGetPointer(commandList, 0);
+	// char *commandName = ListGetPointer(commandList, 0);
 	// TODO: Reimplement
 	// if (strcmp(commandName, "level") == 0)
 	// {

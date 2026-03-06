@@ -65,7 +65,6 @@ static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 	state->camera->transform.rotation = transform->rotation;
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void MainStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
@@ -201,7 +200,6 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	SignalLodThreadCanStart();
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void MainStateRender(GlobalState *state)
 {
 	// warp the mouse to the center of the screen

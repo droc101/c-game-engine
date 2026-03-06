@@ -143,9 +143,10 @@ void GL_AddDebugLine(const Vector3 start, const Vector3 end, const Color color)
 		LogDebug("Resizing GL debug lines buffer from %zu to %zu\n",
 				 debugLinesCapacity,
 				 debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT);
-		glDebugLines = realloc(glDebugLines,
-							   sizeof(GL_DebugLine) * (debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT));
-		CheckAlloc(glDebugLines);
+		void *newAlloc = realloc(glDebugLines,
+								 sizeof(GL_DebugLine) * (debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT));
+		CheckAlloc(newAlloc);
+		glDebugLines = newAlloc;
 		debugLinesCapacity += GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT;
 	}
 	const Vector3 colorVec = {color.r, color.g, color.b};

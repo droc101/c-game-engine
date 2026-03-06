@@ -43,10 +43,12 @@ void ErrorDialog(const wchar_t *message, const wchar_t *title)
 		printf(ANSI_RED "bootstrap: failed to show error message box HRESULT=%lx\n" ANSI_RESET, res);
 	}
 #else
+	// ReSharper disable CppPrintfBadFormat
 	char *text_argument = malloc(strlen("--text=") + wcslen(message) + 1);
 	sprintf(text_argument, "--text=%ls", message);
 	char *title_argument = malloc(strlen("--title=") + wcslen(title) + 1);
 	sprintf(title_argument, "--title=%ls", title);
+	// ReSharper restore CppPrintfBadFormat
 	char *zenity_argv[] = {"zenity", "--error", "--no-wrap", "--ok-label=Quit", text_argument, title_argument, NULL};
 
 	pid_t zenity_pid = 0;

@@ -95,7 +95,6 @@ void DestroySlider(const Control *c)
 	free(data);
 }
 
-// ReSharper disable twice CppParameterMayBeConstPtrOrRef
 void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const uint32_t ctlIndex)
 {
 	SliderData *data = c->controlData;

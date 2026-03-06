@@ -77,19 +77,19 @@ inline void UpdateWindowSize()
 	windowHeight = (int)(windowHeight / GetState()->uiScale);
 }
 
-inline Vector2 ActualWindowSizeIgnoreDPI()
-{
-	int w = 0;
-	int h = 0;
-	SDL_GetWindowSizeInPixels(window, &w, &h);
-	return v2((float)w, (float)h);
-}
-
 inline Vector2 ActualWindowSize()
 {
 	int w = 0;
 	int h = 0;
 	SDL_GetWindowSize(window, &w, &h);
+	return v2((float)w, (float)h);
+}
+
+inline Vector2 ActualWindowSizeIgnoreDPI()
+{
+	int w = 0;
+	int h = 0;
+	SDL_GetWindowSizeInPixels(window, &w, &h);
 	return v2((float)w, (float)h);
 }
 
@@ -304,7 +304,7 @@ void LoadMapModels(const Map *map)
 	}
 }
 
-void SetVsyncEnabled(bool enabled)
+void SetVsyncEnabled(const bool enabled)
 {
 	switch (currentRenderer)
 	{

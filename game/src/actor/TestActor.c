@@ -22,6 +22,7 @@
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)

@@ -168,7 +168,6 @@ static inline void CreateDoorBodies(Actor *this, const Transform *transform, con
 	}
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static void DoorUpdate(Actor *this, const double delta)
 {
 	DoorData *data = this->extraData;
@@ -200,7 +199,6 @@ static void DoorUpdate(Actor *this, const double delta)
 	data->animationTime += delta / PHYSICS_TARGET_TPS;
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static void DoorDestroy(Actor *this)
 {
 	const DoorData *data = this->extraData;
@@ -320,7 +318,7 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 
-	Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
+	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
 
 	this->extraData = calloc(1, sizeof(DoorData));
 	CheckAlloc(this->extraData);
