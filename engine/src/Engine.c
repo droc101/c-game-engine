@@ -4,6 +4,7 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/Commit.h>
 #include <engine/debug/DPrint.h>
 #include <engine/debug/DPrintConsole.h>
 #include <engine/debug/FrameBenchmark.h>
@@ -42,7 +43,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "engine/Commit.h"
 
 // Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems
 // I do not know if these do anything on Linux, but they are here just in case.

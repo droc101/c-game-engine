@@ -143,7 +143,10 @@ Asset *DecompressAsset(const char *relPath, const bool cache)
 
 	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
 	{
-		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read this asset.\n", fileSize - ASSET_HEADER_SIZE, compressedSize);
+		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read "
+				 "this asset.\n",
+				 fileSize - ASSET_HEADER_SIZE,
+				 compressedSize);
 		free(assetData);
 		return NULL;
 	}

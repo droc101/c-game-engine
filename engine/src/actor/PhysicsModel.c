@@ -7,6 +7,7 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
@@ -17,7 +18,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "engine/structs/Color.h"
 
 static inline void CreatePhysicsModelCollider(Actor *this,
 											  const Transform *transform,

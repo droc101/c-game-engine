@@ -8,6 +8,7 @@
 #include <engine/assets/MapLoader.h>
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
@@ -34,7 +35,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "engine/graphics/RenderingHelpers.h"
 
 bool LoadMap(Map *map, Asset *mapData)
 {

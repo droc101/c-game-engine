@@ -36,7 +36,7 @@ bool CreateInstance(SDL_Window *window)
 	vulkanWindow = window;
 	uint32_t extensionCount = 0;
 	// const char *extensionNames[extensionCount];
-	char const * const *extensionNames = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
+	const char *const *extensionNames = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
 	if (!extensionNames)
 	{
 		VulkanLogError("Failed to acquire extensions required for SDL window!\n");
@@ -59,7 +59,7 @@ bool CreateInstance(SDL_Window *window)
 
 bool CreateSurface()
 {
-	if (!SDL_Vulkan_CreateSurface(vulkanWindow, lunaGetInstance(), NULL, &surface)) // TODO should argument 3 be something
+	if (!SDL_Vulkan_CreateSurface(vulkanWindow, lunaGetInstance(), NULL, &surface))
 	{
 		VulkanLogError("Failed to create window surface\n");
 		return false;
