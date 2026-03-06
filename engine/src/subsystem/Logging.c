@@ -33,7 +33,7 @@ void LogInit()
 	free(filePath);
 	if (logFile == NULL)
 	{
-		LogError("Failed to open log file");
+		LogError("Failed to open log file\n");
 	}
 }
 
