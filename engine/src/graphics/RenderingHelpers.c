@@ -194,7 +194,10 @@ void FrameEnd()
 		default:
 			break;
 	}
-	GetState()->map->changeFlags = 0;
+	if (GetState()->map)
+	{
+		GetState()->map->changeFlags = 0;
+	}
 }
 
 inline void UpdateViewportSize()

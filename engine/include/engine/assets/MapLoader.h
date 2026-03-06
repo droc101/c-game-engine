@@ -11,9 +11,10 @@
 
 /**
  * Load a map asset
- * @param path The asset path
+ * @param map The asset path
+ * @param mapData
  * @return The loaded map
  */
-Map *LoadMap(const char *path);
+bool LoadMap(Map *map, Asset *mapData);
 
 #endif //GAME_MAPLOADER_H

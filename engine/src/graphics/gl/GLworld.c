@@ -592,23 +592,25 @@ void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 void GL_LoadMap(const Map *map)
 {
 	GL_DestroyMapModels();
-
-	for (size_t i = 0; i < map->modelCount; i++)
+	if (map)
 	{
-		GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
-		CheckAlloc(mmb);
-		mapModels[i] = mmb;
-		mmb->mapModel = &map->models[i];
-		mmb->buffer = GL_ConstructBuffer();
-		GL_BindBuffer(mmb->buffer);
-		glBufferData(GL_ARRAY_BUFFER,
-					 (GLsizeiptr)(mmb->mapModel->vertexCount * sizeof(MapVertex)),
-					 mmb->mapModel->vertices,
-					 GL_STREAM_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-					 (GLsizeiptr)(mmb->mapModel->indexCount * sizeof(uint32_t)),
-					 mmb->mapModel->indices,
-					 GL_STREAM_DRAW);
+		for (size_t i = 0; i < map->modelCount; i++)
+		{
+			GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
+			CheckAlloc(mmb);
+			mapModels[i] = mmb;
+			mmb->mapModel = &map->models[i];
+			mmb->buffer = GL_ConstructBuffer();
+			GL_BindBuffer(mmb->buffer);
+			glBufferData(GL_ARRAY_BUFFER,
+						 (GLsizeiptr)(mmb->mapModel->vertexCount * sizeof(MapVertex)),
+						 mmb->mapModel->vertices,
+						 GL_STREAM_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+						 (GLsizeiptr)(mmb->mapModel->indexCount * sizeof(uint32_t)),
+						 mmb->mapModel->indices,
+						 GL_STREAM_DRAW);
+		}
 	}
 }
 

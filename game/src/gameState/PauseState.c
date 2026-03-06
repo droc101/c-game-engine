@@ -75,7 +75,7 @@ void BtnOptions()
 
 void BtnPauseExit()
 {
-	ChangeMap(CreateMap());
+	ChangeMap(NULL);
 #ifdef USE_LEVEL_SELECT
 	LevelSelectStateSet();
 #else

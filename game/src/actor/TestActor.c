@@ -119,6 +119,7 @@ static void TestActorTargetReached(Actor *this, const double delta)
 
 void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
+	(void)GetState()->map->fogEnd;
 	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
 	this->hasModel = true;
 	this->model = LoadModel(MODEL("leafy"));
