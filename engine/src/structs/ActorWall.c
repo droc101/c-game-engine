@@ -19,19 +19,19 @@
 
 void ActorWallBake(const Actor *this)
 {
-	const float dx = this->actorWall->b.x - this->actorWall->a.x;
-	const float dy = this->actorWall->b.y - this->actorWall->a.y;
-	this->actorWall->length = sqrtf(dx * dx + dy * dy);
+	const float dx = this->wall->b.x - this->wall->a.x;
+	const float dy = this->wall->b.y - this->wall->a.y;
+	this->wall->length = sqrtf(dx * dx + dy * dy);
 	if (this->bodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
 	{
 		JPH_Quat rotation = {};
 		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
-		this->actorWall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY) + atan2f(dy, dx);
+		this->wall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY) + atan2f(dy, dx);
 	} else
 	{
-		this->actorWall->angle = atan2f(dy, dx);
+		this->wall->angle = atan2f(dy, dx);
 	}
-	this->actorWall->angle += GLM_PI_2f;
+	this->wall->angle += GLM_PI_2f;
 }
 
 JPH_Shape *ActorWallCreateCollider(const ActorWall *wall)

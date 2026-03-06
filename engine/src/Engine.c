@@ -4,6 +4,7 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/Commit.h>
 #include <engine/debug/DPrint.h>
 #include <engine/debug/DPrintConsole.h>
 #include <engine/debug/FrameBenchmark.h>

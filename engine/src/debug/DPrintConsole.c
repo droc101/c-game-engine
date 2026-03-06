@@ -4,7 +4,6 @@
 
 #include <engine/debug/DPrint.h>
 #include <engine/debug/DPrintConsole.h>
-#include <engine/helpers/Arguments.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
@@ -14,6 +13,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef BUILDSTYLE_DEBUG
+#include <engine/helpers/Arguments.h>
+#endif
 
 #define CONSOLE_MESSAGE_VISIBLE_FOR_MS 2000
 
@@ -64,7 +67,8 @@ void AddConsoleMessage(const char *msg, const Color color)
 	CheckAlloc(cm);
 	cm->message = strdup(msg);
 	cm->color = color;
-	cm->time = 0; // time will be set when the message is first processed so a 2 second frame doesn't result in messages not getting shown
+	cm->time =
+			0; // time will be set when the message is first processed so a 2 second frame doesn't result in messages not getting shown
 	ListAdd(consoleMessages, cm);
 }
 

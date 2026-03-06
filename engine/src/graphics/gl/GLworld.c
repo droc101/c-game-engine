@@ -35,13 +35,15 @@
 
 void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
-	const ActorWall *wall = actor->actorWall;
+	const ActorWall *wall = actor->wall;
 
 	GL_UseShader(actorWallShadedShader);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallShadedSharedUniformsLoc, sharedUniformBuffer);
 
 	glUniformMatrix4fv(actorWallShadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
+	glUniform4fv(actorWallShadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
 	GL_LoadTextureFromAsset(wall->tex);
 
@@ -153,13 +155,15 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
-	const ActorWall *wall = actor->actorWall;
+	const ActorWall *wall = actor->wall;
 
 	GL_UseShader(actorWallUnshadedShader);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallUnshadedSharedUniformsLoc, sharedUniformBuffer);
 
 	glUniformMatrix4fv(actorWallUnshadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
+
+	glUniform4fv(actorWallUnshadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
 	GL_LoadTextureFromAsset(wall->tex);
 
@@ -291,7 +295,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(map->actors, i);
-		if (!actor->actorWall && !actor->actorModel)
+		if (!actor->wall && !actor->model)
 		{
 			continue;
 		}
@@ -302,22 +306,22 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);
-		if (actor->actorModel == NULL)
+		if (actor->hasModel)
 		{
-			if (actor->actorWall == NULL)
+			GL_RenderModel(actor->model, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
+		} else
+		{
+			if (actor->wall == NULL)
 			{
 				continue;
 			}
-			if (actor->actorWall->unshaded)
+			if (actor->wall->unshaded)
 			{
 				GL_DrawUnshadedActorWall(actor, actorXfm);
 			} else
 			{
 				GL_DrawShadedActorWall(actor, actorXfm);
 			}
-		} else
-		{
-			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
 		}
 	}
 	ListUnlock(map->actors);
@@ -588,23 +592,25 @@ void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 void GL_LoadMap(const Map *map)
 {
 	GL_DestroyMapModels();
-
-	for (size_t i = 0; i < map->modelCount; i++)
+	if (map)
 	{
-		GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
-		CheckAlloc(mmb);
-		mapModels[i] = mmb;
-		mmb->mapModel = &map->models[i];
-		mmb->buffer = GL_ConstructBuffer();
-		GL_BindBuffer(mmb->buffer);
-		glBufferData(GL_ARRAY_BUFFER,
-					 (GLsizeiptr)(mmb->mapModel->vertexCount * sizeof(MapVertex)),
-					 mmb->mapModel->vertices,
-					 GL_STREAM_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-					 (GLsizeiptr)(mmb->mapModel->indexCount * sizeof(uint32_t)),
-					 mmb->mapModel->indices,
-					 GL_STREAM_DRAW);
+		for (size_t i = 0; i < map->modelCount; i++)
+		{
+			GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
+			CheckAlloc(mmb);
+			mapModels[i] = mmb;
+			mmb->mapModel = &map->models[i];
+			mmb->buffer = GL_ConstructBuffer();
+			GL_BindBuffer(mmb->buffer);
+			glBufferData(GL_ARRAY_BUFFER,
+						 (GLsizeiptr)(mmb->mapModel->vertexCount * sizeof(MapVertex)),
+						 mmb->mapModel->vertices,
+						 GL_STREAM_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+						 (GLsizeiptr)(mmb->mapModel->indexCount * sizeof(uint32_t)),
+						 mmb->mapModel->indices,
+						 GL_STREAM_DRAW);
+		}
 	}
 }
 

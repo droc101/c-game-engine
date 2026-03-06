@@ -59,10 +59,7 @@ bool CreateInstance(SDL_Window *window)
 
 bool CreateSurface()
 {
-	if (!SDL_Vulkan_CreateSurface(vulkanWindow,
-								  lunaGetInstance(),
-								  NULL,
-								  &surface)) // TODO should argument 3 be something
+	if (!SDL_Vulkan_CreateSurface(vulkanWindow, lunaGetInstance(), NULL, &surface))
 	{
 		VulkanLogError("Failed to create window surface\n");
 		return false;

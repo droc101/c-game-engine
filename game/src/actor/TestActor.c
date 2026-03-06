@@ -22,12 +22,13 @@
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 static inline void CreateTestActorCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
+			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
 																		  transform,
 																		  JPH_MotionType_Dynamic,
 																		  OBJECT_LAYER_DYNAMIC,
@@ -119,8 +120,10 @@ static void TestActorTargetReached(Actor *this, const double delta)
 
 void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
-	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
-	this->actorModel = LoadModel(MODEL("leafy"));
+	(void)GetState()->map->fogEnd;
+	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
+	this->hasModel = true;
+	this->model = LoadModel(MODEL("leafy"));
 	CreateTestActorCollider(this, transform);
 
 	this->extraData = calloc(1, sizeof(NavigationConfig));

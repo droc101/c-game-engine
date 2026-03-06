@@ -77,19 +77,19 @@ inline void UpdateWindowSize()
 	windowHeight = (int)(windowHeight / GetState()->uiScale);
 }
 
-inline Vector2 ActualWindowSizeIgnoreDPI()
-{
-	int w = 0;
-	int h = 0;
-	SDL_GetWindowSizeInPixels(window, &w, &h);
-	return v2((float)w, (float)h);
-}
-
 inline Vector2 ActualWindowSize()
 {
 	int w = 0;
 	int h = 0;
 	SDL_GetWindowSize(window, &w, &h);
+	return v2((float)w, (float)h);
+}
+
+inline Vector2 ActualWindowSizeIgnoreDPI()
+{
+	int w = 0;
+	int h = 0;
+	SDL_GetWindowSizeInPixels(window, &w, &h);
 	return v2((float)w, (float)h);
 }
 
@@ -111,13 +111,13 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 		JPH_RMat44 matrix;
 		JPH_BodyInterface_GetWorldTransform(actor->bodyInterface, actor->bodyId, &matrix);
 		memcpy(*transformMatrix, &matrix, sizeof(mat4));
-		if (actor->actorModel != NULL &&
-			(actor->actorFlags & ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION) == ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION)
+		if (actor->model != NULL &&
+			(actor->flags & ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION) == ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION)
 		{
 			glm_translate(*transformMatrix,
-						  (vec3){-actor->actorModel->boundingBoxOrigin.x,
-								 -actor->actorModel->boundingBoxOrigin.y,
-								 -actor->actorModel->boundingBoxOrigin.z});
+						  (vec3){-actor->model->boundingBoxOrigin.x,
+								 -actor->model->boundingBoxOrigin.y,
+								 -actor->model->boundingBoxOrigin.z});
 		}
 	} else
 	{
@@ -194,7 +194,10 @@ void FrameEnd()
 		default:
 			break;
 	}
-	GetState()->map->changeFlags = 0;
+	if (GetState()->map)
+	{
+		GetState()->map->changeFlags = 0;
+	}
 }
 
 inline void UpdateViewportSize()
@@ -301,7 +304,7 @@ void LoadMapModels(const Map *map)
 	}
 }
 
-void SetVsyncEnabled(bool enabled)
+void SetVsyncEnabled(const bool enabled)
 {
 	switch (currentRenderer)
 	{

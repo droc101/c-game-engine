@@ -6,11 +6,13 @@
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/structs/Color.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <GL/glew.h>
+#include <joltc/Math/Vector3.h>
 #include <signal.h>
 #include <stddef.h>
-#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define BREAK_ON_ERROR
@@ -138,51 +140,37 @@ void GL_AddDebugLine(const Vector3 start, const Vector3 end, const Color color)
 {
 	if (numDebugLines >= debugLinesCapacity)
 	{
-		LogDebug("Resizing GL debug lines buffer from %zu to %zu\n", debugLinesCapacity, debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT);
-		glDebugLines = realloc(glDebugLines, sizeof(GL_DebugLine) * (debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT));
-		CheckAlloc(glDebugLines);
+		LogDebug("Resizing GL debug lines buffer from %zu to %zu\n",
+				 debugLinesCapacity,
+				 debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT);
+		void *newAlloc = realloc(glDebugLines,
+								 sizeof(GL_DebugLine) * (debugLinesCapacity + GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT));
+		CheckAlloc(newAlloc);
+		glDebugLines = newAlloc;
 		debugLinesCapacity += GL_DEBUG_LINES_BUFFER_RESIZE_INCREMENT;
 	}
+	const Vector3 colorVec = {color.r, color.g, color.b};
+
 	GL_DebugLine *line = &glDebugLines[numDebugLines];
 	line->start = start;
+	line->startColor = colorVec;
 	line->end = end;
-	line->color = color;
+	line->endColor = colorVec;
 	numDebugLines++;
 }
 
 void GL_DrawDebugLines()
 {
-	const size_t lineSize = (sizeof(float) * 6) * 2;
-	const size_t linesBufferSize = lineSize * numDebugLines;
-	float *linesBuffer = malloc(linesBufferSize);
-	CheckAlloc(linesBuffer);
-	for (size_t i = 0; i < numDebugLines; i++)
-	{
-		const GL_DebugLine *line = &glDebugLines[i];
-		float *buf = &linesBuffer[i*12];
-		buf[0] = line->start.x;
-		buf[1] = line->start.y;
-		buf[2] = line->start.z;
-		buf[3] = line->color.r;
-		buf[4] = line->color.g;
-		buf[5] = line->color.b;
-
-		buf[6] = line->end.x;
-		buf[7] = line->end.y;
-		buf[8] = line->end.z;
-		buf[9] = line->color.r;
-		buf[10] = line->color.g;
-		buf[11] = line->color.b;
-	}
-
 	glDisable(GL_LINE_SMOOTH);
 
 	GL_UseShader(debugShader);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, debugSharedUniformsLoc, sharedUniformBuffer);
 
+	const GLsizeiptr linesBufferSize = (GLsizeiptr)(sizeof(GL_DebugLine) * numDebugLines);
+
 	glBindBuffer(GL_ARRAY_BUFFER, glBuffer->vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)linesBufferSize, linesBuffer, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, linesBufferSize, glDebugLines, GL_STREAM_DRAW);
 
 	glVertexAttribPointer(debugVertexLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(debugVertexLoc);
@@ -191,8 +179,6 @@ void GL_DrawDebugLines()
 
 	glLineWidth(2.0f);
 	glDrawArrays(GL_LINES, 0, (GLsizei)numDebugLines * 2);
-
-	free(linesBuffer);
 }
 
 void GL_ResetDebugLines()

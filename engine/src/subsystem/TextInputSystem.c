@@ -2,13 +2,12 @@
 // Created by droc101 on 3/3/25.
 //
 
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/TextInputSystem.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_keyboard.h>
 #include <stddef.h>
-
-#include "engine/graphics/RenderingHelpers.h"
 
 TextInput *CurrentTextInput = NULL;
 

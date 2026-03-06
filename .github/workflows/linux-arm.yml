@@ -1,10 +1,7 @@
 name: Linux (ARM64) Build
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_call:
   workflow_dispatch:
 
 jobs:

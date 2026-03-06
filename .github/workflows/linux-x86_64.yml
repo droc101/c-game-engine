@@ -1,10 +1,12 @@
 name: Linux (x86_64) Build
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_call:
+    inputs:
+      buildForDistribution:
+        description: "Build all four x86 ABI versions"
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
       buildForDistribution:

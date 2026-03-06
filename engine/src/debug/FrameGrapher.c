@@ -189,8 +189,8 @@ void FrameGraphDraw()
 void TickGraphDraw()
 {
 #ifdef TICKGRAPH_ENABLE
-	const int start_x = ScaledWindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
 #ifndef FRAMEGRAPH_FPS_ONLY
+	const int start_x = ScaledWindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
 	const int height = TICKGRAPH_THRESHOLD_GOOD * 2 * TICKGRAPH_V_SCALE + 20;
 
 	// Draw a background for the graph

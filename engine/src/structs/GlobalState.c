@@ -40,7 +40,6 @@ void InitState()
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
-	state.map = CreateMap(); // empty map so we don't segfault
 	state.camera = calloc(1, sizeof(Camera));
 	CheckAlloc(state.camera);
 	state.camera->fov = GetState()->options.fov;
@@ -64,16 +63,16 @@ Item *GetItem()
 
 void GiveItem(const ItemDefinition *definition, const bool switchToItem)
 {
-	for (size_t i = 0; i < state.saveData->items.length; i++)
+	if (switchToItem)
 	{
-		const Item *item = ListGetPointer(state.saveData->items, i);
-		if (item->definition == definition)
+		for (size_t i = 0; i < state.saveData->items.length; i++)
 		{
-			if (switchToItem)
+			const Item *item = ListGetPointer(state.saveData->items, i);
+			if (item->definition == definition)
 			{
 				SwitchToItem(definition);
+				return;
 			}
-			break;
 		}
 	}
 	Item *item = malloc(sizeof(Item));
@@ -95,13 +94,13 @@ void SwitchToItem(const ItemDefinition *definition)
 		if (item->definition == definition)
 		{
 			Item *previousItem = GetItem();
-			if (previousItem)
-			{
-				previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
-			}
 			state.saveData->currentItem = i;
 			if (state.map)
 			{
+				if (previousItem)
+				{
+					previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
+				}
 				definition->SwitchTo(item, &state.map->viewmodel);
 			}
 			return;
@@ -147,18 +146,12 @@ void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
 
 void ChangeMap(Map *map)
 {
-	if (!map)
-	{
-		LogError("Cannot change to a NULL map. Something might have gone wrong while loading it.\n");
-		return;
-	}
 	PhysicsThreadLockTickMutex();
 	if (state.map)
 	{
 		DestroyMap(state.map);
 	}
 	state.map = map;
-	LoadMapModels(map);
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -166,7 +159,10 @@ void DestroyGlobalState()
 {
 	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
-	DestroyMap(state.map);
+	if (state.map)
+	{
+		DestroyMap(state.map);
+	}
 	for (size_t i = 0; i < state.saveData->items.length; i++)
 	{
 		Item *item = ListGetPointer(state.saveData->items, i);
@@ -200,7 +196,12 @@ bool ChangeMapByName(const char *name)
 		return false;
 	}
 	GetState()->saveData->blueCoins = 0;
-	ChangeMap(LoadMap(mapPath));
+	Map *map = CreateMap();
+	ChangeMap(map);
+	if (!LoadMap(map, DecompressAsset(mapPath, false)))
+	{
+		return false;
+	}
 	DiscordUpdateRPC();
 	return true;
 }

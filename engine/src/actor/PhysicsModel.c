@@ -3,9 +3,21 @@
 //
 
 #include <engine/actor/PhysicsModel.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/KVList.h>
 #include <engine/subsystem/Logging.h>
+#include <joltc/enums.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyCreationSettings.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Body/MassProperties.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 static inline void CreatePhysicsModelCollider(Actor *this,
 											  const Transform *transform,
@@ -15,19 +27,19 @@ static inline void CreatePhysicsModelCollider(Actor *this,
 	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
 	if (!useAABB)
 	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
+		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
 																	 transform,
 																	 JPH_MotionType_Dynamic,
 																	 OBJECT_LAYER_DYNAMIC,
 																	 this);
 	} else
 	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->boundingBoxShape,
+		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->boundingBoxShape,
 																	 transform,
 																	 JPH_MotionType_Dynamic,
 																	 OBJECT_LAYER_DYNAMIC,
 																	 this);
-		this->actorFlags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
+		this->flags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
 	}
 
 	if (massOverride > 0)
@@ -48,11 +60,12 @@ static inline void CreatePhysicsModelCollider(Actor *this,
 
 void PhysicsModelInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->actorModel = LoadModel(KvGetString(params, "model", "leafy"));
+	this->hasModel = true;
+	this->model = LoadModel(KvGetString(params, "model", "leafy"));
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	const float massOverride = KvGetFloat(params, "mass_override", 0.0f);
-	if (this->actorModel->collisionModelType != COLLISION_MODEL_TYPE_DYNAMIC)
+	if (this->model->collisionModelType != COLLISION_MODEL_TYPE_DYNAMIC)
 	{
 		LogWarning("Tried to create a " PHYSICS_MODEL_ACTOR_NAME
 				   " with full collision, but the model file (\"%s\") does not have any!\n",
@@ -65,7 +78,7 @@ void PhysicsModelInit(Actor *this, const KvList params, Transform *transform)
 
 	if (KvGetBool(params, "allow_pickup", true))
 	{
-		this->actorFlags |= ACTOR_FLAG_CAN_BE_HELD;
+		this->flags |= ACTOR_FLAG_CAN_BE_HELD;
 	}
 }
 
@@ -90,7 +103,7 @@ static void PhysicsModelSetSkinHandler(Actor *this, const Actor * /*sender*/, co
 	{
 		newSkin = param->uint64value;
 	}
-	if (this->actorModel->skinCount <= newSkin)
+	if (this->model->skinCount <= newSkin)
 	{
 		LogError("Tried to switch to skin %u, but that index is out of bounds\n", newSkin);
 	} else

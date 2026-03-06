@@ -31,6 +31,15 @@
 		} \
 		(bytesRemaining) -= (expected); \
 	}
+#define EXPECT_BYTES_BOOL(expected, bytesRemaining) \
+	{ \
+		if ((bytesRemaining) < (expected)) \
+		{ \
+			LogError("Not enough bytes remaining to read %zu bytes\n", (expected)); \
+			return false; \
+		} \
+		(bytesRemaining) -= (expected); \
+	}
 
 /**
  * Initialize the asset cache

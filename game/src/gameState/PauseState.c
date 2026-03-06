@@ -10,7 +10,6 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
@@ -42,7 +41,6 @@ void PauseStateUpdate(GlobalState * /*state*/)
 	}
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 void PauseStateRender(GlobalState * /*state*/)
 {
 	RenderInGameMenuBackground();
@@ -75,7 +73,7 @@ void BtnOptions()
 
 void BtnPauseExit()
 {
-	ChangeMap(CreateMap());
+	ChangeMap(NULL);
 #ifdef USE_LEVEL_SELECT
 	LevelSelectStateSet();
 #else

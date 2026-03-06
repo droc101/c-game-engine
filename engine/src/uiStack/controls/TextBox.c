@@ -46,11 +46,10 @@ Control *CreateTextBoxControl(const char *placeholder,
 	data->input.TextInput = TextBoxTextInputCallback;
 	strcpy(data->placeholder, placeholder); // up to caller to ensure placeholder is not too long
 
-
 	return c;
 }
 
-void DrawTextBox(const Control *control, ControlState /*state*/, Vector2 position)
+void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 position)
 {
 	DrawNinePatchTexture(control->anchoredPosition, control->size, 8, 8, TEXTURE("interface/textbox"));
 

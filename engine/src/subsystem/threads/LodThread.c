@@ -50,7 +50,7 @@ int LodThreadMain(void * /*data*/)
 		for (size_t i = 0; i < actorCount; i++)
 		{
 			Actor *actor = ListGetPointer(*actors, i);
-			if (!actor->actorModel || actor->actorModel->lodCount == 1)
+			if (!actor->hasModel || actor->model->lodCount == 1)
 			{
 				continue;
 			}
@@ -58,13 +58,13 @@ int LodThreadMain(void * /*data*/)
 			Vector3_Subtract(&actorPosition, &state->camera->transform.position, &offsetFromCamera);
 			const float distanceSquared = Vector3_LengthSquared(&offsetFromCamera);
 			while (actor->currentLod != 0 &&
-				   actor->actorModel->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)
+				   actor->model->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)
 			{
 				actor->currentLod--;
 				shouldReloadActors = true;
 			}
-			while (actor->actorModel->lodCount > actor->currentLod + 1 &&
-				   actor->actorModel->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distanceSquared)
+			while (actor->model->lodCount > actor->currentLod + 1 &&
+				   actor->model->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distanceSquared)
 			{
 				actor->currentLod++;
 				shouldReloadActors = true;

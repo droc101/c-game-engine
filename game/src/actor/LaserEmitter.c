@@ -45,7 +45,7 @@ typedef struct LaserEmitterData
 static inline void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
+			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
 																		  transform,
 																		  JPH_MotionType_Static,
 																		  OBJECT_LAYER_STATIC,
@@ -90,7 +90,7 @@ static void LaserEmitterTurnOffHandler(Actor *this, const Actor * /*sender*/, co
 
 void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS;
+	this->flags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	this->extraData = calloc(1, sizeof(LaserEmitterData));
 	CheckAlloc(this->extraData);
@@ -98,14 +98,15 @@ void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 	data->height = (LaserHeight)KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->hasTicked = false;
 
-	this->actorModel = LoadModel(MODEL("laseremitter"));
+	this->hasModel = true;
+	this->model = LoadModel(MODEL("laseremitter"));
 	this->currentSkinIndex = data->height + 1;
 
 	data->transform = *transform;
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&transform->rotation, &forwardVector);
 	Vector3 offsetVector = {};
-	Vector3_MultiplyScalar(&forwardVector, this->actorModel->boundingBoxExtents.z, &offsetVector);
+	Vector3_MultiplyScalar(&forwardVector, this->model->boundingBoxExtents.z, &offsetVector);
 	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
 
 	CreateLaserEmitterCollider(this, transform);

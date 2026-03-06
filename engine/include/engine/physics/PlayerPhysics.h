@@ -11,12 +11,11 @@
 #include <joltc/Math/Transform.h>
 
 /// Player movement speed (in units per second)
-static const float MOVE_SPEED = 6.0f;
+extern const float MOVE_SPEED;
 /// Player movement speed when ctrl is held
-static const float SLOW_MOVE_SPEED = 0.6f;
-
+extern const float SLOW_MOVE_SPEED;
 /// The maximum angle that the player can walk on, in degrees
-static const float MAX_WALKABLE_SLOPE = 50.0f;
+extern const float MAX_WALKABLE_SLOPE;
 
 void PlayerPersistentStateInit();
 

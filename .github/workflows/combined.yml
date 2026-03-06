@@ -1,0 +1,21 @@
+name: Combined
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+    inputs:
+      buildForDistribution:
+        description: "Build all four x86 ABI versions"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  linux-arm:
+    uses: './.github/workflows/linux-arm.yml'
+  linux-x86_64:
+    uses: './.github/workflows/linux-x86_64.yml'
+  windows:
+    uses: './.github/workflows/windows.yml'

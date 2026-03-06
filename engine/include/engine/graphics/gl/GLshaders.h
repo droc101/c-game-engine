@@ -52,6 +52,7 @@ extern GLint actorWallShadedModelWorldMatrixLoc;
 extern GLint actorWallShadedSharedUniformsLoc;
 /// The location of the transform matrix uniform in the shaded actor wall shader
 extern GLint actorWallShadedTransformMatrixLoc;
+extern GLint actorWallShadedAlbColorLoc;
 /// The location of the vertex position attribute in the shaded actor wall shader
 extern GLint actorWallShadedVertexLoc;
 /// The location of the vertex UV attribute in the shaded actor wall shader
@@ -67,6 +68,7 @@ extern GLint actorWallUnshadedModelWorldMatrixLoc;
 extern GLint actorWallUnshadedSharedUniformsLoc;
 /// The location of the transform matrix uniform in the unshaded actor wall shader
 extern GLint actorWallUnshadedTransformMatrixLoc;
+extern GLint actorWallUnshadedAlbColorLoc;
 /// The location of the vertex position attribute in the unshaded actor wall shader
 extern GLint actorWallUnshadedVertexLoc;
 /// The location of the vertex UV attribute in the unshaded actor wall shader

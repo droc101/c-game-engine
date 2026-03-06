@@ -24,7 +24,10 @@ static void LaserStopperItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 	viewmodel->enabled = false;
 }
 
-static bool LaserStopperItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, double delta)
+static bool LaserStopperItemCanTargetFunction(Item *this,
+											  Actor *targetedActor,
+											  Color *crosshairColor,
+											  const double delta)
 {
 	(void)this;
 	(void)delta;
