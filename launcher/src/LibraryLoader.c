@@ -37,7 +37,7 @@ LibraryHandle OpenLibrary(const char *path)
 #ifdef WIN32
 	return LoadLibraryEx(path, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
 #else
-	return dlopen(path, RTLD_NOW);
+	return dlopen(path, RTLD_NOW | RTLD_NODELETE);
 #endif
 }
 
