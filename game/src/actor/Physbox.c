@@ -18,7 +18,7 @@
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
 	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->actorModel->collisionModelShape,
+			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
 																		  transform,
 																		  JPH_MotionType_Dynamic,
 																		  OBJECT_LAYER_DYNAMIC,
@@ -37,8 +37,9 @@ static inline void CreatePhysboxCollider(Actor *this, const Transform *transform
 
 void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
-	this->actorFlags = ACTOR_FLAG_CAN_BLOCK_LASERS | ACTOR_FLAG_CAN_BE_HELD;
-	this->actorModel = LoadModel(MODEL("cube"));
+	this->flags = ACTOR_FLAG_CAN_BLOCK_LASERS | ACTOR_FLAG_CAN_BE_HELD;
+	this->hasModel = true;
+	this->model = LoadModel(MODEL("cube"));
 
 	CreatePhysboxCollider(this, transform);
 }

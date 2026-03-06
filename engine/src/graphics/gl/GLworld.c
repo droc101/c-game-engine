@@ -35,7 +35,7 @@
 
 void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
-	const ActorWall *wall = actor->actorWall;
+	const ActorWall *wall = actor->wall;
 
 	GL_UseShader(actorWallShadedShader);
 
@@ -155,7 +155,7 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
-	const ActorWall *wall = actor->actorWall;
+	const ActorWall *wall = actor->wall;
 
 	GL_UseShader(actorWallUnshadedShader);
 
@@ -295,7 +295,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		const Actor *actor = ListGetPointer(map->actors, i);
-		if (!actor->actorWall && !actor->actorModel)
+		if (!actor->wall && !actor->model)
 		{
 			continue;
 		}
@@ -306,22 +306,22 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 		mat4 actorXfm = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &actorXfm);
-		if (actor->actorModel == NULL)
+		if (actor->hasModel)
 		{
-			if (actor->actorWall == NULL)
+			GL_RenderModel(actor->model, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
+		} else
+		{
+			if (actor->wall == NULL)
 			{
 				continue;
 			}
-			if (actor->actorWall->unshaded)
+			if (actor->wall->unshaded)
 			{
 				GL_DrawUnshadedActorWall(actor, actorXfm);
 			} else
 			{
 				GL_DrawShadedActorWall(actor, actorXfm);
 			}
-		} else
-		{
-			GL_RenderModel(actor->actorModel, actorXfm, actor->currentSkinIndex, actor->currentLod, actor->modColor);
 		}
 	}
 	ListUnlock(map->actors);

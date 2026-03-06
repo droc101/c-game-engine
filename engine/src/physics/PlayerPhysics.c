@@ -95,7 +95,7 @@ static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor)
 	{
-		ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
+		ioSettings->canPushCharacter = (actor->flags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
 		actor->definition->OnPlayerContactAdded(actor, bodyId);
 	}
 }
@@ -111,7 +111,7 @@ static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
 	if (actor)
 	{
-		ioSettings->canPushCharacter = (actor->actorFlags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
+		ioSettings->canPushCharacter = (actor->flags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
 		actor->definition->OnPlayerContactPersisted(actor, bodyId);
 	}
 }
@@ -415,7 +415,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 			{
 				if (!itemTarget)
 				{
-					if (((player->targetedActor->actorFlags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
+					if (((player->targetedActor->flags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
 						(raycastResult.fraction * actorRaycastMaxDistance < 1.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_HOLDABLE;

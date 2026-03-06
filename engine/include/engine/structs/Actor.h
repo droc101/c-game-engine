@@ -12,8 +12,8 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <joltc/types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -50,36 +50,41 @@ struct ActorConnection
 
 struct Actor
 {
-	/// Flags used to provide more information about the actor
-	uint32_t actorFlags;
-
-	JPH_BodyID bodyId;
-	JPH_BodyInterface *bodyInterface;
+	/// The actor's definition
+	const ActorDefinition *definition;
 
 	/// Whether the actor is currently visible
 	bool visible;
 
-	/// Optional model for the actor, if not NULL, will be rendered instead of the wall
-	ModelDefinition *actorModel;
-	/// The index of the active skin for the actor's model
-	uint32_t currentSkinIndex;
-	/// The current LOD level of the actor's model, re-calculated each physics tick
-	uint32_t currentLod;
+	/// Whether the actor has a model or not
+	bool hasModel;
+	union
+	{
+		struct
+		{
+			/// Optional model for the actor, if not NULL, will be rendered instead of the wall
+			ModelDefinition *model;
+			/// The index of the active skin for the actor's model
+			uint32_t currentSkinIndex;
+			/// The current LOD level of the actor's model, re-calculated each physics tick
+			uint32_t currentLod;
+		};
+		/// The actor's wall, in global space
+		ActorWall *wall;
+	};
+
 	/// The color modifier of the actor's model
 	Color modColor;
 
-	/// The actor's wall, in global space
-	ActorWall *actorWall;
+	/// Flags used to provide more information about the actor
+	uint32_t flags;
 
-	/// The actor's definition
-	const ActorDefinition *definition;
+	JPH_BodyID bodyId;
+	JPH_BodyInterface *bodyInterface;
 
 	/// List of I/O connections
 	LockingList ioConnections;
 
-	/// The actor's health
-	/// @note May be unused for some actors
-	int health;
 	/// Extra data for the actor
 	void *extraData;
 };

@@ -74,16 +74,16 @@ static inline VkResult PreSizeActorBuffers(const LockingList *actors)
 	{
 		assert(loadedActorCount == actors->length);
 		const Actor *actor = ListGetPointer(*actors, i);
-		if (!actor->actorModel)
+		if (!actor->model)
 		{
-			if (!actor->actorWall)
+			if (!actor->wall)
 			{
 				continue;
 			}
 			buffers.actorWalls.count++;
 		} else
 		{
-			const ModelDefinition *model = actor->actorModel;
+			const ModelDefinition *model = actor->model;
 			if (ListFind(loadedModels, model->id) == SIZE_MAX)
 			{
 				for (uint32_t j = 0; j < model->lodCount; j++)
@@ -260,9 +260,9 @@ static inline VkResult InitActors(const LockingList *actors)
 	{
 		assert(loadedActorCount == actors->length);
 		const Actor *actor = ListGetPointer(*actors, i);
-		if (!actor->actorModel)
+		if (!actor->model)
 		{
-			if (!actor->actorWall)
+			if (!actor->wall)
 			{
 				continue;
 			}
@@ -276,7 +276,7 @@ static inline VkResult InitActors(const LockingList *actors)
 				   buffers.actorWalls.drawInfo.allocatedSize);
 		} else
 		{
-			const ModelDefinition *model = actor->actorModel;
+			const ModelDefinition *model = actor->model;
 			if (ListFind(loadedModels, model->id) == SIZE_MAX)
 			{
 				LoadActorModel(model, &loadedModelLods, &modelLodVertexOffsets, &modelLodIndexOffsets);
@@ -376,11 +376,11 @@ static inline VkResult LoadActorWalls(const LockingList *actors)
 	for (size_t i = 0; i < loadedActorCount; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
-		if (!actor->actorWall || actor->actorModel != NULL)
+		if (!actor->wall || actor->model != NULL)
 		{
 			continue;
 		}
-		const ActorWall *wall = actor->actorWall;
+		const ActorWall *wall = actor->wall;
 		const float halfHeight = wall->height / 2.0f;
 		const vec2 startVertex = {wall->a.x, wall->a.y};
 		const vec2 endVertex = {wall->b.x, wall->b.y};
@@ -445,16 +445,16 @@ static inline VkResult UpdateActorInstanceData(const LockingList *actors)
 	for (size_t i = 0; i < loadedActorCount; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
-		if (!actor->actorWall && !actor->actorModel)
+		if (!actor->wall && !actor->model)
 		{
 			continue;
 		}
 
 		mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
 		ActorTransformMatrix(actor, &transformMatrix);
-		if (actor->actorModel)
+		if (actor->model)
 		{
-			const ModelLod *lod = actor->actorModel->lods[actor->currentLod];
+			const ModelLod *lod = actor->model->lods[actor->currentLod];
 			const uint64_t lodSkin = ((size_t)lod->id << 32) | actor->currentSkinIndex;
 			const size_t lodSkinIndex = ListFind(loadedLodSkins, lodSkin);
 			if (lodSkinIndex == SIZE_MAX)
@@ -468,23 +468,23 @@ static inline VkResult UpdateActorInstanceData(const LockingList *actors)
 			assert(offset < buffers.actorModels.instanceData.allocatedSize);
 			ModelInstanceData *offsetInstanceData = buffers.actorModels.instanceData.data + offset;
 			const size_t instanceCount = ListGetUint32(lodSkinInstanceCounts, lodSkinIndex);
-			for (size_t j = 0; j < actor->actorModel->materialsPerSkin; j++)
+			for (size_t j = 0; j < actor->model->materialsPerSkin; j++)
 			{
 				const size_t index = j * instanceCount;
-				const size_t materialIndex = actor->actorModel->skins[actor->currentSkinIndex][j];
-				const Material *material = &actor->actorModel->materials[materialIndex];
+				const size_t materialIndex = actor->model->skins[actor->currentSkinIndex][j];
+				const Material *material = &actor->model->materials[materialIndex];
 				memcpy(offsetInstanceData[index].transform, transformMatrix, sizeof(mat4));
 				offsetInstanceData[index].textureIndex = TextureIndex(material->texture);
 				offsetInstanceData[index].materialColor = material->color;
 				offsetInstanceData[index].instanceColor = actor->modColor;
 			}
 			ListGetUint32(instanceDataLodSkinCounts, lodSkinIndex)++;
-		} else if (actor->actorWall)
+		} else if (actor->wall)
 		{
-			const ActorWall *wall = actor->actorWall;
+			const ActorWall *wall = actor->wall;
 			memcpy(actorWallsInstanceData[wallCount].transform, transformMatrix, sizeof(mat4));
 			actorWallsInstanceData[wallCount].textureIndex = TextureIndex(wall->tex);
-			actorWallsInstanceData[wallCount].wallAngle = actor->actorWall->angle;
+			actorWallsInstanceData[wallCount].wallAngle = actor->wall->angle;
 
 			wallCount++;
 		}

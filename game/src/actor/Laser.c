@@ -75,13 +75,13 @@ static bool BodyFilterShouldCollide(const JPH_BodyID bodyId)
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	const Actor *actor = (const Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
-	return !actor || ((actor->actorFlags & ACTOR_FLAG_CAN_BLOCK_LASERS) == ACTOR_FLAG_CAN_BLOCK_LASERS);
+	return !actor || ((actor->flags & ACTOR_FLAG_CAN_BLOCK_LASERS) == ACTOR_FLAG_CAN_BLOCK_LASERS);
 }
 
 static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
 {
 	const Actor *actor = (const Actor *)JPH_Body_GetUserData(body);
-	return !actor || ((actor->actorFlags & ACTOR_FLAG_CAN_BLOCK_LASERS) == ACTOR_FLAG_CAN_BLOCK_LASERS);
+	return !actor || ((actor->flags & ACTOR_FLAG_CAN_BLOCK_LASERS) == ACTOR_FLAG_CAN_BLOCK_LASERS);
 }
 
 static const JPH_BroadPhaseLayerFilter_Impl normalLaserBroadPhaseLayerFilterImpl = {
@@ -151,10 +151,10 @@ static void LaserUpdate(Actor *this, double delta)
 															bodyFilter);
 		if (hit)
 		{
-			this->actorWall->b = v2(hitPointOffset.x, hitPointOffset.z);
+			this->wall->b = v2(hitPointOffset.x, hitPointOffset.z);
 			ActorWallBake(this);
 		}
-		this->actorWall->uvOffset.x = (float)fmod(this->actorWall->uvOffset.x + delta / 8, 1.0);
+		this->wall->uvOffset.x = (float)fmod(this->wall->uvOffset.x + delta / 8, 1.0);
 	}
 }
 
@@ -180,17 +180,17 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	data->height = KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
 	data->on = KvGetBool(params, "startOn", true);
 
-	this->actorWall = malloc(sizeof(ActorWall));
-	CheckAlloc(this->actorWall);
-	this->actorWall->a = v2s(0);
-	this->actorWall->b = v2s(0);
-	this->actorWall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
-	strcpy(this->actorWall->tex,
+	this->wall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->wall);
+	this->wall->a = v2s(0);
+	this->wall->b = v2s(0);
+	this->wall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
+	strcpy(this->wall->tex,
 		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
-	this->actorWall->uvScale = v2s(1.0f);
-	this->actorWall->uvOffset = v2s(0.0f);
-	this->actorWall->height = 1.0f;
-	this->actorWall->unshaded = true;
+	this->wall->uvScale = v2s(1.0f);
+	this->wall->uvOffset = v2s(0.0f);
+	this->wall->height = 1.0f;
+	this->wall->unshaded = true;
 	this->visible = data->on;
 
 	switch (data->height)

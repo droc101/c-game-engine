@@ -106,7 +106,7 @@ static inline void DoorSetState(const Actor *this, const DoorState state, const 
 
 static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 {
-	JPH_Shape *shape = ActorWallCreateCollider(this->actorWall);
+	JPH_Shape *shape = ActorWallCreateCollider(this->wall);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Kinematic,
@@ -130,7 +130,7 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 	DoorData *data = this->extraData;
 
 	JPH_Shape *shape = (JPH_Shape *)
-			JPH_BoxShape_Create((Vector3[]){{0.5f, this->actorWall->height / 2.0f, data->width / 2.0f}},
+			JPH_BoxShape_Create((Vector3[]){{0.5f, this->wall->height / 2.0f, data->width / 2.0f}},
 								JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
@@ -318,7 +318,7 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 
 void DoorInit(Actor *this, const KvList params, Transform *transform)
 {
-	this->actorFlags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
+	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 
 	Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
 
@@ -329,16 +329,16 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	data->width = size.x;
 	data->stayOpenTime = KvGetFloat(params, "delay_until_close", 1.0f);
 
-	this->actorWall = malloc(sizeof(ActorWall));
-	CheckAlloc(this->actorWall);
+	this->wall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->wall);
 	const float width = data->width;
-	this->actorWall->a = v2(0, -width / 2.0f);
-	this->actorWall->b = v2(0, width / 2.0f);
-	this->actorWall->tex = strdup(KvGetString(params, "texture", TEXTURE("actor/door")));
-	this->actorWall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
-	this->actorWall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
-	this->actorWall->height = size.y;
-	this->actorWall->unshaded = KvGetBool(params, "unshaded", false);
+	this->wall->a = v2(0, -width / 2.0f);
+	this->wall->b = v2(0, width / 2.0f);
+	this->wall->tex = strdup(KvGetString(params, "texture", TEXTURE("actor/door")));
+	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
+	this->wall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
+	this->wall->height = size.y;
+	this->wall->unshaded = KvGetBool(params, "unshaded", false);
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	ActorWallBake(this);
 

@@ -62,7 +62,7 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 		data->currentAnimationFrame %= 4;
 
 		const float uvo = 0.25f * (float)data->currentAnimationFrame;
-		this->actorWall->uvOffset.x = uvo;
+		this->wall->uvOffset.x = uvo;
 	}
 
 	Vector3 position = {};
@@ -70,8 +70,8 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 	const float rotation = atan2f(GetState()->map->player.transform.position.z - position.z,
 								  GetState()->map->player.transform.position.x - position.x) +
 						   GLM_PI_2f;
-	this->actorWall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
-	this->actorWall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
+	this->wall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
+	this->wall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
 	ActorWallBake(this);
 }
 
@@ -106,16 +106,16 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	};
 	CreateCoinSensor(this, &adjustedTransform);
 
-	this->actorWall = malloc(sizeof(ActorWall));
-	CheckAlloc(this->actorWall);
-	this->actorWall->a = v2(0, 0.125f);
-	this->actorWall->b = v2(0, -0.125f);
-	this->actorWall->tex = malloc(strlen(TEXTURE("actor/bluecoin")) + 1);
-	strcpy(this->actorWall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
-	this->actorWall->uvScale = v2(1.0f, 4.0f);
-	this->actorWall->uvOffset = v2s(0.0f);
-	this->actorWall->height = 0.25f;
-	this->actorWall->unshaded = false;
+	this->wall = malloc(sizeof(ActorWall));
+	CheckAlloc(this->wall);
+	this->wall->a = v2(0, 0.125f);
+	this->wall->b = v2(0, -0.125f);
+	this->wall->tex = malloc(strlen(TEXTURE("actor/bluecoin")) + 1);
+	strcpy(this->wall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
+	this->wall->uvScale = v2(1.0f, 4.0f);
+	this->wall->uvOffset = v2s(0.0f);
+	this->wall->height = 0.25f;
+	this->wall->unshaded = false;
 	ActorWallBake(this);
 }
 

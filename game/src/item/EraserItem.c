@@ -35,7 +35,7 @@ static bool EraserItemCanTargetFunction(Item *this, Actor *targetedActor, Color 
 {
 	(void)this;
 	(void)delta;
-	if (targetedActor && (targetedActor->actorFlags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
+	if (targetedActor && (targetedActor->flags & ACTOR_FLAG_ENEMY) == ACTOR_FLAG_ENEMY)
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
