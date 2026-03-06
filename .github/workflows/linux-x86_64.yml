@@ -5,8 +5,7 @@ on:
     inputs:
       buildForDistribution:
         description: "Build all four x86 ABI versions"
-        required: true
-        default: true
+        default: false
         type: boolean
   workflow_dispatch:
     inputs:
