@@ -669,8 +669,8 @@ void GL_GetViewmodelMatrix(const Map *map, mat4 *out)
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(VIEWMODEL_FOV),
 					ScaledWindowWidthFloat() / ScaledWindowHeightFloat(),
-					NEAR_Z,
-					FAR_Z,
+					VIEWMODEL_NEAR_Z,
+					VIEWMODEL_FAR_Z,
 					perspectiveMatrix);
 
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;

@@ -18,8 +18,10 @@
 #define VIEWMODEL_FOV 70
 /// Near clipping plane
 #define NEAR_Z 0.01
+#define VIEWMODEL_NEAR_Z 0.01
 /// Far clipping plane
 #define FAR_Z 2000
+#define VIEWMODEL_FAR_Z 4
 
 // Default window size
 #define DEF_WIDTH 1280
@@ -30,8 +32,8 @@
 #define MIN_HEIGHT 720
 
 // Maximum window size
-#define MAX_WIDTH 9999
-#define MAX_HEIGHT 9999
+#define MAX_WIDTH 16384
+#define MAX_HEIGHT 16384
 
 /// The number of milliseconds to sleep for when in low FPS mode
 #define LOW_FPS_MODE_SLEEP_MS 33
