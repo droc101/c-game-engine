@@ -5,6 +5,7 @@
 #include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLinit.h>
@@ -29,8 +30,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-
-#include "engine/assets/AssetReader.h"
 
 Renderer currentRenderer;
 bool windowFocused;

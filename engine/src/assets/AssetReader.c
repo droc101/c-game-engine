@@ -35,8 +35,7 @@ AssetCache assetCache;
 
 FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	const size_t maxPathLength = 300;
-	// const size_t pathLen = assetPathLen + strlen("/") + strlen(relPath) + 1;
+	const int64_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
@@ -52,7 +51,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 			LogError("Path is too long: %s\n", relPath);
 			continue;
 		}
-		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > 300)
+		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > maxPathLength)
 		{
 			LogError("Asset path too long!\n");
 			continue;
@@ -76,21 +75,26 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 
 void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension)
 {
+	ListFreeOnlyContents(*output);
 	ListClear(*output);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
 	{
 		const AssetPath *assetPath = ListGetPointer(gameConfig.assetPaths, i);
 		char levelDataPath[300];
-		sprintf(levelDataPath, "%s/%s/", assetPath->path, folder);
+		if (snprintf(levelDataPath, 300, "%s/%s/", assetPath->path, folder) > 300)
+		{
+			LogError("Asset directory path is too long: %s/%s\n", assetPath->path, folder);
+			continue;
+		}
 
 		DIR *dir = opendir(levelDataPath);
 		if (dir == NULL)
 		{
 			if (errno != ENOENT)
 			{
-				LogError("Failed to open directory: %s\n", levelDataPath);
+				LogError("Failed to open directory: %s\nError: %s\n", levelDataPath, strerror(errno));
 			}
-			return;
+			continue;
 		}
 
 		const struct dirent *ent = readdir(dir);
@@ -108,7 +112,7 @@ void EnumerateAssetsInFolder(const char *folder, List *output, const char *exten
 				for (size_t j = 0; j < output->length; j++)
 				{
 					const char *existing = ListGetPointer(*output, j);
-					if (strcmp(levelName, existing) == 0) // TODO strcmp is slow
+					if (strcmp(levelName, existing) == 0)
 					{
 						found = true;
 						break;
@@ -160,7 +164,6 @@ Asset *CreateAssetFromFile(FILE *file)
 	fclose(file);
 
 	size_t offset = 0;
-	// Read the first 4 bytes of the asset to get the size of the compressed data
 	const uint32_t magic = ReadUint(assetData, &offset);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
@@ -179,6 +182,16 @@ Asset *CreateAssetFromFile(FILE *file)
 	const uint8_t typeVersion = ReadByte(assetData, &offset);
 	const size_t decompressedSize = ReadSizeT(assetData, &offset);
 	const size_t compressedSize = ReadSizeT(assetData, &offset);
+
+	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
+	{
+		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read "
+				 "this asset.\n",
+				 compressedSize,
+				 fileSize - ASSET_HEADER_SIZE);
+		free(assetData);
+		return NULL;
+	}
 
 	// Allocate memory for the decompressed data
 	uint8_t *decompressedData = malloc(decompressedSize);
@@ -282,7 +295,6 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 	}
 
 	size_t offset = 0;
-	// Read the first 4 bytes of the asset to get the size of the compressed data
 	const uint32_t magic = ReadUint(assetData, &offset);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
@@ -306,8 +318,8 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 	{
 		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read "
 				 "this asset.\n",
-				 fileSize - ASSET_HEADER_SIZE,
-				 compressedSize);
+				 compressedSize,
+				 fileSize - ASSET_HEADER_SIZE);
 		free(assetData);
 		return NULL;
 	}

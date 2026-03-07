@@ -55,7 +55,7 @@ void LoadGameConfig(const char *game)
 		}
 	} else
 	{
-		configPath = malloc(strlen(GetState()->executableFolder) + strlen(game) + 1 + strlen("game.gkvl") + 1);
+		configPath = malloc(strlen(GetState()->executableFolder) + strlen(game) + strlen("/game.gkvl") + 1);
 		CheckAlloc(configPath);
 		sprintf(configPath, "%s%s/game.gkvl", GetState()->executableFolder, game);
 	}
