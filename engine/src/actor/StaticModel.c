@@ -78,6 +78,7 @@ ActorDefinition staticModelActorDefinition = {
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = DefaultActorDestroy,
 	.Init = StaticModelInit,
 };

@@ -421,13 +421,22 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 					if (((player->targetedActor->flags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
 						(raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
 					{
-						crosshairColor = CROSSHAIR_COLOR_HOLDABLE;
+						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
 						if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
 							IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH))
 						{
 							player->heldActor = player->targetedActor;
 							player->hasHeldActor = true;
 							crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
+						}
+					} else if (((player->targetedActor->flags & ACTOR_FLAG_INTERACTABLE) == ACTOR_FLAG_INTERACTABLE) &&
+							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
+					{
+						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
+						if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
+							IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH))
+						{
+							player->targetedActor->definition->Interact(player->targetedActor);
 						}
 					} else
 					{

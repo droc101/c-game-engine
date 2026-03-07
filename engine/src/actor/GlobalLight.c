@@ -121,6 +121,7 @@ ActorDefinition globalLightActorDefinition = {
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = GlobalLightDestroy,
 	.Init = GlobalLightInit,
 };

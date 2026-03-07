@@ -116,6 +116,7 @@ ActorDefinition goalActorDefinition = {
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = DefaultActorDestroy,
 	.Init = GoalInit,
 };

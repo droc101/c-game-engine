@@ -36,6 +36,7 @@ ActorDefinition ioProxyActorDefinition = {
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = DefaultActorDestroy,
 	.Init = IoProxyInit,
 };

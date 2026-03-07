@@ -31,6 +31,8 @@ typedef void (*ActorPlayerContactPersistedFunction)(Actor *this, JPH_BodyID body
 
 typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyID bodyId);
 
+typedef void (*ActorInteractFunction)(Actor *this);
+
 typedef void (*ActorRegisterFunction)();
 
 typedef void (*RegisterGameActorsFunction)();
@@ -54,6 +56,8 @@ struct ActorDefinition
 
 	/// The list of input handlers
 	ActorInputHandlerFunctionDict inputHandlers;
+
+	ActorInteractFunction Interact;
 
 	/// The function to call to initialize the actor
 	ActorInitFunction Init;

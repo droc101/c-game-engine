@@ -118,6 +118,7 @@ ActorDefinition triggerActorDefinition = {
 	.OnPlayerContactPersisted = TriggerOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = TriggerOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = DefaultActorDestroy,
 	.Init = TriggerInit,
 };
