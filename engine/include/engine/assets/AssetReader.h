@@ -6,8 +6,8 @@
 #define GAME_ASSETREADER_H
 
 #include <engine/structs/Asset.h>
-#include <engine/subsystem/Logging.h>
 #include <engine/structs/List.h>
+#include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -52,7 +52,7 @@ void AssetCacheInit();
  */
 void DestroyAssetCache();
 
-void EnumerateAssetsInFolder(const char *folder, List *output);
+void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension);
 
 /**
  * Create an asset directly from a file handle. This does NOT cache the asset, as it has no associated path.

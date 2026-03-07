@@ -96,7 +96,7 @@ void LevelSelectStateRender(GlobalState * /*state*/)
 void LoadLevelList()
 {
 	ListInit(levelList, LIST_POINTER);
-	EnumerateAssetsInFolder("map", &levelList);
+	EnumerateAssetsInFolder("map", &levelList, ".gmap");
 }
 
 void LevelSelectStateSet()

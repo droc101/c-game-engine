@@ -74,9 +74,8 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 	return NULL;
 }
 
-void EnumerateAssetsInFolder(const char *folder, List *output)
+void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension)
 {
-	// TODO don't add duplicates (assets overwritten in another asset path)
 	ListClear(*output);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
 	{
@@ -84,7 +83,6 @@ void EnumerateAssetsInFolder(const char *folder, List *output)
 		char levelDataPath[300];
 		sprintf(levelDataPath, "%s/%s/", assetPath->path, folder);
 
-		// Get the name of all gmap files in the level directory
 		DIR *dir = opendir(levelDataPath);
 		if (dir == NULL)
 		{
@@ -98,14 +96,28 @@ void EnumerateAssetsInFolder(const char *folder, List *output)
 		const struct dirent *ent = readdir(dir);
 		while (ent != NULL)
 		{
-			if (strstr(ent->d_name, ".gmap") != NULL)
+			if (strstr(ent->d_name, extension) != NULL)
 			{
 				char *levelName = malloc(strlen(ent->d_name) + 1);
 				CheckAlloc(levelName);
 				strcpy(levelName, ent->d_name);
 				// Remove the .gmap extension
-				levelName[strlen(levelName) - 5] = '\0';
-				ListAdd(*output, levelName);
+				levelName[strlen(levelName) - strlen(extension)] = '\0';
+
+				bool found = false;
+				for (size_t j = 0; j < output->length; j++)
+				{
+					const char *existing = ListGetPointer(*output, j);
+					if (strcmp(levelName, existing) == 0) // TODO strcmp is slow
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					ListAdd(*output, levelName);
+				}
 			}
 			ent = readdir(dir);
 		}
