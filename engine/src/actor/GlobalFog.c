@@ -124,6 +124,7 @@ ActorDefinition globalFogActorDefinition = {
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = GlobalFogDestroy,
 	.Init = GlobalFogInit,
 };

@@ -349,6 +349,7 @@ ActorDefinition doorActorDefinition = {
 	.OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = DoorDestroy,
 	.Init = DoorInit,
 };

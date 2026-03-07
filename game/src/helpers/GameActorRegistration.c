@@ -3,6 +3,7 @@
 //
 
 #include "helpers/GameActorRegistration.h"
+#include "actor/Button.h"
 #include "actor/Coin.h"
 #include "actor/Door.h"
 #include "actor/Goal.h"
@@ -20,4 +21,5 @@ void RegisterGameActors()
 	RegisterLaserEmitter();
 	RegisterPhysbox();
 	RegisterTestActor();
+	RegisterButton();
 }

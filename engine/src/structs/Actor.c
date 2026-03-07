@@ -139,6 +139,8 @@ void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/)
 
 void DefaultActorRenderUi(Actor * /*this*/) {}
 
+void DefaultActorInteract(Actor * /*this*/) {}
+
 void DefaultActorDestroy(Actor * /*this*/) {}
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)

@@ -33,6 +33,7 @@ enum ActorFlags
 	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 2, // TODO should we split this enum into engine-side and game-side
 	ACTOR_FLAG_CAN_BE_HELD = 1 << 3,
 	ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION = 1 << 4,
+	ACTOR_FLAG_INTERACTABLE = 1 << 5,
 };
 
 struct ActorConnection
@@ -165,6 +166,11 @@ void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/)
  * Default actor render ui function
  */
 void DefaultActorRenderUi(Actor * /*this*/);
+
+/**
+ * Default actor interact function
+ */
+void DefaultActorInteract(Actor * /*this*/);
 
 /**
  * Default actor destroy function

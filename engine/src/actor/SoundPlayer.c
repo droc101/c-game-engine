@@ -107,6 +107,7 @@ ActorDefinition soundPlayerActorDefinition = {
 	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
+	.Interact = DefaultActorInteract,
 	.Destroy = SoundPlayerDestroy,
 	.Init = SoundPlayerInit,
 };
