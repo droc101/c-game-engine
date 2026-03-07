@@ -15,7 +15,7 @@
 
 Shader *LoadShader(const char *asset)
 {
-	Asset *assetData = DecompressAsset(asset, false);
+	Asset *assetData = DecompressAsset(asset, false, true);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load shader from asset, asset was NULL!\n");

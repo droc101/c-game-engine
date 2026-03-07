@@ -50,6 +50,11 @@ void OpenOptions()
 	OptionsStateSet(false);
 }
 
+void ReloadAssets()
+{
+	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+}
+
 void MenuStateUpdate(GlobalState * /*state*/) {}
 
 void MenuStateRender(GlobalState *state)
@@ -140,6 +145,8 @@ void MenuStateSet()
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Options", OpenOptions, MIDDLE_CENTER));
 		opY += opSpacing;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
+		opY += opSpacing;
+		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);

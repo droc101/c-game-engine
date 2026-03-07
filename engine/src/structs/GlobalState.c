@@ -198,7 +198,7 @@ bool ChangeMapByName(const char *name)
 	GetState()->saveData->blueCoins = 0;
 	Map *map = CreateMap();
 	ChangeMap(map);
-	if (!LoadMap(map, DecompressAsset(mapPath, false)))
+	if (!LoadMap(map, DecompressAsset(mapPath, false, false)))
 	{
 		return false;
 	}

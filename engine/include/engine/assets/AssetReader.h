@@ -6,9 +6,11 @@
 #define GAME_ASSETREADER_H
 
 #include <engine/structs/Asset.h>
+#include <engine/structs/List.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #define ASSET_FORMAT_VERSION 2
 #define ASSET_FORMAT_MAGIC 0x454D4147
@@ -40,11 +42,6 @@
 	}
 
 /**
- * Set the base path that assets will be loaded from
- */
-void SetAssetsPath(const char *newPath);
-
-/**
  * Initialize the asset cache
  */
 void AssetCacheInit();
@@ -55,15 +52,25 @@ void AssetCacheInit();
  */
 void DestroyAssetCache();
 
+void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension);
+
+/**
+ * Create an asset directly from a file handle. This does NOT cache the asset, as it has no associated path.
+ * @param file The file to create the asset from
+ * @return A pointer to an Asset, or NULL on failure
+ */
+Asset *CreateAssetFromFile(FILE *file);
+
 /**
  * Decompress an asset and cache it
  * @param relPath The asset to decompress
  * @param cache Whether the asset should be cached
+ * @param isCodeAsset Whether the asset is considered code, when true it will not search asset paths without @c ASSET_PATH_ALLOW_CODE_EXECUTION set
  * @return Decompressed asset, including header
  * @warning If the asset is not cached, you will have to pass it to @c FreeAsset. Otherwise,
  * it is kept around until program exit and automatically freed.
  */
-Asset *DecompressAsset(const char *relPath, bool cache);
+Asset *DecompressAsset(const char *relPath, bool cache, bool isCodeAsset);
 
 /**
  * Remove an asset from the cache
@@ -71,6 +78,8 @@ Asset *DecompressAsset(const char *relPath, bool cache);
  * @note Any pointers to this asset will become invalid.
  */
 void RemoveAssetFromCache(const char *relPath);
+
+void HotReloadAssets();
 
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")
 #define SOUND(assetName) ("sound/" assetName ".gsnd")

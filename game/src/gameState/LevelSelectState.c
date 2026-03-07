@@ -4,6 +4,7 @@
 
 #include "gameState/LevelSelectState.h"
 #include <dirent.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -17,6 +18,9 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/SoundSystem.h>
+#include <gameState/LoadingState.h>
+#include <gameState/MenuState.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -24,8 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gameState/LoadingState.h"
-#include "gameState/MenuState.h"
 
 int selectedLevel = 0;
 List levelList;
@@ -94,32 +96,7 @@ void LevelSelectStateRender(GlobalState * /*state*/)
 void LoadLevelList()
 {
 	ListInit(levelList, LIST_POINTER);
-	char levelDataPath[300];
-	sprintf(levelDataPath, "%sassets/map/", GetState()->executableFolder);
-
-	// Get the name of all gmap files in the level directory
-	DIR *dir = opendir(levelDataPath);
-	if (dir == NULL)
-	{
-		LogError("Failed to open level directory: %s\n", levelDataPath);
-		return;
-	}
-
-	const struct dirent *ent = readdir(dir);
-	while (ent != NULL)
-	{
-		if (strstr(ent->d_name, ".gmap") != NULL)
-		{
-			char *levelName = malloc(strlen(ent->d_name) + 1);
-			CheckAlloc(levelName);
-			strcpy(levelName, ent->d_name);
-			// Remove the .gmap extension
-			levelName[strlen(levelName) - 5] = '\0';
-			ListAdd(levelList, levelName);
-		}
-		ent = readdir(dir);
-	}
-	closedir(dir);
+	EnumerateAssetsInFolder("map", &levelList, ".gmap");
 }
 
 void LevelSelectStateSet()

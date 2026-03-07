@@ -69,8 +69,8 @@ void ButtonInit(Actor *this, const KvList params, Transform *transform)
 	CreateButtonCollider(this, transform, shape);
 	ButtonData *data = malloc(sizeof(ButtonData));
 	this->extraData = data;
-	data->offSkin = KvGetUint64(params, "off_skin", 0);
-	data->onSkin = KvGetUint64(params, "on_skin", 1);
+	data->offSkin = KvGetInt(params, "off_skin", 0);
+	data->onSkin = KvGetInt(params, "on_skin", 1);
 	data->pressed = KvGetBool(params, "start_pressed", false);
 	data->resetDelay = KvGetInt(params, "reset_delay_ms", -1);
 	if (data->pressed && data->resetDelay != -1)

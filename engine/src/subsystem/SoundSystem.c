@@ -263,7 +263,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	{
 		return NULL;
 	}
-	const Asset *wav = DecompressAsset(request->soundAsset, true);
+	const Asset *wav = DecompressAsset(request->soundAsset, true, false);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");
@@ -349,5 +349,17 @@ inline void StopSound(const SoundChannel *effect)
 	if (!MIX_StopTrack(effect->track, 0)) // TODO argument for fade_out_frames?
 	{
 		LogError("MIX_StopTrack failed: %s", SDL_GetError());
+	}
+}
+
+void StopAllSounds()
+{
+	for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
+	{
+		const SoundChannel *channel = soundSys.channels[i];
+		if (channel)
+		{
+			StopSound(channel);
+		}
 	}
 }

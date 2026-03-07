@@ -207,6 +207,12 @@ bool GL_FrameStart()
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 	}
 
+	if ((rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_MODELS) != 0)
+	{
+		GL_DestroyAllModels();
+		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
 	return true;

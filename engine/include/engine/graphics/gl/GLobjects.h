@@ -199,4 +199,6 @@ void GL_DestroyObjects();
 
 void GL_DeleteAllTextures();
 
+void GL_DestroyAllModels();
+
 #endif //GAME_GLOBJECTS_H

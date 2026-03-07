@@ -5,6 +5,7 @@
 #include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/gl/GLframe.h>
 #include <engine/graphics/gl/GLinit.h>
@@ -170,6 +171,12 @@ void RenderDestroy()
 
 bool FrameStart()
 {
+	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
+	{
+		HotReloadAssets();
+		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	}
+
 	switch (currentRenderer)
 	{
 		case RENDERER_VULKAN:

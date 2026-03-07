@@ -33,6 +33,7 @@
 typedef enum ParamType ParamType;
 
 typedef struct Param Param;
+typedef struct ParamArray ParamArray;
 
 enum ParamType
 {
@@ -50,6 +51,12 @@ enum ParamType
 	PARAM_TYPE_VEC3
 };
 
+struct ParamArray
+{
+	size_t length;
+	Param *data;
+};
+
 struct Param
 {
 	/// The type contained in this param
@@ -63,11 +70,7 @@ struct Param
 		char *stringValue;
 		Color colorValue;
 		struct KvList_s *kvListValue;
-		struct
-		{
-			size_t length;
-			Param *data;
-		} arrayValue;
+		ParamArray arrayValue;
 		uint64_t uint64value;
 		Vector2 vec2value;
 		Vector3 vec3value;
@@ -210,6 +213,8 @@ Color KvGetColor(const KvList list, const char *key, Color defaultValue);
 
 uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
 
+ParamArray *KvGetArray(const KvList list, const char *key);
+
 Vector2 KvGetVec2(const KvList list, const char *key, Vector2 defaultValue);
 
 Vector3 KvGetVec3(const KvList list, const char *key, Vector3 defaultValue);
@@ -267,6 +272,8 @@ void KvSetString(KvList list, const char *key, const char *value);
 void KvSetColor(KvList list, const char *key, Color value);
 
 void KvSetUint64(KvList list, const char *key, uint64_t value);
+
+void KvSetParamArray(KvList list, const char *key, const ParamArray array);
 
 void KvSetVec2(KvList list, const char *key, Vector2 value);
 

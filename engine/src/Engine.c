@@ -215,7 +215,14 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitArguments(argc, argv);
 
-	LoadGameConfig();
+	if (HasCliArg("--game"))
+	{
+		const char *game = GetCliArgStr("--game", "assets/game");
+		LoadGameConfig(game);
+	} else
+	{
+		LoadGameConfig("assets/game");
+	}
 
 	InitOptions();
 
@@ -364,6 +371,7 @@ void DestroyEngine()
 	SDL_DestroySurface(windowIcon);
 	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
+	DestroyGameConfig();
 	LogDebug("Cleaning up SDL...\n");
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();
