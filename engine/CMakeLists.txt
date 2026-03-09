@@ -19,7 +19,7 @@ fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
 
 disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
         SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK)
-fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git prerelease-3.*.* SDL3_mixer)
+fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git release-3.*.* SDL3_mixer)
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
