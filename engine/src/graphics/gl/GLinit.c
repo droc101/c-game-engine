@@ -50,6 +50,10 @@ bool GL_PreInit()
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+#ifdef BUILDSTYLE_DEBUG
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#endif
+
 
 	return true;
 }
@@ -78,7 +82,6 @@ bool GL_Init(SDL_Window *wnd)
 		return false;
 	}
 
-	// Ensure we have GL 3.3 or higher
 	if (!GL_VERSION_CHECK)
 	{
 		SDL_GL_DestroyContext(ctx);
@@ -95,8 +98,18 @@ bool GL_Init(SDL_Window *wnd)
 	GL_UpdateAnisotropyLevel();
 
 #ifdef BUILDSTYLE_DEBUG
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(GL_DebugMessageCallback, NULL);
+	int glContextFlags = 0;
+	glGetIntegerv(GL_CONTEXT_FLAGS, &glContextFlags);
+	if (glContextFlags & GL_CONTEXT_FLAG_DEBUG_BIT)
+	{
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(GL_DebugMessageCallback, NULL);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+	} else
+	{
+		LogWarning("OpenGL debugging was not enabled as GL_CONTEXT_FLAG_DEBUG_BIT didn't get set\n");
+	}
 
 	int redSize = 0;
 	int greenSize = 0;

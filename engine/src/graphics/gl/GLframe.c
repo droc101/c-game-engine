@@ -16,9 +16,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define GL_COLOR_INTERNAL_FORMAT GL_RGB8
-#define GL_COLOR_FORMAT GL_RGB
-#define GL_COLOR_TYPE GL_UNSIGNED_BYTE
+#define GL_COLOR_INTERNAL_FORMAT GL_RGBA16F
+#define GL_COLOR_FORMAT GL_RGBA
+#define GL_COLOR_TYPE GL_FLOAT
 #define GL_DEPTH_FORMAT GL_DEPTH24_STENCIL8
 
 GLuint frameBufferObject;
