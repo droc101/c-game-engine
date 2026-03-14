@@ -2,9 +2,8 @@
   "description": "An arbitrary 2D sprite",
   "extends": "actor",
   "display": {
-    "color": -1,
-    "color_param": "color",
-    "texture_param": "texture"
+    "color": "$color",
+    "texture": "$texture"
   },
   "params": {
     "size": {

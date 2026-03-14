@@ -2,8 +2,7 @@
   "extends": "actor",
   "description": "Button that can be pressed with the use key",
   "display": {
-    "type": "model",
-    "model_param": "model"
+    "model": "$model"
   },
   "outputs": {
     "pressed": {

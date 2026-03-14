@@ -2,8 +2,8 @@
   "extends": "actor",
   "description": "An arbitrary model with physics",
   "display": {
-    "model_param": "model",
-    "color_param": "color"
+    "model": "$model",
+    "color": "$color"
   },
   "inputs": {
     "set_color": {

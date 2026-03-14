@@ -2,7 +2,6 @@
   "extends": "actor",
   "description": "Actor used for engine testing. Subject to change.",
   "display": {
-    "type": "model",
     "model": "model/leafy.gmdl"
   }
 }

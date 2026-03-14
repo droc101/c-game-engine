@@ -2,7 +2,6 @@
   "description": "A physics-enabled box the player can pick up",
   "extends": "actor",
   "display": {
-    "type": "model",
     "model": "model/cube.gmdl"
   }
 }
