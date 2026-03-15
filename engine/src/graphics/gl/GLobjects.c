@@ -58,19 +58,13 @@ void GL_UpdateAnisotropyLevel()
 				return;
 		}
 		GLfloat gpuMaxAnisotropy = 0;
-		if (GLEW_EXT_texture_filter_anisotropic)
-		{
-			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &gpuMaxAnisotropy);
-		} else
-		{
-			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
-		}
-		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &gpuMaxAnisotropy);
+		// LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY=%f\n", gpuMaxAnisotropy);
 		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
 		if (requestedAnisotropy != anisotropyLevel)
 		{
 			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
-					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
+					   "GL_MAX_TEXTURE_MAX_ANISOTROPY=%f\n",
 					   anisotropyLevel,
 					   requestedAnisotropy,
 					   gpuMaxAnisotropy);
@@ -229,10 +223,10 @@ int GL_RegisterTexture(const Image *image)
 	{
 		if (anisotropyLevel != 0 && image->filter)
 		{
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropyLevel);
 		} else
 		{
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.0f);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 		}
 
 		if (image->filter)
