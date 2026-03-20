@@ -658,12 +658,14 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 
 inline void GL_Enable3D(void)
 {
+	GL_Begin3DPass();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 }
 
 inline void GL_Disable3D()
 {
+	GL_End3DPass();
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_MULTISAMPLE);
 }

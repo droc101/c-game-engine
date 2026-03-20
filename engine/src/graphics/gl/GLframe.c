@@ -16,14 +16,21 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define GL_COLOR_INTERNAL_FORMAT GL_RGBA16F
-#define GL_COLOR_FORMAT GL_RGBA
-#define GL_COLOR_TYPE GL_FLOAT
-#define GL_DEPTH_FORMAT GL_DEPTH24_STENCIL8
+#define GL_WORLD_FRAMEBUFFER_COLOR_INTERNAL_FORMAT GL_RGBA16F
+#define GL_WORLD_FRAMEBUFFER_COLOR_FORMAT GL_RGBA
+#define GL_WORLD_FRAMEBUFFER_COLOR_TYPE GL_FLOAT
+#define GL_WORLD_FRAMEBUFFER_DEPTH_FORMAT GL_DEPTH24_STENCIL8
 
-GLuint frameBufferObject;
-GLuint renderBufferObject;
-GLuint framebufferColorTexture;
+#define GL_UI_FRAMEBUFFER_COLOR_INTERNAL_FORMAT GL_RGBA8
+#define GL_UI_FRAMEBUFFER_COLOR_FORMAT GL_RGBA
+#define GL_UI_FRAMEBUFFER_COLOR_TYPE GL_UNSIGNED_BYTE
+
+GLuint worldFrameBufferObject;
+GLuint worldRenderBufferObject;
+GLuint worldFramebufferColorTexture;
+
+GLuint uiFrameBufferObject;
+GLuint uiFramebufferColorTexture;
 
 int GetActualMsaaSamples(const OptionsMsaa requested)
 {
@@ -74,19 +81,19 @@ bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
 {
 	glMsaaSamples = GetActualMsaaSamples(msaaSamples);
 
-	glGenFramebuffers(1, &frameBufferObject);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
-	glGenRenderbuffers(1, &renderBufferObject);
-	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
+	glGenFramebuffers(1, &worldFrameBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, worldFrameBufferObject);
+	glGenRenderbuffers(1, &worldRenderBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, worldRenderBufferObject);
 
-	glGenTextures(1, &framebufferColorTexture);
+	glGenTextures(1, &worldFramebufferColorTexture);
 	if (glMsaaSamples != 0)
 	{
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferColorTexture);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, worldFramebufferColorTexture);
 
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 								glMsaaSamples,
-								GL_COLOR_INTERNAL_FORMAT,
+								GL_WORLD_FRAMEBUFFER_COLOR_INTERNAL_FORMAT,
 								DEF_WIDTH,
 								DEF_HEIGHT,
 								GL_TRUE);
@@ -97,23 +104,30 @@ bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
 		glFramebufferTexture2D(GL_FRAMEBUFFER,
 							   GL_COLOR_ATTACHMENT0,
 							   GL_TEXTURE_2D_MULTISAMPLE,
-							   framebufferColorTexture,
+							   worldFramebufferColorTexture,
 							   0);
 
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, glMsaaSamples, GL_DEPTH_FORMAT, DEF_WIDTH, DEF_WIDTH);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferObject);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+										 glMsaaSamples,
+										 GL_WORLD_FRAMEBUFFER_DEPTH_FORMAT,
+										 DEF_WIDTH,
+										 DEF_WIDTH);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+								  GL_DEPTH_STENCIL_ATTACHMENT,
+								  GL_RENDERBUFFER,
+								  worldRenderBufferObject);
 	} else
 	{
-		glBindTexture(GL_TEXTURE_2D, framebufferColorTexture);
+		glBindTexture(GL_TEXTURE_2D, worldFramebufferColorTexture);
 
 		glTexImage2D(GL_TEXTURE_2D,
 					 0,
-					 GL_COLOR_INTERNAL_FORMAT,
+					 GL_WORLD_FRAMEBUFFER_COLOR_INTERNAL_FORMAT,
 					 DEF_WIDTH,
 					 DEF_HEIGHT,
 					 0,
-					 GL_COLOR_FORMAT,
-					 GL_COLOR_TYPE,
+					 GL_WORLD_FRAMEBUFFER_COLOR_FORMAT,
+					 GL_WORLD_FRAMEBUFFER_COLOR_TYPE,
 					 NULL);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -121,17 +135,19 @@ bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferColorTexture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, worldFramebufferColorTexture, 0);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, DEF_WIDTH, DEF_WIDTH);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferObject);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_WORLD_FRAMEBUFFER_DEPTH_FORMAT, DEF_WIDTH, DEF_WIDTH);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+								  GL_DEPTH_STENCIL_ATTACHMENT,
+								  GL_RENDERBUFFER,
+								  worldRenderBufferObject);
 	}
 
-
-	const GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (frameBufferStatus != GL_FRAMEBUFFER_COMPLETE)
+	const GLenum worldFrameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (worldFrameBufferStatus != GL_FRAMEBUFFER_COMPLETE)
 	{
-		LogError("OpenGL framebuffer is incomplete, status is %u\n", frameBufferStatus);
+		LogError("OpenGL world framebuffer is incomplete, status is %u\n", worldFrameBufferStatus);
 		return false;
 	}
 
@@ -166,7 +182,7 @@ bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
 										  GL_DEPTH_ATTACHMENT,
 										  GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
 										  &stencilSize);
-	LogDebug("Internal Framebuffer: R:%d G:%d B:%d A:%d D:%d S:%d\n",
+	LogDebug("Internal World Framebuffer: R:%d G:%d B:%d A:%d D:%d S:%d\n",
 			 redSize,
 			 greenSize,
 			 blueSize,
@@ -174,6 +190,37 @@ bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
 			 depthSize,
 			 stencilSize);
 #endif
+
+	glGenFramebuffers(1, &uiFrameBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
+
+	glGenTextures(1, &uiFramebufferColorTexture);
+	glBindTexture(GL_TEXTURE_2D, uiFramebufferColorTexture);
+
+	glTexImage2D(GL_TEXTURE_2D,
+				 0,
+				 GL_UI_FRAMEBUFFER_COLOR_INTERNAL_FORMAT,
+				 DEF_WIDTH,
+				 DEF_HEIGHT,
+				 0,
+				 GL_UI_FRAMEBUFFER_COLOR_FORMAT,
+				 GL_UI_FRAMEBUFFER_COLOR_TYPE,
+				 NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, uiFramebufferColorTexture, 0);
+
+	const GLenum uiFrameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (uiFrameBufferStatus != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LogError("OpenGL world framebuffer is incomplete, status is %u\n", uiFrameBufferStatus);
+		return false;
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
@@ -183,9 +230,9 @@ bool GL_InitFramebuffer(const OptionsMsaa msaaSamples)
 
 void GL_DestroyFramebuffer()
 {
-	glDeleteFramebuffers(1, &frameBufferObject);
-	glDeleteRenderbuffers(1, &renderBufferObject);
-	glDeleteTextures(1, &framebufferColorTexture);
+	glDeleteFramebuffers(1, &worldFrameBufferObject);
+	glDeleteRenderbuffers(1, &worldRenderBufferObject);
+	glDeleteTextures(1, &worldFramebufferColorTexture);
 }
 
 bool GL_FrameStart()
@@ -213,8 +260,8 @@ bool GL_FrameStart()
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
-	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
 	return true;
 }
 
@@ -231,7 +278,7 @@ inline void GL_ClearDepthOnly()
 inline void GL_FrameEnd()
 {
 	const Vector2 wndSize = ActualWindowSizeIgnoreDPI();
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBufferObject);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, uiFrameBufferObject);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_NONE);
 	glBlitFramebuffer(0,
 					  0,
@@ -253,38 +300,85 @@ inline void GL_UpdateViewportSize()
 	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
 
 	GLint boundRbo = GL_NONE;
+	GLint boundFbo = GL_NONE;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &boundFbo);
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &boundRbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, worldFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, worldRenderBufferObject);
 
 	if (glMsaaSamples != 0)
 	{
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferColorTexture);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, worldFramebufferColorTexture);
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 								glMsaaSamples,
-								GL_COLOR_INTERNAL_FORMAT,
+								GL_WORLD_FRAMEBUFFER_COLOR_INTERNAL_FORMAT,
 								(GLsizei)windowSize.x,
 								(GLsizei)windowSize.y,
 								GL_TRUE);
 
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 										 glMsaaSamples,
-										 GL_DEPTH_FORMAT,
+										 GL_WORLD_FRAMEBUFFER_DEPTH_FORMAT,
 										 (GLsizei)windowSize.x,
 										 (GLsizei)windowSize.y);
 	} else
 	{
-		glBindTexture(GL_TEXTURE_2D, framebufferColorTexture);
+		glBindTexture(GL_TEXTURE_2D, worldFramebufferColorTexture);
 		glTexImage2D(GL_TEXTURE_2D,
 					 0,
-					 GL_COLOR_INTERNAL_FORMAT,
+					 GL_WORLD_FRAMEBUFFER_COLOR_INTERNAL_FORMAT,
 					 (GLsizei)windowSize.x,
 					 (GLsizei)windowSize.y,
 					 0,
-					 GL_COLOR_FORMAT,
-					 GL_COLOR_TYPE,
+					 GL_WORLD_FRAMEBUFFER_COLOR_FORMAT,
+					 GL_WORLD_FRAMEBUFFER_COLOR_TYPE,
 					 NULL);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_FORMAT, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
+		glRenderbufferStorage(GL_RENDERBUFFER,
+							  GL_WORLD_FRAMEBUFFER_DEPTH_FORMAT,
+							  (GLsizei)windowSize.x,
+							  (GLsizei)windowSize.y);
 	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
+
+	glBindTexture(GL_TEXTURE_2D, uiFramebufferColorTexture);
+	glTexImage2D(GL_TEXTURE_2D,
+				 0,
+				 GL_UI_FRAMEBUFFER_COLOR_INTERNAL_FORMAT,
+				 (GLsizei)windowSize.x,
+				 (GLsizei)windowSize.y,
+				 0,
+				 GL_UI_FRAMEBUFFER_COLOR_FORMAT,
+				 GL_UI_FRAMEBUFFER_COLOR_TYPE,
+				 NULL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, boundFbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, boundRbo);
+}
+
+void GL_Begin3DPass()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, worldFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, worldRenderBufferObject);
+}
+
+void GL_End3DPass()
+{
+	const Vector2 wndSize = ActualWindowSizeIgnoreDPI();
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, worldFrameBufferObject);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, uiFrameBufferObject);
+	glBlitFramebuffer(0,
+					  0,
+					  (GLint)wndSize.x,
+					  (GLint)wndSize.y,
+					  0,
+					  0,
+					  (GLint)wndSize.x,
+					  (GLint)wndSize.y,
+					  GL_COLOR_BUFFER_BIT,
+					  GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
 }

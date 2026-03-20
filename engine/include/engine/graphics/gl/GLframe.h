@@ -65,4 +65,8 @@ void GL_UpdateViewportSize();
  */
 #define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
 
+void GL_Begin3DPass();
+
+void GL_End3DPass();
+
 #endif //GAME_GLFRAME_H
