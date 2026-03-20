@@ -15,9 +15,11 @@ GL_Shader *uiColoredShader;
 GL_Shader *actorWallShadedShader;
 GL_Shader *actorWallUnshadedShader;
 GL_Shader *skyShader;
-GL_Shader *modelUnshadedShader;
-GL_Shader *modelShadedShader;
+GL_Shader *actorUnshadedShader;
+GL_Shader *actorShadedShader;
 GL_Shader *debugShader;
+GL_Shader *mapShadedShader;
+GL_Shader *mapUnshadedShader;
 
 GLint uiColoredColorLoc;
 GLint uiColoredVertexLoc;
@@ -55,44 +57,62 @@ GLint skyVertexLoc;
 GLint skyUvLoc;
 GLint skyColorLoc;
 
-GLint shadedModelSharedUniformsLoc;
-GLint shadedModelModelWorldMatrixLoc;
-GLint shadedModelAlbColorLoc;
-GLint shadedModelModColorLoc;
-GLint shadedModelVertexLoc;
-GLint shadedModelUvLoc;
-GLint shadedModelNormalLoc;
-GLint shadedModelColorLoc;
+GLint shadedActorModelSharedUniformsLoc;
+GLint shadedActorModelModelWorldMatrixLoc;
+GLint shadedActorModelAlbColorLoc;
+GLint shadedActorModelModColorLoc;
+GLint shadedActorModelVertexLoc;
+GLint shadedActorModelUvLoc;
+GLint shadedActorModelNormalLoc;
+GLint shadedActorModelColorLoc;
 
-GLint unshadedModelSharedUniformsLoc;
-GLint unshadedModelModelWorldMatrixLoc;
-GLint unshadedModelAlbColorLoc;
-GLint unshadedModelModColorLoc;
-GLint unshadedModelVertexLoc;
-GLint unshadedModelUvLoc;
-GLint unshadedModelColorLoc;
+GLint unshadedActorModelSharedUniformsLoc;
+GLint unshadedActorModelModelWorldMatrixLoc;
+GLint unshadedActorModelAlbColorLoc;
+GLint unshadedActorModelModColorLoc;
+GLint unshadedActorModelVertexLoc;
+GLint unshadedActorModelUvLoc;
+GLint unshadedActorModelColorLoc;
+
+GLint shadedMapModelSharedUniformsLoc;
+GLint shadedMapModelModelWorldMatrixLoc;
+GLint shadedMapModelLightmapLoc;
+GLint shadedMapModelVertexLoc;
+GLint shadedMapModelUvLoc;
+GLint shadedMapModelUv2Loc;
+
+GLint unshadedMapModelSharedUniformsLoc;
+GLint unshadedMapModelModelWorldMatrixLoc;
+GLint unshadedMapModelVertexLoc;
+GLint unshadedMapModelUvLoc;
 
 bool GL_LoadShaders()
 {
-	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_textured_f"), SHADER("gl/hud_textured_v"));
-	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud_color_f"), SHADER("gl/hud_color_v"));
-	actorWallShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor_wall_shaded_f"),
-														 SHADER("gl/actor_wall_shaded_v"));
-	actorWallUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor_wall_unshaded_f"),
-														   SHADER("gl/actor_wall_unshaded_v"));
-	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/sky_f"), SHADER("gl/sky_v"));
-	modelShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_shaded_f"), SHADER("gl/model_shaded_v"));
-	modelUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/model_unshaded_f"), SHADER("gl/model_unshaded_v"));
+	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/textured_f"), SHADER("gl/hud/textured_v"));
+	uiColoredShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/colored_f"), SHADER("gl/hud/colored_v"));
+	actorWallShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor/wall_shaded_f"),
+														 SHADER("gl/actor/wall_shaded_v"));
+	actorWallUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor/wall_unshaded_f"),
+														   SHADER("gl/actor/wall_unshaded_v"));
+	skyShader = GL_ConstructShaderFromAssets(SHADER("gl/map/sky_f"), SHADER("gl/map/sky_v"));
+	actorShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor/actor_shaded_f"),
+													 SHADER("gl/actor/actor_shaded_v"));
+	actorUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/actor/actor_unshaded_f"),
+													   SHADER("gl/actor/actor_unshaded_v"));
 	debugShader = GL_ConstructShaderFromAssets(SHADER("gl/debug_f"), SHADER("gl/debug_v"));
+	mapShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/map/map_shaded_f"), SHADER("gl/map/map_shaded_v"));
+	mapUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/map/map_unshaded_f"), SHADER("gl/map/map_unshaded_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
 		!actorWallShadedShader ||
 		!actorWallUnshadedShader ||
 		!skyShader ||
-		!modelShadedShader ||
-		!modelUnshadedShader ||
-		!debugShader)
+		!actorShadedShader ||
+		!actorUnshadedShader ||
+		!debugShader ||
+		!mapShadedShader ||
+		!mapUnshadedShader)
 	{
 		LogError("OpenGL: Failed to compile shaders");
 		return false;
@@ -134,22 +154,34 @@ bool GL_LoadShaders()
 	skyUvLoc = glGetAttribLocation(skyShader->program, "VERTEX_UV");
 	skyColorLoc = glGetAttribLocation(skyShader->program, "VERTEX_COLOR");
 
-	shadedModelSharedUniformsLoc = glGetUniformBlockIndex(modelShadedShader->program, "SharedUniforms");
-	shadedModelModelWorldMatrixLoc = glGetUniformLocation(modelShadedShader->program, "MODEL_WORLD_MATRIX");
-	shadedModelAlbColorLoc = glGetUniformLocation(modelShadedShader->program, "albColor");
-	shadedModelModColorLoc = glGetUniformLocation(modelShadedShader->program, "modColor");
-	shadedModelVertexLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX");
-	shadedModelUvLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX_UV");
-	shadedModelNormalLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX_NORMAL");
-	shadedModelColorLoc = glGetAttribLocation(modelShadedShader->program, "VERTEX_COLOR");
+	shadedActorModelSharedUniformsLoc = glGetUniformBlockIndex(actorShadedShader->program, "SharedUniforms");
+	shadedActorModelModelWorldMatrixLoc = glGetUniformLocation(actorShadedShader->program, "MODEL_WORLD_MATRIX");
+	shadedActorModelAlbColorLoc = glGetUniformLocation(actorShadedShader->program, "albColor");
+	shadedActorModelModColorLoc = glGetUniformLocation(actorShadedShader->program, "modColor");
+	shadedActorModelVertexLoc = glGetAttribLocation(actorShadedShader->program, "VERTEX");
+	shadedActorModelUvLoc = glGetAttribLocation(actorShadedShader->program, "VERTEX_UV");
+	shadedActorModelNormalLoc = glGetAttribLocation(actorShadedShader->program, "VERTEX_NORMAL");
+	shadedActorModelColorLoc = glGetAttribLocation(actorShadedShader->program, "VERTEX_COLOR");
 
-	unshadedModelSharedUniformsLoc = glGetUniformBlockIndex(modelUnshadedShader->program, "SharedUniforms");
-	unshadedModelModelWorldMatrixLoc = glGetUniformLocation(modelUnshadedShader->program, "MODEL_WORLD_MATRIX");
-	unshadedModelAlbColorLoc = glGetUniformLocation(modelUnshadedShader->program, "albColor");
-	unshadedModelModColorLoc = glGetUniformLocation(modelUnshadedShader->program, "modColor");
-	unshadedModelVertexLoc = glGetAttribLocation(modelUnshadedShader->program, "VERTEX");
-	unshadedModelUvLoc = glGetAttribLocation(modelUnshadedShader->program, "VERTEX_UV");
-	unshadedModelColorLoc = glGetAttribLocation(modelUnshadedShader->program, "VERTEX_COLOR");
+	unshadedActorModelSharedUniformsLoc = glGetUniformBlockIndex(actorUnshadedShader->program, "SharedUniforms");
+	unshadedActorModelModelWorldMatrixLoc = glGetUniformLocation(actorUnshadedShader->program, "MODEL_WORLD_MATRIX");
+	unshadedActorModelAlbColorLoc = glGetUniformLocation(actorUnshadedShader->program, "albColor");
+	unshadedActorModelModColorLoc = glGetUniformLocation(actorUnshadedShader->program, "modColor");
+	unshadedActorModelVertexLoc = glGetAttribLocation(actorUnshadedShader->program, "VERTEX");
+	unshadedActorModelUvLoc = glGetAttribLocation(actorUnshadedShader->program, "VERTEX_UV");
+	unshadedActorModelColorLoc = glGetAttribLocation(actorUnshadedShader->program, "VERTEX_COLOR");
+
+	shadedMapModelSharedUniformsLoc = glGetUniformBlockIndex(mapShadedShader->program, "SharedUniforms");
+	shadedMapModelModelWorldMatrixLoc = glGetUniformLocation(mapShadedShader->program, "MODEL_WORLD_MATRIX");
+	shadedMapModelLightmapLoc = glGetUniformLocation(mapShadedShader->program, "lightmap");
+	shadedMapModelVertexLoc = glGetAttribLocation(mapShadedShader->program, "VERTEX");
+	shadedMapModelUvLoc = glGetAttribLocation(mapShadedShader->program, "VERTEX_UV");
+	shadedMapModelUv2Loc = glGetAttribLocation(mapShadedShader->program, "VERTEX_LIGHTMAP_UV");
+
+	unshadedMapModelSharedUniformsLoc = glGetUniformBlockIndex(mapUnshadedShader->program, "SharedUniforms");
+	unshadedMapModelModelWorldMatrixLoc = glGetUniformLocation(mapUnshadedShader->program, "MODEL_WORLD_MATRIX");
+	unshadedMapModelVertexLoc = glGetAttribLocation(mapUnshadedShader->program, "VERTEX");
+	unshadedMapModelUvLoc = glGetAttribLocation(mapUnshadedShader->program, "VERTEX_UV");
 
 	return true;
 }
@@ -161,8 +193,10 @@ void GL_DestroyShaders()
 	GL_DestroyShader(actorWallShadedShader);
 	GL_DestroyShader(actorWallUnshadedShader);
 	GL_DestroyShader(skyShader);
-	GL_DestroyShader(modelShadedShader);
-	GL_DestroyShader(modelUnshadedShader);
+	GL_DestroyShader(actorShadedShader);
+	GL_DestroyShader(actorUnshadedShader);
+	GL_DestroyShader(mapShadedShader);
+	GL_DestroyShader(mapUnshadedShader);
 	GL_DestroyShader(debugShader);
 	glUseProgram(0);
 	glDisableVertexAttribArray(0);

@@ -208,7 +208,6 @@ int GL_RegisterTexture(const Image *image)
 	const int slot = glNextFreeSlot;
 
 	glGenTextures(1, &glTextures[slot]);
-	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
 	glTexImage2D(GL_TEXTURE_2D,
 				 0,

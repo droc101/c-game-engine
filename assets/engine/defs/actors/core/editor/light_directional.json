@@ -1,0 +1,7 @@
+{
+  "description": "Directional (sun) light",
+  "extends": "light",
+  "display": {
+    "color": "$color"
+  }
+}

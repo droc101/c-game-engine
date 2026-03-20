@@ -81,6 +81,8 @@ void DestroyMap(Map *map)
 	free(map->discordRpcIcon);
 	free(map->discordRpcName);
 
+	free(map->lightmapPixels);
+
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
 	for (size_t i = 0; i < map->joltBodies.length; i++)

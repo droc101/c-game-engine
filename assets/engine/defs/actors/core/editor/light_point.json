@@ -1,0 +1,23 @@
+{
+  "description": "Point light",
+  "extends": "light",
+  "display": {
+    "color": "$color",
+    "directional": false
+  },
+  "params": {
+    "range": {
+      "display": "Light Range",
+      "type": "float",
+      "default": 2.0,
+      "minimum": 0.0,
+      "description": "The radius of the light cast by this point light"
+    },
+    "attenuation": {
+      "display": "Attenuation Factor",
+      "type": "float",
+      "default": 2.0,
+      "minimum": 0.0
+    }
+  }
+}

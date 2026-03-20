@@ -1,0 +1,22 @@
+{
+  "description": "Spotlight",
+  "extends": "light_point",
+  "display": {
+    "color": "$color"
+  },
+  "params": {
+    "angle": {
+      "display": "Spotlight Angle",
+      "type": "float",
+      "default": 45.0,
+      "minimum": 0.0,
+      "maximum": 180.0
+    },
+    "angle_attenuation": {
+      "display": "Angular Attenuation Factor",
+      "type": "float",
+      "default": 2.0,
+      "minimum": 0.0
+    }
+  }
+}

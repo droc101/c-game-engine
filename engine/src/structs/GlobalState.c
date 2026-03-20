@@ -200,6 +200,7 @@ bool ChangeMapByName(const char *name)
 	ChangeMap(map);
 	if (!LoadMap(map, DecompressAsset(mapPath, false, false)))
 	{
+		ChangeMap(NULL);
 		return false;
 	}
 	DiscordUpdateRPC();

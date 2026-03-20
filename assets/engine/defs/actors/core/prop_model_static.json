@@ -2,7 +2,8 @@
   "description": "An arbitrary model that cannot move or change in any way.",
   "display": {
     "model": "$model",
-    "color": "$color"
+    "color": "$color",
+    "affect_lightmap": "$affect_lightmap"
   },
   "params": {
     "model": {
@@ -31,6 +32,12 @@
       "default": "Full Collision",
       "type": "byte",
       "options": "static_collision_type"
+    },
+    "affect_lightmap": {
+      "display": "Affect lightmap",
+      "description": "Whether this model should affect the baked lightmap, such as by casting shadows",
+      "type": "bool",
+      "default": true
     }
   }
 }

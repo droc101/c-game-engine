@@ -38,10 +38,8 @@ struct MapVertex
 	Vector3 position;
 	/// The UV coordinate
 	Vector2 uv;
-	/// The vertex color
-	Color color;
-	/// The vertex normal
-	Vector3 normal;
+	/// The Lightmap UV coordiante
+	Vector2 lightmapUv;
 };
 
 struct MapModel
@@ -109,6 +107,10 @@ struct Map
 
 	/// The view model
 	Viewmodel viewmodel;
+
+	size_t lightmapWidth;
+	size_t lightmapHeight;
+	void *lightmapPixels;
 };
 
 /**

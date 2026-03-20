@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+GLuint lightmap = 0;
+
 void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
 	const ActorWall *wall = actor->wall;
@@ -45,6 +47,7 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 	glUniform4fv(actorWallShadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(wall->tex);
 
 	const float halfHeight = wall->height / 2.0f;
@@ -165,6 +168,7 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 	glUniform4fv(actorWallUnshadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(wall->tex);
 
 	const float halfHeight = wall->height / 2.0f;
@@ -276,6 +280,8 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, lightmap);
 	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
 	{
 		if (mapModels[i] == NULL)
@@ -290,6 +296,8 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 			GL_RenderUnshadedMapModel(mapModels[i]);
 		}
 	}
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
@@ -372,39 +380,45 @@ void GL_RenderShadedModelPart(const ModelDefinition *model,
 							  Color modColor,
 							  const Material *mat)
 {
-	GL_UseShader(modelShadedShader);
+	GL_UseShader(actorShadedShader);
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(mat->texture);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedActorModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(shadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(shadedActorModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *modelWorldMatrix); // model -> world
-	glUniform4fv(shadedModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
-	glUniform4fv(shadedModelModColorLoc, 1, COLOR_TO_ARR(modColor));
+	glUniform4fv(shadedActorModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
+	glUniform4fv(shadedActorModelModColorLoc, 1, COLOR_TO_ARR(modColor));
 
 	GL_LoadModel(model, lod, materialIndex);
 
-	glVertexAttribPointer(shadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(shadedModelVertexLoc);
+	glVertexAttribPointer(shadedActorModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(shadedActorModelVertexLoc);
 
-	glVertexAttribPointer(shadedModelUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelUvLoc);
+	glVertexAttribPointer(shadedActorModelUvLoc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedActorModelUvLoc);
 
-	glVertexAttribPointer(shadedModelColorLoc,
+	glVertexAttribPointer(shadedActorModelColorLoc,
 						  4,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelColorLoc);
+	glEnableVertexAttribArray(shadedActorModelColorLoc);
 
-	glVertexAttribPointer(shadedModelNormalLoc,
+	glVertexAttribPointer(shadedActorModelNormalLoc,
 						  3,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(9 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelNormalLoc);
+	glEnableVertexAttribArray(shadedActorModelNormalLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
 }
@@ -416,36 +430,37 @@ void GL_RenderUnshadedModelPart(const ModelDefinition *model,
 								Color modColor,
 								const Material *mat)
 {
-	GL_UseShader(modelUnshadedShader);
+	GL_UseShader(actorUnshadedShader);
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(mat->texture);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedActorModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(unshadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(unshadedActorModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *modelWorldMatrix); // model -> world
-	glUniform4fv(unshadedModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
-	glUniform4fv(unshadedModelModColorLoc, 1, COLOR_TO_ARR(modColor));
+	glUniform4fv(unshadedActorModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
+	glUniform4fv(unshadedActorModelModColorLoc, 1, COLOR_TO_ARR(modColor));
 
 	GL_LoadModel(model, lod, materialIndex);
 
-	glVertexAttribPointer(unshadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(unshadedModelVertexLoc);
+	glVertexAttribPointer(unshadedActorModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(unshadedActorModelVertexLoc);
 
-	glVertexAttribPointer(unshadedModelUvLoc,
+	glVertexAttribPointer(unshadedActorModelUvLoc,
 						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelUvLoc);
+	glEnableVertexAttribArray(unshadedActorModelUvLoc);
 
-	glVertexAttribPointer(unshadedModelColorLoc,
+	glVertexAttribPointer(unshadedActorModelColorLoc,
 						  4,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelColorLoc);
+	glEnableVertexAttribArray(unshadedActorModelColorLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
 }
@@ -457,6 +472,7 @@ void GL_RenderSkyModelPart(const ModelDefinition *model,
 {
 	GL_UseShader(skyShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(GetState()->map->skyTexture);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, skySharedUniformsLoc, sharedUniformBuffer);
@@ -506,85 +522,69 @@ void GL_RenderModel(const ModelDefinition *model,
 
 void GL_RenderShadedMapModel(const GL_MapModelBuffer *model)
 {
-	GL_UseShader(modelShadedShader);
+	GL_UseShader(mapShadedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
+	glUniform1i(shadedMapModelLightmapLoc, 1);
 
 	const mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedMapModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(shadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(shadedMapModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *idty); // model -> world
 
 	GL_BindBuffer(model->buffer);
 
-	glVertexAttribPointer(shadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(shadedModelVertexLoc);
+	glVertexAttribPointer(shadedMapModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(shadedMapModelVertexLoc);
 
-	glVertexAttribPointer(shadedModelUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelUvLoc);
-
-	glVertexAttribPointer(shadedModelColorLoc,
-						  4,
+	glVertexAttribPointer(shadedMapModelUvLoc,
+						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  12 * sizeof(GLfloat),
+						  7 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedMapModelUvLoc);
+
+	glVertexAttribPointer(shadedMapModelUv2Loc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  7 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelColorLoc);
-
-	glVertexAttribPointer(shadedModelNormalLoc,
-						  3,
-						  GL_FLOAT,
-						  GL_FALSE,
-						  12 * sizeof(GLfloat),
-						  (void *)(9 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelNormalLoc);
-
-	glUniform4fv(shadedModelAlbColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
-
-	glUniform4fv(shadedModelModColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
+	glEnableVertexAttribArray(shadedMapModelUv2Loc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 {
-	GL_UseShader(modelUnshadedShader);
+	GL_UseShader(mapUnshadedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
 
 	const mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedMapModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(unshadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(unshadedMapModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *idty); // model -> world
 
 	GL_BindBuffer(model->buffer);
 
-	glVertexAttribPointer(unshadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(unshadedModelVertexLoc);
+	glVertexAttribPointer(unshadedMapModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(unshadedMapModelVertexLoc);
 
-	glVertexAttribPointer(unshadedModelUvLoc,
+	glVertexAttribPointer(unshadedMapModelUvLoc,
 						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  12 * sizeof(GLfloat),
+						  7 * sizeof(GLfloat),
 						  (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelUvLoc);
-
-	glVertexAttribPointer(unshadedModelColorLoc,
-						  4,
-						  GL_FLOAT,
-						  GL_FALSE,
-						  12 * sizeof(GLfloat),
-						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelColorLoc);
-
-	glUniform4fv(unshadedModelAlbColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
-
-	glUniform4fv(unshadedModelModColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
+	glEnableVertexAttribArray(unshadedMapModelUvLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
 }
@@ -592,6 +592,11 @@ void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 void GL_LoadMap(const Map *map)
 {
 	GL_DestroyMapModels();
+	if (glIsTexture(lightmap))
+	{
+		glDeleteTextures(1, &lightmap);
+	}
+	glActiveTexture(GL_TEXTURE1);
 	if (map)
 	{
 		for (size_t i = 0; i < map->modelCount; i++)
@@ -611,7 +616,24 @@ void GL_LoadMap(const Map *map)
 						 mmb->mapModel->indices,
 						 GL_STREAM_DRAW);
 		}
+
+		glGenTextures(1, &lightmap);
+		glBindTexture(GL_TEXTURE_2D, lightmap);
+		glTexImage2D(GL_TEXTURE_2D,
+					 0,
+					 GL_RGBA16F,
+					 (GLsizei)map->lightmapWidth,
+					 (GLsizei)map->lightmapHeight,
+					 0,
+					 GL_RGBA,
+					 GL_HALF_FLOAT,
+					 map->lightmapPixels);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
