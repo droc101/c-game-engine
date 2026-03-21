@@ -385,10 +385,10 @@ void GL_End3DPass(const float exposure)
 	const Vector2 ndcEndPos = v2(GL_X_TO_NDC(wndSize.x), GL_Y_TO_NDC(wndSize.y));
 
 	const float vertices[4][4] = {
-		{(float)ndcStartPos.x, (float)ndcStartPos.y, 0.0f, wndSize.y},
-		{(float)ndcEndPos.x, (float)ndcStartPos.y, wndSize.x, wndSize.y},
-		{(float)ndcEndPos.x, (float)ndcEndPos.y, wndSize.x, 0.0f},
-		{(float)ndcStartPos.x, (float)ndcEndPos.y, 0.0f, 0.0f},
+		{-1.0f, 1.0f, 0.0f, wndSize.y},
+		{1.0f, 1.0f, wndSize.x, wndSize.y},
+		{1.0f, -1.0f, wndSize.x, 0.0f},
+		{-1.0f, -1.0f, 0.0f, 0.0f},
 	};
 
 	const uint32_t indices[] = {0, 2, 1, 0, 3, 2};
