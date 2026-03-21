@@ -370,7 +370,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	GL_Disable3D();
+	GL_Disable3D(map->exposure);
 }
 
 void GL_RenderShadedModelPart(const ModelDefinition *model,
@@ -663,9 +663,9 @@ inline void GL_Enable3D(void)
 	glEnable(GL_MULTISAMPLE);
 }
 
-inline void GL_Disable3D()
+inline void GL_Disable3D(const float exposure)
 {
-	GL_End3DPass();
+	GL_End3DPass(exposure);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_MULTISAMPLE);
 }

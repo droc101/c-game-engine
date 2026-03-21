@@ -16,6 +16,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "engine/graphics/gl/GLshaders.h"
+
 #define GL_WORLD_FRAMEBUFFER_COLOR_INTERNAL_FORMAT GL_RGBA16F
 #define GL_WORLD_FRAMEBUFFER_COLOR_FORMAT GL_RGBA
 #define GL_WORLD_FRAMEBUFFER_COLOR_TYPE GL_FLOAT
@@ -362,23 +364,45 @@ void GL_Begin3DPass()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, worldFrameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, worldRenderBufferObject);
+	GL_ClearScreen();
 }
 
-void GL_End3DPass()
+void GL_End3DPass(const float exposure)
 {
 	const Vector2 wndSize = ActualWindowSizeIgnoreDPI();
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, worldFrameBufferObject);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, uiFrameBufferObject);
-	glBlitFramebuffer(0,
-					  0,
-					  (GLint)wndSize.x,
-					  (GLint)wndSize.y,
-					  0,
-					  0,
-					  (GLint)wndSize.x,
-					  (GLint)wndSize.y,
-					  GL_COLOR_BUFFER_BIT,
-					  GL_NEAREST);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
+	GL_UseShader(tonemapShader);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, worldFramebufferColorTexture);
+
+	glUniform1i(tonemapFramebufferLoc, 0);
+	glUniform1f(tonemapExposureLoc, exposure);
+
+	const Vector2 ndcStartPos = v2(GL_X_TO_NDC(0), GL_Y_TO_NDC(0));
+	const Vector2 ndcEndPos = v2(GL_X_TO_NDC(wndSize.x), GL_Y_TO_NDC(wndSize.y));
+
+	const float vertices[4][4] = {
+		{(float)ndcStartPos.x, (float)ndcStartPos.y, 0.0f, wndSize.y},
+		{(float)ndcEndPos.x, (float)ndcStartPos.y, wndSize.x, wndSize.y},
+		{(float)ndcEndPos.x, (float)ndcEndPos.y, wndSize.x, 0.0f},
+		{(float)ndcStartPos.x, (float)ndcEndPos.y, 0.0f, 0.0f},
+	};
+
+	const uint32_t indices[] = {0, 2, 1, 0, 3, 2};
+
+	GL_BindBuffer(glBuffer);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+
+	glVertexAttribPointer(tonemapVertexLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(tonemapVertexLoc);
+
+	glVertexAttribPointer(tonemapUvLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(tonemapUvLoc);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }

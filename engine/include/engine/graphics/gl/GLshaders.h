@@ -27,6 +27,7 @@ extern GL_Shader *actorShadedShader;
 extern GL_Shader *debugShader;
 extern GL_Shader *mapShadedShader;
 extern GL_Shader *mapUnshadedShader;
+extern GL_Shader *tonemapShader;
 
 #pragma region Uniform/Attribute Locations
 
@@ -137,6 +138,11 @@ extern GLint unshadedMapModelSharedUniformsLoc;
 extern GLint unshadedMapModelModelWorldMatrixLoc;
 extern GLint unshadedMapModelVertexLoc;
 extern GLint unshadedMapModelUvLoc;
+
+extern GLint tonemapFramebufferLoc;
+extern GLint tonemapExposureLoc;
+extern GLint tonemapVertexLoc;
+extern GLint tonemapUvLoc;
 
 #pragma endregion
 

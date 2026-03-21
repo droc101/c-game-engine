@@ -28,7 +28,7 @@
     },
     "on_skin": {
       "display": "On Skin",
-      "default": 0,
+      "default": 1,
       "type": "int",
       "description": "The skin of the model to use when the button is on/pressed"
     },

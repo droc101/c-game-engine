@@ -72,6 +72,8 @@ target_sources(engine INTERFACE
         include/engine/actor/GlobalFog.h
         include/engine/actor/PhysicsModel.h
         src/actor/PhysicsModel.c
+        src/actor/TonemapController.c
+        include/engine/actor/TonemapController.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

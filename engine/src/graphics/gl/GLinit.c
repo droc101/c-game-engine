@@ -155,7 +155,8 @@ bool GL_Init(SDL_Window *wnd)
 
 	fflush(stdout);
 
-	GL_Disable3D();
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_MULTISAMPLE);
 
 	return true;
 }

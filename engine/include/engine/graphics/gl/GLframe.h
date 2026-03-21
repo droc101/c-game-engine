@@ -67,6 +67,6 @@ void GL_UpdateViewportSize();
 
 void GL_Begin3DPass();
 
-void GL_End3DPass();
+void GL_End3DPass(float exposure);
 
 #endif //GAME_GLFRAME_H

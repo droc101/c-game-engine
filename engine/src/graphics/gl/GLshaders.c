@@ -20,6 +20,7 @@ GL_Shader *actorShadedShader;
 GL_Shader *debugShader;
 GL_Shader *mapShadedShader;
 GL_Shader *mapUnshadedShader;
+GL_Shader *tonemapShader;
 
 GLint uiColoredColorLoc;
 GLint uiColoredVertexLoc;
@@ -86,6 +87,11 @@ GLint unshadedMapModelModelWorldMatrixLoc;
 GLint unshadedMapModelVertexLoc;
 GLint unshadedMapModelUvLoc;
 
+GLint tonemapFramebufferLoc;
+GLint tonemapExposureLoc;
+GLint tonemapVertexLoc;
+GLint tonemapUvLoc;
+
 bool GL_LoadShaders()
 {
 	uiTexturedShader = GL_ConstructShaderFromAssets(SHADER("gl/hud/textured_f"), SHADER("gl/hud/textured_v"));
@@ -102,6 +108,7 @@ bool GL_LoadShaders()
 	debugShader = GL_ConstructShaderFromAssets(SHADER("gl/debug_f"), SHADER("gl/debug_v"));
 	mapShadedShader = GL_ConstructShaderFromAssets(SHADER("gl/map/map_shaded_f"), SHADER("gl/map/map_shaded_v"));
 	mapUnshadedShader = GL_ConstructShaderFromAssets(SHADER("gl/map/map_unshaded_f"), SHADER("gl/map/map_unshaded_v"));
+	tonemapShader = GL_ConstructShaderFromAssets(SHADER("gl/tonemap_f"), SHADER("gl/tonemap_v"));
 
 	if (!uiTexturedShader ||
 		!uiColoredShader ||
@@ -112,7 +119,8 @@ bool GL_LoadShaders()
 		!actorUnshadedShader ||
 		!debugShader ||
 		!mapShadedShader ||
-		!mapUnshadedShader)
+		!mapUnshadedShader ||
+		!tonemapShader)
 	{
 		LogError("OpenGL: Failed to compile shaders");
 		return false;
@@ -183,6 +191,11 @@ bool GL_LoadShaders()
 	unshadedMapModelVertexLoc = glGetAttribLocation(mapUnshadedShader->program, "VERTEX");
 	unshadedMapModelUvLoc = glGetAttribLocation(mapUnshadedShader->program, "VERTEX_UV");
 
+	tonemapFramebufferLoc = glGetUniformLocation(tonemapShader->program, "framebuffer");
+	tonemapExposureLoc = glGetUniformLocation(tonemapShader->program, "exposure");
+	tonemapVertexLoc = glGetAttribLocation(tonemapShader->program, "VERTEX");
+	tonemapUvLoc = glGetAttribLocation(tonemapShader->program, "VERTEX_UV");
+
 	return true;
 }
 
@@ -198,6 +211,7 @@ void GL_DestroyShaders()
 	GL_DestroyShader(mapShadedShader);
 	GL_DestroyShader(mapUnshadedShader);
 	GL_DestroyShader(debugShader);
+	GL_DestroyShader(tonemapShader);
 	glUseProgram(0);
 	glDisableVertexAttribArray(0);
 }

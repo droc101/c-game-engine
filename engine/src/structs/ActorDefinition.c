@@ -13,6 +13,7 @@
 #include <engine/actor/SoundPlayer.h>
 #include <engine/actor/Sprite.h>
 #include <engine/actor/StaticModel.h>
+#include <engine/actor/TonemapController.h>
 #include <engine/actor/Trigger.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
@@ -88,6 +89,7 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterGlobalLight();
 	RegisterGlobalFog();
 	RegisterPhysicsModel();
+	RegisterTonemapController();
 	RegisterGameActors();
 }
 

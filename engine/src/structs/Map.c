@@ -45,6 +45,7 @@ Map *CreateMap(void)
 	map->lightColor = COLOR_WHITE;
 	map->physicsTick = 0;
 	map->changeFlags = 0;
+	map->exposure = 1.0f;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);

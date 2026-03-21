@@ -88,6 +88,8 @@ struct Map
 	Vector2 lightAngle;
 	/// The light color. The alpha channel is ignored.
 	Color lightColor;
+	/// HDR tonemapping exposure
+	float exposure;
 
 	JPH_PhysicsSystem *physicsSystem;
 	uint64_t physicsTick;

@@ -1,27 +1,26 @@
 {
-  "description": "Realtime Directional light",
+  "description": "Controls HDR tonemapping",
   "extends": "actor",
   "display": {
-    "color": "$light_color"
+    "directional": false
   },
   "inputs": {
     "set": {
       "type": "none",
-      "description": "Set the map's light information from this actor"
+      "description": "Set the map's tonemapping information from this actor"
     },
     "set_instant": {
       "type": "none",
-      "description": "Immediately set the map's light information from this actor without interpolation"
+      "description": "Immediately set the map's tonemapping information from this actor without interpolation"
     }
   },
   "outputs": {},
   "params": {
-    "light_color": {
-      "display": "Light Color",
-      "default": -1,
-      "type": "color",
-      "showAlpha": false,
-      "description": "The color of this light"
+    "exposure": {
+      "display": "Exposure",
+      "default": 1.0,
+      "type": "float",
+      "minimum": 0.0
     },
     "start_on": {
       "display": "Start On",

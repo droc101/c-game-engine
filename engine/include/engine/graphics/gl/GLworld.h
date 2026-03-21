@@ -147,6 +147,6 @@ void GL_Enable3D(void);
 /**
  * Disable 3D mode
  */
-void GL_Disable3D();
+void GL_Disable3D(float exposure);
 
 #endif //GAME_GLWORLD_H
