@@ -40,11 +40,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include "actor/Physbox.h"
 #include "actor/TestActor.h"
 #include "gameState/PauseState.h"
 
 static bool lodThreadInitDone = false;
+static const char *spawnActorOnce = NULL;
+static const char *spawnActorEveryTick = NULL;
 
 static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
@@ -159,20 +162,35 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 
 	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_L))
 	{
-		Actor *leaf = CreateActor(&state->map->player.transform,
-								  TEST_ACTOR_NAME,
-								  NULL,
-								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
-		AddActor(leaf);
+		if (spawnActorEveryTick == NULL || strcmp(spawnActorEveryTick, TEST_ACTOR_NAME) != 0)
+		{
+			spawnActorEveryTick = TEST_ACTOR_NAME;
+		} else
+		{
+			spawnActorEveryTick = NULL;
+		}
 	}
-
 	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_C))
 	{
-		Actor *leaf = CreateActor(&state->map->player.transform,
-								  PHYSBOX_ACTOR_NAME,
-								  NULL,
-								  JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
-		AddActor(leaf);
+		spawnActorOnce = PHYSBOX_ACTOR_NAME;
+	}
+
+	if (spawnActorOnce)
+	{
+		Actor *actor = CreateActor(&state->map->player.transform,
+								   spawnActorOnce,
+								   NULL,
+								   JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
+		AddActor(actor);
+		spawnActorOnce = NULL;
+	}
+	if (spawnActorEveryTick)
+	{
+		Actor *actor = CreateActor(&state->map->player.transform,
+								   spawnActorEveryTick,
+								   NULL,
+								   JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
+		AddActor(actor);
 	}
 
 	// TODO proper UI for switching items
