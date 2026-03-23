@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *configPath = NULL;
 GameConfig gameConfig = {0};
 
 AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags, const char *path)
@@ -34,14 +35,28 @@ AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags,
 		const size_t pathLen = strlen(GetState()->executableFolder) + 1 + strlen(path) + 1;
 		assetPath->path = malloc(pathLen);
 		snprintf(assetPath->path, pathLen, "%s/%s", GetState()->executableFolder, path);
+	} else if (type == RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY)
+	{
+		const size_t pathLen = strlen(configPath) + 1 + strlen(path) + 1;
+
+		// TODO: is this the best way to do this? seems messy...
+		char *configPathParentDir = strdup(configPath);
+		configPathParentDir[strlen(configPathParentDir) - strlen("game.gkvl")] = '\0';
+		const char pathSep = configPathParentDir[strlen(configPathParentDir)-1];
+		*strrchr(configPathParentDir, pathSep) = '\0';
+		*strrchr(configPathParentDir, pathSep) = '\0';
+
+		assetPath->path = malloc(pathLen);
+		snprintf(assetPath->path, pathLen, "%s/%s", configPathParentDir, path);
+		free(configPathParentDir);
 	}
+	LogDebug("Added asset path \"%s\"\n", assetPath->path);
 	return assetPath;
 }
 
 void LoadGameConfig(const char *game)
 {
 	LogDebug("Loading game configuration...\n");
-	char *configPath = NULL;
 	if (IsPathAbsolute(game))
 	{
 		configPath = malloc(strlen(game) + strlen("/game.gkvl") + 1); // TODO use game.gcfg
@@ -61,7 +76,6 @@ void LoadGameConfig(const char *game)
 	}
 	LogDebug("Loading game.gkvl from %s\n", configPath);
 	FILE *file = fopen(configPath, "rb");
-	free(configPath);
 	if (!file)
 	{
 		Error("Failed to open game configuration");
@@ -93,9 +107,16 @@ void LoadGameConfig(const char *game)
 		if (searchPathParam->type == PARAM_TYPE_KV_LIST)
 		{
 			const bool allowCodeExec = KvGetBool(searchPathParam->kvListValue, "allow_code_execution", false);
-			const bool pathIsAbsolute = KvGetBool(searchPathParam->kvListValue, "path_is_absolute", false);
+			const char *pathType = KvGetString(searchPathParam->kvListValue, "path_type", "relative_to_executable_directory");
 			const char *searchPath = KvGetString(searchPathParam->kvListValue, "search_path", "");
-			const AssetPathType type = pathIsAbsolute ? ABSOLUTE_PATH : RELATIVE_TO_EXECUTABLE_DIRECTORY;
+			AssetPathType type = RELATIVE_TO_EXECUTABLE_DIRECTORY;
+			if (strcmp(pathType, "absolute") == 0)
+			{
+				type = ABSOLUTE_PATH;
+			} else if (strcmp(pathType, "relative_to_game_config_parent_directory") == 0)
+			{
+				type = RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY;
+			}
 			AssetPathFlags flags = 0;
 			if (allowCodeExec)
 			{
@@ -132,4 +153,5 @@ void DestroyGameConfig()
 		free(assetPath);
 	}
 	ListFree(gameConfig.assetPaths);
+	free(configPath);
 }

@@ -18,6 +18,8 @@ typedef struct AssetPath AssetPath;
 enum AssetPathType
 {
 	RELATIVE_TO_EXECUTABLE_DIRECTORY,
+	/// if game config dir is "/path/to/game.cfg" this would be relative to "/path"
+	RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY,
 	ABSOLUTE_PATH,
 };
 
