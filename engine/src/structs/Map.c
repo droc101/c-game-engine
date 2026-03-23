@@ -62,6 +62,20 @@ Map *CreateMap(void)
 	return map;
 }
 
+void FreeLoadTimeMapData(Map *map)
+{
+	for (size_t i = 0; i < map->modelCount; i++)
+	{
+		MapModel *model = map->models + i;
+		free(model->vertices);
+		free(model->indices);
+		model->vertices = NULL;
+		model->indices = NULL;
+	}
+	free(map->lightmapPixels);
+	map->lightmapPixels = NULL;
+}
+
 void DestroyMap(Map *map)
 {
 	for (size_t i = 0; i < map->actors.length; i++)
@@ -69,14 +83,17 @@ void DestroyMap(Map *map)
 		FreeActor(ListGetPointer(map->actors, i));
 	}
 
-	for (size_t i = 0; i < map->modelCount; i++)
+	if (map->models)
 	{
-		const MapModel *model = map->models + i;
-		free(model->vertices);
-		free(model->indices);
+		for (size_t i = 0; i < map->modelCount; i++)
+		{
+			const MapModel *model = map->models + i;
+			free(model->vertices);
+			free(model->indices);
+		}
+		free(map->models);
+		map->models = NULL;
 	}
-	free(map->models);
-	map->models = NULL;
 
 	free(map->skyTexture);
 	free(map->discordRpcIcon);

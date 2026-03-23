@@ -122,6 +122,12 @@ struct Map
 Map *CreateMap(void);
 
 /**
+ * Free data from a map that is only used when first loading it
+ * @param map The map to free data from
+ */
+void FreeLoadTimeMapData(Map *map);
+
+/**
  * Destroy a map and everything in it
  * @param map Map to destroy
  */
