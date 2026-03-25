@@ -83,7 +83,11 @@ bool IsPathAbsolute(const char *path)
 	// yes, the drive "letter" doesn't have to be a letter.
 	// no, I'm not accounting for that case.
 	// I have also chosen to not care about UNC paths.
-	if (strlen(path) < 3 && isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\'))
+	const bool lengthCheck = strlen(path) >= 3;
+	const bool letterCheck = isalpha(path[0]);
+	const bool colonCheck = path[1] == ':';
+	const bool slashCheck = path[2] == '/' || path[2] == '\\';
+	if (lengthCheck && letterCheck && colonCheck && slashCheck)
 	{
 		return true;
 	}

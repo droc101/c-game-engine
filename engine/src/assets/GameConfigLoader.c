@@ -61,7 +61,7 @@ void LoadGameConfig(const char *game)
 	{
 		configPath = malloc(strlen(game) + strlen("/game.gkvl") + 1); // TODO use game.gcfg
 		CheckAlloc(configPath);
-		if (game[strlen(game) - 1] == '/')
+		if (game[strlen(game) - 1] == '/' || game[strlen(game) - 1] == '\\')
 		{
 			sprintf(configPath, "%sgame.gkvl", game);
 		} else
