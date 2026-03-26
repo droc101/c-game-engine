@@ -37,7 +37,8 @@ SDL_Surface *ToSDLSurface(const char *texture)
 
 	SDL_Surface *surface = SDL_CreateSurfaceFrom((int)img->width,
 												 (int)img->height,
-												 SDL_PIXELFORMAT_ABGR8888,
+												 img->pixelFormat == PIXEL_FORMAT_RGBA8 ? SDL_PIXELFORMAT_ABGR8888
+																						: SDL_PIXELFORMAT_ABGR64_FLOAT,
 												 img->pixelData,
 												 (int)(img->width * sizeof(uint32_t)));
 

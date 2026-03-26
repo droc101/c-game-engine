@@ -209,7 +209,9 @@ int GL_RegisterTexture(const Image *image)
 
 	glGenTextures(1, &glTextures[slot]);
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
-	glTexImage2D(GL_TEXTURE_2D,
+	if (image->pixelFormat == PIXEL_FORMAT_RGBA8)
+	{
+		glTexImage2D(GL_TEXTURE_2D,
 				 0,
 				 GL_RGBA8,
 				 (GLsizei)image->width,
@@ -218,6 +220,18 @@ int GL_RegisterTexture(const Image *image)
 				 GL_RGBA,
 				 GL_UNSIGNED_BYTE,
 				 image->pixelData);
+	} else
+	{
+		glTexImage2D(GL_TEXTURE_2D,
+				 0,
+				 GL_RGBA16F,
+				 (GLsizei)image->width,
+				 (GLsizei)image->height,
+				 0,
+				 GL_RGBA,
+				 GL_HALF_FLOAT,
+				 image->pixelData);
+	}
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
