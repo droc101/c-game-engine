@@ -37,7 +37,8 @@ void LevelSelectStateUpdate(GlobalState * /*state*/)
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		MenuStateSet();
+		menuStateFadeIn = false;
+		SetGameState(&MenuState);
 	}
 	if (levelList.length > 1)
 	{
@@ -60,7 +61,8 @@ void LevelSelectStateUpdate(GlobalState * /*state*/)
 	{
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
 		ConsumeButton(mainThreadInput, CONTROLLER_OK);
-		LoadingStateSet(ListGetPointer(levelList, selectedLevel));
+		loadStateLevelname = strdup(ListGetPointer(levelList, selectedLevel));
+		SetGameState(&LoadingState);
 	}
 }
 
@@ -106,14 +108,18 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
-	SetStateCallbacks(LevelSelectStateUpdate,
-					  NULL,
-					  GAME_STATE_LEVEL_SELECT,
-					  LevelSelectStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void LevelSelectStateDestroy()
 {
-	ListFreeOnlyContents(levelList);
+	ListAndContentsFree(levelList);
 }
+
+const GameState LevelSelectState = {
+	.UpdateGame = LevelSelectStateUpdate,
+	.RenderGame = LevelSelectStateRender,
+	.FixedUpdateGame = NULL,
+	.Set = LevelSelectStateSet,
+	.Destroy = LevelSelectStateDestroy,
+	.enableRelativeMouseMode = false
+};

@@ -15,11 +15,12 @@
 #include <stdint.h>
 #include <string.h>
 #include "gameState/MainState.h"
+#include "gameState/MenuState.h"
 
 /// The minimum time the loading screen should be visible for, to prevent quick flashes
 #define LEVEL_LOAD_MIN_TIME_MS 250
 
-char loadStateLevelname[32];
+char *loadStateLevelname = NULL;
 uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
 
@@ -29,9 +30,11 @@ void LoadingStateUpdate(GlobalState * /*state*/)
 	{
 		loadStateLoadedLevel = true;
 		const uint64_t realLoadStart = GetTimeNs();
-		if (!ChangeMapByName((char *)&loadStateLevelname))
+		if (!ChangeMapByName(loadStateLevelname))
 		{
 			LogError("Failed to load map: %s\n", loadStateLevelname);
+			menuStateFadeIn = false;
+			SetGameState(&MenuState); // get out before crash
 		}
 		const uint64_t realLoadEnd = GetTimeNs();
 		const uint64_t realLoadTime = realLoadEnd - realLoadStart;
@@ -41,7 +44,7 @@ void LoadingStateUpdate(GlobalState * /*state*/)
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
 	if (loadTime > LEVEL_LOAD_MIN_TIME_MS)
 	{
-		MainStateSet();
+		SetGameState(&MainState);
 	}
 }
 
@@ -57,10 +60,22 @@ void LoadingStateRender(GlobalState * /*state*/)
 					smallFont);
 }
 
-void LoadingStateSet(const char *mapName)
+void LoadingStateSet()
 {
 	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
-	strncpy(loadStateLevelname, mapName, 31);
-	SetStateCallbacks(LoadingStateUpdate, NULL, GAME_STATE_LOADING, LoadingStateRender, false);
+	assert(loadStateLevelname);
 }
+
+void LoadingStateDestroy() {
+	free(loadStateLevelname);
+}
+
+const GameState LoadingState = {
+	.UpdateGame = LoadingStateUpdate,
+	.RenderGame = LoadingStateRender,
+	.FixedUpdateGame = NULL,
+	.Destroy = LoadingStateDestroy,
+	.Set = LoadingStateSet,
+	.enableRelativeMouseMode = false,
+};

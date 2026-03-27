@@ -5,15 +5,13 @@
 #ifndef MENUSTATE_H
 #define MENUSTATE_H
 
-#define GAME_STATE_MENU 8
+#include <engine/structs/GameState.h>
+#include <stdbool.h>
 
 // Shows a level select after main menu and pause exit course.
 #define USE_LEVEL_SELECT
 
-void MenuStateSetWithFade();
-
-void MenuStateSet();
-
-void MenuStateDestroy();
+extern bool menuStateFadeIn;
+extern const GameState MenuState;
 
 #endif //MENUSTATE_H

@@ -32,28 +32,22 @@ void SetInitialGameState()
 	}
 	if (loadMap)
 	{
-		MainStateSet();
+		SetGameState(&MainState);
 	} else
 	{
 		if (!HasCliArg("--nosplash"))
 		{
-			LogoSplashStateSet();
+			SetGameState(&LogoSplashState);
 		} else
 		{
-			MenuStateSet();
+			menuStateFadeIn = false;
+			SetGameState(&MenuState);
 		}
 	}
 }
 
 void DestroyGame()
 {
-	InputOptionsStateDestroy();
-	SoundOptionsStateDestroy();
-	VideoOptionsStateDestroy();
-	LevelSelectStateDestroy();
-	MenuStateDestroy();
-	OptionsStateDestroy();
-	PauseStateDestroy();
 	LaserRaycastFiltersDestroy();
 }
 

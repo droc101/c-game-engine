@@ -34,7 +34,7 @@ static List physicsThreadInputEventQueue;
  * The function to run in the physics thread
  * @warning Only touch this when you have a lock on the mutex
  */
-FixedUpdateFunction PhysicsThreadFunction;
+GameStateFixedUpdateFunction PhysicsThreadFunction;
 
 /**
  * Whether to quit the physics thread on the next iteration
@@ -91,7 +91,7 @@ int PhysicsThreadMain(void * /*data*/)
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
-		const FixedUpdateFunction UpdateFunction = PhysicsThreadFunction;
+		const GameStateFixedUpdateFunction UpdateFunction = PhysicsThreadFunction;
 		SDL_UnlockMutex(physicsThreadMutex);
 
 		// delta is the portion of one "tick" that the last tick took (including idle time)
@@ -135,7 +135,7 @@ void PhysicsThreadInit()
 	}
 }
 
-void PhysicsThreadSetFunction(const FixedUpdateFunction function)
+void PhysicsThreadSetFunction(const GameStateFixedUpdateFunction function)
 {
 	SDL_LockMutex(physicsThreadMutex);
 	GetState()->physicsFrame = 0;

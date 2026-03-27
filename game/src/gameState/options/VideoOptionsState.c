@@ -39,7 +39,7 @@ void BtnVideoOptionsBack()
 					   "Yes",
 					   "No");
 	}
-	OptionsStateSet(optionsStateInGame);
+	SetGameState(&OptionsState);
 }
 
 char *SliderLabelMSAA(const Control *slider)
@@ -296,12 +296,6 @@ void VideoOptionsStateSet()
 	}
 	UiStackResetFocus(videoOptionsStack);
 	hasChangedVideoOptions = false;
-
-	SetStateCallbacks(VideoOptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_VIDEO_OPTIONS,
-					  VideoOptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void VideoOptionsStateDestroy()
@@ -312,3 +306,12 @@ void VideoOptionsStateDestroy()
 		videoOptionsStack = NULL;
 	}
 }
+
+const GameState VideoOptionsState = {
+	.UpdateGame = VideoOptionsStateUpdate,
+	.RenderGame = VideoOptionsStateRender,
+	.FixedUpdateGame = NULL,
+	.Destroy = VideoOptionsStateDestroy,
+	.Set = VideoOptionsStateSet,
+	.enableRelativeMouseMode = false,
+};

@@ -24,7 +24,7 @@ UiStack *soundOptionsStack = NULL;
 
 void BtnSoundOptionsBack()
 {
-	OptionsStateSet(optionsStateInGame);
+	SetGameState(&OptionsState);
 }
 
 void SldOptionsMasterVolume(const float value)
@@ -148,12 +148,6 @@ void SoundOptionsStateSet()
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnSoundOptionsBack, BOTTOM_CENTER));
 	}
 	UiStackResetFocus(soundOptionsStack);
-
-	SetStateCallbacks(SoundOptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_SOUND_OPTIONS,
-					  SoundOptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void SoundOptionsStateDestroy()
@@ -164,3 +158,12 @@ void SoundOptionsStateDestroy()
 		soundOptionsStack = NULL;
 	}
 }
+
+const GameState SoundOptionsState = {
+	.UpdateGame = SoundOptionsStateUpdate,
+	.RenderGame = SoundOptionsStateRender,
+	.FixedUpdateGame = NULL,
+	.Destroy = SoundOptionsStateDestroy,
+	.Set = SoundOptionsStateSet,
+	.enableRelativeMouseMode = false,
+};

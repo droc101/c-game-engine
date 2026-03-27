@@ -75,7 +75,7 @@ void MainStateUpdate(GlobalState *state)
 		!IsWindowFocused())
 	{
 		(void)PlaySound(SOUND("sfx/popup"), SOUND_CATEGORY_UI);
-		PauseStateSet();
+		SetGameState(&PauseState);
 		return;
 	}
 
@@ -249,5 +249,13 @@ void MainStateSet()
 		LodThreadInit();
 		lodThreadInitDone = true;
 	}
-	SetStateCallbacks(MainStateUpdate, MainStateFixedUpdate, GAME_STATE_MAIN, MainStateRender, true);
 }
+
+const GameState MainState = {
+	.UpdateGame = MainStateUpdate,
+	.RenderGame = MainStateRender,
+	.FixedUpdateGame = MainStateFixedUpdate,
+	.Destroy = NULL,
+	.Set = MainStateSet,
+	.enableRelativeMouseMode = true,
+};

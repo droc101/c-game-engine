@@ -5,10 +5,8 @@
 #ifndef PAUSESTATE_H
 #define PAUSESTATE_H
 
-#define GAME_STATE_PAUSE 10
+#include <engine/structs/GameState.h>
 
-void PauseStateSet();
-
-void PauseStateDestroy();
+extern const GameState PauseState;
 
 #endif //PAUSESTATE_H

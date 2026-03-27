@@ -29,7 +29,8 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 		IsKeyPressed(physicsThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
-		MenuStateSetWithFade();
+		menuStateFadeIn = true;
+		SetGameState(&MenuState);
 	}
 }
 
@@ -60,11 +61,11 @@ void LogoSplashStateRender(GlobalState *State)
 				   &color);
 }
 
-void LogoSplashStateSet()
-{
-	SetStateCallbacks(NULL,
-					  LogoSplashStateFixedUpdate,
-					  GAME_STATE_LOGO_SPLASH,
-					  LogoSplashStateRender,
-					  false); // Non-fixed is not needed for this state
-}
+const GameState LogoSplashState = {
+	.UpdateGame = NULL,
+	.RenderGame = LogoSplashStateRender,
+	.FixedUpdateGame = LogoSplashStateFixedUpdate,
+	.Destroy = NULL,
+	.Set = NULL,
+	.enableRelativeMouseMode = false,
+};

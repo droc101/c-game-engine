@@ -28,6 +28,8 @@
 
 static GlobalState state;
 
+static const GameState *queuedStateChange = NULL;
+
 void InitOptions()
 {
 	LogDebug("Loading options...\n");
@@ -127,20 +129,35 @@ void PreviousItem()
 	}
 }
 
-void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
-					   const FixedUpdateFunction FixedUpdateGame,
-					   const GameStateId currentState,
-					   const FrameRenderFunction RenderGame,
-					   const bool enableRelativeMouseMode)
+void SetGameState(const GameState *gameState)
 {
-	state.UpdateGame = UpdateGame;
-	state.currentState = currentState;
-	state.RenderGame = RenderGame;
-	PhysicsThreadSetFunction(FixedUpdateGame);
-	DiscordUpdateRPC();
-	if (!HasCliArg("--no-mouse-capture"))
+	queuedStateChange = gameState;
+	if (state.gameState == NULL)
 	{
-		SDL_SetWindowRelativeMouseMode(GetGameWindow(), enableRelativeMouseMode);
+		ProcessStateChangeQueue();
+	}
+}
+
+void ProcessStateChangeQueue()
+{
+	if (queuedStateChange)
+	{
+		if (state.gameState && state.gameState->Destroy)
+		{
+			state.gameState->Destroy();
+		}
+		if (queuedStateChange->Set)
+		{
+			queuedStateChange->Set();
+		}
+		state.gameState = queuedStateChange;
+		PhysicsThreadSetFunction(queuedStateChange->FixedUpdateGame);
+		DiscordUpdateRPC();
+		if (!HasCliArg("--no-mouse-capture"))
+		{
+			SDL_SetWindowRelativeMouseMode(GetGameWindow(), queuedStateChange->enableRelativeMouseMode);
+		}
+		queuedStateChange = NULL;
 	}
 }
 
@@ -159,6 +176,10 @@ void DestroyGlobalState()
 {
 	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
+	if (state.gameState->Destroy)
+	{
+		state.gameState->Destroy();
+	}
 	if (state.map)
 	{
 		DestroyMap(state.map);

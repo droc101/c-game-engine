@@ -37,7 +37,7 @@ void PauseStateUpdate(GlobalState * /*state*/)
 		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
 		(void)PlaySound(SOUND("sfx/popdown"), SOUND_CATEGORY_UI);
-		MainStateSet();
+		SetGameState(&MainState);
 	}
 }
 
@@ -63,21 +63,23 @@ void PauseStateRender(GlobalState * /*state*/)
 
 void BtnPauseResume()
 {
-	MainStateSet();
+	SetGameState(&MainState);
 }
 
 void BtnOptions()
 {
-	OptionsStateSet(true);
+	optionsStateInGame = true;
+	SetGameState(&OptionsState);
 }
 
 void BtnPauseExit()
 {
 	ChangeMap(NULL);
 #ifdef USE_LEVEL_SELECT
-	LevelSelectStateSet();
+	SetGameState(&LevelSelectState);
 #else
-	MenuStateSet();
+	bool fade = false;
+	SetGameState(&MenuState, &fade);
 #endif
 }
 
@@ -93,12 +95,6 @@ void PauseStateSet()
 					CreateButtonControl(v2(0, 120), v2(300, 40), "Exit Level", BtnPauseExit, MIDDLE_CENTER));
 	}
 	UiStackResetFocus(pauseStack);
-
-	SetStateCallbacks(PauseStateUpdate,
-					  NULL,
-					  GAME_STATE_PAUSE,
-					  PauseStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void PauseStateDestroy()
@@ -109,3 +105,12 @@ void PauseStateDestroy()
 		pauseStack = NULL;
 	}
 }
+
+const GameState PauseState = {
+	.UpdateGame = PauseStateUpdate,
+	.RenderGame = PauseStateRender,
+	.FixedUpdateGame = NULL,
+	.Set = PauseStateSet,
+	.Destroy = PauseStateDestroy,
+	.enableRelativeMouseMode = false,
+};

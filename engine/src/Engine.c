@@ -292,9 +292,9 @@ void EngineIteration()
 
 	if (!FrameStart())
 	{
-		if (state->UpdateGame)
+		if (state->gameState->UpdateGame)
 		{
-			state->UpdateGame(state);
+			state->gameState->UpdateGame(state);
 		}
 		UpdateSoundSystem();
 		if (state->requestExit)
@@ -312,9 +312,9 @@ void EngineIteration()
 
 	ResetDPrintYPos();
 
-	if (state->UpdateGame)
+	if (state->gameState->UpdateGame)
 	{
-		state->UpdateGame(state);
+		state->gameState->UpdateGame(state);
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
@@ -324,7 +324,7 @@ void EngineIteration()
 	}
 #endif
 
-	state->RenderGame(state);
+	state->gameState->RenderGame(state);
 
 	FrameGraphDraw();
 	TickGraphDraw();
@@ -336,6 +336,8 @@ void EngineIteration()
 	UpdateSoundSystem();
 
 	UpdateInputStates(mainThreadInput);
+
+	ProcessStateChangeQueue();
 
 	DiscordUpdate();
 	if (state->requestExit)

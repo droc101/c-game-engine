@@ -28,15 +28,15 @@
 #endif
 
 UiStack *menuStack = NULL;
-bool fadeIn = false;
+bool menuStateFadeIn = false;
 bool easterEgg = false;
 
 void StartGame()
 {
 #ifdef USE_LEVEL_SELECT
-	LevelSelectStateSet();
+	SetGameState(&LevelSelectState);
 #else
-	MainStateSet();
+	SetGameState(&MainState);
 #endif
 }
 
@@ -47,7 +47,8 @@ void QuitGame()
 
 void OpenOptions()
 {
-	OptionsStateSet(false);
+	optionsStateInGame = false;
+	SetGameState(&OptionsState);
 }
 
 void ReloadAssets()
@@ -110,7 +111,7 @@ void MenuStateRender(GlobalState *state)
 	ProcessUiStack(menuStack);
 	DrawUiStack(menuStack);
 
-	if (fadeIn)
+	if (menuStateFadeIn)
 	{
 		const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
 		Color color = COLOR_BLACK;
@@ -119,21 +120,14 @@ void MenuStateRender(GlobalState *state)
 
 		if (GetState()->physicsFrame >= 20)
 		{
-			fadeIn = false;
+			menuStateFadeIn = false;
 		}
 	}
-}
-
-void MenuStateSetWithFade()
-{
-	MenuStateSet();
-	fadeIn = true;
 }
 
 void MenuStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
-	fadeIn = false;
 	if (menuStack == NULL)
 	{
 		menuStack = CreateUiStack();
@@ -146,7 +140,8 @@ void MenuStateSet()
 		opY += opSpacing;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
 		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
@@ -154,12 +149,6 @@ void MenuStateSet()
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);
 	easterEgg = (t->tm_mon == 3 && t->tm_mday == 1) || HasCliArg("--force-menu-easter-egg");
-
-	SetStateCallbacks(MenuStateUpdate,
-					  NULL,
-					  GAME_STATE_MENU,
-					  MenuStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void MenuStateDestroy()
@@ -170,3 +159,12 @@ void MenuStateDestroy()
 		menuStack = NULL;
 	}
 }
+
+const GameState MenuState = {
+	.UpdateGame = MenuStateUpdate,
+	.RenderGame = MenuStateRender,
+	.FixedUpdateGame = NULL,
+	.Destroy = MenuStateDestroy,
+	.Set = MenuStateSet,
+	.enableRelativeMouseMode = false,
+};

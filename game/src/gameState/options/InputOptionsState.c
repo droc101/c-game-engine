@@ -23,7 +23,7 @@ UiStack *inputOptionsStack = NULL;
 
 void BtnInputOptionsBack()
 {
-	OptionsStateSet(optionsStateInGame);
+	SetGameState(&OptionsState);
 }
 
 void InputOptionsStateUpdate(GlobalState * /*state*/)
@@ -195,12 +195,6 @@ void InputOptionsStateSet()
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnInputOptionsBack, BOTTOM_CENTER));
 	}
 	UiStackResetFocus(inputOptionsStack);
-
-	SetStateCallbacks(InputOptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_INPUT_OPTIONS,
-					  InputOptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void InputOptionsStateDestroy()
@@ -211,3 +205,12 @@ void InputOptionsStateDestroy()
 		inputOptionsStack = NULL;
 	}
 }
+
+const GameState InputOptionsState = {
+	.UpdateGame = InputOptionsStateUpdate,
+	.RenderGame = InputOptionsStateRender,
+	.FixedUpdateGame = NULL,
+	.Destroy = InputOptionsStateDestroy,
+	.Set = InputOptionsStateSet,
+	.enableRelativeMouseMode = false,
+};

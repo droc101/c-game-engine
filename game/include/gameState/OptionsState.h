@@ -5,14 +5,10 @@
 #ifndef OPTIONSSTATE_H
 #define OPTIONSSTATE_H
 
-#define GAME_STATE_OPTIONS 9
-
+#include <engine/structs/GameState.h>
 #include <stdbool.h>
 
 extern bool optionsStateInGame;
-
-void OptionsStateSet(bool inGame);
-
-void OptionsStateDestroy();
+extern const GameState OptionsState;
 
 #endif //OPTIONSSTATE_H

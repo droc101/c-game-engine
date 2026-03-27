@@ -28,10 +28,11 @@ void BtnOptionsBack()
 {
 	if (optionsStateInGame)
 	{
-		PauseStateSet();
+		SetGameState(&PauseState);
 	} else
 	{
-		MenuStateSet();
+		menuStateFadeIn = false;
+		SetGameState(&MenuState);
 	}
 }
 
@@ -67,9 +68,23 @@ void OptionsStateRender(GlobalState * /*state*/)
 	DrawUiStack(optionsStack);
 }
 
-void OptionsStateSet(const bool inGame)
+void BtnVideoOptions()
 {
-	optionsStateInGame = inGame;
+	SetGameState(&VideoOptionsState);
+}
+
+void BtnSoundOptions()
+{
+	SetGameState(&SoundOptionsState);
+}
+
+void BtnInputOptions()
+{
+	SetGameState(&InputOptionsState);
+}
+
+void OptionsStateSet()
+{
 	if (optionsStack == NULL)
 	{
 		optionsStack = CreateUiStack();
@@ -77,24 +92,18 @@ void OptionsStateSet(const bool inGame)
 		const float opSpacing = 45;
 
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Video Options", VideoOptionsStateSet, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Video Options", BtnVideoOptions, TOP_CENTER));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Sound Options", SoundOptionsStateSet, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Sound Options", BtnSoundOptions, TOP_CENTER));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", InputOptionsStateSet, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", BtnInputOptions, TOP_CENTER));
 		opY += opSpacing;
 
 		UiStackPush(optionsStack, CreateButtonControl(v2(0, -40), v2(480, 40), "Done", BtnOptionsBack, BOTTOM_CENTER));
 	}
 	UiStackResetFocus(optionsStack);
-
-	SetStateCallbacks(OptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_OPTIONS,
-					  OptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void OptionsStateDestroy()
@@ -105,3 +114,12 @@ void OptionsStateDestroy()
 		optionsStack = NULL;
 	}
 }
+
+const GameState OptionsState = {
+	.UpdateGame = OptionsStateUpdate,
+	.RenderGame = OptionsStateRender,
+	.FixedUpdateGame = NULL,
+	.Set = OptionsStateSet,
+	.Destroy = OptionsStateDestroy,
+	.enableRelativeMouseMode = false,
+};

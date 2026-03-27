@@ -16,19 +16,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#define GAME_STATE_UNKNOWN 0
-
-typedef uint64_t GameStateId;
+#include <engine/structs/GameState.h>
 
 typedef struct GlobalState GlobalState;
 typedef struct SaveData SaveData;
-
-typedef void (*FixedUpdateFunction)(GlobalState *state, double delta);
-
-typedef void (*FrameUpdateFunction)(GlobalState *state);
-
-typedef void (*FrameRenderFunction)(GlobalState *state);
 
 struct SaveData
 {
@@ -51,12 +42,7 @@ struct GlobalState
 
 	JPH_JobSystem *jobSystem;
 
-	/// State update function
-	FrameUpdateFunction UpdateGame;
-	/// State render function
-	FrameRenderFunction RenderGame;
-	/// The current state of the game
-	GameStateId currentState;
+	const GameState *gameState;
 	/// The number of physics frames that have passed since the last game state change
 	uint64_t physicsFrame;
 
@@ -113,18 +99,11 @@ void PreviousItem();
 void NextItem();
 
 /**
- * Set game state callbacks
- * @param UpdateGame update callback
- * @param FixedUpdateGame fixed-FPS update callback
- * @param currentState used for checking the state
- * @param RenderGame render callback
- * @param enableRelativeMouseMode
+ * Set the game state
  */
-void SetStateCallbacks(FrameUpdateFunction UpdateGame,
-					   FixedUpdateFunction FixedUpdateGame,
-					   GameStateId currentState,
-					   FrameRenderFunction RenderGame,
-					   bool enableRelativeMouseMode);
+void SetGameState(const GameState *gameState);
+
+void ProcessStateChangeQueue();
 
 /**
  * Change the current map
