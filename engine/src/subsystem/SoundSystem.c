@@ -2,6 +2,7 @@
 // Created by droc101 on 8/4/25.
 //
 
+#include <SDL3/SDL_mutex.h>
 #include <cglm/quat.h>
 #include <cglm/vec3.h>
 #include <engine/assets/AssetReader.h>
@@ -59,9 +60,20 @@ struct SoundSystem
 	MIX_Track *tracks[SOUND_SYSTEM_CHANNEL_COUNT];
 	/// currently playing sounds
 	SoundChannel *channels[SOUND_SYSTEM_CHANNEL_COUNT];
+	SDL_Mutex *mutex;
 };
 
 SoundSystem soundSys;
+
+void LockSoundSystem()
+{
+	SDL_LockMutex(soundSys.mutex);
+}
+
+void UnlockSoundSystem()
+{
+	SDL_UnlockMutex(soundSys.mutex);
+}
 
 /**
  * callback for when a channel finishes playing (so we can free it)
@@ -73,6 +85,7 @@ void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 		LogWarning("ChannelFinished called with NULL userdata!\n");
 		return;
 	}
+	LockSoundSystem();
 	SoundChannel *effect = userdata;
 	if (effect->callback)
 	{
@@ -85,6 +98,7 @@ void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 	MIX_DestroyAudio(effect->audio);
 	soundSys.channels[effect->channelIndex] = NULL;
 	free(effect);
+	UnlockSoundSystem();
 }
 
 void InitSoundSystem()
@@ -131,12 +145,15 @@ void InitSoundSystem()
 	}
 
 	UpdateVolume();
+
+	soundSys.mutex = SDL_CreateMutex();
 }
 
 void DestroySoundSystem()
 {
 	LogDebug("Cleaning up sound system...\n");
 
+	LockSoundSystem();
 	if (soundSys.isAudioStarted)
 	{
 		for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
@@ -154,6 +171,8 @@ void DestroySoundSystem()
 
 	MIX_DestroyMixer(soundSys.mixer);
 	MIX_Quit();
+	UnlockSoundSystem();
+	SDL_DestroyMutex(soundSys.mutex);
 }
 
 void UpdateSoundSystem()
@@ -162,6 +181,7 @@ void UpdateSoundSystem()
 	versor listenerRotation = GLM_VEC3_ZERO_INIT;
 	memcpy(&listenerPosition, VECTOR3_TO_VEC3(GetState()->camera->transform.position), sizeof(vec3));
 	QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
+	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		if (MIX_TrackPlaying(soundSys.tracks[i]))
@@ -188,6 +208,7 @@ void UpdateSoundSystem()
 			}
 		}
 	}
+	UnlockSoundSystem();
 }
 
 float GetCategoryVolume(const SoundCategory category)
@@ -211,6 +232,7 @@ float GetCategoryVolume(const SoundCategory category)
 
 void UpdateVolume()
 {
+	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		const SoundChannel *effect = soundSys.channels[i];
@@ -220,6 +242,7 @@ void UpdateVolume()
 			MIX_SetTrackGain(effect->track, mixedVolume);
 		}
 	}
+	UnlockSoundSystem();
 }
 
 MIX_Track *FindAvailableTrack(uint8_t *index)
@@ -259,6 +282,7 @@ SoundChannel *PlaySound(const char *soundAsset, const SoundCategory category)
 
 SoundChannel *PlaySoundEx(const SoundRequest *request)
 {
+	LockSoundSystem();
 	if (!soundSys.isAudioStarted)
 	{
 		return NULL;
@@ -331,6 +355,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	}
 	SDL_DestroyProperties(props);
 
+	UnlockSoundSystem();
 	return effect;
 }
 
@@ -354,6 +379,7 @@ inline void StopSound(const SoundChannel *effect)
 
 void StopAllSounds()
 {
+	LockSoundSystem();
 	for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		const SoundChannel *channel = soundSys.channels[i];
@@ -362,4 +388,5 @@ void StopAllSounds()
 			StopSound(channel);
 		}
 	}
+	UnlockSoundSystem();
 }
