@@ -24,21 +24,13 @@
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
 
-#ifndef USE_LEVEL_SELECT
-#include "gameState/MainState.h"
-#endif
-
 UiStack *menuStack = NULL;
 bool menuStateFadeIn = false;
 bool easterEgg = false;
 
 void StartGame()
 {
-#ifdef USE_LEVEL_SELECT
 	SetGameState(&LevelSelectState);
-#else
-	SetGameState(&MainState);
-#endif
 }
 
 void QuitGame()

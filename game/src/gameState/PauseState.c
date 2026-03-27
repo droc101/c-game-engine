@@ -22,12 +22,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "gameState/MainState.h"
-#include "gameState/MenuState.h"
 #include "gameState/OptionsState.h"
-
-#ifdef USE_LEVEL_SELECT
 #include "gameState/LevelSelectState.h"
-#endif
 
 UiStack *pauseStack = NULL;
 
@@ -76,12 +72,7 @@ void BtnOptions()
 void BtnPauseExit()
 {
 	ChangeMap(NULL);
-#ifdef USE_LEVEL_SELECT
 	SetGameState(&LevelSelectState);
-#else
-	bool fade = false;
-	SetGameState(&MenuState, &fade);
-#endif
 }
 
 void PauseStateSet()
