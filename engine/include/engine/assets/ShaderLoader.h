@@ -26,7 +26,9 @@ enum ShaderType
 	/// Fragment shader
 	SHADER_TYPE_FRAG,
 	/// Vertex shader
-	SHADER_TYPE_VERT
+	SHADER_TYPE_VERT,
+	/// Compute shader
+	SHADER_TYPE_COMP,
 };
 
 struct Shader

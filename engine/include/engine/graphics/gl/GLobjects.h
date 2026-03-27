@@ -114,6 +114,9 @@ extern GLfloat anisotropyLevel;
 /// Number of MSAA samples
 extern GLint glMsaaSamples;
 
+/**
+ * Update the anisotropic filtering level
+ */
 void GL_UpdateAnisotropyLevel();
 
 /**
@@ -197,8 +200,14 @@ void GL_InitObjects();
  */
 void GL_DestroyObjects();
 
+/**
+ * Unload all textures
+ */
 void GL_DeleteAllTextures();
 
+/**
+ * Unload all models
+ */
 void GL_DestroyAllModels();
 
 #endif //GAME_GLOBJECTS_H

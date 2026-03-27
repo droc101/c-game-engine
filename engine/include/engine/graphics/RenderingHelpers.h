@@ -172,6 +172,9 @@ void WindowObscured();
  */
 void WindowRestored();
 
+/**
+ * Set whether the window is focused
+ */
 void SetWindowFocused(bool val);
 
 /**

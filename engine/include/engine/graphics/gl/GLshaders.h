@@ -25,8 +25,11 @@ extern GL_Shader *actorUnshadedShader;
 extern GL_Shader *actorShadedShader;
 /// The shader used for the debug renderer
 extern GL_Shader *debugShader;
+/// The shader used for shaded map models
 extern GL_Shader *mapShadedShader;
+/// The shader used for unshaded map models
 extern GL_Shader *mapUnshadedShader;
+/// The shader used for tonemapping
 extern GL_Shader *tonemapShader;
 
 #pragma region Uniform/Attribute Locations

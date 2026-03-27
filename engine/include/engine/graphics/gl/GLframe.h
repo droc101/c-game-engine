@@ -65,8 +65,15 @@ void GL_UpdateViewportSize();
  */
 #define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
 
+/**
+ * Switch the active OpenGL framebuffer to the HDR world framebuffer
+ */
 void GL_Begin3DPass();
 
+/**
+ * Finalize rendering of the world framebuffer and copy it to the SDR framebuffer with tonemapping
+ * @param exposure Exposure for tonemapping shader
+ */
 void GL_End3DPass(float exposure);
 
 #endif //GAME_GLFRAME_H
