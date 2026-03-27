@@ -80,12 +80,12 @@ void UnlockSoundSystem()
  */
 void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 {
+	// TODO this function might need to lock the soundsystem, but that causes a deadlock in level select state
 	if (!userdata)
 	{
 		LogWarning("ChannelFinished called with NULL userdata!\n");
 		return;
 	}
-	LockSoundSystem();
 	SoundChannel *effect = userdata;
 	if (effect->callback)
 	{
@@ -98,7 +98,6 @@ void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 	MIX_DestroyAudio(effect->audio);
 	soundSys.channels[effect->channelIndex] = NULL;
 	free(effect);
-	UnlockSoundSystem();
 }
 
 void InitSoundSystem()
