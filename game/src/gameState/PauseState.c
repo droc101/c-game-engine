@@ -9,6 +9,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
@@ -54,7 +55,7 @@ void PauseStateRender(GlobalState * /*state*/)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", COLOR_WHITE, false);
+	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", false, COLOR_WHITE);
 #endif
 
 	ProcessUiStack(pauseStack);

@@ -26,8 +26,8 @@ void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 void DPrintPlayer(const Player *player)
 {
 	DPrintF("Position: (%.2f, %.2f, %.2f)",
-			COLOR_WHITE,
 			false,
+			COLOR_WHITE,
 			player->transform.position.x,
 			player->transform.position.y,
 			player->transform.position.z);
@@ -35,8 +35,8 @@ void DPrintPlayer(const Player *player)
 	JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &playerVelocity);
 	const float totalVelocity = Vector3_Length(&playerVelocity);
 	DPrintF("Velocity: %.2f (%.2f, %.2f, %.2f)",
-			COLOR_WHITE,
 			false,
+			COLOR_WHITE,
 			totalVelocity,
 			playerVelocity.x,
 			playerVelocity.y,
@@ -47,8 +47,8 @@ void DPrintPlayer(const Player *player)
 	JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
 	JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
 	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
-			COLOR_WHITE,
 			false,
+			COLOR_WHITE,
 			player->transform.rotation.x,
 			fabsf(player->transform.rotation.y),
 			radToDeg(player->transform.rotation.x),
@@ -56,5 +56,5 @@ void DPrintPlayer(const Player *player)
 			axis.x,
 			axis.y,
 			axis.z);
-	DPrintF("%s Actor: %p", COLOR_WHITE, false, player->hasHeldActor ? "Held" : "Targeted", player->targetedActor);
+	DPrintF("%s Actor: %p", false, COLOR_WHITE, player->hasHeldActor ? "Held" : "Targeted", player->targetedActor);
 }

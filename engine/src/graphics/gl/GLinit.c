@@ -7,7 +7,6 @@
 #include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
-#include <engine/graphics/gl/GLworld.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>

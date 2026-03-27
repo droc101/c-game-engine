@@ -16,6 +16,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/List.h>
@@ -234,11 +235,11 @@ void MainStateRender(GlobalState *state)
 	}
 
 #ifdef BUILDSTYLE_DEBUG
-	DPrintF("Engine " ENGINE_VERSION, COLOR_WHITE, false);
+	DPrintF("Engine " ENGINE_VERSION, false, COLOR_WHITE);
 #endif
 	DPrintPlayer(&state->map->player);
 
-	DPrintF("Actors: %d", COLOR_WHITE, false, state->map->actors.length);
+	DPrintF("Actors: %d", false, COLOR_WHITE, state->map->actors.length);
 }
 
 void MainStateSet()

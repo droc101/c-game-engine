@@ -27,16 +27,16 @@ void DPrint(const char *str, const Color color)
 #endif
 }
 
-void DPrintF(const char *str, const Color color, const bool con, ...)
+void DPrintF(const char *format, const bool printToConsole, const Color color, ...)
 {
 #ifdef ENABLE_DEBUG_PRINT
 	char buffer[256];
 	va_list args;
-	va_start(args, con);
-	vsprintf(buffer, str, args);
+	va_start(args, color);
+	vsprintf(buffer, format, args);
 	va_end(args);
 	DPrint(buffer, color);
-	if (con)
+	if (printToConsole)
 	{
 		LogInfo(buffer);
 	}

@@ -2,7 +2,6 @@
 // Created by droc101 on 8/4/25.
 //
 
-#include <SDL3/SDL_mutex.h>
 #include <cglm/quat.h>
 #include <cglm/vec3.h>
 #include <engine/assets/AssetReader.h>
@@ -16,6 +15,7 @@
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3_mixer/SDL_mixer.h>

@@ -8,6 +8,7 @@
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/List.h>

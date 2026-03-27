@@ -42,7 +42,7 @@ AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags,
 		// TODO: is this the best way to do this? seems messy...
 		char *configPathParentDir = strdup(configPath);
 		configPathParentDir[strlen(configPathParentDir) - strlen("game.gkvl")] = '\0';
-		const char pathSep = configPathParentDir[strlen(configPathParentDir)-1];
+		const char pathSep = configPathParentDir[strlen(configPathParentDir) - 1];
 		*strrchr(configPathParentDir, pathSep) = '\0';
 		*strrchr(configPathParentDir, pathSep) = '\0';
 
@@ -107,7 +107,9 @@ void LoadGameConfig(const char *game)
 		if (searchPathParam->type == PARAM_TYPE_KV_LIST)
 		{
 			const bool allowCodeExec = KvGetBool(searchPathParam->kvListValue, "allow_code_execution", false);
-			const char *pathType = KvGetString(searchPathParam->kvListValue, "path_type", "relative_to_executable_directory");
+			const char *pathType = KvGetString(searchPathParam->kvListValue,
+											   "path_type",
+											   "relative_to_executable_directory");
 			const char *searchPath = KvGetString(searchPathParam->kvListValue, "search_path", "");
 			AssetPathType type = RELATIVE_TO_EXECUTABLE_DIRECTORY;
 			if (strcmp(pathType, "absolute") == 0)

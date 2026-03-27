@@ -3,7 +3,6 @@
 //
 
 #include "gameState/LevelSelectState.h"
-#include <dirent.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/graphics/Drawing.h>
@@ -11,14 +10,12 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <gameState/LoadingState.h>
 #include <gameState/MenuState.h>
 #include <SDL3/SDL_gamepad.h>
@@ -26,7 +23,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 int selectedLevel = 0;
@@ -115,11 +111,9 @@ void LevelSelectStateDestroy()
 	ListAndContentsFree(levelList);
 }
 
-const GameState LevelSelectState = {
-	.UpdateGame = LevelSelectStateUpdate,
-	.RenderGame = LevelSelectStateRender,
-	.FixedUpdateGame = NULL,
-	.Set = LevelSelectStateSet,
-	.Destroy = LevelSelectStateDestroy,
-	.enableRelativeMouseMode = false
-};
+const GameState LevelSelectState = {.UpdateGame = LevelSelectStateUpdate,
+									.RenderGame = LevelSelectStateRender,
+									.FixedUpdateGame = NULL,
+									.Set = LevelSelectStateSet,
+									.Destroy = LevelSelectStateDestroy,
+									.enableRelativeMouseMode = false};

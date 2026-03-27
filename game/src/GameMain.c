@@ -4,15 +4,9 @@
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include "actor/Laser.h"
-#include "gameState/LevelSelectState.h"
 #include "gameState/LogoSplashState.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
-#include "gameState/options/InputOptionsState.h"
-#include "gameState/options/SoundOptionsState.h"
-#include "gameState/options/VideoOptionsState.h"
-#include "gameState/OptionsState.h"
-#include "gameState/PauseState.h"
 #include "helpers/GameActorRegistration.h"
 #include "item/EraserItem.h"
 #include "item/LaserStopperItem.h"

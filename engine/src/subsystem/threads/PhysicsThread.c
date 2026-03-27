@@ -5,6 +5,7 @@
 #include <engine/debug/FrameGrapher.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
