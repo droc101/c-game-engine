@@ -25,10 +25,11 @@
 char *loadStateLevelname = NULL;
 uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
+size_t loadStateFrameCounter = 0;
 
 void LoadingStateUpdate(GlobalState * /*state*/)
 {
-	if (!loadStateLoadedLevel)
+	if (!loadStateLoadedLevel && loadStateFrameCounter > 2)
 	{
 		loadStateLoadedLevel = true;
 		const uint64_t realLoadStart = GetTimeNs();
@@ -60,10 +61,12 @@ void LoadingStateRender(GlobalState * /*state*/)
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
+	loadStateFrameCounter++;
 }
 
 void LoadingStateSet()
 {
+	loadStateFrameCounter = 0;
 	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
 	assert(loadStateLevelname);
