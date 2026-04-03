@@ -359,7 +359,8 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 			.lightColor = {map->lightColor.r, map->lightColor.g, map->lightColor.b},
 			.lightDirection = {0, -(float)PI, 0},
 		};
-		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
+		memcpy(uniforms.worldViewMatrix, viewModelMatrix, sizeof(mat4_std140));
+		// glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
@@ -639,7 +640,8 @@ void GL_LoadMap(const Map *map)
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 {
 	GL_SharedUniforms uniforms;
-	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
+	memcpy(uniforms.worldViewMatrix, modelViewProjection, sizeof(mat4_std140));
+	// glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
 	uniforms.fogColor = map->fogColor;
 	uniforms.fogStart = (float)map->fogStart;
 	uniforms.fogEnd = (float)map->fogEnd;

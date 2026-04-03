@@ -8,6 +8,7 @@
 #include <cglm/types.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/graphics/std140.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Map.h>
 #include <GL/glew.h>
@@ -63,24 +64,21 @@ struct GL_MapModelBuffer
 	GL_Buffer *buffer;
 };
 
-struct GL_SharedUniforms
+struct STD140 GL_SharedUniforms
 {
 	/// The model -> screen matrix
-	mat4 worldViewMatrix;
+	STD140_MAT4 worldViewMatrix;
 	/// The color of the fog
-	Color fogColor;
+	STD140_COLOR fogColor;
 	/// The distance from the camera at which the fog starts
-	float fogStart;
+	STD140_FLOAT fogStart;
 	/// The distance from the camera at which the fog is fully opaque
-	float fogEnd;
-	float _padding_1[2];
+	STD140_FLOAT fogEnd;
 	/// The global light color
-	vec3 lightColor;
-	float _padding_2;
+	STD140_VEC3 lightColor;
 	/// The global light direction
-	vec3 lightDirection;
-	float _padding_3;
-}; // __attribute__((aligned(16))); // TODO aligned(16) does not seem to be doing what it should be doing. manually added padding floats for now.
+	STD140_VEC3 lightDirection;
+};
 
 struct GL_DebugLine
 {
