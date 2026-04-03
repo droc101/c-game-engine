@@ -139,14 +139,4 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm);
  */
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map);
 
-/**
- * Enable 3D mode
- */
-void GL_Enable3D(void);
-
-/**
- * Disable 3D mode
- */
-void GL_Disable3D(float exposure);
-
 #endif //GAME_GLWORLD_H

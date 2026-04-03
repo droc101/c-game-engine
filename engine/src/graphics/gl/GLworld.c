@@ -262,7 +262,7 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 void GL_RenderMap(const Map *map, const Camera *camera)
 {
-	GL_Enable3D(); // depth should be clear from frame start
+	GL_Begin3DPass(); // depth should be clear from frame start
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	// glLineWidth(2);
@@ -370,7 +370,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	GL_Disable3D(map->exposure);
+	GL_End3DPass(map->exposure);
 }
 
 void GL_RenderShadedModelPart(const ModelDefinition *model,
@@ -654,20 +654,6 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-inline void GL_Enable3D(void)
-{
-	GL_Begin3DPass();
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-}
-
-inline void GL_Disable3D(const float exposure)
-{
-	GL_End3DPass(exposure);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_MULTISAMPLE);
 }
 
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)

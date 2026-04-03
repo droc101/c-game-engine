@@ -287,7 +287,7 @@ bool GL_FrameStart()
 
 inline void GL_ClearScreen()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 inline void GL_ClearDepthOnly()
@@ -380,6 +380,8 @@ inline void GL_UpdateViewportSize()
 
 void GL_Begin3DPass()
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 	glBindFramebuffer(GL_FRAMEBUFFER, worldFrameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, worldRenderBufferObject);
 	GL_ClearScreen();
@@ -387,6 +389,9 @@ void GL_Begin3DPass()
 
 void GL_End3DPass(const float exposure)
 {
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_MULTISAMPLE);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
 	GL_UseShader(tonemapShader);
