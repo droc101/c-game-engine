@@ -16,6 +16,10 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         include/actor/Physbox.h
         src/actor/TestActor.c
         include/actor/TestActor.h
+        src/actor/Button.c
+        include/actor/Button.h
+        src/actor/NpcJohn.c
+        include/actor/NpcJohn.h
 
         src/gameState/LevelSelectState.c
         include/gameState/LevelSelectState.h
@@ -47,8 +51,6 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         src/item/EraserItem.c
         include/item/LaserStopperItem.h
         src/item/LaserStopperItem.c
-        src/actor/Button.c
-        include/actor/Button.h
 )
 
 if (x86_64)

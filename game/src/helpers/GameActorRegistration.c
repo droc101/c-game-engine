@@ -9,6 +9,7 @@
 #include "actor/Goal.h"
 #include "actor/Laser.h"
 #include "actor/LaserEmitter.h"
+#include "actor/NpcJohn.h"
 #include "actor/Physbox.h"
 #include "actor/TestActor.h"
 
@@ -22,4 +23,5 @@ void RegisterGameActors()
 	RegisterPhysbox();
 	RegisterTestActor();
 	RegisterButton();
+	RegisterNpcJohn();
 }
