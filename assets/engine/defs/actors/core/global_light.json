@@ -1,8 +1,9 @@
 {
-  "description": "Realtime Directional light",
+  "description": "Realtime ambient light",
   "extends": "actor",
   "display": {
-    "color": "$light_color"
+    "color": "$light_color",
+    "directional": false
   },
   "inputs": {
     "set": {

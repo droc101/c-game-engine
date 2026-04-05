@@ -41,7 +41,6 @@ Map *CreateMap(void)
 	map->discordRpcName = NULL;
 	map->renderSky = false;
 	map->skyTexture = NULL;
-	map->lightAngle = v2s(0);
 	map->lightColor = COLOR_WHITE;
 	map->physicsTick = 0;
 	map->changeFlags = 0;

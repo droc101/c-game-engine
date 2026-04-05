@@ -84,8 +84,6 @@ struct Map
 	/// The distance from the player at which the fog is fully opaque
 	float fogEnd;
 
-	/// The pitch and yaw of the directional light. The roll is always zero as it has no effect.
-	Vector2 lightAngle;
 	/// The light color. The alpha channel is ignored.
 	Color lightColor;
 	/// HDR tonemapping exposure

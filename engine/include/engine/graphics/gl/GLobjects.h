@@ -83,8 +83,6 @@ struct STD140 GL_SharedUniforms
 	STD140_FLOAT fogEnd;
 	/// The global light color
 	STD140_VEC3 lightColor;
-	/// The global light direction
-	STD140_VEC3 lightDirection;
 };
 
 struct GL_DebugLine

@@ -26,7 +26,6 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
-#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -357,7 +356,6 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 			.fogStart = map->fogStart,
 			.fogEnd = map->fogEnd,
 			.lightColor = {map->lightColor.r, map->lightColor.g, map->lightColor.b},
-			.lightDirection = {0, -(float)PI, 0},
 		};
 		memcpy(uniforms.worldViewMatrix, viewModelMatrix, sizeof(mat4_std140));
 		// glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
@@ -648,10 +646,6 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 	uniforms.lightColor[0] = map->lightColor.r;
 	uniforms.lightColor[1] = map->lightColor.g;
 	uniforms.lightColor[2] = map->lightColor.b;
-
-	uniforms.lightDirection[0] = -cosf(map->lightAngle.x) * sinf(map->lightAngle.y);
-	uniforms.lightDirection[1] = sinf(map->lightAngle.x);
-	uniforms.lightDirection[2] = -cosf(map->lightAngle.x) * cosf(map->lightAngle.y);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
