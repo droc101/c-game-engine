@@ -20,6 +20,7 @@
 #define GL_MAX_MAP_MODELS 2048
 
 typedef struct GL_Shader GL_Shader;
+typedef struct GL_ComputeShader GL_ComputeShader;
 typedef struct GL_Buffer GL_Buffer;
 typedef struct GL_ModelBuffers GL_ModelBuffers;
 typedef struct GL_SharedUniforms GL_SharedUniforms;
@@ -33,6 +34,12 @@ struct GL_Shader
 	/// The ID of the fragment shader
 	GLuint fragmentShader;
 	/// The ID of the shader program
+	GLuint program;
+};
+
+struct GL_ComputeShader
+{
+	GLuint computeShader;
 	GLuint program;
 };
 
@@ -119,19 +126,13 @@ void GL_UpdateAnisotropyLevel();
 
 /**
  * Create a shader program from assets
- * @param fsh The fragment shader asset
- * @param vsh The vertex shader asset
+ * @param fragmentAsset The fragment shader asset
+ * @param vertexAsset The vertex shader asset
  * @return The constructed shader or NULLPTR on error
  */
-GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh);
+GL_Shader *GL_ConstructShader(const char *fragmentAsset, const char *vertexAsset);
 
-/**
- * Create a shader program
- * @param fsh The fragment shader source
- * @param vsh The vertex shader source
- * @return The shader struct or NULLPTR on error
- */
-GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh);
+GL_ComputeShader *GL_ConstructComputeShader(const char *asset);
 
 /**
  * Create a buffer object
@@ -145,6 +146,8 @@ GL_Buffer *GL_ConstructBuffer();
  * @param shd The shader to destroy
  */
 void GL_DestroyShader(GL_Shader *shd);
+
+void GL_DestroyComputeShader(GL_ComputeShader *shd);
 
 /**
  * Bind/use a GL shader

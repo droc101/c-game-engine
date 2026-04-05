@@ -392,6 +392,8 @@ void GL_End3DPass(const float exposure)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_MULTISAMPLE);
 
+	glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, uiFrameBufferObject);
 	glBindRenderbuffer(GL_RENDERBUFFER, GL_NONE);
 	GL_UseShader(tonemapShader);
