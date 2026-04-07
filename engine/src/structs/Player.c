@@ -6,6 +6,7 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/Player.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -19,6 +20,7 @@ void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
 	player->transform.rotation = JPH_Quat_Identity;
 	player->canDropHeldActor = true;
+	player->playerCamera.fov = GetState()->options.fov;
 
 	CreatePlayerPhysics(player, physicsSystem);
 }

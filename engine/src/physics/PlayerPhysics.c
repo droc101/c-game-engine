@@ -282,7 +282,7 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 
 		if (player->isFreecamActive)
 		{
-			JPH_Quat_Rotate(&GetState()->camera->transform.rotation, &moveVec, &moveVec);
+			JPH_Quat_Rotate(&GetState()->map->player.playerCamera.transform.rotation, &moveVec, &moveVec);
 		} else if (player->isNoclipActive)
 		{
 			JPH_Quat_Rotate(&player->transform.rotation, &moveVec, &moveVec);
@@ -297,7 +297,7 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 	}
 	if (player->isFreecamActive)
 	{
-		Vector3 *cameraPosition = &GetState()->camera->transform.position;
+		Vector3 *cameraPosition = &GetState()->map->player.playerCamera.transform.position;
 		Vector3_MultiplyScalar(&moveVec, (float)delta / PHYSICS_TARGET_TPS, &moveVec);
 		Vector3_Add(cameraPosition, &moveVec, cameraPosition);
 		return;

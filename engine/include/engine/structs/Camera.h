@@ -13,11 +13,10 @@ struct Camera
 {
 	/// The 3d transform of the camera
 	Transform transform;
-	/// The y-offset, used for view bobbing
-	float yOffset;
-
 	/// The field of view of the camera
 	float fov;
+	/// Whether the 3rd person player model should be rendered
+	bool showPlayerModel;
 };
 
 #endif //GAME_CAMERA_H

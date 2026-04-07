@@ -178,8 +178,11 @@ void UpdateSoundSystem()
 {
 	vec3 listenerPosition = GLM_VEC3_ZERO_INIT;
 	versor listenerRotation = GLM_VEC3_ZERO_INIT;
-	memcpy(&listenerPosition, VECTOR3_TO_VEC3(GetState()->camera->transform.position), sizeof(vec3));
-	QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
+	if (GetState()->map)
+	{
+		memcpy(&listenerPosition, VECTOR3_TO_VEC3(GetState()->camera->transform.position), sizeof(vec3));
+		QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
+	}
 	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{

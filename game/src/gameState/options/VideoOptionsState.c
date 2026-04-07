@@ -129,7 +129,10 @@ void SldOptionsLod(const float value)
 void SldOptionsFov(const float value)
 {
 	GetState()->options.fov = value;
-	GetState()->camera->fov = GetState()->options.fov;
+	if (GetState()->map)
+	{
+		GetState()->camera->fov = GetState()->options.fov;
+	}
 }
 
 void VideoOptionsStateUpdate(GlobalState * /*state*/)

@@ -52,7 +52,8 @@ static const char *spawnActorEveryTick = NULL;
 
 static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 {
-	Transform *transform = state->map->player.isFreecamActive ? &state->camera->transform
+	Camera *playerCamera = &state->map->player.playerCamera;
+	Transform *transform = state->map->player.isFreecamActive ? &playerCamera->transform
 															  : &state->map->player.transform;
 	const float currentPitch = JPH_Quat_GetRotationAngle(&transform->rotation, &Vector3_AxisX) + GLM_PI_2f;
 	JPH_Quat newYaw;
@@ -63,10 +64,15 @@ static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 	JPH_Quat_Multiply(&transform->rotation, &newPitch, &transform->rotation);
 	JPH_Quat_Normalized(&transform->rotation, &transform->rotation);
 
-	state->camera->transform.position.x = transform->position.x;
-	state->camera->transform.position.y = transform->position.y; // + state->camera->yOffset;
-	state->camera->transform.position.z = transform->position.z;
-	state->camera->transform.rotation = transform->rotation;
+	playerCamera->transform.position.x = transform->position.x;
+	playerCamera->transform.position.z = transform->position.z;
+	playerCamera->transform.rotation = transform->rotation;
+	float yPos = transform->position.y;
+	if (!state->map->player.isFreecamActive)
+	{
+		yPos += 0.25f;
+	}
+	playerCamera->transform.position.y = yPos;
 }
 
 void MainStateUpdate(GlobalState *state)
@@ -144,7 +150,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
-	state->camera->yOffset = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
+	state->map->player.viewBobbingHeight = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
 	WaitForLodThreadToEnd();
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!

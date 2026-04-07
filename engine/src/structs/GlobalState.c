@@ -43,9 +43,7 @@ void InitState()
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
-	state.camera = calloc(1, sizeof(Camera));
-	CheckAlloc(state.camera);
-	state.camera->fov = GetState()->options.fov;
+	state.camera = NULL;
 	state.rpcState = IN_MENUS;
 	ListInit(state.saveData->items, LIST_POINTER);
 }
@@ -164,12 +162,14 @@ void ProcessStateChangeQueue()
 
 void ChangeMap(Map *map)
 {
+	state.camera = NULL;
 	PhysicsThreadLockTickMutex();
 	if (state.map)
 	{
 		DestroyMap(state.map);
 	}
 	state.map = map;
+	state.camera = &state.map->player.playerCamera;
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -201,7 +201,6 @@ void DestroyGlobalState()
 	}
 	ListFree(state.saveData->items);
 	free(state.saveData);
-	free(state.camera);
 
 	LogDebug("Cleaning up physics...\n");
 	PhysicsDestroyGlobal(&state);

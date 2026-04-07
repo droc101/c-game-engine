@@ -6,6 +6,7 @@
 #define PLAYER_H
 
 #include <engine/structs/Actor.h>
+#include <engine/structs/Camera.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
@@ -36,6 +37,9 @@ struct Player
 	bool canDropHeldActor;
 	bool isNoclipActive;
 	bool isFreecamActive;
+
+	Camera playerCamera;
+	float viewBobbingHeight;
 };
 
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem);
