@@ -192,7 +192,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -216,7 +216,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0

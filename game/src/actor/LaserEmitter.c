@@ -64,7 +64,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 		KvList laserParams;
 		KvListCreate(laserParams);
 		KvSetByte(laserParams, "height", data->height);
-		KvSetBool(laserParams, "startEnabled", data->startOn);
+		KvSetBool(laserParams, "startOn", data->startOn);
 		data->laserActor = CreateActor(&data->transform,
 									   LASER_ACTOR_NAME,
 									   laserParams,
