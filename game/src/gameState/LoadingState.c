@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -27,7 +28,7 @@ uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
 size_t loadStateFrameCounter = 0;
 
-void LoadingStateUpdate(GlobalState * /*state*/)
+void LoadingStateUpdate(GlobalState *state)
 {
 	if (!loadStateLoadedLevel && loadStateFrameCounter > 2)
 	{
@@ -42,6 +43,7 @@ void LoadingStateUpdate(GlobalState * /*state*/)
 		const uint64_t realLoadEnd = GetTimeNs();
 		const uint64_t realLoadTime = realLoadEnd - realLoadStart;
 		LogInfo("Loaded map %s in %f ms\n", loadStateLevelname, (double)realLoadTime / 1000000.0);
+		MapUpdate(state);
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
