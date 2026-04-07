@@ -45,13 +45,13 @@ void LevelSelectStateUpdate(GlobalState *state)
 			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN) ||
 			GetMouseWheelTicks(mainThreadInput).y < 0)
 		{
-			selectedLevel--;
+			selectedLevel++;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
 		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_UP) ||
 				   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP) ||
 				   GetMouseWheelTicks(mainThreadInput).y > 0)
 		{
-			selectedLevel++;
+			selectedLevel--;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
 		}
 	}
@@ -69,30 +69,39 @@ void LevelSelectStateRender(GlobalState * /*state*/)
 {
 	RenderMenuBackground();
 
-	FontDrawString(v2(20, 20), gameConfig.gameTitle, 128, COLOR_WHITE, largeFont);
-	FontDrawString(v2(20, 150), "Press Space to start.", 32, COLOR(0xFFa0a0a0), largeFont);
+	FontDrawString(v2(52, 52), "Map Select", 64, COLOR_BLACK, smallFont);
+	FontDrawString(v2(50, 50), "Map Select", 64, COLOR_WHITE, smallFont);
 
-	char levelNameBuffer[128];
-
-	if (levelList.length > 0)
+	DrawRect(0, 315, ScaledWindowWidth(), 120, COLOR(0x80000000));
+	if (levelList.length == 0)
 	{
-		char *levelName = ListGetPointer(levelList, selectedLevel);
-
-		snprintf(levelNameBuffer, 128, "%s", levelName);
+		DrawTextAligned("No Levels Found",
+						32,
+						COLOR_WHITE,
+						v2(50, 345),
+						v2(ScaledWindowWidthFloat() - 50, 60),
+						FONT_HALIGN_LEFT,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
 	} else
 	{
-		strcpy((char *)&levelNameBuffer, "No levels found");
+		for (size_t i = 0; i < levelList.length; i++)
+		{
+			const float yPos = (float)(345 + ((i - selectedLevel) * 60));
+			DrawTextAligned(ListGetPointer(levelList, i),
+							32,
+							(int)i == selectedLevel ? COLOR_WHITE : COLOR(0x80ffffff),
+							v2(50, yPos),
+							v2(ScaledWindowWidthFloat() - 50, 60),
+							FONT_HALIGN_LEFT,
+							FONT_VALIGN_MIDDLE,
+							smallFont);
+		}
+		char progress[64];
+		snprintf(progress, 64, "Map %02d/%02zu", selectedLevel + 1, levelList.length);
+		FontDrawString(v2(50, 325), progress, 16, COLOR_WHITE, smallFont);
+		FontDrawString(v2(50, 409), "Up/Down to change, space to play", 16, COLOR_WHITE, smallFont);
 	}
-
-	DrawRect(0, 345, ScaledWindowWidth(), 60, COLOR(0x80000000));
-	DrawTextAligned(levelNameBuffer,
-					32,
-					COLOR_WHITE,
-					v2(50, 250),
-					v2(ScaledWindowWidthFloat() - 50, 250),
-					FONT_HALIGN_LEFT,
-					FONT_VALIGN_MIDDLE,
-					smallFont);
 }
 
 void LoadLevelList()
