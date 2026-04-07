@@ -8,6 +8,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
@@ -117,9 +118,15 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
-	if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
+	if (HasCliArg("--no-background-map"))
 	{
-		ChangeMapByName(gameConfig.backgroundMap);
+		ChangeMap(NULL);
+	} else
+	{
+		if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
+		{
+			ChangeMapByName(gameConfig.backgroundMap);
+		}
 	}
 }
 

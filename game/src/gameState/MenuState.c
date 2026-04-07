@@ -134,9 +134,15 @@ void MenuStateSet()
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);
 	easterEgg = (t->tm_mon == 3 && t->tm_mday == 1) || HasCliArg("--force-menu-easter-egg");
-	if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
+	if (HasCliArg("--no-background-map"))
 	{
-		ChangeMapByName(gameConfig.backgroundMap);
+		ChangeMap(NULL);
+	} else
+	{
+		if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
+		{
+			ChangeMapByName(gameConfig.backgroundMap);
+		}
 	}
 }
 
