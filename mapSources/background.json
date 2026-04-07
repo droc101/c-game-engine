@@ -36,7 +36,7 @@
             },
             "wallMaterials": [
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -180,7 +180,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -192,7 +192,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -204,7 +204,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -216,7 +216,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -228,7 +228,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -815,91 +815,6 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                }
-            ],
-            "points": [
-                {
-                    "x": 15.0,
-                    "z": -1.0
-                },
-                {
-                    "x": 16.0,
-                    "z": -1.0
-                },
-                {
-                    "x": 16.0,
-                    "z": 1.0
-                },
-                {
-                    "x": 15.0,
-                    "z": 1.0
-                }
-            ]
-        },
-        {
-            "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 0.5,
-            "floorMaterial": {
-                "material": "material/dev/floor_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "ceilingMaterial": {
-                "material": "material/dev/ceiling_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "wallMaterials": [
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
                     "material": "material/tools/skip.gmtl",
                     "uvOffset": {
                         "x": 0.0,
@@ -910,68 +825,24 @@
                         "y": 1.0
                     },
                     "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
                 }
             ],
             "points": [
                 {
                     "x": 15.0,
+                    "z": -1.0
+                },
+                {
+                    "x": 16.0,
+                    "z": -1.0
+                },
+                {
+                    "x": 16.0,
                     "z": 1.0
                 },
                 {
                     "x": 15.0,
-                    "z": 1.5
-                },
-                {
-                    "x": 13.25,
-                    "z": 2.0
-                },
-                {
-                    "x": 13.25,
-                    "z": -2.0
-                },
-                {
-                    "x": 15.0,
-                    "z": -1.5
-                },
-                {
-                    "x": 15.0,
-                    "z": -1.0
+                    "z": 1.0
                 }
             ]
         },
@@ -1071,15 +942,112 @@
                     "z": -1.0
                 }
             ]
+        },
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 1.0,
+            "floorMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/tools/invisible.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/tools/invisible.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/tools/invisible.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/tools/invisible.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": 13.0,
+                    "z": 1.0
+                },
+                {
+                    "x": 12.0,
+                    "z": 1.0
+                },
+                {
+                    "x": 12.0,
+                    "z": -1.0
+                },
+                {
+                    "x": 13.0,
+                    "z": -1.0
+                }
+            ]
         }
     ],
     "actors": [
         {
             "class": "player",
             "position": {
-                "x": 13.75,
-                "y": -0.25,
-                "z": 1.25
+                "x": 12.5,
+                "y": -0.5,
+                "z": 0.5
             },
             "rotation": {
                 "x": 0.0,
@@ -1110,43 +1078,6 @@
             }
         },
         {
-            "class": "global_light",
-            "position": {
-                "x": 17.75,
-                "y": 0.0,
-                "z": 0.25
-            },
-            "rotation": {
-                "x": -30.0,
-                "y": 10.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
-                "light_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 0.9955305457115173,
-                        "b": 0.8480392098426819,
-                        "a": 1.0
-                    }
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                }
-            }
-        },
-        {
             "class": "prop_door",
             "position": {
                 "x": 24.5,
@@ -1160,12 +1091,43 @@
             },
             "connections": [],
             "params": {
-                "size": {
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -1176,42 +1138,11 @@
                         "a": 1.0
                     }
                 },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
                     }
                 }
             }
@@ -1230,12 +1161,43 @@
             },
             "connections": [],
             "params": {
-                "size": {
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -1246,42 +1208,11 @@
                         "a": 1.0
                     }
                 },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
                     }
                 }
             }
@@ -1300,26 +1231,26 @@
             },
             "connections": [],
             "params": {
-                "fov": {
-                    "type": "int",
-                    "value": 90
+                "name": {
+                    "type": "string",
+                    "value": "camera"
                 },
                 "show_player_model": {
                     "type": "bool",
                     "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "camera"
+                "fov": {
+                    "type": "int",
+                    "value": 90
                 }
             }
         },
         {
             "class": "io_proxy",
             "position": {
-                "x": 14.25,
-                "y": 0.0,
-                "z": -1.0
+                "x": 12.5,
+                "y": -0.5,
+                "z": -0.5
             },
             "rotation": {
                 "x": 0.0,
@@ -1339,6 +1270,179 @@
                 }
             ],
             "params": {}
+        },
+        {
+            "class": "npc_john",
+            "position": {
+                "x": 18.25,
+                "y": -1.5,
+                "z": -1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_physbox",
+            "position": {
+                "x": 18.75,
+                "y": -1.75,
+                "z": 1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 42.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 20.25,
+                "y": -1.25,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_laser_emitter",
+            "position": {
+                "x": 24.0,
+                "y": -1.0,
+                "z": -1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "startOn": {
+                    "type": "bool",
+                    "value": true
+                },
+                "height": {
+                    "type": "byte",
+                    "value": 1
+                }
+            }
+        },
+        {
+            "class": "prop_laser_emitter",
+            "position": {
+                "x": 24.0,
+                "y": -1.0,
+                "z": 1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "startOn": {
+                    "type": "bool",
+                    "value": true
+                },
+                "height": {
+                    "type": "byte",
+                    "value": 1
+                }
+            }
+        },
+        {
+            "class": "tonemap_controller",
+            "position": {
+                "x": 12.5,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
+                },
+                "exposure": {
+                    "type": "float",
+                    "value": 0.5
+                }
+            }
         }
     ]
 }
