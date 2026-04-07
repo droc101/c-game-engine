@@ -152,7 +152,7 @@ void SldOptionsFov(const float value)
 	GetState()->options.fov = value;
 	if (GetState()->map)
 	{
-		GetState()->camera->fov = GetState()->options.fov;
+		GetState()->map->player.playerCamera.fov = GetState()->options.fov;
 	}
 }
 
