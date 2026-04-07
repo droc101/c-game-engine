@@ -21,6 +21,7 @@ void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 	player->transform.rotation = JPH_Quat_Identity;
 	player->canDropHeldActor = true;
 	player->playerCamera.fov = GetState()->options.fov;
+	player->playerCamera.transform.rotation = JPH_Quat_Identity;
 
 	CreatePlayerPhysics(player, physicsSystem);
 }

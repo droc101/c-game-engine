@@ -324,7 +324,7 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 	}
 	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->map->physicsSystem);
 	if (!JPH_NarrowPhaseQuery_CastRay_GAME(narrowPhaseQuery,
-										   &state->map->player.transform,
+										   &state->map->player.playerCamera.transform,
 										   ACTOR_RAYCAST_MAX_DISTANCE,
 										   raycastResult,
 										   actorRaycastBroadPhaseLayerFilter,
