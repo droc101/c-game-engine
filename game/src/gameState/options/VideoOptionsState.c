@@ -73,6 +73,21 @@ char *SliderLabelLod(const Control *slider)
 	return buf;
 }
 
+char *SliderLabelMaxFps(const Control *slider)
+{
+	const SliderData *data = (SliderData *)slider->controlData;
+	char *buf = malloc(64);
+	CheckAlloc(buf);
+	if (data->value == 0)
+	{
+		sprintf(buf, "%s: Unlimited", data->label);
+	} else
+	{
+		sprintf(buf, "%s: %.0f", data->label, data->value);
+	}
+	return buf;
+}
+
 void CbOptionsFullscreen(const bool value)
 {
 	GetState()->options.fullscreen = value;
@@ -125,6 +140,11 @@ void SldOptionsAnisotropy(const float value)
 void SldOptionsLod(const float value)
 {
 	GetState()->options.lodMultiplier = value;
+}
+
+void SldOptionsMaxFps(const float value)
+{
+	GetState()->options.maxFps = value;
 }
 
 void SldOptionsFov(const float value)
@@ -283,6 +303,19 @@ void VideoOptionsStateSet()
 										0.5,
 										1,
 										SliderLabelLod));
+		opY += opSpacing;
+		UiStackPush(videoOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"Maximum FPS",
+										SldOptionsMaxFps,
+										TOP_CENTER,
+										0,
+										500,
+										GetState()->options.maxFps,
+										10,
+										10,
+										SliderLabelMaxFps));
 #ifdef SDL_PLATFORM_LINUX
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,

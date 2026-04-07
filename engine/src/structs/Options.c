@@ -23,7 +23,6 @@ void DefaultOptions(Options *options)
 	options->uiVolume = 1.0f;
 	options->masterVolume = 1.0f;
 	options->fullscreen = false;
-	options->vsync = false;
 	options->lodMultiplier = 1.0f;
 	options->cameraSpeed = 1;
 	options->controllerMode = false;
@@ -34,9 +33,16 @@ void DefaultOptions(Options *options)
 	options->invertVerticalCamera = false;
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = true;
-	options->limitFpsWhenUnfocused = true;
 	options->fov = 90.0f;
 	options->anisotropy = ANISOTROPY_16X;
+	options->vsync = false;
+#ifdef BUILDSTYLE_DEBUG
+	options->maxFps = 0;
+	options->limitFpsWhenUnfocused = false;
+#else
+	options->maxFps = 240;
+	options->limitFpsWhenUnfocused = true;
+#endif
 }
 
 bool ValidateOptions(const Options *options)

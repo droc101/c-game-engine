@@ -355,6 +355,17 @@ void EngineIteration()
 	{
 		SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 	}
+
+	if (GetState()->options.maxFps != 0)
+	{
+		const uint64_t actualFrameTime = GetTimeNs() - frameStart;
+		const uint64_t targetFrameTime = 1000000000 / (uint64_t)GetState()->options.maxFps;
+		if (targetFrameTime > actualFrameTime)
+		{
+			SDL_DelayPrecise(targetFrameTime - actualFrameTime);
+		}
+	}
+
 	FrameGraphUpdate(GetTimeNs() - frameStart);
 }
 

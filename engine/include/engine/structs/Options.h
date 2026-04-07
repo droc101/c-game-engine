@@ -75,6 +75,7 @@ struct Options
 	float fov;
 	/// Anisotropy level
 	OptionsAnisotropy anisotropy;
+	uint16_t maxFps;
 
 	/* Audio */
 
