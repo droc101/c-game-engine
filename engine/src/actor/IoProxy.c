@@ -13,7 +13,7 @@
 
 static void IoProxyUpdate(Actor *this, double /*delta*/)
 {
-	if (GetState()->map->physicsTick == 1)
+	if (GetState()->map->physicsTick == 0)
 	{
 		ActorFireOutput(this, IO_PROXY_OUTPUT_FIRST_TICK, PARAM_NONE);
 	}
