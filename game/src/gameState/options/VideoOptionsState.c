@@ -194,32 +194,30 @@ void VideoOptionsStateSet()
 
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
+					CreateCheckboxControl(v2(-120, opY),
+										  v2(230, 40),
 										  "Fullscreen",
 										  CbOptionsFullscreen,
 										  TOP_CENTER,
 										  GetState()->options.fullscreen));
-		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
+					CreateCheckboxControl(v2(120, opY),
+										  v2(230, 40),
 										  "VSync",
 										  CbOptionsVsync,
 										  TOP_CENTER,
 										  GetState()->options.vsync));
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Limit FPS when in background",
+					CreateCheckboxControl(v2(-120, opY),
+										  v2(230, 40),
+										  "Limit BG FPS",
 										  CbOptionsLimitFpsWhenUnfocused,
 										  TOP_CENTER,
 										  GetState()->options.limitFpsWhenUnfocused));
-		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
+					CreateCheckboxControl(v2(120, opY),
+										  v2(230, 40),
 										  "Mipmaps",
 										  CbOptionsMipmaps,
 										  TOP_CENTER,
@@ -227,20 +225,18 @@ void VideoOptionsStateSet()
 		opY += opSpacing * 1.5f;
 
 		UiStackPush(videoOptionsStack,
-					CreateRadioButtonControl(v2(0, opY),
-											 v2(480, 40),
-											 "Vulkan (unsupported)",
+					CreateRadioButtonControl(v2(-120, opY),
+											 v2(230, 40),
+											 "Vulkan",
 											 RbOptionsRenderer,
 											 TOP_CENTER,
 											 GetState()->options.renderer == RENDERER_VULKAN,
 											 0,
 											 RENDERER_VULKAN));
-
-		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateRadioButtonControl(v2(0, opY),
-											 v2(480, 40),
-											 "OpenGL (Compatibility)",
+					CreateRadioButtonControl(v2(120, opY),
+											 v2(230, 40),
+											 "OpenGL",
 											 RbOptionsRenderer,
 											 TOP_CENTER,
 											 GetState()->options.renderer == RENDERER_OPENGL,
