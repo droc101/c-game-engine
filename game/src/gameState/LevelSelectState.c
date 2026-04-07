@@ -117,9 +117,9 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
-	if (!GetState()->map || strcmp(GetState()->map->mapName, "background") != 0)
+	if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
 	{
-		ChangeMapByName("background");
+		ChangeMapByName(gameConfig.backgroundMap);
 	}
 }
 

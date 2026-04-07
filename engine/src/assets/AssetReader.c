@@ -75,6 +75,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 
 void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension)
 {
+	// TODO this should do subfolders
 	ListFreeOnlyContents(*output);
 	ListClear(*output);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)

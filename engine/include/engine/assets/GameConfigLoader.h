@@ -50,6 +50,8 @@ struct GameConfig
 
 	// Asset search paths
 	List assetPaths;
+
+	const char *backgroundMap;
 };
 
 /// The loaded game config

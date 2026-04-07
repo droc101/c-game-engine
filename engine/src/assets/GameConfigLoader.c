@@ -92,6 +92,7 @@ void LoadGameConfig(const char *game)
 	gameConfig.gameTitle = strdup(KvGetString(configList, "game_title", "Untitled"));
 	gameConfig.gameCopyright = strdup(KvGetString(configList, "game_copyright", ""));
 	gameConfig.discordAppId = KvGetUint64(configList, "discord_app_id", 0);
+	gameConfig.backgroundMap = strdup(KvGetString(configList, "background_map", "background"));
 
 	ListInit(gameConfig.assetPaths, LIST_POINTER);
 
