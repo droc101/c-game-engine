@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/actor/Camera.h>
 #include <engine/actor/GlobalFog.h>
 #include <engine/actor/GlobalLight.h>
 #include <engine/actor/IoProxy.h>
@@ -90,6 +91,7 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterGlobalFog();
 	RegisterPhysicsModel();
 	RegisterTonemapController();
+	RegisterCamera();
 	RegisterGameActors();
 }
 

@@ -48,8 +48,7 @@ fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14
 
 #endregion
 
-add_library(engine INTERFACE
-        include/engine/graphics/std140.h)
+add_library(engine INTERFACE)
 target_sources(engine INTERFACE
         src/actor/IoProxy.c
         include/engine/actor/IoProxy.h
@@ -75,6 +74,8 @@ target_sources(engine INTERFACE
         src/actor/PhysicsModel.c
         src/actor/TonemapController.c
         include/engine/actor/TonemapController.h
+        src/actor/Camera.c
+        include/engine/actor/Camera.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -136,6 +137,7 @@ target_sources(engine INTERFACE
         src/graphics/vulkan/VulkanPipelines.c
         src/graphics/vulkan/VulkanResources.c
         include/engine/graphics/vulkan/VulkanResources.h
+        include/engine/graphics/std140.h
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h

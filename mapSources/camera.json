@@ -1,0 +1,218 @@
+{
+    "version": 1,
+    "discord_rpc_icon_id": "logo",
+    "discord_rpc_map_name": "Unnamed Map",
+    "has_sky": true,
+    "sky_texture": "texture/level/sky_test.gtex",
+    "light_cube_luxels_per_unit": 4,
+    "sectors": [
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 1.0,
+            "floorMaterial": {
+                "material": "material/floor.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/floor.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/floor.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": -3.0,
+                    "z": -3.0
+                },
+                {
+                    "x": 3.0,
+                    "z": -3.0
+                },
+                {
+                    "x": 3.0,
+                    "z": 3.0
+                },
+                {
+                    "x": -3.0,
+                    "z": 3.0
+                }
+            ]
+        }
+    ],
+    "actors": [
+        {
+            "class": "player",
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {}
+        },
+        {
+            "class": "camera",
+            "position": {
+                "x": 2.0,
+                "y": 0.0,
+                "z": 2.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 45.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "fov": {
+                    "type": "int",
+                    "value": 90
+                },
+                "show_player_model": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": "camera"
+                }
+            }
+        },
+        {
+            "class": "io_proxy",
+            "position": {
+                "x": 2.0,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "camera",
+                    "targetInput": "enable",
+                    "sourceOutput": "first_tick",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {}
+        },
+        {
+            "class": "npc_john",
+            "position": {
+                "x": -1.75,
+                "y": 0.0,
+                "z": 1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_physbox",
+            "position": {
+                "x": -0.25,
+                "y": 0.0,
+                "z": -1.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        }
+    ]
+}

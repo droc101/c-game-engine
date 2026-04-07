@@ -73,6 +73,7 @@ static inline void UpdateCamera(GlobalState *state, const Vector2 cameraMotion)
 		yPos += 0.25f;
 	}
 	playerCamera->transform.position.y = yPos;
+	playerCamera->showPlayerModel = state->map->player.isFreecamActive;
 }
 
 void MainStateUpdate(GlobalState *state)
@@ -86,16 +87,20 @@ void MainStateUpdate(GlobalState *state)
 		return;
 	}
 
-	Vector2 cameraMotion = GetMouseRel(mainThreadInput);
-	cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
-	cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
-	if (state->options.invertHorizontalCamera)
+	Vector2 cameraMotion = v2s(0);
+	if (state->camera == &state->map->player.playerCamera)
 	{
-		cameraMotion.x *= -1;
-	}
-	if (state->options.invertVerticalCamera)
-	{
-		cameraMotion.y *= -1;
+		cameraMotion = GetMouseRel(mainThreadInput);
+		cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
+		cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
+		if (state->options.invertHorizontalCamera)
+		{
+			cameraMotion.x *= -1;
+		}
+		if (state->options.invertVerticalCamera)
+		{
+			cameraMotion.y *= -1;
+		}
 	}
 
 	UpdateCamera(state, cameraMotion);
@@ -118,11 +123,13 @@ void MainStateUpdate(GlobalState *state)
 
 void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
+	const bool allowMovement = state->camera == &state->map->player.playerCamera;
+
 	float distanceTraveled = 0;
-	MovePlayer(&state->map->player, &distanceTraveled, delta);
+	MovePlayer(&state->map->player, &distanceTraveled, delta, allowMovement);
 
 	// TODO: Why is controller rotation handed on the physics thread
-	if (UseController())
+	if (UseController() && allowMovement)
 	{
 		Vector2 cameraMotion = v2s(0);
 
@@ -157,7 +164,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
-	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime);
+	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime, allowMovement);
 
 	JPH_CharacterVirtual_GetPosition(state->map->player.joltCharacter, &state->map->player.transform.position);
 
@@ -201,13 +208,16 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	// TODO proper UI for switching items
-	const float scroll = GetMouseWheel(physicsThreadInput).y;
-	if (scroll > 0)
+	if (allowMovement)
 	{
-		PreviousItem();
-	} else if (scroll < 0)
-	{
-		NextItem();
+		const float scroll = GetMouseWheel(physicsThreadInput).y;
+		if (scroll > 0)
+		{
+			PreviousItem();
+		} else if (scroll < 0)
+		{
+			NextItem();
+		}
 	}
 
 	const JPH_PhysicsUpdateError result = JPH_PhysicsSystem_Update(state->map->physicsSystem,

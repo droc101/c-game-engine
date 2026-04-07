@@ -411,6 +411,11 @@ void RenderInGameMenuBackground()
 void RenderHUD()
 {
 	const GlobalState *state = GetState();
+	if (state->camera != &state->map->player.playerCamera)
+	{
+		return;
+	}
+
 	Vector2 coinIconPos = v2(ScaledWindowWidth() - 260, 16);
 	const Vector2 coinIconSize = v2s(40);
 	DrawTexture(v2(ScaledWindowWidthFloat() - 260, 16), coinIconSize, TEXTURE("interface/hud_ycoin"));

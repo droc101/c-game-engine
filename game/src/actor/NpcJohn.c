@@ -59,8 +59,8 @@ static void JohnUpdate(Actor *this, double /*delta*/)
 {
 	Vector3 position = {};
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	const float rotation = atan2f(GetState()->map->player.transform.position.z - position.z,
-								  GetState()->map->player.transform.position.x - position.x) +
+	const float rotation = atan2f(GetState()->camera->transform.position.z - position.z,
+								  GetState()->camera->transform.position.x - position.x) +
 						   GLM_PI_2f;
 	this->wall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
 	this->wall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));

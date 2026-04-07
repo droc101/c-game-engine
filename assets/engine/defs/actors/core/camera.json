@@ -1,0 +1,33 @@
+{
+  "description": "Player independent camera, useful for cutscenes and such",
+  "extends": "actor",
+  "display": {
+    "directional": true
+  },
+  "inputs": {
+    "enable": {
+      "type": "none",
+      "description": "Set the current camera to this actor"
+    },
+    "disable": {
+      "type": "none",
+      "description": "Restore the camera to the player's camera"
+    }
+  },
+  "outputs": {},
+  "params": {
+    "show_player_model": {
+      "display": "Show player model",
+      "default": true,
+      "type": "bool",
+      "description": "Show the player's third person model from this camera"
+    },
+    "fov": {
+      "display": "FOV",
+      "default": 90,
+      "type": "int",
+      "min": 0,
+      "description": "The field of view of this camera"
+    }
+  }
+}

@@ -224,40 +224,43 @@ void TeleportPlayer(Player *player, const Transform *transform)
 	player->transform = *transform;
 }
 
-void MovePlayer(const Player *player, float *distanceTraveled, const double delta)
+void MovePlayer(const Player *player, float *distanceTraveled, const double delta, const bool allowInput)
 {
 	Vector3 moveVec = Vector3_Zero;
 
-	if (UseController())
+	if (allowInput)
 	{
-		moveVec.z = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTY);
-		moveVec.x = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTX);
-		if (fabsf(moveVec.x) < STICK_DEADZONE)
+		if (UseController())
 		{
-			moveVec.x = 0;
-		}
-		if (fabsf(moveVec.z) < STICK_DEADZONE)
+			moveVec.z = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTY);
+			moveVec.x = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTX);
+			if (fabsf(moveVec.x) < STICK_DEADZONE)
+			{
+				moveVec.x = 0;
+			}
+			if (fabsf(moveVec.z) < STICK_DEADZONE)
+			{
+				moveVec.z = 0;
+			}
+		} else
 		{
-			moveVec.z = 0;
-		}
-	} else
-	{
-		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_W))
-		{
-			moveVec.z -= 1;
-		}
-		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_S))
-		{
-			moveVec.z += 1;
-		}
+			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_W))
+			{
+				moveVec.z -= 1;
+			}
+			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_S))
+			{
+				moveVec.z += 1;
+			}
 
-		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_D))
-		{
-			moveVec.x += 1;
-		}
-		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_A))
-		{
-			moveVec.x -= 1;
+			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_D))
+			{
+				moveVec.x += 1;
+			}
+			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_A))
+			{
+				moveVec.x -= 1;
+			}
 		}
 	}
 
@@ -332,9 +335,12 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 	return (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, raycastResult->bodyID);
 }
 
-void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime)
+void UpdatePlayer(Player *player,
+				  const JPH_PhysicsSystem *physicsSystem,
+				  const float deltaTime,
+				  const bool allowMovement)
 {
-	if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_F8))
+	if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_F8) && allowMovement)
 	{
 		player->isFreecamActive = !player->isFreecamActive;
 		Viewmodel *viewmodel = &GetState()->map->viewmodel;
@@ -354,7 +360,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 		{
 			if ((IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
 				 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH)) &&
-				player->canDropHeldActor)
+				player->canDropHeldActor && allowMovement)
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
@@ -414,7 +420,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				itemTarget = item->definition->FixedUpdate(item, player->targetedActor, &crosshairColor, deltaTime);
 			}
 
-			if (player->targetedActor)
+			if (player->targetedActor && allowMovement)
 			{
 				if (!itemTarget)
 				{
@@ -448,7 +454,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			}
 		}
-		if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_V))
+		if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_V) && allowMovement)
 		{
 			player->isNoclipActive = !player->isNoclipActive;
 		}

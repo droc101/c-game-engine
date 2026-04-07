@@ -333,7 +333,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	}
 	ListUnlock(map->actors);
 
-	if (map->player.isFreecamActive)
+	if (camera->showPlayerModel)
 	{
 		mat4 playerXfm = GLM_MAT4_IDENTITY_INIT;
 		JPH_RMat44 matrix;
@@ -344,7 +344,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	GL_DrawDebugLines();
 
-	if (map->viewmodel.enabled)
+	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 
