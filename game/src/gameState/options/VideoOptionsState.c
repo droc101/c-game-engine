@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -135,12 +136,16 @@ void SldOptionsFov(const float value)
 	}
 }
 
-void VideoOptionsStateUpdate(GlobalState * /*state*/)
+void VideoOptionsStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnVideoOptionsBack();
+	}
+	if (!optionsStateInGame)
+	{
+		MapUpdate(state);
 	}
 }
 
@@ -314,7 +319,7 @@ void VideoOptionsStateDestroy()
 const GameState VideoOptionsState = {
 	.UpdateGame = VideoOptionsStateUpdate,
 	.RenderGame = VideoOptionsStateRender,
-	.FixedUpdateGame = NULL,
+	.FixedUpdateGame = OptionsStateFixedUpdate,
 	.Destroy = VideoOptionsStateDestroy,
 	.Set = VideoOptionsStateSet,
 	.enableRelativeMouseMode = false,

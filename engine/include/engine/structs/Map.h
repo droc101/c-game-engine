@@ -58,6 +58,7 @@ struct MapModel
 
 struct Map
 {
+	char *mapName;
 	/// The name of the icon this map uses for Discord RPC
 	char *discordRpcIcon;
 	/// The display name this map uses for Discord RPC

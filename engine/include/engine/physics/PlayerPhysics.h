@@ -25,9 +25,9 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem);
 
 void TeleportPlayer(Player *player, const Transform *transform);
 
-void MovePlayer(const Player *player, float *distanceTraveled, double delta, const bool allowInput);
+void MovePlayer(const Player *player, float *distanceTraveled, double delta, bool allowInput);
 
-void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime, const bool allowMovement);
+void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime, bool allowMovement);
 
 const Color *GetCrosshairColor();
 

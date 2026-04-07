@@ -270,6 +270,8 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitDPrintConsole();
 
+	LodThreadInit();
+
 	SDL_ShowWindow(GetGameWindow());
 }
 

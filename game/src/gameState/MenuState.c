@@ -10,6 +10,7 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
+#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -20,6 +21,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
@@ -43,13 +45,6 @@ void OpenOptions()
 	optionsStateInGame = false;
 	SetGameState(&OptionsState);
 }
-
-void ReloadAssets()
-{
-	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
-}
-
-void MenuStateUpdate(GlobalState * /*state*/) {}
 
 void MenuStateRender(GlobalState *state)
 {
@@ -133,15 +128,16 @@ void MenuStateSet()
 		opY += opSpacing;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
 		opY += opSpacing;
-		UiStackPush(menuStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
-		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
 
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);
 	easterEgg = (t->tm_mon == 3 && t->tm_mday == 1) || HasCliArg("--force-menu-easter-egg");
+	if (!GetState()->map || strcmp(GetState()->map->mapName, "background") != 0)
+	{
+		ChangeMapByName("background");
+	}
 }
 
 void MenuStateDestroy()
@@ -154,9 +150,9 @@ void MenuStateDestroy()
 }
 
 const GameState MenuState = {
-	.UpdateGame = MenuStateUpdate,
+	.UpdateGame = MapUpdate,
 	.RenderGame = MenuStateRender,
-	.FixedUpdateGame = NULL,
+	.FixedUpdateGame = MapFixedUpdate,
 	.Destroy = MenuStateDestroy,
 	.Set = MenuStateSet,
 	.enableRelativeMouseMode = false,

@@ -16,6 +16,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -387,17 +388,14 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 
 void RenderMenuBackground()
 {
-	// sorry for the confusing variable names
-	const Vector2 bgTileSize = v2(320, 240); // size on screen
-	const Vector2 bgTexSize = GetTextureSize(TEXTURE("interface/menu_bg_tile")); // actual size of the texture
-
-	const Vector2 tilesOnScreen = v2(ScaledWindowWidthFloat() / bgTileSize.x, ScaledWindowHeightFloat() / bgTileSize.y);
-	const Vector2 tileRegion = v2(tilesOnScreen.x * bgTexSize.x, tilesOnScreen.y * bgTexSize.y);
-	DrawTextureRegion(v2(0, 0),
-					  v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
-					  TEXTURE("interface/menu_bg_tile"),
-					  v2(0, 0),
-					  tileRegion);
+	const GlobalState *state = GetState();
+	if (GetState()->map)
+	{
+		RenderMap(state->map, state->camera);
+	} else
+	{
+		DrawTexture(v2s(0), v2(ScaledWindowWidth(), ScaledWindowHeight()), TEXTURE("interface/background_placeholder"));
+	}
 }
 
 void RenderInGameMenuBackground()
@@ -438,6 +436,12 @@ void RenderHUD()
 				   v2s(24),
 				   TEXTURE("interface/crosshair"),
 				   crosshairColor);
+
+	Item *item = GetItem();
+	if (item)
+	{
+		item->definition->RenderHud(item);
+	}
 }
 
 void RenderMap3D(const Map *map, const Camera *cam)

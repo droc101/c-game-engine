@@ -11,4 +11,6 @@
 extern bool optionsStateInGame;
 extern const GameState OptionsState;
 
+void OptionsStateFixedUpdate(GlobalState *state, double delta);
+
 #endif //OPTIONSSTATE_H

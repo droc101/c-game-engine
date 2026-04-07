@@ -13,7 +13,7 @@
 typedef vec4 mat4_std140[4];
 
 /// Align a variable to a multiple of sizeof(float)
-#define STD140_ALIGN(N) _Alignas(N * sizeof(float))
+#define STD140_ALIGN(N) _Alignas((N) * sizeof(float))
 /// STD140 structs require this
 #define STD140 __attribute__((__packed__))
 

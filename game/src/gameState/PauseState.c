@@ -38,7 +38,7 @@ void PauseStateUpdate(GlobalState * /*state*/)
 	}
 }
 
-void PauseStateRender(GlobalState * /*state*/)
+void PauseStateRender(GlobalState *state)
 {
 	RenderInGameMenuBackground();
 
@@ -52,6 +52,7 @@ void PauseStateRender(GlobalState * /*state*/)
 
 #ifdef BUILDSTYLE_DEBUG
 	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", false, COLOR_WHITE);
+	DPrintF("Map: %s", false, COLOR_WHITE, state->map->mapName);
 #endif
 
 	ProcessUiStack(pauseStack);

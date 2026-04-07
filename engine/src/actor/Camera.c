@@ -3,9 +3,16 @@
 //
 
 #include <engine/actor/Camera.h>
+#include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Camera.h>
-#include "engine/structs/Actor.h"
-#include "engine/structs/GlobalState.h"
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
+#include <engine/subsystem/Error.h>
+#include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyInterface.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct CameraData
 {

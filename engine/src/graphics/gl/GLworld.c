@@ -11,6 +11,7 @@
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/std140.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

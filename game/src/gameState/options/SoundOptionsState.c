@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -52,12 +53,16 @@ void SldOptionsUiVolume(const float value)
 	UpdateVolume();
 }
 
-void SoundOptionsStateUpdate(GlobalState * /*state*/)
+void SoundOptionsStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnSoundOptionsBack();
+	}
+	if (!optionsStateInGame)
+	{
+		MapUpdate(state);
 	}
 }
 
@@ -163,7 +168,7 @@ void SoundOptionsStateDestroy()
 const GameState SoundOptionsState = {
 	.UpdateGame = SoundOptionsStateUpdate,
 	.RenderGame = SoundOptionsStateRender,
-	.FixedUpdateGame = NULL,
+	.FixedUpdateGame = OptionsStateFixedUpdate,
 	.Destroy = SoundOptionsStateDestroy,
 	.Set = SoundOptionsStateSet,
 	.enableRelativeMouseMode = false,

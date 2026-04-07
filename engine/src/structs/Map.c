@@ -15,7 +15,6 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
@@ -34,6 +33,7 @@ Map *CreateMap(void)
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
 	CreatePlayer(&map->player, map->physicsSystem);
+	map->mapName = NULL;
 	map->fogColor = COLOR(0xff000000);
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
@@ -93,6 +93,8 @@ void DestroyMap(Map *map)
 		free(map->models);
 		map->models = NULL;
 	}
+
+	free(map->mapName);
 
 	free(map->skyTexture);
 	free(map->discordRpcIcon);

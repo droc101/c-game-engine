@@ -64,7 +64,9 @@ static void TestActorUpdate(Actor *this, const double delta)
 
 static void TestActorRenderUi(Actor *this)
 {
-	DrawTextAligned("I'm TestActor!",
+	if (GetState()->camera == &GetState()->map->player.playerCamera)
+	{
+		DrawTextAligned("I'm TestActor!",
 					16,
 					COLOR_BLACK,
 					v2s(22),
@@ -72,14 +74,16 @@ static void TestActorRenderUi(Actor *this)
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_BOTTOM,
 					smallFont);
-	DrawTextAligned("I'm TestActor!",
-					16,
-					COLOR_WHITE,
-					v2s(20),
-					v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_BOTTOM,
-					smallFont);
+		DrawTextAligned("I'm TestActor!",
+						16,
+						COLOR_WHITE,
+						v2s(20),
+						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
+						FONT_HALIGN_CENTER,
+						FONT_VALIGN_BOTTOM,
+						smallFont);
+	}
+
 	if (!GetState()->map->player.hasHeldActor && GetState()->map->player.targetedActor == this)
 	{
 		DrawTextAligned("please spare me",

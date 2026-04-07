@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -37,12 +38,25 @@ void BtnOptionsBack()
 	}
 }
 
-void OptionsStateUpdate(GlobalState * /*state*/)
+void OptionsStateUpdate(GlobalState *state)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnOptionsBack();
+	}
+
+	if (!optionsStateInGame)
+	{
+		MapUpdate(state);
+	}
+}
+
+void OptionsStateFixedUpdate(GlobalState *state, const double delta)
+{
+	if (!optionsStateInGame)
+	{
+		MapFixedUpdate(state, delta);
 	}
 }
 
@@ -119,7 +133,7 @@ void OptionsStateDestroy()
 const GameState OptionsState = {
 	.UpdateGame = OptionsStateUpdate,
 	.RenderGame = OptionsStateRender,
-	.FixedUpdateGame = NULL,
+	.FixedUpdateGame = OptionsStateFixedUpdate,
 	.Set = OptionsStateSet,
 	.Destroy = OptionsStateDestroy,
 	.enableRelativeMouseMode = false,

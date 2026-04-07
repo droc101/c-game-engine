@@ -154,6 +154,8 @@ target_sources(engine INTERFACE
         include/engine/physics/Physics.h
         src/physics/PlayerPhysics.c
         include/engine/physics/PlayerPhysics.h
+        src/physics/MapPhysics.c
+        include/engine/physics/MapPhysics.h
 
         src/structs/Actor.c
         include/engine/structs/Actor.h

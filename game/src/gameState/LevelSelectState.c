@@ -9,6 +9,7 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
+#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -28,8 +29,10 @@
 int selectedLevel = 0;
 List levelList;
 
-void LevelSelectStateUpdate(GlobalState * /*state*/)
+void LevelSelectStateUpdate(GlobalState *state)
 {
+	MapUpdate(state);
+
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
@@ -81,6 +84,7 @@ void LevelSelectStateRender(GlobalState * /*state*/)
 		strcpy((char *)&levelNameBuffer, "No levels found");
 	}
 
+	DrawRect(0, 345, ScaledWindowWidth(), 60, COLOR(0x80000000));
 	DrawTextAligned(levelNameBuffer,
 					32,
 					COLOR_WHITE,
@@ -104,6 +108,10 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
+	if (!GetState()->map || strcmp(GetState()->map->mapName, "background") != 0)
+	{
+		ChangeMapByName("background");
+	}
 }
 
 void LevelSelectStateDestroy()
@@ -113,7 +121,7 @@ void LevelSelectStateDestroy()
 
 const GameState LevelSelectState = {.UpdateGame = LevelSelectStateUpdate,
 									.RenderGame = LevelSelectStateRender,
-									.FixedUpdateGame = NULL,
+									.FixedUpdateGame = MapFixedUpdate,
 									.Set = LevelSelectStateSet,
 									.Destroy = LevelSelectStateDestroy,
 									.enableRelativeMouseMode = false};

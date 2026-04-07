@@ -7,7 +7,6 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
-#include <engine/structs/Camera.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
@@ -23,6 +22,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80
@@ -224,6 +224,7 @@ bool ChangeMapByName(const char *name)
 		ChangeMap(NULL);
 		return false;
 	}
+	map->mapName = strdup(name);
 	DiscordUpdateRPC();
 	return true;
 }
