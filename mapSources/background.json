@@ -20,7 +20,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "luxels_per_unit": 128
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -57,7 +57,19 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -81,7 +93,31 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -105,7 +141,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -117,7 +153,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -129,43 +165,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 64
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -279,11 +279,11 @@
             "points": [
                 {
                     "x": 12.0,
-                    "z": 10.75
+                    "z": 10.0
                 },
                 {
-                    "x": 17.25,
-                    "z": 10.75
+                    "x": 18.0,
+                    "z": 10.0
                 },
                 {
                     "x": 24.0,
@@ -318,12 +318,12 @@
                     "z": -4.0
                 },
                 {
-                    "x": 17.25,
-                    "z": -10.75
+                    "x": 18.0,
+                    "z": -10.0
                 },
                 {
                     "x": 12.0,
-                    "z": -10.75
+                    "z": -10.0
                 },
                 {
                     "x": 12.0,
@@ -365,7 +365,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "luxels_per_unit": 128
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -402,7 +402,31 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -426,7 +450,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -450,7 +474,31 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -474,55 +522,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/wall_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -602,7 +602,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "luxels_per_unit": 128
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -639,7 +639,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/floor.gmtl",
@@ -675,7 +675,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -687,7 +687,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -699,7 +699,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -763,7 +763,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "luxels_per_unit": 128
             },
             "ceilingMaterial": {
                 "material": "material/dev/wall_test.gmtl",
@@ -775,7 +775,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "luxels_per_unit": 128
             },
             "wallMaterials": [
                 {
@@ -788,7 +788,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -812,7 +812,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "luxels_per_unit": 128
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1091,43 +1091,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -1138,11 +1107,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -1161,43 +1161,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -1208,11 +1177,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -1231,17 +1231,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "camera"
+                "fov": {
+                    "type": "int",
+                    "value": 90
                 },
                 "show_player_model": {
                     "type": "bool",
                     "value": true
                 },
-                "fov": {
-                    "type": "int",
-                    "value": 90
+                "name": {
+                    "type": "string",
+                    "value": "camera"
                 }
             }
         },
@@ -1325,21 +1325,9 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 },
                 "color": {
                     "type": "color",
@@ -1350,9 +1338,21 @@
                         "a": 1.0
                     }
                 },
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1370,17 +1370,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "startOn": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1398,17 +1398,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "startOn": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1426,21 +1426,173 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
+                "exposure": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "interpolation_ticks": {
                     "type": "int",
                     "value": 60
                 },
-                "exposure": {
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 18.0,
+                "y": 0.0,
+                "z": 6.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
                     "type": "float",
-                    "value": 0.5
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 512.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 16.0,
+                "y": 0.0,
+                "z": -8.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.5738396644592285,
+                        "b": 0.8759280443191528,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 512.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 23.75,
+                "y": 0.75,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.9113924503326416,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 256.0
+                }
+            }
+        },
+        {
+            "class": "prop_model_static",
+            "position": {
+                "x": 23.75,
+                "y": 0.75,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/quad.gmdl"
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "collision": {
+                    "type": "byte",
+                    "value": 2
+                },
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         }
