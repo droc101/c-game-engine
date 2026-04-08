@@ -95,11 +95,11 @@ void RenderMenuBackground(GlobalState *state)
 			DrawTextAligned("LOADING",
 							16,
 							COLOR_BLACK,
-						v2s(2),
-						v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
+							v2s(2),
+							v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
+							FONT_HALIGN_CENTER,
+							FONT_VALIGN_MIDDLE,
+							smallFont);
 			DrawTextAligned("LOADING",
 							16,
 							COLOR_WHITE,
