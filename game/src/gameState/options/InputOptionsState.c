@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
@@ -37,7 +38,7 @@ void InputOptionsStateUpdate(GlobalState *state)
 	}
 	if (!optionsStateInGame)
 	{
-		MapUpdate(state);
+		UpdateMenuBackground(state);
 	}
 }
 
@@ -72,14 +73,14 @@ void CbOptionsSwapOkCancel(const bool value)
 	GetState()->options.controllerSwapOkCancel = value;
 }
 
-void InputOptionsStateRender(GlobalState * /*state*/)
+void InputOptionsStateRender(GlobalState *state)
 {
 	if (optionsStateInGame)
 	{
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground();
+		RenderMenuBackground(state);
 	}
 
 	DrawTextAligned("Input Options",

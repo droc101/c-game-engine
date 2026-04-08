@@ -147,6 +147,8 @@ target_sources(engine INTERFACE
         include/engine/helpers/PlatformHelpers.h
         src/helpers/Realloc.c
         include/engine/helpers/Realloc.h
+        src/helpers/BackgroundMapManager.c
+        include/engine/helpers/BackgroundMapManager.h
 
         src/physics/Navigation.c
         include/engine/physics/Navigation.h

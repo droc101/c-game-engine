@@ -10,7 +10,7 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
-#include <engine/physics/MapPhysics.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -21,7 +21,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
@@ -46,9 +45,31 @@ void OpenOptions()
 	SetGameState(&OptionsState);
 }
 
+static void DrawMenuFadeIn(GlobalState *state)
+{
+	// TODO: how to make this play nice with the big lag frame from the background map load
+	// if (menuStateFadeIn)
+	// {
+	// 	const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
+	// 	Color color = COLOR_BLACK;
+	// 	color.a = alpha;
+	// 	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), color);
+	//
+	// 	if (GetState()->physicsFrame >= 20)
+	// 	{
+	// 		menuStateFadeIn = false;
+	// 	}
+	// }
+}
+
 void MenuStateRender(GlobalState *state)
 {
-	RenderMenuBackground();
+	RenderMenuBackground(state);
+	if (!IsBackgroundMapLoaded())
+	{
+		DrawMenuFadeIn(state);
+		return;
+	}
 
 	// draw the logo
 	Vector2 logoPosition;
@@ -99,18 +120,7 @@ void MenuStateRender(GlobalState *state)
 	ProcessUiStack(menuStack);
 	DrawUiStack(menuStack);
 
-	if (menuStateFadeIn)
-	{
-		const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
-		Color color = COLOR_BLACK;
-		color.a = alpha;
-		DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), color);
-
-		if (GetState()->physicsFrame >= 20)
-		{
-			menuStateFadeIn = false;
-		}
-	}
+	DrawMenuFadeIn(state);
 }
 
 void MenuStateSet()
@@ -134,16 +144,7 @@ void MenuStateSet()
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);
 	easterEgg = (t->tm_mon == 3 && t->tm_mday == 1) || HasCliArg("--force-menu-easter-egg");
-	if (HasCliArg("--no-background-map"))
-	{
-		ChangeMap(NULL);
-	} else
-	{
-		if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
-		{
-			ChangeMapByName(gameConfig.backgroundMap);
-		}
-	}
+	EnterMenuBackgroundState();
 }
 
 void MenuStateDestroy()
@@ -156,9 +157,9 @@ void MenuStateDestroy()
 }
 
 const GameState MenuState = {
-	.UpdateGame = MapUpdate,
+	.UpdateGame = UpdateMenuBackground,
 	.RenderGame = MenuStateRender,
-	.FixedUpdateGame = MapFixedUpdate,
+	.FixedUpdateGame = FixedUpdateMenuBackground,
 	.Destroy = MenuStateDestroy,
 	.Set = MenuStateSet,
 	.enableRelativeMouseMode = false,

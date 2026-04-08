@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
@@ -48,7 +49,7 @@ void OptionsStateUpdate(GlobalState *state)
 
 	if (!optionsStateInGame)
 	{
-		MapUpdate(state);
+		UpdateMenuBackground(state);
 	}
 }
 
@@ -56,18 +57,18 @@ void OptionsStateFixedUpdate(GlobalState *state, const double delta)
 {
 	if (!optionsStateInGame)
 	{
-		MapFixedUpdate(state, delta);
+		FixedUpdateMenuBackground(state, delta);
 	}
 }
 
-void OptionsStateRender(GlobalState * /*state*/)
+void OptionsStateRender(GlobalState *state)
 {
 	if (optionsStateInGame)
 	{
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground();
+		RenderMenuBackground(state);
 	}
 
 	DrawTextAligned("Options",

@@ -4,13 +4,11 @@
 
 #include "gameState/LevelSelectState.h"
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/GameConfigLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/helpers/Arguments.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/helpers/MathEx.h>
-#include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -32,7 +30,7 @@ List levelList;
 
 void LevelSelectStateUpdate(GlobalState *state)
 {
-	MapUpdate(state);
+	UpdateMenuBackground(state);
 
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -66,9 +64,13 @@ void LevelSelectStateUpdate(GlobalState *state)
 	}
 }
 
-void LevelSelectStateRender(GlobalState * /*state*/)
+void LevelSelectStateRender(GlobalState *state)
 {
-	RenderMenuBackground();
+	RenderMenuBackground(state);
+	if (!IsBackgroundMapLoaded())
+	{
+		return;
+	}
 
 	FontDrawString(v2(52, 52), "Map Select", 64, COLOR_BLACK, smallFont);
 	FontDrawString(v2(50, 50), "Map Select", 64, COLOR_WHITE, smallFont);
@@ -118,16 +120,7 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
-	if (HasCliArg("--no-background-map"))
-	{
-		ChangeMap(NULL);
-	} else
-	{
-		if (!GetState()->map || strcmp(GetState()->map->mapName, gameConfig.backgroundMap) != 0)
-		{
-			ChangeMapByName(gameConfig.backgroundMap);
-		}
-	}
+	EnterMenuBackgroundState();
 }
 
 void LevelSelectStateDestroy()
@@ -135,9 +128,11 @@ void LevelSelectStateDestroy()
 	ListAndContentsFree(levelList);
 }
 
-const GameState LevelSelectState = {.UpdateGame = LevelSelectStateUpdate,
-									.RenderGame = LevelSelectStateRender,
-									.FixedUpdateGame = MapFixedUpdate,
-									.Set = LevelSelectStateSet,
-									.Destroy = LevelSelectStateDestroy,
-									.enableRelativeMouseMode = false};
+const GameState LevelSelectState = {
+	.UpdateGame = LevelSelectStateUpdate,
+	.RenderGame = LevelSelectStateRender,
+	.FixedUpdateGame = FixedUpdateMenuBackground,
+	.Set = LevelSelectStateSet,
+	.Destroy = LevelSelectStateDestroy,
+	.enableRelativeMouseMode = false,
+};

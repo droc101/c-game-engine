@@ -386,18 +386,6 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 	}
 }
 
-void RenderMenuBackground()
-{
-	const GlobalState *state = GetState();
-	if (GetState()->map)
-	{
-		RenderMap(state->map, state->camera);
-	} else
-	{
-		DrawTexture(v2s(0), v2(ScaledWindowWidth(), ScaledWindowHeight()), TEXTURE("interface/background_placeholder"));
-	}
-}
-
 void RenderInGameMenuBackground()
 {
 	const GlobalState *state = GetState();

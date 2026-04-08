@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/physics/MapPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
@@ -62,18 +63,18 @@ void SoundOptionsStateUpdate(GlobalState *state)
 	}
 	if (!optionsStateInGame)
 	{
-		MapUpdate(state);
+		UpdateMenuBackground(state);
 	}
 }
 
-void SoundOptionsStateRender(GlobalState * /*state*/)
+void SoundOptionsStateRender(GlobalState *state)
 {
 	if (optionsStateInGame)
 	{
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground();
+		RenderMenuBackground(state);
 	}
 
 	DrawTextAligned("Sound Options",
