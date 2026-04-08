@@ -45,6 +45,14 @@ void OpenOptions()
 	SetGameState(&OptionsState);
 }
 
+void ReloadAssets()
+{
+	// TODO this sometimes causes a crash in the physics or lod threads, something isn't syncing.
+	ChangeMap(NULL);
+	EnterMenuBackgroundState();
+	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+}
+
 static void DrawMenuFadeIn(GlobalState *state)
 {
 	// TODO: how to make this play nice with the big lag frame from the background map load
@@ -137,6 +145,8 @@ void MenuStateSet()
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Options", OpenOptions, MIDDLE_CENTER));
 		opY += opSpacing;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
+		opY += opSpacing;
+		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
