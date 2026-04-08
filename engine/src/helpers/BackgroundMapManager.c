@@ -24,6 +24,7 @@
 
 size_t bgMapLoadFrameCounter = 0;
 float placeholderOpacity = 1.0f;
+bool dontLoadBackgroundMap = false;
 
 static bool IsBackgroundMapLoadedIgnoreTicks()
 {
@@ -34,7 +35,7 @@ static bool IsBackgroundMapLoadedIgnoreTicks()
 
 bool IsBackgroundMapLoaded()
 {
-	return HasCliArg("--no-background-map") || (IsBackgroundMapLoadedIgnoreTicks() && GetState()->map->physicsTick > 0);
+	return dontLoadBackgroundMap || (IsBackgroundMapLoadedIgnoreTicks() && GetState()->map->physicsTick > 0);
 }
 
 void EnterMenuBackgroundState()
@@ -43,15 +44,17 @@ void EnterMenuBackgroundState()
 	{
 		bgMapLoadFrameCounter = 0;
 		placeholderOpacity = 1.0f;
+		dontLoadBackgroundMap = HasCliArg("--no-background-map");
+		if (dontLoadBackgroundMap)
+		{
+			ChangeMap(NULL);
+		}
 	}
 }
 
 void UpdateMenuBackground(GlobalState *state)
 {
-	if (HasCliArg("--no-background-map"))
-	{
-		ChangeMap(NULL);
-	} else
+	if (!dontLoadBackgroundMap)
 	{
 		if (!IsBackgroundMapLoadedIgnoreTicks())
 		{
@@ -61,6 +64,7 @@ void UpdateMenuBackground(GlobalState *state)
 				if (!ChangeMapByName(gameConfig.backgroundMap))
 				{
 					LogError("Failed to load background map: %s\n", gameConfig.backgroundMap);
+					dontLoadBackgroundMap = true;
 				}
 				const uint64_t realLoadEnd = GetTimeNs();
 				const uint64_t realLoadTime = realLoadEnd - realLoadStart;
@@ -75,7 +79,7 @@ void UpdateMenuBackground(GlobalState *state)
 
 void RenderMenuBackground(GlobalState *state)
 {
-	if (IsBackgroundMapLoaded() && !HasCliArg("--no-background-map"))
+	if (IsBackgroundMapLoaded() && !dontLoadBackgroundMap)
 	{
 		RenderMap(state->map, state->camera);
 		const uint32_t alpha = (uint32_t)(0xFF * placeholderOpacity) << 24;
@@ -86,10 +90,10 @@ void RenderMenuBackground(GlobalState *state)
 	} else
 	{
 		DrawTexture(v2s(0), v2(ScaledWindowWidth(), ScaledWindowHeight()), TEXTURE("interface/background_placeholder"));
-		if (!HasCliArg("--no-background-map"))
+		if (!dontLoadBackgroundMap)
 		{
 			DrawTextAligned("LOADING",
-						16,
+							16,
 						COLOR_BLACK,
 						v2s(2),
 						v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
@@ -111,7 +115,7 @@ void RenderMenuBackground(GlobalState *state)
 
 void FixedUpdateMenuBackground(GlobalState *state, const double delta)
 {
-	if (IsBackgroundMapLoadedIgnoreTicks() && !HasCliArg("--no-background-map"))
+	if (IsBackgroundMapLoadedIgnoreTicks() && !dontLoadBackgroundMap)
 	{
 		MapFixedUpdate(state, delta);
 		placeholderOpacity -= (float)(delta * 0.01);
