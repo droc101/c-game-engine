@@ -345,7 +345,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	GL_DrawDebugLines();
 
-	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
+	if (map->viewmodel.enabled && camera == &map->player.playerCamera && map->viewmodel.model)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 

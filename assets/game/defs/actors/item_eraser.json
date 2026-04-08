@@ -1,0 +1,10 @@
+{
+  "description": "Eraser item",
+  "extends": "actor",
+  "display": {
+    "model": "model/eraser_w.gmdl"
+  },
+  "inputs": {},
+  "outputs": {},
+  "params": {}
+}

@@ -7,6 +7,7 @@
 #include "actor/Coin.h"
 #include "actor/Door.h"
 #include "actor/Goal.h"
+#include "actor/ItemEraser.h"
 #include "actor/Laser.h"
 #include "actor/LaserEmitter.h"
 #include "actor/NpcJohn.h"
@@ -24,4 +25,5 @@ void RegisterGameActors()
 	RegisterTestActor();
 	RegisterButton();
 	RegisterNpcJohn();
+	RegisterItemEraser();
 }
