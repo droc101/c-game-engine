@@ -34,7 +34,7 @@ static bool IsBackgroundMapLoadedIgnoreTicks()
 
 bool IsBackgroundMapLoaded()
 {
-	return IsBackgroundMapLoadedIgnoreTicks() && GetState()->map->physicsTick > 0;
+	return HasCliArg("--no-background-map") || (IsBackgroundMapLoadedIgnoreTicks() && GetState()->map->physicsTick > 0);
 }
 
 void EnterMenuBackgroundState()
@@ -75,7 +75,7 @@ void UpdateMenuBackground(GlobalState *state)
 
 void RenderMenuBackground(GlobalState *state)
 {
-	if (IsBackgroundMapLoaded())
+	if (IsBackgroundMapLoaded() && !HasCliArg("--no-background-map"))
 	{
 		RenderMap(state->map, state->camera);
 		const uint32_t alpha = (uint32_t)(0xFF * placeholderOpacity) << 24;
@@ -86,7 +86,9 @@ void RenderMenuBackground(GlobalState *state)
 	} else
 	{
 		DrawTexture(v2s(0), v2(ScaledWindowWidth(), ScaledWindowHeight()), TEXTURE("interface/background_placeholder"));
-		DrawTextAligned("LOADING",
+		if (!HasCliArg("--no-background-map"))
+		{
+			DrawTextAligned("LOADING",
 						16,
 						COLOR_BLACK,
 						v2s(2),
@@ -94,21 +96,22 @@ void RenderMenuBackground(GlobalState *state)
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
 						smallFont);
-		DrawTextAligned("LOADING",
-						16,
-						COLOR_WHITE,
-						v2s(0),
-						v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
+			DrawTextAligned("LOADING",
+							16,
+							COLOR_WHITE,
+							v2s(0),
+							v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
+							FONT_HALIGN_CENTER,
+							FONT_VALIGN_MIDDLE,
+							smallFont);
+		}
 	}
 	bgMapLoadFrameCounter++;
 }
 
 void FixedUpdateMenuBackground(GlobalState *state, const double delta)
 {
-	if (IsBackgroundMapLoadedIgnoreTicks())
+	if (IsBackgroundMapLoadedIgnoreTicks() && !HasCliArg("--no-background-map"))
 	{
 		MapFixedUpdate(state, delta);
 		placeholderOpacity -= (float)(delta * 0.01);
