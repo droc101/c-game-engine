@@ -47,7 +47,7 @@ void LoadingStateUpdate(GlobalState *state)
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
-	if (loadTime > LEVEL_LOAD_MIN_TIME_MS)
+	if (loadTime > LEVEL_LOAD_MIN_TIME_MS && loadStateLoadedLevel)
 	{
 		SetGameState(&MainState);
 	}
