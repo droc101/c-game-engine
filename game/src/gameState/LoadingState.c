@@ -26,11 +26,11 @@
 char *loadStateLevelname = NULL;
 uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
-size_t loadStateFrameCounter = 0;
+bool frameDrawn = false;
 
 void LoadingStateUpdate(GlobalState *state)
 {
-	if (!loadStateLoadedLevel && loadStateFrameCounter > 2)
+	if (!loadStateLoadedLevel && frameDrawn)
 	{
 		loadStateLoadedLevel = true;
 		const uint64_t realLoadStart = GetTimeNs();
@@ -47,7 +47,7 @@ void LoadingStateUpdate(GlobalState *state)
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
-	if (loadTime > LEVEL_LOAD_MIN_TIME_MS && loadStateLoadedLevel)
+	if (loadStateLoadedLevel && loadTime > LEVEL_LOAD_MIN_TIME_MS)
 	{
 		SetGameState(&MainState);
 	}
@@ -63,12 +63,12 @@ void LoadingStateRender(GlobalState * /*state*/)
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
-	loadStateFrameCounter++;
+	frameDrawn = true;
 }
 
 void LoadingStateSet()
 {
-	loadStateFrameCounter = 0;
+	frameDrawn = false;
 	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
 	assert(loadStateLevelname);
