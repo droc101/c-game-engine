@@ -112,6 +112,10 @@ void SwitchToItem(const ItemDefinition *definition)
 
 void NextItem()
 {
+	if (state.saveData->items.length == 0)
+	{
+		return;
+	}
 	if (state.saveData->currentItem < state.saveData->items.length - 1)
 	{
 		const Item *next = ListGetPointer(state.saveData->items, state.saveData->currentItem + 1);
@@ -121,6 +125,10 @@ void NextItem()
 
 void PreviousItem()
 {
+	if (state.saveData->items.length == 0)
+	{
+		return;
+	}
 	if (state.saveData->currentItem > 0)
 	{
 		const Item *next = ListGetPointer(state.saveData->items, state.saveData->currentItem - 1);
