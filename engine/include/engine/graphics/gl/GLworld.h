@@ -28,8 +28,11 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
  * Get the transform matrix for the viewmodel/held item
  * @param map The map containing the viewmodel
  * @param out The destination matrix
+ * @param camera
  */
-void GL_GetViewmodelMatrix(const Map *map, mat4 *out);
+void GL_GetViewmodelProjectionMatrix(const Map *map, mat4 *out, const Camera *camera);
+
+void GL_GetViewmodelModelWorldMatrix(const Map *map, mat4 *out, const Camera *camera);
 
 /**
  * OpenGL code to render the 3D portion of a map
