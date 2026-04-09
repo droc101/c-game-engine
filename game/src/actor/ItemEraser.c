@@ -42,16 +42,26 @@ void ItemEraserInit(Actor *this, const KvList /*params*/, Transform *transform)
 	CreateItemEraserCollider(this, transform);
 }
 
+void ItemEraserActivate(Actor *this)
+{
+	if (HasItem(&eraserItemDefinition))
+	{
+		SwitchToItem(&eraserItemDefinition);
+	} else
+	{
+		GiveItem(&eraserItemDefinition, true);
+		RemoveActor(this);
+	}
+}
+
 static void ItemEraserOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
-	GiveItem(&eraserItemDefinition, true);
-	RemoveActor(this);
+	ItemEraserActivate(this);
 }
 
 static void ItemEraserInteracted(Actor *this)
 {
-	GiveItem(&eraserItemDefinition, true);
-	RemoveActor(this);
+	ItemEraserActivate(this);
 }
 
 ActorDefinition itemEraserActorDefinition = {

@@ -62,19 +62,25 @@ Item *GetItem()
 	return NULL;
 }
 
+bool HasItem(const ItemDefinition *definition)
+{
+	for (size_t i = 0; i < state.saveData->items.length; i++)
+	{
+		const Item *item = ListGetPointer(state.saveData->items, i);
+		if (item->definition == definition)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void GiveItem(const ItemDefinition *definition, const bool switchToItem)
 {
-	if (switchToItem)
+	if (switchToItem && HasItem(definition))
 	{
-		for (size_t i = 0; i < state.saveData->items.length; i++)
-		{
-			const Item *item = ListGetPointer(state.saveData->items, i);
-			if (item->definition == definition)
-			{
-				SwitchToItem(definition);
-				return;
-			}
-		}
+		SwitchToItem(definition);
+		return;
 	}
 	Item *item = malloc(sizeof(Item));
 	CheckAlloc(item);

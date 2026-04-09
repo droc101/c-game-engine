@@ -90,6 +90,8 @@ GlobalState *GetState();
 
 Item *GetItem();
 
+bool HasItem(const ItemDefinition *definition);
+
 void GiveItem(const ItemDefinition *definition, bool switchToItem);
 
 void SwitchToItem(const ItemDefinition *definition);
