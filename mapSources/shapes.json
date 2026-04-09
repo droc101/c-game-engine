@@ -3641,13 +3641,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "isBlue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3696,13 +3696,9 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
                 },
                 "light_color": {
                     "type": "color",
@@ -3713,9 +3709,13 @@
                         "a": 1.0
                     }
                 },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3733,43 +3733,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": "goal_door"
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -3780,11 +3749,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": "goal_door"
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -3803,43 +3803,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": "goal_door"
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -3850,11 +3819,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": "goal_door"
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -3873,13 +3873,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "startEnabled": {
                     "type": "bool",
                     "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3897,13 +3897,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "isBlue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3921,13 +3921,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "isBlue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3945,13 +3945,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "isBlue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3969,13 +3969,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "isBlue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3993,16 +3993,31 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
+                "solid": {
+                    "type": "bool",
+                    "value": true
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/uvtest.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
-                        "x": 0.0,
-                        "y": 0.0
+                        "x": 1.0,
+                        "y": 1.0
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 2.0,
+                        "y": 1.0
+                    }
                 },
                 "color": {
                     "type": "color",
@@ -4013,31 +4028,16 @@
                         "a": 1.0
                     }
                 },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 2.0,
-                        "y": 1.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
+                "name": {
                     "type": "string",
-                    "value": "texture/level/uvtest.gtex"
+                    "value": ""
                 },
-                "solid": {
-                    "type": "bool",
-                    "value": true
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
                 }
             }
         },
@@ -4055,17 +4055,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 },
                 "startOn": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 }
             }
         },
@@ -4083,17 +4083,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 },
                 "startOn": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 }
             }
         },
@@ -4111,17 +4111,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 },
                 "startOn": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 }
             }
         },
@@ -4139,17 +4139,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 },
                 "startOn": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 }
             }
         },
@@ -4198,43 +4198,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": false
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -4245,11 +4214,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -4268,43 +4268,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stayOpen": {
-                    "type": "bool",
-                    "value": false
-                },
-                "preventPlayerOpen": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -4315,11 +4284,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preventPlayerOpen": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stayOpen": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }

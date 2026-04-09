@@ -50,6 +50,8 @@ extern GLint uiTexturedVertexLoc;
 /// The location of the vertex UV attribute in the UI textured shader
 extern GLint uiTexturedUvLoc;
 
+extern GLint actorWallShadedLightMetadataLoc;
+extern GLint actorWallShadedPointLightsLoc;
 /// The location of the texture uniform in the shaded actor wall shader
 extern GLint actorWallShadedTextureLoc;
 /// The location of the model -> world matrix in the shaded actor wall shader
@@ -63,8 +65,7 @@ extern GLint actorWallShadedAlbColorLoc;
 extern GLint actorWallShadedVertexLoc;
 /// The location of the vertex UV attribute in the shaded actor wall shader
 extern GLint actorWallShadedUvLoc;
-/// The location of the vertex angle attribute in the shaded actor wall shader
-extern GLint actorWallShadedAngleLoc;
+extern GLint actorWallShadedNormalLoc;
 
 /// The location of the texture uniform in the unshaded actor wall shader
 extern GLint actorWallUnshadedTextureLoc;
@@ -100,6 +101,8 @@ extern GLint skyColorLoc;
 
 /// The location of the shared uniforms buffer on the shaded model shader
 extern GLint shadedActorModelSharedUniformsLoc;
+extern GLint shadedActorLightMetadataLoc;
+extern GLint shadedActorPointLightsLoc;
 /// The location of the model -> world matrix on the shaded model shader
 extern GLint shadedActorModelModelWorldMatrixLoc;
 /// The location of the material color uniform in the shaded model shader

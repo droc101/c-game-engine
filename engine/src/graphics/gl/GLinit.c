@@ -7,6 +7,7 @@
 #include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/gl/GLobjects.h>
 #include <engine/graphics/gl/GLshaders.h>
+#include <engine/graphics/gl/GLworld.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
@@ -163,6 +164,7 @@ bool GL_Init(SDL_Window *wnd)
 void GL_DestroyGL()
 {
 	LogDebug("Cleaning up OpenGL renderer...\n");
+	GL_LoadMap(NULL);
 	GL_DestroyFramebuffer();
 	GL_DestroyShaders();
 	GL_DestroyObjects();

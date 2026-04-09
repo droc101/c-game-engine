@@ -72,6 +72,8 @@ void ReadString(const uint8_t *data, size_t *offset, char *dest, size_t len);
  */
 short ReadShort(const uint8_t *data, size_t *offset);
 
+uint16_t ReadUint16(const uint8_t *data, size_t *offset);
+
 /**
  * Reads arbitrary bytes from the given data at the given offset into dest
  * @param data The data to read from

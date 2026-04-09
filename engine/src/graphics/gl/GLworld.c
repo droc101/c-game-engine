@@ -19,6 +19,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
@@ -34,6 +35,8 @@
 #include <string.h>
 
 GLuint lightmap = 0;
+GLuint lightMetadataBuffer = 0;
+GLuint pointLightBuffer = 0;
 
 void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
@@ -42,6 +45,8 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	GL_UseShader(actorWallShadedShader);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallShadedSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallShadedLightMetadataLoc, lightMetadataBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, actorWallShadedPointLightsLoc, pointLightBuffer);
 
 	glUniformMatrix4fv(actorWallShadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
 
@@ -57,7 +62,7 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
 							 wall->uvScale.y * wall->height + wall->uvOffset.y);
 	const float backfaceWallAngle = wall->angle + PIf;
-	const float vertices[8][6] = {
+	const float vertices[8][8] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
@@ -65,7 +70,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			startVertex.y,
 			startUV.x,
 			startUV.y,
-			wall->angle,
+			sinf(wall->angle),
+			0,
+			cosf(wall->angle),
 		},
 		{
 			endVertex.x,
@@ -73,7 +80,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			endVertex.y,
 			endUV.x,
 			startUV.y,
-			wall->angle,
+			sinf(wall->angle),
+			0,
+			cosf(wall->angle),
 		},
 		{
 			endVertex.x,
@@ -81,7 +90,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			endVertex.y,
 			endUV.x,
 			endUV.y,
-			wall->angle,
+			sinf(wall->angle),
+			0,
+			cosf(wall->angle),
 		},
 		{
 			startVertex.x,
@@ -89,7 +100,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			startVertex.y,
 			startUV.x,
 			endUV.y,
-			wall->angle,
+			sinf(wall->angle),
+			0,
+			cosf(wall->angle),
 		},
 
 		// backface
@@ -99,7 +112,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			startVertex.y,
 			endUV.x,
 			startUV.y,
-			backfaceWallAngle,
+			sinf(backfaceWallAngle),
+			0,
+			cosf(backfaceWallAngle),
 		},
 		{
 			endVertex.x,
@@ -107,7 +122,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			endVertex.y,
 			startUV.x,
 			startUV.y,
-			backfaceWallAngle,
+			sinf(backfaceWallAngle),
+			0,
+			cosf(backfaceWallAngle),
 		},
 		{
 			endVertex.x,
@@ -115,7 +132,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			endVertex.y,
 			startUV.x,
 			endUV.y,
-			backfaceWallAngle,
+			sinf(backfaceWallAngle),
+			0,
+			cosf(backfaceWallAngle),
 		},
 		{
 			startVertex.x,
@@ -123,7 +142,9 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 			startVertex.y,
 			endUV.x,
 			endUV.y,
-			backfaceWallAngle,
+			sinf(backfaceWallAngle),
+			0,
+			cosf(backfaceWallAngle),
 		},
 	};
 
@@ -134,24 +155,24 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	glVertexAttribPointer(actorWallShadedVertexLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	glVertexAttribPointer(actorWallShadedVertexLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(actorWallShadedVertexLoc);
 
 	glVertexAttribPointer(actorWallShadedUvLoc,
 						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  6 * sizeof(GLfloat),
+						  8 * sizeof(GLfloat),
 						  (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(actorWallShadedUvLoc);
 
-	glVertexAttribPointer(actorWallShadedAngleLoc,
-						  1,
+	glVertexAttribPointer(actorWallShadedNormalLoc,
+						  3,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  6 * sizeof(GLfloat),
+						  8 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(actorWallShadedAngleLoc);
+	glEnableVertexAttribArray(actorWallShadedNormalLoc);
 
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, NULL);
 }
@@ -385,6 +406,8 @@ void GL_RenderShadedModelPart(const ModelDefinition *model,
 	GL_LoadTextureFromAsset(mat->texture);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, shadedActorModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedActorLightMetadataLoc, lightMetadataBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, shadedActorPointLightsLoc, pointLightBuffer);
 
 	glUniformMatrix4fv(shadedActorModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *modelWorldMatrix); // model -> world
@@ -591,6 +614,15 @@ void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 
 void GL_LoadMap(const Map *map)
 {
+	if (glIsBuffer(lightMetadataBuffer))
+	{
+		glDeleteBuffers(1, &lightMetadataBuffer);
+	}
+	if (glIsBuffer(pointLightBuffer))
+	{
+		glDeleteBuffers(1, &pointLightBuffer);
+	}
+
 	GL_DestroyMapModels();
 	if (glIsTexture(lightmap))
 	{
@@ -599,6 +631,19 @@ void GL_LoadMap(const Map *map)
 	glActiveTexture(GL_TEXTURE1);
 	if (map)
 	{
+		const GL_LightMetadata metadata = {
+			.numPointLights = map->numPointLights,
+		};
+		glGenBuffers(1, &lightMetadataBuffer);
+		glBindBuffer(GL_UNIFORM_BUFFER, lightMetadataBuffer);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_LightMetadata), &metadata, GL_STATIC_READ);
+		glGenBuffers(1, &pointLightBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER,
+					 (GLsizeiptr)(sizeof(PointLight) * metadata.numPointLights),
+					 map->pointLights,
+					 GL_STATIC_READ);
+
 		for (size_t i = 0; i < map->modelCount; i++)
 		{
 			GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
@@ -634,6 +679,8 @@ void GL_LoadMap(const Map *map)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)

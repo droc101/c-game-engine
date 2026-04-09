@@ -31,6 +31,8 @@ GLint uiTexturedRegionLoc;
 GLint uiTexturedVertexLoc;
 GLint uiTexturedUvLoc;
 
+GLint actorWallShadedLightMetadataLoc;
+GLint actorWallShadedPointLightsLoc;
 GLint actorWallShadedTextureLoc;
 GLint actorWallShadedModelWorldMatrixLoc;
 GLint actorWallShadedSharedUniformsLoc;
@@ -38,7 +40,7 @@ GLint actorWallShadedTransformMatrixLoc;
 GLint actorWallShadedAlbColorLoc;
 GLint actorWallShadedVertexLoc;
 GLint actorWallShadedUvLoc;
-GLint actorWallShadedAngleLoc;
+GLint actorWallShadedNormalLoc;
 
 GLint actorWallUnshadedTextureLoc;
 GLint actorWallUnshadedModelWorldMatrixLoc;
@@ -59,6 +61,8 @@ GLint skyUvLoc;
 GLint skyColorLoc;
 
 GLint shadedActorModelSharedUniformsLoc;
+GLint shadedActorLightMetadataLoc;
+GLint shadedActorPointLightsLoc;
 GLint shadedActorModelModelWorldMatrixLoc;
 GLint shadedActorModelAlbColorLoc;
 GLint shadedActorModelModColorLoc;
@@ -132,6 +136,9 @@ bool GL_LoadShaders()
 	uiTexturedVertexLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX");
 	uiTexturedUvLoc = glGetAttribLocation(uiTexturedShader->program, "VERTEX_UV");
 
+	actorWallShadedLightMetadataLoc = glGetUniformBlockIndex(actorWallShadedShader->program, "LightMetadata");
+	actorWallShadedPointLightsLoc =
+			2; //glGetProgramResourceIndex(actorWallShadedShader->program, GL_SHADER_STORAGE_BLOCK, "PointLights");
 	actorWallShadedTextureLoc = glGetUniformLocation(actorWallShadedShader->program, "alb");
 	actorWallShadedModelWorldMatrixLoc = glGetUniformLocation(actorWallShadedShader->program, "MODEL_WORLD_MATRIX");
 	actorWallShadedSharedUniformsLoc = glGetUniformBlockIndex(actorWallShadedShader->program, "SharedUniforms");
@@ -139,7 +146,7 @@ bool GL_LoadShaders()
 	actorWallShadedAlbColorLoc = glGetUniformLocation(actorWallShadedShader->program, "albColor");
 	actorWallShadedVertexLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX");
 	actorWallShadedUvLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX_UV");
-	actorWallShadedAngleLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX_ANGLE");
+	actorWallShadedNormalLoc = glGetAttribLocation(actorWallShadedShader->program, "VERTEX_NORMAL");
 
 	actorWallUnshadedTextureLoc = glGetUniformLocation(actorWallUnshadedShader->program, "alb");
 	actorWallUnshadedModelWorldMatrixLoc = glGetUniformLocation(actorWallUnshadedShader->program, "MODEL_WORLD_MATRIX");
@@ -159,6 +166,9 @@ bool GL_LoadShaders()
 	skyUvLoc = glGetAttribLocation(skyShader->program, "VERTEX_UV");
 	skyColorLoc = glGetAttribLocation(skyShader->program, "VERTEX_COLOR");
 
+	shadedActorLightMetadataLoc = glGetUniformBlockIndex(actorShadedShader->program, "LightMetadata");
+	shadedActorPointLightsLoc =
+			2; //glGetProgramResourceIndex(actorShadedShader->program, GL_SHADER_STORAGE_BLOCK, "PointLights");
 	shadedActorModelSharedUniformsLoc = glGetUniformBlockIndex(actorShadedShader->program, "SharedUniforms");
 	shadedActorModelModelWorldMatrixLoc = glGetUniformLocation(actorShadedShader->program, "MODEL_WORLD_MATRIX");
 	shadedActorModelAlbColorLoc = glGetUniformLocation(actorShadedShader->program, "albColor");

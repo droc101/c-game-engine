@@ -62,6 +62,14 @@ short ReadShort(const uint8_t *data, size_t *offset)
 	return s;
 }
 
+uint16_t ReadUint16(const uint8_t *data, size_t *offset)
+{
+	uint16_t s = 0;
+	memcpy(&s, data + *offset, sizeof(uint16_t));
+	*offset += sizeof(uint16_t);
+	return s;
+}
+
 void ReadBytes(const uint8_t *data, size_t *offset, const size_t len, void *dest)
 {
 	memcpy(dest, data + *offset, len);

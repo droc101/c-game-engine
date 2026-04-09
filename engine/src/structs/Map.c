@@ -45,6 +45,8 @@ Map *CreateMap(void)
 	map->physicsTick = 0;
 	map->changeFlags = 0;
 	map->exposure = 1.0f;
+	map->numPointLights = 0;
+	map->pointLights = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
@@ -101,6 +103,8 @@ void DestroyMap(Map *map)
 	free(map->discordRpcName);
 
 	free(map->lightmapPixels);
+
+	free(map->pointLights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 

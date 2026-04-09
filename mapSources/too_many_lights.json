@@ -119,18 +119,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -139,6 +127,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -156,18 +156,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -176,6 +164,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -193,18 +193,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -213,6 +201,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -230,18 +230,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -250,6 +238,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -267,18 +267,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -287,6 +275,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -304,18 +304,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -324,6 +312,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -341,18 +341,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -361,6 +349,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -378,18 +378,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -398,6 +386,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -415,18 +415,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -435,6 +423,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -452,18 +452,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -472,6 +460,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -489,18 +489,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -509,6 +497,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -526,18 +526,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -546,6 +534,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -563,18 +563,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -583,6 +571,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -600,18 +600,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -620,6 +608,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -637,18 +637,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -657,6 +645,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -674,18 +674,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -694,6 +682,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -711,18 +711,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -731,6 +719,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -748,18 +748,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -768,6 +756,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -785,18 +785,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -805,6 +793,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -822,18 +822,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -842,6 +830,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -859,18 +859,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -879,6 +867,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -896,18 +896,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -916,6 +904,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -933,18 +933,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -953,6 +941,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -970,18 +970,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -990,6 +978,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1007,18 +1007,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1027,6 +1015,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1044,18 +1044,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1064,6 +1052,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1081,18 +1081,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1101,6 +1089,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1118,18 +1118,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1138,6 +1126,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1155,18 +1155,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1175,6 +1163,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1192,18 +1192,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1212,6 +1200,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1229,18 +1229,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1249,6 +1237,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1266,18 +1266,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1286,6 +1274,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1303,18 +1303,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1323,6 +1311,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1340,18 +1340,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1360,6 +1348,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1377,18 +1377,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1397,6 +1385,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         },
@@ -1414,18 +1414,6 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1434,6 +1422,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "range": {
+                    "type": "float",
+                    "value": 2.0
                 }
             }
         }

@@ -9,6 +9,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
@@ -112,6 +113,9 @@ struct Map
 	size_t lightmapWidth;
 	size_t lightmapHeight;
 	void *lightmapPixels;
+
+	uint16_t numPointLights;
+	PointLight *pointLights;
 };
 
 /**

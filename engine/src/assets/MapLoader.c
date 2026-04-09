@@ -16,6 +16,7 @@
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
@@ -281,6 +282,27 @@ bool LoadMap(Map *map, Asset *mapData)
 	map->lightmapPixels = malloc(lightmapDataSize);
 	CheckAlloc(map->lightmapPixels);
 	ReadBytes(mapData->data, &offset, lightmapDataSize, map->lightmapPixels);
+
+	EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
+	map->numPointLights = ReadUint16(mapData->data, &offset);
+	map->pointLights = malloc(sizeof(PointLight) * map->numPointLights);
+	CheckAlloc(map->pointLights);
+	EXPECT_BYTES_BOOL(sizeof(float) * 8 * map->numPointLights, bytesRemaining);
+	for (size_t i = 0; i < map->numPointLights; i++)
+	{
+		PointLight *light = &map->pointLights[i];
+		light->position[0] = ReadFloat(mapData->data, &offset);
+		light->position[1] = ReadFloat(mapData->data, &offset);
+		light->position[2] = ReadFloat(mapData->data, &offset);
+
+		light->color[0] = ReadFloat(mapData->data, &offset);
+		light->color[1] = ReadFloat(mapData->data, &offset);
+		light->color[2] = ReadFloat(mapData->data, &offset);
+
+		light->brightnessScale = ReadFloat(mapData->data, &offset);
+		light->range = ReadFloat(mapData->data, &offset);
+		light->attenuation = ReadFloat(mapData->data, &offset);
+	}
 
 	FreeAsset(mapData);
 

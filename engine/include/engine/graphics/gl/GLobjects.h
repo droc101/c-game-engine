@@ -26,6 +26,7 @@ typedef struct GL_ModelBuffers GL_ModelBuffers;
 typedef struct GL_SharedUniforms GL_SharedUniforms;
 typedef struct GL_DebugLine GL_DebugLine;
 typedef struct GL_MapModelBuffer GL_MapModelBuffer;
+typedef struct GL_LightMetadata GL_LightMetadata;
 
 struct GL_Shader
 {
@@ -91,6 +92,11 @@ struct GL_DebugLine
 	Vector3 startColor;
 	Vector3 end;
 	Vector3 endColor;
+};
+
+struct STD140 GL_LightMetadata
+{
+	STD140_UINT numPointLights;
 };
 
 /// Loaded textures
