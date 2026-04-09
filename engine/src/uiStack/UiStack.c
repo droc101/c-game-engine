@@ -24,8 +24,6 @@
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/controls/TextBox.h>
 
-#include "engine/subsystem/Timing.h"
-
 typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
 typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
 typedef void (*ControlDestroyFunc)(const Control *);
@@ -327,23 +325,7 @@ Control *CreateEmptyControl()
 
 void UiStackPush(UiStack *stack, Control *control)
 {
-	if (stack->controls.length == 0)
-	{
-		srand(GetTimeNs());
-		ListAdd(stack->controls, control);
-	} else
-	{
-		uint32_t index = (float)rand() / RAND_MAX * stack->controls.length;
-		Control *oldControl = ListGetPointer(stack->controls, index);
-		Vector2 tmp = control->position;
-		control->position = oldControl->position;
-		oldControl->position = tmp;
-		ControlAnchor tmp2 = control->anchor;
-		control->anchor = oldControl->anchor;
-		oldControl->anchor = tmp2;
-		ListAdd(stack->controls, oldControl);
-		ListSet(stack->controls, index, control);
-	}
+	ListAdd(stack->controls, control);
 }
 
 void UiStackRemove(UiStack *stack, const Control *control)
