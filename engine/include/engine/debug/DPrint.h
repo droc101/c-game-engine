@@ -22,7 +22,7 @@ void DPrint(const char *str, Color color);
 /**
  * Prints a string to the screen and optionally to the console (stdout)
  * @param format Format string
- * @param con Whether to print to the console
+ * @param printToConsole Whether to print to the console
  * @param color Text color
  * @param ... Parameters to be formatted
  */

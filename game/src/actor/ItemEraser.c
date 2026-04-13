@@ -11,13 +11,22 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
+#include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "item/EraserItem.h"
+
+typedef struct ItemEraserData ItemEraserData;
+
+struct ItemEraserData
+{
+	bool alwaysGive;
+};
 
 static inline void CreateItemEraserCollider(Actor *this, const Transform *transform)
 {
@@ -33,18 +42,23 @@ static inline void CreateItemEraserCollider(Actor *this, const Transform *transf
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void ItemEraserInit(Actor *this, const KvList /*params*/, Transform *transform)
+void ItemEraserInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->hasModel = true;
 	this->model = LoadModel(MODEL("eraser_w"));
 	this->flags = ACTOR_FLAG_INTERACTABLE;
+	ItemEraserData *data = malloc(sizeof(ItemEraserData));
+	CheckAlloc(data);
+	data->alwaysGive = KvGetBool(params, "always_give", false);
+	this->extraData = data;
 
 	CreateItemEraserCollider(this, transform);
 }
 
 void ItemEraserActivate(Actor *this)
 {
-	if (HasItem(&eraserItemDefinition))
+	const ItemEraserData *data = this->extraData;
+	if (HasItem(&eraserItemDefinition) && !data->alwaysGive)
 	{
 		SwitchToItem(&eraserItemDefinition);
 	} else

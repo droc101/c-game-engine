@@ -4,7 +4,6 @@
 
 #include <engine/debug/DPrintConsole.h>
 #include <engine/Engine.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>

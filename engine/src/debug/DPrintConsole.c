@@ -2,6 +2,7 @@
 // Created by droc101 on 2/15/26.
 //
 
+#include <assert.h>
 #include <engine/debug/DPrint.h>
 #include <engine/debug/DPrintConsole.h>
 #include <engine/structs/Color.h>

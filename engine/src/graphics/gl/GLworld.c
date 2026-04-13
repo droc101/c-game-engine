@@ -28,6 +28,7 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
+#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -371,7 +372,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		mat4 viewModelMatrix;
-		GL_GetViewmodelProjectionMatrix(map, &viewModelMatrix, &map->player.playerCamera);
+		GL_GetViewmodelProjectionMatrix(&viewModelMatrix, &map->player.playerCamera);
 
 		GL_SharedUniforms uniforms = {
 			.fogColor = map->fogColor,
@@ -721,7 +722,7 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
 
-void GL_GetViewmodelProjectionMatrix(const Map *map, mat4 *out, const Camera *camera)
+void GL_GetViewmodelProjectionMatrix(mat4 *out, const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(VIEWMODEL_FOV),

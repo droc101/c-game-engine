@@ -29,7 +29,7 @@ typedef struct TonemapControllerData
 	bool startOn;
 } TonemapControllerData;
 
-void TonemapControllerInit(Actor *this, const KvList params, Transform *transform)
+void TonemapControllerInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->extraData = calloc(1, sizeof(TonemapControllerData));
 	CheckAlloc(this->extraData);

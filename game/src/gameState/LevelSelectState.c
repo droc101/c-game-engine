@@ -77,7 +77,6 @@ void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 		if ((int)i == selectedLevel)
 		{
 			continue;
-			;
 		}
 		const float yPos = (float)(345 + ((i - selectedLevel) * 60));
 		DrawTextAligned(ListGetPointer(levelList, i),

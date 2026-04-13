@@ -53,7 +53,7 @@ void ReloadAssets()
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
 }
 
-static void DrawMenuFadeIn(GlobalState *state)
+static void DrawMenuFadeIn(GlobalState * /*state*/)
 {
 	// TODO: how to make this play nice with the big lag frame from the background map load
 	// if (menuStateFadeIn)

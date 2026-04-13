@@ -30,7 +30,7 @@ typedef struct GlobalLightData
 	bool startOn;
 } GlobalLightData;
 
-void GlobalLightInit(Actor *this, const KvList params, Transform *transform)
+void GlobalLightInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->extraData = calloc(1, sizeof(GlobalLightData));
 	CheckAlloc(this->extraData);

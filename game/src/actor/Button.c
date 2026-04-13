@@ -52,7 +52,7 @@ static void ButtonUpdate(Actor *this, const double /*delta*/)
 		{
 			data->pressed = false;
 			this->currentSkinIndex = data->offSkin;
-			ActorFireOutput(this, "unpressed", PARAM_NONE);
+			ActorFireOutput(this, BUTTON_OUTPUT_UNPRESSED, PARAM_NONE);
 		}
 	}
 }
@@ -92,7 +92,7 @@ void ButtonInteract(Actor *this)
 	data->pressed = !data->pressed;
 	this->currentSkinIndex = data->pressed ? data->onSkin : data->offSkin;
 	data->timePressed = GetTimeMs();
-	ActorFireOutput(this, data->pressed ? "pressed" : "unpressed", PARAM_NONE);
+	ActorFireOutput(this, data->pressed ? BUTTON_OUTPUT_PRESSED : BUTTON_OUTPUT_UNPRESSED, PARAM_NONE);
 }
 
 ActorDefinition buttonActorDefinition = {

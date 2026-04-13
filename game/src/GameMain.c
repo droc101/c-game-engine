@@ -8,8 +8,6 @@
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 #include "helpers/GameActorRegistration.h"
-#include "item/EraserItem.h"
-#include "item/LaserStopperItem.h"
 
 #undef main // Leaked by SDL_main.h
 

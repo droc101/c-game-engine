@@ -2,23 +2,23 @@
 // Created by droc101 on 11/10/2024.
 //
 
-#include <ctype.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #ifdef WIN32
+#include <ctype.h>
 #include <dwmapi.h>
 #include <handleapi.h>
 #include <minwindef.h>
 #include <processthreadsapi.h>
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL_video.h>
+#include <string.h>
 #include <winbase.h>
 #endif
 

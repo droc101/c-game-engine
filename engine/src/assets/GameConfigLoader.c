@@ -4,7 +4,6 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
-#include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/GlobalState.h>

@@ -12,6 +12,7 @@
 #include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
+#include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Input.h>
 #include <joltc/enums.h>
@@ -38,9 +39,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "engine/Engine.h"
-#include "engine/structs/Vector2.h"
 
 const float MOVE_SPEED = 6.0f;
 const float SLOW_MOVE_SPEED = 0.6f;

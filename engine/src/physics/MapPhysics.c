@@ -30,8 +30,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <SDL3/SDL_timer.h>
-
 void MapUpdate(GlobalState *state, const double delta)
 {
 	if (!state->map)
