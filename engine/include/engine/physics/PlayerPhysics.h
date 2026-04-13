@@ -32,6 +32,6 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float 
 
 const Color *GetCrosshairColor();
 
-void UpdatePlayerCamera(GlobalState *state);
+void UpdatePlayerCamera(GlobalState *state, double delta);
 
 #endif //GAME_PLAYERPHYSICS_H

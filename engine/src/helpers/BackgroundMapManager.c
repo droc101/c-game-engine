@@ -52,7 +52,7 @@ void EnterMenuBackgroundState()
 	}
 }
 
-void UpdateMenuBackground(GlobalState *state)
+void UpdateMenuBackground(GlobalState *state, const double delta)
 {
 	if (!dontLoadBackgroundMap)
 	{
@@ -71,7 +71,7 @@ void UpdateMenuBackground(GlobalState *state)
 				LogInfo("Loaded background map %s in %f ms\n",
 						gameConfig.backgroundMap,
 						(double)realLoadTime / 1000000.0);
-				MapUpdate(state);
+				MapUpdate(state, delta);
 			}
 		}
 	}

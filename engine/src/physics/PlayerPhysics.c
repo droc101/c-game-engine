@@ -38,6 +38,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include "engine/Engine.h"
 #include "engine/structs/Vector2.h"
 
 const float MOVE_SPEED = 6.0f;
@@ -492,7 +494,7 @@ const Color *GetCrosshairColor()
 	return &crosshairColor;
 }
 
-void UpdatePlayerCamera(GlobalState *state)
+void UpdatePlayerCamera(GlobalState *state, const double delta)
 {
 	Vector2 cameraMotion = v2s(0);
 	if (state->camera == &state->map->player.playerCamera)
@@ -509,7 +511,7 @@ void UpdatePlayerCamera(GlobalState *state)
 			}
 			if (fabsf(cx) > STICK_DEADZONE)
 			{
-				cameraMotion.x = cx * state->options.cameraSpeed / 11.25f;
+				cameraMotion.x = cx * state->options.cameraSpeed / 6.0f;
 			}
 
 			float cy = -GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTY);
@@ -519,8 +521,10 @@ void UpdatePlayerCamera(GlobalState *state)
 			}
 			if (fabsf(cy) > STICK_DEADZONE)
 			{
-				cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
+				cameraMotion.y = cy * state->options.cameraSpeed / 6.0f;
 			}
+			cameraMotion.x *= (float)delta;
+			cameraMotion.y *= (float)delta;
 		} else
 		{
 			cameraMotion = GetMouseRel(mainThreadInput);

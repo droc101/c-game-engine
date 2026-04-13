@@ -35,7 +35,7 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 	}
 }
 
-void LogoSplashStateRender(GlobalState *State)
+void LogoSplashStateRender(GlobalState *State, const double /*delta*/)
 {
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)
 	{

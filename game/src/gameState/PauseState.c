@@ -21,13 +21,13 @@
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "gameState/LevelSelectState.h"
 #include "gameState/MainState.h"
 #include "gameState/OptionsState.h"
-#include "gameState/LevelSelectState.h"
 
 UiStack *pauseStack = NULL;
 
-void PauseStateUpdate(GlobalState * /*state*/)
+void PauseStateUpdate(GlobalState * /*state*/, const double /*delta*/)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL) ||
@@ -38,7 +38,7 @@ void PauseStateUpdate(GlobalState * /*state*/)
 	}
 }
 
-void PauseStateRender(GlobalState *state)
+void PauseStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderInGameMenuBackground();
 

@@ -54,7 +54,7 @@ void SldOptionsUiVolume(const float value)
 	UpdateVolume();
 }
 
-void SoundOptionsStateUpdate(GlobalState *state)
+void SoundOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -63,11 +63,11 @@ void SoundOptionsStateUpdate(GlobalState *state)
 	}
 	if (!optionsStateInGame)
 	{
-		UpdateMenuBackground(state);
+		UpdateMenuBackground(state, delta);
 	}
 }
 
-void SoundOptionsStateRender(GlobalState *state)
+void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{

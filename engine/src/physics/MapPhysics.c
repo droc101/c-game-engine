@@ -32,14 +32,14 @@
 
 #include <SDL3/SDL_timer.h>
 
-void MapUpdate(GlobalState *state)
+void MapUpdate(GlobalState *state, const double delta)
 {
 	if (!state->map)
 	{
 		return;
 	}
 
-	UpdatePlayerCamera(state);
+	UpdatePlayerCamera(state, delta);
 
 	Item *item = GetItem();
 	if (item)

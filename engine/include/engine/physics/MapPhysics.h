@@ -7,7 +7,7 @@
 
 #include <engine/structs/GlobalState.h>
 
-void MapUpdate(GlobalState *state);
+void MapUpdate(GlobalState *state, double delta);
 
 void MapFixedUpdate(GlobalState *state, double delta);
 

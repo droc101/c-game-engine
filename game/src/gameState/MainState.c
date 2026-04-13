@@ -39,7 +39,7 @@
 static const char *spawnActorOnce = NULL;
 static const char *spawnActorEveryTick = NULL;
 
-void MainStateUpdate(GlobalState *state)
+void MainStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START) ||
@@ -50,7 +50,7 @@ void MainStateUpdate(GlobalState *state)
 		return;
 	}
 
-	MapUpdate(state);
+	MapUpdate(state, delta);
 }
 
 void MainStateFixedUpdate(GlobalState *state, const double delta)
@@ -91,7 +91,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	MapFixedUpdate(state, delta);
 }
 
-void MainStateRender(GlobalState *state)
+void MainStateRender(GlobalState *state, const double delta)
 {
 	// warp the mouse to the center of the screen
 	const Vector2 realWndSize = ActualWindowSize();
@@ -106,6 +106,7 @@ void MainStateRender(GlobalState *state)
 	DPrintPlayer(&state->map->player);
 
 	DPrintF("Actors: %d", false, COLOR_WHITE, state->map->actors.length);
+	DPrintF("Frame Delta: %lf", false, COLOR_WHITE, delta);
 }
 
 void MainStateSet()

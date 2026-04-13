@@ -12,7 +12,7 @@ bool IsBackgroundMapLoaded();
 
 void EnterMenuBackgroundState();
 
-void UpdateMenuBackground(GlobalState *state);
+void UpdateMenuBackground(GlobalState *state, double delta);
 
 void RenderMenuBackground(GlobalState *state);
 

@@ -29,7 +29,7 @@ void BtnInputOptionsBack()
 	SetGameState(&OptionsState);
 }
 
-void InputOptionsStateUpdate(GlobalState *state)
+void InputOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -38,7 +38,7 @@ void InputOptionsStateUpdate(GlobalState *state)
 	}
 	if (!optionsStateInGame)
 	{
-		UpdateMenuBackground(state);
+		UpdateMenuBackground(state, delta);
 	}
 }
 
@@ -73,7 +73,7 @@ void CbOptionsSwapOkCancel(const bool value)
 	GetState()->options.controllerSwapOkCancel = value;
 }
 
-void InputOptionsStateRender(GlobalState *state)
+void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{

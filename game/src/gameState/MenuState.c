@@ -70,7 +70,7 @@ static void DrawMenuFadeIn(GlobalState *state)
 	// }
 }
 
-void MenuStateRender(GlobalState *state)
+void MenuStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderMenuBackground(state);
 	if (!IsBackgroundMapLoaded())
@@ -146,7 +146,8 @@ void MenuStateSet()
 		opY += opSpacing;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
 		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);

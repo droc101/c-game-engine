@@ -28,7 +28,7 @@ uint64_t levelLoadStartTime;
 bool loadStateLoadedLevel;
 bool frameDrawn = false;
 
-void LoadingStateUpdate(GlobalState *state)
+void LoadingStateUpdate(GlobalState *state, const double delta)
 {
 	if (!loadStateLoadedLevel && frameDrawn)
 	{
@@ -43,7 +43,7 @@ void LoadingStateUpdate(GlobalState *state)
 		const uint64_t realLoadEnd = GetTimeNs();
 		const uint64_t realLoadTime = realLoadEnd - realLoadStart;
 		LogInfo("Loaded map %s in %f ms\n", loadStateLevelname, (double)realLoadTime / 1000000.0);
-		MapUpdate(state);
+		MapUpdate(state, delta);
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
@@ -53,7 +53,7 @@ void LoadingStateUpdate(GlobalState *state)
 	}
 }
 
-void LoadingStateRender(GlobalState * /*state*/)
+void LoadingStateRender(GlobalState * /*state*/, const double /*delta*/)
 {
 	DrawTextAligned("LOADING",
 					16,

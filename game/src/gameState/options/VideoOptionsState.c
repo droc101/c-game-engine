@@ -157,7 +157,7 @@ void SldOptionsFov(const float value)
 	}
 }
 
-void VideoOptionsStateUpdate(GlobalState *state)
+void VideoOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -166,11 +166,11 @@ void VideoOptionsStateUpdate(GlobalState *state)
 	}
 	if (!optionsStateInGame)
 	{
-		UpdateMenuBackground(state);
+		UpdateMenuBackground(state, delta);
 	}
 }
 
-void VideoOptionsStateRender(GlobalState *state)
+void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{

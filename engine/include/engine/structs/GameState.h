@@ -5,7 +5,6 @@
 #ifndef GAME_GAMESTATE_H
 #define GAME_GAMESTATE_H
 
-#include <stdint.h>
 #include <stdbool.h>
 
 typedef struct GlobalState GlobalState; // forward decl.
@@ -13,9 +12,9 @@ typedef struct GameState GameState;
 
 typedef void (*GameStateFixedUpdateFunction)(GlobalState *state, double delta);
 
-typedef void (*GameStateFrameUpdateFunction)(GlobalState *state);
+typedef void (*GameStateFrameUpdateFunction)(GlobalState *state, double delta);
 
-typedef void (*GameStateFrameRenderFunction)(GlobalState *state);
+typedef void (*GameStateFrameRenderFunction)(GlobalState *state, double delta);
 
 typedef void (*GameStateSetFunction)(void);
 

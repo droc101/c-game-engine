@@ -39,7 +39,7 @@ void BtnOptionsBack()
 	}
 }
 
-void OptionsStateUpdate(GlobalState *state)
+void OptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -49,7 +49,7 @@ void OptionsStateUpdate(GlobalState *state)
 
 	if (!optionsStateInGame)
 	{
-		UpdateMenuBackground(state);
+		UpdateMenuBackground(state, delta);
 	}
 }
 
@@ -61,7 +61,7 @@ void OptionsStateFixedUpdate(GlobalState *state, const double delta)
 	}
 }
 
-void OptionsStateRender(GlobalState *state)
+void OptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{

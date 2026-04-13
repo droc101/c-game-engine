@@ -28,9 +28,9 @@
 int selectedLevel = 0;
 List levelList;
 
-void LevelSelectStateUpdate(GlobalState *state)
+void LevelSelectStateUpdate(GlobalState *state, const double delta)
 {
-	UpdateMenuBackground(state);
+	UpdateMenuBackground(state, delta);
 
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -64,7 +64,7 @@ void LevelSelectStateUpdate(GlobalState *state)
 	}
 }
 
-void LevelSelectStateRender(GlobalState *state)
+void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderMenuBackground(state);
 	if (!IsBackgroundMapLoaded())
