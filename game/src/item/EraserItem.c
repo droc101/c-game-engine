@@ -45,7 +45,6 @@ static bool EraserItemCanTargetFunction(Item * /*this*/,
 		{
 			const GlobalState *state = GetState();
 			RemoveActor(state->map->player.targetedActor);
-			state->map->player.targetedActor = NULL;
 		}
 
 		return true;

@@ -148,6 +148,14 @@ void RemoveActor(Actor *actor)
 	}
 	ListRemoveAt(map->actors, idx);
 	FreeActor(actor);
+
+	Player *plr = &GetState()->map->player;
+	if (plr->targetedActor == actor)
+	{
+		plr->targetedActor = NULL;
+		plr->hasHeldActor = false;
+		plr->canDropHeldActor = false;
+	}
 }
 
 void NameActor(Actor *actor, const char *name, Map *map)
