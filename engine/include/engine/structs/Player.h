@@ -7,6 +7,7 @@
 
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
+#include <engine/structs/Color.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>

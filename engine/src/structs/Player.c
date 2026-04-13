@@ -3,7 +3,6 @@
 //
 
 #include <engine/debug/DPrint.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
@@ -12,7 +11,6 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -44,20 +42,25 @@ void DPrintPlayer(const Player *player)
 			playerVelocity.x,
 			playerVelocity.y,
 			playerVelocity.z);
-	Vector3 eulerAngles;
-	Vector3 axis;
-	float angle = NAN;
-	JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
-	JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
-	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
+	// Vector3 eulerAngles;
+	// Vector3 axis;
+	// float angle = NAN;
+	// JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
+	// JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
+	// DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
+	// 		false,
+	// 		COLOR_WHITE,
+	// 		player->transform.rotation.x,
+	// 		fabsf(player->transform.rotation.y),
+	// 		radToDeg(player->transform.rotation.x),
+	// 		radToDeg(fabsf(player->transform.rotation.y)),
+	// 		axis.x,
+	// 		axis.y,
+	// 		axis.z);
+	DPrintF("%s Actor: %s %p",
 			false,
 			COLOR_WHITE,
-			player->transform.rotation.x,
-			fabsf(player->transform.rotation.y),
-			radToDeg(player->transform.rotation.x),
-			radToDeg(fabsf(player->transform.rotation.y)),
-			axis.x,
-			axis.y,
-			axis.z);
-	DPrintF("%s Actor: %p", false, COLOR_WHITE, player->hasHeldActor ? "Held" : "Targeted", player->targetedActor);
+			player->hasHeldActor ? "Held" : "Targeted",
+			player->targetedActor ? player->targetedActor->definition->className : "None",
+			player->targetedActor);
 }
