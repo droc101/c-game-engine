@@ -106,11 +106,9 @@ int PhysicsThreadMain(void * /*data*/)
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
-		if (timeElapsed < PHYSICS_TARGET_NS)
-		{
-			const uint64_t delayNs = (PHYSICS_TARGET_NS - timeElapsed);
-			SDL_DelayPrecise(delayNs);
-		}
+		// FIXME: hardcoded minimum of 0.5ms to prevent sync timeout on low TPS when we aren't giving other threads a chance to lock the mutex
+		const uint64_t delayNs = max(PHYSICS_TARGET_NS - timeElapsed, 500000);
+		SDL_DelayPrecise(delayNs);
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
 		TickGraphUpdate(timeElapsed);
