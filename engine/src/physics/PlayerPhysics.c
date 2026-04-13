@@ -38,6 +38,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "engine/structs/Vector2.h"
 
 const float MOVE_SPEED = 6.0f;
 const float SLOW_MOVE_SPEED = 0.6f;
@@ -360,7 +361,8 @@ void UpdatePlayer(Player *player,
 		{
 			if ((IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
 				 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH)) &&
-				player->canDropHeldActor && allowMovement)
+				player->canDropHeldActor &&
+				allowMovement)
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
@@ -479,4 +481,73 @@ void UpdatePlayer(Player *player,
 const Color *GetCrosshairColor()
 {
 	return &crosshairColor;
+}
+
+void UpdatePlayerCamera(GlobalState *state)
+{
+	Vector2 cameraMotion = v2s(0);
+	if (state->camera == &state->map->player.playerCamera)
+	{
+		if (UseController())
+		{
+			// TODO this is framerate dependant, need to have something similar to delta time for frame updates!
+			cameraMotion = v2s(0);
+
+			float cx = -GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTX);
+			if (state->options.invertHorizontalCamera)
+			{
+				cx *= -1;
+			}
+			if (fabsf(cx) > STICK_DEADZONE)
+			{
+				cameraMotion.x = cx * state->options.cameraSpeed / 11.25f;
+			}
+
+			float cy = -GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTY);
+			if (state->options.invertVerticalCamera)
+			{
+				cy *= -1;
+			}
+			if (fabsf(cy) > STICK_DEADZONE)
+			{
+				cameraMotion.y = cy * state->options.cameraSpeed / 11.25f;
+			}
+		} else
+		{
+			cameraMotion = GetMouseRel(mainThreadInput);
+			cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
+			cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
+			if (state->options.invertHorizontalCamera)
+			{
+				cameraMotion.x *= -1;
+			}
+			if (state->options.invertVerticalCamera)
+			{
+				cameraMotion.y *= -1;
+			}
+		}
+	}
+
+	Camera *playerCamera = &state->map->player.playerCamera;
+	Transform *transform = state->map->player.isFreecamActive ? &playerCamera->transform
+															  : &state->map->player.transform;
+	const float currentPitch = JPH_Quat_GetRotationAngle(&transform->rotation, &Vector3_AxisX) + GLM_PI_2f;
+	JPH_Quat newYaw;
+	JPH_Quat newPitch;
+	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
+	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
+	JPH_Quat_Multiply(&newYaw, &transform->rotation, &transform->rotation);
+	JPH_Quat_Multiply(&transform->rotation, &newPitch, &transform->rotation);
+	JPH_Quat_Normalized(&transform->rotation, &transform->rotation);
+
+	playerCamera->transform.position.x = transform->position.x;
+	playerCamera->transform.position.z = transform->position.z;
+	playerCamera->transform.rotation = transform->rotation;
+	float yPos = transform->position.y;
+	if (!state->map->player.isFreecamActive)
+	{
+		yPos += 0.25f;
+	}
+	playerCamera->transform.position.y = yPos;
+	playerCamera->showPlayerModel = state->map->player.isFreecamActive;
 }

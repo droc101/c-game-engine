@@ -6,6 +6,7 @@
 #define GAME_PLAYERPHYSICS_H
 
 #include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/Player.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
@@ -30,5 +31,7 @@ void MovePlayer(const Player *player, float *distanceTraveled, double delta, boo
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime, bool allowMovement);
 
 const Color *GetCrosshairColor();
+
+void UpdatePlayerCamera(GlobalState *state);
 
 #endif //GAME_PLAYERPHYSICS_H
