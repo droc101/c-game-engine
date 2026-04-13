@@ -48,6 +48,7 @@ void RegisterActor(const char *actorTypeName, ActorDefinition *definition)
 		ActorInputHandlerFunctionDict_next(it);
 	}
 #endif
+	definition->className = actorTypeName;
 	ActorDefinitionDict_set_at(actorDefinitions, actorTypeName, definition);
 }
 

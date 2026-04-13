@@ -64,6 +64,8 @@ struct ActorDefinition
 	/// The function to call when the actor is destroyed
 	/// @note This should only be called once, when the actor is destroyed
 	ActorDestroyFunction Destroy;
+
+	const char *className;
 };
 
 /**
