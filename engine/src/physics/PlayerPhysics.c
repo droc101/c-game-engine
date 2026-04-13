@@ -43,7 +43,7 @@
 const float MOVE_SPEED = 6.0f;
 const float SLOW_MOVE_SPEED = 0.6f;
 const float MAX_WALKABLE_SLOPE = 50.0f;
-static const double GRAVITY = 9.81 / PHYSICS_TARGET_TPS;
+const float JUMP_SPEED = 4.25f;
 static const float ACTOR_RAYCAST_MAX_DISTANCE = 10.0f;
 static const float OFFSET = 1.0f;
 /// Lower values are smoother
@@ -299,6 +299,15 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 			JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
 		}
 	}
+
+	if (allowInput &&
+		JPH_CharacterBase_GetGroundState((JPH_CharacterBase *)player->joltCharacter) == JPH_GroundState_OnGround &&
+		(IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_SPACE) ||
+		 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_EAST)))
+	{
+		moveVec.y = JUMP_SPEED;
+	}
+
 	if (player->isFreecamActive)
 	{
 		Vector3 *cameraPosition = &GetState()->map->player.playerCamera.transform.position;
@@ -311,7 +320,7 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 	{
 		Vector3 oldVelocity;
 		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
-		moveVec.y += oldVelocity.y - (float)(GRAVITY * delta);
+		moveVec.y += oldVelocity.y + (float)(GRAVITY * (delta / PHYSICS_TARGET_TPS));
 	}
 	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
 }

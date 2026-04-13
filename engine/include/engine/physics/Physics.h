@@ -32,6 +32,8 @@
 	(dest).z = (src)[2]; \
 	(dest).w = (src)[3];
 
+#define GRAVITY (-9.81f)
+
 enum ObjectLayers
 {
 	OBJECT_LAYER_STATIC,

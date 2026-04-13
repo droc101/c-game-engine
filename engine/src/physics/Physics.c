@@ -95,6 +95,7 @@ void PhysicsInitMap(Map *map)
 		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&objectVsBroadPhaseLayerFilterImpl),
 	};
 	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
+	JPH_PhysicsSystem_SetGravity(map->physicsSystem, &(Vector3){0, GRAVITY, 0});
 }
 
 void PhysicsDestroyMap(const Map *map, JPH_BodyInterface * /*bodyInterface*/)
