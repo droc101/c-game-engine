@@ -3,6 +3,7 @@
 //
 
 #include <engine/debug/DPrint.h>
+#include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
@@ -21,9 +22,10 @@ void ResetDPrintYPos()
 void DPrint(const char *str, const Color color)
 {
 #ifdef ENABLE_DEBUG_PRINT
-	FontDrawString(v2(12, (float)dprintYPosition + 2), str, 16, COLOR_BLACK, smallFont);
+	const Vector2 textSize = MeasureText(str, 16, smallFont);
+	DrawRect(5, dprintYPosition - 5, (int)textSize.x + 10, (int)textSize.y + 10, COLOR(0x80000000));
 	FontDrawString(v2(10, (float)dprintYPosition), str, 16, color, smallFont);
-	dprintYPosition += (int)MeasureText(str, 16, smallFont).y + 8;
+	dprintYPosition += (int)textSize.y + 10;
 #endif
 }
 

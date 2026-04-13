@@ -72,7 +72,7 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 			bufferLength - 8,
 			type); // Minus 8 due to color, brackets, and null not included
 	vsprintf(plainTextBuffer + strlen(plainTextBuffer), message, args);
-	AddConsoleMessage(plainTextBuffer, COLOR_WHITE);
+	AddConsoleMessage(plainTextBuffer, color);
 
 	if (logFile)
 	{

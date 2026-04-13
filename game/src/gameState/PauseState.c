@@ -51,7 +51,8 @@ void PauseStateRender(GlobalState *state)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", false, COLOR_WHITE);
+	DPrintF("Engine " ENGINE_VERSION, false, COLOR_WHITE);
+	DPrintF("DEBUG BUILD", false, COLOR_WHITE);
 	DPrintF("Map: %s", false, COLOR_WHITE, state->map->mapName);
 #endif
 

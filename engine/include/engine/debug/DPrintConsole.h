@@ -8,7 +8,7 @@
 #include <engine/structs/Color.h>
 #include <stddef.h>
 
-void AddConsoleMessage(const char *msg, Color color);
+void AddConsoleMessage(const char *msg, int color);
 
 void InitDPrintConsole();
 

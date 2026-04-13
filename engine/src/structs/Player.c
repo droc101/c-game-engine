@@ -42,21 +42,6 @@ void DPrintPlayer(const Player *player)
 			playerVelocity.x,
 			playerVelocity.y,
 			playerVelocity.z);
-	// Vector3 eulerAngles;
-	// Vector3 axis;
-	// float angle = NAN;
-	// JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
-	// JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
-	// DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
-	// 		false,
-	// 		COLOR_WHITE,
-	// 		player->transform.rotation.x,
-	// 		fabsf(player->transform.rotation.y),
-	// 		radToDeg(player->transform.rotation.x),
-	// 		radToDeg(fabsf(player->transform.rotation.y)),
-	// 		axis.x,
-	// 		axis.y,
-	// 		axis.z);
 	DPrintF("%s Actor: %s %p",
 			false,
 			COLOR_WHITE,
