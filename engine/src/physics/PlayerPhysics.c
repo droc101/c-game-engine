@@ -501,7 +501,6 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 	{
 		if (UseController())
 		{
-			// TODO this is framerate dependant, need to have something similar to delta time for frame updates!
 			cameraMotion = v2s(0);
 
 			float cx = -GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTX);
