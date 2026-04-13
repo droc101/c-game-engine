@@ -17,6 +17,11 @@
  */
 void ResetDPrintYPos();
 
+/**
+ * Print a string to the screen
+ * @param str The string to print
+ * @param color The color to print with
+ */
 void DPrint(const char *str, Color color);
 
 /**

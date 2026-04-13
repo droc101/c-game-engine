@@ -86,7 +86,7 @@ struct Map
 	/// The distance from the player at which the fog is fully opaque
 	float fogEnd;
 
-	/// The light color. The alpha channel is ignored.
+	/// The global light color. The alpha channel is ignored.
 	Color lightColor;
 	/// HDR tonemapping exposure
 	float exposure;
@@ -110,11 +110,16 @@ struct Map
 	/// The view model
 	Viewmodel viewmodel;
 
+	/// The width of the lightmap in pixels
 	size_t lightmapWidth;
+	/// The height of the lightmap in pixels
 	size_t lightmapHeight;
+	/// The lightmap data in RGBA16F format
 	void *lightmapPixels;
 
+	/// The number of point lights in the level
 	uint16_t numPointLights;
+	/// The point lights in this level
 	PointLight *pointLights;
 };
 

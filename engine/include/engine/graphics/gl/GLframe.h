@@ -9,6 +9,25 @@
 #include <engine/structs/Options.h>
 #include <stdbool.h>
 
+/**
+ * Convert screen X to NDC
+ * @param x X position in pixels
+ * @return The NDC position
+ */
+#define GL_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
+
+/**
+ * Convert screen Y to NDC
+ * @param y Y position in pixels
+ * @return The NDC position
+ */
+#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
+
+/**
+ * Get the number of MSAA samples to use, either the number requested by the user or the maximum the GPU supports
+ * @param requested The MSAA level requested
+ * @return The MSAA level to use
+ */
 int GetActualMsaaSamples(OptionsMsaa requested);
 
 /**
@@ -50,20 +69,6 @@ void GL_FrameEnd();
  * Update the viewport and framebuffer sizes
  */
 void GL_UpdateViewportSize();
-
-/**
- * Convert screen X to NDC
- * @param x X position in pixels
- * @return The NDC position
- */
-#define GL_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
-
-/**
- * Convert screen Y to NDC
- * @param y Y position in pixels
- * @return The NDC position
- */
-#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
 
 /**
  * Switch the active OpenGL framebuffer to the HDR world framebuffer

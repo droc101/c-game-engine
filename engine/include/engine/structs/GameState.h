@@ -28,7 +28,9 @@ struct GameState
 	GameStateFrameRenderFunction RenderGame;
 	/// Physics state update function
 	GameStateFixedUpdateFunction FixedUpdateGame;
+	/// Constructor/Initialization function
 	GameStateSetFunction Set;
+	/// Destructor/Cleanup function
 	GameStateDestroyFunction Destroy;
 	/// Whether to enable relative mouse mode
 	bool enableRelativeMouseMode;

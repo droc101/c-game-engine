@@ -39,7 +39,9 @@ struct Player
 	bool isNoclipActive;
 	bool isFreecamActive;
 
+	/// The player's camera
 	Camera playerCamera;
+	/// The height of view bobbing
 	float viewBobbingHeight;
 };
 

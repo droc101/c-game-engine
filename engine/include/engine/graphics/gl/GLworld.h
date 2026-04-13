@@ -25,20 +25,25 @@
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
 
 /**
- * Get the transform matrix for the viewmodel/held item
+ * Get the projection matrix for the viewmodel
  * @param out The destination matrix
- * @param camera
+ * @param camera The camera to view from
  */
 void GL_GetViewmodelProjectionMatrix(mat4 *out, const Camera *camera);
 
+/**
+ * Get the model world transform matrix for the viewmodel
+ * @param map The map containing the viewmodel
+ * @param out The destination matrix
+ * @param camera The camera to view from
+ */
 void GL_GetViewmodelModelWorldMatrix(const Map *map, mat4 *out, const Camera *camera);
 
 /**
- * OpenGL code to render the 3D portion of a map
+ * Render the 3D portion of a map
  * @param map The map to render
  * @param camera The camera to render with
- * @note - This does not render the sky
- * @note - This destroys the contents of the depth buffer
+ * @note This destroys the contents of the depth buffer
  */
 void GL_RenderMap(const Map *map, const Camera *camera);
 
@@ -48,7 +53,7 @@ void GL_RenderMap(const Map *map, const Camera *camera);
  * @param modelWorldMatrix The model -> world matrix
  * @param skin The skin to use
  * @param lod The lod to use
- * @param modColor
+ * @param modColor The modifier color to use
  */
 void GL_RenderModel(const ModelDefinition *model,
 					const mat4 modelWorldMatrix,

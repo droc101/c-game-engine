@@ -6,17 +6,16 @@
 #define LOBALSTATE_H
 
 #include <engine/structs/Camera.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Discord.h>
 #include <joltc/joltc.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <engine/structs/GameState.h>
 
 typedef struct GlobalState GlobalState;
 typedef struct SaveData SaveData;
@@ -31,6 +30,7 @@ struct SaveData
 	int blueCoins;
 	/// The items the player has
 	List items;
+	/// The index of the current item
 	size_t currentItem;
 };
 
@@ -88,16 +88,38 @@ void InitState();
  */
 GlobalState *GetState();
 
+/**
+ * Get the player's current item, or @c NULL if there isn't one
+ */
 Item *GetItem();
 
+/**
+ * Check if the player has a given item type
+ * @param definition The definition of the item type to check for
+ */
 bool HasItem(const ItemDefinition *definition);
 
+/**
+ * Give the player an item
+ * @param definition The definition of the item type to give
+ * @param switchToItem Whether to switch to the item
+ */
 void GiveItem(const ItemDefinition *definition, bool switchToItem);
 
+/**
+ * Switch to a given item type if the player has it
+ * @param definition The definition of the item type to switch to
+ */
 void SwitchToItem(const ItemDefinition *definition);
 
+/**
+ * Switch to the previous item if possible
+ */
 void PreviousItem();
 
+/**
+ * Switch to the next item if possible
+ */
 void NextItem();
 
 /**
@@ -105,6 +127,9 @@ void NextItem();
  */
 void SetGameState(const GameState *gameState);
 
+/**
+ * Process any queued GameState change
+ */
 void ProcessStateChangeQueue();
 
 /**

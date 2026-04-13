@@ -40,7 +40,9 @@ struct GL_Shader
 
 struct GL_ComputeShader
 {
+	/// The ID of the compute shader
 	GLuint computeShader;
+	/// The ID of the shader program
 	GLuint program;
 };
 
@@ -88,14 +90,19 @@ struct STD140 GL_SharedUniforms
 
 struct GL_DebugLine
 {
+	/// The start position of the line
 	Vector3 start;
+	/// The start color of the line
 	Vector3 startColor;
+	/// The end position of the line
 	Vector3 end;
+	/// The end color of the line
 	Vector3 endColor;
 };
 
 struct STD140 GL_LightMetadata
 {
+	/// The number of point lights in the map
 	STD140_UINT numPointLights;
 };
 
@@ -136,6 +143,11 @@ void GL_UpdateAnisotropyLevel();
  */
 GL_Shader *GL_ConstructShader(const char *fragmentAsset, const char *vertexAsset);
 
+/**
+ * Create a compute shader program from assets
+ * @param asset The compute shader asset
+ * @return The constructed compute shader or NULLPTR on error
+ */
 GL_ComputeShader *GL_ConstructComputeShader(const char *asset);
 
 /**
@@ -151,6 +163,10 @@ GL_Buffer *GL_ConstructBuffer();
  */
 void GL_DestroyShader(GL_Shader *shd);
 
+/**
+ * Destroy a GL_ComputeShader
+ * @param shd The shader to destroy
+ */
 void GL_DestroyComputeShader(GL_ComputeShader *shd);
 
 /**

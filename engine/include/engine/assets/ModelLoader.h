@@ -5,13 +5,12 @@
 #ifndef MODELLOADER_H
 #define MODELLOADER_H
 
+#include <engine/structs/Color.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include <engine/structs/Color.h>
 
 #define MODEL_ASSET_VERSION 1
 

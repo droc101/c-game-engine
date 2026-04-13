@@ -33,8 +33,11 @@ enum AssetPathFlags
 
 struct AssetPath
 {
+	/// The type of this asset path
 	AssetPathType type;
+	/// The flags of this asset path
 	AssetPathFlags flags;
+	/// The path of this asset path
 	char *path;
 };
 
@@ -51,6 +54,7 @@ struct GameConfig
 	// Asset search paths
 	List assetPaths;
 
+	/// The map to load for the menu background
 	const char *backgroundMap;
 };
 
@@ -62,6 +66,9 @@ extern GameConfig gameConfig;
  */
 void LoadGameConfig(const char *game);
 
+/**
+ * Destroy the game config asset
+ */
 void DestroyGameConfig();
 
 #endif //GAME_GAMECONFIGLOADER_H

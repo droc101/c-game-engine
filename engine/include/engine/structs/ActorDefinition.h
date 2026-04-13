@@ -33,9 +33,9 @@ typedef void (*ActorPlayerContactRemovedFunction)(Actor *this, JPH_BodyID bodyId
 
 typedef void (*ActorInteractFunction)(Actor *this);
 
-typedef void (*ActorRegisterFunction)();
+typedef void (*ActorRegisterFunction)(void);
 
-typedef void (*RegisterGameActorsFunction)();
+typedef void (*RegisterGameActorsFunction)(void);
 
 DEFINE_DICT(ActorInputHandlerFunctionDict, const char *, M_CSTR_OPLIST, ActorInputHandlerFunction, M_PTR_OPLIST);
 
@@ -65,6 +65,7 @@ struct ActorDefinition
 	/// @note This should only be called once, when the actor is destroyed
 	ActorDestroyFunction Destroy;
 
+	/// The class name of this actor definition
 	const char *className;
 };
 

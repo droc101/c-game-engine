@@ -47,8 +47,9 @@ struct Options
 	float cameraSpeed;
 	/// The strength of the rumble
 	float rumbleStrength;
-	/// Whether to invert the camera Y axis
+	/// Whether to invert the camera X axis
 	bool invertHorizontalCamera;
+	/// Whether to invert the camera Y axis
 	bool invertVerticalCamera;
 	/// Whether to swap the controller A and B buttons
 	bool controllerSwapOkCancel;
@@ -75,6 +76,7 @@ struct Options
 	float fov;
 	/// Anisotropy level
 	OptionsAnisotropy anisotropy;
+	/// The FPS cap, or 0 for no cap
 	uint16_t maxFps;
 
 	/* Audio */

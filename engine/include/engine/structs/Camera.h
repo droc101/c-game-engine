@@ -6,6 +6,7 @@
 #define GAME_CAMERA_H
 
 #include <joltc/Math/Transform.h>
+#include <stdbool.h>
 
 typedef struct Camera Camera;
 

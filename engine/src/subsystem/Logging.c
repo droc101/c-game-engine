@@ -64,7 +64,7 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	va_end(args);
 
 	va_start(args, message);
-	char *plainTextBuffer = calloc(sizeof(char), length + 1);
+	char *plainTextBuffer = calloc(length + 1, sizeof(char));
 	CheckAlloc(plainTextBuffer);
 	sprintf(plainTextBuffer,
 			"[%.*s] ",

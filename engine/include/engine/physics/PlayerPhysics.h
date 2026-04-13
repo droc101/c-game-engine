@@ -30,8 +30,17 @@ void MovePlayer(const Player *player, float *distanceTraveled, double delta, boo
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, float deltaTime, bool allowMovement);
 
+/**
+ * Get the requested crosshair color
+ * @return Crosshair color
+ */
 const Color *GetCrosshairColor();
 
+/**
+ * Update the player's camera, applying any inputs
+ * @param state GlobalState pointer
+ * @param delta Delta time
+ */
 void UpdatePlayerCamera(GlobalState *state, double delta);
 
 #endif //GAME_PLAYERPHYSICS_H

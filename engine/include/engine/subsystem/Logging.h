@@ -22,6 +22,14 @@ void LogInit();
  */
 void LogDestroy();
 
+/**
+ * Internal handler for Log* macros
+ * @param type The type of log, such as INFO or ERROR
+ * @param color The ANSI foreground color code
+ * @param flush Whether to flush output after printing
+ * @param message The message format string
+ * @param ... Format arguments
+ */
 void LogInternal(const char *type, int color, bool flush, const char *message, ...);
 
 /**
