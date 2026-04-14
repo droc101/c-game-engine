@@ -154,7 +154,6 @@ void RemoveActor(Actor *actor)
 	{
 		plr->targetedActor = NULL;
 		plr->hasHeldActor = false;
-		plr->canDropHeldActor = false;
 	}
 }
 

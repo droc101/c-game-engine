@@ -52,6 +52,7 @@ static const float HELD_ACTOR_MAX_DISTANCE_SQUARED = 6.0f;
 
 static Color crosshairColor = CROSSHAIR_COLOR_NORMAL;
 static bool enableViewmodelAfterFreecam = false;
+static bool canDropHeldActor = true;
 
 
 static bool ActorRaycastBroadPhaseLayerShouldCollide(const JPH_BroadPhaseLayer layer)
@@ -87,6 +88,20 @@ static const JPH_ObjectLayerFilter_Impl actorRaycastObjectLayerFilterImpl = {
 static JPH_BroadPhaseLayerFilter *actorRaycastBroadPhaseLayerFilter;
 static JPH_ObjectLayerFilter *actorRaycastObjectLayerFilter;
 
+
+static bool OnContactValidate(const JPH_CharacterVirtual *character,
+							  const JPH_BodyID bodyId,
+							  JPH_SubShapeID /*subShapeId*/)
+{
+	const Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
+	assert(player);
+	if (player->hasHeldActor && bodyId == player->heldActor->bodyId)
+	{
+		canDropHeldActor = false;
+		return false;
+	}
+	return true;
+}
 
 static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 						   const JPH_BodyID bodyId,
@@ -132,42 +147,25 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 	}
 }
 
-static void OnContactSolve(const JPH_CharacterVirtual *character,
-						   const JPH_BodyID bodyId,
-						   const JPH_SubShapeID /*subShapeId*/,
-						   const JPH_RVec3 * /*contactPosition*/,
-						   const Vector3 * /*contactNormal*/,
-						   const Vector3 * /*contactVelocity*/,
-						   const JPH_PhysicsMaterial * /*contactMaterial*/,
-						   const Vector3 *characterVelocity,
-						   Vector3 *newCharacterVelocity)
-{
-	const Player *player = (Player *)JPH_CharacterVirtual_GetUserData(character);
-	if (player->hasHeldActor && player->heldActor->bodyId == bodyId)
-	{
-		*newCharacterVelocity = *characterVelocity;
-	}
-}
-
 static bool BodyFilterShouldCollide(const JPH_BodyID bodyId)
 {
 	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	assert(player);
-	return !player->isNoclipActive && (!player->hasHeldActor || bodyId != player->heldActor->bodyId);
+	return !player->isNoclipActive;
 }
 
 static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
 {
 	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
 	assert(player);
-	return !player->isNoclipActive && (!player->hasHeldActor || JPH_Body_GetID(body) != player->heldActor->bodyId);
+	return !player->isNoclipActive;
 }
 
 static const JPH_CharacterContactListener_Impl contactListenerImpl = {
+	.OnContactValidate = OnContactValidate,
 	.OnContactAdded = OnContactAdded,
 	.OnContactPersisted = OnContactPersisted,
 	.OnContactRemoved = OnContactRemoved,
-	.OnContactSolve = OnContactSolve,
 };
 static const JPH_BodyFilter_Impl bodyFilterImpl = {
 	.ShouldCollide = BodyFilterShouldCollide,
@@ -370,7 +368,7 @@ void UpdatePlayer(Player *player,
 		{
 			if ((IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
 				 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH)) &&
-				player->canDropHeldActor &&
+				canDropHeldActor &&
 				allowMovement)
 			{
 				player->heldActor = NULL;
@@ -470,6 +468,7 @@ void UpdatePlayer(Player *player,
 			player->isNoclipActive = !player->isNoclipActive;
 		}
 	}
+	canDropHeldActor = true;
 	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
 		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.25f,
 		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.25f,
