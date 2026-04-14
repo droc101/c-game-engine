@@ -7,6 +7,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Player.h>
+#include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
@@ -26,6 +27,7 @@ void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 
 void DPrintPlayer(const Player *player)
 {
+#ifdef ENABLE_DEBUG_PRINT
 	DPrintF("Position: (%.2f, %.2f, %.2f)",
 			false,
 			COLOR_WHITE,
@@ -42,10 +44,13 @@ void DPrintPlayer(const Player *player)
 			playerVelocity.x,
 			playerVelocity.y,
 			playerVelocity.z);
+	PhysicsThreadLockTickMutex();
 	DPrintF("%s Actor: %s %p",
 			false,
 			COLOR_WHITE,
 			player->hasHeldActor ? "Held" : "Targeted",
 			player->targetedActor ? player->targetedActor->definition->className : "None",
 			player->targetedActor);
+	PhysicsThreadUnlockTickMutex();
+#endif
 }

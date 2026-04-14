@@ -105,8 +105,10 @@ void MainStateRender(GlobalState *state, const double delta)
 #endif
 	DPrintPlayer(&state->map->player);
 
+#ifdef ENABLE_DEBUG_PRINT
 	DPrintF("Actors: %d", false, COLOR_WHITE, state->map->actors.length);
 	DPrintF("Frame Delta: %lf", false, COLOR_WHITE, delta);
+#endif
 }
 
 void MainStateSet()
