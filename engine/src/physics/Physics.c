@@ -99,7 +99,7 @@ void PhysicsInitMap(Map *map)
 	JPH_PhysicsSystem_SetGravity(map->physicsSystem, &(Vector3){0, GRAVITY, 0});
 }
 
-void PhysicsDestroyMap(const Map *map, JPH_BodyInterface * /*bodyInterface*/)
+void PhysicsDestroyMap(const Map *map)
 {
 	JPH_CharacterVirtual_Destroy(map->player.joltCharacter);
 	JPH_PhysicsSystem_Destroy(map->physicsSystem);

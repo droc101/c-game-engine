@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 
-size_t bgMapLoadFrameCounter = 0;
+size_t backgroundMapLoadFrameCounter = 0;
 float placeholderOpacity = 1.0f;
 bool dontLoadBackgroundMap = false;
 
@@ -42,7 +42,7 @@ void EnterMenuBackgroundState()
 {
 	if (!IsBackgroundMapLoaded())
 	{
-		bgMapLoadFrameCounter = 0;
+		backgroundMapLoadFrameCounter = 0;
 		placeholderOpacity = 1.0f;
 		dontLoadBackgroundMap = HasCliArg("--no-background-map");
 		if (dontLoadBackgroundMap)
@@ -58,7 +58,7 @@ void UpdateMenuBackground(GlobalState *state, const double delta)
 	{
 		if (!IsBackgroundMapLoadedIgnoreTicks())
 		{
-			if (bgMapLoadFrameCounter > 10)
+			if (backgroundMapLoadFrameCounter > 1)
 			{
 				const uint64_t realLoadStart = GetTimeNs();
 				if (!ChangeMapByName(gameConfig.backgroundMap))
@@ -74,6 +74,10 @@ void UpdateMenuBackground(GlobalState *state, const double delta)
 				MapUpdate(state, delta);
 			}
 		}
+	}
+	if (IsBackgroundMapLoadedIgnoreTicks())
+	{
+		MapUpdate(state, delta);
 	}
 }
 
@@ -110,7 +114,7 @@ void RenderMenuBackground(GlobalState *state)
 							smallFont);
 		}
 	}
-	bgMapLoadFrameCounter++;
+	backgroundMapLoadFrameCounter++;
 }
 
 void FixedUpdateMenuBackground(GlobalState *state, const double delta)

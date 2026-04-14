@@ -124,7 +124,7 @@ bool LoadMap(Map *map, Asset *mapData)
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			TeleportPlayer(&map->player, &xfm);
+			SetPlayerTransform(&map->player, &xfm);
 			KvListDestroy(params);
 			ListFree(ioConnections);
 			free(actorClass);

@@ -21,15 +21,12 @@
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/Body.h>
-#include <joltc/Physics/Body/BodyFilter.h>
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <joltc/Physics/Collision/CastResult.h>
 #include <joltc/Physics/Collision/NarrowPhaseQuery.h>
 #include <joltc/Physics/Collision/ObjectLayer.h>
-#include <joltc/Physics/Collision/PhysicsMaterial.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <joltc/Physics/Collision/Shape/SubShapeID.h>
 #include <joltc/Physics/Collision/ShapeFilter.h>
@@ -43,7 +40,7 @@
 const float MOVE_SPEED = 6.0f;
 const float SLOW_MOVE_SPEED = 0.6f;
 const float MAX_WALKABLE_SLOPE = 50.0f;
-const float JUMP_SPEED = 4.25f;
+static const float JUMP_SPEED = 4.25f;
 static const float ACTOR_RAYCAST_MAX_DISTANCE = 10.0f;
 static const float OFFSET = 1.0f;
 /// Lower values are smoother
@@ -51,7 +48,7 @@ static const float SMOOTH_FACTOR = 17.5f;
 static const float HELD_ACTOR_MAX_DISTANCE_SQUARED = 6.0f;
 
 static Color crosshairColor = CROSSHAIR_COLOR_NORMAL;
-static bool enableViewmodelAfterFreecam = false;
+static bool viewmodelStateBeforeFreecam = false;
 static bool canDropHeldActor = true;
 
 
@@ -100,7 +97,7 @@ static bool OnContactValidate(const JPH_CharacterVirtual *character,
 		canDropHeldActor = false;
 		return false;
 	}
-	return true;
+	return !player->isNoclipActive;
 }
 
 static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
@@ -147,39 +144,19 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 	}
 }
 
-static bool BodyFilterShouldCollide(const JPH_BodyID bodyId)
-{
-	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
-	assert(player);
-	return !player->isNoclipActive;
-}
-
-static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
-{
-	const Player *player = (const Player *)JPH_CharacterVirtual_GetUserData(GetState()->map->player.joltCharacter);
-	assert(player);
-	return !player->isNoclipActive;
-}
-
 static const JPH_CharacterContactListener_Impl contactListenerImpl = {
 	.OnContactValidate = OnContactValidate,
 	.OnContactAdded = OnContactAdded,
 	.OnContactPersisted = OnContactPersisted,
 	.OnContactRemoved = OnContactRemoved,
 };
-static const JPH_BodyFilter_Impl bodyFilterImpl = {
-	.ShouldCollide = BodyFilterShouldCollide,
-	.ShouldCollideLocked = BodyFilterShouldCollideLocked,
-};
 static JPH_CharacterContactListener *contactListener;
-static JPH_BodyFilter *bodyFilter;
 static JPH_ShapeFilter *shapeFilter;
 
 
 void PlayerPersistentStateInit()
 {
 	contactListener = JPH_CharacterContactListener_Create(&contactListenerImpl);
-	bodyFilter = JPH_BodyFilter_Create(&bodyFilterImpl);
 	shapeFilter = JPH_ShapeFilter_Create(NULL);
 	actorRaycastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&actorRaycastBroadPhaseLayerFilterImpl);
 	actorRaycastObjectLayerFilter = JPH_ObjectLayerFilter_Create(&actorRaycastObjectLayerFilterImpl);
@@ -188,14 +165,14 @@ void PlayerPersistentStateInit()
 void PlayerPersistentStateDestroy()
 {
 	JPH_CharacterContactListener_Destroy(contactListener);
-	JPH_BodyFilter_Destroy(bodyFilter);
 	JPH_ShapeFilter_Destroy(shapeFilter);
 	JPH_BroadPhaseLayerFilter_Destroy(actorRaycastBroadPhaseLayerFilter);
 	JPH_ObjectLayerFilter_Destroy(actorRaycastObjectLayerFilter);
 }
 
-void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
+void CreatePlayerPhysics(Map *map)
 {
+	assert(map);
 	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.2f, 0.25f);
 	JPH_CharacterVirtualSettings characterSettings = {
 		.base.supportingVolume.normal = Vector3_AxisY,
@@ -206,24 +183,24 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 		.mass = 10.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
-	player->joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
-														&player->transform.position,
-														NULL,
-														0,
-														physicsSystem);
-	JPH_CharacterVirtual_SetUserData(player->joltCharacter, (uint64_t)player);
-	JPH_CharacterVirtual_SetListener(player->joltCharacter, contactListener);
+	map->player.joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
+															&map->player.transform.position,
+															NULL,
+															0,
+															map->physicsSystem);
+	JPH_CharacterVirtual_SetUserData(map->player.joltCharacter, (uint64_t)&map->player);
+	JPH_CharacterVirtual_SetListener(map->player.joltCharacter, contactListener);
 	JPH_Shape_Destroy(shape);
 }
 
-void TeleportPlayer(Player *player, const Transform *transform)
+void SetPlayerTransform(Player *player, const Transform *transform)
 {
 	JPH_CharacterVirtual_SetPosition(player->joltCharacter, &transform->position);
 	JPH_CharacterVirtual_SetRotation(player->joltCharacter, &transform->rotation);
 	player->transform = *transform;
 }
 
-void MovePlayer(const Player *player, float *distanceTraveled, const double delta, const bool allowInput)
+void MovePlayer(const Player *player, const double delta, const bool allowInput)
 {
 	Vector3 moveVec = Vector3_Zero;
 
@@ -261,57 +238,47 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 				moveVec.x -= 1;
 			}
 		}
-	}
 
-	if (moveVec.x != 0 || moveVec.z != 0)
-	{
-		Vector3_Normalized(&moveVec, &moveVec);
-		*distanceTraveled = MOVE_SPEED;
-		if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LCTRL) ||
-			GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
+		if (moveVec.x != 0 || moveVec.z != 0)
 		{
-			*distanceTraveled = SLOW_MOVE_SPEED;
-		} else if ((player->isFreecamActive || player->isNoclipActive) &&
-				   (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LSHIFT) ||
-					IsKeyPressed(physicsThreadInput, SDL_SCANCODE_RSHIFT)))
-		{
-			*distanceTraveled = MOVE_SPEED * 2;
-		} else
-		{
-			*distanceTraveled = MOVE_SPEED;
+			Vector3_Normalized(&moveVec, &moveVec);
+			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LCTRL) ||
+				GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
+			{
+				Vector3_MultiplyScalar(&moveVec, SLOW_MOVE_SPEED, &moveVec);
+			} else if ((player->isFreecamActive || player->isNoclipActive) &&
+					   (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LSHIFT) ||
+						IsKeyPressed(physicsThreadInput, SDL_SCANCODE_RSHIFT)))
+			{
+				Vector3_MultiplyScalar(&moveVec, MOVE_SPEED * 2, &moveVec);
+			} else
+			{
+				Vector3_MultiplyScalar(&moveVec, MOVE_SPEED, &moveVec);
+			}
+
+			if (player->isFreecamActive)
+			{
+				JPH_Quat_Rotate(&GetState()->map->player.playerCamera.transform.rotation, &moveVec, &moveVec);
+			} else if (player->isNoclipActive)
+			{
+				JPH_Quat_Rotate(&player->transform.rotation, &moveVec, &moveVec);
+			} else
+			{
+				JPH_Quat playerRotation;
+				JPH_Quat_Rotation(&Vector3_AxisY,
+								  JPH_Quat_GetRotationAngle(&player->transform.rotation, &Vector3_AxisY),
+								  &playerRotation);
+				JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
+			}
 		}
-		Vector3_MultiplyScalar(&moveVec, *distanceTraveled, &moveVec);
 
 		if (player->isFreecamActive)
 		{
-			JPH_Quat_Rotate(&GetState()->map->player.playerCamera.transform.rotation, &moveVec, &moveVec);
-		} else if (player->isNoclipActive)
-		{
-			JPH_Quat_Rotate(&player->transform.rotation, &moveVec, &moveVec);
-		} else
-		{
-			JPH_Quat playerRotation;
-			JPH_Quat_Rotation(&Vector3_AxisY,
-							  JPH_Quat_GetRotationAngle(&player->transform.rotation, &Vector3_AxisY),
-							  &playerRotation);
-			JPH_Quat_Rotate(&playerRotation, &moveVec, &moveVec);
+			Vector3 *cameraPosition = &GetState()->map->player.playerCamera.transform.position;
+			Vector3_MultiplyScalar(&moveVec, (float)delta / PHYSICS_TARGET_TPS, &moveVec);
+			Vector3_Add(cameraPosition, &moveVec, cameraPosition);
+			return;
 		}
-	}
-
-	if (allowInput &&
-		JPH_CharacterBase_GetGroundState((JPH_CharacterBase *)player->joltCharacter) == JPH_GroundState_OnGround &&
-		(IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_SPACE) ||
-		 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_EAST)))
-	{
-		moveVec.y = JUMP_SPEED;
-	}
-
-	if (player->isFreecamActive)
-	{
-		Vector3 *cameraPosition = &GetState()->map->player.playerCamera.transform.position;
-		Vector3_MultiplyScalar(&moveVec, (float)delta / PHYSICS_TARGET_TPS, &moveVec);
-		Vector3_Add(cameraPosition, &moveVec, cameraPosition);
-		return;
 	}
 	if (!(player->isNoclipActive ||
 		  JPH_CharacterBase_GetGroundState((JPH_CharacterBase *)player->joltCharacter) == JPH_GroundState_OnGround))
@@ -319,6 +286,10 @@ void MovePlayer(const Player *player, float *distanceTraveled, const double delt
 		Vector3 oldVelocity;
 		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
 		moveVec.y += oldVelocity.y + (float)(GRAVITY * (delta / PHYSICS_TARGET_TPS));
+	} else if (allowInput && (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_SPACE) ||
+							  IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_EAST)))
+	{
+		moveVec.y = JUMP_SPEED;
 	}
 	JPH_CharacterVirtual_SetLinearVelocity(player->joltCharacter, &moveVec);
 }
@@ -343,33 +314,29 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 	return (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, raycastResult->bodyID);
 }
 
-void UpdatePlayer(Player *player,
-				  const JPH_PhysicsSystem *physicsSystem,
-				  const float deltaTime,
-				  const bool allowMovement)
+void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime, const bool allowInput)
 {
-	if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_F8) && allowMovement)
+	if (allowInput && !player->isNoclipActive && IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_F8))
 	{
 		player->isFreecamActive = !player->isFreecamActive;
 		Viewmodel *viewmodel = &GetState()->map->viewmodel;
 		if (player->isFreecamActive)
 		{
 			crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
-			enableViewmodelAfterFreecam = viewmodel->enabled;
+			viewmodelStateBeforeFreecam = viewmodel->enabled;
 			viewmodel->enabled = false;
 		} else
 		{
-			viewmodel->enabled = enableViewmodelAfterFreecam;
+			viewmodel->enabled = viewmodelStateBeforeFreecam;
 		}
 	}
-	if (!player->isFreecamActive)
+	if (allowInput && !player->isFreecamActive)
 	{
 		if (player->hasHeldActor)
 		{
 			if ((IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
 				 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH)) &&
-				canDropHeldActor &&
-				allowMovement)
+				canDropHeldActor)
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
@@ -429,7 +396,7 @@ void UpdatePlayer(Player *player,
 				itemTarget = item->definition->FixedUpdate(item, player->targetedActor, &crosshairColor, deltaTime);
 			}
 
-			if (player->targetedActor && allowMovement)
+			if (player->targetedActor)
 			{
 				if (!itemTarget)
 				{
@@ -463,15 +430,15 @@ void UpdatePlayer(Player *player,
 				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			}
 		}
-		if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_V) && allowMovement)
+		if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_V))
 		{
 			player->isNoclipActive = !player->isNoclipActive;
 		}
 	}
-	canDropHeldActor = true;
+	canDropHeldActor = allowInput;
 	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
-		.stickToFloorStepDown.y = player->isNoclipActive ? 0.0f : -0.25f,
-		.walkStairsStepUp.y = player->isNoclipActive ? 0.0f : 0.25f,
+		.stickToFloorStepDown.y = -0.25f,
+		.walkStairsStepUp.y = 0.25f,
 		.walkStairsMinStepForward = 0.02f,
 		.walkStairsStepForwardTest = 0.15f,
 		.walkStairsCosAngleForwardContact = cosf(degToRad(75)),
@@ -482,7 +449,7 @@ void UpdatePlayer(Player *player,
 										&extendedUpdateSettings,
 										OBJECT_LAYER_PLAYER,
 										physicsSystem,
-										bodyFilter,
+										NULL,
 										shapeFilter);
 }
 

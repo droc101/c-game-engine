@@ -64,11 +64,7 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 
 	const bool allowMovement = state->camera == &state->map->player.playerCamera;
 
-	float distanceTraveled = 0;
-	MovePlayer(&state->map->player, &distanceTraveled, delta, allowMovement);
-
-	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.00175);
-	state->map->player.viewBobbingHeight = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
+	MovePlayer(&state->map->player, delta, allowMovement);
 
 	WaitForLodThreadToEnd();
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
@@ -77,7 +73,14 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 
 	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime, allowMovement);
 
+	Vector2 oldPosition = v2(state->map->player.transform.position.x, state->map->player.transform.position.z);
 	JPH_CharacterVirtual_GetPosition(state->map->player.joltCharacter, &state->map->player.transform.position);
+
+	const float distanceTraveled = Vector2Distance(oldPosition,
+												   v2(state->map->player.transform.position.x,
+													  state->map->player.transform.position.z));
+	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.1);
+	state->map->player.viewBobbingHeight = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
 
 	for (size_t i = 0; i < state->map->actors.length; i++)
 	{

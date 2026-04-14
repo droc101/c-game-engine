@@ -6,6 +6,7 @@
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/joltc.h>
@@ -15,13 +16,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
+void CreatePlayer(Map *map)
 {
-	player->transform.rotation = JPH_Quat_Identity;
-	player->playerCamera.fov = GetState()->options.fov;
-	player->playerCamera.transform.rotation = JPH_Quat_Identity;
+	map->player.transform.rotation = JPH_Quat_Identity;
+	map->player.playerCamera.fov = GetState()->options.fov;
+	map->player.playerCamera.transform.rotation = JPH_Quat_Identity;
 
-	CreatePlayerPhysics(player, physicsSystem);
+	CreatePlayerPhysics(map);
 }
 
 void DPrintPlayer(const Player *player)

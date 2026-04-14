@@ -17,6 +17,7 @@
 #define CROSSHAIR_COLOR_ENEMY COLOR(0xffff0000)
 #define CROSSHAIR_COLOR_INVISIBLE COLOR(0x00ff0000)
 
+typedef struct Map Map;
 typedef struct Player Player;
 
 struct Player
@@ -44,7 +45,7 @@ struct Player
 	float viewBobbingHeight;
 };
 
-void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem);
+void CreatePlayer(Map *map);
 
 void DPrintPlayer(const Player *player);
 
