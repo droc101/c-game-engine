@@ -51,7 +51,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 			LogError("Path is too long: %s\n", relPath);
 			continue;
 		}
-		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > maxPathLength)
+		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > (int64_t)maxPathLength)
 		{
 			LogError("Asset path too long!\n");
 			continue;
