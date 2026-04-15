@@ -2,7 +2,7 @@
 // Created by droc101 on 1/16/26.
 //
 
-#include <engine/actor/GlobalFog.h>
+#include <engine/actor/env/GlobalFog.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

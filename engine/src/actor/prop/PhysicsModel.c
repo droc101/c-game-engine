@@ -2,7 +2,7 @@
 // Created by droc101 on 3/2/26.
 //
 
-#include <engine/actor/PhysicsModel.h>
+#include <engine/actor/prop/PhysicsModel.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

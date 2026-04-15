@@ -2,7 +2,7 @@
 // Created by droc101 on 4/8/26.
 //
 
-#include "actor/ItemEraser.h"
+#include "actor/item/ItemEraser.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>

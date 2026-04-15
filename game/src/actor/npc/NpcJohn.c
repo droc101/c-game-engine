@@ -2,7 +2,7 @@
 // Created by droc101 on 4/3/26.
 //
 
-#include "actor/NpcJohn.h"
+#include "actor/npc/NpcJohn.h"
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>

@@ -2,7 +2,7 @@
 // Created by droc101 on 1/4/26.
 //
 
-#include <engine/actor/GlobalLight.h>
+#include <engine/actor/env/GlobalLight.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

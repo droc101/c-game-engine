@@ -2,7 +2,7 @@
 // Created by droc101 on 11/7/2024.
 //
 
-#include "actor/Door.h"
+#include "actor/prop/Door.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

@@ -2,7 +2,7 @@
 // Created by droc101 on 4/28/25.
 //
 
-#include "actor/Physbox.h"
+#include "actor/prop/Physbox.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>

@@ -2,7 +2,7 @@
 // Created by droc101 on 7/22/25.
 //
 
-#include <engine/actor/LogicCounter.h>
+#include <engine/actor/logic/LogicCounter.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>

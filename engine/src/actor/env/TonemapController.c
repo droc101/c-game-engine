@@ -2,7 +2,7 @@
 // Created by droc101 on 3/20/26.
 //
 
-#include <engine/actor/TonemapController.h>
+#include <engine/actor/env/TonemapController.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

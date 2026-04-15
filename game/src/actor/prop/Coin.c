@@ -2,7 +2,7 @@
 // Created by droc101 on 7/11/2024.
 //
 
-#include "actor/Coin.h"
+#include "actor/prop/Coin.h"
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>

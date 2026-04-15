@@ -20,20 +20,18 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <joltc/joltc.h>
 #include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include "actor/Physbox.h"
-#include "actor/TestActor.h"
+#include "actor/npc/TestActor.h"
+#include "actor/prop/Physbox.h"
 #include "gameState/PauseState.h"
 
 static const char *spawnActorOnce = NULL;

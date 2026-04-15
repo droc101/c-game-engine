@@ -2,7 +2,7 @@
 // Created by droc101 on 7/12/2024.
 //
 
-#include "actor/Goal.h"
+#include "actor/prop/Goal.h"
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>

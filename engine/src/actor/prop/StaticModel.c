@@ -2,7 +2,7 @@
 // Created by droc101 on 5/28/25.
 //
 
-#include <engine/actor/StaticModel.h>
+#include <engine/actor/prop/StaticModel.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

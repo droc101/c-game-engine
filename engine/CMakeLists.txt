@@ -57,30 +57,32 @@ add_library(engine INTERFACE
 target_sources(engine INTERFACE
         src/actor/IoProxy.c
         include/engine/actor/IoProxy.h
-        src/actor/LogicBinary.c
-        include/engine/actor/LogicBinary.h
-        src/actor/LogicCounter.c
-        include/engine/actor/LogicCounter.h
-        src/actor/LogicDecimal.c
-        include/engine/actor/LogicDecimal.h
+        src/actor/logic/LogicBinary.c
+        include/engine/actor/logic/LogicBinary.h
+        src/actor/logic/LogicCounter.c
+        include/engine/actor/logic/LogicCounter.h
+        src/actor/logic/LogicDecimal.c
+        include/engine/actor/logic/LogicDecimal.h
         src/actor/SoundPlayer.c
         include/engine/actor/SoundPlayer.h
-        src/actor/Sprite.c
-        include/engine/actor/Sprite.h
-        src/actor/StaticModel.c
-        include/engine/actor/StaticModel.h
+        src/actor/prop/Sprite.c
+        include/engine/actor/prop/Sprite.h
+        src/actor/prop/StaticModel.c
+        include/engine/actor/prop/StaticModel.h
         src/actor/Trigger.c
         include/engine/actor/Trigger.h
-        src/actor/GlobalLight.c
-        include/engine/actor/GlobalLight.h
-        src/actor/GlobalFog.c
-        include/engine/actor/GlobalFog.h
-        include/engine/actor/PhysicsModel.h
-        src/actor/PhysicsModel.c
-        src/actor/TonemapController.c
-        include/engine/actor/TonemapController.h
+        src/actor/env/GlobalLight.c
+        include/engine/actor/env/GlobalLight.h
+        src/actor/env/GlobalFog.c
+        include/engine/actor/env/GlobalFog.h
+        include/engine/actor/prop/PhysicsModel.h
+        src/actor/prop/PhysicsModel.c
+        src/actor/env/TonemapController.c
+        include/engine/actor/env/TonemapController.h
         src/actor/Camera.c
         include/engine/actor/Camera.h
+        include/engine/actor/prop/Button.h
+        src/actor/prop/Button.c
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

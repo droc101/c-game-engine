@@ -3,7 +3,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
-#include "actor/Laser.h"
+#include "actor/prop/Laser.h"
 #include "gameState/LogoSplashState.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"

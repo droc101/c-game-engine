@@ -2,7 +2,7 @@
 // Created by droc101 on 4/28/25.
 //
 
-#include "actor/Laser.h"
+#include "actor/prop/Laser.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

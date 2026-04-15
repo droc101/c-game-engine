@@ -2,7 +2,7 @@
 // Created by droc101 on 5/29/25.
 //
 
-#include <engine/actor/Sprite.h>
+#include <engine/actor/prop/Sprite.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>

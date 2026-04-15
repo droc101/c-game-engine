@@ -2,7 +2,7 @@
 // Created by droc101 on 6/19/25.
 //
 
-#include <engine/actor/LogicBinary.h>
+#include <engine/actor/logic/LogicBinary.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>

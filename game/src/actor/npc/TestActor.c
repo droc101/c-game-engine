@@ -2,7 +2,7 @@
 // Created by droc101 on 4/22/2024.
 //
 
-#include "actor/TestActor.h"
+#include "actor/npc/TestActor.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/Font.h>
@@ -67,13 +67,13 @@ static void TestActorRenderUi(Actor *this)
 	if (GetState()->camera == &GetState()->map->player.playerCamera)
 	{
 		DrawTextAligned("I'm TestActor!",
-					16,
-					COLOR_BLACK,
-					v2s(22),
-					v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_BOTTOM,
-					smallFont);
+						16,
+						COLOR_BLACK,
+						v2s(22),
+						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
+						FONT_HALIGN_CENTER,
+						FONT_VALIGN_BOTTOM,
+						smallFont);
 		DrawTextAligned("I'm TestActor!",
 						16,
 						COLOR_WHITE,

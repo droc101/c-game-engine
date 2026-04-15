@@ -2,7 +2,7 @@
 // Created by droc101 on 3/6/26.
 //
 
-#include "actor/Button.h"
+#include <engine/actor/prop/Button.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>

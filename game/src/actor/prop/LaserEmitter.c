@@ -2,7 +2,7 @@
 // Created by droc101 on 6/1/25.
 //
 
-#include "actor/LaserEmitter.h"
+#include "actor/prop/LaserEmitter.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include "actor/Laser.h"
+#include "actor/prop/Laser.h"
 
 enum LaserEmitterSkin
 {

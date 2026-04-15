@@ -2,7 +2,7 @@
 // Created by droc101 on 7/22/25.
 //
 
-#include <engine/actor/LogicDecimal.h>
+#include <engine/actor/logic/LogicDecimal.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
