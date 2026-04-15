@@ -16,10 +16,12 @@ disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI
         SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM)
 enable_options(SDL_CCACHE)
 fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
+target_compile_options(SDL3-shared PRIVATE "-w")
 
 disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
         SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK)
 fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git release-3.*.* SDL3_mixer)
+target_compile_options(SDL3_mixer-shared PRIVATE "-w")
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
@@ -27,6 +29,7 @@ find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 
 fetch_glew()
+target_compile_options(glew_s PRIVATE "-w")
 fetch_dict()
 
 message(STATUS "Fetching Luna...")
@@ -45,6 +48,7 @@ if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 message(STATUS "Fetching JoltC/Jolt...")
 fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14ecd27 joltc)
+target_compile_options(joltc PRIVATE "-w")
 
 #endregion
 

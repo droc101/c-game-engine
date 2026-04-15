@@ -35,7 +35,7 @@ AssetCache assetCache;
 
 FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	const int64_t maxPathLength = 300;
+	const size_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
