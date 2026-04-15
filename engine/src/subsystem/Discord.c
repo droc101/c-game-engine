@@ -9,6 +9,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Logging.h>
+#include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,10 +22,33 @@ struct DiscordApplication
 };
 
 struct DiscordApplication app;
+IDiscordCoreEvents events;
+
+static void DiscordLogHook(void * /*hook_data*/, enum EDiscordLogLevel level, const char *message)
+{
+	switch (level)
+	{
+		case DiscordLogLevel_Error:
+			LogError("Discord Game SDK Error: %s\n", message);
+			break;
+		case DiscordLogLevel_Warn:
+			LogWarning("Discord Game SDK Warning: %s\n", message);
+			break;
+		case DiscordLogLevel_Info:
+			LogInfo("Discord Game SDK Info: %s\n", message);
+			break;
+		case DiscordLogLevel_Debug:
+			LogDebug("Discord Game SDK Debug: %s\n", message);
+			break;
+	}
+}
 
 void DiscordInit()
 {
+	signal(SIGPIPE, SIG_IGN);
+
 	memset(&app, 0, sizeof(app));
+	memset(&events, 0, sizeof(events));
 
 	if (gameConfig.discordAppId == 0)
 	{
@@ -35,6 +59,7 @@ void DiscordInit()
 	DiscordCreateParamsSetDefault(&params);
 	params.client_id = (DiscordClientId)gameConfig.discordAppId;
 	params.flags = DiscordCreateFlags_NoRequireDiscord;
+	params.events = &events;
 	params.event_data = &app;
 
 	const enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
@@ -44,6 +69,8 @@ void DiscordInit()
 		LogError("Failed to start Discord Game SDK: Errno %d\n", res);
 		return;
 	}
+
+	app.core->set_log_hook(app.core, DiscordLogLevel_Debug, NULL, DiscordLogHook);
 
 	app.activityManager = app.core->get_activity_manager(app.core);
 
@@ -77,6 +104,7 @@ void DiscordUpdateRPC()
 	{
 		return;
 	}
+
 	struct DiscordActivity activity = {0};
 	activity.application_id = (DiscordClientId)gameConfig.discordAppId;
 	activity.type = DiscordActivityType_Playing;
