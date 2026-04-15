@@ -9,7 +9,6 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Logging.h>
-#include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,7 +23,7 @@ struct DiscordApplication
 struct DiscordApplication app;
 IDiscordCoreEvents events;
 
-static void DiscordLogHook(void * /*hook_data*/, enum EDiscordLogLevel level, const char *message)
+static void DiscordLogHook(void * /*hook_data*/, const enum EDiscordLogLevel level, const char *message)
 {
 	switch (level)
 	{
@@ -45,10 +44,6 @@ static void DiscordLogHook(void * /*hook_data*/, enum EDiscordLogLevel level, co
 
 void DiscordInit()
 {
-#ifndef WIN32
-	signal(SIGPIPE, SIG_IGN);
-#endif
-
 	memset(&app, 0, sizeof(app));
 	memset(&events, 0, sizeof(events));
 
@@ -89,7 +84,13 @@ void DiscordUpdate()
 	{
 		return;
 	}
-	app.core->run_callbacks(app.core);
+	const enum EDiscordResult result = app.core->run_callbacks(app.core);
+	if (result != DiscordResult_Ok)
+	{
+		LogError("Discord SDK run_callbacks failed with errno %d, Discord integration will be disabled for this session.\n", result);
+		app.activityManager = NULL; // Prevent clearing activity during cleanup
+		DiscordDestroy();
+	}
 }
 
 static void ActivityCallback(void * /*data*/, const enum EDiscordResult result)
@@ -137,7 +138,10 @@ void DiscordDestroy()
 	if (app.core)
 	{
 		LogDebug("Cleaning up Discord Game SDK...\n");
-		app.activityManager->clear_activity(app.activityManager, NULL, NULL);
+		if (app.activityManager)
+		{
+			app.activityManager->clear_activity(app.activityManager, NULL, NULL);
+		}
 		app.core->destroy(app.core);
 		app.core = NULL;
 		app.activityManager = NULL;
