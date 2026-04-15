@@ -329,6 +329,13 @@ void EngineIteration()
 	}
 #endif
 
+	if (state->gameState->enableRelativeMouseMode)
+	{
+		// warp the mouse to the center of the screen
+		const Vector2 realWndSize = ActualWindowSize();
+		SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
+	}
+
 	state->gameState->RenderGame(state, delta);
 
 	FrameGraphDraw();

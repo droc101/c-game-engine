@@ -38,6 +38,7 @@
 
 static const char *spawnActorOnce = NULL;
 static const char *spawnActorEveryTick = NULL;
+static double lastTickDelta = 0.0f;
 
 void MainStateUpdate(GlobalState *state, const double delta)
 {
@@ -89,14 +90,12 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	MapFixedUpdate(state, delta);
+
+	lastTickDelta = delta;
 }
 
 void MainStateRender(GlobalState *state, const double delta)
 {
-	// warp the mouse to the center of the screen
-	const Vector2 realWndSize = ActualWindowSize();
-	SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
-
 	RenderMap(state->map, state->camera);
 	RenderHUD();
 
@@ -107,7 +106,8 @@ void MainStateRender(GlobalState *state, const double delta)
 
 #ifdef ENABLE_DEBUG_PRINT
 	DPrintF("Actors: %d", false, COLOR_WHITE, state->map->actors.length);
-	DPrintF("Frame Delta: %lf", false, COLOR_WHITE, delta);
+	DPrintF("Frame Delta: %.3lf", false, COLOR_WHITE, delta);
+	DPrintF("Tick Delta: %.3lf", false, COLOR_WHITE, lastTickDelta);
 #endif
 }
 
