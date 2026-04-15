@@ -45,7 +45,9 @@ static void DiscordLogHook(void * /*hook_data*/, enum EDiscordLogLevel level, co
 
 void DiscordInit()
 {
+#ifndef WIN32
 	signal(SIGPIPE, SIG_IGN);
+#endif
 
 	memset(&app, 0, sizeof(app));
 	memset(&events, 0, sizeof(events));
