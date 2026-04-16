@@ -16,12 +16,10 @@
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
-#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,29 +53,22 @@ static inline void CreateNpcJohnCollider(Actor *this, const Transform *transform
 
 static void JohnUpdate(Actor *this, double /*delta*/)
 {
-	Vector3 position = {};
-	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	const float rotation = atan2f(GetState()->camera->transform.position.z - position.z,
-								  GetState()->camera->transform.position.x - position.x) +
-						   GLM_PI_2f;
-	this->wall->a = v2(0.5f * cosf(rotation), 0.5f * sinf(rotation));
-	this->wall->b = v2(-0.5f * cosf(rotation), -0.5f * sinf(rotation));
-	ActorWallBake(this);
+	ActorYBillboard(GetState()->camera, this);
 }
 
 void JohnInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->a = v2(0, 0.5f);
-	this->wall->b = v2(0, -0.5f);
+	this->wall->localCenter = v2s(0);
+	this->wall->orientation = X_AXIS;
+	this->wall->length = 1;
 	this->wall->tex = malloc(strlen(TEXTURE("actor/john")) + 1);
 	strcpy(this->wall->tex, TEXTURE("actor/john"));
 	this->wall->uvScale = v2s(1.0f);
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 1.0f;
 	this->wall->unshaded = false;
-	ActorWallBake(this);
 	CreateNpcJohnCollider(this, transform);
 }
 

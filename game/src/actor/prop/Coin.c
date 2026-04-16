@@ -24,12 +24,13 @@
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+static const float SIZE = 0.25f;
 
 typedef struct CoinData
 {
@@ -39,7 +40,7 @@ typedef struct CoinData
 
 static inline void CreateCoinSensor(Actor *this, const Transform *transform)
 {
-	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.25f, 0.25f, 0.25f}}, JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{SIZE, SIZE, SIZE}}, JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -65,14 +66,7 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 		this->wall->uvOffset.x = uvo;
 	}
 
-	Vector3 position = {};
-	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	const float rotation = atan2f(GetState()->camera->transform.position.z - position.z,
-								  GetState()->camera->transform.position.x - position.x) +
-						   GLM_PI_2f;
-	this->wall->a = v2(0.125f * cosf(rotation), 0.125f * sinf(rotation));
-	this->wall->b = v2(-0.125f * cosf(rotation), -0.125f * sinf(rotation));
-	ActorWallBake(this);
+	ActorYBillboard(GetState()->camera, this);
 }
 
 static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
@@ -108,15 +102,15 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->a = v2(0, 0.125f);
-	this->wall->b = v2(0, -0.125f);
+	this->wall->localCenter = v2s(0);
+	this->wall->orientation = X_AXIS;
+	this->wall->length = SIZE;
 	this->wall->tex = malloc(strlen(TEXTURE("actor/bluecoin")) + 1);
 	strcpy(this->wall->tex, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
 	this->wall->uvScale = v2(1.0f, 4.0f);
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 0.25f;
 	this->wall->unshaded = false;
-	ActorWallBake(this);
 }
 
 ActorDefinition coinActorDefinition = {

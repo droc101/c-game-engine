@@ -107,7 +107,7 @@ static JPH_BroadPhaseLayerFilter *tripleLaserBroadPhaseLayerFilter;
 static JPH_ObjectLayerFilter *tripleLaserObjectLayerFilter;
 static JPH_BodyFilter *bodyFilter;
 
-static const float maxDistance = 50.0f;
+static const float MAX_DISTANCE = 50.0f;
 
 static inline void LaserCreateBody(Actor *this, const Transform *transform)
 {
@@ -142,7 +142,7 @@ static void LaserUpdate(Actor *this, const double delta)
 		const bool hit = JPH_NarrowPhaseQuery_CastRay2_GAME(narrowPhaseQuery,
 															this->bodyInterface,
 															this->bodyId,
-															maxDistance,
+															MAX_DISTANCE,
 															&result,
 															&hitPointOffset,
 															broadPhaseLayerFilter,
@@ -150,8 +150,8 @@ static void LaserUpdate(Actor *this, const double delta)
 															bodyFilter);
 		if (hit)
 		{
-			this->wall->b = v2(hitPointOffset.x, hitPointOffset.z);
-			ActorWallBake(this);
+			this->wall->length = MAX_DISTANCE * result.fraction;
+			this->wall->localCenter = v2(-this->wall->length / 2.0f, 0);
 		}
 		this->wall->uvOffset.x = (float)fmod(this->wall->uvOffset.x + delta / 8, 1.0);
 	}
@@ -181,8 +181,9 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->a = v2s(0);
-	this->wall->b = v2s(0);
+	this->wall->length = 0;
+	this->wall->localCenter = v2s(0);
+	this->wall->orientation = Z_AXIS;
 	this->wall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
 	strcpy(this->wall->tex,
 		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
@@ -205,7 +206,6 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 			transform->position.y += 0.0f;
 			break;
 	}
-	ActorWallBake(this);
 
 	LaserCreateBody(this, transform);
 

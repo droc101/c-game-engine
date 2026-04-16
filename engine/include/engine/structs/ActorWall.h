@@ -5,20 +5,31 @@
 #ifndef GAME_WALL_H
 #define GAME_WALL_H
 
+#include <engine/structs/Camera.h>
 #include <engine/structs/Vector2.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 
 typedef struct Actor Actor;
 
+typedef enum ActorWallOrientation ActorWallOrientation;
+
 typedef struct ActorWall ActorWall;
+
+enum ActorWallOrientation
+{
+	/// Wall should be along the actor's local X axis
+	X_AXIS,
+	/// Wall should be along the actor's local Z axis
+	Z_AXIS,
+};
 
 struct ActorWall
 {
-	/// The first point of the wall
-	Vector2 a;
-	/// The second point of the wall
-	Vector2 b;
+	/// Which axis the wall extends along
+	ActorWallOrientation orientation;
+	/// The local center of the wall
+	Vector2 localCenter;
 	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
 	char *tex;
 	/// The UV scale of the wall
@@ -27,19 +38,11 @@ struct ActorWall
 	Vector2 uvOffset;
 	/// height of the wall for rendering. Does not affect collision
 	float height;
-	/// The length of the wall (Call @c WallBake to update)
+	/// The length of the wallS
 	float length;
-	/// The angle of the wall (Call @c WallBake to update)
-	float angle;
 	/// Whether the wall should be rendered without shading
 	bool unshaded;
 };
-
-/**
- * Bake an actor wall's information
- * @param this ActorWall to bake
- */
-void ActorWallBake(const Actor *this);
 
 /**
  * Create a collider for an actor wall
@@ -53,5 +56,7 @@ JPH_Shape *ActorWallCreateCollider(const ActorWall *wall);
  * @note This does NOT free the wall pointer itself
  */
 void FreeActorWall(const ActorWall *wall);
+
+void ActorYBillboard(Camera *camera, Actor *this);
 
 #endif //GAME_WALL_H

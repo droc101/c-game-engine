@@ -4461,6 +4461,84 @@
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "always_give": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 18.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 1000.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 10.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.19607843458652496,
+                        "b": 0.19607843458652496,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 1000.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 10.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.19607843458652496,
+                        "g": 0.19607843458652496,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
                 }
             }
         }

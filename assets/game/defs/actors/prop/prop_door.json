@@ -1,6 +1,9 @@
 {
   "description": "A door that can open and close",
   "extends": "actor",
+  "display": {
+    "directional": true
+  },
   "inputs": {
     "open": {
       "description": "Forcefully open this door, regardless of player position"

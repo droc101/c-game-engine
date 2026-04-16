@@ -5,57 +5,44 @@
 #include <cglm/types.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
-#include <engine/structs/Vector2.h>
+#include <engine/structs/Camera.h>
 #include <joltc/constants.h>
+#include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdlib.h>
 
-void ActorWallBake(const Actor *this)
-{
-	const float dx = this->wall->b.x - this->wall->a.x;
-	const float dy = this->wall->b.y - this->wall->a.y;
-	this->wall->length = sqrtf(dx * dx + dy * dy);
-	if (this->bodyId != JPH_BodyId_InvalidBodyID && this->bodyInterface != NULL)
-	{
-		JPH_Quat rotation = {};
-		JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
-		this->wall->angle = JPH_Quat_GetRotationAngle(&rotation, &Vector3_AxisY) + atan2f(dy, dx);
-	} else
-	{
-		this->wall->angle = atan2f(dy, dx);
-	}
-	this->wall->angle += GLM_PI_2f;
-}
-
 JPH_Shape *ActorWallCreateCollider(const ActorWall *wall)
 {
+	const float halfLength = wall->length / 2.0f;
+	const float halfHeight = wall->height / 2.0f;
+	const float xComponent = (wall->orientation == X_AXIS ? halfLength : 0) + wall->localCenter.x;
+	const float zComponent = (wall->orientation == Z_AXIS ? halfLength : 0) + wall->localCenter.x;
 	const Vector3 points[4] = {
 		{
-			wall->a.x,
-			-(wall->height / 2),
-			wall->a.y,
+			-xComponent,
+			-halfHeight + wall->localCenter.y,
+			-zComponent,
 		},
 		{
-			wall->b.x,
-			-(wall->height / 2),
-			wall->b.y,
+			xComponent,
+			-halfHeight + wall->localCenter.y,
+			zComponent,
 		},
 		{
-			wall->a.x,
-			(wall->height / 2),
-			wall->a.y,
+			-xComponent,
+			halfHeight + wall->localCenter.y,
+			-zComponent,
 		},
 		{
-			wall->b.x,
-			(wall->height / 2),
-			wall->b.y,
+			xComponent,
+			halfHeight + wall->localCenter.y,
+			zComponent,
 		},
 	};
 	return (JPH_Shape *)JPH_ConvexHullShape_Create(points, 4, JPH_DefaultConvexRadius);
@@ -64,4 +51,20 @@ JPH_Shape *ActorWallCreateCollider(const ActorWall *wall)
 void FreeActorWall(const ActorWall *wall)
 {
 	free(wall->tex);
+}
+
+void ActorYBillboard(Camera *camera, Actor *this)
+{
+	// TODO quaternion
+	Vector3 position;
+	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
+	float rotation = atan2f(camera->transform.position.x - position.x, camera->transform.position.z - position.z);
+	if (this->wall->orientation == Z_AXIS)
+	{
+		rotation += GLM_PI_2f;
+	}
+	const Vector3 euler = {0, rotation, 0};
+	JPH_Quat quat;
+	JPH_Quat_FromEulerAngles(&euler, &quat);
+	JPH_BodyInterface_SetRotation(this->bodyInterface, this->bodyId, &quat, JPH_Activation_DontActivate);
 }

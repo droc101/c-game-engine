@@ -28,7 +28,6 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
-#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -56,96 +55,111 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(wall->tex);
 
+	const float halfLength = wall->length / 2.0f;
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
-	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
+	Vector2 startVertex;
+	Vector2 endVertex;
+	Vector3 normal = {0};
+	Vector3 backfaceNormal = {0};
+	if (wall->orientation == X_AXIS)
+	{
+		normal.z = 1;
+		backfaceNormal.z = -1;
+		startVertex = v2(-halfLength + wall->localCenter.x, 0);
+		endVertex = v2(halfLength + wall->localCenter.x, 0);
+	} else
+	{
+		normal.x = -1;
+		backfaceNormal.x = 1;
+		startVertex = v2(0, -halfLength + wall->localCenter.x);
+		endVertex = v2(0, halfLength + wall->localCenter.x);
+	}
 	const Vector2 startUV = v2(wall->uvOffset.x, wall->uvOffset.y);
 	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
 							 wall->uvScale.y * wall->height + wall->uvOffset.y);
-	const float backfaceWallAngle = wall->angle + PIf;
 	const float vertices[8][8] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			startVertex.y,
 			startUV.x,
 			startUV.y,
-			sinf(wall->angle),
-			0,
-			cosf(wall->angle),
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 		{
 			endVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			endVertex.y,
 			endUV.x,
 			startUV.y,
-			sinf(wall->angle),
-			0,
-			cosf(wall->angle),
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 		{
 			endVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			endVertex.y,
 			endUV.x,
 			endUV.y,
-			sinf(wall->angle),
-			0,
-			cosf(wall->angle),
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 		{
 			startVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			startVertex.y,
 			startUV.x,
 			endUV.y,
-			sinf(wall->angle),
-			0,
-			cosf(wall->angle),
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 
 		// backface
 		{
 			startVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			startVertex.y,
 			endUV.x,
 			startUV.y,
-			sinf(backfaceWallAngle),
-			0,
-			cosf(backfaceWallAngle),
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 		{
 			endVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			endVertex.y,
 			startUV.x,
 			startUV.y,
-			sinf(backfaceWallAngle),
-			0,
-			cosf(backfaceWallAngle),
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 		{
 			endVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			endVertex.y,
 			startUV.x,
 			endUV.y,
-			sinf(backfaceWallAngle),
-			0,
-			cosf(backfaceWallAngle),
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 		{
 			startVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			startVertex.y,
 			endUV.x,
 			endUV.y,
-			sinf(backfaceWallAngle),
-			0,
-			cosf(backfaceWallAngle),
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 	};
 
@@ -193,9 +207,19 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(wall->tex);
 
+	const float halfLength = wall->length / 2.0f;
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
-	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
+	Vector2 startVertex;
+	Vector2 endVertex;
+	if (wall->orientation == X_AXIS)
+	{
+		startVertex = v2(-halfLength + wall->localCenter.x, 0);
+		endVertex = v2(halfLength + wall->localCenter.x, 0);
+	} else
+	{
+		startVertex = v2(0, -halfLength + wall->localCenter.x);
+		endVertex = v2(0, halfLength + wall->localCenter.x);
+	}
 	const Vector2 startUV = v2(wall->uvOffset.x, wall->uvOffset.y);
 	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
 							 wall->uvScale.y * wall->height + wall->uvOffset.y);

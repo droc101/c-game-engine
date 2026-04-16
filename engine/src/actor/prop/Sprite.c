@@ -47,8 +47,9 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->a = v2(size.x * 0.5f, 0.0f);
-	this->wall->b = v2(-size.x * 0.5f, 0.0f);
+	this->wall->localCenter = v2s(0);
+	this->wall->orientation = X_AXIS;
+	this->wall->length = size.x;
 	this->wall->height = size.y;
 	this->wall->tex = strdup(KvGetString(params, "texture", "level/uvtest"));
 	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
@@ -62,7 +63,6 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	{
 		ActorCreateEmptyBody(this, transform);
 	}
-	ActorWallBake(this);
 }
 
 ActorDefinition spriteActorDefinition = {

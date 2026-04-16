@@ -366,68 +366,68 @@ static inline VkResult InitActors(const LockingList *actors)
 static inline VkResult LoadActorWalls(const LockingList *actors)
 {
 	assert(actors);
-	if (__builtin_expect(loadedActorCount != actors->length, false))
-	{
-		VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
-	}
-	uint32_t wallCount = 0;
-	ActorWallVertex *vertices = buffers.actorWalls.vertices.data;
-	uint32_t *indices = buffers.actorWalls.indices.data;
-	for (size_t i = 0; i < loadedActorCount; i++)
-	{
-		const Actor *actor = ListGetPointer(*actors, i);
-		if (!actor->wall || actor->model != NULL)
-		{
-			continue;
-		}
-		const ActorWall *wall = actor->wall;
-		const float halfHeight = wall->height / 2.0f;
-		const vec2 startVertex = {wall->a.x, wall->a.y};
-		const vec2 endVertex = {wall->b.x, wall->b.y};
-		const vec2 startUV = {wall->uvOffset.x, 0};
-		const vec2 endUV = {wall->uvScale.x * wall->length + wall->uvOffset.x, 1};
-
-		vertices[4 * wallCount].position.x = startVertex[0];
-		vertices[4 * wallCount].position.y = halfHeight;
-		vertices[4 * wallCount].position.z = startVertex[1];
-		vertices[4 * wallCount].u = startUV[0];
-		vertices[4 * wallCount].v = startUV[1];
-
-		vertices[4 * wallCount + 1].position.x = endVertex[0];
-		vertices[4 * wallCount + 1].position.y = halfHeight;
-		vertices[4 * wallCount + 1].position.z = endVertex[1];
-		vertices[4 * wallCount + 1].u = endUV[0];
-		vertices[4 * wallCount + 1].v = startUV[1];
-
-		vertices[4 * wallCount + 2].position.x = endVertex[0];
-		vertices[4 * wallCount + 2].position.y = -halfHeight;
-		vertices[4 * wallCount + 2].position.z = endVertex[1];
-		vertices[4 * wallCount + 2].u = endUV[0];
-		vertices[4 * wallCount + 2].v = endUV[1];
-
-		vertices[4 * wallCount + 3].position.x = startVertex[0];
-		vertices[4 * wallCount + 3].position.y = -halfHeight;
-		vertices[4 * wallCount + 3].position.z = startVertex[1];
-		vertices[4 * wallCount + 3].u = startUV[0];
-		vertices[4 * wallCount + 3].v = endUV[1];
-
-		indices[6 * wallCount] = wallCount * 4;
-		indices[6 * wallCount + 1] = wallCount * 4 + 1;
-		indices[6 * wallCount + 2] = wallCount * 4 + 2;
-		indices[6 * wallCount + 3] = wallCount * 4;
-		indices[6 * wallCount + 4] = wallCount * 4 + 2;
-		indices[6 * wallCount + 5] = wallCount * 4 + 3;
-
-		wallCount++;
-	}
-	lunaWriteDataToBuffer(buffers.actorWalls.vertices.buffer,
-						  buffers.actorWalls.vertices.data,
-						  buffers.actorWalls.vertices.bytesUsed,
-						  0);
-	lunaWriteDataToBuffer(buffers.actorWalls.indices.buffer,
-						  buffers.actorWalls.indices.data,
-						  buffers.actorWalls.indices.bytesUsed,
-						  0);
+	// if (__builtin_expect(loadedActorCount != actors->length, false))
+	// {
+	// 	VulkanTestReturnResult(InitActors(actors), "Failed to init actors!");
+	// }
+	// uint32_t wallCount = 0;
+	// ActorWallVertex *vertices = buffers.actorWalls.vertices.data;
+	// uint32_t *indices = buffers.actorWalls.indices.data;
+	// for (size_t i = 0; i < loadedActorCount; i++)
+	// {
+	// 	const Actor *actor = ListGetPointer(*actors, i);
+	// 	if (!actor->wall || actor->model != NULL)
+	// 	{
+	// 		continue;
+	// 	}
+	// 	const ActorWall *wall = actor->wall;
+	// 	const float halfHeight = wall->height / 2.0f;
+	// 	const vec2 startVertex = {wall->a.x, wall->a.y};
+	// 	const vec2 endVertex = {wall->b.x, wall->b.y};
+	// 	const vec2 startUV = {wall->uvOffset.x, 0};
+	// 	const vec2 endUV = {wall->uvScale.x * wall->length + wall->uvOffset.x, 1};
+	//
+	// 	vertices[4 * wallCount].position.x = startVertex[0];
+	// 	vertices[4 * wallCount].position.y = halfHeight;
+	// 	vertices[4 * wallCount].position.z = startVertex[1];
+	// 	vertices[4 * wallCount].u = startUV[0];
+	// 	vertices[4 * wallCount].v = startUV[1];
+	//
+	// 	vertices[4 * wallCount + 1].position.x = endVertex[0];
+	// 	vertices[4 * wallCount + 1].position.y = halfHeight;
+	// 	vertices[4 * wallCount + 1].position.z = endVertex[1];
+	// 	vertices[4 * wallCount + 1].u = endUV[0];
+	// 	vertices[4 * wallCount + 1].v = startUV[1];
+	//
+	// 	vertices[4 * wallCount + 2].position.x = endVertex[0];
+	// 	vertices[4 * wallCount + 2].position.y = -halfHeight;
+	// 	vertices[4 * wallCount + 2].position.z = endVertex[1];
+	// 	vertices[4 * wallCount + 2].u = endUV[0];
+	// 	vertices[4 * wallCount + 2].v = endUV[1];
+	//
+	// 	vertices[4 * wallCount + 3].position.x = startVertex[0];
+	// 	vertices[4 * wallCount + 3].position.y = -halfHeight;
+	// 	vertices[4 * wallCount + 3].position.z = startVertex[1];
+	// 	vertices[4 * wallCount + 3].u = startUV[0];
+	// 	vertices[4 * wallCount + 3].v = endUV[1];
+	//
+	// 	indices[6 * wallCount] = wallCount * 4;
+	// 	indices[6 * wallCount + 1] = wallCount * 4 + 1;
+	// 	indices[6 * wallCount + 2] = wallCount * 4 + 2;
+	// 	indices[6 * wallCount + 3] = wallCount * 4;
+	// 	indices[6 * wallCount + 4] = wallCount * 4 + 2;
+	// 	indices[6 * wallCount + 5] = wallCount * 4 + 3;
+	//
+	// 	wallCount++;
+	// }
+	// lunaWriteDataToBuffer(buffers.actorWalls.vertices.buffer,
+	// 					  buffers.actorWalls.vertices.data,
+	// 					  buffers.actorWalls.vertices.bytesUsed,
+	// 					  0);
+	// lunaWriteDataToBuffer(buffers.actorWalls.indices.buffer,
+	// 					  buffers.actorWalls.indices.data,
+	// 					  buffers.actorWalls.indices.bytesUsed,
+	// 					  0);
 
 	return VK_SUCCESS;
 }
@@ -484,7 +484,7 @@ static inline VkResult UpdateActorInstanceData(const LockingList *actors)
 			const ActorWall *wall = actor->wall;
 			memcpy(actorWallsInstanceData[wallCount].transform, transformMatrix, sizeof(mat4));
 			actorWallsInstanceData[wallCount].textureIndex = TextureIndex(wall->tex);
-			actorWallsInstanceData[wallCount].wallAngle = actor->wall->angle;
+			// actorWallsInstanceData[wallCount].wallAngle = actor->wall->angle;
 
 			wallCount++;
 		}
