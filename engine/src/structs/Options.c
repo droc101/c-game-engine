@@ -47,10 +47,45 @@ void DefaultOptions(Options *options)
 
 bool ValidateOptions(const Options *options)
 {
+	// ignore controller mode
+	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
+	{
+		return false;
+	}
+	if (options->rumbleStrength < 0.0 || options->rumbleStrength > 1.00)
+	{
+		return false;
+	}
+	// ignore invert h/v and swap a/b
+
 	if (options->renderer >= RENDERER_MAX)
 	{
 		return false;
 	}
+	// ignore fullscreen,vsync
+	if (options->msaa > MSAA_8X)
+	{
+		return false;
+	}
+	// ignore mipmaps, wayland/x11, bg fps limit
+	if (options->lodMultiplier < 0.5 || options->lodMultiplier > 2.0)
+	{
+		return false;
+	}
+	if (options->fov < 30 || options->fov > 120)
+	{
+		return false;
+	}
+	if (options->anisotropy > ANISOTROPY_16X)
+	{
+		return false;
+	}
+	if (options->maxFps % 10 != 0 || options->maxFps > 500)
+	{
+		return false;
+	}
+
+
 	if (options->musicVolume < 0 || options->musicVolume > 1)
 	{
 		return false;
@@ -59,15 +94,11 @@ bool ValidateOptions(const Options *options)
 	{
 		return false;
 	}
+	if (options->uiVolume < 0 || options->uiVolume > 1)
+	{
+		return false;
+	}
 	if (options->masterVolume < 0 || options->masterVolume > 1)
-	{
-		return false;
-	}
-	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
-	{
-		return false;
-	}
-	if (options->fov < 30 || options->fov > 120)
 	{
 		return false;
 	}
