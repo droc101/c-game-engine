@@ -55,15 +55,16 @@ void FreeActorWall(const ActorWall *wall)
 
 void ActorYBillboard(Camera *camera, Actor *this)
 {
+	assert(!this->hasModel);
 	// TODO quaternion
 	Vector3 position;
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	float rotation = atan2f(camera->transform.position.x - position.x, camera->transform.position.z - position.z);
+	float yaw = atan2f(camera->transform.position.x - position.x, camera->transform.position.z - position.z);
 	if (this->wall->orientation == Z_AXIS)
 	{
-		rotation += GLM_PI_2f;
+		yaw += GLM_PI_2f;
 	}
-	const Vector3 euler = {0, rotation, 0};
+	const Vector3 euler = {0, yaw, 0};
 	JPH_Quat quat;
 	JPH_Quat_FromEulerAngles(&euler, &quat);
 	JPH_BodyInterface_SetRotation(this->bodyInterface, this->bodyId, &quat, JPH_Activation_DontActivate);

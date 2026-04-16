@@ -36,10 +36,10 @@ struct ActorWall
 	Vector2 uvScale;
 	/// The UV offset of the wall
 	Vector2 uvOffset;
-	/// height of the wall for rendering. Does not affect collision
-	float height;
-	/// The length of the wallS
+	/// The length of the wall
 	float length;
+	/// The height of the wall
+	float height;
 	/// Whether the wall should be rendered without shading
 	bool unshaded;
 };
@@ -57,6 +57,11 @@ JPH_Shape *ActorWallCreateCollider(const ActorWall *wall);
  */
 void FreeActorWall(const ActorWall *wall);
 
+/**
+ * Perform y-axis billboarding for a wall actor
+ * @param camera The camera to billboard to
+ * @param this The actor to billboard
+ */
 void ActorYBillboard(Camera *camera, Actor *this);
 
 #endif //GAME_WALL_H

@@ -25,6 +25,7 @@ UiStack *inputOptionsStack = NULL;
 
 void BtnInputOptionsBack()
 {
+	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
 }
 

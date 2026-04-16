@@ -33,9 +33,9 @@ bool hasChangedVideoOptions = false;
 
 void BtnVideoOptionsBack()
 {
+	SaveOptions(&GetState()->options);
 	if (hasChangedVideoOptions)
 	{
-		SaveOptions(&GetState()->options);
 		PromptRelaunch("Restart Game?",
 					   "You have changed options that require a relaunch. Would you like to relaunch now?",
 					   "Yes",

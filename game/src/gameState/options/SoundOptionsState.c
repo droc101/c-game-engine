@@ -26,6 +26,7 @@ UiStack *soundOptionsStack = NULL;
 
 void BtnSoundOptionsBack()
 {
+	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
 }
 
