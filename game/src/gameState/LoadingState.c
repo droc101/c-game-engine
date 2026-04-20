@@ -20,19 +20,38 @@
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 
+typedef enum LoadingStateStage
+{
+	/// Drawing the first frame ("LOADING" text)
+	LSS_WAITING_FOR_FRAME,
+	/// Loading the map from disk and performing the first frame update
+	LSS_LOADING_LEVEL,
+	/// Performing the first physics tick
+	LSS_WAITING_FOR_TICK,
+	/// Done, will chance to MainState once LEVEL_LOAD_MIN_TIME_MS check passes
+	LSS_DONE
+} LoadingStateStage;
+
 /// The minimum time the loading screen should be visible for, to prevent quick flashes
 #define LEVEL_LOAD_MIN_TIME_MS 250
 
 char *loadStateLevelname = NULL;
 uint64_t levelLoadStartTime;
-bool loadStateLoadedLevel;
-bool frameDrawn = false;
+LoadingStateStage stage;
+
+void LoadingStateFixedUpdate(GlobalState *state, const double delta)
+{
+	if (stage == LSS_WAITING_FOR_TICK)
+	{
+		MapFixedUpdate(state, delta);
+		stage = LSS_DONE;
+	}
+}
 
 void LoadingStateUpdate(GlobalState *state, const double delta)
 {
-	if (!loadStateLoadedLevel && frameDrawn)
+	if (stage == LSS_LOADING_LEVEL)
 	{
-		loadStateLoadedLevel = true;
 		const uint64_t realLoadStart = GetTimeNs();
 		if (!ChangeMapByName(loadStateLevelname))
 		{
@@ -44,10 +63,11 @@ void LoadingStateUpdate(GlobalState *state, const double delta)
 		const uint64_t realLoadTime = realLoadEnd - realLoadStart;
 		LogInfo("Loaded map %s in %f ms\n", loadStateLevelname, (double)realLoadTime / 1000000.0);
 		MapUpdate(state, delta);
+		stage = LSS_WAITING_FOR_TICK;
 	}
 	const uint64_t currentTime = GetTimeMs();
 	const uint64_t loadTime = currentTime - levelLoadStartTime;
-	if (loadStateLoadedLevel && loadTime > LEVEL_LOAD_MIN_TIME_MS)
+	if (stage == LSS_DONE && loadTime > LEVEL_LOAD_MIN_TIME_MS)
 	{
 		SetGameState(&MainState);
 	}
@@ -63,15 +83,17 @@ void LoadingStateRender(GlobalState * /*state*/, const double /*delta*/)
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
-	frameDrawn = true;
+	if (stage == LSS_WAITING_FOR_FRAME)
+	{
+		stage = LSS_LOADING_LEVEL;
+	}
 }
 
 void LoadingStateSet()
 {
-	frameDrawn = false;
-	loadStateLoadedLevel = false;
 	levelLoadStartTime = GetTimeMs();
 	assert(loadStateLevelname);
+	stage = LSS_WAITING_FOR_FRAME;
 }
 
 void LoadingStateDestroy()
@@ -82,7 +104,7 @@ void LoadingStateDestroy()
 const GameState LoadingState = {
 	.UpdateGame = LoadingStateUpdate,
 	.RenderGame = LoadingStateRender,
-	.FixedUpdateGame = NULL,
+	.FixedUpdateGame = LoadingStateFixedUpdate,
 	.Destroy = LoadingStateDestroy,
 	.Set = LoadingStateSet,
 	.enableRelativeMouseMode = false,
