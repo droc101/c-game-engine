@@ -4541,6 +4541,154 @@
                     }
                 }
             }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 8.25,
+                "y": -0.0,
+                "z": 10.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 256.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.6389468312263489,
+                        "g": 1.0,
+                        "b": 0.5611814260482788,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 8.25,
+                "y": 0.0,
+                "z": -10.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 256.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.8342680335044861,
+                        "b": 0.5485231876373291,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 28.0,
+                "y": -0.75,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 128.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.9943917393684387,
+                        "g": 0.5569620132446289,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 7.0,
+                "y": 2.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 64.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.7172995805740356,
+                        "g": 1.0,
+                        "b": 0.9534796476364136,
+                        "a": 1.0
+                    }
+                }
+            }
         }
     ]
 }
