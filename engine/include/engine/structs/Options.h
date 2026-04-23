@@ -39,6 +39,8 @@ struct Options
 	/// Checksum of the options struct (helps prevent corruption)
 	uint16_t checksum;
 
+	bool enableDiscordRpc;
+
 	/* Controls */
 
 	/// Whether the game is in controller mode

@@ -17,6 +17,7 @@
 
 void DefaultOptions(Options *options)
 {
+	options->enableDiscordRpc = true;
 	options->renderer = RENDERER_OPENGL; // TODO: RENDERER_VULKAN;
 	options->musicVolume = 1.0f;
 	options->sfxVolume = 1.0f;

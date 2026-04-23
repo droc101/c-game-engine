@@ -11,12 +11,15 @@
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+
 #include "gameState/MenuState.h"
 #include "gameState/options/InputOptionsState.h"
 #include "gameState/options/SoundOptionsState.h"
@@ -98,6 +101,18 @@ void BtnInputOptions()
 	SetGameState(&InputOptionsState);
 }
 
+void CbOptionsEnableDiscordRpc(const bool value)
+{
+	GetState()->options.enableDiscordRpc = value;
+	if (!value)
+	{
+		DiscordDestroy();
+	} else
+	{
+		DiscordInit();
+	}
+}
+
 void OptionsStateSet()
 {
 	if (optionsStack == NULL)
@@ -114,6 +129,16 @@ void OptionsStateSet()
 		opY += opSpacing;
 		UiStackPush(optionsStack,
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", BtnInputOptions, TOP_CENTER));
+#ifdef ENABLE_DISCORD_SDK
+		opY += opSpacing * 1.5f;
+		UiStackPush(optionsStack,
+					CreateCheckboxControl(v2(0, opY),
+										  v2(480, 40),
+										  "Enable Discord rich presence",
+										  CbOptionsEnableDiscordRpc,
+										  TOP_CENTER,
+										  GetState()->options.enableDiscordRpc));
+#endif
 		opY += opSpacing;
 
 		UiStackPush(optionsStack, CreateButtonControl(v2(0, -40), v2(480, 40), "Done", BtnOptionsBack, BOTTOM_CENTER));

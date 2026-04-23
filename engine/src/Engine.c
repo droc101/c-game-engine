@@ -267,7 +267,10 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitCommonFonts();
 
-	DiscordInit();
+	if (GetState()->options.enableDiscordRpc)
+	{
+		DiscordInit();
+	}
 
 	InitDPrintConsole();
 

@@ -71,8 +71,6 @@ void DiscordInit()
 
 	app.activityManager = app.core->get_activity_manager(app.core);
 
-	GetState()->rpcState = UNKNOWN;
-
 	DiscordUpdateRPC();
 
 	LogInfo("Discord Game SDK started with App ID %zu\n", gameConfig.discordAppId);
