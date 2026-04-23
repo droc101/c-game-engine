@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(launcher C)
 
-add_executable(launcher
+add_executable(launcher WIN32
         src/main.c
         src/LibraryLoader.c
         include/LibraryLoader.h
@@ -45,8 +45,6 @@ if (WIN32)
     set(DLLS
             zlib1.dll
             libwinpthread-1.dll
-            libgcc_s_seh-1.dll
-            libstdc++-6.dll
     )
 
     foreach (DLL IN LISTS DLLS)
