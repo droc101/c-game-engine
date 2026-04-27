@@ -1,6 +1,14 @@
 {
   "description": "Emits signals based on player contact",
   "extends": "actor",
+  "display": {
+    "color": 4294902015,
+    "directional": false,
+    "box": true,
+    "box_width": "$width",
+    "box_height": "$height",
+    "box_depth": "$depth"
+  },
   "inputs": {
     "force_trigger": {
       "description": "Forcibly output the \"triggered\" signal"
