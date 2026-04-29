@@ -10,7 +10,8 @@
       "type": "box",
       "width": "$width",
       "height": "$height",
-      "depth": "$depth"
+      "depth": "$depth",
+      "color": 4294902015
     }
   ],
   "inputs": {
