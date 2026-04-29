@@ -1,6 +1,15 @@
 {
   "description": "The spawn point for the player",
-  "display": {
-    "model": "model/player.gmdl"
-  }
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "orientation"
+    },
+    {
+      "type": "model",
+      "model": "model/player.gmdl"
+    }
+  ]
 }

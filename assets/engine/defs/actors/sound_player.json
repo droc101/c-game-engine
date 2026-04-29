@@ -1,9 +1,12 @@
 {
   "description": "Plays a sound with the ability to control volume and looping",
   "extends": "actor",
-  "display": {
-    "directional": false
-  },
+  "renderers": [
+    {
+      "type": "point",
+      "color": 4294902015
+    }
+  ],
   "inputs": {
     "play": {
       "description": "Play this sound from the start"

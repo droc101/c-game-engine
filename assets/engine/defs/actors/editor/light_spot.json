@@ -1,9 +1,16 @@
 {
   "description": "Spotlight",
   "extends": "light_point",
-  "display": {
-    "color": "$color"
-  },
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color"
+    },
+    {
+      "type": "orientation",
+      "color": "$color"
+    }
+  ],
   "params": {
     "angle": {
       "display": "Spotlight Angle",

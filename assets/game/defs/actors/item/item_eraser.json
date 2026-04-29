@@ -1,9 +1,15 @@
 {
   "description": "Eraser item",
   "extends": "actor",
-  "display": {
-    "model": "model/eraser_w.gmdl"
-  },
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "model",
+      "model": "model/eraser_w.gmdl"
+    }
+  ],
   "inputs": {},
   "outputs": {},
   "params": {

@@ -1,9 +1,18 @@
 {
   "extends": "actor",
   "description": "Button that can be pressed with the use key",
-  "display": {
-    "model": "$model"
-  },
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "orientation"
+    },
+    {
+      "type": "model",
+      "model": "$model"
+    }
+  ],
   "outputs": {
     "pressed": {
       "description": "Emitted when the button is pressed"

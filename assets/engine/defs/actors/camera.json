@@ -1,9 +1,14 @@
 {
   "description": "Player independent camera, useful for cutscenes and such",
   "extends": "actor",
-  "display": {
-    "directional": true
-  },
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "orientation"
+    }
+  ],
   "inputs": {
     "enable": {
       "type": "none",

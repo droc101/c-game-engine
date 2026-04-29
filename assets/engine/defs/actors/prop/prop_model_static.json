@@ -1,10 +1,21 @@
 {
   "description": "An arbitrary model that cannot move or change in any way.",
-  "display": {
-    "model": "$model",
-    "color": "$color",
-    "affect_lightmap": "$affect_lightmap"
-  },
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color"
+    },
+    {
+      "type": "orientation",
+      "color": "$color"
+    },
+    {
+      "type": "model",
+      "model": "$model",
+      "color": "$color",
+      "affect_lightmap": "$affect_lightmap"
+    }
+  ],
   "params": {
     "model": {
       "display": "Model",

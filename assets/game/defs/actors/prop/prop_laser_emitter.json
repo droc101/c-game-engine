@@ -1,10 +1,16 @@
 {
   "description": "A prop that emits a prop_laser actor",
   "extends": "actor",
-  "display": {
-    "model": "model/laseremitter.gmdl",
-    "affect_lightmap": true
-  },
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "model",
+      "model": "model/laseremitter.gmdl",
+      "affect_lightmap": true
+    }
+  ],
   "inputs": {
     "turn_on": {
       "description": "Turn on this laser emitter"

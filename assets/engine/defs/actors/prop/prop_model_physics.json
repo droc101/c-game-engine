@@ -1,10 +1,21 @@
 {
   "extends": "actor",
   "description": "An arbitrary model with physics",
-  "display": {
-    "model": "$model",
-    "color": "$color"
-  },
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color"
+    },
+    {
+      "type": "orientation",
+      "color": "$color"
+    },
+    {
+      "type": "model",
+      "model": "$model",
+      "color": "$color"
+    }
+  ],
   "inputs": {
     "set_color": {
       "type": "color",

@@ -1,9 +1,11 @@
 {
   "description": "Controls HDR tonemapping",
   "extends": "actor",
-  "display": {
-    "directional": false
-  },
+  "renderers": [
+    {
+      "type": "point"
+    }
+  ],
   "inputs": {
     "set": {
       "type": "none",

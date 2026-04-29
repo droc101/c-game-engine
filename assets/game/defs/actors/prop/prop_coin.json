@@ -1,6 +1,11 @@
 {
   "description": "A coin the player can collect",
   "extends": "actor",
+  "renderers": [
+    {
+      "type": "point"
+    }
+  ],
   "outputs": {
     "collected": {
       "description": "Emitted when this coin is collected by the player"

@@ -1,10 +1,17 @@
 {
   "description": "An arbitrary 2D sprite",
   "extends": "actor",
-  "display": {
-    "color": "$color",
-    "texture": "$texture"
-  },
+  "renderers": [
+    {
+      "type": "orientation",
+      "color": "$color"
+    },
+    {
+      "type": "sprite",
+      "texture": "$texture",
+      "tint_color": "$color"
+    }
+  ],
   "params": {
     "size": {
       "display": "Size",
