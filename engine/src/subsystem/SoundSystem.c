@@ -287,29 +287,34 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	LockSoundSystem();
 	if (!soundSys.isAudioStarted)
 	{
+		UnlockSoundSystem();
 		return NULL;
 	}
 	const Asset *wav = DecompressAsset(request->soundAsset, true, false);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");
+		UnlockSoundSystem();
 		return NULL;
 	}
 	if (wav->type != ASSET_TYPE_WAV)
 	{
 		LogError("PlaySoundEx Error: Asset is not a sound effect file.\n");
+		UnlockSoundSystem();
 		return NULL;
 	}
 	SDL_IOStream *stream = SDL_IOFromConstMem(wav->data, wav->size);
 	if (!stream)
 	{
 		LogError("SDL_IOFromConstMem Error: %s\n", SDL_GetError());
+		UnlockSoundSystem();
 		return NULL;
 	}
 	MIX_Audio *audio = MIX_LoadAudio_IO(soundSys.mixer, stream, request->preload, true);
 	if (audio == NULL)
 	{
 		LogError("MIX_LoadAudio_IO Error: %s\n", SDL_GetError());
+		UnlockSoundSystem();
 		return NULL;
 	}
 	uint8_t index = 0;
@@ -318,6 +323,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	{
 		LogError("PlaySoundEffect Error: No available tracks.\n");
 		MIX_DestroyAudio(audio);
+		UnlockSoundSystem();
 		return NULL;
 	}
 
