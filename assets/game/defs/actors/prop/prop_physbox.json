@@ -1,0 +1,13 @@
+{
+  "description": "A physics-enabled box the player can pick up",
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "model",
+      "model": "model/cube.gmdl"
+    }
+  ]
+}

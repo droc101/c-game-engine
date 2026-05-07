@@ -15,6 +15,7 @@
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3_mixer/SDL_mixer.h>
@@ -59,15 +60,27 @@ struct SoundSystem
 	MIX_Track *tracks[SOUND_SYSTEM_CHANNEL_COUNT];
 	/// currently playing sounds
 	SoundChannel *channels[SOUND_SYSTEM_CHANNEL_COUNT];
+	SDL_Mutex *mutex;
 };
 
 SoundSystem soundSys;
+
+void LockSoundSystem()
+{
+	SDL_LockMutex(soundSys.mutex);
+}
+
+void UnlockSoundSystem()
+{
+	SDL_UnlockMutex(soundSys.mutex);
+}
 
 /**
  * callback for when a channel finishes playing (so we can free it)
  */
 void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 {
+	// TODO this function might need to lock the soundsystem, but that causes a deadlock in level select state
 	if (!userdata)
 	{
 		LogWarning("ChannelFinished called with NULL userdata!\n");
@@ -131,12 +144,15 @@ void InitSoundSystem()
 	}
 
 	UpdateVolume();
+
+	soundSys.mutex = SDL_CreateMutex();
 }
 
 void DestroySoundSystem()
 {
 	LogDebug("Cleaning up sound system...\n");
 
+	LockSoundSystem();
 	if (soundSys.isAudioStarted)
 	{
 		for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
@@ -154,14 +170,20 @@ void DestroySoundSystem()
 
 	MIX_DestroyMixer(soundSys.mixer);
 	MIX_Quit();
+	UnlockSoundSystem();
+	SDL_DestroyMutex(soundSys.mutex);
 }
 
 void UpdateSoundSystem()
 {
 	vec3 listenerPosition = GLM_VEC3_ZERO_INIT;
 	versor listenerRotation = GLM_VEC3_ZERO_INIT;
-	memcpy(&listenerPosition, VECTOR3_TO_VEC3(GetState()->camera->transform.position), sizeof(vec3));
-	QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
+	if (GetState()->map)
+	{
+		memcpy(&listenerPosition, VECTOR3_TO_VEC3(GetState()->camera->transform.position), sizeof(vec3));
+		QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
+	}
+	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		if (MIX_TrackPlaying(soundSys.tracks[i]))
@@ -188,6 +210,7 @@ void UpdateSoundSystem()
 			}
 		}
 	}
+	UnlockSoundSystem();
 }
 
 float GetCategoryVolume(const SoundCategory category)
@@ -211,6 +234,7 @@ float GetCategoryVolume(const SoundCategory category)
 
 void UpdateVolume()
 {
+	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		const SoundChannel *effect = soundSys.channels[i];
@@ -220,6 +244,7 @@ void UpdateVolume()
 			MIX_SetTrackGain(effect->track, mixedVolume);
 		}
 	}
+	UnlockSoundSystem();
 }
 
 MIX_Track *FindAvailableTrack(uint8_t *index)
@@ -259,31 +284,37 @@ SoundChannel *PlaySound(const char *soundAsset, const SoundCategory category)
 
 SoundChannel *PlaySoundEx(const SoundRequest *request)
 {
+	LockSoundSystem();
 	if (!soundSys.isAudioStarted)
 	{
+		UnlockSoundSystem();
 		return NULL;
 	}
 	const Asset *wav = DecompressAsset(request->soundAsset, true, false);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");
+		UnlockSoundSystem();
 		return NULL;
 	}
 	if (wav->type != ASSET_TYPE_WAV)
 	{
 		LogError("PlaySoundEx Error: Asset is not a sound effect file.\n");
+		UnlockSoundSystem();
 		return NULL;
 	}
 	SDL_IOStream *stream = SDL_IOFromConstMem(wav->data, wav->size);
 	if (!stream)
 	{
 		LogError("SDL_IOFromConstMem Error: %s\n", SDL_GetError());
+		UnlockSoundSystem();
 		return NULL;
 	}
 	MIX_Audio *audio = MIX_LoadAudio_IO(soundSys.mixer, stream, request->preload, true);
 	if (audio == NULL)
 	{
 		LogError("MIX_LoadAudio_IO Error: %s\n", SDL_GetError());
+		UnlockSoundSystem();
 		return NULL;
 	}
 	uint8_t index = 0;
@@ -292,6 +323,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	{
 		LogError("PlaySoundEffect Error: No available tracks.\n");
 		MIX_DestroyAudio(audio);
+		UnlockSoundSystem();
 		return NULL;
 	}
 
@@ -331,6 +363,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	}
 	SDL_DestroyProperties(props);
 
+	UnlockSoundSystem();
 	return effect;
 }
 
@@ -354,6 +387,7 @@ inline void StopSound(const SoundChannel *effect)
 
 void StopAllSounds()
 {
+	LockSoundSystem();
 	for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		const SoundChannel *channel = soundSys.channels[i];
@@ -362,4 +396,5 @@ void StopAllSounds()
 			StopSound(channel);
 		}
 	}
+	UnlockSoundSystem();
 }

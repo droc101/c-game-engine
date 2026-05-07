@@ -1,0 +1,63 @@
+{
+  "description": "An arbitrary 2D sprite",
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "orientation",
+      "color": "$color"
+    },
+    {
+      "type": "sprite",
+      "texture": "$texture",
+      "tint_color": "$color"
+    }
+  ],
+  "params": {
+    "size": {
+      "display": "Size",
+      "type": "vec2",
+      "default_x": 1.0,
+      "default_y": 1.0,
+      "description": "The in-game size of the sprite"
+    },
+    "uv_scale": {
+      "display": "UV Scale",
+      "type": "vec2",
+      "default_x": 1.0,
+      "default_y": 1.0,
+      "description": "The UV scale factor"
+    },
+    "uv_offset": {
+      "display": "UV Offset",
+      "type": "vec2",
+      "default_x": 0.0,
+      "default_y": 0.0,
+      "description": "The UV offset"
+    },
+    "texture": {
+      "display": "Texture",
+      "default": "texture/level/uvtest.gtex",
+      "type": "string",
+      "string_hint": "texture",
+      "description": "The texture of the sprite"
+    },
+    "unshaded": {
+      "display": "Unshaded",
+      "default": false,
+      "type": "bool",
+      "description": "Whether or not the sprite should be rendered without shading (glowing)"
+    },
+    "solid": {
+      "display": "Solid",
+      "default": false,
+      "type": "bool",
+      "description": "Whether or not the sprite have solid collision"
+    },
+    "color": {
+      "display": "Tint Color",
+      "default": -1,
+      "type": "color",
+      "description": "The tint color of this sprite"
+    }
+  }
+}

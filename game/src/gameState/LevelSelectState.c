@@ -3,22 +3,19 @@
 //
 
 #include "gameState/LevelSelectState.h"
-#include <dirent.h>
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/GameConfigLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <gameState/LoadingState.h>
 #include <gameState/MenuState.h>
 #include <SDL3/SDL_gamepad.h>
@@ -26,18 +23,20 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 int selectedLevel = 0;
 List levelList;
 
-void LevelSelectStateUpdate(GlobalState * /*state*/)
+void LevelSelectStateUpdate(GlobalState *state, const double delta)
 {
+	UpdateMenuBackground(state, delta);
+
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		MenuStateSet();
+		menuStateFadeIn = false;
+		SetGameState(&MenuState);
 	}
 	if (levelList.length > 1)
 	{
@@ -45,13 +44,13 @@ void LevelSelectStateUpdate(GlobalState * /*state*/)
 			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN) ||
 			GetMouseWheelTicks(mainThreadInput).y < 0)
 		{
-			selectedLevel--;
+			selectedLevel++;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
 		} else if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_UP) ||
 				   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP) ||
 				   GetMouseWheelTicks(mainThreadInput).y > 0)
 		{
-			selectedLevel++;
+			selectedLevel--;
 			selectedLevel = wrap(selectedLevel, 0, levelList.length);
 		}
 	}
@@ -60,37 +59,65 @@ void LevelSelectStateUpdate(GlobalState * /*state*/)
 	{
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
 		ConsumeButton(mainThreadInput, CONTROLLER_OK);
-		LoadingStateSet(ListGetPointer(levelList, selectedLevel));
+		loadStateLevelname = strdup(ListGetPointer(levelList, selectedLevel));
+		SetGameState(&LoadingState);
 	}
 }
 
-void LevelSelectStateRender(GlobalState * /*state*/)
+void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 {
-	RenderMenuBackground();
-
-	FontDrawString(v2(20, 20), gameConfig.gameTitle, 128, COLOR_WHITE, largeFont);
-	FontDrawString(v2(20, 150), "Press Space to start.", 32, COLOR(0xFFa0a0a0), largeFont);
-
-	char levelNameBuffer[128];
-
-	if (levelList.length > 0)
+	RenderMenuBackground(state);
+	if (!IsBackgroundMapLoaded())
 	{
-		char *levelName = ListGetPointer(levelList, selectedLevel);
-
-		snprintf(levelNameBuffer, 128, "%s", levelName);
-	} else
-	{
-		strcpy((char *)&levelNameBuffer, "No levels found");
+		return;
 	}
 
-	DrawTextAligned(levelNameBuffer,
-					32,
-					COLOR_WHITE,
-					v2(50, 250),
-					v2(ScaledWindowWidthFloat() - 50, 250),
-					FONT_HALIGN_LEFT,
-					FONT_VALIGN_MIDDLE,
-					smallFont);
+	for (size_t i = 0; i < levelList.length; i++)
+	{
+		if ((int)i == selectedLevel)
+		{
+			continue;
+		}
+		const float yPos = (float)(345 + ((i - selectedLevel) * 60));
+		DrawTextAligned(ListGetPointer(levelList, i),
+						32,
+						COLOR(0x50ffffff),
+						v2(50, yPos),
+						v2(ScaledWindowWidthFloat() - 50, 60),
+						FONT_HALIGN_LEFT,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
+	}
+
+	FontDrawString(v2(52, 52), "Map Select", 64, COLOR_BLACK, smallFont);
+	FontDrawString(v2(50, 50), "Map Select", 64, COLOR_WHITE, smallFont);
+
+	DrawRect(0, 315, ScaledWindowWidth(), 120, COLOR(0x80000000));
+	if (levelList.length == 0)
+	{
+		DrawTextAligned("No Levels Found",
+						32,
+						COLOR_WHITE,
+						v2(50, 345),
+						v2(ScaledWindowWidthFloat() - 50, 60),
+						FONT_HALIGN_LEFT,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
+	} else
+	{
+		DrawTextAligned(ListGetPointer(levelList, selectedLevel),
+						32,
+						COLOR_WHITE,
+						v2(50, 345),
+						v2(ScaledWindowWidthFloat() - 50, 60),
+						FONT_HALIGN_LEFT,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
+		char progress[64];
+		snprintf(progress, 64, "Map %02d/%02zu", selectedLevel + 1, levelList.length);
+		FontDrawString(v2(50, 325), progress, 16, COLOR_WHITE, smallFont);
+		FontDrawString(v2(50, 409), "Up/Down to change, space to play", 16, COLOR_WHITE, smallFont);
+	}
 }
 
 void LoadLevelList()
@@ -106,14 +133,19 @@ void LevelSelectStateSet()
 	{
 		LoadLevelList();
 	}
-	SetStateCallbacks(LevelSelectStateUpdate,
-					  NULL,
-					  GAME_STATE_LEVEL_SELECT,
-					  LevelSelectStateRender,
-					  false); // Fixed update is not needed for this state
+	EnterMenuBackgroundState();
 }
 
 void LevelSelectStateDestroy()
 {
-	ListFreeOnlyContents(levelList);
+	ListAndContentsFree(levelList);
 }
+
+const GameState LevelSelectState = {
+	.UpdateGame = LevelSelectStateUpdate,
+	.RenderGame = LevelSelectStateRender,
+	.FixedUpdateGame = FixedUpdateMenuBackground,
+	.Set = LevelSelectStateSet,
+	.Destroy = LevelSelectStateDestroy,
+	.enableRelativeMouseMode = false,
+};

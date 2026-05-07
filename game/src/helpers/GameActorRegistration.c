@@ -3,14 +3,15 @@
 //
 
 #include "helpers/GameActorRegistration.h"
-#include "actor/Button.h"
-#include "actor/Coin.h"
-#include "actor/Door.h"
-#include "actor/Goal.h"
-#include "actor/Laser.h"
-#include "actor/LaserEmitter.h"
-#include "actor/Physbox.h"
-#include "actor/TestActor.h"
+#include "actor/item/ItemEraser.h"
+#include "actor/npc/NpcJohn.h"
+#include "actor/npc/TestActor.h"
+#include "actor/prop/Coin.h"
+#include "actor/prop/Door.h"
+#include "actor/prop/Goal.h"
+#include "actor/prop/Laser.h"
+#include "actor/prop/LaserEmitter.h"
+#include "actor/prop/Physbox.h"
 
 void RegisterGameActors()
 {
@@ -21,5 +22,6 @@ void RegisterGameActors()
 	RegisterLaserEmitter();
 	RegisterPhysbox();
 	RegisterTestActor();
-	RegisterButton();
+	RegisterNpcJohn();
+	RegisterItemEraser();
 }

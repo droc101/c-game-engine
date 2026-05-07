@@ -6,7 +6,9 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
@@ -31,15 +33,15 @@ bool hasChangedVideoOptions = false;
 
 void BtnVideoOptionsBack()
 {
+	SaveOptions(&GetState()->options);
 	if (hasChangedVideoOptions)
 	{
-		SaveOptions(&GetState()->options);
 		PromptRelaunch("Restart Game?",
 					   "You have changed options that require a relaunch. Would you like to relaunch now?",
 					   "Yes",
 					   "No");
 	}
-	OptionsStateSet(optionsStateInGame);
+	SetGameState(&OptionsState);
 }
 
 char *SliderLabelMSAA(const Control *slider)
@@ -68,6 +70,21 @@ char *SliderLabelLod(const Control *slider)
 	char *buf = malloc(64);
 	CheckAlloc(buf);
 	sprintf(buf, "%s: %.1fx", data->label, data->value);
+	return buf;
+}
+
+char *SliderLabelMaxFps(const Control *slider)
+{
+	const SliderData *data = (SliderData *)slider->controlData;
+	char *buf = malloc(64);
+	CheckAlloc(buf);
+	if (data->value == 0)
+	{
+		sprintf(buf, "%s: Unlimited", data->label);
+	} else
+	{
+		sprintf(buf, "%s: %.0f", data->label, data->value);
+	}
 	return buf;
 }
 
@@ -125,29 +142,41 @@ void SldOptionsLod(const float value)
 	GetState()->options.lodMultiplier = value;
 }
 
+void SldOptionsMaxFps(const float value)
+{
+	GetState()->options.maxFps = (uint16_t)value;
+}
+
 void SldOptionsFov(const float value)
 {
 	GetState()->options.fov = value;
-	GetState()->camera->fov = GetState()->options.fov;
+	if (GetState()->map)
+	{
+		GetState()->map->player.playerCamera.fov = GetState()->options.fov;
+	}
 }
 
-void VideoOptionsStateUpdate(GlobalState * /*state*/)
+void VideoOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnVideoOptionsBack();
 	}
+	if (!optionsStateInGame)
+	{
+		UpdateMenuBackground(state, delta);
+	}
 }
 
-void VideoOptionsStateRender(GlobalState * /*state*/)
+void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground();
+		RenderMenuBackground(state);
 	}
 
 	DrawTextAligned("Video Options",
@@ -185,32 +214,30 @@ void VideoOptionsStateSet()
 
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
+					CreateCheckboxControl(v2(-120, opY),
+										  v2(230, 40),
 										  "Fullscreen",
 										  CbOptionsFullscreen,
 										  TOP_CENTER,
 										  GetState()->options.fullscreen));
-		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
+					CreateCheckboxControl(v2(120, opY),
+										  v2(230, 40),
 										  "VSync",
 										  CbOptionsVsync,
 										  TOP_CENTER,
 										  GetState()->options.vsync));
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Limit FPS when in background",
+					CreateCheckboxControl(v2(-120, opY),
+										  v2(230, 40),
+										  "Limit BG FPS",
 										  CbOptionsLimitFpsWhenUnfocused,
 										  TOP_CENTER,
 										  GetState()->options.limitFpsWhenUnfocused));
-		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
+					CreateCheckboxControl(v2(120, opY),
+										  v2(230, 40),
 										  "Mipmaps",
 										  CbOptionsMipmaps,
 										  TOP_CENTER,
@@ -218,20 +245,18 @@ void VideoOptionsStateSet()
 		opY += opSpacing * 1.5f;
 
 		UiStackPush(videoOptionsStack,
-					CreateRadioButtonControl(v2(0, opY),
-											 v2(480, 40),
-											 "Vulkan (unsupported)",
+					CreateRadioButtonControl(v2(-120, opY),
+											 v2(230, 40),
+											 "Vulkan",
 											 RbOptionsRenderer,
 											 TOP_CENTER,
 											 GetState()->options.renderer == RENDERER_VULKAN,
 											 0,
 											 RENDERER_VULKAN));
-
-		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
-					CreateRadioButtonControl(v2(0, opY),
-											 v2(480, 40),
-											 "OpenGL (Compatibility)",
+					CreateRadioButtonControl(v2(120, opY),
+											 v2(230, 40),
+											 "OpenGL",
 											 RbOptionsRenderer,
 											 TOP_CENTER,
 											 GetState()->options.renderer == RENDERER_OPENGL,
@@ -278,6 +303,19 @@ void VideoOptionsStateSet()
 										0.5,
 										1,
 										SliderLabelLod));
+		opY += opSpacing;
+		UiStackPush(videoOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"Maximum FPS",
+										SldOptionsMaxFps,
+										TOP_CENTER,
+										0,
+										500,
+										GetState()->options.maxFps,
+										10,
+										10,
+										SliderLabelMaxFps));
 #ifdef SDL_PLATFORM_LINUX
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
@@ -296,12 +334,6 @@ void VideoOptionsStateSet()
 	}
 	UiStackResetFocus(videoOptionsStack);
 	hasChangedVideoOptions = false;
-
-	SetStateCallbacks(VideoOptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_VIDEO_OPTIONS,
-					  VideoOptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void VideoOptionsStateDestroy()
@@ -312,3 +344,12 @@ void VideoOptionsStateDestroy()
 		videoOptionsStack = NULL;
 	}
 }
+
+const GameState VideoOptionsState = {
+	.UpdateGame = VideoOptionsStateUpdate,
+	.RenderGame = VideoOptionsStateRender,
+	.FixedUpdateGame = OptionsStateFixedUpdate,
+	.Destroy = VideoOptionsStateDestroy,
+	.Set = VideoOptionsStateSet,
+	.enableRelativeMouseMode = false,
+};

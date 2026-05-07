@@ -21,7 +21,7 @@ MapMaterial *mapMaterials[MAX_MAP_MATERIALS];
 static MapMaterial fallbackMaterial = {
 	.id = -1,
 	.name = "_fallback",
-	.shader = SHADER_SHADED,
+	.shader = SHADER_UNSHADED,
 	.soundClass = SOUND_CLASS_DEFAULT,
 	.texture = "_generic_fallback",
 };

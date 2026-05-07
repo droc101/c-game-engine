@@ -5,8 +5,8 @@
 #ifndef LOGOSPLASHSTATE_H
 #define LOGOSPLASHSTATE_H
 
-#define GAME_STATE_LOGO_SPLASH 6
+#include <engine/structs/GameState.h>
 
-void LogoSplashStateSet();
+extern const GameState LogoSplashState;
 
 #endif //LOGOSPLASHSTATE_H

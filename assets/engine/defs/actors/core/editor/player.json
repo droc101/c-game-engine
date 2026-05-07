@@ -1,6 +1,0 @@
-{
-  "description": "The spawn point for the player",
-  "display": {
-    "model": "model/player.gmdl"
-  }
-}

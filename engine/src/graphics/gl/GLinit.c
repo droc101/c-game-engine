@@ -155,7 +155,8 @@ bool GL_Init(SDL_Window *wnd)
 
 	fflush(stdout);
 
-	GL_Disable3D();
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_MULTISAMPLE);
 
 	return true;
 }
@@ -163,6 +164,7 @@ bool GL_Init(SDL_Window *wnd)
 void GL_DestroyGL()
 {
 	LogDebug("Cleaning up OpenGL renderer...\n");
+	GL_LoadMap(NULL);
 	GL_DestroyFramebuffer();
 	GL_DestroyShaders();
 	GL_DestroyObjects();

@@ -9,6 +9,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
@@ -38,10 +39,8 @@ struct MapVertex
 	Vector3 position;
 	/// The UV coordinate
 	Vector2 uv;
-	/// The vertex color
-	Color color;
-	/// The vertex normal
-	Vector3 normal;
+	/// The Lightmap UV coordiante
+	Vector2 lightmapUv;
 };
 
 struct MapModel
@@ -60,6 +59,7 @@ struct MapModel
 
 struct Map
 {
+	char *mapName;
 	/// The name of the icon this map uses for Discord RPC
 	char *discordRpcIcon;
 	/// The display name this map uses for Discord RPC
@@ -86,10 +86,10 @@ struct Map
 	/// The distance from the player at which the fog is fully opaque
 	float fogEnd;
 
-	/// The pitch and yaw of the directional light. The roll is always zero as it has no effect.
-	Vector2 lightAngle;
-	/// The light color. The alpha channel is ignored.
+	/// The global light color. The alpha channel is ignored.
 	Color lightColor;
+	/// HDR tonemapping exposure
+	float exposure;
 
 	JPH_PhysicsSystem *physicsSystem;
 	uint64_t physicsTick;
@@ -109,6 +109,18 @@ struct Map
 
 	/// The view model
 	Viewmodel viewmodel;
+
+	/// The width of the lightmap in pixels
+	size_t lightmapWidth;
+	/// The height of the lightmap in pixels
+	size_t lightmapHeight;
+	/// The lightmap data in RGBA16F format
+	void *lightmapPixels;
+
+	/// The number of point lights in the level
+	uint16_t numPointLights;
+	/// The point lights in this level
+	PointLight *pointLights;
 };
 
 /**
@@ -116,6 +128,12 @@ struct Map
  * @return Blank map
  */
 Map *CreateMap(void);
+
+/**
+ * Free data from a map that is only used when first loading it
+ * @param map The map to free data from
+ */
+void FreeLoadTimeMapData(Map *map);
 
 /**
  * Destroy a map and everything in it

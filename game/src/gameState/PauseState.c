@@ -9,6 +9,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
@@ -20,28 +21,24 @@
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "gameState/MainState.h"
-#include "gameState/MenuState.h"
-#include "gameState/OptionsState.h"
-
-#ifdef USE_LEVEL_SELECT
 #include "gameState/LevelSelectState.h"
-#endif
+#include "gameState/MainState.h"
+#include "gameState/OptionsState.h"
 
 UiStack *pauseStack = NULL;
 
-void PauseStateUpdate(GlobalState * /*state*/)
+void PauseStateUpdate(GlobalState * /*state*/, const double /*delta*/)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL) ||
 		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
 		(void)PlaySound(SOUND("sfx/popdown"), SOUND_CATEGORY_UI);
-		MainStateSet();
+		SetGameState(&MainState);
 	}
 }
 
-void PauseStateRender(GlobalState * /*state*/)
+void PauseStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderInGameMenuBackground();
 
@@ -54,7 +51,9 @@ void PauseStateRender(GlobalState * /*state*/)
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
 #ifdef BUILDSTYLE_DEBUG
-	DPrintF("Engine " ENGINE_VERSION "\nDEBUG BUILD", COLOR_WHITE, false);
+	DPrintF("Engine " ENGINE_VERSION, false, COLOR_WHITE);
+	DPrintF("DEBUG BUILD", false, COLOR_WHITE);
+	DPrintF("Map: %s", false, COLOR_WHITE, state->map->mapName);
 #endif
 
 	ProcessUiStack(pauseStack);
@@ -63,22 +62,19 @@ void PauseStateRender(GlobalState * /*state*/)
 
 void BtnPauseResume()
 {
-	MainStateSet();
+	SetGameState(&MainState);
 }
 
 void BtnOptions()
 {
-	OptionsStateSet(true);
+	optionsStateInGame = true;
+	SetGameState(&OptionsState);
 }
 
 void BtnPauseExit()
 {
 	ChangeMap(NULL);
-#ifdef USE_LEVEL_SELECT
-	LevelSelectStateSet();
-#else
-	MenuStateSet();
-#endif
+	SetGameState(&LevelSelectState);
 }
 
 void PauseStateSet()
@@ -93,12 +89,6 @@ void PauseStateSet()
 					CreateButtonControl(v2(0, 120), v2(300, 40), "Exit Level", BtnPauseExit, MIDDLE_CENTER));
 	}
 	UiStackResetFocus(pauseStack);
-
-	SetStateCallbacks(PauseStateUpdate,
-					  NULL,
-					  GAME_STATE_PAUSE,
-					  PauseStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void PauseStateDestroy()
@@ -109,3 +99,12 @@ void PauseStateDestroy()
 		pauseStack = NULL;
 	}
 }
+
+const GameState PauseState = {
+	.UpdateGame = PauseStateUpdate,
+	.RenderGame = PauseStateRender,
+	.FixedUpdateGame = NULL,
+	.Set = PauseStateSet,
+	.Destroy = PauseStateDestroy,
+	.enableRelativeMouseMode = false,
+};

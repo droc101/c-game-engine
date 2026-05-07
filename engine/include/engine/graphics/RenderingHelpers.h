@@ -172,6 +172,9 @@ void WindowObscured();
  */
 void WindowRestored();
 
+/**
+ * Set whether the window is focused
+ */
 void SetWindowFocused(bool val);
 
 /**
@@ -203,7 +206,7 @@ float Y_TO_NDC(float y);
  * Load the map models from a map
  * @param map The map to load from
  */
-void LoadMapModels(const Map *map);
+void LoadMapModels(Map *map);
 
 /**
  * Set whether vertical sync is enabled

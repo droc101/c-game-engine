@@ -4,7 +4,6 @@
 
 #include <engine/debug/DPrintConsole.h>
 #include <engine/Engine.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -65,14 +64,14 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	va_end(args);
 
 	va_start(args, message);
-	char *plainTextBuffer = calloc(sizeof(char), length + 1);
+	char *plainTextBuffer = calloc(length + 1, sizeof(char));
 	CheckAlloc(plainTextBuffer);
 	sprintf(plainTextBuffer,
 			"[%.*s] ",
 			bufferLength - 8,
 			type); // Minus 8 due to color, brackets, and null not included
 	vsprintf(plainTextBuffer + strlen(plainTextBuffer), message, args);
-	AddConsoleMessage(plainTextBuffer, COLOR_WHITE);
+	AddConsoleMessage(plainTextBuffer, color);
 
 	if (logFile)
 	{

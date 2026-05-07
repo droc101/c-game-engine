@@ -49,9 +49,10 @@
 EXPORT_SYM uint32_t NvOptimusEnablement = 0x00000001;
 EXPORT_SYM int AmdPowerXpressRequestHighPerformance = 1;
 
-SDL_Surface *windowIcon;
-SDL_Event event;
-bool shouldQuit = false;
+static SDL_Surface *windowIcon;
+static SDL_Event event;
+static bool shouldQuit = false;
+static double lastFrameTime = TARGET_FPS_NS_D;
 
 void ExecPathInit(const int argc, const char *argv[])
 {
@@ -266,9 +267,14 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitCommonFonts();
 
-	DiscordInit();
+	if (GetState()->options.enableDiscordRpc)
+	{
+		DiscordInit();
+	}
 
 	InitDPrintConsole();
+
+	LodThreadInit();
 
 	SDL_ShowWindow(GetGameWindow());
 }
@@ -290,11 +296,13 @@ void EngineIteration()
 	}
 	GlobalState *state = GetState();
 
+	const double delta = lastFrameTime / TARGET_FPS_NS_D;
+
 	if (!FrameStart())
 	{
-		if (state->UpdateGame)
+		if (state->gameState->UpdateGame)
 		{
-			state->UpdateGame(state);
+			state->gameState->UpdateGame(state, delta);
 		}
 		UpdateSoundSystem();
 		if (state->requestExit)
@@ -312,9 +320,9 @@ void EngineIteration()
 
 	ResetDPrintYPos();
 
-	if (state->UpdateGame)
+	if (state->gameState->UpdateGame)
 	{
-		state->UpdateGame(state);
+		state->gameState->UpdateGame(state, delta);
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
@@ -324,7 +332,14 @@ void EngineIteration()
 	}
 #endif
 
-	state->RenderGame(state);
+	if (state->gameState->enableRelativeMouseMode)
+	{
+		// warp the mouse to the center of the screen
+		const Vector2 realWndSize = ActualWindowSize();
+		SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
+	}
+
+	state->gameState->RenderGame(state, delta);
 
 	FrameGraphDraw();
 	TickGraphDraw();
@@ -336,6 +351,8 @@ void EngineIteration()
 	UpdateSoundSystem();
 
 	UpdateInputStates(mainThreadInput);
+
+	ProcessStateChangeQueue();
 
 	DiscordUpdate();
 	if (state->requestExit)
@@ -351,7 +368,20 @@ void EngineIteration()
 	{
 		SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 	}
+
+	const uint64_t actualFrameTime = GetTimeNs() - frameStart;
+	if (GetState()->options.maxFps != 0)
+	{
+		const uint64_t targetFrameTime = 1000000000 / (uint64_t)GetState()->options.maxFps;
+		if (targetFrameTime > actualFrameTime)
+		{
+			SDL_DelayPrecise(targetFrameTime - actualFrameTime);
+		}
+	}
+
 	FrameGraphUpdate(GetTimeNs() - frameStart);
+
+	lastFrameTime = (double)(GetTimeNs() - frameStart); // we want this recalculated AFTER fps limiter delay
 }
 
 void DestroyEngine()

@@ -17,13 +17,13 @@
 
 void DefaultOptions(Options *options)
 {
+	options->enableDiscordRpc = true;
 	options->renderer = RENDERER_OPENGL; // TODO: RENDERER_VULKAN;
 	options->musicVolume = 1.0f;
 	options->sfxVolume = 1.0f;
 	options->uiVolume = 1.0f;
 	options->masterVolume = 1.0f;
 	options->fullscreen = false;
-	options->vsync = false;
 	options->lodMultiplier = 1.0f;
 	options->cameraSpeed = 1;
 	options->controllerMode = false;
@@ -34,17 +34,59 @@ void DefaultOptions(Options *options)
 	options->invertVerticalCamera = false;
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = true;
-	options->limitFpsWhenUnfocused = true;
 	options->fov = 90.0f;
 	options->anisotropy = ANISOTROPY_16X;
+	options->vsync = false;
+#ifdef BUILDSTYLE_DEBUG
+	options->maxFps = 0;
+	options->limitFpsWhenUnfocused = false;
+#else
+	options->maxFps = 240;
+	options->limitFpsWhenUnfocused = true;
+#endif
 }
 
 bool ValidateOptions(const Options *options)
 {
+	// ignore controller mode
+	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
+	{
+		return false;
+	}
+	if (options->rumbleStrength < 0.0 || options->rumbleStrength > 1.00)
+	{
+		return false;
+	}
+	// ignore invert h/v and swap a/b
+
 	if (options->renderer >= RENDERER_MAX)
 	{
 		return false;
 	}
+	// ignore fullscreen,vsync
+	if (options->msaa > MSAA_8X)
+	{
+		return false;
+	}
+	// ignore mipmaps, wayland/x11, bg fps limit
+	if (options->lodMultiplier < 0.5 || options->lodMultiplier > 2.0)
+	{
+		return false;
+	}
+	if (options->fov < 30 || options->fov > 120)
+	{
+		return false;
+	}
+	if (options->anisotropy > ANISOTROPY_16X)
+	{
+		return false;
+	}
+	if (options->maxFps % 10 != 0 || options->maxFps > 500)
+	{
+		return false;
+	}
+
+
 	if (options->musicVolume < 0 || options->musicVolume > 1)
 	{
 		return false;
@@ -53,15 +95,11 @@ bool ValidateOptions(const Options *options)
 	{
 		return false;
 	}
+	if (options->uiVolume < 0 || options->uiVolume > 1)
+	{
+		return false;
+	}
 	if (options->masterVolume < 0 || options->masterVolume > 1)
-	{
-		return false;
-	}
-	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
-	{
-		return false;
-	}
-	if (options->fov < 30 || options->fov > 120)
 	{
 		return false;
 	}

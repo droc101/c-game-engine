@@ -35,7 +35,7 @@ AssetCache assetCache;
 
 FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	const int64_t maxPathLength = 300;
+	const size_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
@@ -51,7 +51,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 			LogError("Path is too long: %s\n", relPath);
 			continue;
 		}
-		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > maxPathLength)
+		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > (int64_t)maxPathLength)
 		{
 			LogError("Asset path too long!\n");
 			continue;
@@ -75,6 +75,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 
 void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension)
 {
+	// TODO this should do subfolders
 	ListFreeOnlyContents(*output);
 	ListClear(*output);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)

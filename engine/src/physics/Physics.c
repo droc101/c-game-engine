@@ -10,6 +10,7 @@
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <joltc/Physics/Collision/ObjectLayer.h>
@@ -95,9 +96,10 @@ void PhysicsInitMap(Map *map)
 		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&objectVsBroadPhaseLayerFilterImpl),
 	};
 	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
+	JPH_PhysicsSystem_SetGravity(map->physicsSystem, &(Vector3){0, GRAVITY, 0});
 }
 
-void PhysicsDestroyMap(const Map *map, JPH_BodyInterface * /*bodyInterface*/)
+void PhysicsDestroyMap(const Map *map)
 {
 	JPH_CharacterVirtual_Destroy(map->player.joltCharacter);
 	JPH_PhysicsSystem_Destroy(map->physicsSystem);

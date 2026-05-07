@@ -2,20 +2,22 @@ cmake_minimum_required(VERSION 3.24)
 project(game_module C CXX)
 
 add_library(game MODULE EXCLUDE_FROM_ALL
-        src/actor/Coin.c
-        include/actor/Coin.h
-        src/actor/Door.c
-        include/actor/Door.h
-        src/actor/Goal.c
-        include/actor/Goal.h
-        src/actor/Laser.c
-        include/actor/Laser.h
-        src/actor/LaserEmitter.c
-        include/actor/LaserEmitter.h
-        src/actor/Physbox.c
-        include/actor/Physbox.h
-        src/actor/TestActor.c
-        include/actor/TestActor.h
+        src/actor/prop/Coin.c
+        include/actor/prop/Coin.h
+        src/actor/prop/Door.c
+        include/actor/prop/Door.h
+        src/actor/prop/Goal.c
+        include/actor/prop/Goal.h
+        src/actor/prop/Laser.c
+        include/actor/prop/Laser.h
+        src/actor/prop/LaserEmitter.c
+        include/actor/prop/LaserEmitter.h
+        src/actor/prop/Physbox.c
+        include/actor/prop/Physbox.h
+        src/actor/npc/TestActor.c
+        include/actor/npc/TestActor.h
+        src/actor/npc/NpcJohn.c
+        include/actor/npc/NpcJohn.h
 
         src/gameState/LevelSelectState.c
         include/gameState/LevelSelectState.h
@@ -47,8 +49,8 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         src/item/EraserItem.c
         include/item/LaserStopperItem.h
         src/item/LaserStopperItem.c
-        src/actor/Button.c
-        include/actor/Button.h
+        include/actor/item/ItemEraser.h
+        src/actor/item/ItemEraser.c
 )
 
 if (x86_64)

@@ -11,6 +11,7 @@
 #include <engine/graphics/gl/GLshaders.h>
 #include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/std140.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
@@ -18,6 +19,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
@@ -26,12 +28,15 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
-#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+GLuint lightmap = 0;
+GLuint lightMetadataBuffer = 0;
+GLuint pointLightBuffer = 0;
 
 void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 {
@@ -40,87 +45,121 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	GL_UseShader(actorWallShadedShader);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallShadedSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, actorWallShadedLightMetadataLoc, lightMetadataBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, actorWallShadedPointLightsLoc, pointLightBuffer);
 
 	glUniformMatrix4fv(actorWallShadedTransformMatrixLoc, 1, GL_FALSE, *actorXfm);
 
 	glUniform4fv(actorWallShadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(wall->tex);
 
+	const float halfLength = wall->length / 2.0f;
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
-	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
+	Vector2 startVertex;
+	Vector2 endVertex;
+	Vector3 normal = {0};
+	Vector3 backfaceNormal = {0};
+	if (wall->orientation == X_AXIS)
+	{
+		normal.z = 1;
+		backfaceNormal.z = -1;
+		startVertex = v2(-halfLength + wall->localCenter.x, 0);
+		endVertex = v2(halfLength + wall->localCenter.x, 0);
+	} else
+	{
+		normal.x = -1;
+		backfaceNormal.x = 1;
+		startVertex = v2(0, -halfLength + wall->localCenter.x);
+		endVertex = v2(0, halfLength + wall->localCenter.x);
+	}
 	const Vector2 startUV = v2(wall->uvOffset.x, wall->uvOffset.y);
 	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
 							 wall->uvScale.y * wall->height + wall->uvOffset.y);
-	const float backfaceWallAngle = wall->angle + PIf;
-	const float vertices[8][6] = {
+	const float vertices[8][8] = {
 		// X Y Z U V A
 		{
 			startVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			startVertex.y,
 			startUV.x,
 			startUV.y,
-			wall->angle,
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 		{
 			endVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			endVertex.y,
 			endUV.x,
 			startUV.y,
-			wall->angle,
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 		{
 			endVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			endVertex.y,
 			endUV.x,
 			endUV.y,
-			wall->angle,
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 		{
 			startVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			startVertex.y,
 			startUV.x,
 			endUV.y,
-			wall->angle,
+			normal.x,
+			normal.y,
+			normal.z,
 		},
 
 		// backface
 		{
 			startVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			startVertex.y,
 			endUV.x,
 			startUV.y,
-			backfaceWallAngle,
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 		{
 			endVertex.x,
-			halfHeight,
+			halfHeight + wall->localCenter.y,
 			endVertex.y,
 			startUV.x,
 			startUV.y,
-			backfaceWallAngle,
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 		{
 			endVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			endVertex.y,
 			startUV.x,
 			endUV.y,
-			backfaceWallAngle,
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 		{
 			startVertex.x,
-			-halfHeight,
+			-halfHeight + wall->localCenter.y,
 			startVertex.y,
 			endUV.x,
 			endUV.y,
-			backfaceWallAngle,
+			backfaceNormal.x,
+			backfaceNormal.y,
+			backfaceNormal.z,
 		},
 	};
 
@@ -131,24 +170,24 @@ void GL_DrawShadedActorWall(const Actor *actor, const mat4 actorXfm)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
 
-	glVertexAttribPointer(actorWallShadedVertexLoc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	glVertexAttribPointer(actorWallShadedVertexLoc, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(actorWallShadedVertexLoc);
 
 	glVertexAttribPointer(actorWallShadedUvLoc,
 						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  6 * sizeof(GLfloat),
+						  8 * sizeof(GLfloat),
 						  (void *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(actorWallShadedUvLoc);
 
-	glVertexAttribPointer(actorWallShadedAngleLoc,
-						  1,
+	glVertexAttribPointer(actorWallShadedNormalLoc,
+						  3,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  6 * sizeof(GLfloat),
+						  8 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(actorWallShadedAngleLoc);
+	glEnableVertexAttribArray(actorWallShadedNormalLoc);
 
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, NULL);
 }
@@ -165,11 +204,22 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 	glUniform4fv(actorWallUnshadedAlbColorLoc, 1, COLOR_TO_ARR(actor->modColor));
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(wall->tex);
 
+	const float halfLength = wall->length / 2.0f;
 	const float halfHeight = wall->height / 2.0f;
-	const Vector2 startVertex = v2(wall->a.x, wall->a.y);
-	const Vector2 endVertex = v2(wall->b.x, wall->b.y);
+	Vector2 startVertex;
+	Vector2 endVertex;
+	if (wall->orientation == X_AXIS)
+	{
+		startVertex = v2(-halfLength + wall->localCenter.x, 0);
+		endVertex = v2(halfLength + wall->localCenter.x, 0);
+	} else
+	{
+		startVertex = v2(0, -halfLength + wall->localCenter.x);
+		endVertex = v2(0, halfLength + wall->localCenter.x);
+	}
 	const Vector2 startUV = v2(wall->uvOffset.x, wall->uvOffset.y);
 	const Vector2 endUV = v2(wall->uvScale.x * wall->length + wall->uvOffset.x,
 							 wall->uvScale.y * wall->height + wall->uvOffset.y);
@@ -258,7 +308,7 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm)
 
 void GL_RenderMap(const Map *map, const Camera *camera)
 {
-	GL_Enable3D(); // depth should be clear from frame start
+	GL_Begin3DPass(); // depth should be clear from frame start
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	// glLineWidth(2);
@@ -276,6 +326,8 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 		GL_ClearDepthOnly(); // prevent sky from clipping into walls
 	}
 
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, lightmap);
 	for (size_t i = 0; i < GL_MAX_MAP_MODELS; i++)
 	{
 		if (mapModels[i] == NULL)
@@ -290,6 +342,8 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 			GL_RenderUnshadedMapModel(mapModels[i]);
 		}
 	}
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
@@ -326,7 +380,7 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 	}
 	ListUnlock(map->actors);
 
-	if (map->player.isFreecamActive)
+	if (camera->showPlayerModel)
 	{
 		mat4 playerXfm = GLM_MAT4_IDENTITY_INIT;
 		JPH_RMat44 matrix;
@@ -337,32 +391,35 @@ void GL_RenderMap(const Map *map, const Camera *camera)
 
 	GL_DrawDebugLines();
 
-	if (map->viewmodel.enabled)
+	if (map->viewmodel.enabled && camera == &map->player.playerCamera && map->viewmodel.model)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		mat4 viewModelMatrix;
-		GL_GetViewmodelMatrix(map, &viewModelMatrix);
+		GL_GetViewmodelProjectionMatrix(&viewModelMatrix, &map->player.playerCamera);
 
 		GL_SharedUniforms uniforms = {
 			.fogColor = map->fogColor,
 			.fogStart = map->fogStart,
 			.fogEnd = map->fogEnd,
 			.lightColor = {map->lightColor.r, map->lightColor.g, map->lightColor.b},
-			.lightDirection = {0, -(float)PI, 0},
 		};
-		glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
+		memcpy(uniforms.worldViewMatrix, viewModelMatrix, sizeof(mat4_std140));
+		// glm_mat4_copy(viewModelMatrix, uniforms.worldViewMatrix);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		GL_RenderModel(map->viewmodel.model, GLM_MAT4_IDENTITY, 0, 0, COLOR_WHITE);
+		mat4 modelWorldMatrix;
+		GL_GetViewmodelModelWorldMatrix(map, &modelWorldMatrix, &map->player.playerCamera);
+
+		GL_RenderModel(map->viewmodel.model, modelWorldMatrix, 0, 0, COLOR_WHITE);
 	}
 
 	// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	GL_Disable3D();
+	GL_End3DPass(map->exposure);
 }
 
 void GL_RenderShadedModelPart(const ModelDefinition *model,
@@ -372,39 +429,47 @@ void GL_RenderShadedModelPart(const ModelDefinition *model,
 							  Color modColor,
 							  const Material *mat)
 {
-	GL_UseShader(modelShadedShader);
+	GL_UseShader(actorShadedShader);
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(mat->texture);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedActorModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedActorLightMetadataLoc, lightMetadataBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, shadedActorPointLightsLoc, pointLightBuffer);
 
-	glUniformMatrix4fv(shadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(shadedActorModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *modelWorldMatrix); // model -> world
-	glUniform4fv(shadedModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
-	glUniform4fv(shadedModelModColorLoc, 1, COLOR_TO_ARR(modColor));
+	glUniform4fv(shadedActorModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
+	glUniform4fv(shadedActorModelModColorLoc, 1, COLOR_TO_ARR(modColor));
 
 	GL_LoadModel(model, lod, materialIndex);
 
-	glVertexAttribPointer(shadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(shadedModelVertexLoc);
+	glVertexAttribPointer(shadedActorModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(shadedActorModelVertexLoc);
 
-	glVertexAttribPointer(shadedModelUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelUvLoc);
+	glVertexAttribPointer(shadedActorModelUvLoc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  12 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedActorModelUvLoc);
 
-	glVertexAttribPointer(shadedModelColorLoc,
+	glVertexAttribPointer(shadedActorModelColorLoc,
 						  4,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelColorLoc);
+	glEnableVertexAttribArray(shadedActorModelColorLoc);
 
-	glVertexAttribPointer(shadedModelNormalLoc,
+	glVertexAttribPointer(shadedActorModelNormalLoc,
 						  3,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(9 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelNormalLoc);
+	glEnableVertexAttribArray(shadedActorModelNormalLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
 }
@@ -416,36 +481,37 @@ void GL_RenderUnshadedModelPart(const ModelDefinition *model,
 								Color modColor,
 								const Material *mat)
 {
-	GL_UseShader(modelUnshadedShader);
+	GL_UseShader(actorUnshadedShader);
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(mat->texture);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedActorModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(unshadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(unshadedActorModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *modelWorldMatrix); // model -> world
-	glUniform4fv(unshadedModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
-	glUniform4fv(unshadedModelModColorLoc, 1, COLOR_TO_ARR(modColor));
+	glUniform4fv(unshadedActorModelAlbColorLoc, 1, COLOR_TO_ARR(mat->color));
+	glUniform4fv(unshadedActorModelModColorLoc, 1, COLOR_TO_ARR(modColor));
 
 	GL_LoadModel(model, lod, materialIndex);
 
-	glVertexAttribPointer(unshadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(unshadedModelVertexLoc);
+	glVertexAttribPointer(unshadedActorModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(unshadedActorModelVertexLoc);
 
-	glVertexAttribPointer(unshadedModelUvLoc,
+	glVertexAttribPointer(unshadedActorModelUvLoc,
 						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelUvLoc);
+	glEnableVertexAttribArray(unshadedActorModelUvLoc);
 
-	glVertexAttribPointer(unshadedModelColorLoc,
+	glVertexAttribPointer(unshadedActorModelColorLoc,
 						  4,
 						  GL_FLOAT,
 						  GL_FALSE,
 						  12 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelColorLoc);
+	glEnableVertexAttribArray(unshadedActorModelColorLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->lods[lod]->indexCount[materialIndex], GL_UNSIGNED_INT, NULL);
 }
@@ -457,6 +523,7 @@ void GL_RenderSkyModelPart(const ModelDefinition *model,
 {
 	GL_UseShader(skyShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(GetState()->map->skyTexture);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, skySharedUniformsLoc, sharedUniformBuffer);
@@ -506,94 +573,105 @@ void GL_RenderModel(const ModelDefinition *model,
 
 void GL_RenderShadedMapModel(const GL_MapModelBuffer *model)
 {
-	GL_UseShader(modelShadedShader);
+	GL_UseShader(mapShadedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
+	glUniform1i(shadedMapModelLightmapLoc, 1);
 
 	const mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, shadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, shadedMapModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(shadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(shadedMapModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *idty); // model -> world
 
 	GL_BindBuffer(model->buffer);
 
-	glVertexAttribPointer(shadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(shadedModelVertexLoc);
+	glVertexAttribPointer(shadedMapModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(shadedMapModelVertexLoc);
 
-	glVertexAttribPointer(shadedModelUvLoc, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelUvLoc);
-
-	glVertexAttribPointer(shadedModelColorLoc,
-						  4,
+	glVertexAttribPointer(shadedMapModelUvLoc,
+						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  12 * sizeof(GLfloat),
+						  7 * sizeof(GLfloat),
+						  (void *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(shadedMapModelUvLoc);
+
+	glVertexAttribPointer(shadedMapModelUv2Loc,
+						  2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  7 * sizeof(GLfloat),
 						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelColorLoc);
-
-	glVertexAttribPointer(shadedModelNormalLoc,
-						  3,
-						  GL_FLOAT,
-						  GL_FALSE,
-						  12 * sizeof(GLfloat),
-						  (void *)(9 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(shadedModelNormalLoc);
-
-	glUniform4fv(shadedModelAlbColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
-
-	glUniform4fv(shadedModelModColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
+	glEnableVertexAttribArray(shadedMapModelUv2Loc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_RenderUnshadedMapModel(const GL_MapModelBuffer *model)
 {
-	GL_UseShader(modelUnshadedShader);
+	GL_UseShader(mapUnshadedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(model->mapModel->material->texture);
 
 	const mat4 idty = GLM_MAT4_IDENTITY_INIT;
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedModelSharedUniformsLoc, sharedUniformBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, unshadedMapModelSharedUniformsLoc, sharedUniformBuffer);
 
-	glUniformMatrix4fv(unshadedModelModelWorldMatrixLoc, 1, GL_FALSE,
+	glUniformMatrix4fv(unshadedMapModelModelWorldMatrixLoc, 1, GL_FALSE,
 					   *idty); // model -> world
 
 	GL_BindBuffer(model->buffer);
 
-	glVertexAttribPointer(unshadedModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(GLfloat), (void *)0);
-	glEnableVertexAttribArray(unshadedModelVertexLoc);
+	glVertexAttribPointer(unshadedMapModelVertexLoc, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void *)0);
+	glEnableVertexAttribArray(unshadedMapModelVertexLoc);
 
-	glVertexAttribPointer(unshadedModelUvLoc,
+	glVertexAttribPointer(unshadedMapModelUvLoc,
 						  2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  12 * sizeof(GLfloat),
+						  7 * sizeof(GLfloat),
 						  (void *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelUvLoc);
-
-	glVertexAttribPointer(unshadedModelColorLoc,
-						  4,
-						  GL_FLOAT,
-						  GL_FALSE,
-						  12 * sizeof(GLfloat),
-						  (void *)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(unshadedModelColorLoc);
-
-	glUniform4fv(unshadedModelAlbColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
-
-	glUniform4fv(unshadedModelModColorLoc, 1, COLOR_TO_ARR(COLOR_WHITE));
+	glEnableVertexAttribArray(unshadedMapModelUvLoc);
 
 	glDrawElements(GL_TRIANGLES, (int)model->mapModel->indexCount, GL_UNSIGNED_INT, NULL);
 }
 
 void GL_LoadMap(const Map *map)
 {
+	if (glIsBuffer(lightMetadataBuffer))
+	{
+		glDeleteBuffers(1, &lightMetadataBuffer);
+	}
+	if (glIsBuffer(pointLightBuffer))
+	{
+		glDeleteBuffers(1, &pointLightBuffer);
+	}
+
 	GL_DestroyMapModels();
+	if (glIsTexture(lightmap))
+	{
+		glDeleteTextures(1, &lightmap);
+	}
+	glActiveTexture(GL_TEXTURE1);
 	if (map)
 	{
+		const GL_LightMetadata metadata = {
+			.numPointLights = map->numPointLights,
+		};
+		glGenBuffers(1, &lightMetadataBuffer);
+		glBindBuffer(GL_UNIFORM_BUFFER, lightMetadataBuffer);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_LightMetadata), &metadata, GL_STATIC_READ);
+		glGenBuffers(1, &pointLightBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointLightBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER,
+					 (GLsizeiptr)(sizeof(PointLight) * metadata.numPointLights),
+					 map->pointLights,
+					 GL_STATIC_READ);
+
 		for (size_t i = 0; i < map->modelCount; i++)
 		{
 			GL_MapModelBuffer *mmb = malloc(sizeof(GL_MapModelBuffer));
@@ -611,13 +689,33 @@ void GL_LoadMap(const Map *map)
 						 mmb->mapModel->indices,
 						 GL_STREAM_DRAW);
 		}
+
+		glGenTextures(1, &lightmap);
+		glBindTexture(GL_TEXTURE_2D, lightmap);
+		glTexImage2D(GL_TEXTURE_2D,
+					 0,
+					 GL_RGBA16F,
+					 (GLsizei)map->lightmapWidth,
+					 (GLsizei)map->lightmapHeight,
+					 0,
+					 GL_RGBA,
+					 GL_HALF_FLOAT,
+					 map->lightmapPixels);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 {
 	GL_SharedUniforms uniforms;
-	glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
+	memcpy(uniforms.worldViewMatrix, modelViewProjection, sizeof(mat4_std140));
+	// glm_mat4_copy(*modelViewProjection, uniforms.worldViewMatrix);
 	uniforms.fogColor = map->fogColor;
 	uniforms.fogStart = (float)map->fogStart;
 	uniforms.fogEnd = (float)map->fogEnd;
@@ -625,25 +723,9 @@ void GL_SetMapParams(mat4 *modelViewProjection, const Map *map)
 	uniforms.lightColor[1] = map->lightColor.g;
 	uniforms.lightColor[2] = map->lightColor.b;
 
-	uniforms.lightDirection[0] = -cosf(map->lightAngle.x) * sinf(map->lightAngle.y);
-	uniforms.lightDirection[1] = sinf(map->lightAngle.x);
-	uniforms.lightDirection[2] = -cosf(map->lightAngle.x) * cosf(map->lightAngle.y);
-
 	glBindBuffer(GL_UNIFORM_BUFFER, sharedUniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(GL_SharedUniforms), &uniforms, GL_STREAM_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-inline void GL_Enable3D(void)
-{
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-}
-
-inline void GL_Disable3D()
-{
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_MULTISAMPLE);
 }
 
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
@@ -664,7 +746,7 @@ void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix)
 	glm_mat4_mul(perspectiveMatrix, viewMatrix, *modelViewProjectionMatrix);
 }
 
-void GL_GetViewmodelMatrix(const Map *map, mat4 *out)
+void GL_GetViewmodelProjectionMatrix(mat4 *out, const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective(glm_rad(VIEWMODEL_FOV),
@@ -673,6 +755,17 @@ void GL_GetViewmodelMatrix(const Map *map, mat4 *out)
 					VIEWMODEL_FAR_Z,
 					perspectiveMatrix);
 
+	versor rotationQuat;
+	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
+
+	mat4 viewMatrix;
+	glm_quat_look(VECTOR3_TO_VEC3(camera->transform.position), rotationQuat, viewMatrix);
+
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, *out);
+}
+
+void GL_GetViewmodelModelWorldMatrix(const Map *map, mat4 *out, const Camera *camera)
+{
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix, VECTOR3_TO_VEC3(map->viewmodel.transform.position));
 
@@ -681,5 +774,12 @@ void GL_GetViewmodelMatrix(const Map *map, mat4 *out)
 	glm_rotate(rotationMatrix, JPH_Quat_GetRotationAngle(&map->viewmodel.transform.rotation, &Vector3_AxisY), GLM_YUP);
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
-	glm_mat4_mul(perspectiveMatrix, translationMatrix, *out);
+
+	versor rotationQuat;
+	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
+	mat4 cameraTransform = GLM_MAT4_IDENTITY_INIT;
+	glm_quat_look(VECTOR3_TO_VEC3(camera->transform.position), rotationQuat, cameraTransform);
+	glm_mat4_inv(cameraTransform, cameraTransform);
+
+	glm_mat4_mul(cameraTransform, translationMatrix, *out);
 }

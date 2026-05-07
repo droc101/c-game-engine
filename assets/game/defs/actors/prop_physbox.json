@@ -1,7 +1,0 @@
-{
-  "description": "A physics-enabled box the player can pick up",
-  "extends": "actor",
-  "display": {
-    "model": "model/cube.gmdl"
-  }
-}

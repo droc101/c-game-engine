@@ -1,0 +1,64 @@
+{
+  "extends": "actor",
+  "description": "Button that can be pressed with the use key",
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "orientation"
+    },
+    {
+      "type": "model",
+      "model": "$model"
+    }
+  ],
+  "outputs": {
+    "pressed": {
+      "description": "Emitted when the button is pressed"
+    },
+    "unpressed": {
+      "description": "Emitted when the button is unpressed"
+    }
+  },
+  "params": {
+    "model": {
+      "display": "Model",
+      "default": "model/wall_button.gmdl",
+      "type": "string",
+      "string_hint": "model",
+      "description": "The model to use"
+    },
+    "off_skin": {
+      "display": "Off Skin",
+      "default": 0,
+      "type": "int",
+      "description": "The skin of the model to use when the button is off/not pressed"
+    },
+    "on_skin": {
+      "display": "On Skin",
+      "default": 1,
+      "type": "int",
+      "description": "The skin of the model to use when the button is on/pressed"
+    },
+    "start_pressed": {
+      "display": "Start Pressed",
+      "default": false,
+      "type": "bool",
+      "description": "Whether the button should start pressed/on"
+    },
+    "reset_delay_ms": {
+      "display": "Reset delay (msec)",
+      "default": 3000,
+      "minimum": -1,
+      "type": "int",
+      "description": "How many milliseconds the button should stay pressed for, set to -1 to stay pressed forever"
+    },
+    "toggle_mode": {
+      "display": "Toggle Mode",
+      "default": false,
+      "type": "bool",
+      "description": "Whether the player should also be able to turn the button off with the use key"
+    }
+  }
+}

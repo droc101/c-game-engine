@@ -10,7 +10,9 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
@@ -23,21 +25,13 @@
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
 
-#ifndef USE_LEVEL_SELECT
-#include "gameState/MainState.h"
-#endif
-
 UiStack *menuStack = NULL;
-bool fadeIn = false;
+bool menuStateFadeIn = false;
 bool easterEgg = false;
 
 void StartGame()
 {
-#ifdef USE_LEVEL_SELECT
-	LevelSelectStateSet();
-#else
-	MainStateSet();
-#endif
+	SetGameState(&LevelSelectState);
 }
 
 void QuitGame()
@@ -47,19 +41,43 @@ void QuitGame()
 
 void OpenOptions()
 {
-	OptionsStateSet(false);
+	optionsStateInGame = false;
+	SetGameState(&OptionsState);
 }
 
 void ReloadAssets()
 {
+	// TODO this sometimes causes a crash in the physics or lod threads, something isn't syncing.
+	ChangeMap(NULL);
+	EnterMenuBackgroundState();
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
 }
 
-void MenuStateUpdate(GlobalState * /*state*/) {}
-
-void MenuStateRender(GlobalState *state)
+static void DrawMenuFadeIn(GlobalState * /*state*/)
 {
-	RenderMenuBackground();
+	// TODO: how to make this play nice with the big lag frame from the background map load
+	// if (menuStateFadeIn)
+	// {
+	// 	const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
+	// 	Color color = COLOR_BLACK;
+	// 	color.a = alpha;
+	// 	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), color);
+	//
+	// 	if (GetState()->physicsFrame >= 20)
+	// 	{
+	// 		menuStateFadeIn = false;
+	// 	}
+	// }
+}
+
+void MenuStateRender(GlobalState *state, const double /*delta*/)
+{
+	RenderMenuBackground(state);
+	if (!IsBackgroundMapLoaded())
+	{
+		DrawMenuFadeIn(state);
+		return;
+	}
 
 	// draw the logo
 	Vector2 logoPosition;
@@ -110,30 +128,12 @@ void MenuStateRender(GlobalState *state)
 	ProcessUiStack(menuStack);
 	DrawUiStack(menuStack);
 
-	if (fadeIn)
-	{
-		const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
-		Color color = COLOR_BLACK;
-		color.a = alpha;
-		DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), color);
-
-		if (GetState()->physicsFrame >= 20)
-		{
-			fadeIn = false;
-		}
-	}
-}
-
-void MenuStateSetWithFade()
-{
-	MenuStateSet();
-	fadeIn = true;
+	DrawMenuFadeIn(state);
 }
 
 void MenuStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
-	fadeIn = false;
 	if (menuStack == NULL)
 	{
 		menuStack = CreateUiStack();
@@ -146,7 +146,8 @@ void MenuStateSet()
 		opY += opSpacing;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
 		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
@@ -154,12 +155,7 @@ void MenuStateSet()
 	const time_t current = time(NULL);
 	const struct tm *t = localtime(&current);
 	easterEgg = (t->tm_mon == 3 && t->tm_mday == 1) || HasCliArg("--force-menu-easter-egg");
-
-	SetStateCallbacks(MenuStateUpdate,
-					  NULL,
-					  GAME_STATE_MENU,
-					  MenuStateRender,
-					  false); // Fixed update is not needed for this state
+	EnterMenuBackgroundState();
 }
 
 void MenuStateDestroy()
@@ -170,3 +166,12 @@ void MenuStateDestroy()
 		menuStack = NULL;
 	}
 }
+
+const GameState MenuState = {
+	.UpdateGame = UpdateMenuBackground,
+	.RenderGame = MenuStateRender,
+	.FixedUpdateGame = FixedUpdateMenuBackground,
+	.Destroy = MenuStateDestroy,
+	.Set = MenuStateSet,
+	.enableRelativeMouseMode = false,
+};

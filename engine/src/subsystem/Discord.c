@@ -21,10 +21,31 @@ struct DiscordApplication
 };
 
 struct DiscordApplication app;
+IDiscordCoreEvents events;
+
+static void DiscordLogHook(void * /*hook_data*/, const enum EDiscordLogLevel level, const char *message)
+{
+	switch (level)
+	{
+		case DiscordLogLevel_Error:
+			LogError("Discord Game SDK Error: %s\n", message);
+			break;
+		case DiscordLogLevel_Warn:
+			LogWarning("Discord Game SDK Warning: %s\n", message);
+			break;
+		case DiscordLogLevel_Info:
+			LogInfo("Discord Game SDK Info: %s\n", message);
+			break;
+		case DiscordLogLevel_Debug:
+			LogDebug("Discord Game SDK Debug: %s\n", message);
+			break;
+	}
+}
 
 void DiscordInit()
 {
 	memset(&app, 0, sizeof(app));
+	memset(&events, 0, sizeof(events));
 
 	if (gameConfig.discordAppId == 0)
 	{
@@ -35,6 +56,7 @@ void DiscordInit()
 	DiscordCreateParamsSetDefault(&params);
 	params.client_id = (DiscordClientId)gameConfig.discordAppId;
 	params.flags = DiscordCreateFlags_NoRequireDiscord;
+	params.events = &events;
 	params.event_data = &app;
 
 	const enum EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &app.core);
@@ -45,9 +67,9 @@ void DiscordInit()
 		return;
 	}
 
-	app.activityManager = app.core->get_activity_manager(app.core);
+	app.core->set_log_hook(app.core, DiscordLogLevel_Debug, NULL, DiscordLogHook);
 
-	GetState()->rpcState = UNKNOWN;
+	app.activityManager = app.core->get_activity_manager(app.core);
 
 	DiscordUpdateRPC();
 
@@ -60,7 +82,15 @@ void DiscordUpdate()
 	{
 		return;
 	}
-	app.core->run_callbacks(app.core);
+	const enum EDiscordResult result = app.core->run_callbacks(app.core);
+	// really looking for DiscordResult_NotRunning here, but if something goes wrong
+	// it's not worth keeping this insignificant subsystem in a potentially unstable state
+	if (result != DiscordResult_Ok)
+	{
+		LogError("Discord SDK run_callbacks failed with errno %d, Discord integration will be disabled for this session.\n", result);
+		app.activityManager = NULL; // Prevent clearing activity during cleanup as it will cause SIGPIPE
+		DiscordDestroy();
+	}
 }
 
 static void ActivityCallback(void * /*data*/, const enum EDiscordResult result)
@@ -77,6 +107,7 @@ void DiscordUpdateRPC()
 	{
 		return;
 	}
+
 	struct DiscordActivity activity = {0};
 	activity.application_id = (DiscordClientId)gameConfig.discordAppId;
 	activity.type = DiscordActivityType_Playing;
@@ -107,7 +138,10 @@ void DiscordDestroy()
 	if (app.core)
 	{
 		LogDebug("Cleaning up Discord Game SDK...\n");
-		app.activityManager->clear_activity(app.activityManager, NULL, NULL);
+		if (app.activityManager)
+		{
+			app.activityManager->clear_activity(app.activityManager, NULL, NULL);
+		}
 		app.core->destroy(app.core);
 		app.core = NULL;
 		app.activityManager = NULL;

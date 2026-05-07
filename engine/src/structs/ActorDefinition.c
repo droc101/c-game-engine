@@ -3,16 +3,19 @@
 //
 
 #include <assert.h>
-#include <engine/actor/GlobalFog.h>
-#include <engine/actor/GlobalLight.h>
+#include <engine/actor/Camera.h>
+#include <engine/actor/env/GlobalFog.h>
+#include <engine/actor/env/GlobalLight.h>
+#include <engine/actor/env/TonemapController.h>
 #include <engine/actor/IoProxy.h>
-#include <engine/actor/LogicBinary.h>
-#include <engine/actor/LogicCounter.h>
-#include <engine/actor/LogicDecimal.h>
-#include <engine/actor/PhysicsModel.h>
+#include <engine/actor/logic/LogicBinary.h>
+#include <engine/actor/logic/LogicCounter.h>
+#include <engine/actor/logic/LogicDecimal.h>
+#include <engine/actor/prop/Button.h>
+#include <engine/actor/prop/PhysicsModel.h>
+#include <engine/actor/prop/Sprite.h>
+#include <engine/actor/prop/StaticModel.h>
 #include <engine/actor/SoundPlayer.h>
-#include <engine/actor/Sprite.h>
-#include <engine/actor/StaticModel.h>
 #include <engine/actor/Trigger.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
@@ -46,6 +49,7 @@ void RegisterActor(const char *actorTypeName, ActorDefinition *definition)
 		ActorInputHandlerFunctionDict_next(it);
 	}
 #endif
+	definition->className = actorTypeName;
 	ActorDefinitionDict_set_at(actorDefinitions, actorTypeName, definition);
 }
 
@@ -88,6 +92,9 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterGlobalLight();
 	RegisterGlobalFog();
 	RegisterPhysicsModel();
+	RegisterTonemapController();
+	RegisterCamera();
+	RegisterButton();
 	RegisterGameActors();
 }
 

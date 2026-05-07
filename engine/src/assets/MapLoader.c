@@ -16,6 +16,7 @@
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
@@ -38,6 +39,11 @@
 
 bool LoadMap(Map *map, Asset *mapData)
 {
+	if (!map || !mapData)
+	{
+		return false;
+	}
+
 	size_t offset = 0;
 	size_t bytesRemaining = mapData->size;
 	size_t strLength = 0;
@@ -118,7 +124,7 @@ bool LoadMap(Map *map, Asset *mapData)
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			TeleportPlayer(&map->player, &xfm);
+			SetPlayerTransform(&map->player, &xfm);
 			KvListDestroy(params);
 			ListFree(ioConnections);
 			free(actorClass);
@@ -172,19 +178,14 @@ bool LoadMap(Map *map, Asset *mapData)
 		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
 			MapVertex *vertex = model->vertices + j;
-			EXPECT_BYTES_BOOL(sizeof(float) * 12, bytesRemaining);
+			EXPECT_BYTES_BOOL(sizeof(float) * 7, bytesRemaining);
 			vertex->position.x = ReadFloat(mapData->data, &offset);
 			vertex->position.y = ReadFloat(mapData->data, &offset);
 			vertex->position.z = ReadFloat(mapData->data, &offset);
 			vertex->uv.x = ReadFloat(mapData->data, &offset);
 			vertex->uv.y = ReadFloat(mapData->data, &offset);
-			vertex->color.r = ReadFloat(mapData->data, &offset);
-			vertex->color.g = ReadFloat(mapData->data, &offset);
-			vertex->color.b = ReadFloat(mapData->data, &offset);
-			vertex->color.a = ReadFloat(mapData->data, &offset);
-			vertex->normal.x = ReadFloat(mapData->data, &offset);
-			vertex->normal.y = ReadFloat(mapData->data, &offset);
-			vertex->normal.z = ReadFloat(mapData->data, &offset);
+			vertex->lightmapUv.x = ReadFloat(mapData->data, &offset);
+			vertex->lightmapUv.y = ReadFloat(mapData->data, &offset);
 		}
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->indexCount = ReadUint(mapData->data, &offset);
@@ -269,6 +270,39 @@ bool LoadMap(Map *map, Asset *mapData)
 	}
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
+
+	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
+	map->lightmapWidth = ReadSizeT(mapData->data, &offset);
+	map->lightmapHeight = ReadSizeT(mapData->data, &offset);
+	size_t lightmapDataSize = sizeof(uint16_t) *
+							  4 *
+							  map->lightmapHeight *
+							  map->lightmapWidth; // uint16_t because float16
+	EXPECT_BYTES_BOOL(lightmapDataSize, bytesRemaining);
+	map->lightmapPixels = malloc(lightmapDataSize);
+	CheckAlloc(map->lightmapPixels);
+	ReadBytes(mapData->data, &offset, lightmapDataSize, map->lightmapPixels);
+
+	EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
+	map->numPointLights = ReadUint16(mapData->data, &offset);
+	map->pointLights = malloc(sizeof(PointLight) * map->numPointLights);
+	CheckAlloc(map->pointLights);
+	EXPECT_BYTES_BOOL(sizeof(float) * 8 * map->numPointLights, bytesRemaining);
+	for (size_t i = 0; i < map->numPointLights; i++)
+	{
+		PointLight *light = &map->pointLights[i];
+		light->position[0] = ReadFloat(mapData->data, &offset);
+		light->position[1] = ReadFloat(mapData->data, &offset);
+		light->position[2] = ReadFloat(mapData->data, &offset);
+
+		light->color[0] = ReadFloat(mapData->data, &offset);
+		light->color[1] = ReadFloat(mapData->data, &offset);
+		light->color[2] = ReadFloat(mapData->data, &offset);
+
+		light->brightnessScale = ReadFloat(mapData->data, &offset);
+		light->range = ReadFloat(mapData->data, &offset);
+		light->attenuation = ReadFloat(mapData->data, &offset);
+	}
 
 	FreeAsset(mapData);
 

@@ -5,12 +5,9 @@
 #ifndef LOADINGSTATE_H
 #define LOADINGSTATE_H
 
-#define GAME_STATE_LOADING 5
+#include <engine/structs/GameState.h>
 
-/**
- * Change to the map loading state
- * @param mapName The name of the map to load
- */
-void LoadingStateSet(const char *mapName);
+extern char *loadStateLevelname;
+extern const GameState LoadingState;
 
 #endif //LOADINGSTATE_H

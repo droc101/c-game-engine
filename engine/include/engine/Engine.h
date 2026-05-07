@@ -9,13 +9,16 @@
 #include <engine/structs/ActorDefinition.h>
 #include <stdbool.h>
 
+#define TARGET_FPS 60
+#define TARGET_FPS_NS_D (1000000000.0 / TARGET_FPS)
+
 #define STR(x) #x
 #define TO_STR(x) STR(x)
 
 #define ENGINE_VERSION_MAJOR 0
 #define ENGINE_VERSION_MINOR 0
 #define ENGINE_VERSION_PATCH 1
-#define ENGINE_VERSION_SUFFIX "-dev"
+#define ENGINE_VERSION_SUFFIX "-baked-lighting"
 #define ENGINE_VERSION \
 	TO_STR(ENGINE_VERSION_MAJOR) \
 	"." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX \

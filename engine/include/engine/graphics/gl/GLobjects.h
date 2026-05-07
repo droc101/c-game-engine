@@ -8,6 +8,7 @@
 #include <cglm/types.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/graphics/std140.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Map.h>
 #include <GL/glew.h>
@@ -19,11 +20,13 @@
 #define GL_MAX_MAP_MODELS 2048
 
 typedef struct GL_Shader GL_Shader;
+typedef struct GL_ComputeShader GL_ComputeShader;
 typedef struct GL_Buffer GL_Buffer;
 typedef struct GL_ModelBuffers GL_ModelBuffers;
 typedef struct GL_SharedUniforms GL_SharedUniforms;
 typedef struct GL_DebugLine GL_DebugLine;
 typedef struct GL_MapModelBuffer GL_MapModelBuffer;
+typedef struct GL_LightMetadata GL_LightMetadata;
 
 struct GL_Shader
 {
@@ -31,6 +34,14 @@ struct GL_Shader
 	GLuint vertexShader;
 	/// The ID of the fragment shader
 	GLuint fragmentShader;
+	/// The ID of the shader program
+	GLuint program;
+};
+
+struct GL_ComputeShader
+{
+	/// The ID of the compute shader
+	GLuint computeShader;
 	/// The ID of the shader program
 	GLuint program;
 };
@@ -63,31 +74,36 @@ struct GL_MapModelBuffer
 	GL_Buffer *buffer;
 };
 
-struct GL_SharedUniforms
+struct STD140 GL_SharedUniforms
 {
 	/// The model -> screen matrix
-	mat4 worldViewMatrix;
+	STD140_MAT4 worldViewMatrix;
 	/// The color of the fog
-	Color fogColor;
+	STD140_COLOR fogColor;
 	/// The distance from the camera at which the fog starts
-	float fogStart;
+	STD140_FLOAT fogStart;
 	/// The distance from the camera at which the fog is fully opaque
-	float fogEnd;
-	float _padding_1[2];
+	STD140_FLOAT fogEnd;
 	/// The global light color
-	vec3 lightColor;
-	float _padding_2;
-	/// The global light direction
-	vec3 lightDirection;
-	float _padding_3;
-}; // __attribute__((aligned(16))); // TODO aligned(16) does not seem to be doing what it should be doing. manually added padding floats for now.
+	STD140_VEC3 lightColor;
+};
 
 struct GL_DebugLine
 {
+	/// The start position of the line
 	Vector3 start;
+	/// The start color of the line
 	Vector3 startColor;
+	/// The end position of the line
 	Vector3 end;
+	/// The end color of the line
 	Vector3 endColor;
+};
+
+struct STD140 GL_LightMetadata
+{
+	/// The number of point lights in the map
+	STD140_UINT numPointLights;
 };
 
 /// Loaded textures
@@ -114,23 +130,25 @@ extern GLfloat anisotropyLevel;
 /// Number of MSAA samples
 extern GLint glMsaaSamples;
 
+/**
+ * Update the anisotropic filtering level
+ */
 void GL_UpdateAnisotropyLevel();
 
 /**
  * Create a shader program from assets
- * @param fsh The fragment shader asset
- * @param vsh The vertex shader asset
+ * @param fragmentAsset The fragment shader asset
+ * @param vertexAsset The vertex shader asset
  * @return The constructed shader or NULLPTR on error
  */
-GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh);
+GL_Shader *GL_ConstructShader(const char *fragmentAsset, const char *vertexAsset);
 
 /**
- * Create a shader program
- * @param fsh The fragment shader source
- * @param vsh The vertex shader source
- * @return The shader struct or NULLPTR on error
+ * Create a compute shader program from assets
+ * @param asset The compute shader asset
+ * @return The constructed compute shader or NULLPTR on error
  */
-GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh);
+GL_ComputeShader *GL_ConstructComputeShader(const char *asset);
 
 /**
  * Create a buffer object
@@ -144,6 +162,12 @@ GL_Buffer *GL_ConstructBuffer();
  * @param shd The shader to destroy
  */
 void GL_DestroyShader(GL_Shader *shd);
+
+/**
+ * Destroy a GL_ComputeShader
+ * @param shd The shader to destroy
+ */
+void GL_DestroyComputeShader(GL_ComputeShader *shd);
 
 /**
  * Bind/use a GL shader
@@ -197,8 +221,14 @@ void GL_InitObjects();
  */
 void GL_DestroyObjects();
 
+/**
+ * Unload all textures
+ */
 void GL_DeleteAllTextures();
 
+/**
+ * Unload all models
+ */
 void GL_DestroyAllModels();
 
 #endif //GAME_GLOBJECTS_H

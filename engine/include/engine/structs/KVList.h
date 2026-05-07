@@ -211,12 +211,39 @@ const char *KvGetString(const KvList list, const char *key, const char *defaultV
  */
 Color KvGetColor(const KvList list, const char *key, Color defaultValue);
 
+/**
+ * Get a uint64_t value from the key-value list.
+ * @param list The list to get the value from.
+ * @param key The key to get the value for.
+ * @param defaultValue The default value to return if the key does not exist.
+ * @return The uint64_t value associated with the key, or the default value if the key does not exist.
+ */
 uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
 
+/**
+ * Get a ParamArray value from the key-value list
+ * @param list The list to get the value from
+ * @param key The key to get the value for
+ * @return The ParamArray associated with the key, or NULL if it doesn't exist.
+ */
 ParamArray *KvGetArray(const KvList list, const char *key);
 
+/**
+ * Get a Vector2 value from the key-value list.
+ * @param list The list to get the value from.
+ * @param key The key to get the value for.
+ * @param defaultValue The default value to return if the key does not exist.
+ * @return The Vector2 value associated with the key, or the default value if the key does not exist.
+ */
 Vector2 KvGetVec2(const KvList list, const char *key, Vector2 defaultValue);
 
+/**
+ * Get a Vector3 value from the key-value list.
+ * @param list The list to get the value from.
+ * @param key The key to get the value for.
+ * @param defaultValue The default value to return if the key does not exist.
+ * @return The Vector3 value associated with the key, or the default value if the key does not exist.
+ */
 Vector3 KvGetVec3(const KvList list, const char *key, Vector3 defaultValue);
 
 #pragma endregion
@@ -271,12 +298,36 @@ void KvSetString(KvList list, const char *key, const char *value);
  */
 void KvSetColor(KvList list, const char *key, Color value);
 
+/**
+ * Set a uint64_t value in the key-value list.
+ * @param list The list to set the value in.
+ * @param key The key to set the value for.
+ * @param value The uint64_t value to set.
+ */
 void KvSetUint64(KvList list, const char *key, uint64_t value);
 
-void KvSetParamArray(KvList list, const char *key, const ParamArray array);
+/**
+ * Set a ParamArray value in the key-value list.
+ * @param list The list to set the value in.
+ * @param key The key to set the value for.
+ * @param array The ParamArray value to set.
+ */
+void KvSetParamArray(KvList list, const char *key, ParamArray array);
 
+/**
+ * Set a Vector2 value in the key-value list.
+ * @param list The list to set the value in.
+ * @param key The key to set the value for.
+ * @param value The Vector2 value to set.
+ */
 void KvSetVec2(KvList list, const char *key, Vector2 value);
 
+/**
+ * Set a Vector3 value in the key-value list.
+ * @param list The list to set the value in.
+ * @param key The key to set the value for.
+ * @param value The Vector3 value to set.
+ */
 void KvSetVec3(KvList list, const char *key, Vector3 value);
 
 /**

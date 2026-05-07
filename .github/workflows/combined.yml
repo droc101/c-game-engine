@@ -17,5 +17,9 @@ jobs:
     uses: './.github/workflows/linux-arm.yml'
   linux-x86_64:
     uses: './.github/workflows/linux-x86_64.yml'
+    with:
+      buildForDistribution: ${{ inputs.buildForDistribution }}
   windows:
     uses: './.github/workflows/windows.yml'
+    with:
+      buildForDistribution: ${{ inputs.buildForDistribution }}

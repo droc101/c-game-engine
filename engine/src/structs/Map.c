@@ -15,7 +15,6 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
@@ -33,7 +32,8 @@ Map *CreateMap(void)
 	CheckAlloc(map);
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
-	CreatePlayer(&map->player, map->physicsSystem);
+	CreatePlayer(map);
+	map->mapName = NULL;
 	map->fogColor = COLOR(0xff000000);
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
@@ -41,10 +41,12 @@ Map *CreateMap(void)
 	map->discordRpcName = NULL;
 	map->renderSky = false;
 	map->skyTexture = NULL;
-	map->lightAngle = v2s(0);
 	map->lightColor = COLOR_WHITE;
 	map->physicsTick = 0;
 	map->changeFlags = 0;
+	map->exposure = 1.0f;
+	map->numPointLights = 0;
+	map->pointLights = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
@@ -61,6 +63,20 @@ Map *CreateMap(void)
 	return map;
 }
 
+void FreeLoadTimeMapData(Map *map)
+{
+	for (size_t i = 0; i < map->modelCount; i++)
+	{
+		MapModel *model = map->models + i;
+		free(model->vertices);
+		free(model->indices);
+		model->vertices = NULL;
+		model->indices = NULL;
+	}
+	free(map->lightmapPixels);
+	map->lightmapPixels = NULL;
+}
+
 void DestroyMap(Map *map)
 {
 	for (size_t i = 0; i < map->actors.length; i++)
@@ -68,18 +84,27 @@ void DestroyMap(Map *map)
 		FreeActor(ListGetPointer(map->actors, i));
 	}
 
-	for (size_t i = 0; i < map->modelCount; i++)
+	if (map->models)
 	{
-		const MapModel *model = map->models + i;
-		free(model->vertices);
-		free(model->indices);
+		for (size_t i = 0; i < map->modelCount; i++)
+		{
+			const MapModel *model = map->models + i;
+			free(model->vertices);
+			free(model->indices);
+		}
+		free(map->models);
+		map->models = NULL;
 	}
-	free(map->models);
-	map->models = NULL;
+
+	free(map->mapName);
 
 	free(map->skyTexture);
 	free(map->discordRpcIcon);
 	free(map->discordRpcName);
+
+	free(map->lightmapPixels);
+
+	free(map->pointLights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
@@ -89,7 +114,7 @@ void DestroyMap(Map *map)
 	}
 	ListFree(map->joltBodies);
 
-	PhysicsDestroyMap(map, bodyInterface);
+	PhysicsDestroyMap(map);
 
 	ListAndContentsFree(map->namedActorNames);
 	ListFree(map->namedActorPointers);
@@ -123,6 +148,13 @@ void RemoveActor(Actor *actor)
 	}
 	ListRemoveAt(map->actors, idx);
 	FreeActor(actor);
+
+	Player *plr = &GetState()->map->player;
+	if (plr->targetedActor == actor)
+	{
+		plr->targetedActor = NULL;
+		plr->hasHeldActor = false;
+	}
 }
 
 void NameActor(Actor *actor, const char *name, Map *map)

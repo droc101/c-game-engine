@@ -1,0 +1,14 @@
+{
+  "description": "Directional (sun) light",
+  "extends": "light",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color"
+    },
+    {
+      "type": "orientation",
+      "color": "$color"
+    }
+  ]
+}

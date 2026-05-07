@@ -5,6 +5,7 @@
 #include <engine/debug/FrameGrapher.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
@@ -26,7 +27,6 @@
 static SDL_Thread *physicsThread;
 static SDL_Mutex *physicsThreadMutex;
 static SDL_Mutex *physicsTickMutex;
-static SDL_Semaphore *physicsTickHasEnded;
 
 static List physicsThreadInputEventQueue;
 
@@ -34,7 +34,7 @@ static List physicsThreadInputEventQueue;
  * The function to run in the physics thread
  * @warning Only touch this when you have a lock on the mutex
  */
-FixedUpdateFunction PhysicsThreadFunction;
+GameStateFixedUpdateFunction PhysicsThreadFunction;
 
 /**
  * Whether to quit the physics thread on the next iteration
@@ -62,8 +62,6 @@ int PhysicsThreadMain(void * /*data*/)
 	while (true)
 	{
 		const uint64_t timeStart = GetTimeNs();
-		// I don't remember why this needs to be a TryWaitSemaphore, but everything breaks if it isn't.
-		(void)SDL_TryWaitSemaphore(physicsTickHasEnded);
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
 		if (physicsThreadPostQuit)
@@ -91,7 +89,7 @@ int PhysicsThreadMain(void * /*data*/)
 			continue;
 		}
 		// The function is copied to a local variable so we can unlock the mutex during its runtime
-		const FixedUpdateFunction UpdateFunction = PhysicsThreadFunction;
+		const GameStateFixedUpdateFunction UpdateFunction = PhysicsThreadFunction;
 		SDL_UnlockMutex(physicsThreadMutex);
 
 		// delta is the portion of one "tick" that the last tick took (including idle time)
@@ -101,15 +99,10 @@ int PhysicsThreadMain(void * /*data*/)
 		UpdateInputStates(physicsThreadInput);
 		GetState()->physicsFrame++;
 		SDL_UnlockMutex(physicsTickMutex);
-		SDL_SignalSemaphore(physicsTickHasEnded);
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
-		if (timeElapsed < PHYSICS_TARGET_NS)
-		{
-			const uint64_t delayNs = (PHYSICS_TARGET_NS - timeElapsed);
-			SDL_DelayPrecise(delayNs);
-		}
+		SDL_DelayPrecise(PHYSICS_TARGET_NS - timeElapsed);
 		timeEnd = GetTimeNs();
 		timeElapsed = timeEnd - timeStart;
 		TickGraphUpdate(timeElapsed);
@@ -125,7 +118,6 @@ void PhysicsThreadInit()
 	physicsThreadPostQuit = false;
 	physicsThreadMutex = SDL_CreateMutex();
 	physicsTickMutex = SDL_CreateMutex();
-	physicsTickHasEnded = SDL_CreateSemaphore(0);
 	physicsThread = SDL_CreateThread(PhysicsThreadMain, "GamePhysics", NULL);
 	if (physicsThread == NULL)
 	{
@@ -135,20 +127,12 @@ void PhysicsThreadInit()
 	}
 }
 
-void PhysicsThreadSetFunction(const FixedUpdateFunction function)
+void PhysicsThreadSetFunction(const GameStateFixedUpdateFunction function)
 {
 	SDL_LockMutex(physicsThreadMutex);
 	GetState()->physicsFrame = 0;
 	PhysicsThreadFunction = function;
 	SDL_UnlockMutex(physicsThreadMutex);
-	if (function)
-	{
-		if (!SDL_TryWaitSemaphore(physicsTickHasEnded) && !SDL_WaitSemaphoreTimeout(physicsTickHasEnded, 1000))
-		{
-			LogError("Failed to wait for physics tick semaphore with error %s", SDL_GetError());
-			Error("Failed to wait for physics tick semaphore!");
-		}
-	}
 }
 
 void PhysicsThreadTerminate()
@@ -161,7 +145,6 @@ void PhysicsThreadTerminate()
 	ListAndContentsFree(physicsThreadInputEventQueue);
 	SDL_DestroyMutex(physicsThreadMutex);
 	SDL_DestroyMutex(physicsTickMutex);
-	SDL_DestroySemaphore(physicsTickHasEnded);
 }
 
 void PhysicsThreadLockTickMutex()

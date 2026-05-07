@@ -6,7 +6,9 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
@@ -24,7 +26,8 @@ UiStack *soundOptionsStack = NULL;
 
 void BtnSoundOptionsBack()
 {
-	OptionsStateSet(optionsStateInGame);
+	SaveOptions(&GetState()->options);
+	SetGameState(&OptionsState);
 }
 
 void SldOptionsMasterVolume(const float value)
@@ -51,23 +54,27 @@ void SldOptionsUiVolume(const float value)
 	UpdateVolume();
 }
 
-void SoundOptionsStateUpdate(GlobalState * /*state*/)
+void SoundOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnSoundOptionsBack();
 	}
+	if (!optionsStateInGame)
+	{
+		UpdateMenuBackground(state, delta);
+	}
 }
 
-void SoundOptionsStateRender(GlobalState * /*state*/)
+void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground();
+		RenderMenuBackground(state);
 	}
 
 	DrawTextAligned("Sound Options",
@@ -148,12 +155,6 @@ void SoundOptionsStateSet()
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnSoundOptionsBack, BOTTOM_CENTER));
 	}
 	UiStackResetFocus(soundOptionsStack);
-
-	SetStateCallbacks(SoundOptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_SOUND_OPTIONS,
-					  SoundOptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void SoundOptionsStateDestroy()
@@ -164,3 +165,12 @@ void SoundOptionsStateDestroy()
 		soundOptionsStack = NULL;
 	}
 }
+
+const GameState SoundOptionsState = {
+	.UpdateGame = SoundOptionsStateUpdate,
+	.RenderGame = SoundOptionsStateRender,
+	.FixedUpdateGame = OptionsStateFixedUpdate,
+	.Destroy = SoundOptionsStateDestroy,
+	.Set = SoundOptionsStateSet,
+	.enableRelativeMouseMode = false,
+};
