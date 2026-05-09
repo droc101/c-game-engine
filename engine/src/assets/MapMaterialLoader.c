@@ -98,3 +98,16 @@ MapMaterial *LoadMapMaterial(const char *path)
 
 	return material;
 }
+
+void DestroyMapMaterialLoader()
+{
+	for (uint32_t i = 0; i < mapMaterialId; i++)
+	{
+		MapMaterial *material = mapMaterials[i];
+		free(material->name);
+		free(material->texture);
+		free(material);
+		mapMaterials[i] = NULL;
+	}
+	mapMaterialId = 0;
+}

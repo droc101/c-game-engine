@@ -58,6 +58,8 @@ void UpdateMenuBackground(GlobalState *state, const double delta)
 	{
 		if (!IsBackgroundMapLoadedIgnoreTicks())
 		{
+			// TODO: Waiting a frame here allows a single frame where if the physics thread starts, finishes,
+			//  and starts the lod thread then the game will attempt to read from a null map
 			if (backgroundMapLoadFrameCounter > 1)
 			{
 				const uint64_t realLoadStart = GetTimeNs();
