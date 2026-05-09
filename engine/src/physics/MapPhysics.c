@@ -66,7 +66,7 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 
 	MovePlayer(&state->map->player, delta, allowMovement);
 
-	WaitForLodThreadToEnd();
+	LockLodThreadMutex();
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
 
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
@@ -113,5 +113,6 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 	GetState()->map->physicsTick++;
 
 	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
+	UnlockLodThreadMutex();
 	SignalLodThreadCanStart();
 }

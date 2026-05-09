@@ -11,8 +11,6 @@ void LodThreadDestroy();
 
 void SignalLodThreadCanStart();
 
-void WaitForLodThreadToEnd();
-
 void LockLodThreadMutex();
 
 void UnlockLodThreadMutex();

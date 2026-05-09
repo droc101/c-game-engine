@@ -16,6 +16,7 @@
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/threads/LodThread.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
@@ -176,14 +177,16 @@ void ProcessStateChangeQueue()
 
 void ChangeMap(Map *map)
 {
-	state.camera = NULL;
 	PhysicsThreadLockTickMutex();
+	LockLodThreadMutex();
+	state.camera = NULL;
 	if (state.map)
 	{
 		DestroyMap(state.map);
 	}
 	state.map = map;
 	state.camera = &state.map->player.playerCamera;
+	UnlockLodThreadMutex();
 	PhysicsThreadUnlockTickMutex();
 }
 

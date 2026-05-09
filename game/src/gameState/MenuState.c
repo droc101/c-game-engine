@@ -47,7 +47,6 @@ void OpenOptions()
 
 void ReloadAssets()
 {
-	// TODO this sometimes causes a crash in the physics or lod threads, something isn't syncing.
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
