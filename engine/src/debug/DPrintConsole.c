@@ -22,7 +22,7 @@
 #define CONSOLE_MESSAGE_VISIBLE_FOR_MS 2000
 
 static bool consoleEnabled = false;
-static List consoleMessages;
+static LockingList consoleMessages;
 
 typedef struct ConsoleMessage ConsoleMessage;
 
@@ -107,6 +107,7 @@ void AddConsoleMessage(const char *msg, const int color)
 void ProcessDPrintConsole()
 {
 	size_t indexToRemove = SIZE_MAX;
+	ListLock(consoleMessages);
 	for (size_t i = 0; i < consoleMessages.length; i++)
 	{
 		ConsoleMessage *msg = ListGetPointer(consoleMessages, i);
@@ -126,4 +127,5 @@ void ProcessDPrintConsole()
 		free(msg);
 		ListRemoveAt(consoleMessages, indexToRemove);
 	}
+	ListUnlock(consoleMessages);
 }
