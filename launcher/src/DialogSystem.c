@@ -22,6 +22,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <wchar.h>
+
+extern char** environ;
 #endif
 
 void InitDialogSystem()
@@ -52,7 +54,7 @@ void ErrorDialog(const wchar_t *message, const wchar_t *title)
 	char *zenity_argv[] = {"zenity", "--error", "--no-wrap", "--ok-label=Quit", text_argument, title_argument, NULL};
 
 	pid_t zenity_pid = 0;
-	if (posix_spawnp(&zenity_pid, "zenity", NULL, NULL, zenity_argv, __environ) == 0)
+	if (posix_spawnp(&zenity_pid, "zenity", NULL, NULL, zenity_argv, environ) == 0)
 	{
 		waitpid(zenity_pid, NULL, 0);
 	} else
