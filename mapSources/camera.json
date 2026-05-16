@@ -134,17 +134,17 @@
             },
             "connections": [],
             "params": {
-                "fov": {
-                    "type": "int",
-                    "value": 90
+                "name": {
+                    "type": "string",
+                    "value": "camera"
                 },
                 "show_player_model": {
                     "type": "bool",
                     "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "camera"
+                "fov": {
+                    "type": "int",
+                    "value": 90
                 }
             }
         },
