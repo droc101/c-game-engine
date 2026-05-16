@@ -14,6 +14,7 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
@@ -125,9 +126,11 @@ void WindowAndRenderInit()
 	}
 	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
+	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH), MIN_WIDTH, MAX_WIDTH);
+	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT), MIN_HEIGHT, MAX_HEIGHT);
 	SDL_Window *window = SDL_CreateWindow(title,
-										  DEF_WIDTH,
-										  DEF_HEIGHT,
+										  width,
+										  height,
 										  rendererFlags |
 												  SDL_WINDOW_RESIZABLE |
 												  SDL_WINDOW_HIGH_PIXEL_DENSITY |
@@ -138,6 +141,13 @@ void WindowAndRenderInit()
 		Error("Failed to create window.");
 	}
 	SetDwmWindowAttribs(window);
+	if (HasCliArg("--fullscreen"))
+	{
+		GetState()->options.fullscreen = true;
+	} else if (HasCliArg("--windowed"))
+	{
+		GetState()->options.fullscreen = false;
+	}
 	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen);
 	SDL_StopTextInput(window);
 	SetGameWindow(window);
