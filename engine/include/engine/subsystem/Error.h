@@ -72,7 +72,7 @@ void ErrorHandlerInit();
  * @param result The result of the SDL function
  * @param message The message to log (%s: sdl error)
  */
-void TestSDLFunction_NonFatal(bool result, const char *message);
+void TestSDLFunctionNonFatal(bool result, const char *message);
 
 /**
  * Test an SDL function for failure and log the error, terminating the program if it failed

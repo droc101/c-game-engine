@@ -60,8 +60,8 @@ void DestroyGame()
 EXPORT_SYM int GameMain(const int argc, const char *argv[])
 {
 	InitEngine(argc, argv, RegisterGameActors);
-	GiveItem(&eraserItemDefinition, true);
-	GiveItem(&laserStopperItemDefinition, false);
+	GiveItem(&ERASER_ITEM_DEFINITION, true);
+	GiveItem(&LASER_STOPPER_ITEM_DEFINITION, false);
 	LaserRaycastFiltersInit();
 	SetInitialGameState();
 	LogInfo("Engine initialized, entering mainloop\n");

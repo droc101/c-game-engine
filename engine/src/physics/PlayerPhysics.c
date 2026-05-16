@@ -77,10 +77,10 @@ static bool ActorRaycastObjectLayerShouldCollide(const JPH_ObjectLayer layer)
 	}
 }
 
-static const JPH_BroadPhaseLayerFilter_Impl actorRaycastBroadPhaseLayerFilterImpl = {
+static const JPH_BroadPhaseLayerFilter_Impl ACTOR_RAYCAST_BROAD_PHASE_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ActorRaycastBroadPhaseLayerShouldCollide,
 };
-static const JPH_ObjectLayerFilter_Impl actorRaycastObjectLayerFilterImpl = {
+static const JPH_ObjectLayerFilter_Impl ACTOR_RAYCAST_OBJECT_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ActorRaycastObjectLayerShouldCollide,
 };
 static JPH_BroadPhaseLayerFilter *actorRaycastBroadPhaseLayerFilter;
@@ -162,13 +162,13 @@ static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
 	return !player->isNoclipActive && (!player->hasHeldActor || JPH_Body_GetID(body) != player->heldActor->bodyId);
 }
 
-static const JPH_CharacterContactListener_Impl contactListenerImpl = {
+static const JPH_CharacterContactListener_Impl CONTACT_LISTENER_IMPL = {
 	.OnContactAdded = OnContactAdded,
 	.OnContactPersisted = OnContactPersisted,
 	.OnContactRemoved = OnContactRemoved,
 	.OnContactSolve = OnContactSolve,
 };
-static const JPH_BodyFilter_Impl bodyFilterImpl = {
+static const JPH_BodyFilter_Impl BODY_FILTER_IMPL = {
 	.ShouldCollide = BodyFilterShouldCollide,
 	.ShouldCollideLocked = BodyFilterShouldCollideLocked,
 };
@@ -179,11 +179,11 @@ static JPH_ShapeFilter *shapeFilter;
 
 void PlayerPersistentStateInit()
 {
-	contactListener = JPH_CharacterContactListener_Create(&contactListenerImpl);
-	bodyFilter = JPH_BodyFilter_Create(&bodyFilterImpl);
+	contactListener = JPH_CharacterContactListener_Create(&CONTACT_LISTENER_IMPL);
+	bodyFilter = JPH_BodyFilter_Create(&BODY_FILTER_IMPL);
 	shapeFilter = JPH_ShapeFilter_Create(NULL);
-	actorRaycastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&actorRaycastBroadPhaseLayerFilterImpl);
-	actorRaycastObjectLayerFilter = JPH_ObjectLayerFilter_Create(&actorRaycastObjectLayerFilterImpl);
+	actorRaycastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&ACTOR_RAYCAST_BROAD_PHASE_LAYER_FILTER_IMPL);
+	actorRaycastObjectLayerFilter = JPH_ObjectLayerFilter_Create(&ACTOR_RAYCAST_OBJECT_LAYER_FILTER_IMPL);
 }
 
 void PlayerPersistentStateDestroy()

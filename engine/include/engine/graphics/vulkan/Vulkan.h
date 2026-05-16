@@ -47,10 +47,10 @@ bool VK_RenderMap(const Map *map, const Camera *camera);
 
 bool VK_FrameEnd();
 
-bool VK_LoadMap(const Map *map);
-
 /// A function used to destroy the Vulkan objects when they are no longer needed.
 void VK_Cleanup();
+
+bool VK_LoadMap(const Map *map);
 
 bool VK_UpdateViewportSize();
 

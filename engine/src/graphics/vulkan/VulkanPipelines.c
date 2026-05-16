@@ -18,13 +18,13 @@
 //  but make sure to go through and add documentation as well as ensuring there aren't any cut corners left in.
 
 #pragma region shared
-static const VkPipelineViewportStateCreateInfo viewportState = {
+static const VkPipelineViewportStateCreateInfo VIEWPORT_STATE = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 	.viewportCount = 1,
 	.scissorCount = 1,
 };
 
-static const VkPipelineRasterizationStateCreateInfo rasterizer = {
+static const VkPipelineRasterizationStateCreateInfo RASTERIZER = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 	.polygonMode = VK_POLYGON_MODE_FILL,
 	.cullMode = VK_CULL_MODE_BACK_BIT,
@@ -38,7 +38,7 @@ static VkPipelineMultisampleStateCreateInfo multisampling = {
 	.minSampleShading = 1,
 };
 
-static const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
+static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 	.depthTestEnable = VK_TRUE,
 	.depthWriteEnable = VK_TRUE,
@@ -46,11 +46,11 @@ static const VkPipelineDepthStencilStateCreateInfo depthStencilState = {
 	.maxDepthBounds = 1,
 };
 
-static const VkPipelineDepthStencilStateCreateInfo depthStencilStateUnused = {
+static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE_UNUSED = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 };
 
-static const VkPipelineColorBlendAttachmentState colorBlendAttachment = {
+static const VkPipelineColorBlendAttachmentState COLOR_BLEND_ATTACHMENT = {
 	.blendEnable = VK_TRUE,
 	.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
 	.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
@@ -63,22 +63,22 @@ static const VkPipelineColorBlendAttachmentState colorBlendAttachment = {
 					  VK_COLOR_COMPONENT_B_BIT |
 					  VK_COLOR_COMPONENT_A_BIT,
 };
-static const VkPipelineColorBlendStateCreateInfo colorBlending = {
+static const VkPipelineColorBlendStateCreateInfo COLOR_BLENDING = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 	.attachmentCount = 1,
-	.pAttachments = &colorBlendAttachment,
+	.pAttachments = &COLOR_BLEND_ATTACHMENT,
 };
 
 static LunaPipelineLayoutCreationInfo pipelineLayoutCreationInfo = {
 	.descriptorSetLayoutCount = 1,
 };
 
-static const VkPipelineInputAssemblyStateCreateInfo inputAssembly = {
+static const VkPipelineInputAssemblyStateCreateInfo INPUT_ASSEMBLY = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 	.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
 };
 
-static const VkPipelineDynamicStateCreateInfo dynamicState = {
+static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 	.dynamicStateCount = 2,
 	.pDynamicStates = (VkDynamicState[]){VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR},
@@ -151,13 +151,13 @@ static inline bool CreateUIPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilStateUnused,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -239,13 +239,13 @@ static inline bool CreateShadedMapPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -322,13 +322,13 @@ static inline bool CreateUnshadedMapPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -403,13 +403,13 @@ static inline bool CreateSkyPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilStateUnused,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = skyPipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -528,13 +528,13 @@ static inline bool CreateShadedViewmodelPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilStateUnused,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -641,13 +641,13 @@ static inline bool CreateUnshadedViewmodelPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilStateUnused,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -771,13 +771,13 @@ static inline bool CreateShadedActorModelPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilStateUnused,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -890,13 +890,13 @@ static inline bool CreateUnshadedActorModelPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &rasterizer,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilStateUnused,
-		.colorBlendState = &colorBlending,
-		.dynamicState = &dynamicState,
+		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
@@ -966,8 +966,8 @@ static inline bool CreateDebugDrawPipeline()
 		.viewportState = &viewportState,
 		.rasterizationState = &nonCullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
-		.colorBlendState = &colorBlending,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
@@ -979,12 +979,12 @@ static inline bool CreateDebugDrawPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &inputAssembly,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
 		.viewportState = &viewportState,
 		.rasterizationState = &nonCullingRasterizer,
 		.multisampleState = &multisampling,
-		.depthStencilState = &depthStencilState,
-		.colorBlendState = &colorBlending,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &dynamicState,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),

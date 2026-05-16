@@ -13,13 +13,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
-double framerates[FRAMEGRAPH_HISTORY_SIZE] = {0};
-long framegraphLastUpdateTime = LONG_MIN;
+static double framerates[FRAMEGRAPH_HISTORY_SIZE] = {0};
+static long framegraphLastUpdateTime = LONG_MIN;
 
-double tickrates[FRAMEGRAPH_HISTORY_SIZE] = {0};
-double tickGraphLastUpdateTime = LONG_MIN;
+static double tickrates[FRAMEGRAPH_HISTORY_SIZE] = {0};
+static double tickGraphLastUpdateTime = LONG_MIN;
 
-static inline void FG_PushIntoArray(const double value)
+static inline void FrameGraphPushIntoArray(const double value)
 {
 	for (int i = 0; i < FRAMEGRAPH_HISTORY_SIZE - 1; i++)
 	{
@@ -28,7 +28,7 @@ static inline void FG_PushIntoArray(const double value)
 	framerates[FRAMEGRAPH_HISTORY_SIZE - 1] = value;
 }
 
-static inline void TG_PushIntoArray(const double value)
+static inline void TickGraphPushIntoArray(const double value)
 {
 	for (int i = 0; i < FRAMEGRAPH_HISTORY_SIZE - 1; i++)
 	{
@@ -45,7 +45,7 @@ void FrameGraphUpdate(const uint64_t ns)
 		return;
 	}
 
-	FG_PushIntoArray(ns == 0 ? 1 : (double)ns);
+	FrameGraphPushIntoArray(ns == 0 ? 1 : (double)ns);
 	framegraphLastUpdateTime = (long)GetTimeMs();
 }
 
@@ -57,7 +57,7 @@ void TickGraphUpdate(const uint64_t ns)
 		return;
 	}
 
-	TG_PushIntoArray(ns == 0 ? 1 : (double)ns);
+	TickGraphPushIntoArray(ns == 0 ? 1 : (double)ns);
 	tickGraphLastUpdateTime = (double)GetTimeMs();
 }
 

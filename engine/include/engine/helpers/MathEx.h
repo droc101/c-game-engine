@@ -26,6 +26,7 @@
  */
 #define max(a, b) ((a) < (b) ? (b) : (a))
 
+// NOLINTBEGIN(*-identifier-naming)
 int wrapi(int x, int min, int max);
 
 uint32_t wrapu(uint32_t x, uint32_t min, uint32_t max);
@@ -33,6 +34,7 @@ uint32_t wrapu(uint32_t x, uint32_t min, uint32_t max);
 float wrapf(float x, float min, float max);
 
 double wrapd(double x, double min, double max);
+// NOLINTEND(*-identifier-naming)
 
 /**
  * Wraps a number between a minimum and maximum value

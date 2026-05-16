@@ -44,7 +44,7 @@ int GetActualMsaaSamples(const OptionsMsaa requested)
 				break;
 			default:
 				LogError("OpenGL: Invalid MSAA value!");
-				return false;
+				return 1;
 		}
 
 		GLint gpuMaxSamples = 0;

@@ -52,7 +52,7 @@ static bool LaserStopperItemCanTargetFunction(Item *this,
 	return false;
 }
 
-const ItemDefinition laserStopperItemDefinition = {
+const ItemDefinition LASER_STOPPER_ITEM_DEFINITION = {
 	.name = "Laser Stopper 3000",
 	.Construct = DefaultItemConstruct,
 	.Destruct = DefaultItemDestruct,

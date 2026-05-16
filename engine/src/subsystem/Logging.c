@@ -16,7 +16,7 @@
 #include <string.h>
 
 /// The length of the longest value passed to the type argument of the LogInternal function (including the null) plus 7
-#define bufferLength 14
+#define BUFFER_LENGTH 14
 
 FILE *logFile = NULL;
 
@@ -50,7 +50,7 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 {
 	va_list args;
 	va_start(args, message);
-	char buf[bufferLength];
+	char buf[BUFFER_LENGTH];
 	size_t length = 0;
 	if (!type)
 	{
@@ -69,7 +69,7 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	CheckAlloc(plainTextBuffer);
 	sprintf(plainTextBuffer,
 			"[%.*s] ",
-			bufferLength - 8,
+			BUFFER_LENGTH - 8,
 			type); // Minus 8 due to color, brackets, and null not included
 	vsprintf(plainTextBuffer + strlen(plainTextBuffer), message, args);
 	AddConsoleMessage(plainTextBuffer, COLOR_WHITE);

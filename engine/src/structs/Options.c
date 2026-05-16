@@ -45,11 +45,15 @@ bool ValidateOptions(const Options *options)
 	{
 		return false;
 	}
+	if (options->sfxVolume < 0 || options->sfxVolume > 1)
+	{
+		return false;
+	}
 	if (options->musicVolume < 0 || options->musicVolume > 1)
 	{
 		return false;
 	}
-	if (options->sfxVolume < 0 || options->sfxVolume > 1)
+	if (options->uiVolume < 0 || options->uiVolume > 1)
 	{
 		return false;
 	}

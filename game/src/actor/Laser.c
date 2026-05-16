@@ -84,19 +84,19 @@ static bool BodyFilterShouldCollideLocked(const JPH_Body *body)
 	return !actor || ((actor->flags & ACTOR_FLAG_CAN_BLOCK_LASERS) == ACTOR_FLAG_CAN_BLOCK_LASERS);
 }
 
-static const JPH_BroadPhaseLayerFilter_Impl normalLaserBroadPhaseLayerFilterImpl = {
+static const JPH_BroadPhaseLayerFilter_Impl NORMAL_LASER_BROAD_PHASE_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ActorRaycastBroadPhaseLayerShouldCollide,
 };
-static const JPH_ObjectLayerFilter_Impl normalLaserObjectLayerFilterImpl = {
+static const JPH_ObjectLayerFilter_Impl NORMAL_LASER_OBJECT_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ActorRaycastObjectLayerShouldCollide,
 };
-static const JPH_BroadPhaseLayerFilter_Impl tripleLaserBroadPhaseLayerFilterImpl = {
+static const JPH_BroadPhaseLayerFilter_Impl TRIPLE_LASER_BROAD_PHASE_LAYER_FILTER_IMPL = {
 	.ShouldCollide = TripleLaserBroadPhaseLayerShouldCollide,
 };
-static const JPH_ObjectLayerFilter_Impl tripleLaserObjectLayerFilterImpl = {
+static const JPH_ObjectLayerFilter_Impl TRIPLE_LASER_OBJECT_LAYER_FILTER_IMPL = {
 	.ShouldCollide = TripleLaserObjectLayerShouldCollide,
 };
-static const JPH_BodyFilter_Impl bodyFilterImpl = {
+static const JPH_BodyFilter_Impl BODY_FILTER_IMPL = {
 	.ShouldCollide = BodyFilterShouldCollide,
 	.ShouldCollideLocked = BodyFilterShouldCollideLocked,
 };
@@ -214,11 +214,11 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 
 void LaserRaycastFiltersInit()
 {
-	normalLaserBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&normalLaserBroadPhaseLayerFilterImpl);
-	normalLaserObjectLayerFilter = JPH_ObjectLayerFilter_Create(&normalLaserObjectLayerFilterImpl);
-	tripleLaserBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&tripleLaserBroadPhaseLayerFilterImpl);
-	tripleLaserObjectLayerFilter = JPH_ObjectLayerFilter_Create(&tripleLaserObjectLayerFilterImpl);
-	bodyFilter = JPH_BodyFilter_Create(&bodyFilterImpl);
+	normalLaserBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&NORMAL_LASER_BROAD_PHASE_LAYER_FILTER_IMPL);
+	normalLaserObjectLayerFilter = JPH_ObjectLayerFilter_Create(&NORMAL_LASER_OBJECT_LAYER_FILTER_IMPL);
+	tripleLaserBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&TRIPLE_LASER_BROAD_PHASE_LAYER_FILTER_IMPL);
+	tripleLaserObjectLayerFilter = JPH_ObjectLayerFilter_Create(&TRIPLE_LASER_OBJECT_LAYER_FILTER_IMPL);
+	bodyFilter = JPH_BodyFilter_Create(&BODY_FILTER_IMPL);
 }
 
 void LaserRaycastFiltersDestroy()

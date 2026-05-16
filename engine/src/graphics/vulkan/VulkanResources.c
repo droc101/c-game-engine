@@ -239,7 +239,7 @@ bool LoadTexture(const Image *image)
 	{
 		sampler = textureSamplers.nearestNoRepeatNoAnisotropy;
 	}
-	const LunaSampledImageCreationInfo imageCreationInfo = {
+	const LunaImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
 		.height = image->height,

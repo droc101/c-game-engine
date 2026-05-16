@@ -12,7 +12,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <zlib.h>
 
 #define __USE_GNU 1 // NOLINT(*-reserved-identifier)
 #define __STDC_WANT_LIB_EXT1__ 1 // NOLINT(*-reserved-identifier)
@@ -96,7 +95,11 @@ void _LockingListAdd(LockingList *list, const void *data)
 	ListUnlock(*list);
 }
 
-int CompareFunction(const void *a, const void *b, void *function)
+#ifdef WIN32
+static int CompareFunction(void *function, const void *a, const void *b)
+#else
+static int CompareFunction(const void *a, const void *b, void *function)
+#endif
 {
 	return ((SortedListCompareFunction)function)(*(const void **)a, *(const void **)b);
 }
@@ -107,7 +110,11 @@ void _SortedListAdd(SortedList *list, const void *data)
 
 	// TODO: Fast insert logic
 	_ListAdd((List *)list, data);
+#ifdef WIN32
+	qsort_s(list->data, list->length, list->stride, CompareFunction, list->CompareFunction);
+#else
 	qsort_r(list->data, list->length, list->stride, CompareFunction, list->CompareFunction);
+#endif
 }
 
 
@@ -130,7 +137,7 @@ void _LockingListSet(const LockingList *list, const size_t index, const void *da
 }
 
 
-void ListRemoveAtHelper(List *list, const size_t index)
+static inline void ListRemoveAtHelper(List *list, const size_t index)
 {
 	memmove(list->data + (index * list->stride),
 			list->data + ((index + 1) * list->stride),

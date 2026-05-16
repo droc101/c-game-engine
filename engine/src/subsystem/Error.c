@@ -252,7 +252,7 @@ void ErrorHandlerInit()
 #endif
 }
 
-inline void TestSDLFunction_NonFatal(const bool result, const char *message)
+inline void TestSDLFunctionNonFatal(const bool result, const char *message)
 {
 	if (!result)
 	{

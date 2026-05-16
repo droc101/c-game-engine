@@ -273,7 +273,7 @@ void KvSetColor(KvList list, const char *key, Color value);
 
 void KvSetUint64(KvList list, const char *key, uint64_t value);
 
-void KvSetParamArray(KvList list, const char *key, const ParamArray array);
+void KvSetParamArray(KvList list, const char *key, ParamArray array);
 
 void KvSetVec2(KvList list, const char *key, Vector2 value);
 

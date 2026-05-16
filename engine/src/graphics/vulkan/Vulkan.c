@@ -661,7 +661,7 @@ bool VK_FrameEnd()
 		VulkanTest(lunaGrowBuffer(&buffers.ui.indexBuffer, buffers.ui.allocatedQuads * 6 * sizeof(uint32_t)),
 				   "Failed to recreate UI index buffer!");
 
-		pendingTasks ^= PENDING_TASK_UI_BUFFERS_RESIZE_BIT;
+		pendingTasks &= ~PENDING_TASK_UI_BUFFERS_RESIZE_BIT;
 	}
 	if (buffers.ui.freeQuads != buffers.ui.allocatedQuads)
 	{

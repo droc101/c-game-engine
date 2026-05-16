@@ -430,7 +430,7 @@ bool CreateDescriptorSet()
 
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,
-		.descriptorSetCount = 1,
+		.setLayoutCount = 1,
 		.setLayouts = &descriptorSetLayout,
 	};
 	VulkanTest(lunaAllocateDescriptorSets(&allocationInfo, &descriptorSet), "Failed to allocate descriptor sets!");
