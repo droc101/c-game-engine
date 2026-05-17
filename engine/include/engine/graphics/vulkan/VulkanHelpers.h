@@ -255,6 +255,8 @@ extern uint32_t queueFamilyIndex;
 extern VkQueue queue;
 extern LunaCommandPool commandPool;
 extern LunaCommandBuffer commandBuffer;
+extern LunaCommandBuffer secondaryCommandBuffer;
+extern LunaSemaphore semaphore;
 extern VkSurfaceKHR surface;
 extern VkExtent2D swapChainExtent;
 extern VkSampleCountFlagBits msaaSamples;

@@ -17,6 +17,7 @@
 #include <luna/lunaDrawing.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaInstance.h>
+#include <luna/lunaSynchronization.h>
 #include <luna/lunaTypes.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_stdinc.h>
@@ -103,7 +104,7 @@ bool CreateLogicalDevice()
 	return true;
 }
 
-bool CreateCommandBuffer()
+bool CreateCommandBuffers()
 {
 	const LunaQueueFamilyProperties requiredProperties = {
 		.queueFamilyProperties.queueFlags = VK_QUEUE_GRAPHICS_BIT,
@@ -118,6 +119,11 @@ bool CreateCommandBuffer()
 	VulkanTest(lunaCreateCommandPool(device, &commandPoolCreationInfo, &commandPool), "Failed to create command pool!");
 	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &commandBuffer),
 			   "Failed to allocate command buffer!");
+	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &secondaryCommandBuffer),
+			   "Failed to allocate secondary command buffer!");
+
+	const LunaSemaphoreCreationInfo semaphoreCreationInfo = {};
+	VulkanTest(lunaCreateSemaphore(device, &semaphoreCreationInfo, &semaphore), "Failed to create semaphore!");
 
 	return true;
 }

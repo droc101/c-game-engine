@@ -281,6 +281,20 @@ bool LoadTexture(const Image *image)
 	{
 		sampler = textureSamplers.nearestNoRepeatNoAnisotropy;
 	}
+
+	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+	// TODO: Using the same semaphore for wait and signal slows down loading multiple textures per frame.
+	//  The wait semaphore is important because this needs to wait for the previous render to be finished before it can
+	//  actually start, otherwise it could cause the previous frame to have garbage data.
+	//  For now I'm just using one semaphore for both image->render and for render->image.
+	const LunaCommandBufferSubmitInfo submitInfo = {
+		.queue = queue,
+		.waitSemaphoreCount = 1,
+		.waitSemaphores = &semaphore,
+		.waitDstStageMasks = &waitStage,
+		.signalSemaphoreCount = 1,
+		.signalSemaphores = &semaphore,
+	};
 	const LunaImageCreationInfo imageCreationInfo = {
 		.format = VK_FORMAT_R8G8B8A8_UNORM,
 		.width = image->width,
@@ -297,11 +311,12 @@ bool LoadTexture(const Image *image)
 		.writeInfo.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 		.writeInfo.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.writeInfo.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
+		.writeInfo.submitInfo = &submitInfo,
 		.sampler = sampler,
 	};
 	LunaImage lunaImage = LUNA_NULL_HANDLE;
 	const size_t index = textures.length;
-	VulkanTest(lunaCreateImage(device, commandBuffer, &imageCreationInfo, &lunaImage), "Failed to create texture!");
+	VulkanTest(lunaCreateImage(device, secondaryCommandBuffer, &imageCreationInfo, &lunaImage), "Failed to create texture!");
 	imageAssetIdToIndexMap[image->id] = index;
 	ListAdd(textures, lunaImage);
 

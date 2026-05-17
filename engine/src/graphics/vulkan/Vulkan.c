@@ -519,7 +519,7 @@ bool VK_Init(SDL_Window *window)
 {
 	LogDebug("Initializing Vulkan renderer...\n");
 	// clang-format off
-	if (CreateSurface(window) && CreateLogicalDevice() && CreateCommandBuffer() && CreateSwapchain() &&
+	if (CreateSurface(window) && CreateLogicalDevice() && CreateCommandBuffers() && CreateSwapchain() &&
 		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
 		CreateBuffers() && CreateDescriptorSet())
 	{
@@ -794,9 +794,14 @@ bool VK_FrameEnd()
 		.pSwapchains = &swapchain,
 		.pImageIndices = &imageIndex,
 	};
+	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
 	const LunaCommandBufferSubmitInfo submitInfo = {
 		.queue = queue,
-		.stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.waitSemaphoreCount = 1,
+		.waitSemaphores = &semaphore,
+		.waitDstStageMasks = &waitStage,
+		.signalSemaphoreCount = 1,
+		.signalSemaphores = &semaphore,
 	};
 
 	VulkanTestResizeSwapchain(lunaEndFrame(device, commandBuffer, &presentInfo, &submitInfo),
