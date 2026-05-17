@@ -5,10 +5,8 @@
 #ifndef SOUNDOPTIONSSTATE_H
 #define SOUNDOPTIONSSTATE_H
 
-#define GAME_STATE_SOUND_OPTIONS 2
+#include <engine/structs/GameState.h>
 
-void SoundOptionsStateSet();
-
-void SoundOptionsStateDestroy();
+extern const GameState SoundOptionsState;
 
 #endif //SOUNDOPTIONSSTATE_H

@@ -112,20 +112,20 @@ void TextGetLine(const char *str, const int line, char *out, const size_t outBuf
 	const int end = MeasureLine(str, line + 1);
 
 	// ensure start is less than end
-	if (start > end)
+	if (start >= end)
 	{
 		out[0] = '\0';
 		return;
 	}
 
 	size_t copySize = end - start;
-	if (copySize > outBufferSize)
+	if (copySize >= outBufferSize)
 	{
-		copySize = outBufferSize;
+		copySize = outBufferSize - 1;
 	}
 
 	strncpy(out, str + start, copySize);
-	out[end - start] = '\0';
+	out[copySize] = '\0';
 
 	if (convertToUppercase)
 	{

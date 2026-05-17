@@ -14,6 +14,7 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
@@ -49,9 +50,10 @@
 EXPORT_SYM uint32_t NvOptimusEnablement = 0x00000001;
 EXPORT_SYM int AmdPowerXpressRequestHighPerformance = 1;
 
-SDL_Surface *windowIcon;
-SDL_Event event;
-bool shouldQuit = false;
+static SDL_Surface *windowIcon;
+static SDL_Event event;
+static bool shouldQuit = false;
+static double lastFrameTime = TARGET_FPS_NS_D;
 
 void ExecPathInit(const int argc, const char *argv[])
 {
@@ -124,9 +126,11 @@ void WindowAndRenderInit()
 	}
 	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
+	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH), MIN_WIDTH, MAX_WIDTH);
+	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT), MIN_HEIGHT, MAX_HEIGHT);
 	SDL_Window *window = SDL_CreateWindow(title,
-										  DEF_WIDTH,
-										  DEF_HEIGHT,
+										  width,
+										  height,
 										  rendererFlags |
 												  SDL_WINDOW_RESIZABLE |
 												  SDL_WINDOW_HIGH_PIXEL_DENSITY |
@@ -137,6 +141,13 @@ void WindowAndRenderInit()
 		Error("Failed to create window.");
 	}
 	SetDwmWindowAttribs(window);
+	if (HasCliArg("--fullscreen"))
+	{
+		GetState()->options.fullscreen = true;
+	} else if (HasCliArg("--windowed"))
+	{
+		GetState()->options.fullscreen = false;
+	}
 	SDL_SetWindowFullscreen(window, GetState()->options.fullscreen);
 	SDL_StopTextInput(window);
 	SetGameWindow(window);
@@ -266,9 +277,14 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitCommonFonts();
 
-	DiscordInit();
+	if (GetState()->options.enableDiscordRpc)
+	{
+		DiscordInit();
+	}
 
 	InitDPrintConsole();
+
+	LodThreadInit();
 
 	SDL_ShowWindow(GetGameWindow());
 }
@@ -290,11 +306,13 @@ void EngineIteration()
 	}
 	GlobalState *state = GetState();
 
+	const double delta = lastFrameTime / TARGET_FPS_NS_D;
+
 	if (!FrameStart())
 	{
-		if (state->UpdateGame)
+		if (state->gameState->UpdateGame)
 		{
-			state->UpdateGame(state);
+			state->gameState->UpdateGame(state, delta);
 		}
 		UpdateSoundSystem();
 		if (state->requestExit)
@@ -312,9 +330,9 @@ void EngineIteration()
 
 	ResetDPrintYPos();
 
-	if (state->UpdateGame)
+	if (state->gameState->UpdateGame)
 	{
-		state->UpdateGame(state);
+		state->gameState->UpdateGame(state, delta);
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
@@ -324,7 +342,14 @@ void EngineIteration()
 	}
 #endif
 
-	state->RenderGame(state);
+	if (state->gameState->enableRelativeMouseMode)
+	{
+		// warp the mouse to the center of the screen
+		const Vector2 realWndSize = ActualWindowSize();
+		SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
+	}
+
+	state->gameState->RenderGame(state, delta);
 
 	FrameGraphDraw();
 	TickGraphDraw();
@@ -336,6 +361,8 @@ void EngineIteration()
 	UpdateSoundSystem();
 
 	UpdateInputStates(mainThreadInput);
+
+	ProcessStateChangeQueue();
 
 	DiscordUpdate();
 	if (state->requestExit)
@@ -351,7 +378,20 @@ void EngineIteration()
 	{
 		SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
 	}
+
+	const uint64_t actualFrameTime = GetTimeNs() - frameStart;
+	if (GetState()->options.maxFps != 0)
+	{
+		const uint64_t targetFrameTime = 1000000000 / (uint64_t)GetState()->options.maxFps;
+		if (targetFrameTime > actualFrameTime)
+		{
+			SDL_DelayPrecise(targetFrameTime - actualFrameTime);
+		}
+	}
+
 	FrameGraphUpdate(GetTimeNs() - frameStart);
+
+	lastFrameTime = (double)(GetTimeNs() - frameStart); // we want this recalculated AFTER fps limiter delay
 }
 
 void DestroyEngine()

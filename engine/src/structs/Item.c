@@ -23,7 +23,7 @@ void DefaultItemDestruct(Item *this)
 void DefaultItemUpdateFunction(Item *this, GlobalState *state)
 {
 	(void)this;
-	state->map->viewmodel.transform.position.y = state->camera->yOffset * 0.2f - 0.35f;
+	state->map->viewmodel.transform.position.y = state->map->player.viewBobbingHeight * 0.2f - 0.35f;
 }
 
 bool DefaultItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, const double delta)

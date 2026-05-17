@@ -25,18 +25,25 @@
 void GL_GetMatrix(const Camera *camera, mat4 *modelViewProjectionMatrix);
 
 /**
- * Get the transform matrix for the viewmodel/held item
- * @param map The map containing the viewmodel
+ * Get the projection matrix for the viewmodel
  * @param out The destination matrix
+ * @param camera The camera to view from
  */
-void GL_GetViewmodelMatrix(const Map *map, mat4 *out);
+void GL_GetViewmodelProjectionMatrix(mat4 *out, const Camera *camera);
 
 /**
- * OpenGL code to render the 3D portion of a map
+ * Get the model world transform matrix for the viewmodel
+ * @param map The map containing the viewmodel
+ * @param out The destination matrix
+ * @param camera The camera to view from
+ */
+void GL_GetViewmodelModelWorldMatrix(const Map *map, mat4 *out, const Camera *camera);
+
+/**
+ * Render the 3D portion of a map
  * @param map The map to render
  * @param camera The camera to render with
- * @note - This does not render the sky
- * @note - This destroys the contents of the depth buffer
+ * @note This destroys the contents of the depth buffer
  */
 void GL_RenderMap(const Map *map, const Camera *camera);
 
@@ -46,7 +53,7 @@ void GL_RenderMap(const Map *map, const Camera *camera);
  * @param modelWorldMatrix The model -> world matrix
  * @param skin The skin to use
  * @param lod The lod to use
- * @param modColor
+ * @param modColor The modifier color to use
  */
 void GL_RenderModel(const ModelDefinition *model,
 					const mat4 modelWorldMatrix,
@@ -138,15 +145,5 @@ void GL_DrawUnshadedActorWall(const Actor *actor, const mat4 actorXfm);
  * @param map The map
  */
 void GL_SetMapParams(mat4 *modelViewProjection, const Map *map);
-
-/**
- * Enable 3D mode
- */
-void GL_Enable3D(void);
-
-/**
- * Disable 3D mode
- */
-void GL_Disable3D();
 
 #endif //GAME_GLWORLD_H

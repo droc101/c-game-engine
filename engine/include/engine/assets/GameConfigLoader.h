@@ -18,6 +18,8 @@ typedef struct AssetPath AssetPath;
 enum AssetPathType
 {
 	RELATIVE_TO_EXECUTABLE_DIRECTORY,
+	/// if game config dir is "/path/to/game.cfg" this would be relative to "/path"
+	RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY,
 	ABSOLUTE_PATH,
 };
 
@@ -31,8 +33,11 @@ enum AssetPathFlags
 
 struct AssetPath
 {
+	/// The type of this asset path
 	AssetPathType type;
+	/// The flags of this asset path
 	AssetPathFlags flags;
+	/// The path of this asset path
 	char *path;
 };
 
@@ -48,6 +53,9 @@ struct GameConfig
 
 	// Asset search paths
 	List assetPaths;
+
+	/// The map to load for the menu background
+	const char *backgroundMap;
 };
 
 /// The loaded game config
@@ -58,6 +66,9 @@ extern GameConfig gameConfig;
  */
 void LoadGameConfig(const char *game);
 
+/**
+ * Destroy the game config asset
+ */
 void DestroyGameConfig();
 
 #endif //GAME_GAMECONFIGLOADER_H

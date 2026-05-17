@@ -357,8 +357,7 @@ void KvSetString(KvList list, const char *key, const char *value)
 	{
 		value = "";
 	}
-	KvSet(list, key, (Param){PARAM_TYPE_STRING, .stringValue = ""});
-	strncpy(KvGet(list, key)->stringValue, value, sizeof(KvGet(list, key)->stringValue) - 1);
+	KvSet(list, key, (Param){PARAM_TYPE_STRING, .stringValue = strdup(value)});
 }
 
 inline void KvSetColor(KvList list, const char *key, const Color value)

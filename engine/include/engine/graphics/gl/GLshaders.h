@@ -20,11 +20,17 @@ extern GL_Shader *actorWallUnshadedShader;
 /// The shader used for the sky
 extern GL_Shader *skyShader;
 /// The shader used for generic models without shading
-extern GL_Shader *modelUnshadedShader;
+extern GL_Shader *actorUnshadedShader;
 /// The shader used for generic models with shading
-extern GL_Shader *modelShadedShader;
+extern GL_Shader *actorShadedShader;
 /// The shader used for the debug renderer
 extern GL_Shader *debugShader;
+/// The shader used for shaded map models
+extern GL_Shader *mapShadedShader;
+/// The shader used for unshaded map models
+extern GL_Shader *mapUnshadedShader;
+/// The shader used for tonemapping
+extern GL_Shader *tonemapShader;
 
 #pragma region Uniform/Attribute Locations
 
@@ -44,6 +50,8 @@ extern GLint uiTexturedVertexLoc;
 /// The location of the vertex UV attribute in the UI textured shader
 extern GLint uiTexturedUvLoc;
 
+extern GLint actorWallShadedLightMetadataLoc;
+extern GLint actorWallShadedPointLightsLoc;
 /// The location of the texture uniform in the shaded actor wall shader
 extern GLint actorWallShadedTextureLoc;
 /// The location of the model -> world matrix in the shaded actor wall shader
@@ -57,8 +65,7 @@ extern GLint actorWallShadedAlbColorLoc;
 extern GLint actorWallShadedVertexLoc;
 /// The location of the vertex UV attribute in the shaded actor wall shader
 extern GLint actorWallShadedUvLoc;
-/// The location of the vertex angle attribute in the shaded actor wall shader
-extern GLint actorWallShadedAngleLoc;
+extern GLint actorWallShadedNormalLoc;
 
 /// The location of the texture uniform in the unshaded actor wall shader
 extern GLint actorWallUnshadedTextureLoc;
@@ -93,36 +100,55 @@ extern GLint skyUvLoc;
 extern GLint skyColorLoc;
 
 /// The location of the shared uniforms buffer on the shaded model shader
-extern GLint shadedModelSharedUniformsLoc;
+extern GLint shadedActorModelSharedUniformsLoc;
+extern GLint shadedActorLightMetadataLoc;
+extern GLint shadedActorPointLightsLoc;
 /// The location of the model -> world matrix on the shaded model shader
-extern GLint shadedModelModelWorldMatrixLoc;
+extern GLint shadedActorModelModelWorldMatrixLoc;
 /// The location of the material color uniform in the shaded model shader
-extern GLint shadedModelAlbColorLoc;
+extern GLint shadedActorModelAlbColorLoc;
 /// The location of the modifier color uniform in the shaded model shader
-extern GLint shadedModelModColorLoc;
+extern GLint shadedActorModelModColorLoc;
 /// The location of the vertex position attribute in the shaded model shader
-extern GLint shadedModelVertexLoc;
+extern GLint shadedActorModelVertexLoc;
 /// The location of the vertex UV attribute in the shaded model shader
-extern GLint shadedModelUvLoc;
+extern GLint shadedActorModelUvLoc;
 /// The location of the vertex normal attribute in the shaded model shader
-extern GLint shadedModelNormalLoc;
+extern GLint shadedActorModelNormalLoc;
 /// The location of the vertex color attribute in the shaded model shader
-extern GLint shadedModelColorLoc;
+extern GLint shadedActorModelColorLoc;
 
 /// The location of the shared uniforms buffer on the unshaded model shader
-extern GLint unshadedModelSharedUniformsLoc;
+extern GLint unshadedActorModelSharedUniformsLoc;
 /// The location of the model -> world matrix on the unshaded model shader
-extern GLint unshadedModelModelWorldMatrixLoc;
+extern GLint unshadedActorModelModelWorldMatrixLoc;
 /// The location of the material color uniform in the unshaded model shader
-extern GLint unshadedModelAlbColorLoc;
+extern GLint unshadedActorModelAlbColorLoc;
 /// The location of the modifier color uniform in the unshaded model shader
-extern GLint unshadedModelModColorLoc;
+extern GLint unshadedActorModelModColorLoc;
 /// The location of the vertex position attribute in the unshaded model shader
-extern GLint unshadedModelVertexLoc;
+extern GLint unshadedActorModelVertexLoc;
 /// The location of the vertex UV attribute in the unshaded model shader
-extern GLint unshadedModelUvLoc;
+extern GLint unshadedActorModelUvLoc;
 /// The location of the vertex color attribute in the unshaded model shader
-extern GLint unshadedModelColorLoc;
+extern GLint unshadedActorModelColorLoc;
+
+extern GLint shadedMapModelSharedUniformsLoc;
+extern GLint shadedMapModelModelWorldMatrixLoc;
+extern GLint shadedMapModelLightmapLoc;
+extern GLint shadedMapModelVertexLoc;
+extern GLint shadedMapModelUvLoc;
+extern GLint shadedMapModelUv2Loc;
+
+extern GLint unshadedMapModelSharedUniformsLoc;
+extern GLint unshadedMapModelModelWorldMatrixLoc;
+extern GLint unshadedMapModelVertexLoc;
+extern GLint unshadedMapModelUvLoc;
+
+extern GLint tonemapFramebufferLoc;
+extern GLint tonemapExposureLoc;
+extern GLint tonemapVertexLoc;
+extern GLint tonemapUvLoc;
 
 #pragma endregion
 

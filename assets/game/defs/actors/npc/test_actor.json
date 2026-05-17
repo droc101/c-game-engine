@@ -1,0 +1,16 @@
+{
+  "extends": "actor",
+  "description": "Actor used for engine testing. Subject to change.",
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "orientation"
+    },
+    {
+      "type": "model",
+      "model": "model/leafy.gmdl"
+    }
+  ]
+}

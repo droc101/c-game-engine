@@ -116,7 +116,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		lod->distanceSquared = ReadFloat(assetData->data, &offset);
 		lod->vertexCount = ReadSizeT(assetData->data, &offset);
 
-		const size_t vertexDataSize = lod->vertexCount * sizeof(ModelVertex);
+		const size_t vertexDataSize = lod->vertexCount * sizeof(ModelVertex); // TODO: Is there potentially padding bytes included in this size
 		EXPECT_BYTES(vertexDataSize, bytesRemaining);
 		lod->vertexData = malloc(vertexDataSize);
 		CheckAlloc(lod->vertexData);

@@ -5,8 +5,8 @@
 #ifndef MAINSTATE_H
 #define MAINSTATE_H
 
-#define GAME_STATE_MAIN 7
+#include <engine/structs/GameState.h>
 
-void MainStateSet();
+extern const GameState MainState;
 
 #endif //MAINSTATE_H

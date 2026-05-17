@@ -9,6 +9,9 @@
 #include <engine/structs/ActorDefinition.h>
 #include <stdbool.h>
 
+#define TARGET_FPS 60
+#define TARGET_FPS_NS_D (1000000000.0 / TARGET_FPS)
+
 #define STR(x) #x
 #define TO_STR(x) STR(x)
 

@@ -71,7 +71,7 @@ struct ModelVertex
 	Color color;
 	/// The normal of the vertex, as a unit vector
 	Vector3 normal;
-};
+} __attribute__((packed));
 
 struct ModelLod
 {

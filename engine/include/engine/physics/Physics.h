@@ -7,7 +7,6 @@
 
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
-#include <joltc/Physics/Body/BodyInterface.h>
 
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60
@@ -32,6 +31,8 @@
 	(dest).z = (src)[2]; \
 	(dest).w = (src)[3];
 
+#define GRAVITY (-9.81f)
+
 enum ObjectLayers
 {
 	OBJECT_LAYER_STATIC,
@@ -49,12 +50,28 @@ enum BroadPhaseLayers
 	BROADPHASE_LAYER_MAX,
 };
 
+/**
+ * Initialize the physics-related global state that will persist across levels
+ * @param state The GlobalState to initialize
+ */
 void PhysicsInitGlobal(GlobalState *state);
 
+/**
+ * Cleanup the global physics state objects
+ * @param state The GlobalState to clean up physics for
+ */
 void PhysicsDestroyGlobal(const GlobalState *state);
 
+/**
+ * Initialize the physics related objects for a given map
+ * @param map The map to initialize physics for
+ */
 void PhysicsInitMap(Map *map);
 
-void PhysicsDestroyMap(const Map *map, JPH_BodyInterface *bodyInterface);
+/**
+ * Cleanup the physics related objects associated with the given map
+ * @param map The map to clean up the physics objects from
+ */
+void PhysicsDestroyMap(const Map *map);
 
 #endif //INIT_H

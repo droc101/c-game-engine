@@ -1,0 +1,54 @@
+{
+  "description": "An arbitrary model that cannot move or change in any way.",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color"
+    },
+    {
+      "type": "orientation",
+      "color": "$color"
+    },
+    {
+      "type": "model",
+      "model": "$model",
+      "color": "$color",
+      "affect_lightmap": "$affect_lightmap"
+    }
+  ],
+  "params": {
+    "model": {
+      "display": "Model",
+      "default": "model/quad.gmdl",
+      "type": "string",
+      "string_hint": "model",
+      "description": "The model to use"
+    },
+    "skin": {
+      "display": "Skin",
+      "default": 0,
+      "type": "int",
+      "description": "The skin of the model to use"
+    },
+    "color": {
+      "display": "Color",
+      "type": "color",
+      "showAlpha": true,
+      "default": 4294967295,
+      "description": "The tint color of this model"
+    },
+    "collision": {
+      "display": "Collision Type",
+      "description": "What type of collision this static model should use. If the selected collision type is unavailable, collision will not be used.",
+      "default": "Full Collision",
+      "type": "byte",
+      "options": "static_collision_type"
+    },
+    "affect_lightmap": {
+      "display": "Affect lightmap",
+      "description": "Whether this model should affect the baked lightmap, such as by casting shadows",
+      "type": "bool",
+      "default": true
+    }
+  }
+}

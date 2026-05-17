@@ -2,6 +2,7 @@
 // Created by NBT22 on 6/13/25.
 //
 
+#include <assert.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/structs/Actor.h>
@@ -12,6 +13,7 @@
 #include <engine/subsystem/threads/LodThread.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <SDL3/SDL_atomic.h>
 #include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_thread.h>
 #include <stdbool.h>
@@ -19,8 +21,8 @@
 
 static bool shouldExit;
 static SDL_Thread *lodThread;
-static SDL_Semaphore *canStart;
-static SDL_Semaphore *hasEnded;
+static SDL_Semaphore *canStartSemaphore;
+static SDL_AtomicInt canStart;
 static SDL_Mutex *mutex;
 
 // ReSharper disable once CppDFAConstantFunctionResult
@@ -28,17 +30,20 @@ int LodThreadMain(void * /*data*/)
 {
 	while (!shouldExit)
 	{
-		bool waitResult = SDL_WaitSemaphoreTimeout(canStart, 16);
+		bool waitResult = SDL_WaitSemaphoreTimeout(canStartSemaphore, 16);
 		while (!waitResult)
 		{
 			if (shouldExit)
 			{
 				return 0;
 			}
-			waitResult = SDL_WaitSemaphoreTimeout(canStart, 16);
+			waitResult = SDL_WaitSemaphoreTimeout(canStartSemaphore, 16);
 		}
 
 		SDL_LockMutex(mutex);
+
+		const int oldValue = SDL_SetAtomicInt(&canStart, 0);
+		assert(oldValue == 1);
 
 		const GlobalState *state = GetState();
 		const LockingList *actors = &state->map->actors;
@@ -76,15 +81,13 @@ int LodThreadMain(void * /*data*/)
 		// }
 
 		SDL_UnlockMutex(mutex);
-		SDL_SignalSemaphore(hasEnded);
 	}
 	return 0;
 }
 
 void LodThreadInit()
 {
-	canStart = SDL_CreateSemaphore(0);
-	hasEnded = SDL_CreateSemaphore(1);
+	canStartSemaphore = SDL_CreateSemaphore(0);
 	mutex = SDL_CreateMutex();
 	lodThread = SDL_CreateThread(LodThreadMain, "GameLODThread", NULL);
 }
@@ -98,19 +101,16 @@ void LodThreadDestroy()
 	LogDebug("Terminating LOD thread...\n");
 	shouldExit = true;
 	SDL_WaitThread(lodThread, NULL);
-	SDL_DestroySemaphore(canStart);
-	SDL_DestroySemaphore(hasEnded);
+	SDL_DestroySemaphore(canStartSemaphore);
 	SDL_DestroyMutex(mutex);
 }
 
 void SignalLodThreadCanStart()
 {
-	return SDL_SignalSemaphore(canStart);
-}
-
-void WaitForLodThreadToEnd()
-{
-	return SDL_WaitSemaphore(hasEnded);
+	if (SDL_CompareAndSwapAtomicInt(&canStart, 0, 1))
+	{
+		SDL_SignalSemaphore(canStartSemaphore);
+	}
 }
 
 void LockLodThreadMutex()

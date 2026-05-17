@@ -7,6 +7,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Font.h>
@@ -35,7 +36,7 @@ AssetCache assetCache;
 
 FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	const int64_t maxPathLength = 300;
+	const size_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
@@ -51,7 +52,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 			LogError("Path is too long: %s\n", relPath);
 			continue;
 		}
-		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > maxPathLength)
+		if (snprintf(path, maxPathLength, "%s/%s", assetPath->path, relPath) > (int64_t)maxPathLength)
 		{
 			LogError("Asset path too long!\n");
 			continue;
@@ -75,6 +76,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 
 void EnumerateAssetsInFolder(const char *folder, SortedList *output, const char *extension)
 {
+	// TODO this should do subfolders
 	ListFreeOnlyContents(*output);
 	ListClear(*output);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
@@ -132,6 +134,7 @@ void DestroyAssetCache()
 	AssetCache_clear(assetCache);
 	DestroyTextureLoader();
 	DestroyModelLoader();
+	DestroyMapMaterialLoader();
 }
 
 Asset *CreateAssetFromFile(FILE *file)
@@ -389,13 +392,17 @@ void HotReloadAssets()
 {
 	assert(GetState()->map == NULL);
 	StopAllSounds();
-	DestroyTextureLoader();
+	// TODO: This causes a bug where the image IDs will be reset at whatever point within the frame this function is
+	//  called, which could cause the image be associated with the wrong GPU texture. This is not simple to fix though,
+	//  since reloading the fonts requires that the image cache already be reset, otherwise the font will reference an
+	//  image that has been freed. This could be fixed by moving this function into RenderingHelpers.c and only allowing
+	//  it to be called by FrameStart. Doing so would also allow this function to directly clear the textures and models
+	//  instead of queuing it.
 	DestroyCommonFonts();
-	DestroyModelLoader();
-	AssetCache_clear(assetCache);
+	DestroyAssetCache();
 
-	AssetCache_init(assetCache);
-	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
+	AssetCacheInit();
 	InitCommonFonts();
-	InitModelLoader();
+
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 }

@@ -46,6 +46,7 @@ struct ActorConnection
 	char *targetActorName;
 	/// The param to send to the input
 	Param outParamOverride;
+	// TODO this should be used!!!
 	size_t numRefires;
 };
 

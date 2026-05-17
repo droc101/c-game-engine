@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(launcher C)
 
-add_executable(launcher
+add_executable(launcher WIN32
         src/main.c
         src/LibraryLoader.c
         include/LibraryLoader.h
@@ -45,8 +45,6 @@ if (WIN32)
     set(DLLS
             zlib1.dll
             libwinpthread-1.dll
-            libgcc_s_seh-1.dll
-            libstdc++-6.dll
     )
 
     foreach (DLL IN LISTS DLLS)
@@ -57,14 +55,14 @@ if (WIN32)
         )
     endforeach ()
 
-    if (x86_64)
+    if (x86_64 AND USE_DISCORD_SDK)
         add_custom_command(TARGET copy_libraries POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${CMAKE_BINARY_DIR}/discord_game_sdk.dll"
                 "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/discord_game_sdk.dll"
         )
     endif ()
-elseif (x86_64) # linux x86
+elseif (x86_64 AND USE_DISCORD_SDK) # linux x86
     add_custom_command(TARGET copy_libraries POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_BINARY_DIR}/discord_game_sdk.so"

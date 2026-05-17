@@ -49,7 +49,9 @@ struct ItemDefinition
 
 struct Item
 {
+	/// The definition of this item
 	const ItemDefinition *definition;
+	/// Extra data pointer for item-specific data
 	void *data;
 };
 

@@ -17,15 +17,20 @@
  */
 void ResetDPrintYPos();
 
+/**
+ * Print a string to the screen
+ * @param str The string to print
+ * @param color The color to print with
+ */
 void DPrint(const char *str, Color color);
 
 /**
  * Prints a string to the screen and optionally to the console (stdout)
- * @param str Format string
+ * @param format Format string
+ * @param printToConsole Whether to print to the console
  * @param color Text color
- * @param con Whether to print to the console
  * @param ... Parameters to be formatted
  */
-void DPrintF(const char *str, Color color, bool con, ...);
+void DPrintF(const char *format, bool printToConsole, Color color, ...);
 
 #endif //GAME_DPRINT_H

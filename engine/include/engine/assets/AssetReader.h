@@ -53,13 +53,12 @@ void AssetCacheInit();
 void DestroyAssetCache();
 
 /**
- * Get all assets of a certain type that are in a folder
- * @param folder The folder to enumerate the assets of
- * @param output A @c SortedList containing elements of @code const char *@endcode
- * @param extension The file extension to search for
- * @warning The output list must contain elements of @code const char *@endcode
+ * Get a list of all assets of a certain type that are in a folder, across all asset paths
+ * @param folder The folder to recursively enumerate the assets of
+ * @param output Where to store the list of assets
+ * @param extension Asset file extension to search for
  */
-void EnumerateAssetsInFolder(const char *folder, SortedList *output, const char *extension);
+void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension);
 
 /**
  * Create an asset directly from a file handle. This does NOT cache the asset, as it has no associated path.
@@ -86,6 +85,9 @@ Asset *DecompressAsset(const char *relPath, bool cache, bool isCodeAsset);
  */
 void RemoveAssetFromCache(const char *relPath);
 
+/**
+ * Hot reload all cached assets. Do not call while a map is loaded.
+ */
 void HotReloadAssets();
 
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")

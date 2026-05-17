@@ -18,7 +18,7 @@ jobs:
             zip_name: game.linux.arm64.release
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Cache Dependencies
         uses: actions/cache@v5
@@ -42,7 +42,7 @@ jobs:
         run: cmake --build build-${{ matrix.build_type }} --target launcher -j $(nproc)
 
       - name: Upload results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.zip_name }}
           path: |

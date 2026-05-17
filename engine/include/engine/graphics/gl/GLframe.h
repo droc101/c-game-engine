@@ -9,6 +9,25 @@
 #include <engine/structs/Options.h>
 #include <stdbool.h>
 
+/**
+ * Convert screen X to NDC
+ * @param x X position in pixels
+ * @return The NDC position
+ */
+#define GL_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
+
+/**
+ * Convert screen Y to NDC
+ * @param y Y position in pixels
+ * @return The NDC position
+ */
+#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
+
+/**
+ * Get the number of MSAA samples to use, either the number requested by the user or the maximum the GPU supports
+ * @param requested The MSAA level requested
+ * @return The MSAA level to use
+ */
 int GetActualMsaaSamples(OptionsMsaa requested);
 
 /**
@@ -52,17 +71,14 @@ void GL_FrameEnd();
 void GL_UpdateViewportSize();
 
 /**
- * Convert screen X to NDC
- * @param x X position in pixels
- * @return The NDC position
+ * Switch the active OpenGL framebuffer to the HDR world framebuffer
  */
-#define GL_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
+void GL_Begin3DPass();
 
 /**
- * Convert screen Y to NDC
- * @param y Y position in pixels
- * @return The NDC position
+ * Finalize rendering of the world framebuffer and copy it to the SDR framebuffer with tonemapping
+ * @param exposure Exposure for tonemapping shader
  */
-#define GL_Y_TO_NDC(y) (1.0f - (float)(y) / ScaledWindowHeightFloat() * 2.0f)
+void GL_End3DPass(float exposure);
 
 #endif //GAME_GLFRAME_H

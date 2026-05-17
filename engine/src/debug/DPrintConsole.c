@@ -2,6 +2,7 @@
 // Created by droc101 on 2/15/26.
 //
 
+#include <assert.h>
 #include <engine/debug/DPrint.h>
 #include <engine/debug/DPrintConsole.h>
 #include <engine/structs/Color.h>
@@ -21,7 +22,7 @@
 #define CONSOLE_MESSAGE_VISIBLE_FOR_MS 2000
 
 static bool consoleEnabled = false;
-static List consoleMessages;
+static LockingList consoleMessages;
 
 typedef struct ConsoleMessage ConsoleMessage;
 
@@ -32,6 +33,30 @@ struct ConsoleMessage
 	size_t time;
 };
 
+const Color ansiColors[] = {
+	// NORMAL COLORS
+	COLOR_BLACK, // BLACK
+	COLOR(0xFFD00000), // RED
+	COLOR(0xFF00D000), // GREEN
+	COLOR(0xFFD0D000), // YELLOW,
+	COLOR(0xFF0000D0), // BLUE
+	COLOR(0xFFD000D0), // MAGENTA,
+	COLOR(0xFF00D0D0), // CYAN,
+	COLOR(0xFFe0e0e0), // WHITE,
+	COLOR(0), // UNUSED
+	COLOR(0xFFe0e0e0), // DEFAULT
+
+	// BRIGHT COLORS
+	COLOR(0xFF404040), // BRIGHT BLACK
+	COLOR(0xFFFF0000), // BRIGHT RED
+	COLOR(0xFF00FF00), // BRIGHT GREEN
+	COLOR(0xFFFFFF00), // BRIGHT YELLOW,
+	COLOR(0xFF0000FF), // BRIGHT BLUE
+	COLOR(0xFFFF00FF), // BRIGHT MAGENTA,
+	COLOR(0xFF00FFFF), // BRIGHT CYAN,
+	COLOR_WHITE, // BRIGHT WHITE,
+};
+
 void InitDPrintConsole()
 {
 #ifndef BUILDSTYLE_DEBUG
@@ -39,7 +64,7 @@ void InitDPrintConsole()
 #endif
 	{
 		consoleEnabled = true;
-		ListInit(consoleMessages, ConsoleMessage);
+		ListInit(consoleMessages, LIST_POINTER);
 	}
 }
 
@@ -50,32 +75,42 @@ void DestroyDPrintConsole()
 		consoleEnabled = false;
 		for (size_t i = 0; i < consoleMessages.length; i++)
 		{
-			free(ListGet(consoleMessages, i, ConsoleMessage).message);
+			const ConsoleMessage *msg = ListGetPointer(consoleMessages, i);
+			free(msg->message);
 		}
-		ListFree(consoleMessages);
+		ListAndContentsFree(consoleMessages);
 	}
 }
 
-void AddConsoleMessage(const char *msg, const Color color)
+void AddConsoleMessage(const char *msg, const int color)
 {
 	if (!consoleEnabled)
 	{
 		return;
 	}
-	ConsoleMessage cm = {
-		.message = strdup(msg),
-		.color = color,
-		.time = 0, // time will be set when the message is first processed so a 2 second frame doesn't result in messages not getting shown
-	};
+	assert((color >= 30 && color < 40) || (color >= 90 && color < 98));
+	ConsoleMessage *cm = malloc(sizeof(ConsoleMessage));
+	CheckAlloc(cm);
+	cm->message = strdup(msg);
+	if (color >= 90)
+	{
+		cm->color = ansiColors[(color % 10) + 9];
+	} else
+	{
+		cm->color = ansiColors[color % 10];
+	}
+	// time will be set when the message is first processed so a 2-second frame doesn't result in messages not getting shown
+	cm->time = 0;
 	ListAdd(consoleMessages, cm);
 }
 
 void ProcessDPrintConsole()
 {
 	size_t indexToRemove = SIZE_MAX;
+	ListLock(consoleMessages);
 	for (size_t i = 0; i < consoleMessages.length; i++)
 	{
-		ConsoleMessage *msg = &ListGet(consoleMessages, i, ConsoleMessage);
+		ConsoleMessage *msg = ListGetPointer(consoleMessages, i);
 		DPrint(msg->message, msg->color);
 		if (msg->time == 0)
 		{
@@ -87,7 +122,10 @@ void ProcessDPrintConsole()
 	}
 	if (indexToRemove != SIZE_MAX)
 	{
-		free(ListGet(consoleMessages, indexToRemove, ConsoleMessage).message);
+		ConsoleMessage *msg = ListGetPointer(consoleMessages, indexToRemove);
+		free(msg->message);
+		free(msg);
 		ListRemoveAt(consoleMessages, indexToRemove);
 	}
+	ListUnlock(consoleMessages);
 }

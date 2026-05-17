@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+
 #include "../include/AnsiCodes.h"
 #include "../include/DialogSystem.h"
 #include "../include/Filesystem.h"
@@ -20,6 +21,24 @@ typedef int (*GameMainFunction)(int argc, const char *argv[]);
 
 int main(const int argc, const char *argv[])
 {
+#ifdef WIN32
+
+#ifndef NDEBUG
+	// Create a terminal window if not already attached to a terminal
+	if (AllocConsole())
+	{
+		// Reopen stdio handles to point to newly created terminal
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
+		freopen("CONIN$", "r", stdin);
+	}
+#endif
+
+	// Enable processing of ANSI escape sequences
+	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_PROCESSED_OUTPUT);
+	SetConsoleMode(GetStdHandle(STD_ERROR_HANDLE), ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_PROCESSED_OUTPUT);
+#endif
+
 	InitDialogSystem();
 
 	if (argc < 1)

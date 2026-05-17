@@ -26,10 +26,8 @@ See the [wiki page](https://wiki.droc101.dev/index.php/Building_GAME) for instru
     - NVIDIA GeForce 900 series or newer
     - AMD Radeon HD 7000 series / Southern Islands / GCN 1.0 or newer
     - Intel HD Graphics 510 or newer
-- OpenGL 3.3 Compatibility Renderer:
-    - NVIDIA GeForce 8 series or newer
-    - ATI Radeon HD 2000 series or newer
-    - Intel HD Graphics 4000 or newer
+- OpenGL 4.6 Compatibility Renderer:
+  - TODO
 
 ## Tested on
 - Windows 11

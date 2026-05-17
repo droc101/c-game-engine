@@ -192,11 +192,6 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 									   JPH_DebugRenderer_CastShadow /*castShadow*/);
 
 /**
- * Render the background of the menu screen (main menu, options, level select, etc.)
- */
-void RenderMenuBackground();
-
-/**
  * Render the background of the in-game menu (pause, in-game options, etc.)
  */
 void RenderInGameMenuBackground();

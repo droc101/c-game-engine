@@ -1,0 +1,1441 @@
+{
+    "version": 1,
+    "discord_rpc_icon_id": "logo",
+    "discord_rpc_map_name": "Unnamed Map",
+    "has_sky": true,
+    "sky_texture": "texture/level/sky_test.gtex",
+    "light_cube_luxels_per_unit": 4,
+    "sectors": [
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 1.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": -6.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 3.75,
+                    "z": -4.0
+                },
+                {
+                    "x": 3.75,
+                    "z": 2.5
+                },
+                {
+                    "x": -6.0,
+                    "z": 2.5
+                }
+            ]
+        }
+    ],
+    "actors": [
+        {
+            "class": "light_point",
+            "position": {
+                "x": 2.0,
+                "y": 0.0,
+                "z": 1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 1.25,
+                "y": 0.0,
+                "z": 0.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -4.0,
+                "y": 0.0,
+                "z": 1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -3.25,
+                "y": 0.0,
+                "z": -0.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -2.5,
+                "y": 0.0,
+                "z": -0.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -0.5,
+                "y": 0.0,
+                "z": 1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -0.0,
+                "y": 0.0,
+                "z": 1.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": 1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -2.5,
+                "y": 0.0,
+                "z": 1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -1.25,
+                "y": 0.0,
+                "z": 0.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -0.0,
+                "y": 0.0,
+                "z": -0.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -0.25,
+                "y": 0.0,
+                "z": -1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -3.0,
+                "y": 0.0,
+                "z": -1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -2.0,
+                "y": 0.0,
+                "z": -0.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -1.5,
+                "y": 0.0,
+                "z": -2.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -3.0,
+                "y": 0.0,
+                "z": -3.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -3.25,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -1.0,
+                "y": 0.0,
+                "z": -1.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -1.5,
+                "y": 0.0,
+                "z": -1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 1.25,
+                "y": 0.0,
+                "z": -1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 2.0,
+                "y": 0.0,
+                "z": -1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 2.5,
+                "y": 0.0,
+                "z": 0.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -5.0,
+                "y": 0.0,
+                "z": 1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 3.25,
+                "y": 0.0,
+                "z": -2.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 2.25,
+                "y": 0.0,
+                "z": -0.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 2.0,
+                "y": 0.0,
+                "z": -2.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 1.75,
+                "y": 0.0,
+                "z": -2.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 0.75,
+                "y": 0.0,
+                "z": -2.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 2.25,
+                "y": 0.0,
+                "z": -3.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 3.0,
+                "y": 0.0,
+                "z": -3.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 0.5,
+                "y": 0.0,
+                "z": -3.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -0.75,
+                "y": 0.0,
+                "z": -2.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -5.25,
+                "y": 0.0,
+                "z": -1.5
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -4.25,
+                "y": 0.0,
+                "z": -3.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -4.0,
+                "y": 0.0,
+                "z": -0.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -4.5,
+                "y": 0.0,
+                "z": -1.25
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "range": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "attenuation": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+{
+  "description": "Performs boolean logic operations",
+  "renderers": [
+    {
+      "type": "point",
+      "color": 4294902015
+    }
+  ],
+  "extends": "actor",
+  "inputs": {
+    "operand_a": {
+      "type": "bool",
+      "description": "Set operand A for the next execution"
+    },
+    "operand_b": {
+      "type": "bool",
+      "description": "Set operand B for the next execution"
+    },
+    "execute": {
+      "description": "Execute the logic operation"
+    }
+  },
+  "outputs": {
+    "on_true": {
+      "description": "Emitted when the result of the execution was true"
+    },
+    "on_false": {
+      "description": "Emitted when the result of the execution was false"
+    },
+    "execution_result": {
+      "type": "bool",
+      "description": "Emitted when the \"execute\" input is received. Param contains the result of the execution."
+    }
+  },
+  "params": {
+    "operation": {
+      "display": "Operation",
+      "default": "AND",
+      "type": "byte",
+      "options": "binary_operation",
+      "description": "The operation this logic_binary performs"
+    }
+  }
+}

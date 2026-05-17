@@ -89,6 +89,7 @@ void GL_DrawTexture_Internal(const Vector2 pos,
 {
 	GL_UseShader(uiTexturedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(texture);
 
 	glUniform4fv(uiTexturedColorLoc, 1, COLOR_TO_ARR(color));
@@ -217,6 +218,7 @@ void GL_DrawTexturedArrays(const float *vertices,
 {
 	GL_UseShader(uiTexturedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(texture);
 
 	glUniform4fv(uiTexturedColorLoc, 1, COLOR_TO_ARR(color));
@@ -241,6 +243,7 @@ void GL_DrawUITriangles(const UiTriangleArray *tris, const char *texture, const 
 {
 	GL_UseShader(uiTexturedShader);
 
+	glActiveTexture(GL_TEXTURE0);
 	GL_LoadTextureFromAsset(texture);
 
 	glUniform4fv(uiTexturedColorLoc, 1, COLOR_TO_ARR(col));

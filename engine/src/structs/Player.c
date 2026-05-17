@@ -3,31 +3,34 @@
 //
 
 #include <engine/debug/DPrint.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
+#include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 
-void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
+void CreatePlayer(Map *map)
 {
-	player->transform.rotation = JPH_Quat_Identity;
-	player->canDropHeldActor = true;
+	map->player.transform.rotation = JPH_Quat_Identity;
+	map->player.playerCamera.fov = GetState()->options.fov;
+	map->player.playerCamera.transform.rotation = JPH_Quat_Identity;
 
-	CreatePlayerPhysics(player, physicsSystem);
+	CreatePlayerPhysics(map);
 }
 
 void DPrintPlayer(const Player *player)
 {
+#ifdef ENABLE_DEBUG_PRINT
 	DPrintF("Position: (%.2f, %.2f, %.2f)",
-			COLOR_WHITE,
 			false,
+			COLOR_WHITE,
 			player->transform.position.x,
 			player->transform.position.y,
 			player->transform.position.z);
@@ -35,26 +38,19 @@ void DPrintPlayer(const Player *player)
 	JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &playerVelocity);
 	const float totalVelocity = Vector3_Length(&playerVelocity);
 	DPrintF("Velocity: %.2f (%.2f, %.2f, %.2f)",
-			COLOR_WHITE,
 			false,
+			COLOR_WHITE,
 			totalVelocity,
 			playerVelocity.x,
 			playerVelocity.y,
 			playerVelocity.z);
-	Vector3 eulerAngles;
-	Vector3 axis;
-	float angle = NAN;
-	JPH_Quat_GetEulerAngles(&player->transform.rotation, &eulerAngles);
-	JPH_Quat_GetAxisAngle(&player->transform.rotation, &axis, &angle);
-	DPrintF("Rotation: (%.4f, %.4f) (%.2fdeg, %.2fdeg)\nRotation Axis: (%.4f, %.4f, %.4f)",
-			COLOR_WHITE,
+	PhysicsThreadLockTickMutex();
+	DPrintF("%s Actor: %s %p",
 			false,
-			player->transform.rotation.x,
-			fabsf(player->transform.rotation.y),
-			radToDeg(player->transform.rotation.x),
-			radToDeg(fabsf(player->transform.rotation.y)),
-			axis.x,
-			axis.y,
-			axis.z);
-	DPrintF("%s Actor: %p", COLOR_WHITE, false, player->hasHeldActor ? "Held" : "Targeted", player->targetedActor);
+			COLOR_WHITE,
+			player->hasHeldActor ? "Held" : "Targeted",
+			player->targetedActor ? player->targetedActor->definition->className : "None",
+			player->targetedActor);
+	PhysicsThreadUnlockTickMutex();
+#endif
 }

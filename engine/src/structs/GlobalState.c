@@ -7,7 +7,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
-#include <engine/structs/Camera.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/List.h>
@@ -16,17 +16,21 @@
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/threads/LodThread.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80
 
 static GlobalState state;
+
+static const GameState *queuedStateChange = NULL;
 
 void InitOptions()
 {
@@ -40,11 +44,9 @@ void InitState()
 	state.saveData = calloc(1, sizeof(SaveData));
 	CheckAlloc(state.saveData);
 	state.saveData->hp = 100;
-	state.camera = calloc(1, sizeof(Camera));
-	CheckAlloc(state.camera);
-	state.camera->fov = GetState()->options.fov;
+	state.camera = NULL;
 	state.rpcState = IN_MENUS;
-	ListInit(state.saveData->items, Item);
+	ListInit(state.saveData->items, LIST_POINTER);
 }
 
 inline GlobalState *GetState()
@@ -56,28 +58,35 @@ Item *GetItem()
 {
 	if (state.saveData->items.length != 0 && state.saveData->currentItem < state.saveData->items.length)
 	{
-		return &ListGet(state.saveData->items, state.saveData->currentItem, Item);
+		return ListGetPointer(state.saveData->items, state.saveData->currentItem);
 	}
 	return NULL;
 }
 
-void GiveItem(const ItemDefinition *definition, const bool switchToItem)
+bool HasItem(const ItemDefinition *definition)
 {
-	if (switchToItem)
+	for (size_t i = 0; i < state.saveData->items.length; i++)
 	{
-		for (size_t i = 0; i < state.saveData->items.length; i++)
+		const Item *item = ListGetPointer(state.saveData->items, i);
+		if (item->definition == definition)
 		{
-			if (ListGet(state.saveData->items, i, Item).definition == definition)
-			{
-				SwitchToItem(definition);
-				return;
-			}
+			return true;
 		}
 	}
-	Item item = {
-		.definition = definition,
-	};
-	definition->Construct(&item);
+	return false;
+}
+
+void GiveItem(const ItemDefinition *definition, const bool switchToItem)
+{
+	if (switchToItem && HasItem(definition))
+	{
+		SwitchToItem(definition);
+		return;
+	}
+	Item *item = malloc(sizeof(Item));
+	CheckAlloc(item);
+	item->definition = definition;
+	definition->Construct(item);
 	ListAdd(state.saveData->items, item);
 	if (switchToItem)
 	{
@@ -89,7 +98,7 @@ void SwitchToItem(const ItemDefinition *definition)
 {
 	for (size_t i = 0; i < state.saveData->items.length; i++)
 	{
-		Item *item = &ListGet(state.saveData->items, i, Item);
+		Item *item = ListGetPointer(state.saveData->items, i);
 		if (item->definition == definition)
 		{
 			state.saveData->currentItem = i;
@@ -110,45 +119,74 @@ void SwitchToItem(const ItemDefinition *definition)
 
 void NextItem()
 {
+	if (state.saveData->items.length == 0)
+	{
+		return;
+	}
 	if (state.saveData->currentItem < state.saveData->items.length - 1)
 	{
-		SwitchToItem(ListGet(state.saveData->items, state.saveData->currentItem + 1, Item).definition);
+		const Item *next = ListGetPointer(state.saveData->items, state.saveData->currentItem + 1);
+		SwitchToItem(next->definition);
 	}
 }
 
 void PreviousItem()
 {
+	if (state.saveData->items.length == 0)
+	{
+		return;
+	}
 	if (state.saveData->currentItem > 0)
 	{
-		SwitchToItem(ListGet(state.saveData->items, state.saveData->currentItem - 1, Item).definition);
+		const Item *next = ListGetPointer(state.saveData->items, state.saveData->currentItem - 1);
+		SwitchToItem(next->definition);
 	}
 }
 
-void SetStateCallbacks(const FrameUpdateFunction UpdateGame,
-					   const FixedUpdateFunction FixedUpdateGame,
-					   const GameStateId currentState,
-					   const FrameRenderFunction RenderGame,
-					   const bool enableRelativeMouseMode)
+void SetGameState(const GameState *gameState)
 {
-	state.UpdateGame = UpdateGame;
-	state.currentState = currentState;
-	state.RenderGame = RenderGame;
-	PhysicsThreadSetFunction(FixedUpdateGame);
-	DiscordUpdateRPC();
-	if (!HasCliArg("--no-mouse-capture"))
+	queuedStateChange = gameState;
+	if (state.gameState == NULL)
 	{
-		SDL_SetWindowRelativeMouseMode(GetGameWindow(), enableRelativeMouseMode);
+		ProcessStateChangeQueue();
+	}
+}
+
+void ProcessStateChangeQueue()
+{
+	if (queuedStateChange)
+	{
+		if (state.gameState && state.gameState->Destroy)
+		{
+			state.gameState->Destroy();
+		}
+		if (queuedStateChange->Set)
+		{
+			queuedStateChange->Set();
+		}
+		state.gameState = queuedStateChange;
+		PhysicsThreadSetFunction(queuedStateChange->FixedUpdateGame);
+		DiscordUpdateRPC();
+		if (!HasCliArg("--no-mouse-capture"))
+		{
+			SDL_SetWindowRelativeMouseMode(GetGameWindow(), queuedStateChange->enableRelativeMouseMode);
+		}
+		queuedStateChange = NULL;
 	}
 }
 
 void ChangeMap(Map *map)
 {
 	PhysicsThreadLockTickMutex();
+	LockLodThreadMutex();
+	state.camera = NULL;
 	if (state.map)
 	{
 		DestroyMap(state.map);
 	}
 	state.map = map;
+	state.camera = &state.map->player.playerCamera;
+	UnlockLodThreadMutex();
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -156,19 +194,30 @@ void DestroyGlobalState()
 {
 	LogDebug("Cleaning up GlobalState...\n");
 	SaveOptions(&state.options);
+	if (state.gameState->Destroy)
+	{
+		state.gameState->Destroy();
+	}
 	if (state.map)
 	{
 		DestroyMap(state.map);
-		state.map = NULL;
 	}
 	for (size_t i = 0; i < state.saveData->items.length; i++)
 	{
-		Item *item = &ListGet(state.saveData->items, i, Item);
+		Item *item = ListGetPointer(state.saveData->items, i);
 		item->definition->Destruct(item);
+		free(item);
+	}
+	ListFree(state.saveData->items);
+	state.map = NULL;
+	for (size_t i = 0; i < state.saveData->items.length; i++)
+	{
+		Item *item = ListGetPointer(state.saveData->items, i);
+		item->definition->Destruct(item);
+		free(item);
 	}
 	ListFree(state.saveData->items);
 	free(state.saveData);
-	free(state.camera);
 
 	LogDebug("Cleaning up physics...\n");
 	PhysicsDestroyGlobal(&state);
@@ -189,8 +238,10 @@ bool ChangeMapByName(const char *name)
 	ChangeMap(map);
 	if (!LoadMap(map, DecompressAsset(mapPath, false, false)))
 	{
+		ChangeMap(NULL);
 		return false;
 	}
+	map->mapName = strdup(name);
 	DiscordUpdateRPC();
 	return true;
 }

@@ -51,6 +51,7 @@ void GenFallbackImage(Image *src)
 	src->filter = false;
 	src->repeat = true;
 	src->mipmaps = false;
+	src->pixelFormat = PIXEL_FORMAT_RGBA8;
 	const size_t pixelDataSize = MISSING_TEX_SIZE * MISSING_TEX_SIZE * sizeof(uint32_t);
 	uint32_t *pixelData = malloc(pixelDataSize);
 	CheckAlloc(pixelData);
@@ -102,7 +103,7 @@ Image *LoadImage(const char *asset)
 			GenFallbackImage(img);
 		} else
 		{
-			const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 3);
+			const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 4);
 			if (textureAsset->size < headerSize)
 			{
 				LogError("Failed to load texture asset as it was the wrong size.\n");
@@ -114,7 +115,15 @@ Image *LoadImage(const char *asset)
 				img->filter = ReadByte(textureAsset->data, &offset) != 0;
 				img->repeat = ReadByte(textureAsset->data, &offset) != 0;
 				img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
-				const size_t pixelDataSize = img->width * img->height * sizeof(uint32_t);
+				img->pixelFormat = ReadByte(textureAsset->data, &offset);
+				size_t pixelDataSize = img->width * img->height;
+				if (img->pixelFormat == PIXEL_FORMAT_RGBA8)
+				{
+					pixelDataSize *= sizeof(uint32_t);
+				} else
+				{
+					pixelDataSize *= sizeof(_Float16) * 4;
+				}
 				if (textureAsset->size < headerSize + pixelDataSize)
 				{
 					LogError("Failed to load texture asset as it was the wrong size.\n");

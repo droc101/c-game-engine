@@ -15,10 +15,12 @@ disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI
         SDL_SENSOR_DEFAULT SDL_DIALOG_DEFAULT SDL_TRAY_DEFAULT SDL_DISKAUDIO SDL_DUMMYAUDIO SDL_DUMMYVIDEO SDL_OPENGLES
         SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM)
 fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
+target_compile_options(SDL3-shared PRIVATE "-w")
 
 disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
         SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK)
-fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git prerelease-3.*.* SDL3_mixer)
+fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git release-3.*.* SDL3_mixer)
+target_compile_options(SDL3_mixer-shared PRIVATE "-w")
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
@@ -26,6 +28,7 @@ find_package(ZLIB REQUIRED)
 find_package(OpenGL REQUIRED)
 
 fetch_glew()
+target_compile_options(glew_s PRIVATE "-w")
 fetch_dict()
 
 message(STATUS "Fetching Luna...")
@@ -36,7 +39,7 @@ FetchContent_Declare(
         SYSTEM
 )
 FetchContent_MakeAvailable(Luna)
-if (x86_64)
+if (x86_64 AND USE_DISCORD_SDK)
     fetch_discord_sdk()
 endif ()
 
@@ -54,30 +57,34 @@ fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14
 #endregion
 
 add_library(engine INTERFACE
-        include/engine/graphics/vulkan/VulkanActors.h)
-target_sources(engine INTERFACE
         src/actor/IoProxy.c
         include/engine/actor/IoProxy.h
-        src/actor/LogicBinary.c
-        include/engine/actor/LogicBinary.h
-        src/actor/LogicCounter.c
-        include/engine/actor/LogicCounter.h
-        src/actor/LogicDecimal.c
-        include/engine/actor/LogicDecimal.h
+        src/actor/logic/LogicBinary.c
+        include/engine/actor/logic/LogicBinary.h
+        src/actor/logic/LogicCounter.c
+        include/engine/actor/logic/LogicCounter.h
+        src/actor/logic/LogicDecimal.c
+        include/engine/actor/logic/LogicDecimal.h
         src/actor/SoundPlayer.c
         include/engine/actor/SoundPlayer.h
-        src/actor/Sprite.c
-        include/engine/actor/Sprite.h
-        src/actor/StaticModel.c
-        include/engine/actor/StaticModel.h
+        src/actor/prop/Sprite.c
+        include/engine/actor/prop/Sprite.h
+        src/actor/prop/StaticModel.c
+        include/engine/actor/prop/StaticModel.h
         src/actor/Trigger.c
         include/engine/actor/Trigger.h
-        src/actor/GlobalLight.c
-        include/engine/actor/GlobalLight.h
-        src/actor/GlobalFog.c
-        include/engine/actor/GlobalFog.h
-        include/engine/actor/PhysicsModel.h
-        src/actor/PhysicsModel.c
+        src/actor/env/GlobalLight.c
+        include/engine/actor/env/GlobalLight.h
+        src/actor/env/GlobalFog.c
+        include/engine/actor/env/GlobalFog.h
+        include/engine/actor/prop/PhysicsModel.h
+        src/actor/prop/PhysicsModel.c
+        src/actor/env/TonemapController.c
+        include/engine/actor/env/TonemapController.h
+        src/actor/Camera.c
+        include/engine/actor/Camera.h
+        include/engine/actor/prop/Button.h
+        src/actor/prop/Button.c
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -131,6 +138,7 @@ target_sources(engine INTERFACE
         src/graphics/vulkan/Vulkan.c
         include/engine/graphics/vulkan/Vulkan.h
         src/graphics/vulkan/VulkanActors.c
+        include/engine/graphics/vulkan/VulkanActors.h
         src/graphics/vulkan/VulkanHelpers.c
         include/engine/graphics/vulkan/VulkanHelpers.h
         src/graphics/vulkan/VulkanInternal.c
@@ -138,6 +146,7 @@ target_sources(engine INTERFACE
         src/graphics/vulkan/VulkanPipelines.c
         src/graphics/vulkan/VulkanResources.c
         include/engine/graphics/vulkan/VulkanResources.h
+        include/engine/graphics/std140.h
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h
@@ -147,6 +156,8 @@ target_sources(engine INTERFACE
         include/engine/helpers/PlatformHelpers.h
         src/helpers/Realloc.c
         include/engine/helpers/Realloc.h
+        src/helpers/BackgroundMapManager.c
+        include/engine/helpers/BackgroundMapManager.h
 
         src/physics/Navigation.c
         include/engine/physics/Navigation.h
@@ -154,6 +165,8 @@ target_sources(engine INTERFACE
         include/engine/physics/Physics.h
         src/physics/PlayerPhysics.c
         include/engine/physics/PlayerPhysics.h
+        src/physics/MapPhysics.c
+        include/engine/physics/MapPhysics.h
 
         src/structs/Actor.c
         include/engine/structs/Actor.h
@@ -167,10 +180,11 @@ target_sources(engine INTERFACE
         include/engine/structs/GlobalState.h
         src/structs/KVList.c
         include/engine/structs/KVList.h
-        src/structs/Map.c
-        include/engine/structs/Map.h
+        include/engine/structs/Light.h
         src/structs/List.c
         include/engine/structs/List.h
+        src/structs/Map.c
+        include/engine/structs/Map.h
         src/structs/Options.c
         include/engine/structs/Options.h
         src/structs/Player.c
@@ -181,6 +195,7 @@ target_sources(engine INTERFACE
         include/engine/structs/ActorWall.h
         include/engine/structs/Item.h
         src/structs/Item.c
+        include/engine/structs/GameState.h
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h
@@ -221,7 +236,7 @@ target_sources(engine INTERFACE
 )
 set_target_properties(engine PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
 target_include_directories(engine INTERFACE include)
-if (x86_64)
+if (x86_64 AND USE_DISCORD_SDK)
     target_compile_definitions(engine INTERFACE ENABLE_DISCORD_SDK)
     target_include_directories(engine INTERFACE ${DISCORD_GAME_SDK_DIR}/c/)
     target_link_libraries(engine INTERFACE discord_game_sdk)

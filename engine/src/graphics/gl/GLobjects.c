@@ -58,19 +58,13 @@ void GL_UpdateAnisotropyLevel()
 				return;
 		}
 		GLfloat gpuMaxAnisotropy = 0;
-		if (GLEW_EXT_texture_filter_anisotropic)
-		{
-			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &gpuMaxAnisotropy);
-		} else
-		{
-			LogWarning("GL: GPU does not support GL_EXT_texture_filter_anisotropic, but the user requested it.\n");
-		}
-		LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n", gpuMaxAnisotropy);
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &gpuMaxAnisotropy);
+		// LogDebug("GL: GL_MAX_TEXTURE_MAX_ANISOTROPY=%f\n", gpuMaxAnisotropy);
 		anisotropyLevel = min(requestedAnisotropy, gpuMaxAnisotropy);
 		if (requestedAnisotropy != anisotropyLevel)
 		{
 			LogWarning("GL: Actual anisotropy level of %f differs from requested value of %f. "
-					   "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT=%f\n",
+					   "GL_MAX_TEXTURE_MAX_ANISOTROPY=%f\n",
 					   anisotropyLevel,
 					   requestedAnisotropy,
 					   gpuMaxAnisotropy);
@@ -78,22 +72,20 @@ void GL_UpdateAnisotropyLevel()
 	}
 }
 
-GL_Shader *GL_ConstructShaderFromAssets(const char *fsh, const char *vsh)
+GL_Shader *GL_ConstructShader(const char *fragmentAsset, const char *vertexAsset)
 {
-	Shader *fragmentSource = LoadShader(fsh);
-	Shader *vertexSource = LoadShader(vsh);
+	Shader *fragmentSource = LoadShader(fragmentAsset);
+	Shader *vertexSource = LoadShader(vertexAsset);
 	if (fragmentSource == NULL || vertexSource == NULL)
 	{
 		Error("Failed to load shaders!");
 	}
-	GL_Shader *shd = GL_ConstructShader(fragmentSource->glsl, vertexSource->glsl);
-	FreeShader(fragmentSource);
-	FreeShader(vertexSource);
-	return shd;
-}
 
-GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
-{
+	if (fragmentSource->type != SHADER_TYPE_FRAG || vertexSource->type != SHADER_TYPE_VERT)
+	{
+		Error("Incorrect shader types");
+	}
+
 	GLint status = 0;
 	char errorBuffer[512];
 
@@ -101,7 +93,7 @@ GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
 	CheckAlloc(shader);
 
 	shader->vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(shader->vertexShader, 1, (const GLchar *const *)&vsh, NULL);
+	glShaderSource(shader->vertexShader, 1, (const GLchar *const *)&vertexSource->glsl, NULL);
 	glCompileShader(shader->vertexShader);
 	glGetShaderiv(shader->vertexShader, GL_COMPILE_STATUS, &status);
 	if (status != GL_TRUE)
@@ -112,7 +104,7 @@ GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
 	}
 
 	shader->fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(shader->fragmentShader, 1, (const GLchar *const *)&fsh, NULL);
+	glShaderSource(shader->fragmentShader, 1, (const GLchar *const *)&fragmentSource->glsl, NULL);
 	glCompileShader(shader->fragmentShader);
 	glGetShaderiv(shader->fragmentShader, GL_COMPILE_STATUS, &status);
 	if (status != GL_TRUE)
@@ -140,6 +132,56 @@ GL_Shader *GL_ConstructShader(const char *fsh, const char *vsh)
 		return NULL;
 	}
 
+	FreeShader(fragmentSource);
+	FreeShader(vertexSource);
+	return shader;
+}
+
+GL_ComputeShader *GL_ConstructComputeShader(const char *asset)
+{
+	Shader *source = LoadShader(asset);
+	if (source == NULL)
+	{
+		Error("Failed to load shaders!");
+	}
+
+	if (source->type != SHADER_TYPE_COMP)
+	{
+		Error("Incorrect shader types");
+	}
+
+	GLint status = 0;
+	char errorBuffer[512];
+
+	GL_ComputeShader *shader = malloc(sizeof(GL_ComputeShader));
+	CheckAlloc(shader);
+
+	shader->computeShader = glCreateShader(GL_COMPUTE_SHADER);
+	glShaderSource(shader->computeShader, 1, (const GLchar *const *)&source->glsl, NULL);
+	glCompileShader(shader->computeShader);
+	glGetShaderiv(shader->computeShader, GL_COMPILE_STATUS, &status);
+	if (status != GL_TRUE)
+	{
+		glGetShaderInfoLog(shader->computeShader, sizeof(errorBuffer), NULL, errorBuffer);
+		errorBuffer[sizeof(errorBuffer) - 1] = '\0';
+		Error(errorBuffer);
+	}
+
+	shader->program = glCreateProgram();
+	glAttachShader(shader->program, shader->computeShader);
+	glLinkProgram(shader->program);
+
+	glGetProgramiv(shader->program, GL_LINK_STATUS, &status);
+	if (status != GL_TRUE)
+	{
+		glGetProgramInfoLog(shader->program, sizeof(errorBuffer), NULL, errorBuffer);
+		errorBuffer[sizeof(errorBuffer) - 1] = '\0';
+		LogError(errorBuffer);
+		free(shader);
+		return NULL;
+	}
+
+	FreeShader(source);
 	return shader;
 }
 
@@ -152,6 +194,14 @@ void GL_DestroyShader(GL_Shader *shd)
 {
 	glDeleteShader(shd->vertexShader);
 	glDeleteShader(shd->fragmentShader);
+	glDeleteProgram(shd->program);
+	free(shd);
+	shd = NULL;
+}
+
+void GL_DestroyComputeShader(GL_ComputeShader *shd)
+{
+	glDeleteShader(shd->computeShader);
 	glDeleteProgram(shd->program);
 	free(shd);
 	shd = NULL;
@@ -208,9 +258,10 @@ int GL_RegisterTexture(const Image *image)
 	const int slot = glNextFreeSlot;
 
 	glGenTextures(1, &glTextures[slot]);
-	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, glTextures[slot]);
-	glTexImage2D(GL_TEXTURE_2D,
+	if (image->pixelFormat == PIXEL_FORMAT_RGBA8)
+	{
+		glTexImage2D(GL_TEXTURE_2D,
 				 0,
 				 GL_RGBA8,
 				 (GLsizei)image->width,
@@ -219,6 +270,18 @@ int GL_RegisterTexture(const Image *image)
 				 GL_RGBA,
 				 GL_UNSIGNED_BYTE,
 				 image->pixelData);
+	} else
+	{
+		glTexImage2D(GL_TEXTURE_2D,
+				 0,
+				 GL_RGBA16F,
+				 (GLsizei)image->width,
+				 (GLsizei)image->height,
+				 0,
+				 GL_RGBA,
+				 GL_HALF_FLOAT,
+				 image->pixelData);
+	}
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);
 
@@ -229,10 +292,10 @@ int GL_RegisterTexture(const Image *image)
 	{
 		if (anisotropyLevel != 0 && image->filter)
 		{
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropyLevel);
 		} else
 		{
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.0f);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 		}
 
 		if (image->filter)

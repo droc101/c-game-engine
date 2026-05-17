@@ -2,23 +2,23 @@
 // Created by droc101 on 11/10/2024.
 //
 
-#include <ctype.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #ifdef WIN32
+#include <ctype.h>
 #include <dwmapi.h>
 #include <handleapi.h>
 #include <minwindef.h>
 #include <processthreadsapi.h>
 #include <SDL3/SDL_properties.h>
 #include <SDL3/SDL_video.h>
+#include <string.h>
 #include <winbase.h>
 #endif
 
@@ -83,7 +83,11 @@ bool IsPathAbsolute(const char *path)
 	// yes, the drive "letter" doesn't have to be a letter.
 	// no, I'm not accounting for that case.
 	// I have also chosen to not care about UNC paths.
-	if (strlen(path) < 3 && isalpha(path[0]) && path[1] == ':' && (path[2] == '/' || path[2] == '\\'))
+	const bool lengthCheck = strlen(path) >= 3;
+	const bool letterCheck = isalpha(path[0]);
+	const bool colonCheck = path[1] == ':';
+	const bool slashCheck = path[2] == '/' || path[2] == '\\';
+	if (lengthCheck && letterCheck && colonCheck && slashCheck)
 	{
 		return true;
 	}

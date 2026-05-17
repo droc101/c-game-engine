@@ -7,6 +7,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
@@ -29,11 +30,12 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 		IsKeyPressed(physicsThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_START))
 	{
-		MenuStateSetWithFade();
+		menuStateFadeIn = true;
+		SetGameState(&MenuState);
 	}
 }
 
-void LogoSplashStateRender(GlobalState *State)
+void LogoSplashStateRender(GlobalState *State, const double /*delta*/)
 {
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)
 	{
@@ -60,11 +62,11 @@ void LogoSplashStateRender(GlobalState *State)
 				   &color);
 }
 
-void LogoSplashStateSet()
-{
-	SetStateCallbacks(NULL,
-					  LogoSplashStateFixedUpdate,
-					  GAME_STATE_LOGO_SPLASH,
-					  LogoSplashStateRender,
-					  false); // Non-fixed is not needed for this state
-}
+const GameState LogoSplashState = {
+	.UpdateGame = NULL,
+	.RenderGame = LogoSplashStateRender,
+	.FixedUpdateGame = LogoSplashStateFixedUpdate,
+	.Destroy = NULL,
+	.Set = NULL,
+	.enableRelativeMouseMode = false,
+};

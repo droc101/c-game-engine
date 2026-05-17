@@ -18,7 +18,7 @@ void PhysicsThreadInit();
  * @param function The function to run
  * @note This will block until the current iteration of the physics thread is finished
  */
-void PhysicsThreadSetFunction(FixedUpdateFunction function);
+void PhysicsThreadSetFunction(GameStateFixedUpdateFunction function);
 
 /**
  * Process an input event for the physics thread

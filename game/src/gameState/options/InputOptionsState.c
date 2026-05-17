@@ -6,7 +6,9 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
@@ -23,15 +25,20 @@ UiStack *inputOptionsStack = NULL;
 
 void BtnInputOptionsBack()
 {
-	OptionsStateSet(optionsStateInGame);
+	SaveOptions(&GetState()->options);
+	SetGameState(&OptionsState);
 }
 
-void InputOptionsStateUpdate(GlobalState * /*state*/)
+void InputOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
 		BtnInputOptionsBack();
+	}
+	if (!optionsStateInGame)
+	{
+		UpdateMenuBackground(state, delta);
 	}
 }
 
@@ -66,14 +73,14 @@ void CbOptionsSwapOkCancel(const bool value)
 	GetState()->options.controllerSwapOkCancel = value;
 }
 
-void InputOptionsStateRender(GlobalState * /*state*/)
+void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground();
+		RenderMenuBackground(state);
 	}
 
 	DrawTextAligned("Input Options",
@@ -195,12 +202,6 @@ void InputOptionsStateSet()
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnInputOptionsBack, BOTTOM_CENTER));
 	}
 	UiStackResetFocus(inputOptionsStack);
-
-	SetStateCallbacks(InputOptionsStateUpdate,
-					  NULL,
-					  GAME_STATE_INPUT_OPTIONS,
-					  InputOptionsStateRender,
-					  false); // Fixed update is not needed for this state
 }
 
 void InputOptionsStateDestroy()
@@ -211,3 +212,12 @@ void InputOptionsStateDestroy()
 		inputOptionsStack = NULL;
 	}
 }
+
+const GameState InputOptionsState = {
+	.UpdateGame = InputOptionsStateUpdate,
+	.RenderGame = InputOptionsStateRender,
+	.FixedUpdateGame = OptionsStateFixedUpdate,
+	.Destroy = InputOptionsStateDestroy,
+	.Set = InputOptionsStateSet,
+	.enableRelativeMouseMode = false,
+};

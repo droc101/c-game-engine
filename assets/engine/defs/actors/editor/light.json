@@ -1,0 +1,18 @@
+{
+  "description": "Base light class",
+  "virtual": true,
+  "params": {
+    "color": {
+      "display": "Light Color",
+      "type": "color",
+      "description": "The color of this light"
+    },
+    "brightness": {
+      "display": "Brightness Scale",
+      "type": "float",
+      "default": 1.0,
+      "minimum": 0.0,
+      "description": "The brightness scale of this light, used for HDR lights (brighter than 1.0)"
+    }
+  }
+}

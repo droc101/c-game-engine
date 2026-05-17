@@ -3,7 +3,9 @@
 
 // Automatically generated header file
 
+#undef ENGINE_GIT_SHORT_HASH
 #define ENGINE_GIT_SHORT_HASH "@GIT_SHORT_HASH@"
+#undef ENGINE_GIT_HASH
 #define ENGINE_GIT_HASH "@GIT_HASH@"
 
 #endif

@@ -1,0 +1,22 @@
+{
+  "description": "Eraser item",
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point"
+    },
+    {
+      "type": "model",
+      "model": "model/eraser_w.gmdl"
+    }
+  ],
+  "inputs": {},
+  "outputs": {},
+  "params": {
+    "always_give": {
+      "type": "bool",
+      "description": "Whether the player should always pick up this item even if they already have it",
+      "default": false
+    }
+  }
+}

@@ -5,10 +5,8 @@
 #ifndef INPUTOPTIONSSTATE_H
 #define INPUTOPTIONSSTATE_H
 
-#define GAME_STATE_INPUT_OPTIONS 1
+#include <engine/structs/GameState.h>
 
-void InputOptionsStateSet();
-
-void InputOptionsStateDestroy();
+extern const GameState InputOptionsState;
 
 #endif //INPUTOPTIONSSTATE_H

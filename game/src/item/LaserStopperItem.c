@@ -2,7 +2,7 @@
 // Created by droc101 on 1/22/26.
 //
 
-#include <actor/LaserEmitter.h>
+#include "item/LaserStopperItem.h"
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
@@ -12,11 +12,11 @@
 #include <engine/structs/Player.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Input.h>
-#include <item/LaserStopperItem.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
 #include <wchar.h>
+#include "actor/prop/LaserEmitter.h"
 
 static void LaserStopperItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 {

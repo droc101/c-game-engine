@@ -9,12 +9,20 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define TEXTURE_ASSET_VERSION 1
+#define TEXTURE_ASSET_VERSION 2
 
 /// The maximum number of textures that can be loaded in any one execution of the game
 #define MAX_TEXTURES 512
 
 typedef struct Image Image;
+typedef enum ImagePixelFormat ImagePixelFormat;
+
+enum ImagePixelFormat {
+	/// RGBA, uint8_t per channel
+    PIXEL_FORMAT_RGBA8,
+	/// RGBA, Float16 per channel
+    PIXEL_FORMAT_RGBA16F,
+};
 
 struct Image
 {
@@ -24,6 +32,8 @@ struct Image
 	size_t height;
 	/// The ID of the image. This is generated at runtime and not consistent between runs.
 	uint32_t id;
+	/// The pixel format of the image
+    ImagePixelFormat pixelFormat;
 
 	/// Whether to use filtering on this texture
 	bool filter;

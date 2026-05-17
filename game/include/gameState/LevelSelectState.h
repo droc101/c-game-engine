@@ -5,10 +5,8 @@
 #ifndef LEVELSELECTSTATE_H
 #define LEVELSELECTSTATE_H
 
-#define GAME_STATE_LEVEL_SELECT 4
+#include <engine/structs/GameState.h>
 
-void LevelSelectStateSet();
-
-void LevelSelectStateDestroy();
+extern const GameState LevelSelectState;
 
 #endif //LEVELSELECTSTATE_H

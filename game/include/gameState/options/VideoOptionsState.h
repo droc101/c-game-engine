@@ -5,10 +5,8 @@
 #ifndef VIDEOOPTIONSSTATE_H
 #define VIDEOOPTIONSSTATE_H
 
-#define GAME_STATE_VIDEO_OPTIONS 3
+#include <engine/structs/GameState.h>
 
-void VideoOptionsStateSet();
-
-void VideoOptionsStateDestroy();
+extern const GameState VideoOptionsState;
 
 #endif //VIDEOOPTIONSSTATE_H

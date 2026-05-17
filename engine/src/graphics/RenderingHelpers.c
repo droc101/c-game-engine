@@ -2,6 +2,7 @@
 // Created by droc101 on 10/2/24.
 //
 
+#include <assert.h>
 #include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
@@ -297,8 +298,9 @@ inline float Y_TO_NDC(const float y)
 	}
 }
 
-void LoadMapModels(const Map *map)
+void LoadMapModels(Map *map)
 {
+	assert(map->lightmapPixels && map->models);
 	switch (currentRenderer)
 	{
 		case RENDERER_OPENGL:
@@ -309,6 +311,7 @@ void LoadMapModels(const Map *map)
 		default:
 			break;
 	}
+	FreeLoadTimeMapData(map);
 }
 
 void SetVsyncEnabled(const bool enabled)
