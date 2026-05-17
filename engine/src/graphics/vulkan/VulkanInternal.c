@@ -289,6 +289,12 @@ bool CreateDescriptorSetLayouts()
 	// TODO: Use inline uniform block if available
 	const LunaDescriptorSetLayoutBinding bindings[] = {
 		{
+			.bindingName = "Lightmap",
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		},
+		{
 			.bindingName = "Textures",
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = MAX_TEXTURES,
@@ -462,7 +468,7 @@ bool CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES,
+			.descriptorCount = MAX_TEXTURES + 1,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

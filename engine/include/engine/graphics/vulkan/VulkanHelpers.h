@@ -37,7 +37,7 @@
 		if (result != VK_SUCCESS) \
 		{ \
 			LogInternal("VULKAN", 31, false, __VA_ARGS__); \
-			LogInternal(NULL, 0, true, "Error code: %d\n", result); \
+			LogInternal(NULL, 31, true, "Error code: %d\n", result); \
 			if (result == VK_ERROR_DEVICE_LOST) \
 			{ \
 				LogInfo("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.webp for more information\n"); \

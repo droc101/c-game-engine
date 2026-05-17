@@ -46,6 +46,7 @@
 //  I've started this process, so if it cannot it needs to be readded in several places
 
 static const Map *loadedMap;
+static LunaImage lightmap = LUNA_NULL_HANDLE;
 static size_t skyModelIndexCount;
 
 static inline VkResult LoadSky(const ModelDefinition *model)
@@ -370,6 +371,56 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 												 buffers.map.unshadedDrawInfo,
 												 &unshadedDrawInfoBufferWriteInfo),
 						   "Failed to write data to map unshaded draw info buffer!");
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult LoadLightmap(const Map *map)
+{
+	if (lightmap != LUNA_NULL_HANDLE)
+	{
+		lunaDestroyImage(device, lightmap);
+		lightmap = LUNA_NULL_HANDLE;
+	}
+	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+	const LunaCommandBufferSubmitInfo submitInfo = {
+		.queue = queue,
+		.waitSemaphoreCount = 1,
+		.waitSemaphores = &semaphore,
+		.waitDstStageMasks = &waitStage,
+		.signalSemaphoreCount = 1,
+		.signalSemaphores = &semaphore,
+	};
+	const LunaImageCreationInfo imageCreationInfo = {
+		.format = VK_FORMAT_R16G16B16A16_SFLOAT,
+		.width = map->lightmapWidth,
+		.height = map->lightmapHeight,
+		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		.writeInfo.bytes = map->lightmapWidth * map->lightmapHeight * sizeof(_Float16) * 4,
+		.writeInfo.pixels = map->lightmapPixels,
+		.writeInfo.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		.writeInfo.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.writeInfo.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
+		.writeInfo.submitInfo = &submitInfo,
+		.sampler = textureSamplers.nearestNoRepeatNoAnisotropy,
+	};
+	VulkanTestReturnResult(lunaCreateImage(device, secondaryCommandBuffer, &imageCreationInfo, &lightmap),
+						   "Failed to create texture!");
+
+	const LunaDescriptorImageInfo imageInfo = {
+		.image = lightmap,
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+	};
+	const LunaWriteDescriptorSet writeDescriptor = {
+		.descriptorSet = descriptorSet,
+		.bindingName = "Lightmap",
+		.descriptorCount = 1,
+		.imageInfo = &imageInfo,
+	};
+	lunaWriteDescriptorSets(device, 1, &writeDescriptor);
 
 	return VK_SUCCESS;
 }
@@ -845,12 +896,17 @@ bool VK_LoadMap(const Map *map)
 {
 	if (map == NULL)
 	{
+		lunaDestroyImage(device, lightmap);
+		lightmap = LUNA_NULL_HANDLE;
+
 		loadedMap = NULL;
 
 		return true;
 	}
 
 	VulkanTest(LoadMapModelsToBuffer(map->modelCount, map->models), "Failed to load map models!");
+
+	VulkanTest(LoadLightmap(map), "Failed to load lightmap!");
 
 	VulkanTest(LoadViewmodel(&map->viewmodel), "Failed to load viewmodel!");
 

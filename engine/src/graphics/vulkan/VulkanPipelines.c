@@ -84,7 +84,6 @@ static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
 	.pDynamicStates = (VkDynamicState[]){VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR},
 };
 
-static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
 #pragma endregion shared
 
@@ -170,8 +169,11 @@ static inline bool CreateUIPipeline()
 static inline bool CreateShadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/map_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded map vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("vulkan/map_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+			   "Failed to load shaded map fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -180,7 +182,7 @@ static inline bool CreateShadedMapPipeline()
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = modelShadedFragShaderModule,
+			.module = fragShaderModule,
 		},
 	};
 
@@ -665,7 +667,7 @@ static inline bool CreateShadedActorModelPipeline()
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = modelShadedFragShaderModule,
+			// .module = modelShadedFragShaderModule,
 		},
 	};
 
@@ -991,8 +993,6 @@ bool CreateGraphicsPipelines()
 	multisampling.rasterizationSamples = msaaSamples;
 	pipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
 
-	VulkanTest(CreateShaderModule(SHADER("vulkan/model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
-			   "Failed to load shaded model fragment shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/model_unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule),
 			   "Failed to load unshaded model fragment shader!");
 
