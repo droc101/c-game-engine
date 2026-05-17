@@ -119,7 +119,7 @@ void TextGetLine(const char *str, const int line, char *out, const size_t outBuf
 	}
 
 	size_t copySize = end - start;
-	if (copySize > outBufferSize)
+	if (copySize >= outBufferSize)
 	{
 		copySize = outBufferSize - 1;
 	}
