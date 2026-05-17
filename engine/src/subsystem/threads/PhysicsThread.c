@@ -44,8 +44,11 @@ bool physicsThreadPostQuit = false;
 
 void PhysicsThreadQueueInputEvent(const SDL_Event *event)
 {
+	SDL_Event *copiedEvent = malloc(sizeof(SDL_Event));
+	CheckAlloc(copiedEvent);
+	memcpy(copiedEvent, event, sizeof(SDL_Event));
 	SDL_LockMutex(physicsThreadMutex);
-	ListAdd(physicsThreadInputEventQueue, *event);
+	ListAdd(physicsThreadInputEventQueue, copiedEvent);
 	SDL_UnlockMutex(physicsThreadMutex);
 }
 
@@ -70,8 +73,10 @@ int PhysicsThreadMain(void * /*data*/)
 
 		for (size_t i = 0; i < physicsThreadInputEventQueue.length; i++)
 		{
+			SDL_Event *event = ListGetPointer(physicsThreadInputEventQueue, i);
 			// TODO: Should the return result be discarded here?
-			InputSystemProcessEvent(physicsThreadInput, &ListGet(physicsThreadInputEventQueue, i, SDL_Event));
+			InputSystemProcessEvent(physicsThreadInput, event);
+			free(event);
 		}
 		ListClear(physicsThreadInputEventQueue);
 
@@ -109,7 +114,7 @@ int PhysicsThreadMain(void * /*data*/)
 void PhysicsThreadInit()
 {
 	LogDebug("Initializing physics thread...\n");
-	ListInit(physicsThreadInputEventQueue, SDL_Event);
+	ListInit(physicsThreadInputEventQueue, LIST_POINTER);
 	PhysicsThreadFunction = NULL;
 	physicsThreadPostQuit = false;
 	physicsThreadMutex = SDL_CreateMutex();
@@ -138,7 +143,7 @@ void PhysicsThreadTerminate()
 	physicsThreadPostQuit = true;
 	SDL_UnlockMutex(physicsThreadMutex);
 	SDL_WaitThread(physicsThread, NULL);
-	ListFree(physicsThreadInputEventQueue);
+	ListAndContentsFree(physicsThreadInputEventQueue);
 	SDL_DestroyMutex(physicsThreadMutex);
 	SDL_DestroyMutex(physicsTickMutex);
 }

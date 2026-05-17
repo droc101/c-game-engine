@@ -56,7 +56,8 @@ fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14
 
 #endregion
 
-add_library(engine INTERFACE
+add_library(engine INTERFACE)
+target_sources(engine INTERFACE
         src/actor/IoProxy.c
         include/engine/actor/IoProxy.h
         src/actor/logic/LogicBinary.c

@@ -167,6 +167,7 @@ static inline bool CreateUIPipeline()
 	return true;
 }
 
+// TODO: This might be identical to the unshaded map pipeline now that normals aren't around. Check if it is
 static inline bool CreateShadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
@@ -212,17 +213,11 @@ static inline bool CreateShadedMapPipeline()
 		{
 			.location = 2,
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(MapVertex, color),
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(MapVertex, lightmapUv),
 		},
 		{
 			.location = 3,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(MapVertex, normal),
-		},
-		{
-			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = 0,
@@ -301,8 +296,8 @@ static inline bool CreateUnshadedMapPipeline()
 		{
 			.location = 2,
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(MapVertex, color),
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(MapVertex, lightmapUv),
 		},
 		{
 			.location = 3,

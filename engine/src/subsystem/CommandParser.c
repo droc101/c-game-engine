@@ -14,17 +14,16 @@ void ExecuteCommand(const char *command)
 	// no, passing it as non-const does not work
 	char *rwCommand = strdup(command);
 	List commandList;
-	ListInit(commandList, const char *);
+	ListInit(commandList, LIST_POINTER);
 	const char *token = strtok(rwCommand, " ");
 	while (token != NULL)
 	{
-		const char *tempToken = strdup(token);
-		ListAdd(commandList, tempToken);
+		ListAdd(commandList, strdup(token));
 		token = strtok(NULL, " ");
 	}
 	free(rwCommand);
 
-	// const char *commandName = ListGet(commandList, 0, const char *);
+	// char *commandName = ListGetPointer(commandList, 0);
 	// TODO: Reimplement
 	// if (strcmp(commandName, "level") == 0)
 	// {

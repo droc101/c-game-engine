@@ -617,14 +617,11 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		VulkanTest(VK_LoadMap(map), "Failed to load map!");
 	}
 
-	float lighting[7]; // r, g, b, a, x, y, z
+	float lighting[4]; // r, g, b, a
 	lighting[0] = map->lightColor.r;
 	lighting[1] = map->lightColor.g;
 	lighting[2] = map->lightColor.b;
 	lighting[3] = map->lightColor.a;
-	lighting[4] = -cosf(map->lightPitch) * sinf(map->lightYaw);
-	lighting[5] = sinf(map->lightPitch);
-	lighting[6] = -cosf(map->lightPitch) * cosf(map->lightYaw);
 	const LunaBufferWriteInfo lightingBufferWriteInfo = {
 		.bytes = sizeof(lighting),
 		.data = lighting,

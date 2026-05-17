@@ -41,7 +41,7 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 	CheckAlloc(path);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
 	{
-		const AssetPath *assetPath = &ListGet(gameConfig.assetPaths, i, AssetPath);
+		const AssetPath *assetPath = ListGetPointer(gameConfig.assetPaths, i);
 		if (isCodeAsset && !(assetPath->flags & ASSET_PATH_ALLOW_CODE_EXECUTION))
 		{
 			continue;
@@ -74,18 +74,18 @@ FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 	return NULL;
 }
 
-void EnumerateAssetsInFolder(const char *folder, SortedList *output, const char *extension)
+void EnumerateAssetsInFolder(const char *folder, List *output, const char *extension)
 {
 	// TODO this should do subfolders
 	ListFreeOnlyContents(*output);
 	ListClear(*output);
 	for (size_t i = 0; i < gameConfig.assetPaths.length; i++)
 	{
-		const char *assetPathStr = ListGet(gameConfig.assetPaths, i, AssetPath).path;
+		const AssetPath *assetPath = ListGetPointer(gameConfig.assetPaths, i);
 		char levelDataPath[300];
-		if (snprintf(levelDataPath, 300, "%s/%s/", assetPathStr, folder) > 300)
+		if (snprintf(levelDataPath, 300, "%s/%s/", assetPath->path, folder) > 300)
 		{
-			LogError("Asset directory path is too long: %s/%s\n", assetPathStr, folder);
+			LogError("Asset directory path is too long: %s/%s\n", assetPath->path, folder);
 			continue;
 		}
 
@@ -110,7 +110,17 @@ void EnumerateAssetsInFolder(const char *folder, SortedList *output, const char 
 				// Remove the .gmap extension
 				levelName[strlen(levelName) - strlen(extension)] = '\0';
 
-				if (ListFind(*output, levelName) == SIZE_MAX)
+				bool found = false;
+				for (size_t j = 0; j < output->length; j++)
+				{
+					const char *existing = ListGetPointer(*output, j);
+					if (strcmp(levelName, existing) == 0)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
 				{
 					ListAdd(*output, levelName);
 				}

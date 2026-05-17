@@ -71,7 +71,7 @@ void UpdateRadioButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, ui
 		// Find all radio buttons with the same group id and uncheck them
 		for (uint32_t i = 0; i < stack->controls.length; i++)
 		{
-			const Control *control = ListGet(stack->controls, i, Control *);
+			const Control *control = ListGetPointer(stack->controls, i);
 			if (control->type == RADIO_BUTTON)
 			{
 				RadioButtonData *radioData = control->controlData;

@@ -88,33 +88,34 @@ bool LoadMap(Map *map, Asset *mapData)
 		Vector3 eulerAngles = {rotX, rotY, rotZ};
 		JPH_Quat_FromEulerAngles(&eulerAngles, &xfm.rotation);
 
-		LockingList ioConnections;
-		ListInit(ioConnections, ActorConnection);
+		LockingList ioConnections = {0};
+		ListInit(ioConnections, LIST_POINTER);
 		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 		const size_t numConnections = ReadSizeT(mapData->data, &offset);
 		for (size_t j = 0; j < numConnections; j++)
 		{
-			ActorConnection connection = {0};
-			connection.sourceActorOutput = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+			ActorConnection *connection = malloc(sizeof(ActorConnection));
+			CheckAlloc(connection);
+			connection->sourceActorOutput = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
 			bytesRemaining -= strLength;
 			bytesRemaining += sizeof(size_t);
-			connection.targetActorName = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+			connection->targetActorName = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
 			bytesRemaining -= strLength;
 			bytesRemaining += sizeof(size_t);
-			connection.targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+			connection->targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
 			bytesRemaining -= strLength;
 			bytesRemaining += sizeof(size_t);
 			uint8_t hasOverride = ReadByte(mapData->data, &offset);
 			// TODO data size validation for params
 			if (hasOverride)
 			{
-				size_t paramSize = ReadParam(mapData->data, mapData->size, &offset, &connection.outParamOverride);
+				size_t paramSize = ReadParam(mapData->data, mapData->size, &offset, &connection->outParamOverride);
 				bytesRemaining -= paramSize;
 			} else
 			{
-				connection.outParamOverride.type = PARAM_TYPE_NONE;
+				connection->outParamOverride.type = PARAM_TYPE_NONE;
 			}
-			connection.numRefires = ReadSizeT(mapData->data, &offset);
+			connection->numRefires = ReadSizeT(mapData->data, &offset);
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;

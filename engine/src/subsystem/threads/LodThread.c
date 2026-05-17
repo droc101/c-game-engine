@@ -54,7 +54,7 @@ int LodThreadMain(void * /*data*/)
 		Vector3 offsetFromCamera = {};
 		for (size_t i = 0; i < actorCount; i++)
 		{
-			Actor *actor = ListGet(*actors, i, Actor *);
+			Actor *actor = ListGetPointer(*actors, i);
 			if (!actor->hasModel || actor->model->lodCount == 1)
 			{
 				continue;

@@ -40,7 +40,7 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->modColor = COLOR_WHITE;
 	actor->bodyInterface = bodyInterface;
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
-	ListInit(actor->ioConnections, ActorConnection);
+	ListInit(actor->ioConnections, LIST_POINTER);
 
 	actor->definition->Init(actor, params, transform); // kindly allow the Actor to initialize itself
 	ActorFireOutput(actor, ACTOR_OUTPUT_SPAWNED, PARAM_NONE);
@@ -69,7 +69,8 @@ void FreeActor(Actor *actor)
 	}
 	for (size_t i = 0; i < actor->ioConnections.length; i++)
 	{
-		DestroyActorConnection(&ListGet(actor->ioConnections, i, ActorConnection));
+		ActorConnection *connection = ListGetPointer(actor->ioConnections, i);
+		DestroyActorConnection(connection);
 	}
 	ListFree(actor->ioConnections);
 	free(actor);
@@ -94,7 +95,7 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 	ListLock(sender->ioConnections);
 	for (size_t i = 0; i < sender->ioConnections.length; i++)
 	{
-		const ActorConnection *connection = &ListGet(sender->ioConnections, i, ActorConnection);
+		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
 		if (strcmp(connection->sourceActorOutput, output) == 0)
 		{
 			List actors;
@@ -106,12 +107,13 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 			}
 			for (size_t j = 0; j < actors.length; j++)
 			{
+				Actor *actor = ListGetPointer(actors, j);
 				const Param *param = &defaultParam;
 				if (connection->outParamOverride.type != PARAM_TYPE_NONE)
 				{
 					param = &connection->outParamOverride;
 				}
-				ActorTriggerInput(sender, ListGet(actors, j, Actor *), connection->targetActorInput, param);
+				ActorTriggerInput(sender, actor, connection->targetActorInput, param);
 			}
 			ListFree(actors);
 		}
@@ -125,6 +127,7 @@ void DestroyActorConnection(ActorConnection *connection)
 	free(connection->sourceActorOutput);
 	free(connection->targetActorInput);
 	FreeParam(&connection->outParamOverride);
+	free(connection);
 }
 void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
 

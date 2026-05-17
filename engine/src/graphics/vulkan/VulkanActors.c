@@ -42,8 +42,9 @@ static ActorModelInstanceData *modelsInstanceData;
 static VkDrawIndexedIndirectCommand *shadedModelsDrawInfo;
 static VkDrawIndexedIndirectCommand *unshadedModelsDrawInfo;
 
-static SortedList modelLods;
-static SortedList instanceDataOffsets;
+// TODO: These would have improved performance from using SortedList
+static List modelLods;
+static List instanceDataOffsets;
 
 static inline int CompareModelLodDatas(const void *a, const void *b)
 {
@@ -63,8 +64,8 @@ static inline int CompareInstanceDataOffsets(const void *a, const void *b)
 
 void InitActorLoadingVariables()
 {
-	ListInit(modelLods, ModelLodData, CompareModelLodDatas);
-	ListInit(instanceDataOffsets, InstanceDataOffset, CompareInstanceDataOffsets);
+	ListInit(modelLods, LIST_POINTER);
+	ListInit(instanceDataOffsets, LIST_POINTER);
 }
 
 static inline VkResult LoadModelLods(const ModelDefinition *model)
@@ -190,7 +191,7 @@ VkResult LoadActors()
 	ListLock(actors);
 	for (size_t i = 0; i < actors.length; i++)
 	{
-		VulkanTestReturnResult(LoadActor(ListGet(actors, i, const Actor *)), "Failed to load actor!");
+		VulkanTestReturnResult(LoadActor(ListGetPointer(actors, i)), "Failed to load actor!");
 	}
 	ListUnlock(actors);
 

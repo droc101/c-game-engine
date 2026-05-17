@@ -39,7 +39,7 @@ struct MapVertex
 	Vector3 position;
 	/// The UV coordinate
 	Vector2 uv;
-	/// The Lightmap UV coordiante
+	/// The Lightmap UV coordinate
 	Vector2 lightmapUv;
 };
 
