@@ -55,14 +55,14 @@ if (WIN32)
         )
     endforeach ()
 
-    if (x86_64)
+    if (x86_64 AND USE_DISCORD_SDK)
         add_custom_command(TARGET copy_libraries POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${CMAKE_BINARY_DIR}/discord_game_sdk.dll"
                 "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/discord_game_sdk.dll"
         )
     endif ()
-elseif (x86_64) # linux x86
+elseif (x86_64 AND USE_DISCORD_SDK) # linux x86
     add_custom_command(TARGET copy_libraries POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_BINARY_DIR}/discord_game_sdk.so"

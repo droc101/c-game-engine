@@ -34,7 +34,7 @@ fetch_dict()
 
 message(STATUS "Fetching Luna...")
 fetch_package_tag(https://github.com/NBT22/Luna "v0.2.*" Luna)
-if (x86_64)
+if (x86_64 AND USE_DISCORD_SDK)
     fetch_discord_sdk()
 endif ()
 
@@ -233,7 +233,7 @@ target_sources(engine INTERFACE
 )
 set_target_properties(engine PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
 target_include_directories(engine INTERFACE include)
-if (x86_64)
+if (x86_64 AND USE_DISCORD_SDK)
     target_compile_definitions(engine INTERFACE ENABLE_DISCORD_SDK)
     target_include_directories(engine INTERFACE ${DISCORD_GAME_SDK_DIR}/c/)
     target_link_libraries(engine INTERFACE discord_game_sdk)

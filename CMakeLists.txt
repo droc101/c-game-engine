@@ -24,6 +24,8 @@ option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a Re
 option(STANDALONE_LAUNCHER "Whether or not to build only the launcher" OFF)
 set(X86_64_VERSION "3" CACHE STRING "The x86_64 microarchitecture level to target, 1 to 4. Using lower levels has a performance penalty.") # See https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels for details
 
+option(USE_DISCORD_SDK "Whether or not to enable the Discord Game SDK" ON)
+
 #endregion
 
 #region Compile flags

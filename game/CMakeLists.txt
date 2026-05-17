@@ -84,7 +84,7 @@ target_link_libraries(game PRIVATE engine)
 target_include_directories(game PRIVATE include)
 set_target_properties(game PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
 
-if (x86_64)
+if (x86_64 AND USE_DISCORD_SDK)
     if (WIN32)
         add_custom_command(TARGET game PRE_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
