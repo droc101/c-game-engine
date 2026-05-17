@@ -35,8 +35,10 @@ VkResult CreateUiBuffers()
 	const LunaBufferCreationInfo vertexBufferCreationInfo = {
 		.size = vertexBufferAllocationSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.ui.vertexBuffer),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &vertexBufferCreationInfo, &buffers.ui.vertexBuffer),
 						   "Failed to create UI vertex buffer!");
 	buffers.ui.vertexData = malloc(vertexBufferAllocationSize);
 	CheckAlloc(buffers.ui.vertexData);
@@ -45,8 +47,10 @@ VkResult CreateUiBuffers()
 	const LunaBufferCreationInfo indexBufferCreationInfo = {
 		.size = indexBufferAllocationSize,
 		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.ui.indexBuffer),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &indexBufferCreationInfo, &buffers.ui.indexBuffer),
 						   "Failed to create UI index buffer!");
 	buffers.ui.indexData = malloc(indexBufferAllocationSize);
 	CheckAlloc(buffers.ui.indexData);
@@ -59,20 +63,26 @@ VkResult CreateUniformBuffers()
 	const LunaBufferCreationInfo cameraUniformBufferCreationInfo = {
 		.size = sizeof(CameraUniform),
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&cameraUniformBufferCreationInfo, &buffers.uniforms.camera),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &cameraUniformBufferCreationInfo, &buffers.uniforms.camera),
 						   "Failed to create camera uniform buffer!");
 	const LunaBufferCreationInfo lightingBufferCreationInfo = {
 		.size = sizeof(float) * 7, // r, g, b, a, x, y, z
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&lightingBufferCreationInfo, &buffers.uniforms.lighting),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &lightingBufferCreationInfo, &buffers.uniforms.lighting),
 						   "Failed to create lighting uniform buffer!");
 	const LunaBufferCreationInfo fogBufferCreationInfo = {
 		.size = sizeof(Color) + sizeof(float) * 2, // fogColor, fogStart, fogEnd
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&fogBufferCreationInfo, &buffers.uniforms.fog),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &fogBufferCreationInfo, &buffers.uniforms.fog),
 						   "Failed to create fog uniform buffer!");
 
 	return VK_SUCCESS;
@@ -82,28 +92,38 @@ VkResult CreateMapBuffers()
 {
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&verticesBufferCreationInfo, &buffers.map.vertices),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.map.vertices),
 						   "Failed to create shaded map vertex buffer!");
 	const LunaBufferCreationInfo indicesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&indicesBufferCreationInfo, &buffers.map.indices),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.map.indices),
 						   "Failed to create shaded map index buffer!");
 	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&instanceDataBufferCreationInfo, &buffers.map.instanceData),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.map.instanceData),
 						   "Failed to create shaded map instance data buffer!");
 	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&shadedDrawInfoBufferCreationInfo, &buffers.map.shadedDrawInfo),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &shadedDrawInfoBufferCreationInfo, &buffers.map.shadedDrawInfo),
 						   "Failed to create shaded map draw info buffer!");
 	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&unshadedDrawInfoBufferCreationInfo, &buffers.map.unshadedDrawInfo),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &unshadedDrawInfoBufferCreationInfo, &buffers.map.unshadedDrawInfo),
 						   "Failed to create unshaded map draw info buffer!");
 
 	return VK_SUCCESS;
@@ -117,14 +137,18 @@ VkResult CreateSkyBuffers()
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
 		.size = sizeof(SkyVertex) * SKY_MAX_VERTICES_INIT,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&verticesBufferCreationInfo, &buffers.sky.vertices),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.sky.vertices),
 						   "Failed to create sky vertex buffer!");
 	const LunaBufferCreationInfo indicesBufferCreationInfo = {
 		.size = sizeof(uint32_t) * SKY_MAX_INDICES_INIT,
 		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&indicesBufferCreationInfo, &buffers.sky.indices),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.sky.indices),
 						   "Failed to create sky index buffer!");
 
 	return VK_SUCCESS;
@@ -134,28 +158,42 @@ VkResult CreateViewmodelBuffers()
 {
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&verticesBufferCreationInfo, &buffers.viewmodel.vertices),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.viewmodel.vertices),
 						   "Failed to create shaded viewmodel vertex buffer!");
 	const LunaBufferCreationInfo indicesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&indicesBufferCreationInfo, &buffers.viewmodel.indices),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.viewmodel.indices),
 						   "Failed to create shaded viewmodel index buffer!");
 	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&instanceDataBufferCreationInfo, &buffers.viewmodel.instanceData),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.viewmodel.instanceData),
 						   "Failed to create shaded viewmodel instance data buffer!");
 	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&shadedDrawInfoBufferCreationInfo, &buffers.viewmodel.shadedDrawInfo),
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&shadedDrawInfoBufferCreationInfo,
+											&buffers.viewmodel.shadedDrawInfo),
 						   "Failed to create shaded viewmodel draw info buffer!");
 	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&unshadedDrawInfoBufferCreationInfo, &buffers.viewmodel.unshadedDrawInfo),
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&unshadedDrawInfoBufferCreationInfo,
+											&buffers.viewmodel.unshadedDrawInfo),
 						   "Failed to create unshaded viewmodel draw info buffer!");
 
 	return VK_SUCCESS;
@@ -167,6 +205,8 @@ VkResult CreateDebugDrawBuffers()
 	const LunaBufferCreationInfo linesVertexBuffer = {
 		.size = buffers.debugDrawLines.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
 	VulkanTestReturnResult(lunaCreateBuffer(&linesVertexBuffer, &buffers.debugDrawLines.vertices.buffer),
 						   "Failed to create debug draw lines buffer!");
@@ -176,6 +216,8 @@ VkResult CreateDebugDrawBuffers()
 	const LunaBufferCreationInfo vertexVertexBuffer = {
 		.size = buffers.debugDrawTriangles.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
 	VulkanTestReturnResult(lunaCreateBuffer(&vertexVertexBuffer, &buffers.debugDrawTriangles.vertices.buffer),
 						   "Failed to create debug draw triangles buffer!");
@@ -244,6 +286,8 @@ bool LoadTexture(const Image *image)
 		.width = image->width,
 		.height = image->height,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		.writeInfo.bytes = image->width * image->height * sizeof(uint32_t),
 		.writeInfo.pixels = image->pixelData,
@@ -257,7 +301,7 @@ bool LoadTexture(const Image *image)
 	};
 	LunaImage lunaImage = LUNA_NULL_HANDLE;
 	const size_t index = textures.length;
-	VulkanTest(lunaCreateImage(&imageCreationInfo, &lunaImage), "Failed to create texture!");
+	VulkanTest(lunaCreateImage(device, commandBuffer, &imageCreationInfo, &lunaImage), "Failed to create texture!");
 	imageAssetIdToIndexMap[image->id] = index;
 	ListAdd(textures, lunaImage);
 
@@ -272,7 +316,7 @@ bool LoadTexture(const Image *image)
 		.descriptorCount = 1,
 		.imageInfo = &imageInfo,
 	};
-	lunaWriteDescriptorSets(1, &writeDescriptor);
+	lunaWriteDescriptorSets(device, 1, &writeDescriptor);
 	UnlockLodThreadMutex();
 
 	return true;

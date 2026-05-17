@@ -97,9 +97,28 @@ bool CreateLogicalDevice()
 		.surface = surface,
 		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
 	};
-	VulkanTest(lunaCreateDevice2(&deviceCreationInfo), "Failed to create logical device!");
-	lunaGetPhysicalDeviceProperties(&physicalDeviceProperties);
+	VulkanTest(lunaCreateDevice2(&deviceCreationInfo, &device), "Failed to create logical device!");
+	lunaGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
 	// TODO: Additional checks, and change from assert to a failure that allows GL to take over
+	return true;
+}
+
+bool CreateCommandBuffer()
+{
+	const LunaQueueFamilyProperties requiredProperties = {
+		.queueFamilyProperties.queueFlags = VK_QUEUE_GRAPHICS_BIT,
+		.presentationSupport = true,
+	};
+	queueFamilyIndex = lunaGetDeviceQueueFamilyIndex(device, &requiredProperties);
+	queue = lunaGetDeviceQueue(device, queueFamilyIndex, 0);
+
+	const LunaCommandPoolCreationInfo commandPoolCreationInfo = {
+		.queueFamilyIndex = queueFamilyIndex,
+	};
+	VulkanTest(lunaCreateCommandPool(device, &commandPoolCreationInfo, &commandPool), "Failed to create command pool!");
+	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &commandBuffer),
+			   "Failed to allocate command buffer!");
+
 	return true;
 }
 
@@ -112,7 +131,7 @@ bool CreateSwapchain()
 	}
 
 	VkSurfaceCapabilitiesKHR capabilities;
-	VulkanTest(lunaGetSurfaceCapabilities(surface, &capabilities), "Failed to get surface capabilities!");
+	VulkanTest(lunaGetSurfaceCapabilities(device, surface, &capabilities), "Failed to get surface capabilities!");
 
 	if (!capabilities.currentExtent.width || !capabilities.currentExtent.height)
 	{
@@ -127,7 +146,11 @@ bool CreateSwapchain()
 	{
 		int32_t width = 0;
 		int32_t height = 0;
-		SDL_GetWindowSizeInPixels(vulkanWindow, &width, &height);
+		if (!SDL_GetWindowSizeInPixels(vulkanWindow, &width, &height))
+		{
+			LogError("Failed to get window size with error: %s", SDL_GetError());
+			return false;
+		}
 		swapChainExtent.width = clamp((uint32_t)width,
 									  capabilities.minImageExtent.width,
 									  capabilities.maxImageExtent.width);
@@ -158,9 +181,12 @@ bool CreateSwapchain()
 		.presentModeCount = vsync ? 1 : 3,
 		.presentModePriorityList = presentModes,
 		.clipped = true,
+
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
 
-	VulkanTest(lunaCreateSwapchain(&swapChainCreationInfo), "Failed to create swap chain!");
+	VulkanTest(lunaCreateSwapchain(device, &swapChainCreationInfo), "Failed to create swap chain!");
 
 	return true;
 }
@@ -169,7 +195,9 @@ bool CreateRenderPass()
 {
 	// TODO: Once Luna supports it, prefer using VK_FORMAT_D32_SFLOAT
 	//  Also ensure that that is the best format for all drivers, not just for NVIDIA
-	VulkanTest(lunaSetDepthImageFormat(2, (VkFormat[]){VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT_S8_UINT}),
+	VulkanTest(lunaSetDepthImageFormat(device,
+									   2,
+									   (VkFormat[]){VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT_S8_UINT}),
 			   "Failed to set depth image format!");
 
 	switch (GetState()->options.msaa)
@@ -224,7 +252,11 @@ bool CreateRenderPass()
 		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 	};
 	SDL_Rect bounds;
-	SDL_GetDisplayBounds(SDL_GetDisplayForWindow(vulkanWindow), &bounds);
+	if (!SDL_GetDisplayBounds(SDL_GetDisplayForWindow(vulkanWindow), &bounds))
+	{
+		LogError("Failed to get display bounds with error: %s", SDL_GetError());
+		return false;
+	}
 	const LunaRenderPassCreationInfo renderPassCreationInfo = {
 		.samples = msaaSamples,
 		.createColorAttachment = true,
@@ -237,8 +269,11 @@ bool CreateRenderPass()
 		.dependencies = &dependency,
 		.extent = (VkExtent3D){.width = swapChainExtent.width, .height = swapChainExtent.height, .depth = 1},
 		.maxExtent = (VkExtent3D){.width = bounds.w, .height = bounds.h, .depth = 1},
+
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTest(lunaCreateRenderPass(&renderPassCreationInfo, &renderPass), "Failed to create render pass!");
+	VulkanTest(lunaCreateRenderPass(device, &renderPassCreationInfo, &renderPass), "Failed to create render pass!");
 	return true;
 }
 
@@ -278,7 +313,7 @@ bool CreateDescriptorSetLayouts()
 		.bindingCount = sizeof(bindings) / sizeof(*bindings),
 		.bindings = bindings,
 	};
-	VulkanTest(lunaCreateDescriptorSetLayout(&descriptorSetLayoutCreationInfo, &descriptorSetLayout),
+	VulkanTest(lunaCreateDescriptorSetLayout(device, &descriptorSetLayoutCreationInfo, &descriptorSetLayout),
 			   "Failed to create pipeline descriptor set layout!");
 
 	return true;
@@ -371,19 +406,28 @@ bool CreateTextureSamplers()
 		.maxLod = VK_LOD_CLAMP_NONE,
 	};
 
-	VulkanTest(lunaCreateSampler(&linearRepeatSamplerAnisotropyCreateInfo, &textureSamplers.linearRepeatAnisotropy),
+	VulkanTest(lunaCreateSampler(device,
+								 &linearRepeatSamplerAnisotropyCreateInfo,
+								 &textureSamplers.linearRepeatAnisotropy),
 			   "Failed to create linear repeating anisotropy texture sampler!");
-	VulkanTest(lunaCreateSampler(&linearNoRepeatSamplerAnisotropyCreateInfo, &textureSamplers.linearNoRepeatAnisotropy),
+	VulkanTest(lunaCreateSampler(device,
+								 &linearNoRepeatSamplerAnisotropyCreateInfo,
+								 &textureSamplers.linearNoRepeatAnisotropy),
 			   "Failed to create nearest non-repeating anisotropy texture sampler!");
-	VulkanTest(lunaCreateSampler(&linearRepeatSamplerNoAnisotropyCreateInfo, &textureSamplers.linearRepeatNoAnisotropy),
+	VulkanTest(lunaCreateSampler(device,
+								 &linearRepeatSamplerNoAnisotropyCreateInfo,
+								 &textureSamplers.linearRepeatNoAnisotropy),
 			   "Failed to create linear repeating no anisotropy texture sampler!");
-	VulkanTest(lunaCreateSampler(&nearestRepeatSamplerNoAnisotropyCreateInfo,
+	VulkanTest(lunaCreateSampler(device,
+								 &nearestRepeatSamplerNoAnisotropyCreateInfo,
 								 &textureSamplers.nearestRepeatNoAnisotropy),
 			   "Failed to create nearest repeating no anisotropy texture sampler!");
-	VulkanTest(lunaCreateSampler(&linearNoRepeatSamplerNoAnisotropyCreateInfo,
+	VulkanTest(lunaCreateSampler(device,
+								 &linearNoRepeatSamplerNoAnisotropyCreateInfo,
 								 &textureSamplers.linearNoRepeatNoAnisotropy),
 			   "Failed to create linear non-repeating no anisotropy texture sampler!");
-	VulkanTest(lunaCreateSampler(&nearestNoRepeatSamplerNoAnisotropyCreateInfo,
+	VulkanTest(lunaCreateSampler(device,
+								 &nearestNoRepeatSamplerNoAnisotropyCreateInfo,
 								 &textureSamplers.nearestNoRepeatNoAnisotropy),
 			   "Failed to create nearest non-repeating no anisotropy texture sampler!");
 
@@ -425,7 +469,7 @@ bool CreateDescriptorSet()
 		.poolSizeCount = sizeof(poolSizes) / sizeof(*poolSizes),
 		.poolSizes = poolSizes,
 	};
-	VulkanTest(lunaCreateDescriptorPool(&descriptorPoolCreationInfo, &descriptorPool),
+	VulkanTest(lunaCreateDescriptorPool(device, &descriptorPoolCreationInfo, &descriptorPool),
 			   "Failed to create descriptor pool!");
 
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
@@ -433,7 +477,8 @@ bool CreateDescriptorSet()
 		.setLayoutCount = 1,
 		.setLayouts = &descriptorSetLayout,
 	};
-	VulkanTest(lunaAllocateDescriptorSets(&allocationInfo, &descriptorSet), "Failed to allocate descriptor sets!");
+	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, &descriptorSet),
+			   "Failed to allocate descriptor sets!");
 
 	const LunaDescriptorBufferInfo transformMatrixBufferInfo = {
 		.buffer = buffers.uniforms.camera,
@@ -462,7 +507,7 @@ bool CreateDescriptorSet()
 		.descriptorCount = 1,
 		.bufferInfo = &fogBufferInfo,
 	};
-	lunaWriteDescriptorSets(3, (LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite});
+	lunaWriteDescriptorSets(device, 3, (LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite});
 
 	return true;
 }

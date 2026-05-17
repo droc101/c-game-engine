@@ -161,7 +161,8 @@ static inline bool CreateUIPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.ui), "Failed to create UI graphics pipeline!");
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.ui),
+			   "Failed to create UI graphics pipeline!");
 
 	return true;
 }
@@ -249,7 +250,7 @@ static inline bool CreateShadedMapPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.shadedMap),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedMap),
 			   "Failed to create shaded map graphics pipeline!");
 
 	return true;
@@ -332,7 +333,7 @@ static inline bool CreateUnshadedMapPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.unshadedMap),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedMap),
 			   "Failed to create unshaded map graphics pipeline!");
 
 	return true;
@@ -413,7 +414,8 @@ static inline bool CreateSkyPipeline()
 		.layoutCreationInfo = skyPipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.sky), "Failed to create sky graphics pipeline!");
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.sky),
+			   "Failed to create sky graphics pipeline!");
 
 	return true;
 }
@@ -538,7 +540,7 @@ static inline bool CreateShadedViewmodelPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.shadedViewmodel),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedViewmodel),
 			   "Failed to create shaded viewmodel graphics pipeline!");
 
 	return true;
@@ -651,7 +653,7 @@ static inline bool CreateUnshadedViewmodelPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.unshadedViewmodel),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedViewmodel),
 			   "Failed to create unshaded viewmodel graphics pipeline!");
 
 	return true;
@@ -781,7 +783,7 @@ static inline bool CreateShadedActorModelPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.shadedActorModel),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedActorModel),
 			   "Failed to create shaded actor model graphics pipeline!");
 
 	return true;
@@ -900,7 +902,7 @@ static inline bool CreateUnshadedActorModelPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&pipelineInfo, &pipelines.unshadedActorModel),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedActorModel),
 			   "Failed to create unshaded actor model graphics pipeline!");
 
 	return true;

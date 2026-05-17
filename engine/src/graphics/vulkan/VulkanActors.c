@@ -86,10 +86,14 @@ static inline VkResult LoadModelLods(const ModelDefinition *model)
 		return VK_SUCCESS;
 	}
 
-	VulkanTestReturnResult(lunaGrowBuffer(&buffers.actorModels.vertices,
+	VulkanTestReturnResult(lunaGrowBuffer(device,
+										  commandBuffer,
+										  &buffers.actorModels.vertices,
 										  lunaGetBufferSize(buffers.actorModels.vertices) + vertexSize),
 						   "Failed to resize actor model vertex buffer!");
-	VulkanTestReturnResult(lunaGrowBuffer(&buffers.actorModels.indices,
+	VulkanTestReturnResult(lunaGrowBuffer(device,
+										  commandBuffer,
+										  &buffers.actorModels.indices,
 										  lunaGetBufferSize(buffers.actorModels.indices) + indexSize),
 						   "Failed to resize actor model index buffer!");
 
@@ -130,7 +134,10 @@ static inline VkResult LoadModelLods(const ModelDefinition *model)
 		.offset = bufferVertexOffset,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.actorModels.vertices, &vertexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.vertices,
+												 &vertexBufferWriteInfo),
 						   "Failed to write model vertex data to buffer!");
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
 		.bytes = indexSize,
@@ -138,7 +145,10 @@ static inline VkResult LoadModelLods(const ModelDefinition *model)
 		.offset = bufferIndexOffset,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.actorModels.indices, &indexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.indices,
+												 &indexBufferWriteInfo),
 						   "Failed to write model index data to buffer!");
 
 	bufferVertexOffset += vertexSize;

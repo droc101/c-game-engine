@@ -16,6 +16,8 @@ bool CreateSurface(SDL_Window *window);
 
 bool CreateLogicalDevice();
 
+bool CreateCommandBuffer();
+
 bool CreateSwapchain();
 
 bool CreateRenderPass();

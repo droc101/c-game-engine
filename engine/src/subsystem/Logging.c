@@ -59,7 +59,7 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	{
 		length = sprintf(buf, "\x1b[%02dm[%s]", color, type);
 	}
-	printf("%-" TO_STR(bufferLength) "s", buf);
+	printf("%-" TO_STR(BUFFER_LENGTH) "s", buf);
 	length += vprintf(message, args);
 	printf("\x1b[0m");
 	va_end(args);

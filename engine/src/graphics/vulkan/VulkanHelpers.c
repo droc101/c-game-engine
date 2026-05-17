@@ -32,6 +32,11 @@
 
 #pragma region variables
 bool minimized = false;
+LunaDevice device = LUNA_NULL_HANDLE;
+uint32_t queueFamilyIndex = -1u;
+VkQueue queue = VK_NULL_HANDLE;
+LunaCommandPool commandPool = LUNA_NULL_HANDLE;
+LunaCommandBuffer commandBuffer = LUNA_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
 VkExtent2D swapChainExtent = {0};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
@@ -70,15 +75,15 @@ bool ClearTextureCache()
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 	for (size_t i = 0; i < textures.length; i++)
 	{
-		lunaDestroyImage(ListGet(textures, i, LunaImage));
+		lunaDestroyImage(device, ListGet(textures, i, LunaImage));
 	}
 	ListClear(textures);
-	lunaDestroySampler(textureSamplers.linearRepeatAnisotropy);
-	lunaDestroySampler(textureSamplers.linearNoRepeatAnisotropy);
-	lunaDestroySampler(textureSamplers.linearRepeatNoAnisotropy);
-	lunaDestroySampler(textureSamplers.nearestRepeatNoAnisotropy);
-	lunaDestroySampler(textureSamplers.linearNoRepeatNoAnisotropy);
-	lunaDestroySampler(textureSamplers.nearestNoRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearRepeatAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearNoRepeatAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.nearestRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearNoRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.nearestNoRepeatNoAnisotropy);
 	return CreateTextureSamplers();
 }
 
@@ -103,7 +108,7 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 		.creationInfoUnion.spirv.size = sizeof(uint32_t) * shader->spirvLength,
 		.creationInfoUnion.spirv.spirv = shader->spirv,
 	};
-	VulkanTestReturnResult(lunaCreateShaderModule(&shaderModuleCreationInfo, shaderModule),
+	VulkanTestReturnResult(lunaCreateShaderModule(device, &shaderModuleCreationInfo, shaderModule),
 						   "Failed to create shader module!");
 
 	FreeShader(shader);
@@ -160,7 +165,7 @@ VkResult UpdateCameraUniform(const Camera *camera)
 		.data = &uniform,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.uniforms.camera, &bufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.camera, &bufferWriteInfo),
 						   "Failed to write camera uniform!");
 
 	return VK_SUCCESS;
@@ -200,7 +205,7 @@ VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
 			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 		};
-		VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.viewmodel.instanceData, &writeInfo),
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.instanceData, &writeInfo),
 							   "Failed to write viewmodel transform matrix to instance data buffer!");
 	}
 

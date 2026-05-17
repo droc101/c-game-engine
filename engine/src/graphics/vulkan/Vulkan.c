@@ -80,7 +80,7 @@ static inline VkResult LoadSky(const ModelDefinition *model)
 		.data = vertices,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.sky.vertices, &vertexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.sky.vertices, &vertexBufferWriteInfo),
 						   "Failed to write sky model vertex data to buffer!");
 
 	skyModelIndexCount = lod->indexCount[0];
@@ -90,7 +90,7 @@ static inline VkResult LoadSky(const ModelDefinition *model)
 		.data = lod->indexData[0],
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.sky.indices, &indexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.sky.indices, &indexBufferWriteInfo),
 						   "Failed to write sky model index data to buffer!");
 
 	return VK_SUCCESS;
@@ -115,7 +115,10 @@ static inline VkResult UpdateViewmodel(const Viewmodel *viewmodel)
 			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, materialColor),
 			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 		};
-		VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.viewmodel.instanceData, &instanceDataBufferWriteInfo),
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+													 commandBuffer,
+													 buffers.viewmodel.instanceData,
+													 &instanceDataBufferWriteInfo),
 							   "Failed to write viewmodel instance data to buffer!");
 
 		VkDrawIndexedIndirectCommand drawInfo = {
@@ -131,7 +134,9 @@ static inline VkResult UpdateViewmodel(const Viewmodel *viewmodel)
 					  sizeof(VkDrawIndexedIndirectCommand),
 			.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
 		};
-		VulkanTestReturnResult(lunaWriteDataToBuffer(material->shader == SHADER_SHADED
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+													 commandBuffer,
+													 material->shader == SHADER_SHADED
 															 ? buffers.viewmodel.shadedDrawInfo
 															 : buffers.viewmodel.unshadedDrawInfo,
 													 &drawInfoBufferWriteInfo),
@@ -169,18 +174,24 @@ static inline VkResult LoadViewmodel(const Viewmodel *viewmodel)
 	}
 
 	const size_t vertexBufferSize = lod->vertexCount * sizeof(ModelVertex);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.viewmodel.vertices, vertexBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.vertices, vertexBufferSize),
 						   "Failed to resize viewmodel vertex buffer!");
 	const size_t indexBufferSize = lod->totalIndexCount * sizeof(uint32_t);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.viewmodel.indices, indexBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.indices, indexBufferSize),
 						   "Failed to resize viewmodel index buffer!");
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.viewmodel.instanceData,
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.viewmodel.instanceData,
 											(shadedMaterialCount + unshadedMaterialCount) * sizeof(ModelInstanceData)),
 						   "Failed to resize viewmodel instance data buffer!");
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.viewmodel.shadedDrawInfo,
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.viewmodel.shadedDrawInfo,
 											shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand)),
 						   "Failed to resize viewmodel shaded material draw info buffer!");
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.viewmodel.unshadedDrawInfo,
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.viewmodel.unshadedDrawInfo,
 											unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand)),
 						   "Failed to resize viewmodel unshaded material draw info buffer!");
 
@@ -189,14 +200,20 @@ static inline VkResult LoadViewmodel(const Viewmodel *viewmodel)
 		.data = lod->vertexData,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.viewmodel.vertices, &vertexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.viewmodel.vertices,
+												 &vertexBufferWriteInfo),
 						   "Failed to write data to viewmodel vertex buffer!");
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
 		.bytes = indexBufferSize,
 		.data = indices,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.viewmodel.indices, &indexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.viewmodel.indices,
+												 &indexBufferWriteInfo),
 						   "Failed to write data to viewmodel index buffer!");
 
 
@@ -228,24 +245,29 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 				unshadedMaterialCount++;
 				break;
 			default:
-				assert(shader == SHADER_SHADED || shader == SHADER_UNSHADED);
 				return VK_ERROR_UNKNOWN;
 		}
 	}
 	const size_t vertexBufferSize = totalVertexCount * sizeof(MapVertex);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.map.vertices, vertexBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.map.vertices, vertexBufferSize),
 						   "Failed to resize map vertex buffer!");
 	const size_t indexBufferSize = totalIndexCount * sizeof(uint32_t);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.map.indices, indexBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.map.indices, indexBufferSize),
 						   "Failed to resize map index buffer!");
 	const size_t instanceDataBufferSize = totalMaterialCount * sizeof(uint32_t);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.map.instanceData, instanceDataBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.map.instanceData, instanceDataBufferSize),
 						   "Failed to resize map instance data buffer!");
 	const size_t shadedDrawInfoBufferSize = shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.map.shadedDrawInfo, shadedDrawInfoBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.map.shadedDrawInfo,
+											shadedDrawInfoBufferSize),
 						   "Failed to resize map shaded draw info buffer!");
 	const size_t unshadedDrawInfoBufferSize = unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
-	VulkanTestReturnResult(lunaResizeBuffer(&buffers.map.unshadedDrawInfo, unshadedDrawInfoBufferSize),
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.map.unshadedDrawInfo,
+											unshadedDrawInfoBufferSize),
 						   "Failed to resize map unshaded draw info buffer!");
 
 	VkDeviceSize vertexOffset = 0;
@@ -295,35 +317,44 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 		.data = vertices,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.map.vertices, &vertexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.map.vertices, &vertexBufferWriteInfo),
 						   "Failed to write data to map vertex buffer!");
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
 		.bytes = indexBufferSize,
 		.data = indices,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.map.indices, &indexBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.map.indices, &indexBufferWriteInfo),
 						   "Failed to write data to map index buffer!");
 	const LunaBufferWriteInfo instanceDataBufferWriteInfo = {
 		.bytes = instanceDataBufferSize,
 		.data = textureIndices,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.map.instanceData, &instanceDataBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.map.instanceData,
+												 &instanceDataBufferWriteInfo),
 						   "Failed to write data to map per-material data buffer!");
 	const LunaBufferWriteInfo shadedDrawInfoBufferWriteInfo = {
 		.bytes = shadedDrawInfoBufferSize,
 		.data = shadedDrawInfo,
 		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.map.shadedDrawInfo, &shadedDrawInfoBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.map.shadedDrawInfo,
+												 &shadedDrawInfoBufferWriteInfo),
 						   "Failed to write data to map shaded draw info buffer!");
 	const LunaBufferWriteInfo unshadedDrawInfoBufferWriteInfo = {
 		.bytes = unshadedDrawInfoBufferSize,
 		.data = unshadedDrawInfo,
 		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(buffers.map.unshadedDrawInfo, &unshadedDrawInfoBufferWriteInfo),
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.map.unshadedDrawInfo,
+												 &unshadedDrawInfoBufferWriteInfo),
 						   "Failed to write data to map unshaded draw info buffer!");
 
 	return VK_SUCCESS;
@@ -336,14 +367,17 @@ static inline VkResult DrawSky(const LunaGraphicsPipelineBindInfo *pipelineBindI
 		return VK_SUCCESS;
 	}
 
-	VulkanTestReturnResult(lunaPushConstants(pipelines.sky), "Failed to push constants for sky pipeline!");
+	VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, pipelines.sky),
+						   "Failed to push constants for sky pipeline!");
 	const LunaDrawIndexedInfo skyDrawInfo = {
 		.pipeline = pipelines.sky,
 		.pipelineBindInfo = pipelineBindInfo,
 		.indexCount = skyModelIndexCount,
 		.instanceCount = 1,
 	};
-	VulkanTestReturnResult(lunaDrawBufferIndexed(buffers.sky.vertices,
+	VulkanTestReturnResult(lunaDrawBufferIndexed(device,
+												 commandBuffer,
+												 buffers.sky.vertices,
 												 buffers.sky.indices,
 												 VK_INDEX_TYPE_UINT32,
 												 &skyDrawInfo),
@@ -360,8 +394,14 @@ static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindI
 
 	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
 	{
-		lunaBindVertexBuffers((LunaBuffer[]){buffers.map.vertices, buffers.map.instanceData}, 0, 2);
-		lunaBindIndexBuffer(buffers.map.indices, VK_INDEX_TYPE_UINT32);
+		VulkanTest(lunaBindVertexBuffers(device,
+										 commandBuffer,
+										 (LunaBuffer[]){buffers.map.vertices, buffers.map.instanceData},
+										 0,
+										 2),
+				   "Failed to bind map vertex buffers!");
+		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.map.indices, VK_INDEX_TYPE_UINT32),
+				   "Failed to bind map index buffer!");
 	}
 
 	if (shadedDrawCount != 0)
@@ -372,7 +412,7 @@ static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindI
 			.buffer = buffers.map.shadedDrawInfo,
 			.drawCount = shadedDrawCount,
 		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(&drawInfo), "Failed to draw shaded map!");
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo), "Failed to draw shaded map!");
 	}
 
 	if (unshadedDrawCount != 0)
@@ -383,7 +423,8 @@ static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindI
 			.buffer = buffers.map.unshadedDrawInfo,
 			.drawCount = unshadedDrawCount,
 		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(&drawInfo), "Failed to draw unshaded map!");
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw unshaded map!");
 	}
 
 	return VK_SUCCESS;
@@ -398,8 +439,14 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 
 	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
 	{
-		lunaBindVertexBuffers((LunaBuffer[]){buffers.viewmodel.vertices, buffers.viewmodel.instanceData}, 0, 2);
-		lunaBindIndexBuffer(buffers.viewmodel.indices, VK_INDEX_TYPE_UINT32);
+		VulkanTest(lunaBindVertexBuffers(device,
+										 commandBuffer,
+										 (LunaBuffer[]){buffers.viewmodel.vertices, buffers.viewmodel.instanceData},
+										 0,
+										 2),
+				   "Failed to bind viewmodel vertex buffers!");
+		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.viewmodel.indices, VK_INDEX_TYPE_UINT32),
+				   "Failed to bind viewmodel index buffer!");
 	}
 
 	if (shadedDrawCount != 0)
@@ -410,7 +457,8 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 			.buffer = buffers.viewmodel.shadedDrawInfo,
 			.drawCount = shadedDrawCount,
 		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(&drawInfo), "Failed to draw shaded viewmodel!");
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw shaded viewmodel!");
 	}
 
 	if (unshadedDrawCount != 0)
@@ -421,7 +469,8 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 			.buffer = buffers.viewmodel.unshadedDrawInfo,
 			.drawCount = unshadedDrawCount,
 		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(&drawInfo), "Failed to draw unshaded viewmodel!");
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw unshaded viewmodel!");
 	}
 
 	return VK_SUCCESS;
@@ -470,14 +519,14 @@ bool VK_Init(SDL_Window *window)
 {
 	LogDebug("Initializing Vulkan renderer...\n");
 	// clang-format off
-	if (CreateSurface(window) && CreateLogicalDevice() && CreateSwapchain() && CreateRenderPass() &&
-		CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() && CreateBuffers() &&
-		CreateDescriptorSet())
+	if (CreateSurface(window) && CreateLogicalDevice() && CreateCommandBuffer() && CreateSwapchain() &&
+		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
+		CreateBuffers() && CreateDescriptorSet())
 	{
 		// clang-format on
 
 		VkPhysicalDeviceProperties physicalDeviceProperties;
-		lunaGetPhysicalDeviceProperties(&physicalDeviceProperties);
+		lunaGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
 		char vendor[32] = {};
 		switch (physicalDeviceProperties.vendorID)
 		{
@@ -542,16 +591,13 @@ bool VK_FrameStart()
 		return false;
 	}
 
-	LockLodThreadMutex(); // TODO: Why is this required
-
-	VulkanTestResizeSwapchain(lunaBeginFrame(false), "Failed to begin frame!");
+	VulkanTestResizeSwapchain(lunaBeginFrame(device, commandBuffer, false), "Failed to begin frame!");
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = swapChainExtent,
 		.depthAttachmentClearValue.depthStencil.depth = 1,
 	};
-	VulkanTestResizeSwapchain(lunaBeginRenderPass(renderPass, &beginInfo), "Failed to begin render pass!");
-
-	UnlockLodThreadMutex(); // TODO: Why is this required
+	VulkanTestResizeSwapchain(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo),
+							  "Failed to begin render pass!");
 
 	buffers.ui.freeQuads = buffers.ui.allocatedQuads;
 #ifdef JPH_DEBUG_RENDERER
@@ -584,7 +630,7 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		.data = lighting,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
 	};
-	VulkanTest(lunaWriteDataToBuffer(buffers.uniforms.lighting, &lightingBufferWriteInfo),
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lighting, &lightingBufferWriteInfo),
 			   "Failed to update lighting data!");
 
 	float fog[6]; // r, g, b, a, start, end
@@ -599,7 +645,8 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		.data = fog,
 		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 	};
-	VulkanTest(lunaWriteDataToBuffer(buffers.uniforms.fog, &fogBufferWriteInfo), "Failed to update fog data!");
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.fog, &fogBufferWriteInfo),
+			   "Failed to update fog data!");
 
 	VulkanTest(UpdateCameraUniform(camera), "Failed to update transform matrix!");
 
@@ -656,9 +703,15 @@ bool VK_FrameEnd()
 {
 	if ((pendingTasks & PENDING_TASK_UI_BUFFERS_RESIZE_BIT) == PENDING_TASK_UI_BUFFERS_RESIZE_BIT)
 	{
-		VulkanTest(lunaGrowBuffer(&buffers.ui.vertexBuffer, buffers.ui.allocatedQuads * 4 * sizeof(UiVertex)),
+		VulkanTest(lunaGrowBuffer(device,
+								  commandBuffer,
+								  &buffers.ui.vertexBuffer,
+								  buffers.ui.allocatedQuads * 4 * sizeof(UiVertex)),
 				   "Failed to recreate UI vertex buffer!");
-		VulkanTest(lunaGrowBuffer(&buffers.ui.indexBuffer, buffers.ui.allocatedQuads * 6 * sizeof(uint32_t)),
+		VulkanTest(lunaGrowBuffer(device,
+								  commandBuffer,
+								  &buffers.ui.indexBuffer,
+								  buffers.ui.allocatedQuads * 6 * sizeof(uint32_t)),
 				   "Failed to recreate UI index buffer!");
 
 		pendingTasks &= ~PENDING_TASK_UI_BUFFERS_RESIZE_BIT;
@@ -676,13 +729,11 @@ bool VK_FrameEnd()
 			.data = buffers.ui.indexData,
 			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 		};
-		VulkanTest(lunaWriteDataToBuffer(buffers.ui.vertexBuffer, &vertexBufferWriteInfo),
+		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.ui.vertexBuffer, &vertexBufferWriteInfo),
 				   "Failed to write UI vertex buffer!");
-		VulkanTest(lunaWriteDataToBuffer(buffers.ui.indexBuffer, &indexBufferWriteInfo),
+		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.ui.indexBuffer, &indexBufferWriteInfo),
 				   "Failed to write UI index buffer!");
 	}
-
-	LockLodThreadMutex(); // TODO: Why is this required
 
 	if (buffers.ui.freeQuads != buffers.ui.allocatedQuads)
 	{
@@ -724,17 +775,32 @@ bool VK_FrameEnd()
 			.indexCount = (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 6,
 			.instanceCount = 1,
 		};
-		VulkanTest(lunaDrawBufferIndexed(buffers.ui.vertexBuffer,
+		VulkanTest(lunaDrawBufferIndexed(device,
+										 commandBuffer,
+										 buffers.ui.vertexBuffer,
 										 buffers.ui.indexBuffer,
 										 VK_INDEX_TYPE_UINT32,
 										 &drawInfo),
 				   "Failed to draw UI!");
 	}
 
-	lunaEndRenderPass();
+	lunaEndRenderPass(commandBuffer);
 
-	VulkanTestResizeSwapchain(lunaEndFrame(), "Failed to present swapchain!");
-	UnlockLodThreadMutex(); // TODO: Why is this required
+	const VkSwapchainKHR swapchain = lunaGetVkSwapchain();
+	uint32_t imageIndex = lunaGetSwapchainImageIndex();
+	const VkPresentInfoKHR presentInfo = {
+		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+		.swapchainCount = 1,
+		.pSwapchains = &swapchain,
+		.pImageIndices = &imageIndex,
+	};
+	const LunaCommandBufferSubmitInfo submitInfo = {
+		.queue = queue,
+		.stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	};
+
+	VulkanTestResizeSwapchain(lunaEndFrame(device, commandBuffer, &presentInfo, &submitInfo),
+							  "Failed to present swapchain!");
 
 	return true;
 }
@@ -788,17 +854,16 @@ bool VK_LoadMap(const Map *map)
 bool VK_UpdateViewportSize()
 {
 	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
-	const VkExtent2D targetSwapchainSize = {
-		.width = windowSize.x,
-		.height = windowSize.y,
+	swapChainExtent.width = windowSize.x;
+	swapChainExtent.height = windowSize.y;
+	const LunaSwapchainResizeInfo swapchainResizeInfo = {
+		.newSize = swapChainExtent,
+		.renderPassCount = 1,
+		.renderPasses = &renderPass,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	const LunaRenderPassResizeInfo renderPassResizeInfo = {
-		.renderPass = renderPass,
-		.width = LUNA_RENDER_PASS_WIDTH_SWAPCHAIN_WIDTH,
-		.height = LUNA_RENDER_PASS_HEIGHT_SWAPCHAIN_HEIGHT,
-	};
-	VulkanTest(lunaResizeSwapchain(1, &renderPassResizeInfo, &targetSwapchainSize, &swapChainExtent),
-			   "Failed to resize swapchain!");
+	VulkanTest(lunaResizeSwapchain(device, &swapchainResizeInfo), "Failed to resize swapchain!");
 
 	return true;
 }

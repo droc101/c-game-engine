@@ -54,14 +54,17 @@
 		{ \
 			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR || resizeCheckResult == VK_SUBOPTIMAL_KHR) \
 			{ \
-				const LunaRenderPassResizeInfo renderPassResizeInfo = { \
-					.renderPass = renderPass, \
-					.width = LUNA_RENDER_PASS_WIDTH_SWAPCHAIN_WIDTH, \
-					.height = LUNA_RENDER_PASS_HEIGHT_SWAPCHAIN_HEIGHT, \
+				const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
+				swapChainExtent.width = windowSize.x; \
+				swapChainExtent.height = windowSize.y; \
+				const LunaSwapchainResizeInfo swapchainResizeInfo = { \
+					.newSize = swapChainExtent, \
+					.renderPassCount = 1, \
+					.renderPasses = &renderPass, \
+					.queueFamilyIndexCount = 1, \
+					.queueFamilyIndices = &queueFamilyIndex, \
 				}; \
-				VulkanTest(lunaResizeSwapchain(1, &renderPassResizeInfo, NULL, &swapChainExtent), \
-						   "Failed to resize swapchain!"); \
-				UnlockLodThreadMutex(); \
+				VulkanTest(lunaResizeSwapchain(device, &swapchainResizeInfo), "Failed to resize swapchain!"); \
 				return false; \
 			} \
 			VulkanTest(resizeCheckResult, __VA_ARGS__); \
@@ -247,6 +250,11 @@ typedef struct DescriptorSetLayouts
 // TODO: Make sure these are all needed and are all as they should be
 
 extern bool minimized;
+extern LunaDevice device;
+extern uint32_t queueFamilyIndex;
+extern VkQueue queue;
+extern LunaCommandPool commandPool;
+extern LunaCommandBuffer commandBuffer;
 extern VkSurfaceKHR surface;
 extern VkExtent2D swapChainExtent;
 extern VkSampleCountFlagBits msaaSamples;
