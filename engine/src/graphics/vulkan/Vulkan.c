@@ -151,6 +151,20 @@ static inline VkResult UpdateViewmodel(const Viewmodel *viewmodel)
 
 static inline VkResult LoadViewmodel(const Viewmodel *viewmodel)
 {
+	if (viewmodel->model == NULL)
+	{
+		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.vertices, 0),
+							   "Failed to resize viewmodel vertex buffer!");
+		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.indices, 0),
+							   "Failed to resize viewmodel index buffer!");
+		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.instanceData, 0),
+							   "Failed to resize viewmodel instance data buffer!");
+		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.shadedDrawInfo, 0),
+							   "Failed to resize viewmodel shaded material draw info buffer!");
+		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.unshadedDrawInfo, 0),
+							   "Failed to resize viewmodel unshaded material draw info buffer!");
+		return VK_SUCCESS;
+	}
 	const ModelDefinition *model = viewmodel->model;
 	const uint32_t *materialIndices = model->skinMaterialIndices[viewmodel->modelSkin];
 	const ModelLod *lod = model->lods;
@@ -617,15 +631,15 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		VulkanTest(VK_LoadMap(map), "Failed to load map!");
 	}
 
-	float lighting[4]; // r, g, b, a
+	float lighting[4]; // r, g, b, padding
 	lighting[0] = map->lightColor.r;
 	lighting[1] = map->lightColor.g;
 	lighting[2] = map->lightColor.b;
-	lighting[3] = map->lightColor.a;
+	lighting[3] = 0; // padding
 	const LunaBufferWriteInfo lightingBufferWriteInfo = {
 		.bytes = sizeof(lighting),
 		.data = lighting,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lighting, &lightingBufferWriteInfo),
 			   "Failed to update lighting data!");

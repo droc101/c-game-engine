@@ -129,8 +129,6 @@ void LoadLevelList()
 void LevelSelectStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
-	ChangeMap(NULL);
-	LoadMapModels(NULL);
 	if (levelList.length == 0)
 	{
 		LoadLevelList();

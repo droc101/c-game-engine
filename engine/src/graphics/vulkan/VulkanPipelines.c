@@ -167,7 +167,6 @@ static inline bool CreateUIPipeline()
 	return true;
 }
 
-// TODO: This might be identical to the unshaded map pipeline now that normals aren't around. Check if it is
 static inline bool CreateShadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
@@ -181,7 +180,7 @@ static inline bool CreateShadedMapPipeline()
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = modelUnshadedFragShaderModule,
+			.module = modelShadedFragShaderModule,
 		},
 	};
 
@@ -295,12 +294,6 @@ static inline bool CreateUnshadedMapPipeline()
 		},
 		{
 			.location = 2,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(MapVertex, lightmapUv),
-		},
-		{
-			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = 0,
@@ -1009,7 +1002,7 @@ bool CreateGraphicsPipelines()
 		   CreateSkyPipeline() &&
 		   CreateShadedViewmodelPipeline() &&
 		   CreateUnshadedViewmodelPipeline() &&
-		   CreateShadedActorModelPipeline() &&
-		   CreateUnshadedActorModelPipeline() &&
+		   // CreateShadedActorModelPipeline() &&
+		   // CreateUnshadedActorModelPipeline() &&
 		   CreateDebugDrawPipeline();
 }
