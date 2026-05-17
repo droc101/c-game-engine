@@ -77,9 +77,9 @@ bool ClearTextureCache()
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 	for (size_t i = 0; i < textures.length; i++)
 	{
-		lunaDestroyImage(device, (LunaImage)ListGetPointer(textures, i));
+		lunaDestroyImage(device, (LunaImage)ListGetUint64(textures, i));
 	}
-	ListClear(textures);
+	ListFree(textures);
 	lunaDestroySampler(device, textureSamplers.linearRepeatAnisotropy);
 	lunaDestroySampler(device, textureSamplers.linearNoRepeatAnisotropy);
 	lunaDestroySampler(device, textureSamplers.linearRepeatNoAnisotropy);

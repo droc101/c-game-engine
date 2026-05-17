@@ -15,6 +15,7 @@
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
@@ -34,7 +35,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-
 #include "luna/luna.h"
 
 #ifdef JPH_DEBUG_RENDERER
@@ -506,7 +506,7 @@ static inline bool HandleRendererQueuedActions()
 	}
 	if ((rendererQueuedActions & handledActionTypes) != 0)
 	{
-		if (!VK_LoadMap(loadedMap))
+		if (!VK_LoadMap(GetState()->map))
 		{
 			return false;
 		}
