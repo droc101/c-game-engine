@@ -94,12 +94,12 @@ Image *LoadImage(const char *asset)
 				GenFallbackImage(img);
 			} else
 			{
-				img->width = ReadSizeT(textureAsset->data, &offset);
-				img->height = ReadSizeT(textureAsset->data, &offset);
-				img->filter = ReadByte(textureAsset->data, &offset) != 0;
-				img->repeat = ReadByte(textureAsset->data, &offset) != 0;
-				img->mipmaps = ReadByte(textureAsset->data, &offset) != 0;
-				img->pixelFormat = ReadByte(textureAsset->data, &offset);
+				img->width = ReadSizeT(textureAsset->data, &offset, textureAsset->size);
+				img->height = ReadSizeT(textureAsset->data, &offset, textureAsset->size);
+				img->filter = ReadUint8(textureAsset->data, &offset, textureAsset->size) != 0;
+				img->repeat = ReadUint8(textureAsset->data, &offset, textureAsset->size) != 0;
+				img->mipmaps = ReadUint8(textureAsset->data, &offset, textureAsset->size) != 0;
+				img->pixelFormat = ReadUint8(textureAsset->data, &offset, textureAsset->size);
 				size_t pixelDataSize = img->width * img->height;
 				if (img->pixelFormat == PIXEL_FORMAT_RGBA8)
 				{

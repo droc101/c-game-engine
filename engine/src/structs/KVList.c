@@ -18,32 +18,32 @@
 size_t ReadParam(const void *data, const size_t dataSize, size_t *offset, Param *out)
 {
 	const size_t initialOffset = *offset;
-	out->type = ReadByte(data, offset);
+	out->type = ReadUint8(data, offset, dataSize);
 	switch (out->type)
 	{
 		case PARAM_TYPE_BYTE:
-			out->byteValue = ReadByte(data, offset);
+			out->byteValue = ReadUint8(data, offset, dataSize);
 			break;
 		case PARAM_TYPE_INTEGER:
-			out->intValue = ReadInt(data, offset);
+			out->intValue = ReadInt32(data, offset, dataSize);
 			break;
 		case PARAM_TYPE_FLOAT:
-			out->floatValue = ReadFloat(data, offset);
+			out->floatValue = ReadFloat(data, offset, dataSize);
 			break;
 		case PARAM_TYPE_BOOL:
-			out->boolValue = ReadByte(data, offset) != 0;
+			out->boolValue = ReadUint8(data, offset, dataSize) != 0;
 			break;
 		case PARAM_TYPE_COLOR:
-			out->colorValue.r = ReadFloat(data, offset);
-			out->colorValue.g = ReadFloat(data, offset);
-			out->colorValue.b = ReadFloat(data, offset);
-			out->colorValue.a = ReadFloat(data, offset);
+			out->colorValue.r = ReadFloat(data, offset, dataSize);
+			out->colorValue.g = ReadFloat(data, offset, dataSize);
+			out->colorValue.b = ReadFloat(data, offset, dataSize);
+			out->colorValue.a = ReadFloat(data, offset, dataSize);
 			break;
 		case PARAM_TYPE_STRING:
 			out->stringValue = ReadStringSafe(data, offset, dataSize, NULL);
 			break;
 		case PARAM_TYPE_ARRAY:
-			out->arrayValue.length = ReadSizeT(data, offset);
+			out->arrayValue.length = ReadSizeT(data, offset, dataSize);
 			out->arrayValue.data = malloc(sizeof(Param) * out->arrayValue.length);
 			CheckAlloc(out->arrayValue.data);
 			for (size_t i = 0; i < out->arrayValue.length; i++)
@@ -57,16 +57,16 @@ size_t ReadParam(const void *data, const size_t dataSize, size_t *offset, Param 
 			(void)ReadKvList(data, dataSize, offset, out->kvListValue);
 			break;
 		case PARAM_TYPE_UINT_64:
-			out->uint64value = ReadSizeT(data, offset);
+			out->uint64value = ReadSizeT(data, offset, dataSize);
 			break;
 		case PARAM_TYPE_VEC2:
-			out->vec2value.x = ReadFloat(data, offset);
-			out->vec2value.y = ReadFloat(data, offset);
+			out->vec2value.x = ReadFloat(data, offset, dataSize);
+			out->vec2value.y = ReadFloat(data, offset, dataSize);
 			break;
 		case PARAM_TYPE_VEC3:
-			out->vec3value.x = ReadFloat(data, offset);
-			out->vec3value.y = ReadFloat(data, offset);
-			out->vec3value.z = ReadFloat(data, offset);
+			out->vec3value.x = ReadFloat(data, offset, dataSize);
+			out->vec3value.y = ReadFloat(data, offset, dataSize);
+			out->vec3value.z = ReadFloat(data, offset, dataSize);
 			break;
 		default:
 			break;
@@ -182,7 +182,7 @@ size_t ReadKvList(const void *data, const size_t dataSize, size_t *offset, KvLis
 {
 	const size_t initialOffset = *offset;
 	KvListCreate(out);
-	const size_t numParams = ReadSizeT(data, offset);
+	const size_t numParams = ReadSizeT(data, offset, dataSize);
 	for (size_t _ = 0; _ < numParams; _++)
 	{
 		size_t keyLength = 0;

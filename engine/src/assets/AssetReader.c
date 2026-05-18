@@ -167,24 +167,24 @@ Asset *CreateAssetFromFile(FILE *file)
 	fclose(file);
 
 	size_t offset = 0;
-	const uint32_t magic = ReadUint(assetData, &offset);
+	const uint32_t magic = ReadUint32(assetData, &offset, fileSize);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
 		free(assetData);
 		LogError("Failed to read an asset because the magic was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetVersion = ReadByte(assetData, &offset);
+	const uint8_t assetVersion = ReadUint8(assetData, &offset, fileSize);
 	if (assetVersion != ASSET_FORMAT_VERSION)
 	{
 		free(assetData);
 		LogError("Failed to read an asset because the version was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetType = ReadByte(assetData, &offset);
-	const uint8_t typeVersion = ReadByte(assetData, &offset);
-	const size_t decompressedSize = ReadSizeT(assetData, &offset);
-	const size_t compressedSize = ReadSizeT(assetData, &offset);
+	const uint8_t assetType = ReadUint8(assetData, &offset, fileSize);
+	const uint8_t typeVersion = ReadUint8(assetData, &offset, fileSize);
+	const size_t decompressedSize = ReadSizeT(assetData, &offset, fileSize);
+	const size_t compressedSize = ReadSizeT(assetData, &offset, fileSize);
 
 	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
 	{
@@ -254,6 +254,7 @@ Asset *CreateAssetFromFile(FILE *file)
 	return asset;
 }
 
+// TODO contains duplicated code from "CreateAssetFromFile"
 Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeAsset)
 {
 	Asset *asset = NULL;
@@ -298,24 +299,24 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 	}
 
 	size_t offset = 0;
-	const uint32_t magic = ReadUint(assetData, &offset);
+	const uint32_t magic = ReadUint32(assetData, &offset, fileSize);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
 		free(assetData);
 		LogError("Failed to read an asset because the magic was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetVersion = ReadByte(assetData, &offset);
+	const uint8_t assetVersion = ReadUint8(assetData, &offset, fileSize);
 	if (assetVersion != ASSET_FORMAT_VERSION)
 	{
 		free(assetData);
 		LogError("Failed to read an asset because the version was incorrect.\n");
 		return NULL;
 	}
-	const uint8_t assetType = ReadByte(assetData, &offset);
-	const uint8_t typeVersion = ReadByte(assetData, &offset);
-	const size_t decompressedSize = ReadSizeT(assetData, &offset);
-	const size_t compressedSize = ReadSizeT(assetData, &offset);
+	const uint8_t assetType = ReadUint8(assetData, &offset, fileSize);
+	const uint8_t typeVersion = ReadUint8(assetData, &offset, fileSize);
+	const size_t decompressedSize = ReadSizeT(assetData, &offset, fileSize);
+	const size_t compressedSize = ReadSizeT(assetData, &offset, fileSize);
 
 	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
 	{

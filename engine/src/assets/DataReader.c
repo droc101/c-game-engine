@@ -2,6 +2,7 @@
 // Created by droc101 on 4/27/2024.
 //
 
+#include <assert.h>
 #include <engine/assets/DataReader.h>
 #include <engine/subsystem/Error.h>
 #include <stddef.h>
@@ -9,79 +10,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-double ReadDouble(const uint8_t *data, size_t *offset)
-{
-	double d = 0;
-	memcpy(&d, data + *offset, sizeof(double));
-	*offset += sizeof(double);
-	return d;
-}
+#define DefineReadFunction(T, name) \
+	DeclareReadFunction(T, name) \
+	{ \
+		(void)totalBufferSize; \
+		assert(*offset + sizeof(T) <= totalBufferSize); \
+		T val = 0; \
+		memcpy(&val, (data) + *(offset), sizeof(T)); \
+		*(offset) += sizeof(T); \
+		return val; \
+	}
 
-uint32_t ReadUint(const uint8_t *data, size_t *offset)
-{
-	uint32_t i = 0;
-	memcpy(&i, data + *offset, sizeof(uint32_t));
-	*offset += sizeof(uint32_t);
-	return i;
-}
+DefineReadFunction(int8_t, ReadInt8);
+DefineReadFunction(uint8_t, ReadUint8);
 
-int ReadInt(const uint8_t *data, size_t *offset)
-{
-	int i = 0;
-	memcpy(&i, data + *offset, sizeof(int));
-	*offset += sizeof(int);
-	return i;
-}
+DefineReadFunction(int16_t, ReadInt16);
+DefineReadFunction(uint16_t, ReadUint16);
 
-float ReadFloat(const uint8_t *data, size_t *offset)
-{
-	float f = 0;
-	memcpy(&f, data + *offset, sizeof(float));
-	*offset += sizeof(float);
-	return f;
-}
+DefineReadFunction(uint32_t, ReadUint32);
+DefineReadFunction(int32_t, ReadInt32);
 
-uint8_t ReadByte(const uint8_t *data, size_t *offset)
-{
-	const uint8_t b = data[*offset];
-	*offset += sizeof(uint8_t);
-	return b;
-}
+DefineReadFunction(uint64_t, ReadUint64);
+DefineReadFunction(int64_t, ReadInt64);
+DefineReadFunction(size_t, ReadSizeT);
 
-void ReadString(const uint8_t *data, size_t *offset, char *dest, const size_t len)
-{
-	strncpy(dest, (const char *)(data + *offset), len);
-	*offset += len;
-}
+DefineReadFunction(double, ReadDouble);
+DefineReadFunction(float, ReadFloat);
 
-short ReadShort(const uint8_t *data, size_t *offset)
+void ReadBuffer(const uint8_t *data, size_t *offset, const size_t dataSize, const size_t readSize, void *dest)
 {
-	short s = 0;
-	memcpy(&s, data + *offset, sizeof(short));
-	*offset += sizeof(short);
-	return s;
-}
-
-uint16_t ReadUint16(const uint8_t *data, size_t *offset)
-{
-	uint16_t s = 0;
-	memcpy(&s, data + *offset, sizeof(uint16_t));
-	*offset += sizeof(uint16_t);
-	return s;
-}
-
-void ReadBytes(const uint8_t *data, size_t *offset, const size_t len, void *dest)
-{
-	memcpy(dest, data + *offset, len);
-	*offset += len;
-}
-
-size_t ReadSizeT(const uint8_t *data, size_t *offset)
-{
-	size_t i = 0;
-	memcpy(&i, data + *offset, sizeof(size_t));
-	*offset += sizeof(size_t);
-	return i;
+	(void)dataSize;
+	assert(*offset + readSize <= dataSize);
+	memcpy(dest, data + *offset, readSize);
+	*offset += readSize;
 }
 
 char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBufferSize, size_t *outLength)
@@ -89,7 +50,7 @@ char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBuff
 	size_t remainingSize = totalBufferSize - *offset;
 	if (remainingSize >= sizeof(size_t))
 	{
-		const size_t stringLength = ReadSizeT(data, offset);
+		const size_t stringLength = ReadSizeT(data, offset, totalBufferSize);
 		remainingSize -= sizeof(size_t);
 		if (remainingSize >= sizeof(char) * stringLength)
 		{

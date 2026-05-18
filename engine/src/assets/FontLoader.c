@@ -72,14 +72,14 @@ Font *LoadFont(const char *asset)
 	size_t bytesRemaining = assetData->size;
 	EXPECT_BYTES(8, bytesRemaining);
 
-	font->width = ReadByte(assetData->data, &offset);
-	font->textureHeight = ReadByte(assetData->data, &offset);
-	font->baseline = ReadByte(assetData->data, &offset);
-	font->charSpacing = ReadByte(assetData->data, &offset);
-	font->lineSpacing = ReadByte(assetData->data, &offset);
-	font->spaceWidth = ReadByte(assetData->data, &offset);
-	font->defaultSize = ReadByte(assetData->data, &offset);
-	font->uppercaseOnly = ReadByte(assetData->data, &offset) != 0;
+	font->width = ReadUint8(assetData->data, &offset, assetData->size);
+	font->textureHeight = ReadUint8(assetData->data, &offset, assetData->size);
+	font->baseline = ReadUint8(assetData->data, &offset, assetData->size);
+	font->charSpacing = ReadUint8(assetData->data, &offset, assetData->size);
+	font->lineSpacing = ReadUint8(assetData->data, &offset, assetData->size);
+	font->spaceWidth = ReadUint8(assetData->data, &offset, assetData->size);
+	font->defaultSize = ReadUint8(assetData->data, &offset, assetData->size);
+	font->uppercaseOnly = ReadUint8(assetData->data, &offset, assetData->size) != 0;
 	size_t fontTextureLength = 0;
 	char *fontTexture = ReadStringSafe(assetData->data, &offset, assetData->size, &fontTextureLength);
 	if (!fontTexture)
@@ -96,14 +96,14 @@ Font *LoadFont(const char *asset)
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
 	font->image = LoadImage(font->texture);
-	font->charCount = ReadByte(assetData->data, &offset);
+	font->charCount = ReadUint8(assetData->data, &offset, assetData->size);
 	memset(font->indices, 0, 255);
 	memset(font->charWidths, 0, 255);
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{
-		const char chr = (char)ReadByte(assetData->data, &offset);
-		const uint8_t width = ReadByte(assetData->data, &offset);
+		const char chr = (char)ReadUint8(assetData->data, &offset, assetData->size);
+		const uint8_t width = ReadUint8(assetData->data, &offset, assetData->size);
 		font->indices[(int)chr] = i;
 		font->charWidths[(int)chr] = width;
 	}
