@@ -268,7 +268,7 @@ target_link_libraries(engine INTERFACE
 if (UNIX)
     target_link_libraries(engine INTERFACE m)
 elseif (WIN32)
-    target_link_libraries(engine INTERFACE opengl32 dwmapi)
+    target_link_libraries(engine INTERFACE opengl32 dwmapi dbghelp)
 endif ()
 
 file(WRITE ${CMAKE_BINARY_DIR}/generated/include/engine/Commit.h)
