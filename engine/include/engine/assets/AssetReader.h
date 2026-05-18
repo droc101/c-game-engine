@@ -65,7 +65,7 @@ void EnumerateAssetsInFolder(const char *folder, List *output, const char *exten
  * @param file The file to create the asset from
  * @return A pointer to an Asset, or NULL on failure
  */
-Asset *CreateAssetFromFile(FILE *file);
+Asset *LoadAssetFromFile(FILE *file);
 
 /**
  * Decompress an asset and cache it
@@ -76,7 +76,7 @@ Asset *CreateAssetFromFile(FILE *file);
  * @warning If the asset is not cached, you will have to pass it to @c FreeAsset. Otherwise,
  * it is kept around until program exit and automatically freed.
  */
-Asset *DecompressAsset(const char *relPath, bool cache, bool isCodeAsset);
+Asset *LoadAsset(const char *relPath, bool cache, bool isCodeAsset);
 
 /**
  * Remove an asset from the cache

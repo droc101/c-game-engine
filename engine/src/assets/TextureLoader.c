@@ -72,7 +72,7 @@ Image *LoadImage(const char *asset)
 	Image *img = malloc(sizeof(Image));
 	CheckAlloc(img);
 
-	Asset *textureAsset = DecompressAsset(asset, false, false);
+	Asset *textureAsset = LoadAsset(asset, false, false);
 	size_t offset = 0;
 	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
 	{

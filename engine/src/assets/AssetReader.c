@@ -147,8 +147,9 @@ void DestroyAssetCache()
 	DestroyMapMaterialLoader();
 }
 
-Asset *CreateAssetFromFile(FILE *file)
+bool DecompressAsset(FILE *file, Asset *dest)
 {
+	CheckAlloc(dest);
 	fseek(file, 0, SEEK_END);
 	const size_t fileSize = ftell(file);
 
@@ -161,7 +162,7 @@ Asset *CreateAssetFromFile(FILE *file)
 		free(assetData);
 		fclose(file);
 		LogError("Failed to read asset file\n");
-		return NULL;
+		return false;
 	}
 
 	fclose(file);
@@ -172,14 +173,14 @@ Asset *CreateAssetFromFile(FILE *file)
 	{
 		free(assetData);
 		LogError("Failed to read an asset because the magic was incorrect.\n");
-		return NULL;
+		return false;
 	}
 	const uint8_t assetVersion = ReadUint8(assetData, &offset, fileSize);
 	if (assetVersion != ASSET_FORMAT_VERSION)
 	{
 		free(assetData);
 		LogError("Failed to read an asset because the version was incorrect.\n");
-		return NULL;
+		return false;
 	}
 	const uint8_t assetType = ReadUint8(assetData, &offset, fileSize);
 	const uint8_t typeVersion = ReadUint8(assetData, &offset, fileSize);
@@ -193,7 +194,7 @@ Asset *CreateAssetFromFile(FILE *file)
 				 compressedSize,
 				 fileSize - ASSET_HEADER_SIZE);
 		free(assetData);
-		return NULL;
+		return false;
 	}
 
 	// Allocate memory for the decompressed data
@@ -214,7 +215,7 @@ Asset *CreateAssetFromFile(FILE *file)
 		free(decompressedData);
 		free(assetData);
 		LogError("Failed to initialize zlib stream: %s\n", stream.msg);
-		return NULL;
+		return false;
 	}
 
 	// Decompress the data
@@ -226,7 +227,7 @@ Asset *CreateAssetFromFile(FILE *file)
 			free(decompressedData);
 			free(assetData);
 			LogError("Failed to decompress zlib stream: %s\n", stream.msg);
-			return NULL;
+			return false;
 		}
 		inflateReturnValue = inflate(&stream, Z_NO_FLUSH);
 	}
@@ -237,25 +238,31 @@ Asset *CreateAssetFromFile(FILE *file)
 		free(decompressedData);
 		free(assetData);
 		LogError("Failed to end zlib stream: %s\n", stream.msg);
-		return NULL;
+		return false;
 	}
 
 	free(assetData);
+	dest->size = decompressedSize;
+	dest->type = assetType;
+	dest->typeVersion = typeVersion;
+	dest->data = decompressedData;
 
+	return true;
+}
+
+Asset *LoadAssetFromFile(FILE *file)
+{
 	Asset *asset = malloc(sizeof(Asset));
 	CheckAlloc(asset);
-
-	asset->compressedSize = compressedSize;
-	asset->size = decompressedSize;
-	asset->type = assetType;
-	asset->typeVersion = typeVersion;
-	asset->data = decompressedData;
-
+	if (!DecompressAsset(file, asset))
+	{
+		free(asset);
+		return NULL;
+	}
 	return asset;
 }
 
-// TODO contains duplicated code from "CreateAssetFromFile"
-Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeAsset)
+Asset *LoadAsset(const char *relPath, const bool cache, const bool isCodeAsset)
 {
 	Asset *asset = NULL;
 	if (cache)
@@ -274,108 +281,6 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 		return NULL;
 	}
 
-	fseek(file, 0, SEEK_END);
-	const size_t fileSize = ftell(file);
-
-	uint8_t *assetData = malloc(fileSize);
-	CheckAlloc(assetData);
-	fseek(file, 0, SEEK_SET);
-	const size_t bytesRead = fread(assetData, 1, fileSize, file);
-	if (bytesRead != fileSize)
-	{
-		free(assetData);
-		fclose(file);
-		LogError("Failed to read asset file: %s\n", relPath);
-		return NULL;
-	}
-
-	fclose(file);
-
-	if (fileSize < ASSET_HEADER_SIZE)
-	{
-		LogError("Trying to read asset file of size %zu, which is too small. Refusing to read this asset.\n", fileSize);
-		free(assetData);
-		return NULL;
-	}
-
-	size_t offset = 0;
-	const uint32_t magic = ReadUint32(assetData, &offset, fileSize);
-	if (magic != ASSET_FORMAT_MAGIC)
-	{
-		free(assetData);
-		LogError("Failed to read an asset because the magic was incorrect.\n");
-		return NULL;
-	}
-	const uint8_t assetVersion = ReadUint8(assetData, &offset, fileSize);
-	if (assetVersion != ASSET_FORMAT_VERSION)
-	{
-		free(assetData);
-		LogError("Failed to read an asset because the version was incorrect.\n");
-		return NULL;
-	}
-	const uint8_t assetType = ReadUint8(assetData, &offset, fileSize);
-	const uint8_t typeVersion = ReadUint8(assetData, &offset, fileSize);
-	const size_t decompressedSize = ReadSizeT(assetData, &offset, fileSize);
-	const size_t compressedSize = ReadSizeT(assetData, &offset, fileSize);
-
-	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
-	{
-		LogError("Asset misreported compressedSize as %zu, while the file has %zu bytes remaining. Refusing to read "
-				 "this asset.\n",
-				 compressedSize,
-				 fileSize - ASSET_HEADER_SIZE);
-		free(assetData);
-		return NULL;
-	}
-
-	// Allocate memory for the decompressed data
-	uint8_t *decompressedData = malloc(decompressedSize);
-	CheckAlloc(decompressedData);
-
-	z_stream stream = {0};
-
-	// Initialize the zlib stream
-	stream.next_in = assetData + ASSET_HEADER_SIZE;
-	stream.avail_in = compressedSize;
-	stream.next_out = decompressedData;
-	stream.avail_out = decompressedSize;
-
-	// Initialize the zlib stream
-	if (inflateInit2(&stream, MAX_WBITS | 16) != Z_OK)
-	{
-		free(decompressedData);
-		free(assetData);
-		free(asset);
-		LogError("Failed to initialize zlib stream: %s\n", stream.msg);
-		return NULL;
-	}
-
-	// Decompress the data
-	int inflateReturnValue = inflate(&stream, Z_NO_FLUSH);
-	while (inflateReturnValue != Z_STREAM_END)
-	{
-		if (inflateReturnValue != Z_OK)
-		{
-			free(decompressedData);
-			free(assetData);
-			free(asset);
-			LogError("Failed to decompress zlib stream: %s\n", stream.msg);
-			return NULL;
-		}
-		inflateReturnValue = inflate(&stream, Z_NO_FLUSH);
-	}
-
-	// Clean up the zlib stream
-	if (inflateEnd(&stream) != Z_OK)
-	{
-		free(decompressedData);
-		free(assetData);
-		LogError("Failed to end zlib stream: %s\n", stream.msg);
-		return NULL;
-	}
-
-	free(assetData);
-
 	if (cache)
 	{
 		asset = AssetCache_safe_get(assetCache, relPath);
@@ -385,12 +290,11 @@ Asset *DecompressAsset(const char *relPath, const bool cache, const bool isCodeA
 		CheckAlloc(asset);
 	}
 
-	asset->compressedSize = compressedSize;
-	asset->size = decompressedSize;
-	asset->type = assetType;
-	asset->typeVersion = typeVersion;
-	asset->data = decompressedData;
-
+	if (!DecompressAsset(file, asset))
+	{
+		free(asset);
+		return NULL;
+	}
 	return asset;
 }
 

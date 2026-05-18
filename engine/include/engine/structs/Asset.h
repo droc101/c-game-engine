@@ -27,8 +27,6 @@ enum AssetType
 
 struct Asset
 {
-	/// The compressed size of the asset, excluding the header
-	size_t compressedSize;
 	/// The decompressed size of the asset
 	size_t size;
 	/// The type of the asset
