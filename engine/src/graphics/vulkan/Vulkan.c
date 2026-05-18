@@ -753,7 +753,7 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		VulkanTest(DrawSky(&pipelineBindInfo), "Failed to draw sky!");
 	}
 	VulkanTest(DrawMap(&pipelineBindInfo), "Failed to draw map!");
-	if (map->viewmodel.enabled)
+	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
 	{
 		VulkanTest(DrawViewmodel(&pipelineBindInfo), "Failed to draw viewmodel!");
 	}
