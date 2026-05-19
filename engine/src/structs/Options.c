@@ -164,6 +164,7 @@ void LoadOptions(Options *options)
 			DefaultOptions(options);
 			free(buffer);
 			fclose(file);
+			return;
 		}
 
 		size_t offset = 0;
