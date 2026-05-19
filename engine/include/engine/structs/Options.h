@@ -36,9 +36,6 @@ enum OptionsAnisotropy
 
 struct Options
 {
-	/// Checksum of the options struct (helps prevent corruption)
-	uint16_t checksum;
-
 	bool enableDiscordRpc;
 
 	/* Controls */
@@ -91,7 +88,7 @@ struct Options
 	float uiVolume;
 	/// The master volume
 	float masterVolume;
-} __attribute__((packed)); // This is packed because it is saved to disk
+};
 
 /**
  * Read options from disk, or load defaults if no options file is found or is invalid

@@ -79,7 +79,7 @@ void LoadGameConfig(const char *game)
 	{
 		Error("Failed to open game configuration");
 	}
-	Asset *asset = CreateAssetFromFile(file);
+	Asset *asset = LoadAssetFromFile(file);
 	if (!asset || asset->type != ASSET_TYPE_KV_LIST || asset->typeVersion != 1)
 	{
 		Error("Invalid game configuration");

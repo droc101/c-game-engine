@@ -290,7 +290,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 		UnlockSoundSystem();
 		return NULL;
 	}
-	const Asset *wav = DecompressAsset(request->soundAsset, true, false);
+	const Asset *wav = LoadAsset(request->soundAsset, true, false);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");

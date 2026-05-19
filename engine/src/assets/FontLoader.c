@@ -5,7 +5,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/FontLoader.h>
-
 #include <assert.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Asset.h>
@@ -54,7 +53,7 @@ Font *GenerateFallbackFont()
 
 Font *LoadFont(const char *asset)
 {
-	Asset *assetData = DecompressAsset(asset, false, false);
+	Asset *assetData = LoadAsset(asset, false, false);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load font from asset, asset was NULL!\n");
@@ -81,14 +80,14 @@ Font *LoadFont(const char *asset)
 	size_t bytesRemaining = assetData->size;
 	EXPECT_BYTES(8, bytesRemaining);
 
-	font->width = ReadByte(assetData->data, &offset);
-	font->textureHeight = ReadByte(assetData->data, &offset);
-	font->baseline = ReadByte(assetData->data, &offset);
-	font->charSpacing = ReadByte(assetData->data, &offset);
-	font->lineSpacing = ReadByte(assetData->data, &offset);
-	font->spaceWidth = ReadByte(assetData->data, &offset);
-	font->defaultSize = ReadByte(assetData->data, &offset);
-	font->uppercaseOnly = ReadByte(assetData->data, &offset) != 0;
+	font->width = ReadUint8(assetData->data, &offset, assetData->size);
+	font->textureHeight = ReadUint8(assetData->data, &offset, assetData->size);
+	font->baseline = ReadUint8(assetData->data, &offset, assetData->size);
+	font->charSpacing = ReadUint8(assetData->data, &offset, assetData->size);
+	font->lineSpacing = ReadUint8(assetData->data, &offset, assetData->size);
+	font->spaceWidth = ReadUint8(assetData->data, &offset, assetData->size);
+	font->defaultSize = ReadUint8(assetData->data, &offset, assetData->size);
+	font->uppercaseOnly = ReadUint8(assetData->data, &offset, assetData->size) != 0;
 	size_t fontTextureLength = 0;
 	char *fontTexture = ReadStringSafe(assetData->data, &offset, assetData->size, &fontTextureLength);
 	if (!fontTexture)
@@ -105,15 +104,15 @@ Font *LoadFont(const char *asset)
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
 	font->image = LoadImage(font->texture);
-	font->charCount = ReadByte(assetData->data, &offset);
+	font->charCount = ReadUint8(assetData->data, &offset, assetData->size);
 	memset(font->charWidths, 0, sizeof(font->charWidths) / sizeof(*font->charWidths));
 	memset(font->charStartUVs, 0, sizeof(font->charStartUVs) / sizeof(*font->charStartUVs));
 	memset(font->charEndUVs, 0, sizeof(font->charEndUVs) / sizeof(*font->charEndUVs));
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{
-		const char chr = (char)ReadByte(assetData->data, &offset);
-		const uint8_t width = ReadByte(assetData->data, &offset);
+		const char chr = (char)ReadUint8(assetData->data, &offset, assetData->size);
+		const uint8_t width = ReadUint8(assetData->data, &offset, assetData->size);
 		font->charWidths[(int)chr] = width;
 		font->charStartUVs[(int)chr] = (float)((double)i / font->charCount); // Casting through double here is required
 		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount -

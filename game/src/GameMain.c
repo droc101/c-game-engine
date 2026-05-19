@@ -54,7 +54,7 @@ EXPORT_SYM int GameMain(const int argc, const char *argv[])
 		EngineIteration();
 	}
 	LogInfo("Mainloop exited, cleaning up engine...\n");
-	DestroyGame();
 	DestroyEngine();
+	DestroyGame();
 	return 0;
 }

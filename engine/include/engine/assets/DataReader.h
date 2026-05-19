@@ -8,97 +8,34 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/**
- * Reads a double from the given data at the given offset
- * @param data Data to read from
- * @param offset Offset to read from
- * @return The double read
- * @note Increments the offset by @c sizeof(double)
- */
-double ReadDouble(const uint8_t *data, size_t *offset);
+#define DeclareReadFunction(T, name) T name(const uint8_t *data, size_t *offset, const size_t totalBufferSize)
 
-/**
- * Reads a uint32_t from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The uint32_t read
- * @note Increments the offset by @c sizeof(uint32_t)
- */
-uint32_t ReadUint(const uint8_t *data, size_t *offset);
+DeclareReadFunction(int8_t, ReadInt8);
+DeclareReadFunction(uint8_t, ReadUint8);
 
-/**
- * Reads an int from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The int read
- * @note Increments the offset by @c sizeof(int)
- */
-int ReadInt(const uint8_t *data, size_t *offset);
+DeclareReadFunction(int16_t, ReadInt16);
+DeclareReadFunction(uint16_t, ReadUint16);
 
-/**
- * Reads a float from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The float read
- * @note Increments the offset by @c sizeof(float)
- */
-float ReadFloat(const uint8_t *data, size_t *offset);
+DeclareReadFunction(uint32_t, ReadUint32);
+DeclareReadFunction(int32_t, ReadInt32);
 
-/**
- * Reads a byte from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The byte read
- * @note Increments the offset by @c sizeof(uint8_t)
- */
-uint8_t ReadByte(const uint8_t *data, size_t *offset);
+DeclareReadFunction(uint64_t, ReadUint64);
+DeclareReadFunction(int64_t, ReadInt64);
+DeclareReadFunction(size_t, ReadSizeT);
 
-/**
- * Reads a string of length @c len from the given data at the given offset into @c dest
- * @param data The data to read from
- * @param offset The offset to read from
- * @param dest The pointer to read the string into
- * @param len The length of the string to read
- * @note Increments the offset by @c len
- */
-void ReadString(const uint8_t *data, size_t *offset, char *dest, size_t len);
-
-/**
- * Reads a short from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The short read
- * @note Increments the offset by @c sizeof(short)
- */
-short ReadShort(const uint8_t *data, size_t *offset);
-
-/**
- * Reads a uint16_t from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The uint16_t read
- * @note Increments the offset by @c sizeof(uint16_t)
- */
-uint16_t ReadUint16(const uint8_t *data, size_t *offset);
+DeclareReadFunction(double, ReadDouble);
+DeclareReadFunction(float, ReadFloat);
 
 /**
  * Reads arbitrary bytes from the given data at the given offset into dest
  * @param data The data to read from
  * @param offset The offset to read from
- * @param len The length of the data to read
+ * @param dataSize The total size of the data to read from
+ * @param readSize The length of the data to read
  * @param dest The buffer to write the data into
  * @note It is up to the caller to prevent out of bounds access
  */
-void ReadBytes(const uint8_t *data, size_t *offset, size_t len, void *dest);
-
-/**
- * Reads a size_t from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @return The size_t read
- * @note Increments the offset by @c sizeof(size_t)
- */
-size_t ReadSizeT(const uint8_t *data, size_t *offset);
+void ReadBuffer(const uint8_t *data, size_t *offset, size_t dataSize, size_t readSize, void *dest);
 
 /**
  * Reads a length and string from the given data at the given offset
@@ -109,5 +46,13 @@ size_t ReadSizeT(const uint8_t *data, size_t *offset);
  * @return A pointer (must be freed) of the string read
  */
 char *ReadStringSafe(const uint8_t *data, size_t *offset, size_t totalBufferSize, size_t *outLength);
+
+/**
+ * Calculate a 16-bit checksum of a given data buffer
+ * @param buffer The data to checksum
+ * @param bufferSize The size of the data
+ * @return 16-bit checksum of the given data
+ */
+uint16_t Checksum(const uint8_t *buffer, size_t bufferSize);
 
 #endif //GAME_DATAREADER_H

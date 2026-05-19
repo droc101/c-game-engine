@@ -15,7 +15,7 @@
 
 Shader *LoadShader(const char *asset)
 {
-	Asset *assetData = DecompressAsset(asset, false, true);
+	Asset *assetData = LoadAsset(asset, false, true);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load shader from asset, asset was NULL!\n");
@@ -33,19 +33,19 @@ Shader *LoadShader(const char *asset)
 	size_t offset = 0;
 	size_t bytesRemaining = assetData->size;
 	EXPECT_BYTES(2 + sizeof(size_t), bytesRemaining);
-	shader->platform = ReadByte(assetData->data, &offset);
-	shader->type = ReadByte(assetData->data, &offset);
-	shader->glslLength = ReadSizeT(assetData->data, &offset);
+	shader->platform = ReadUint8(assetData->data, &offset, assetData->size);
+	shader->type = ReadUint8(assetData->data, &offset, assetData->size);
+	shader->glslLength = ReadSizeT(assetData->data, &offset, assetData->size);
 	EXPECT_BYTES(shader->glslLength, bytesRemaining);
 	shader->glsl = calloc(shader->glslLength, sizeof(char));
 	CheckAlloc(shader->glsl);
-	ReadBytes(assetData->data, &offset, shader->glslLength * sizeof(char), shader->glsl);
+	ReadBuffer(assetData->data, &offset, assetData->size, shader->glslLength * sizeof(char), shader->glsl);
 	EXPECT_BYTES(sizeof(size_t), bytesRemaining);
-	shader->spirvLength = ReadSizeT(assetData->data, &offset);
+	shader->spirvLength = ReadSizeT(assetData->data, &offset, assetData->size);
 	EXPECT_BYTES(shader->spirvLength * sizeof(uint32_t), bytesRemaining);
 	shader->spirv = calloc(shader->spirvLength, sizeof(uint32_t));
 	CheckAlloc(shader->spirv);
-	ReadBytes(assetData->data, &offset, shader->spirvLength * sizeof(uint32_t), shader->spirv);
+	ReadBuffer(assetData->data, &offset, assetData->size, shader->spirvLength * sizeof(uint32_t), shader->spirv);
 	FreeAsset(assetData);
 
 	return shader;

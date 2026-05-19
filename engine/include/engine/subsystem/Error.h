@@ -82,4 +82,6 @@ void TestSDLFunctionNonFatal(bool result, const char *message);
  */
 void TestSDLFunction(bool result, const char *message, const char *userMessage);
 
+void PrintStackTrace();
+
 #endif //GAME_ERROR_H

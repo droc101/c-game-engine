@@ -30,7 +30,7 @@ option(USE_DISCORD_SDK "Whether or not to enable the Discord Game SDK" ON)
 
 #region Compile flags
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=hidden -Wundef -fPIC ${CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=default -Wundef -fPIC ${CMAKE_C_FLAGS}")
 
 if (WIN32)
     set(CMAKE_C_FLAGS "-static-libgcc -static-libstdc++ ${CMAKE_C_FLAGS}")

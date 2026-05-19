@@ -2,18 +2,15 @@
 // Created by droc101 on 10/27/24.
 //
 
+#include <engine/assets/KvlFile.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/GlobalState.h>
+#include <engine/structs/KVList.h>
 #include <engine/structs/Options.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#define OPTIONS_FILE "options.kvl"
 
 void DefaultOptions(Options *options)
 {
@@ -106,95 +103,83 @@ bool ValidateOptions(const Options *options)
 	return true;
 }
 
-uint16_t GetOptionsChecksum(Options *options)
-{
-	const uint8_t *data = (uint8_t *)options;
-	uint16_t checksum = 0;
-	for (size_t i = sizeof(uint16_t); i < sizeof(Options) - sizeof(uint16_t); i++)
-	{
-		checksum += data[i];
-	}
-	return checksum;
-}
-
-char *GetOptionsPath()
-{
-	const char *folderPath = GetState()->executableFolder;
-	const char *fileName = "/options.bin";
-	char *filePath = malloc(strlen(folderPath) + strlen(fileName) + 1);
-	CheckAlloc(filePath);
-	strcpy(filePath, folderPath);
-	strcat(filePath, fileName);
-	return filePath;
-}
-
 void LoadOptions(Options *options)
 {
-	char *filePath = GetOptionsPath();
-
-	FILE *file = fopen(filePath, "rb");
-	if (file == NULL)
+	KvList list;
+	if (ReadKvlFile(OPTIONS_FILE, list))
 	{
-		LogWarning("Options file not found, using default options\n");
-		DefaultOptions(options);
+		options->enableDiscordRpc = KvGetBool(list, "enable_discord_rpc", true);
+		options->controllerMode = KvGetBool(list, "controller_mode", false);
+		options->cameraSpeed = KvGetFloat(list, "camera_speed", 1.0f);
+		options->rumbleStrength = KvGetFloat(list, "rumble_strength", 1.0f);
+		options->invertHorizontalCamera = KvGetBool(list, "invert_horizontal_camera", false);
+		options->invertVerticalCamera = KvGetBool(list, "invert_vertical_camera", false);
+		options->controllerSwapOkCancel = KvGetBool(list, "controller_swap_ok_cancel", false);
+
+		options->renderer = KvGetByte(list, "renderer", RENDERER_OPENGL);
+		options->fullscreen = KvGetBool(list, "fullscreen", false);
+		options->vsync = KvGetBool(list, "vsync", true);
+		options->msaa = KvGetByte(list, "msaa", MSAA_4X);
+		options->mipmaps = KvGetBool(list, "mipmaps", true);
+		options->preferWayland = KvGetBool(list, "prefer_wayland", true);
+		options->limitFpsWhenUnfocused = KvGetBool(list, "limit_fps_when_unfocused", true);
+		options->lodMultiplier = KvGetFloat(list, "lod_multiplier", 1.0f);
+		options->fov = KvGetFloat(list, "fov", 90.0f);
+		options->anisotropy = KvGetByte(list, "anisotropy", ANISOTROPY_16X);
+		options->maxFps = KvGetInt(list, "max_fps", 0);
+
+		options->musicVolume = KvGetFloat(list, "music_volume", 1.0f);
+		options->sfxVolume = KvGetFloat(list, "sfx_volume", 1.0f);
+		options->uiVolume = KvGetFloat(list, "ui_volume", 1.0f);
+		options->masterVolume = KvGetFloat(list, "master_volume", 1.0f);
+
+		KvListDestroy(list);
 	} else
 	{
-		fseek(file, 0, SEEK_END);
-		const size_t fileLen = ftell(file);
-
-		// if the file is the wrong size, just use the default options
-		if (fileLen != sizeof(Options))
-		{
-			LogWarning("Options file is invalid, using defaults\n");
-			DefaultOptions(options);
-			fclose(file);
-			free(filePath);
-			return;
-		}
-
-		LogInfo("Valid options file found, loading options\n");
-
-		fseek(file, 0, SEEK_SET);
-		const size_t bytesRead = fread(options, 1, sizeof(Options), file);
-		if (bytesRead != sizeof(Options))
-		{
-			LogWarning("Failed to read options file, using defaults (got %d bytes, expected %d)\n",
-					   bytesRead,
-					   sizeof(Options));
-			DefaultOptions(options);
-		} else if (options->checksum !=
-				   GetOptionsChecksum(options)) // This is an else because defaultOptions does not set the checksum
-		{
-			LogWarning("Options file checksum invalid, using defaults\n");
-			DefaultOptions(options);
-		}
-
-		if (!ValidateOptions(options))
-		{
-			LogWarning("Options file is invalid, using defaults\n");
-			DefaultOptions(options);
-		}
-
-		fclose(file);
+		LogWarning("Options file failed to load, defaults will be used\n");
+		DefaultOptions(options);
 	}
 
-	free(filePath);
+	if (!ValidateOptions(options))
+	{
+		LogWarning("Options file is invalid, using defaults\n");
+		DefaultOptions(options);
+	}
 }
 
 void SaveOptions(Options *options)
 {
-	options->checksum = GetOptionsChecksum(options);
-	char *filePath = GetOptionsPath();
+	KvList list;
+	KvListCreate(list);
 
-	FILE *file = fopen(filePath, "wb");
-	if (file == NULL)
+	KvSetBool(list, "enable_discord_rpc", options->enableDiscordRpc);
+
+	KvSetBool(list, "controller_mode", options->controllerMode);
+	KvSetFloat(list, "camera_speed", options->cameraSpeed);
+	KvSetFloat(list, "rumble_strength", options->rumbleStrength);
+	KvSetBool(list, "invert_horizontal_camera", options->invertHorizontalCamera);
+	KvSetBool(list, "invert_vertical_camera", options->invertVerticalCamera);
+	KvSetBool(list, "controller_swap_ok_cancel", options->controllerSwapOkCancel);
+
+	KvSetByte(list, "renderer", options->renderer);
+	KvSetBool(list, "fullscreen", options->fullscreen);
+	KvSetBool(list, "vsync", options->vsync);
+	KvSetByte(list, "msaa", options->msaa);
+	KvSetBool(list, "mipmaps", options->mipmaps);
+	KvSetBool(list, "prefer_wayland", options->preferWayland);
+	KvSetBool(list, "limit_fps_when_unfocused", options->limitFpsWhenUnfocused);
+	KvSetFloat(list, "lod_multiplier", options->lodMultiplier);
+	KvSetFloat(list, "fov", options->fov);
+	KvSetByte(list, "anisotropy", options->anisotropy);
+	KvSetInt(list, "max_fps", options->maxFps);
+
+	KvSetFloat(list, "music_volume", options->musicVolume);
+	KvSetFloat(list, "sfx_volume", options->sfxVolume);
+	KvSetFloat(list, "ui_volume", options->uiVolume);
+	KvSetFloat(list, "master_volume", options->masterVolume);
+
+	if (!WriteKvlFile(OPTIONS_FILE, list))
 	{
-		LogError("File opening failed: %s\n", strerror(errno));
-		free(filePath);
-		return;
+		LogError("Failed to save options!");
 	}
-	fwrite(options, sizeof(Options), 1, file);
-	fclose(file);
-
-	free(filePath);
 }

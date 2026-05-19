@@ -23,6 +23,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef WIN32
+#include <windows.h>
+#include <dbghelp.h>
+#else
+#include <execinfo.h>
+#endif
+
 SDL_MessageBoxColorScheme mbColorScheme;
 
 _Noreturn inline void _GameAllocFailure()
@@ -46,7 +53,10 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	char messageBuffer[256];
 	sprintf(messageBuffer, "%s\n \n%s:%d (%s)\n", error, file, line, function);
 
-	LogError(messageBuffer);
+	LogError("%s\n", error);
+	LogError("At: %s:%d (%s)\n", file, line, function);
+
+	PrintStackTrace();
 
 	char messageBoxTextBuffer[768];
 	sprintf(messageBoxTextBuffer,
@@ -267,4 +277,66 @@ inline void TestSDLFunction(const bool result, const char *message, const char *
 		LogError("%s: %s\n", message, SDL_GetError());
 		Error((char *)userMessage);
 	}
+}
+
+void PrintStackTrace()
+{
+#ifdef WIN32
+	void *frames[512];
+	const HANDLE hProcess = GetCurrentProcess();
+	SymInitialize(hProcess, NULL, TRUE);
+	SYMBOL_INFO *symbol = calloc(1, sizeof(SYMBOL_INFO) + 256);
+	// not using CheckAlloc here because this may be run in memory starved conditions, nullness will be checked before use
+	if (symbol)
+	{
+		symbol->MaxNameLen = 255;
+		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+	}
+	const uint16_t num_frames = CaptureStackBackTrace(0, 512, frames, NULL);
+	if (num_frames > 0)
+	{
+		LogInfo("Stack Trace:\n");
+		for (int i = 0; i < num_frames; i++)
+		{
+			if (symbol && SymFromAddr(hProcess, (uint64_t)frames[i], 0, symbol))
+			{
+				LogInfo("    %d: %s+0x%zx [%p]\n", i, symbol->Name, frames[i] - symbol->Address, frames[i]);
+			} else
+			{
+				LogInfo("    %d: ??? [%p]\n", i, frames[i]);
+			}
+
+		}
+	} else
+	{
+		LogWarning("Stack trace contained no frames!\n");
+	}
+	free(symbol);
+#else
+	void *frames[512];
+	const int num_frames = backtrace(frames, 512);
+	char **symbols = backtrace_symbols(frames, num_frames);
+	if (num_frames > 0)
+	{
+		LogInfo("Stack Trace:\n");
+		if (symbols)
+		{
+			for (int i = 0; i < num_frames; i++)
+			{
+				LogInfo("    %d: %s\n", i, symbols[i]);
+			}
+			free(symbols);
+		} else
+		{
+			LogWarning("Failed to get symbols for stack trace\n");
+			for (int i = 0; i < num_frames; i++)
+			{
+				LogInfo("    %d: %p\n", i, frames[i]);
+			}
+		}
+	} else
+	{
+		LogWarning("Stack trace contained no frames!\n");
+	}
+#endif
 }
