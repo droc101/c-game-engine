@@ -5,6 +5,7 @@
 #ifndef KVLIST_H
 #define KVLIST_H
 
+#include <engine/assets/DataWriter.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
 #include <engine/structs/Vector2.h>
@@ -97,6 +98,8 @@ struct Param
  */
 size_t ReadParam(const void *data, size_t dataSize, size_t *offset, Param *out);
 
+void WriteParam(const Param *param, DataWriter *writer);
+
 /**
  * Copy param @c source into @c dest
  */
@@ -133,6 +136,8 @@ void KvListCopy(const KvList source, KvList dest);
  * @return Number of bytes read
  */
 size_t ReadKvList(const void *data, size_t dataSize, size_t *offset, KvList out);
+
+void WriteKvList(const KvList list, DataWriter *writer);
 
 /**
  * Destroys a key-value list, freeing all memory associated with it.

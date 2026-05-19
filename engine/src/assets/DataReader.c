@@ -67,3 +67,13 @@ char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBuff
 	}
 	return NULL;
 }
+
+uint16_t Checksum(const uint8_t *buffer, const size_t bufferSize)
+{
+	uint16_t checksum = 5873;
+	for (size_t i = 0; i < bufferSize; i++)
+	{
+		checksum += buffer[i];
+	}
+	return checksum;
+}

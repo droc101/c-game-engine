@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <engine/assets/DataReader.h>
+#include <engine/assets/DataWriter.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
@@ -97,6 +98,61 @@ void CopyParam(const Param *source, Param *dest)
 	} else
 	{
 		memcpy(dest, source, sizeof(Param)); // plain-old-data
+	}
+}
+
+void WriteParam(const Param *param, DataWriter *writer)
+{
+	WriteUint8(writer, param->type);
+	switch (param->type)
+	{
+		case PARAM_TYPE_BYTE:
+			WriteUint8(writer, param->byteValue);
+			break;
+		case PARAM_TYPE_INTEGER:
+			WriteInt32(writer, param->intValue);
+			break;
+		case PARAM_TYPE_FLOAT:
+			WriteFloat(writer, param->floatValue);
+			break;
+		case PARAM_TYPE_BOOL:
+			WriteUint8(writer, param->boolValue);
+			break;
+		case PARAM_TYPE_STRING:
+			WriteString(writer, param->stringValue);
+			break;
+		case PARAM_TYPE_COLOR:
+			WriteFloat(writer, param->colorValue.r);
+			WriteFloat(writer, param->colorValue.g);
+			WriteFloat(writer, param->colorValue.b);
+			WriteFloat(writer, param->colorValue.a);
+			break;
+		case PARAM_TYPE_KV_LIST:
+			WriteKvList(param->kvListValue, writer);
+			break;
+		case PARAM_TYPE_ARRAY:
+			WriteSizeT(writer, param->arrayValue.length);
+			for (size_t i = 0; i < param->arrayValue.length; i++)
+			{
+				WriteParam(&param->arrayValue.data[i], writer);
+			}
+			break;
+		case PARAM_TYPE_UINT_64:
+			WriteUint64(writer, param->uint64value);
+			break;
+		case PARAM_TYPE_VEC2:
+			WriteFloat(writer, param->vec2value.x);
+			WriteFloat(writer, param->vec2value.y);
+			break;
+		case PARAM_TYPE_VEC3:
+			WriteFloat(writer, param->vec3value.x);
+			WriteFloat(writer, param->vec3value.y);
+			WriteFloat(writer, param->vec3value.z);
+			break;
+		default:
+		case PARAM_TYPE_NONE:
+			assert(false);
+			break;
 	}
 }
 
@@ -194,6 +250,20 @@ size_t ReadKvList(const void *data, const size_t dataSize, size_t *offset, KvLis
 		FreeParam(&param);
 	}
 	return *offset - initialOffset;
+}
+
+void WriteKvList(const KvList list, DataWriter *writer)
+{
+	assert(DataWriterIsEmpty(writer));
+	const size_t numKeys = KvList_size(list);
+	WriteSizeT(writer, numKeys);
+	KvList_iterator iter;
+	for (KvList_it(iter, list); !KvList_end_p(iter); KvList_next(iter))
+	{
+		const KvList_pair *pair = KvList_cref(iter);
+		WriteString(writer, pair->key);
+		WriteParam(&pair->value, writer);
+	}
 }
 
 void KvListCopy(const KvList source, KvList dest)

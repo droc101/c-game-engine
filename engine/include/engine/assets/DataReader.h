@@ -47,4 +47,6 @@ void ReadBuffer(const uint8_t *data, size_t *offset, size_t dataSize, size_t rea
  */
 char *ReadStringSafe(const uint8_t *data, size_t *offset, size_t totalBufferSize, size_t *outLength);
 
+uint16_t Checksum(const uint8_t *buffer, const size_t bufferSize);
+
 #endif //GAME_DATAREADER_H

@@ -52,8 +52,7 @@ target_compile_options(joltc PRIVATE "-w")
 
 #endregion
 
-add_library(engine INTERFACE
-        include/engine/structs/Light.h)
+add_library(engine INTERFACE)
 target_sources(engine INTERFACE
         src/actor/IoProxy.c
         include/engine/actor/IoProxy.h
@@ -102,6 +101,8 @@ target_sources(engine INTERFACE
         include/engine/assets/TextureLoader.h
         src/assets/MapMaterialLoader.c
         include/engine/assets/MapMaterialLoader.h
+        src/assets/DataWriter.c
+        include/engine/assets/DataWriter.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h
@@ -193,6 +194,7 @@ target_sources(engine INTERFACE
         include/engine/structs/Item.h
         src/structs/Item.c
         include/engine/structs/GameState.h
+        include/engine/structs/Light.h
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h
