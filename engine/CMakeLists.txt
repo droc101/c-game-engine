@@ -103,6 +103,8 @@ target_sources(engine INTERFACE
         include/engine/assets/MapMaterialLoader.h
         src/assets/DataWriter.c
         include/engine/assets/DataWriter.h
+        src/assets/KvlFile.c
+        include/engine/assets/KvlFile.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h

@@ -2,21 +2,15 @@
 // Created by droc101 on 10/27/24.
 //
 
-#include <engine/assets/DataReader.h>
-#include <engine/assets/DataWriter.h>
+#include <engine/assets/KvlFile.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Options.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#define OPTIONS_FILE "options.kvl"
 
 void DefaultOptions(Options *options)
 {
@@ -109,69 +103,11 @@ bool ValidateOptions(const Options *options)
 	return true;
 }
 
-char *GetOptionsPath()
-{
-	const char *folderPath = GetState()->executableFolder;
-	const char *fileName = "/options.kvl";
-	char *filePath = malloc(strlen(folderPath) + strlen(fileName) + 1);
-	CheckAlloc(filePath);
-	strcpy(filePath, folderPath);
-	strcat(filePath, fileName);
-	return filePath;
-}
-
 void LoadOptions(Options *options)
 {
-	char *filePath = GetOptionsPath();
-
-	FILE *file = fopen(filePath, "rb");
-	if (file == NULL)
+	KvList list;
+	if (ReadKvlFile(OPTIONS_FILE, list))
 	{
-		LogWarning("Options file not found, using default options\n");
-		DefaultOptions(options);
-	} else
-	{
-		fseek(file, 0, SEEK_END);
-		const size_t fileLen = ftell(file);
-
-		// if the file is the wrong size, just use the default options
-		if (fileLen < sizeof(size_t) + sizeof(uint16_t)) // number of KvList keys + checksum
-		{
-			LogWarning("Options file is invalid, using defaults\n");
-			DefaultOptions(options);
-			fclose(file);
-			free(filePath);
-			return;
-		}
-
-		LogInfo("Valid options file found, loading options\n");
-
-
-		const size_t bufferSize = fileLen - sizeof(uint16_t);
-		void *buffer = malloc(bufferSize);
-		CheckAlloc(buffer);
-
-		fseek(file, bufferSize, SEEK_SET);
-		uint16_t checksum = 0;
-		fread(&checksum, 1, sizeof(uint16_t), file);
-
-		fseek(file, 0, SEEK_SET);
-		fread(buffer, bufferSize, 1, file);
-
-		if (Checksum(buffer, bufferSize) != checksum)
-		{
-			LogWarning("Options file checksum invalid, using defaults\n");
-			DefaultOptions(options);
-			free(buffer);
-			fclose(file);
-			return;
-		}
-
-		size_t offset = 0;
-		KvList list;
-		ReadKvList(buffer, bufferSize, &offset, list);
-		free(buffer);
-
 		options->enableDiscordRpc = KvGetBool(list, "enable_discord_rpc", true);
 		options->controllerMode = KvGetBool(list, "controller_mode", false);
 		options->cameraSpeed = KvGetFloat(list, "camera_speed", 1.0f);
@@ -198,15 +134,17 @@ void LoadOptions(Options *options)
 		options->masterVolume = KvGetFloat(list, "master_volume", 1.0f);
 
 		KvListDestroy(list);
-
-		if (!ValidateOptions(options))
-		{
-			LogWarning("Options file is invalid, using defaults\n");
-			DefaultOptions(options);
-		}
+	} else
+	{
+		LogWarning("Options file failed to load, defaults will be used\n");
+		DefaultOptions(options);
 	}
 
-	free(filePath);
+	if (!ValidateOptions(options))
+	{
+		LogWarning("Options file is invalid, using defaults\n");
+		DefaultOptions(options);
+	}
 }
 
 void SaveOptions(Options *options)
@@ -240,25 +178,8 @@ void SaveOptions(Options *options)
 	KvSetFloat(list, "ui_volume", options->uiVolume);
 	KvSetFloat(list, "master_volume", options->masterVolume);
 
-	DataWriter *writer = CreateDataWriter();
-	WriteKvList(list, writer);
-	KvListDestroy(list);
-	const uint16_t checksum = Checksum(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer));
-
-	char *filePath = GetOptionsPath();
-
-	FILE *file = fopen(filePath, "wb");
-	if (file == NULL)
+	if (!WriteKvlFile(OPTIONS_FILE, list))
 	{
-		LogError("File opening failed: %s\n", strerror(errno));
-		free(filePath);
-		return;
+		LogError("Failed to save options!");
 	}
-	fwrite(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer), 1, file);
-	fwrite(&checksum, sizeof(uint16_t), 1, file);
-	fclose(file);
-
-	FreeDataWriter(writer);
-
-	free(filePath);
 }
