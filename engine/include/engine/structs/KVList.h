@@ -98,6 +98,11 @@ struct Param
  */
 size_t ReadParam(const void *data, size_t dataSize, size_t *offset, Param *out);
 
+/**
+ * Write a param to a DataWriter
+ * @param param The param to write
+ * @param writer The DataWriter to write to
+ */
 void WriteParam(const Param *param, DataWriter *writer);
 
 /**
@@ -137,6 +142,11 @@ void KvListCopy(const KvList source, KvList dest);
  */
 size_t ReadKvList(const void *data, size_t dataSize, size_t *offset, KvList out);
 
+/**
+ * Write a KvList to a DataWriter
+ * @param list The KvList to write
+ * @param writer The DataWriter to write to
+ */
 void WriteKvList(const KvList list, DataWriter *writer);
 
 /**

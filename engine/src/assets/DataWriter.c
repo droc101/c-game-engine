@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/// The internal buffer of a DataWriter will always be a multiple of this size
+#define DATAWRITER_BUFFER_BLOCK_SIZE 1024
+
 struct DataWriter
 {
 	uint8_t *buffer;
@@ -22,9 +25,9 @@ DataWriter *CreateDataWriter()
 {
 	DataWriter *writer = malloc(sizeof(DataWriter));
 	CheckAlloc(writer);
-	writer->buffer = malloc(DATAWRITER_BUFFER_EXPANSION_SIZE);
+	writer->buffer = malloc(DATAWRITER_BUFFER_BLOCK_SIZE);
 	writer->usedSpace = 0;
-	writer->bufferSize = DATAWRITER_BUFFER_EXPANSION_SIZE;
+	writer->bufferSize = DATAWRITER_BUFFER_BLOCK_SIZE;
 	return writer;
 }
 
@@ -49,12 +52,16 @@ bool DataWriterIsEmpty(const DataWriter *writer)
 	return writer->usedSpace == 0;
 }
 
+/**
+ * Ensure that a DataWriter has enough space to write a given number of bytes
+ * @param neededSpace The amount of free memory needed in bytes
+ */
 void DataWriterEnsureSpace(DataWriter *writer, const size_t neededSpace)
 {
 	if (writer->bufferSize - writer->usedSpace < neededSpace)
 	{
-		const size_t blocksNeeded = (size_t)ceilf((float)neededSpace / DATAWRITER_BUFFER_EXPANSION_SIZE) + 1;
-		const size_t newSize = writer->bufferSize + (blocksNeeded * DATAWRITER_BUFFER_EXPANSION_SIZE);
+		const size_t blocksNeeded = (size_t)ceilf((float)neededSpace / DATAWRITER_BUFFER_BLOCK_SIZE) + 1;
+		const size_t newSize = writer->bufferSize + (blocksNeeded * DATAWRITER_BUFFER_BLOCK_SIZE);
 		writer->buffer = realloc(writer->buffer, newSize);
 		CheckAlloc(writer->buffer);
 		writer->bufferSize = newSize;
@@ -69,7 +76,7 @@ void WriteBuffer(DataWriter *writer, const void *buffer, const size_t elementSiz
 	writer->usedSpace += size;
 }
 
-void WriteString(DataWriter *writer, const char* string)
+void WriteString(DataWriter *writer, const char *string)
 {
 	const size_t len = strlen(string);
 	WriteSizeT(writer, len + 1);

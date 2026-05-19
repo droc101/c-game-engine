@@ -47,6 +47,12 @@ void ReadBuffer(const uint8_t *data, size_t *offset, size_t dataSize, size_t rea
  */
 char *ReadStringSafe(const uint8_t *data, size_t *offset, size_t totalBufferSize, size_t *outLength);
 
-uint16_t Checksum(const uint8_t *buffer, const size_t bufferSize);
+/**
+ * Calculate a 16-bit checksum of a given data buffer
+ * @param buffer The data to checksum
+ * @param bufferSize The size of the data
+ * @return 16-bit checksum of the given data
+ */
+uint16_t Checksum(const uint8_t *buffer, size_t bufferSize);
 
 #endif //GAME_DATAREADER_H

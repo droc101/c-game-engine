@@ -10,16 +10,46 @@
 #include <stdint.h>
 
 typedef struct DataWriter DataWriter;
-#define DATAWRITER_BUFFER_EXPANSION_SIZE 1024
 
+/**
+ * Create a DataWriter
+ */
 DataWriter *CreateDataWriter();
+
+/**
+ * Free a DataWriter
+ */
 void FreeDataWriter(DataWriter *writer);
+
+/**
+ * Get the buffer of a DataWriter (the written data)
+ */
 const uint8_t *DataWriterGetBuffer(const DataWriter *writer);
+
+/**
+ * Get the size of a DataWriter's buffer
+ * @note The actual buffer may be larger than this size, but the remaining space is not used
+ */
 size_t DataWriterGetBufferSize(const DataWriter *writer);
+
+/**
+ * Check if a DataWriter is empty (no data written)
+ */
 bool DataWriterIsEmpty(const DataWriter *writer);
 
+/**
+ * Write a buffer or array to a DataWriter
+ * @param writer The DataWriter to write to
+ * @param buffer The buffer/array to write
+ * @param elementSize The size of each element in the buffer
+ * @param numElements The number of elements in the buffer
+ */
 void WriteBuffer(DataWriter *writer, const void *buffer, size_t elementSize, size_t numElements);
-void WriteString(DataWriter *writer, const char* string);
+
+/**
+ * Write a string to a DataWriter
+ */
+void WriteString(DataWriter *writer, const char *string);
 
 #define DeclareWriteFunction(T, name) void name(DataWriter *writer, const T data)
 
