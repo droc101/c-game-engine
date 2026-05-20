@@ -89,10 +89,10 @@ void InitSDL()
 	LogDebug("Initializing SDL...\n");
 	SDL_SetHint(SDL_HINT_APP_NAME, gameConfig.gameTitle);
 #ifdef SDL_PLATFORM_LINUX
-	// if (GetState()->options.preferWayland)
-	// {
-	// 	SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11");
-	// } else
+	if (GetState()->options.preferWayland)
+	{
+		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11");
+	} else
 	{
 		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11,wayland");
 	}
