@@ -58,7 +58,7 @@ void LoadGameConfig(const char *game)
 	LogDebug("Loading game configuration...\n");
 	if (IsPathAbsolute(game))
 	{
-		configPath = malloc(strlen(game) + strlen("/game.gkvl") + 1); // TODO use game.gcfg
+		configPath = malloc(strlen(game) + strlen("/game.gkvl") + 1);
 		CheckAlloc(configPath);
 		if (game[strlen(game) - 1] == '/' || game[strlen(game) - 1] == '\\')
 		{

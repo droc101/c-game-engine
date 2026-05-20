@@ -9,6 +9,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
@@ -27,8 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-
-#include "engine/graphics/vulkan/VulkanInternal.h"
 
 #pragma region variables
 bool minimized = false;
@@ -129,10 +128,7 @@ inline uint32_t ImageIndex(const Image *image)
 	{
 		if (!LoadTexture(image))
 		{
-			// TODO: If loading a texture fails it can't fall back to OpenGL.
-			//  There is no easy way to fix this with the current system, since the return value of this function is not
-			//  checked but instead is just assumed to be valid. That rules out returning something like -1 on error.
-			Error("Failed to load texture!");
+			Error("Failed to load texture into VkImage!");
 		}
 		return imageAssetIdToIndexMap[image->id];
 	}

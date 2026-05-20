@@ -19,6 +19,8 @@ VkResult CreateSkyBuffers();
 
 VkResult CreateViewmodelBuffers();
 
+VkResult CreateActorModelBuffers();
+
 VkResult CreateDebugDrawBuffers();
 
 VkResult ResizeDebugDrawBuffers();

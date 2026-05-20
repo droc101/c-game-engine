@@ -42,9 +42,6 @@
 #include <engine/subsystem/Error.h>
 #endif
 
-// TODO: Can the concept of frames in flight be removed entirely in favor of simply letting Luna handle it?
-//  I've started this process, so if it cannot it needs to be readded in several places
-
 static const Map *loadedMap;
 static LunaImage lightmap = LUNA_NULL_HANDLE;
 static size_t skyModelIndexCount;
@@ -495,6 +492,54 @@ static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindI
 	return VK_SUCCESS;
 }
 
+static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+	VulkanTestReturnResult(UpdateActors(), "Failed to update actors!");
+
+	const size_t shadedDrawCount = lunaGetBufferSize(buffers.actorModels.shadedDrawInfo) /
+								   sizeof(VkDrawIndexedIndirectCommand);
+	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.actorModels.unshadedDrawInfo) /
+									 sizeof(VkDrawIndexedIndirectCommand);
+
+	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
+	{
+		VulkanTest(lunaBindVertexBuffers(device,
+										 commandBuffer,
+										 (LunaBuffer[]){buffers.actorModels.vertices, buffers.actorModels.instanceData},
+										 0,
+										 2),
+				   "Failed to bind actor models vertex buffers!");
+		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.actorModels.indices, VK_INDEX_TYPE_UINT32),
+				   "Failed to bind actor models index buffer!");
+	}
+
+	if (shadedDrawCount != 0)
+	{
+		const LunaDrawIndexedIndirectInfo drawInfo = {
+			.pipeline = pipelines.shadedActorModel,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.actorModels.shadedDrawInfo,
+			.drawCount = shadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw shaded actor models!");
+	}
+
+	if (unshadedDrawCount != 0)
+	{
+		const LunaDrawIndexedIndirectInfo drawInfo = {
+			.pipeline = pipelines.unshadedActorModel,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.actorModels.unshadedDrawInfo,
+			.drawCount = unshadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw unshaded actor models!");
+	}
+
+	return VK_SUCCESS;
+}
+
 static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
 {
 	const size_t shadedDrawCount = lunaGetBufferSize(buffers.viewmodel.shadedDrawInfo) /
@@ -753,6 +798,7 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		VulkanTest(DrawSky(&pipelineBindInfo), "Failed to draw sky!");
 	}
 	VulkanTest(DrawMap(&pipelineBindInfo), "Failed to draw map!");
+	VulkanTest(DrawActors(&pipelineBindInfo), "Failed to draw actors!");
 	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
 	{
 		VulkanTest(DrawViewmodel(&pipelineBindInfo), "Failed to draw viewmodel!");
@@ -910,7 +956,7 @@ bool VK_LoadMap(const Map *map)
 
 	VulkanTest(LoadViewmodel(&map->viewmodel), "Failed to load viewmodel!");
 
-	VulkanTest(LoadActors(), "Failed to load actors!");
+	VulkanTest(LoadActors(&map->actors), "Failed to load actors!");
 
 	if (map->renderSky)
 	{

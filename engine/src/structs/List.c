@@ -17,7 +17,6 @@
 void _ListInit(List *list, const enum _ListType listType)
 {
 	assert(list);
-	assert(listType == LIST_POINTER || listType == LIST_UINT64 || listType == LIST_UINT32 || listType == LIST_INT32);
 
 	list->length = 0;
 	list->data = malloc(sizeof(struct _ListData));
@@ -45,12 +44,15 @@ static inline void ListCopyHelper(const List *oldList, List *newList)
 	{
 		case LIST_POINTER:
 		case LIST_UINT64:
-			listSize = oldList->length * 8;
+			static_assert(sizeof(void *) == sizeof(uint64_t));
+			listSize = oldList->length * sizeof(uint64_t);
 			break;
 		case LIST_UINT32:
 		case LIST_INT32:
-			listSize = oldList->length * 4;
+			listSize = oldList->length * sizeof(uint32_t);
 			break;
+		case LIST_NESTED:
+			listSize = oldList->length * sizeof(List);
 	}
 	assert(!newList->data->pointerData);
 	newList->data->pointerData = malloc(listSize);
@@ -109,6 +111,17 @@ void _ListAdd(List *list, void *data)
 			CheckAlloc(list->data->int32Data);
 			list->data->int32Data[list->length] = (int32_t)(uintptr_t)data;
 			break;
+		case LIST_NESTED:
+			list->data->nestedListData = GameReallocArray(list->data->nestedListData, list->length + 1, sizeof(List));
+			CheckAlloc(list->data->nestedListData);
+			if (data)
+			{
+				list->data->nestedListData[list->length] = *((List *)data);
+			} else
+			{
+				ListInit(list->data->nestedListData[list->length], LIST_POINTER);
+			}
+			break;
 	}
 	list->length++;
 }
@@ -141,6 +154,10 @@ void _ListSet(const List *list, const size_t index, void *data)
 			break;
 		case LIST_INT32:
 			list->data->int32Data[index] = (int32_t)(uintptr_t)data;
+			break;
+		case LIST_NESTED:
+			assert(data);
+			list->data->nestedListData[index] = *((List *)data);
 			break;
 	}
 }
@@ -188,6 +205,14 @@ void ListRemoveAtHelper(const List *list, const size_t index)
 			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
 			CheckAlloc(list->data->int32Data);
 			break;
+		case LIST_NESTED:
+			ListFree(list->data->nestedListData[index]);
+			memmove(&list->data->nestedListData[index],
+					&list->data->nestedListData[index + 1],
+					sizeof(List) * (list->length - index));
+			list->data->nestedListData = GameReallocArray(list->data->nestedListData, list->length, sizeof(List));
+			CheckAlloc(list->data->nestedListData);
+			break;
 	}
 }
 
@@ -200,8 +225,7 @@ void _ListRemoveAt(List *list, const size_t index)
 	list->length--;
 	if (list->length == 0)
 	{
-		free(list->data->pointerData);
-		list->data->pointerData = NULL;
+		ListClear(*list);
 		return;
 	}
 	ListRemoveAtHelper(list, index);
@@ -217,9 +241,7 @@ void _LockingListRemoveAt(LockingList *list, const size_t index)
 	list->length--;
 	if (list->length == 0)
 	{
-		free(list->data->pointerData);
-		list->data->pointerData = NULL;
-
+		ListClear(*list);
 		ListUnlock(*list);
 		return;
 	}
@@ -379,7 +401,6 @@ size_t _LockingListFind(LockingList *list, const void *data)
 void _ListLock(const LockingList *list)
 {
 	assert(list);
-	// TODO: Explodes on arm64 when the quit button is pressed
 	SDL_LockMutex(list->mutex); // SDL3: this function cannot fail
 }
 
@@ -418,12 +439,15 @@ void _ListZero(const List *list)
 	{
 		case LIST_POINTER:
 		case LIST_UINT64:
-			memset(list->data->pointerData, 0, list->length * 8);
+			static_assert(sizeof(void *) == sizeof(uint64_t));
+			memset(list->data->pointerData, 0, list->length * sizeof(uint64_t));
 			break;
 		case LIST_UINT32:
 		case LIST_INT32:
-			memset(list->data->pointerData, 0, list->length * 4);
+			memset(list->data->pointerData, 0, list->length * sizeof(uint32_t));
 			break;
+		case LIST_NESTED:
+			memset(list->data->pointerData, 0, list->length * sizeof(List));
 	}
 }
 

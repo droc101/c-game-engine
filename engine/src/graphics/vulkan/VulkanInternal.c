@@ -100,7 +100,7 @@ bool CreateLogicalDevice()
 	};
 	VulkanTest(lunaCreateDevice2(&deviceCreationInfo, &device), "Failed to create logical device!");
 	lunaGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
-	// TODO: Additional checks, and change from assert to a failure that allows GL to take over
+	// TODO: Check that no limits are being exceeded
 	return true;
 }
 
@@ -247,9 +247,8 @@ bool CreateRenderPass()
 	const LunaSubpassCreationInfo subpassCreationInfo = {
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 		.useColorAttachment = true,
-		.useDepthAttachment = true, // TODO: Look into disabling this for UI
+		.useDepthAttachment = true,
 	};
-	// TODO: Check that these stages are actually accurate
 	VkSubpassDependency dependency = {
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
 		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
@@ -286,7 +285,6 @@ bool CreateRenderPass()
 // TODO: Look into using uniform texel buffers instead of image samplers to drop dependency on non-uniform indexing
 bool CreateDescriptorSetLayouts()
 {
-	// TODO: Use inline uniform block if available
 	const LunaDescriptorSetLayoutBinding bindings[] = {
 		{
 			.bindingName = "Lightmap",
@@ -456,6 +454,7 @@ bool CreateBuffers()
 	VulkanTest(CreateMapBuffers(), "Failed to create map buffers!");
 	VulkanTest(CreateSkyBuffers(), "Failed to create sky buffers!");
 	VulkanTest(CreateViewmodelBuffers(), "Failed to create viewmodel buffers!");
+	VulkanTest(CreateActorModelBuffers(), "Failed to create actor models buffers!");
 	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
 
 	return true;

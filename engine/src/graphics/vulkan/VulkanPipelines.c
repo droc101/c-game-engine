@@ -84,6 +84,7 @@ static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
 	.pDynamicStates = (VkDynamicState[]){VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR},
 };
 
+static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
 #pragma endregion shared
 
@@ -417,11 +418,8 @@ static inline bool CreateShadedViewmodelPipeline()
 				  offsetof(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, materialColor));
 
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("vulkan/viewmodel_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded viewmodel vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/viewmodel_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
-			   "Failed to load shaded viewmodel fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -430,7 +428,7 @@ static inline bool CreateShadedViewmodelPipeline()
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = fragShaderModule,
+			.module = modelShadedFragShaderModule,
 		},
 	};
 
@@ -667,7 +665,7 @@ static inline bool CreateShadedActorModelPipeline()
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-			// .module = modelShadedFragShaderModule,
+			.module = modelShadedFragShaderModule,
 		},
 	};
 
@@ -767,7 +765,7 @@ static inline bool CreateShadedActorModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -886,7 +884,7 @@ static inline bool CreateUnshadedActorModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -993,6 +991,8 @@ bool CreateGraphicsPipelines()
 	multisampling.rasterizationSamples = msaaSamples;
 	pipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
 
+	VulkanTest(CreateShaderModule(SHADER("vulkan/model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
+			   "Failed to load shaded model fragment shader!");
 	VulkanTest(CreateShaderModule(SHADER("vulkan/model_unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule),
 			   "Failed to load unshaded model fragment shader!");
 
@@ -1002,7 +1002,7 @@ bool CreateGraphicsPipelines()
 		   CreateSkyPipeline() &&
 		   CreateShadedViewmodelPipeline() &&
 		   CreateUnshadedViewmodelPipeline() &&
-		   // CreateShadedActorModelPipeline() &&
-		   // CreateUnshadedActorModelPipeline() &&
+		   CreateShadedActorModelPipeline() &&
+		   CreateUnshadedActorModelPipeline() &&
 		   CreateDebugDrawPipeline();
 }

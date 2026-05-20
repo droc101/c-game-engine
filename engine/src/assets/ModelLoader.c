@@ -19,10 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint32_t modelId;
-uint32_t lodId;
-ModelDefinition *models[MAX_MODELS];
-ModelDefinition *errorModel = NULL;
+static uint32_t modelId;
+static uint32_t lodId;
+static ModelDefinition *models[MAX_MODELS];
+static ModelDefinition *errorModel = NULL;
 
 #define BOUNDING_BOX_CONVEX_RADIUS 0.0005f
 
@@ -116,7 +116,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		lod->distanceSquared = ReadFloat(assetData->data, &offset, assetData->size);
 		lod->vertexCount = ReadSizeT(assetData->data, &offset, assetData->size);
 
-		const size_t vertexDataSize = lod->vertexCount * sizeof(ModelVertex); // TODO: Is there potentially padding bytes included in this size
+		const size_t vertexDataSize = lod->vertexCount * sizeof(ModelVertex);
 		EXPECT_BYTES(vertexDataSize, bytesRemaining);
 		lod->vertexData = malloc(vertexDataSize);
 		CheckAlloc(lod->vertexData);

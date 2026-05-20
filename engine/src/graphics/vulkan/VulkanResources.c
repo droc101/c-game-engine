@@ -26,7 +26,7 @@
 
 VkResult CreateUiBuffers()
 {
-	static const uint32_t MAX_UI_QUADS_INIT = 2 << 20; // TODO: Ensure this is a good value for GGUI
+	static const uint32_t MAX_UI_QUADS_INIT = 8192;
 
 	buffers.ui.allocatedQuads = 0;
 	buffers.ui.freeQuads = MAX_UI_QUADS_INIT;
@@ -199,6 +199,51 @@ VkResult CreateViewmodelBuffers()
 	return VK_SUCCESS;
 }
 
+VkResult CreateActorModelBuffers()
+{
+	const LunaBufferCreationInfo verticesBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.actorModels.vertices),
+						   "Failed to create shaded actor models vertex buffer!");
+	const LunaBufferCreationInfo indicesBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.actorModels.indices),
+						   "Failed to create shaded actor models index buffer!");
+	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.actorModels.instanceData),
+						   "Failed to create shaded actor models instance data buffer!");
+	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&shadedDrawInfoBufferCreationInfo,
+											&buffers.actorModels.shadedDrawInfo),
+						   "Failed to create shaded actor models draw info buffer!");
+	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&unshadedDrawInfoBufferCreationInfo,
+											&buffers.actorModels.unshadedDrawInfo),
+						   "Failed to create unshaded actor models draw info buffer!");
+
+	return VK_SUCCESS;
+}
+
 VkResult CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
@@ -262,7 +307,6 @@ VkResult ResizeDebugDrawBuffers()
 
 bool LoadTexture(const Image *image)
 {
-	LockLodThreadMutex(); // TODO: This is not a great fix but it works ig
 	const bool useMipmaps = GetState()->options.mipmaps && image->mipmaps;
 	LunaSampler sampler = LUNA_NULL_HANDLE;
 	if (image->filter && image->repeat)
@@ -332,7 +376,6 @@ bool LoadTexture(const Image *image)
 		.imageInfo = &imageInfo,
 	};
 	lunaWriteDescriptorSets(device, 1, &writeDescriptor);
-	UnlockLodThreadMutex();
 
 	return true;
 }

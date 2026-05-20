@@ -27,6 +27,8 @@
 #define MAX_DEBUG_DRAW_VERTICES_INIT 1024
 #endif
 
+#define FRAMES_IN_FLIGHT 1
+
 #define SizeofMember(Type, member) (sizeof(((Type *)0)->member))
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
@@ -140,9 +142,8 @@ typedef struct ActorModelInstanceData
 	vec4 modColor;
 	vec4 materialColor;
 	uint32_t textureIndex;
-} ActorModelInstanceData;
+} __attribute__((aligned(32))) ActorModelInstanceData;
 
-// TODO: Should this be changed or is it ok
 typedef struct UiBuffer
 {
 	LunaBuffer vertexBuffer;
@@ -160,19 +161,28 @@ typedef struct UniformBuffers
 	LunaBuffer fog;
 } UniformBuffers;
 
-/// Contains the required buffers for a model that can have multiple materials
+/**
+ * Contains the required buffers for a model that can have multiple materials
+ *
+ * Models with multiple materials are always drawn using lunaDrawIndexedIndirect regardless of if they are instanced.
+ * This is done due to the fact that each different material becomes a driver-dispatched draw call, and would have to be
+ * individually dispatched draw calls if it were not using indirect draw.
+ *
+ * Vertex and index data does not need to be duplicated for each frame in flight due to the fact that it is in local
+ * space and only the instance data should be changing on a frame-to-frame basis.
+ */
 typedef struct ModelBuffer
 {
 	/// A buffer containing per-vertex data
 	LunaBuffer vertices;
 	/// A buffer containing the index data to use along-side the per-vertex data
 	LunaBuffer indices;
-	/// A buffer containing the instance data for each actor
-	LunaBuffer instanceData;
+	/// A buffer containing the instance data for each instance of each model section
+	LunaBuffer instanceData;//[FRAMES_IN_FLIGHT];
 	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
-	LunaBuffer shadedDrawInfo;
+	LunaBuffer shadedDrawInfo;//[FRAMES_IN_FLIGHT];
 	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
-	LunaBuffer unshadedDrawInfo;
+	LunaBuffer unshadedDrawInfo;//[FRAMES_IN_FLIGHT];
 } ModelBuffer;
 
 typedef struct SkyBuffer
@@ -199,8 +209,8 @@ typedef struct DebugDrawBuffer
 
 typedef struct Buffers
 {
-	UiBuffer ui;
-	UniformBuffers uniforms;
+	UiBuffer ui;//[FRAMES_IN_FLIGHT];
+	UniformBuffers uniforms;//[FRAMES_IN_FLIGHT];
 	ModelBuffer viewmodel;
 	ModelBuffer actorModels;
 	ModelBuffer map;
