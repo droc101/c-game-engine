@@ -75,9 +75,10 @@ bool ReadKvlFile(const char *path, KvList output)
 		return false;
 	}
 
-	size_t offset = 0;
-	ReadKvList(buffer, bufferSize, &offset, output);
+	DataReader *reader = CreateDataReader(buffer, bufferSize, 0);
+	ReadKvList(reader, output);
 	free(buffer);
+	DestroyDataReader(reader);
 
 	return true;
 }
@@ -88,11 +89,9 @@ bool WriteKvlFile(const char *path, KvList input)
 	WriteKvList(input, writer);
 	KvListDestroy(input);
 
-	const KvlFileHeader header = {
-		.magic = KVL_MAGIC,
-		.version = KVL_VERSION,
-		.checksum = Checksum(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer))
-	};
+	const KvlFileHeader header = {.magic = KVL_MAGIC,
+								  .version = KVL_VERSION,
+								  .checksum = Checksum(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer))};
 
 	FILE *file = fopen(path, "wb");
 	if (file == NULL)

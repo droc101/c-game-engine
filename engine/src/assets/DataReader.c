@@ -4,20 +4,50 @@
 
 #include <assert.h>
 #include <engine/assets/DataReader.h>
+#include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+struct DataReader
+{
+	uint8_t *data;
+	size_t offset;
+	size_t totalBufferSize;
+};
+
+DataReader *CreateDataReader(void *data, const size_t bufferSize, const size_t offset)
+{
+	DataReader *reader = malloc(sizeof(DataReader));
+	CheckAlloc(reader);
+	reader->data = data;
+	reader->totalBufferSize = bufferSize;
+	reader->offset = offset;
+	return reader;
+}
+
+DataReader *CreateDataReaderFromAsset(Asset *asset)
+{
+	return CreateDataReader(asset->data, asset->size, 0);
+}
+
+void DestroyDataReader(DataReader *reader)
+{
+	free(reader);
+}
+
 #define DefineReadFunction(T, name) \
 	DeclareReadFunction(T, name) \
 	{ \
-		(void)totalBufferSize; \
-		assert(*offset + sizeof(T) <= totalBufferSize); \
+		if (reader->offset + sizeof(T) > reader->totalBufferSize) \
+		{ \
+			Error("DataReader Buffer Overrun"); \
+		} \
 		T val = 0; \
-		memcpy(&val, (data) + *(offset), sizeof(T)); \
-		*(offset) += sizeof(T); \
+		memcpy(&val, (reader->data) + (reader->offset), sizeof(T)); \
+		(reader->offset) += sizeof(T); \
 		return val; \
 	}
 
@@ -37,27 +67,29 @@ DefineReadFunction(size_t, ReadSizeT);
 DefineReadFunction(double, ReadDouble);
 DefineReadFunction(float, ReadFloat);
 
-void ReadBuffer(const uint8_t *data, size_t *offset, const size_t dataSize, const size_t readSize, void *dest)
+void ReadBuffer(DataReader *reader, const size_t readSize, void *dest)
 {
-	(void)dataSize;
-	assert(*offset + readSize <= dataSize);
-	memcpy(dest, data + *offset, readSize);
-	*offset += readSize;
+	if (reader->offset + readSize > reader->totalBufferSize)
+	{
+		Error("DataReader Buffer Overrun");
+	}
+	memcpy(dest, reader->data + reader->offset, readSize);
+	reader->offset += readSize;
 }
 
-char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBufferSize, size_t *outLength)
+char *ReadStringSafe(DataReader *reader, size_t *outLength)
 {
-	size_t remainingSize = totalBufferSize - *offset;
+	size_t remainingSize = reader->totalBufferSize - reader->offset;
 	if (remainingSize >= sizeof(size_t))
 	{
-		const size_t stringLength = ReadSizeT(data, offset, totalBufferSize);
+		const size_t stringLength = ReadSizeT(reader);
 		remainingSize -= sizeof(size_t);
 		if (remainingSize >= sizeof(char) * stringLength)
 		{
 			char *string = calloc(stringLength, sizeof(char));
 			CheckAlloc(string);
-			memcpy(string, data + *offset, stringLength);
-			*offset += stringLength * sizeof(char);
+			memcpy(string, reader->data + reader->offset, stringLength);
+			reader->offset += stringLength * sizeof(char);
 			if (outLength)
 			{
 				*outLength = stringLength;
@@ -66,6 +98,20 @@ char *ReadStringSafe(const uint8_t *data, size_t *offset, const size_t totalBuff
 		}
 	}
 	return NULL;
+}
+
+void Seek(DataReader *reader, const size_t bytes)
+{
+	if (reader->offset + bytes > reader->totalBufferSize)
+	{
+		Error("DataReader Buffer Overrun");
+	}
+	reader->offset += bytes;
+}
+
+size_t DataReaderGetOffset(const DataReader *reader)
+{
+	return reader->offset;
 }
 
 uint16_t Checksum(const uint8_t *buffer, const size_t bufferSize)

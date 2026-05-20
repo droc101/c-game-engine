@@ -30,22 +30,23 @@ Shader *LoadShader(const char *asset)
 	}
 	Shader *shader = malloc(sizeof(Shader));
 	CheckAlloc(shader);
-	size_t offset = 0;
+	DataReader *reader = CreateDataReaderFromAsset(assetData);
 	size_t bytesRemaining = assetData->size;
 	EXPECT_BYTES(2 + sizeof(size_t), bytesRemaining);
-	shader->platform = ReadUint8(assetData->data, &offset, assetData->size);
-	shader->type = ReadUint8(assetData->data, &offset, assetData->size);
-	shader->glslLength = ReadSizeT(assetData->data, &offset, assetData->size);
+	shader->platform = ReadUint8(reader);
+	shader->type = ReadUint8(reader);
+	shader->glslLength = ReadSizeT(reader);
 	EXPECT_BYTES(shader->glslLength, bytesRemaining);
 	shader->glsl = calloc(shader->glslLength, sizeof(char));
 	CheckAlloc(shader->glsl);
-	ReadBuffer(assetData->data, &offset, assetData->size, shader->glslLength * sizeof(char), shader->glsl);
+	ReadBuffer(reader, shader->glslLength * sizeof(char), shader->glsl);
 	EXPECT_BYTES(sizeof(size_t), bytesRemaining);
-	shader->spirvLength = ReadSizeT(assetData->data, &offset, assetData->size);
+	shader->spirvLength = ReadSizeT(reader);
 	EXPECT_BYTES(shader->spirvLength * sizeof(uint32_t), bytesRemaining);
 	shader->spirv = calloc(shader->spirvLength, sizeof(uint32_t));
 	CheckAlloc(shader->spirv);
-	ReadBuffer(assetData->data, &offset, assetData->size, shader->spirvLength * sizeof(uint32_t), shader->spirv);
+	ReadBuffer(reader, shader->spirvLength * sizeof(uint32_t), shader->spirv);
+	DestroyDataReader(reader);
 	FreeAsset(assetData);
 
 	return shader;

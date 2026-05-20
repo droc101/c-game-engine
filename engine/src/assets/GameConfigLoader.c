@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
@@ -84,9 +85,10 @@ void LoadGameConfig(const char *game)
 	{
 		Error("Invalid game configuration");
 	}
-	size_t offset = 0;
+	DataReader *reader = CreateDataReaderFromAsset(asset);
 	KvList configList = {};
-	ReadKvList(asset->data, asset->size, &offset, configList);
+	ReadKvList(reader, configList);
+	DestroyDataReader(reader);
 
 	gameConfig.gameTitle = strdup(KvGetString(configList, "game_title", "Untitled"));
 	gameConfig.gameCopyright = strdup(KvGetString(configList, "game_copyright", ""));

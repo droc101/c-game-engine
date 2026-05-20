@@ -5,10 +5,34 @@
 #ifndef GAME_DATAREADER_H
 #define GAME_DATAREADER_H
 
+#include <engine/structs/Asset.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#define DeclareReadFunction(T, name) T name(const uint8_t *data, size_t *offset, const size_t totalBufferSize)
+typedef struct DataReader DataReader;
+
+/**
+ * Create a DataReader
+ * @param data The data buffer to read from
+ * @param bufferSize The size of the data buffer
+ * @param offset The initial offset into the buffer
+ * @return The DataReader
+ */
+DataReader *CreateDataReader(void *data, size_t bufferSize, size_t offset);
+
+/**
+ * Create a DataReader from an Asset
+ * @param asset The Asset to read from
+ * @return The DataReader
+ */
+DataReader *CreateDataReaderFromAsset(Asset *asset);
+
+/**
+ * Destroy a DataReader
+ */
+void DestroyDataReader(DataReader *reader);
+
+#define DeclareReadFunction(T, name) T name(DataReader *reader)
 
 DeclareReadFunction(int8_t, ReadInt8);
 DeclareReadFunction(uint8_t, ReadUint8);
@@ -28,24 +52,32 @@ DeclareReadFunction(float, ReadFloat);
 
 /**
  * Reads arbitrary bytes from the given data at the given offset into dest
- * @param data The data to read from
- * @param offset The offset to read from
- * @param dataSize The total size of the data to read from
+ * @param reader The DataReader to read from
  * @param readSize The length of the data to read
  * @param dest The buffer to write the data into
  * @note It is up to the caller to prevent out of bounds access
  */
-void ReadBuffer(const uint8_t *data, size_t *offset, size_t dataSize, size_t readSize, void *dest);
+void ReadBuffer(DataReader *reader, size_t readSize, void *dest);
 
 /**
  * Reads a length and string from the given data at the given offset
- * @param data The data to read from
- * @param offset The offset to read from
- * @param totalBufferSize The total size of the data
+ * @param reader The DataReader to read to
  * @param outLength Where to write the length of the string read
  * @return A pointer (must be freed) of the string read
  */
-char *ReadStringSafe(const uint8_t *data, size_t *offset, size_t totalBufferSize, size_t *outLength);
+char *ReadStringSafe(DataReader *reader, size_t *outLength);
+
+/**
+ * Seek ahead in a DataReader without performing any reads
+ * @param reader The DataReader to seek
+ * @param bytes The number of bytes to seek ahead
+ */
+void Seek(DataReader *reader, size_t bytes);
+
+/**
+ * Get the current offset a DataReader is at
+ */
+size_t DataReaderGetOffset(const DataReader *reader);
 
 /**
  * Calculate a 16-bit checksum of a given data buffer
