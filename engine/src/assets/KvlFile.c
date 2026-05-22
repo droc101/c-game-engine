@@ -32,7 +32,7 @@ bool ReadKvlFile(const char *path, KvList output)
 	FILE *file = fopen(path, "rb");
 	if (file == NULL)
 	{
-		LogError("Could not fopen KvlFile \"%s\".\n", path);
+		LogError("Could not open KvlFile \"%s\": %s.\n", path, strerror(errno));
 		return false;
 	}
 	fseek(file, 0, SEEK_END);
