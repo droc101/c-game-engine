@@ -24,8 +24,10 @@
 #include <unistd.h>
 
 #ifdef WIN32
-#include <dbghelp.h>
+// clang-format off
 #include <windows.h>
+#include <dbghelp.h>
+// clang-format on
 #else
 #include <execinfo.h>
 #endif
