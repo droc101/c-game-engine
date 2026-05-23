@@ -97,7 +97,7 @@ bool FindGamepad()
 
 void Rumble(const float strength, const uint32_t time)
 {
-	if (ControllerConnected() && gamepadHasBasicHaptics)
+	if (UseController() && gamepadHasBasicHaptics)
 	{
 		const uint16_t uintStrength = (uint16_t)((strength * GetState()->options.rumbleStrength) * UINT16_MAX);
 		SDL_RumbleGamepad(currentGamepad, uintStrength, uintStrength, time);
