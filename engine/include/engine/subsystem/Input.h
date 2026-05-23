@@ -215,8 +215,10 @@ bool ControllerConnected();
  * Rumble the controller (if available)
  * @param strength The base strength of the rumble (0.0 - 1.0)
  * @param time The time to rumble in milliseconds
+ * @param system
+ * @param system
  */
-void Rumble(float strength, uint32_t time);
+void Rumble(float strength, uint32_t time, const InputSystem *system);
 
 /**
  * Get the name of the connected controller

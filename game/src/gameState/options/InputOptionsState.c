@@ -50,7 +50,7 @@ void SldOptionsMouseSensitivity(const float value)
 void SldOptionsRumbleStrength(const float value)
 {
 	GetState()->options.rumbleStrength = value;
-	Rumble(1.0f, 200);
+	Rumble(1.0f, 200, mainThreadInput);
 }
 
 void CbOptionsInvertCameraH(const bool value)
