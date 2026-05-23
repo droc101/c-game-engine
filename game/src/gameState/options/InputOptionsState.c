@@ -53,11 +53,6 @@ void SldOptionsRumbleStrength(const float value)
 	Rumble(1.0f, 200);
 }
 
-void CbOptionsControllerMode(const bool value)
-{
-	GetState()->options.controllerMode = value;
-}
-
 void CbOptionsInvertCameraH(const bool value)
 {
 	GetState()->options.invertHorizontalCamera = value;
@@ -104,7 +99,6 @@ void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 					FONT_VALIGN_MIDDLE,
 					smallFont);
 
-	if (GetState()->options.controllerMode)
 	{
 		DrawTextAligned("Controller Name:",
 						12,
@@ -167,14 +161,6 @@ void InputOptionsStateSet()
 										  TOP_CENTER,
 										  GetState()->options.invertVerticalCamera));
 		opY += opSpacing * 3;
-		UiStackPush(inputOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Controller Mode",
-										  CbOptionsControllerMode,
-										  TOP_CENTER,
-										  GetState()->options.controllerMode));
-		opY += opSpacing;
 		UiStackPush(inputOptionsStack,
 					CreateSliderControl(v2(0, opY),
 										v2(480, 40),

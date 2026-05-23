@@ -23,7 +23,6 @@ void DefaultOptions(Options *options)
 	options->fullscreen = false;
 	options->lodMultiplier = 1.0f;
 	options->cameraSpeed = 1;
-	options->controllerMode = false;
 	options->msaa = MSAA_4X;
 	options->mipmaps = true;
 	options->rumbleStrength = 1.0f;
@@ -109,7 +108,6 @@ void LoadOptions(Options *options)
 	if (ReadKvlFile(OPTIONS_FILE, list))
 	{
 		options->enableDiscordRpc = KvGetBool(list, "enable_discord_rpc", true);
-		options->controllerMode = KvGetBool(list, "controller_mode", false);
 		options->cameraSpeed = KvGetFloat(list, "camera_speed", 1.0f);
 		options->rumbleStrength = KvGetFloat(list, "rumble_strength", 1.0f);
 		options->invertHorizontalCamera = KvGetBool(list, "invert_horizontal_camera", false);
@@ -154,7 +152,6 @@ void SaveOptions(Options *options)
 
 	KvSetBool(list, "enable_discord_rpc", options->enableDiscordRpc);
 
-	KvSetBool(list, "controller_mode", options->controllerMode);
 	KvSetFloat(list, "camera_speed", options->cameraSpeed);
 	KvSetFloat(list, "rumble_strength", options->rumbleStrength);
 	KvSetBool(list, "invert_horizontal_camera", options->invertHorizontalCamera);

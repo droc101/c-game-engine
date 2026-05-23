@@ -202,10 +202,14 @@ void ConsumeAllMouseButtons(InputSystem *system);
 float GetAxis(const InputSystem *system, SDL_GamepadAxis axis);
 
 /**
- * Checks if a controller is being used
- * @return whether a controller is being used
+ * Checks if the last input made was on a controller
  */
-bool UseController();
+bool UseController(const InputSystem *system);
+
+/**
+ * Checks if a controller is currently connected
+ */
+bool ControllerConnected();
 
 /**
  * Rumble the controller (if available)
