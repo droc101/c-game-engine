@@ -82,7 +82,7 @@ Image *LoadImage(const char *asset)
 		DataReader *reader = CreateDataReaderFromAsset(textureAsset);
 		if (textureAsset->typeVersion != TEXTURE_ASSET_VERSION)
 		{
-			LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)",
+			LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)\n",
 					 textureAsset->typeVersion,
 					 TEXTURE_ASSET_VERSION);
 			GenFallbackImage(img);

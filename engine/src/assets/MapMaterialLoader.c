@@ -59,7 +59,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 
 	if (mapMaterialAsset->typeVersion != MAP_MATERIAL_ASSET_VERSION)
 	{
-		LogError("Failed to load map material from asset due to version mismatch (got %d, expected %d)",
+		LogError("Failed to load map material from asset due to version mismatch (got %d, expected %d)\n",
 				 mapMaterialAsset->typeVersion,
 				 MAP_MATERIAL_ASSET_VERSION);
 		return &fallbackMaterial;

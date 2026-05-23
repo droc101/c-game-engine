@@ -180,6 +180,6 @@ void SaveOptions(Options *options)
 
 	if (!WriteKvlFile(OPTIONS_FILE, list))
 	{
-		LogError("Failed to save options!");
+		LogError("Failed to save options!\n");
 	}
 }

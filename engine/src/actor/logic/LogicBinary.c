@@ -60,7 +60,7 @@ static void LogicBinaryExecuteHandler(Actor *this, const Actor * /*sender*/, con
 			result = !data->operandA;
 			break;
 		default:
-			LogError("Unknown binary operation: %d", data->operation);
+			LogError("Unknown binary operation: %d\n", data->operation);
 			return;
 	}
 	if (result)

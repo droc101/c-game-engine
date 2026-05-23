@@ -256,7 +256,7 @@ static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyID bodyId)
 		case DOOR_OPENING:
 			break;
 		default:
-			LogWarning("Invalid door state: %d", data->state);
+			LogWarning("Invalid door state: %d\n", data->state);
 			break;
 	}
 }
@@ -279,7 +279,7 @@ static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyID bodyId)
 		case DOOR_OPEN:
 			break;
 		default:
-			LogWarning("Invalid door state: %d", data->state);
+			LogWarning("Invalid door state: %d\n", data->state);
 			break;
 	}
 }
@@ -309,7 +309,7 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 		case DOOR_CLOSING:
 			break;
 		default:
-			LogWarning("Invalid door state: %d", data->state);
+			LogWarning("Invalid door state: %d\n", data->state);
 			break;
 	}
 }

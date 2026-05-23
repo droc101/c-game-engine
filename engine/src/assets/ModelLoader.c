@@ -41,7 +41,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	}
 	if (assetData->typeVersion != MODEL_ASSET_VERSION)
 	{
-		LogError("Failed to load model from asset due to version mismatch (got %d, expected %d)",
+		LogError("Failed to load model from asset due to version mismatch (got %d, expected %d)\n",
 				 assetData->typeVersion,
 				 MODEL_ASSET_VERSION);
 		return NULL;

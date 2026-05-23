@@ -24,8 +24,8 @@
 #include <unistd.h>
 
 #ifdef WIN32
-#include <windows.h>
 #include <dbghelp.h>
+#include <windows.h>
 #else
 #include <execinfo.h>
 #endif
@@ -168,7 +168,7 @@ void PromptRelaunch(const char *title, const char *description, const char *yesB
 
 _Noreturn void RenderInitError()
 {
-	LogError("Failed to initialize renderer");
+	LogError("Failed to initialize renderer\n");
 	SDL_HideWindow(GetGameWindow());
 	SDL_MessageBoxData mb;
 	mb.title = "Failed to initialize renderer";
@@ -305,7 +305,6 @@ void PrintStackTrace()
 			{
 				LogInfo("    %d: ??? [%p]\n", i, frames[i]);
 			}
-
 		}
 	} else
 	{

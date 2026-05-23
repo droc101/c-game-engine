@@ -123,7 +123,7 @@ bool GL_LoadShaders()
 		!mapUnshadedShader ||
 		!tonemapShader)
 	{
-		LogError("OpenGL: Failed to compile shaders");
+		LogError("OpenGL: Failed to compile shaders\n");
 		return false;
 	}
 

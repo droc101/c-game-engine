@@ -54,7 +54,7 @@ void GL_UpdateAnisotropyLevel()
 				requestedAnisotropy = 16;
 				break;
 			default:
-				LogError("OpenGL: Invalid anisotropy level!");
+				LogError("OpenGL: Invalid anisotropy level!\n");
 				return;
 		}
 		GLfloat gpuMaxAnisotropy = 0;
@@ -111,7 +111,7 @@ GL_Shader *GL_ConstructShader(const char *fragmentAsset, const char *vertexAsset
 	{
 		glGetShaderInfoLog(shader->fragmentShader, sizeof(errorBuffer), NULL, errorBuffer);
 		errorBuffer[sizeof(errorBuffer) - 1] = '\0';
-		LogError(errorBuffer);
+		LogError("%s\n", errorBuffer);
 		free(shader);
 		return NULL;
 	}
@@ -127,7 +127,7 @@ GL_Shader *GL_ConstructShader(const char *fragmentAsset, const char *vertexAsset
 	{
 		glGetProgramInfoLog(shader->program, sizeof(errorBuffer), NULL, errorBuffer);
 		errorBuffer[sizeof(errorBuffer) - 1] = '\0';
-		LogError(errorBuffer);
+		LogError("%s\n", errorBuffer);
 		free(shader);
 		return NULL;
 	}
@@ -176,7 +176,7 @@ GL_ComputeShader *GL_ConstructComputeShader(const char *asset)
 	{
 		glGetProgramInfoLog(shader->program, sizeof(errorBuffer), NULL, errorBuffer);
 		errorBuffer[sizeof(errorBuffer) - 1] = '\0';
-		LogError(errorBuffer);
+		LogError("%s\n", errorBuffer);
 		free(shader);
 		return NULL;
 	}
@@ -262,25 +262,25 @@ int GL_RegisterTexture(const Image *image)
 	if (image->pixelFormat == PIXEL_FORMAT_RGBA8)
 	{
 		glTexImage2D(GL_TEXTURE_2D,
-				 0,
-				 GL_RGBA8,
-				 (GLsizei)image->width,
-				 (GLsizei)image->height,
-				 0,
-				 GL_RGBA,
-				 GL_UNSIGNED_BYTE,
-				 image->pixelData);
+					 0,
+					 GL_RGBA8,
+					 (GLsizei)image->width,
+					 (GLsizei)image->height,
+					 0,
+					 GL_RGBA,
+					 GL_UNSIGNED_BYTE,
+					 image->pixelData);
 	} else
 	{
 		glTexImage2D(GL_TEXTURE_2D,
-				 0,
-				 GL_RGBA16F,
-				 (GLsizei)image->width,
-				 (GLsizei)image->height,
-				 0,
-				 GL_RGBA,
-				 GL_HALF_FLOAT,
-				 image->pixelData);
+					 0,
+					 GL_RGBA16F,
+					 (GLsizei)image->width,
+					 (GLsizei)image->height,
+					 0,
+					 GL_RGBA,
+					 GL_HALF_FLOAT,
+					 image->pixelData);
 	}
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -1.5f);

@@ -68,7 +68,7 @@ static void LogicDecimalExecuteHandler(Actor *this, const Actor * /*sender*/, co
 			result = data->operandA <= data->operandB;
 			break;
 		default:
-			LogError("Unknown decimal operation: %d", data->operation);
+			LogError("Unknown decimal operation: %d\n", data->operation);
 			return;
 	}
 	if (result)
