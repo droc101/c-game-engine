@@ -133,10 +133,11 @@ void WindowAndRenderInit()
 			snprintf(title, titleLen, "%s", gameConfig.gameTitle);
 			break;
 	}
+	float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
-	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH), MIN_WIDTH, MAX_WIDTH);
-	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT), MIN_HEIGHT, MAX_HEIGHT);
+	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH * dpiScale), MIN_WIDTH, MAX_WIDTH);
+	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT * dpiScale), MIN_HEIGHT, MAX_HEIGHT);
 	SDL_Window *window = SDL_CreateWindow(title,
 										  width,
 										  height,
