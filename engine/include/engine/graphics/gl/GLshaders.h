@@ -54,8 +54,6 @@ extern GLint actorWallShadedLightMetadataLoc;
 extern GLint actorWallShadedPointLightsLoc;
 /// The location of the texture uniform in the shaded actor wall shader
 extern GLint actorWallShadedTextureLoc;
-/// The location of the model -> world matrix in the shaded actor wall shader
-extern GLint actorWallShadedModelWorldMatrixLoc;
 /// The location of the shared uniforms buffer in the shaded actor wall shader
 extern GLint actorWallShadedSharedUniformsLoc;
 /// The location of the transform matrix uniform in the shaded actor wall shader
@@ -69,8 +67,6 @@ extern GLint actorWallShadedNormalLoc;
 
 /// The location of the texture uniform in the unshaded actor wall shader
 extern GLint actorWallUnshadedTextureLoc;
-/// The location of the model -> world matrix in the unshaded actor wall shader
-extern GLint actorWallUnshadedModelWorldMatrixLoc;
 /// The location of the shared uniforms buffer in the unshaded actor wall shader
 extern GLint actorWallUnshadedSharedUniformsLoc;
 /// The location of the transform matrix uniform in the unshaded actor wall shader
