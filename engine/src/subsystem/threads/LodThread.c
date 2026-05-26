@@ -47,6 +47,7 @@ int LodThreadMain(void * /*data*/)
 
 		const GlobalState *state = GetState();
 		const LockingList *actors = &state->map->actors;
+		ListLock(*actors);
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
 		bool shouldReloadActors = false;
@@ -75,6 +76,7 @@ int LodThreadMain(void * /*data*/)
 				shouldReloadActors = true;
 			}
 		}
+		ListUnlock(*actors);
 		// if (currentRenderer == RENDERER_VULKAN && !VK_UpdateActors(actors, shouldReloadActors))
 		// {
 		// 	Error("Failed to load actors!");
