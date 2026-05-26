@@ -1,6 +1,19 @@
 {
   "description": "A door that can open and close",
   "extends": "actor",
+  "renderers": [
+    {
+      "type": "sprite",
+      "texture": "$texture"
+    },
+    {
+      "type": "wall",
+      "width": "$size:x",
+      "height": "$size:y",
+      "local_center_x": "($size:x/2)*-1",
+      "z_axis_orientation": true
+    }
+  ],
   "inputs": {
     "open": {
       "description": "Forcefully open this door, regardless of player position"
