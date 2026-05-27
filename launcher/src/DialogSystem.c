@@ -3,6 +3,7 @@
 //
 
 #include "../include/DialogSystem.h"
+#include <errno.h>
 #include "../include/AnsiCodes.h"
 
 #ifdef WIN32
@@ -23,7 +24,7 @@
 #include <unistd.h>
 #include <wchar.h>
 
-extern char** environ;
+extern char **environ;
 #endif
 
 void InitDialogSystem()
@@ -47,8 +48,19 @@ void ErrorDialog(const wchar_t *message, const wchar_t *title)
 #else
 	// ReSharper disable CppPrintfBadFormat
 	char *text_argument = malloc(strlen("--text=") + wcslen(message) + 1);
+	if (!text_argument)
+	{
+		printf(ANSI_RED "bootstrap: malloc failed: %s\n" ANSI_RESET, strerror(errno));
+		return;
+	}
 	sprintf(text_argument, "--text=%ls", message);
 	char *title_argument = malloc(strlen("--title=") + wcslen(title) + 1);
+	if (!title_argument)
+	{
+		free(text_argument);
+		printf(ANSI_RED "bootstrap: malloc failed: %s\n" ANSI_RESET, strerror(errno));
+		return;
+	}
 	sprintf(title_argument, "--title=%ls", title);
 	// ReSharper restore CppPrintfBadFormat
 	char *zenity_argv[] = {"zenity", "--error", "--no-wrap", "--ok-label=Quit", text_argument, title_argument, NULL};

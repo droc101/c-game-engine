@@ -5,6 +5,7 @@
 #include "../include/Filesystem.h"
 
 #ifdef WIN32
+#include <errno.h>
 #include <io.h>
 #include <minwindef.h>
 #include <pathcch.h>
@@ -15,6 +16,7 @@
 #include <windows.h>
 #include <winerror.h>
 #include <winnt.h>
+#include "../include/AnsiCodes.h"
 #else
 #include <libgen.h>
 #include <unistd.h>
@@ -26,6 +28,7 @@ char *GetDirectoryOfFile(char *fileName)
 	wchar_t *directory = malloc(sizeof(wchar_t) * MAX_PATH);
 	if (!directory)
 	{
+		printf(ANSI_RED "bootstrap: malloc failed: %s\n" ANSI_RESET, strerror(errno));
 		return NULL;
 	}
 	mbstowcs(directory, fileName, MAX_PATH);
@@ -48,6 +51,7 @@ char *GetDirectoryOfFile(char *fileName)
 	if (!outBuf)
 	{
 		free(directory);
+		printf(ANSI_RED "bootstrap: malloc failed: %s\n" ANSI_RESET, strerror(errno));
 		return NULL;
 	}
 	wcstombs(outBuf, directory, MAX_PATH);
