@@ -68,6 +68,13 @@ void ExecPathInit(const int argc, const char *argv[])
 		Error("Executable path too long. Please rethink your file structure.");
 	}
 	strncpy(GetState()->executablePath, argv[0], 260); // we do not mess around with user data in c.
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(GetState()->executablePath); i++) {
+		if (GetState()->executablePath[i] == '\\') {
+			GetState()->executablePath[i] = '/';
+		}
+	}
+#endif
 	LogInfo("Executable path: %s\n", GetState()->executablePath);
 
 	const char *folder = SDL_GetBasePath();
@@ -79,8 +86,14 @@ void ExecPathInit(const int argc, const char *argv[])
 	{
 		Error("Base path too long. Please rethink your file structure.");
 	}
-
 	strncpy(GetState()->executableFolder, folder, 260);
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(GetState()->executableFolder); i++) {
+		if (GetState()->executableFolder[i] == '\\') {
+			GetState()->executableFolder[i] = '/';
+		}
+	}
+#endif
 	LogInfo("Executable folder: %s\n", GetState()->executableFolder);
 }
 

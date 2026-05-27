@@ -34,7 +34,7 @@ AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags,
 	{
 		const size_t pathLen = strlen(GetState()->executableFolder) + 1 + strlen(path) + 1;
 		assetPath->path = malloc(pathLen);
-		snprintf(assetPath->path, pathLen, "%s/%s", GetState()->executableFolder, path);
+		snprintf(assetPath->path, pathLen, "%s%s", GetState()->executableFolder, path);
 	} else if (type == RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY)
 	{
 		const size_t pathLen = strlen(configPath) + 1 + strlen(path) + 1;
@@ -59,7 +59,7 @@ void LoadGameConfig(const char *game)
 	LogDebug("Loading game configuration...\n");
 	if (IsPathAbsolute(game))
 	{
-		configPath = malloc(strlen(game) + strlen("/game.gkvl") + 1); // TODO use game.gcfg
+		configPath = malloc(strlen(game) + strlen("/game.gkvl") + 1);
 		CheckAlloc(configPath);
 		if (game[strlen(game) - 1] == '/' || game[strlen(game) - 1] == '\\')
 		{
@@ -74,6 +74,15 @@ void LoadGameConfig(const char *game)
 		CheckAlloc(configPath);
 		sprintf(configPath, "%s%s/game.gkvl", GetState()->executableFolder, game);
 	}
+
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(configPath); i++) {
+		if (configPath[i] == '\\') {
+			configPath[i] = '/';
+		}
+	}
+#endif
+
 	LogDebug("Loading game.gkvl from %s\n", configPath);
 	FILE *file = fopen(configPath, "rb");
 	if (!file)
