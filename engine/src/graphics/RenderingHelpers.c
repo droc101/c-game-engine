@@ -8,9 +8,6 @@
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
-#include <engine/graphics/gl/GLframe.h>
-#include <engine/graphics/gl/GLinit.h>
-#include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/helpers/MathEx.h>
@@ -32,7 +29,6 @@
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
-Renderer currentRenderer;
 bool windowFocused;
 
 SDL_Window *window;
@@ -130,44 +126,17 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 
 bool RenderPreInit()
 {
-	currentRenderer = GetState()->options.renderer;
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			return VK_PreInit();
-		case RENDERER_OPENGL:
-			return GL_PreInit();
-		default:
-			return false;
-	}
+	return VK_PreInit();
 }
 
 bool RenderInit()
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			return VK_Init(GetGameWindow());
-		case RENDERER_OPENGL:
-			return GL_Init(GetGameWindow());
-		default:
-			return false;
-	}
+	return VK_Init(GetGameWindow());
 }
 
 void RenderDestroy()
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_Cleanup();
-			break;
-		case RENDERER_OPENGL:
-			GL_DestroyGL();
-			break;
-		default:
-			break;
-	}
+	VK_Cleanup();
 }
 
 bool FrameStart()
@@ -177,31 +146,12 @@ bool FrameStart()
 		HotReloadAssets();
 		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
 	}
-
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			return VK_FrameStart();
-		case RENDERER_OPENGL:
-			return GL_FrameStart();
-		default:
-			return true;
-	}
+	return VK_FrameStart();
 }
 
 void FrameEnd()
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_FrameEnd();
-			break;
-		case RENDERER_OPENGL:
-			GL_FrameEnd();
-			break;
-		default:
-			break;
-	}
+	VK_FrameEnd();
 	if (GetState()->map)
 	{
 		GetState()->map->changeFlags = 0;
@@ -216,45 +166,18 @@ inline void UpdateViewportSize()
 	newScale = max(newScale, 1.0f);
 	GetState()->uiScale = newScale;
 	UpdateWindowSize();
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_UpdateViewportSize();
-			break;
-		case RENDERER_OPENGL:
-			GL_UpdateViewportSize();
-			break;
-		default:
-			break;
-	}
+	VK_UpdateViewportSize();
 }
 
 inline void WindowObscured()
 {
 	windowFocused = false;
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_Minimize();
-			break;
-		case RENDERER_OPENGL:
-		default:
-			break;
-	}
+	VK_Minimize();
 }
 
 inline void WindowRestored()
 {
-	windowFocused = true;
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_Restore();
-			break;
-		case RENDERER_OPENGL:
-		default:
-			break;
-	}
+	VK_Restore();
 }
 
 inline void SetWindowFocused(const bool val)
@@ -274,58 +197,24 @@ inline bool IsLowFPSModeEnabled()
 
 inline float X_TO_NDC(const float x)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN: // NOLINT(*-branch-clone)
-			return VK_X_TO_NDC(x);
-		case RENDERER_OPENGL:
-			return GL_X_TO_NDC(x);
-		default:
-			return 0;
-	}
+	return VK_X_TO_NDC(x);
 }
 
 inline float Y_TO_NDC(const float y)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			return VK_Y_TO_NDC(y);
-		case RENDERER_OPENGL:
-			return GL_Y_TO_NDC(y);
-		default:
-			return 0;
-	}
+	return VK_Y_TO_NDC(y);
 }
 
 void LoadMapModels(Map *map)
 {
 	assert(map->lightmapPixels && map->models);
-	switch (currentRenderer)
-	{
-		case RENDERER_OPENGL:
-			GL_LoadMap(map);
-			break;
-		case RENDERER_VULKAN:
-			VK_LoadMap(map);
-		default:
-			break;
-	}
+	VK_LoadMap(map);
 	FreeLoadTimeMapData(map);
 }
 
 void SetVsyncEnabled(const bool enabled)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_OPENGL:
-			GL_SetVsyncEnabled(enabled);
-			break;
-		case RENDERER_VULKAN:
-			// TODO
-		default:
-			break;
-	}
+	// TODO
 }
 
 inline void GetColor(const uint32_t argb, Color *color)

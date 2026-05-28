@@ -38,19 +38,7 @@
 /// The number of milliseconds to sleep for when in low FPS mode
 #define LOW_FPS_MODE_SLEEP_MS 33
 
-typedef enum Renderer Renderer;
-
 typedef enum RendererQueuedAction RendererQueuedAction;
-
-/**
- * Used to check which renderer the game is using
- */
-enum Renderer
-{
-	RENDERER_OPENGL,
-	RENDERER_VULKAN,
-	RENDERER_MAX
-};
 
 enum RendererQueuedAction
 {
@@ -59,8 +47,6 @@ enum RendererQueuedAction
 	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
 };
-
-extern Renderer currentRenderer;
 
 extern RendererQueuedAction rendererQueuedActions;
 

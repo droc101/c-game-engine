@@ -29,26 +29,6 @@ function(fetch_package_tag git_repo version_glob package_name)
     fetch_package(${git_repo} ${LATEST_RELEASE} ${package_name})
 endfunction()
 
-function(fetch_glew)
-    message(STATUS "Fetching GLEW...")
-    set(GLEW_EGL ON)
-    set(GLEW_GLX OFF)
-    set(BUILD_UTILS OFF)
-    set(BUILD_SHARED_LIBS OFF)
-
-    get_latest_package_version(https://github.com/nigels-com/glew glew-2.3.*)
-
-    FetchContent_Declare(
-            GLEW
-            URL https://github.com/nigels-com/glew/releases/download/${LATEST_RELEASE}/${LATEST_RELEASE}.tgz
-            SOURCE_SUBDIR "build/cmake"
-            DOWNLOAD_EXTRACT_TIMESTAMP
-            EXCLUDE_FROM_ALL
-            SYSTEM
-    )
-    FetchContent_MakeAvailable(GLEW)
-endfunction()
-
 function(fetch_dict)
     message(STATUS "Fetching M*LIB dict...")
     set(DICT_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/dict)

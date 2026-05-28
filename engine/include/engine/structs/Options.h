@@ -52,8 +52,6 @@ struct Options
 
 	/* Video */
 
-	/// The renderer to use
-	Renderer renderer;
 	/// Whether the game is fullscreen
 	bool fullscreen;
 	/// Whether vsync is enabled

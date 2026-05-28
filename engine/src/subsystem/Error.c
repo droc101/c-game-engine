@@ -3,7 +3,6 @@
 //
 
 #include <engine/Engine.h>
-#include <engine/graphics/gl/GLinit.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
@@ -174,23 +173,14 @@ _Noreturn void RenderInitError()
 	SDL_HideWindow(GetGameWindow());
 	SDL_MessageBoxData mb;
 	mb.title = "Failed to initialize renderer";
-	if (GetState()->options.renderer == RENDERER_OPENGL)
-	{
-		mb.message = GL_INIT_FAIL_MSG;
-	} else if (GetState()->options.renderer == RENDERER_VULKAN)
-	{
-		mb.message = "Failed to start the Vulkan renderer.\n"
-					 "Please make sure your graphics card and drivers support Vulkan 1.2";
-	}
+	mb.message = "Failed to start the Vulkan renderer.\n"
+				 "Please make sure your graphics card and drivers support Vulkan 1.2";
 
-	mb.numbuttons = 2;
-	SDL_MessageBoxButtonData buttons[2];
-	buttons[0].buttonID = 0;
-	buttons[0].text = GetState()->options.renderer == RENDERER_OPENGL ? "Try Vulkan" : "Try OpenGL";
-	buttons[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-	buttons[1].buttonID = 1;
-	buttons[1].text = "Exit";
-	buttons[1].flags = 0;
+	mb.numbuttons = 1;
+	SDL_MessageBoxButtonData buttons[1];
+	buttons[0].buttonID = 1;
+	buttons[0].text = "Exit";
+	buttons[0].flags = 0;
 
 	mb.colorScheme = &mbColorScheme;
 	mb.buttons = buttons;
@@ -199,18 +189,6 @@ _Noreturn void RenderInitError()
 
 	int pressedButtonID = 0;
 	SDL_ShowMessageBox(&mb, &pressedButtonID);
-	if (pressedButtonID == 0)
-	{
-		if (GetState()->options.renderer == RENDERER_OPENGL)
-		{
-			GetState()->options.renderer = RENDERER_VULKAN;
-		} else
-		{
-			GetState()->options.renderer = RENDERER_OPENGL;
-		}
-		SaveOptions(&GetState()->options);
-		RestartProgram();
-	} // else
 	exit(1);
 }
 

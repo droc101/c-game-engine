@@ -5,22 +5,22 @@
 #ifndef GAME_LIGHT_H
 #define GAME_LIGHT_H
 
-#include <engine/graphics/std140.h>
+#include <cglm/vec3.h>
 
 typedef struct PointLight PointLight;
 
-struct STD140 PointLight
+struct PointLight
 {
 	/// The world space position of the light
-	STD140_VEC3 position;
+	vec3 position;
 	/// The color of the light
-	STD140_VEC3 color;
+	vec3 color;
 	/// The brightness scale of the light
-	STD140_FLOAT brightnessScale;
+	float brightnessScale;
 	/// The maximum range of the light
-	STD140_FLOAT range;
+	float range;
 	/// The attenuation of the light
-	STD140_FLOAT attenuation;
+	float attenuation;
 };
 
 #endif //GAME_LIGHT_H

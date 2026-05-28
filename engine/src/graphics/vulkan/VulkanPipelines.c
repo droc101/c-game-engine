@@ -92,9 +92,9 @@ static inline bool CreateUIPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
 	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/ui_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("ui_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load UI vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/ui_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("ui_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load UI fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -171,9 +171,9 @@ static inline bool CreateShadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
 	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/map_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("map_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded map vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/map_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("map_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load shaded map fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -256,7 +256,7 @@ static inline bool CreateShadedMapPipeline()
 static inline bool CreateUnshadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/map_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("map_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load unshaded map vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -334,9 +334,9 @@ static inline bool CreateSkyPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
 	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/sky_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("sky_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load sky vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/sky_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("sky_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load sky fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -418,7 +418,7 @@ static inline bool CreateShadedViewmodelPipeline()
 				  offsetof(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, materialColor));
 
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/viewmodel_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("viewmodel_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded viewmodel vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -537,7 +537,7 @@ static inline bool CreateShadedViewmodelPipeline()
 static inline bool CreateUnshadedViewmodelPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/viewmodel_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("viewmodel_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load unshaded viewmodel vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -655,7 +655,7 @@ static inline bool CreateShadedActorModelPipeline()
 						  SizeofMember(ActorModelInstanceData, materialColor));
 
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("actor_model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded actor model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -780,7 +780,7 @@ static inline bool CreateShadedActorModelPipeline()
 static inline bool CreateUnshadedActorModelPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/actor_model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("actor_model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load unshaded actor model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -901,9 +901,9 @@ static inline bool CreateDebugDrawPipeline()
 #ifdef JPH_DEBUG_RENDERER
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
 	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("vulkan/debug_draw_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("debug_draw_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load debug draw vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/debug_draw_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("debug_draw_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load debug draw fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -991,9 +991,9 @@ bool CreateGraphicsPipelines()
 	multisampling.rasterizationSamples = msaaSamples;
 	pipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
 
-	VulkanTest(CreateShaderModule(SHADER("vulkan/model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
 			   "Failed to load shaded model fragment shader!");
-	VulkanTest(CreateShaderModule(SHADER("vulkan/model_unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("model_unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule),
 			   "Failed to load unshaded model fragment shader!");
 
 	return CreateUIPipeline() &&

@@ -13,7 +13,7 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin) # TODO SDL3 seems to put its DLLs in the RUNTIME output dir for some reason
 disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI_DEFAULT SDL_POWER_DEFAULT
         SDL_SENSOR_DEFAULT SDL_DIALOG_DEFAULT SDL_TRAY_DEFAULT SDL_DISKAUDIO SDL_DUMMYAUDIO SDL_DUMMYVIDEO SDL_OPENGLES
-        SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM)
+        SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM SDL_OPENGL)
 fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
 target_compile_options(SDL3-shared PRIVATE "-w")
 
@@ -25,10 +25,7 @@ set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
 find_package(ZLIB REQUIRED)
-find_package(OpenGL REQUIRED)
 
-fetch_glew()
-target_compile_options(glew_s PRIVATE "-w")
 fetch_dict()
 
 message(STATUS "Fetching Luna...")
@@ -125,19 +122,6 @@ target_sources(engine INTERFACE
         include/engine/graphics/Drawing.h
         src/graphics/Font.c
         include/engine/graphics/Font.h
-        src/graphics/gl/GLdebug.c
-        src/graphics/gl/GLinit.c
-        include/engine/graphics/gl/GLinit.h
-        src/graphics/gl/GLobjects.c
-        include/engine/graphics/gl/GLobjects.h
-        src/graphics/gl/GLui.c
-        include/engine/graphics/gl/GLui.h
-        src/graphics/gl/GLworld.c
-        include/engine/graphics/gl/GLdebug.h
-        src/graphics/gl/GLframe.c
-        include/engine/graphics/gl/GLframe.h
-        src/graphics/gl/GLshaders.c
-        include/engine/graphics/gl/GLshaders.h
         src/graphics/RenderingHelpers.c
         include/engine/graphics/RenderingHelpers.h
         src/graphics/vulkan/Vulkan.c
@@ -151,7 +135,6 @@ target_sources(engine INTERFACE
         src/graphics/vulkan/VulkanPipelines.c
         src/graphics/vulkan/VulkanResources.c
         include/engine/graphics/vulkan/VulkanResources.h
-        include/engine/graphics/std140.h
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h
@@ -248,8 +231,6 @@ if (x86_64 AND USE_DISCORD_SDK)
     target_link_libraries(engine INTERFACE discord_game_sdk)
 endif ()
 
-target_include_directories(engine INTERFACE ${FETCHCONTENT_BASE_DIR}/glew-src/include)
-
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_definitions(engine INTERFACE BUILDSTYLE_RELEASE)
 else ()
@@ -270,14 +251,12 @@ target_link_libraries(engine INTERFACE
         cglm
         dict
         Luna
-        OpenGL::GL
-        glew_s
 )
 
 if (UNIX)
     target_link_libraries(engine INTERFACE m)
 elseif (WIN32)
-    target_link_libraries(engine INTERFACE opengl32 dwmapi dbghelp)
+    target_link_libraries(engine INTERFACE dwmapi dbghelp)
 endif ()
 
 file(WRITE ${CMAKE_BINARY_DIR}/generated/include/engine/Commit.h)

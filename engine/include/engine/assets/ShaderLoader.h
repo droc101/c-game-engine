@@ -17,7 +17,7 @@ typedef struct Shader Shader;
 
 enum ShaderPlatform
 {
-	PLATFORM_OPENGL,
+	PLATFORM_OPENGL, // TODO remove
 	PLATFORM_VULKAN
 };
 
@@ -34,7 +34,7 @@ enum ShaderType
 struct Shader
 {
 	/// The rendering platform of this shader
-	ShaderPlatform platform;
+	ShaderPlatform platform; // TODO remove
 	/// The type of this shader
 	ShaderType type;
 	/// The length of the GLSL in this shader

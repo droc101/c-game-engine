@@ -69,8 +69,10 @@ void ExecPathInit(const int argc, const char *argv[])
 	}
 	strncpy(GetState()->executablePath, argv[0], 260); // we do not mess around with user data in c.
 #ifdef WIN32
-	for (size_t i = 0; i < strlen(GetState()->executablePath); i++) {
-		if (GetState()->executablePath[i] == '\\') {
+	for (size_t i = 0; i < strlen(GetState()->executablePath); i++)
+	{
+		if (GetState()->executablePath[i] == '\\')
+		{
 			GetState()->executablePath[i] = '/';
 		}
 	}
@@ -88,8 +90,10 @@ void ExecPathInit(const int argc, const char *argv[])
 	}
 	strncpy(GetState()->executableFolder, folder, 260);
 #ifdef WIN32
-	for (size_t i = 0; i < strlen(GetState()->executableFolder); i++) {
-		if (GetState()->executableFolder[i] == '\\') {
+	for (size_t i = 0; i < strlen(GetState()->executableFolder); i++)
+	{
+		if (GetState()->executableFolder[i] == '\\')
+		{
 			GetState()->executableFolder[i] = '/';
 		}
 	}
@@ -132,32 +136,16 @@ void InitSDL()
 void WindowAndRenderInit()
 {
 	LogDebug("Creating window...\n");
-	const size_t titleLen = strlen(gameConfig.gameTitle) + strlen(" - Vulkan") + 1;
-	char title[titleLen];
-	switch (currentRenderer)
-	{
-		case RENDERER_OPENGL:
-			snprintf(title, titleLen, "%s - OpenGL", gameConfig.gameTitle);
-			break;
-		case RENDERER_VULKAN:
-			snprintf(title, titleLen, "%s - Vulkan", gameConfig.gameTitle);
-			break;
-		default:
-			snprintf(title, titleLen, "%s", gameConfig.gameTitle);
-			break;
-	}
 	float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
-	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
 	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH * dpiScale), MIN_WIDTH, MAX_WIDTH);
 	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT * dpiScale), MIN_HEIGHT, MAX_HEIGHT);
-	SDL_Window *window = SDL_CreateWindow(title,
+	SDL_Window *window = SDL_CreateWindow(gameConfig.gameTitle,
 										  width,
 										  height,
-										  rendererFlags |
-												  SDL_WINDOW_RESIZABLE |
+										  SDL_WINDOW_RESIZABLE |
 												  SDL_WINDOW_HIGH_PIXEL_DENSITY |
-												  SDL_WINDOW_HIDDEN);
+												  SDL_WINDOW_HIDDEN |
+												  SDL_WINDOW_VULKAN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -261,20 +249,6 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	InitOptions();
 
 	InitTimers();
-
-	if (HasCliArg("--renderer"))
-	{
-		const char *renderer = GetCliArgStr("--renderer", "gl");
-		if (strncmp(renderer, "gl", strlen("gl")) == 0)
-		{
-			LogInfo("Forcing OpenGL Renderer\n");
-			GetState()->options.renderer = RENDERER_OPENGL;
-		} else if (strncmp(renderer, "vulkan", strlen("vulkan")) == 0)
-		{
-			LogInfo("Forcing Vulkan Renderer\n");
-			GetState()->options.renderer = RENDERER_VULKAN;
-		}
-	}
 
 	PhysicsInitGlobal(GetState());
 
