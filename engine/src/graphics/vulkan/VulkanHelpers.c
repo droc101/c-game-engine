@@ -32,6 +32,7 @@
 #pragma region variables
 bool minimized = false;
 LunaDevice device = LUNA_NULL_HANDLE;
+VkPhysicalDeviceProperties physicalDeviceProperties = {0};
 uint32_t queueFamilyIndex = -1u;
 VkQueue queue = VK_NULL_HANDLE;
 LunaCommandPool commandPool = LUNA_NULL_HANDLE;

@@ -123,16 +123,6 @@ void DrawTextureRegionMod(Vector2 pos,
 						  Color color);
 
 /**
- * Clear the screen with the last used color
- */
-void ClearScreen();
-
-/**
- * Clear the depth buffer
- */
-void ClearDepthOnly();
-
-/**
  * Draw a nine patch image to the screen
  * @param pos The position to draw at
  * @param size The size of the output

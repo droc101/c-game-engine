@@ -323,8 +323,6 @@ void EngineIteration()
 		return;
 	}
 
-	ClearScreen();
-
 	ResetDPrintYPos();
 
 	if (state->gameState->UpdateGame)

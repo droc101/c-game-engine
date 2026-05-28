@@ -60,8 +60,10 @@ VkResult CreateUiBuffers()
 
 VkResult CreateUniformBuffers()
 {
+	const VkDeviceSize alignment = physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
 	const LunaBufferCreationInfo cameraUniformBufferCreationInfo = {
 		.size = sizeof(CameraUniform),
+		.alignment = alignment,
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
@@ -69,7 +71,8 @@ VkResult CreateUniformBuffers()
 	VulkanTestReturnResult(lunaCreateBuffer(device, &cameraUniformBufferCreationInfo, &buffers.uniforms.camera),
 						   "Failed to create camera uniform buffer!");
 	const LunaBufferCreationInfo lightingBufferCreationInfo = {
-		.size = sizeof(float) * 4, // r, g, b, a
+		.size = sizeof(Color),
+		.alignment = alignment,
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
@@ -77,7 +80,8 @@ VkResult CreateUniformBuffers()
 	VulkanTestReturnResult(lunaCreateBuffer(device, &lightingBufferCreationInfo, &buffers.uniforms.lighting),
 						   "Failed to create lighting uniform buffer!");
 	const LunaBufferCreationInfo fogBufferCreationInfo = {
-		.size = sizeof(Color) + sizeof(float) * 2, // fogColor, fogStart, fogEnd
+		.size = sizeof(FogUniform),
+		.alignment = alignment,
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
@@ -360,7 +364,8 @@ bool LoadTexture(const Image *image)
 	};
 	LunaImage lunaImage = LUNA_NULL_HANDLE;
 	const size_t index = textures.length;
-	VulkanTest(lunaCreateImage(device, secondaryCommandBuffer, &imageCreationInfo, &lunaImage), "Failed to create texture!");
+	VulkanTest(lunaCreateImage(device, secondaryCommandBuffer, &imageCreationInfo, &lunaImage),
+			   "Failed to create texture!");
 	imageAssetIdToIndexMap[image->id] = index;
 	ListAdd(textures, lunaImage);
 

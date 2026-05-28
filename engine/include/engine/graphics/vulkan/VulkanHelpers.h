@@ -99,6 +99,13 @@ typedef struct CameraUniform
 	Vector3 position;
 } CameraUniform;
 
+typedef struct FogUniform
+{
+	Color color;
+	float start;
+	float end;
+} FogUniform;
+
 typedef struct UiVertex
 {
 	float x;
@@ -159,6 +166,7 @@ typedef struct UniformBuffers
 	LunaBuffer camera;
 	LunaBuffer lighting;
 	LunaBuffer fog;
+	LunaBuffer lights;
 } UniformBuffers;
 
 /**
@@ -261,6 +269,7 @@ typedef struct DescriptorSetLayouts
 
 extern bool minimized;
 extern LunaDevice device;
+extern VkPhysicalDeviceProperties physicalDeviceProperties;
 extern uint32_t queueFamilyIndex;
 extern VkQueue queue;
 extern LunaCommandPool commandPool;

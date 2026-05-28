@@ -30,7 +30,6 @@
 #include <vulkan/vulkan_core.h>
 
 static SDL_Window *vulkanWindow;
-static VkPhysicalDeviceProperties physicalDeviceProperties;
 
 bool CreateInstance()
 {
@@ -283,7 +282,7 @@ bool CreateRenderPass()
 	return true;
 }
 
-// TODO: Look into using uniform texel buffers instead of image samplers to drop dependency on non-uniform indexing
+// TODO: Look into using alternative methods to remove the dependency on non-uniform indexing
 bool CreateDescriptorSetLayouts()
 {
 	const LunaDescriptorSetLayoutBinding bindings[] = {

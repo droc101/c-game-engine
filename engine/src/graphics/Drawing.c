@@ -106,10 +106,6 @@ inline void DrawTextureRegionMod(const Vector2 pos,
 								 color);
 }
 
-inline void ClearScreen() {}
-
-inline void ClearDepthOnly() {}
-
 inline void DrawRect(const int x, const int y, const int w, const int h, const Color color)
 {
 	VK_DrawColoredQuad(x, y, w, h, color);

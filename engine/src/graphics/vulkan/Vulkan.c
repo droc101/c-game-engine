@@ -634,9 +634,6 @@ bool VK_Init(SDL_Window *window)
 		CreateBuffers() && CreateDescriptorSet())
 	{
 		// clang-format on
-
-		VkPhysicalDeviceProperties physicalDeviceProperties;
-		lunaGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
 		char vendor[32] = {};
 		switch (physicalDeviceProperties.vendorID)
 		{
@@ -727,29 +724,22 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		VulkanTest(VK_LoadMap(map), "Failed to load map!");
 	}
 
-	float lighting[4]; // r, g, b, padding
-	lighting[0] = map->lightColor.r;
-	lighting[1] = map->lightColor.g;
-	lighting[2] = map->lightColor.b;
-	lighting[3] = 0; // padding
 	const LunaBufferWriteInfo lightingBufferWriteInfo = {
-		.bytes = sizeof(lighting),
-		.data = lighting,
+		.bytes = sizeof(map->lightColor),
+		.data = &map->lightColor,
 		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lighting, &lightingBufferWriteInfo),
 			   "Failed to update lighting data!");
 
-	float fog[6]; // r, g, b, a, start, end
-	fog[0] = map->fogColor.r;
-	fog[1] = map->fogColor.g;
-	fog[2] = map->fogColor.b;
-	fog[3] = map->fogColor.a;
-	fog[4] = map->fogStart;
-	fog[5] = map->fogEnd;
+	FogUniform fog = {
+		.color = map->fogColor,
+		.start = map->fogStart,
+		.end = map->fogEnd,
+	};
 	const LunaBufferWriteInfo fogBufferWriteInfo = {
 		.bytes = sizeof(fog),
-		.data = fog,
+		.data = &fog,
 		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.fog, &fogBufferWriteInfo),
