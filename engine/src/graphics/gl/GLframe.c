@@ -56,7 +56,7 @@ int GetActualMsaaSamples(const OptionsMsaa requested)
 				requestedMsaaValue = 8;
 				break;
 			default:
-				LogError("OpenGL: Invalid MSAA value!");
+				LogError("OpenGL: Invalid MSAA value!\n");
 				return 1;
 		}
 

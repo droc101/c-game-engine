@@ -16,63 +16,63 @@
 
 #pragma region Param Functions
 
-size_t ReadParam(const void *data, const size_t dataSize, size_t *offset, Param *out)
+size_t ReadParam(DataReader *reader, Param *out)
 {
-	const size_t initialOffset = *offset;
-	out->type = ReadUint8(data, offset, dataSize);
+	const size_t initialOffset = DataReaderGetOffset(reader);
+	out->type = ReadUint8(reader);
 	switch (out->type)
 	{
 		case PARAM_TYPE_BYTE:
-			out->byteValue = ReadUint8(data, offset, dataSize);
+			out->byteValue = ReadUint8(reader);
 			break;
 		case PARAM_TYPE_INTEGER:
-			out->intValue = ReadInt32(data, offset, dataSize);
+			out->intValue = ReadInt32(reader);
 			break;
 		case PARAM_TYPE_FLOAT:
-			out->floatValue = ReadFloat(data, offset, dataSize);
+			out->floatValue = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_BOOL:
-			out->boolValue = ReadUint8(data, offset, dataSize) != 0;
+			out->boolValue = ReadUint8(reader) != 0;
 			break;
 		case PARAM_TYPE_COLOR:
-			out->colorValue.r = ReadFloat(data, offset, dataSize);
-			out->colorValue.g = ReadFloat(data, offset, dataSize);
-			out->colorValue.b = ReadFloat(data, offset, dataSize);
-			out->colorValue.a = ReadFloat(data, offset, dataSize);
+			out->colorValue.r = ReadFloat(reader);
+			out->colorValue.g = ReadFloat(reader);
+			out->colorValue.b = ReadFloat(reader);
+			out->colorValue.a = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_STRING:
-			out->stringValue = ReadStringSafe(data, offset, dataSize, NULL);
+			out->stringValue = ReadStringSafe(reader, NULL);
 			break;
 		case PARAM_TYPE_ARRAY:
-			out->arrayValue.length = ReadSizeT(data, offset, dataSize);
+			out->arrayValue.length = ReadSizeT(reader);
 			out->arrayValue.data = malloc(sizeof(Param) * out->arrayValue.length);
 			CheckAlloc(out->arrayValue.data);
 			for (size_t i = 0; i < out->arrayValue.length; i++)
 			{
 				Param *arrayIndex = &out->arrayValue.data[i];
-				(void)ReadParam(data, dataSize, offset, arrayIndex);
+				(void)ReadParam(reader, arrayIndex);
 			}
 			break;
 		case PARAM_TYPE_KV_LIST:
 			out->kvListValue = malloc(sizeof(KvList));
-			(void)ReadKvList(data, dataSize, offset, out->kvListValue);
+			(void)ReadKvList(reader, out->kvListValue);
 			break;
 		case PARAM_TYPE_UINT_64:
-			out->uint64value = ReadSizeT(data, offset, dataSize);
+			out->uint64value = ReadSizeT(reader);
 			break;
 		case PARAM_TYPE_VEC2:
-			out->vec2value.x = ReadFloat(data, offset, dataSize);
-			out->vec2value.y = ReadFloat(data, offset, dataSize);
+			out->vec2value.x = ReadFloat(reader);
+			out->vec2value.y = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_VEC3:
-			out->vec3value.x = ReadFloat(data, offset, dataSize);
-			out->vec3value.y = ReadFloat(data, offset, dataSize);
-			out->vec3value.z = ReadFloat(data, offset, dataSize);
+			out->vec3value.x = ReadFloat(reader);
+			out->vec3value.y = ReadFloat(reader);
+			out->vec3value.z = ReadFloat(reader);
 			break;
 		default:
 			break;
 	}
-	return *offset - initialOffset;
+	return DataReaderGetOffset(reader) - initialOffset;
 }
 
 void CopyParam(const Param *source, Param *dest)
@@ -234,22 +234,22 @@ void KvListCreate(KvList list)
 	KvList_init(list);
 }
 
-size_t ReadKvList(const void *data, const size_t dataSize, size_t *offset, KvList out)
+size_t ReadKvList(DataReader *reader, KvList out)
 {
-	const size_t initialOffset = *offset;
+	const size_t initialOffset = DataReaderGetOffset(reader);
 	KvListCreate(out);
-	const size_t numParams = ReadSizeT(data, offset, dataSize);
+	const size_t numParams = ReadSizeT(reader);
 	for (size_t _ = 0; _ < numParams; _++)
 	{
 		size_t keyLength = 0;
-		char *key = ReadStringSafe(data, offset, dataSize, &keyLength);
+		char *key = ReadStringSafe(reader, &keyLength);
 		Param param;
-		(void)ReadParam(data, dataSize, offset, &param);
+		(void)ReadParam(reader, &param);
 		KvSetUnsafe(out, key, param);
 		free(key);
 		FreeParam(&param);
 	}
-	return *offset - initialOffset;
+	return DataReaderGetOffset(reader) - initialOffset;
 }
 
 void WriteKvList(const KvList list, DataWriter *writer)

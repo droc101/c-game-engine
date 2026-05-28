@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
+#include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
@@ -33,7 +34,7 @@ AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags,
 	{
 		const size_t pathLen = strlen(GetState()->executableFolder) + 1 + strlen(path) + 1;
 		assetPath->path = malloc(pathLen);
-		snprintf(assetPath->path, pathLen, "%s/%s", GetState()->executableFolder, path);
+		snprintf(assetPath->path, pathLen, "%s%s", GetState()->executableFolder, path);
 	} else if (type == RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY)
 	{
 		const size_t pathLen = strlen(configPath) + 1 + strlen(path) + 1;
@@ -73,6 +74,15 @@ void LoadGameConfig(const char *game)
 		CheckAlloc(configPath);
 		sprintf(configPath, "%s%s/game.gkvl", GetState()->executableFolder, game);
 	}
+
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(configPath); i++) {
+		if (configPath[i] == '\\') {
+			configPath[i] = '/';
+		}
+	}
+#endif
+
 	LogDebug("Loading game.gkvl from %s\n", configPath);
 	FILE *file = fopen(configPath, "rb");
 	if (!file)
@@ -84,9 +94,10 @@ void LoadGameConfig(const char *game)
 	{
 		Error("Invalid game configuration");
 	}
-	size_t offset = 0;
+	DataReader *reader = CreateDataReaderFromAsset(asset);
 	KvList configList = {};
-	ReadKvList(asset->data, asset->size, &offset, configList);
+	ReadKvList(reader, configList);
+	DestroyDataReader(reader);
 
 	gameConfig.gameTitle = strdup(KvGetString(configList, "game_title", "Untitled"));
 	gameConfig.gameCopyright = strdup(KvGetString(configList, "game_copyright", ""));

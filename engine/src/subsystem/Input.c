@@ -54,6 +54,8 @@ struct InputSystem
 	float mouseWheelRelativeY;
 	int mouseWheelRelativeTicksX;
 	int mouseWheelRelativeTicksY;
+
+	bool lastInputWasController;
 };
 
 SDL_Gamepad *currentGamepad;
@@ -93,9 +95,9 @@ bool FindGamepad()
 	return false;
 }
 
-void Rumble(const float strength, const uint32_t time)
+void Rumble(const float strength, const uint32_t time, const InputSystem *system)
 {
-	if (UseController() && gamepadHasBasicHaptics)
+	if (UseController(system) && gamepadHasBasicHaptics)
 	{
 		const uint16_t uintStrength = (uint16_t)((strength * GetState()->options.rumbleStrength) * UINT16_MAX);
 		SDL_RumbleGamepad(currentGamepad, uintStrength, uintStrength, time);
@@ -151,6 +153,7 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 				UpdateInputState(&system->keys[event->key.scancode],
 								 &system->queueReleaseKeys[event->key.scancode],
 								 INP_JUST_RELEASED);
+				system->lastInputWasController = false;
 			}
 			break;
 		case SDL_EVENT_KEY_DOWN:
@@ -159,6 +162,7 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 				UpdateInputState(&system->keys[event->key.scancode],
 								 &system->queueReleaseKeys[event->key.scancode],
 								 INP_JUST_PRESSED);
+				system->lastInputWasController = false;
 			}
 			break;
 		case SDL_EVENT_MOUSE_MOTION:
@@ -166,6 +170,7 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 			system->mouseY = (int)event->motion.y;
 			system->mouseRelativeX += (int)event->motion.xrel;
 			system->mouseRelativeY += (int)event->motion.yrel;
+			system->lastInputWasController = false;
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_UP:
 			if (event->button.button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
@@ -179,6 +184,7 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 			UpdateInputState(&system->mouseButtons[event->button.button],
 							 &system->queueReleaseMouseButtons[event->button.button],
 							 INP_JUST_RELEASED);
+			system->lastInputWasController = false;
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			if (event->button.button >= MAX_RECOGNIZED_MOUSE_BUTTONS)
@@ -192,25 +198,30 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 			UpdateInputState(&system->mouseButtons[event->button.button],
 							 &system->queueReleaseMouseButtons[event->button.button],
 							 INP_JUST_PRESSED);
+			system->lastInputWasController = false;
 			break;
 		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 			UpdateInputState(&system->controllerButtons[event->gbutton.button],
 							 &system->queueReleaseControllerButtons[event->gbutton.button],
 							 INP_JUST_PRESSED);
+			system->lastInputWasController = true;
 			break;
 		case SDL_EVENT_GAMEPAD_BUTTON_UP:
 			UpdateInputState(&system->controllerButtons[event->gbutton.button],
 							 &system->queueReleaseControllerButtons[event->gbutton.button],
 							 INP_JUST_RELEASED);
+			system->lastInputWasController = true;
 			break;
 		case SDL_EVENT_GAMEPAD_AXIS_MOTION:
 			system->gamepadAxes[event->gaxis.axis] = (float)event->gaxis.value / 32767.0f;
+			system->lastInputWasController = true;
 			break;
 		case SDL_EVENT_MOUSE_WHEEL:
 			system->mouseWheelRelativeX += event->wheel.x;
 			system->mouseWheelRelativeY += event->wheel.y;
 			system->mouseWheelRelativeTicksX += event->wheel.integer_x;
 			system->mouseWheelRelativeTicksY += event->wheel.integer_y;
+			system->lastInputWasController = false;
 			break;
 		default:
 			return false;
@@ -378,14 +389,19 @@ float GetAxis(const InputSystem *system, const SDL_GamepadAxis axis)
 	return system->gamepadAxes[axis];
 }
 
-inline bool UseController()
+inline bool UseController(const InputSystem *system)
 {
-	return GetState()->options.controllerMode && currentGamepad != NULL;
+	return system->lastInputWasController && ControllerConnected();
+}
+
+bool ControllerConnected()
+{
+	return currentGamepad != NULL;
 }
 
 const char *GetControllerName()
 {
-	if (!UseController())
+	if (!currentGamepad)
 	{
 		return NULL;
 	}

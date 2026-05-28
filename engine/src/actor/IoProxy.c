@@ -23,7 +23,7 @@ void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/
 {
 	if (GetState()->map->ioProxy != NULL)
 	{
-		LogError("Attempted to add an I/O proxy actor to level, but it already has one! The new one cannot be used.");
+		LogError("Attempted to add an I/O proxy actor to level, but it already has one! The new one cannot be used.\n");
 	} else
 	{
 		GetState()->map->ioProxy = this;

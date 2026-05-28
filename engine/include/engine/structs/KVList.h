@@ -5,6 +5,7 @@
 #ifndef KVLIST_H
 #define KVLIST_H
 
+#include <engine/assets/DataReader.h>
 #include <engine/assets/DataWriter.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
@@ -90,13 +91,11 @@ struct Param
 
 /**
  * Read a param from bytes
- * @param data Data to read from
- * @param dataSize Total size of the data
- * @param offset Offset into the data (will be updated)
+ * @param reader DataReader to read from
  * @param out The param to read to
  * @return Number of bytes read
  */
-size_t ReadParam(const void *data, size_t dataSize, size_t *offset, Param *out);
+size_t ReadParam(DataReader *reader, Param *out);
 
 /**
  * Write a param to a DataWriter
@@ -134,13 +133,11 @@ void KvListCopy(const KvList source, KvList dest);
 
 /**
  * Read a KvList from bytes
- * @param data Data to read from
- * @param dataSize Total size of the data
- * @param offset Offset into the data (will be updated)
+ * @param reader DataReader to read from
  * @param out The KvList to read to (will be created)
  * @return Number of bytes read
  */
-size_t ReadKvList(const void *data, size_t dataSize, size_t *offset, KvList out);
+size_t ReadKvList(DataReader *reader, KvList out);
 
 /**
  * Write a KvList to a DataWriter

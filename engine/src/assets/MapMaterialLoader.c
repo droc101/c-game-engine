@@ -55,27 +55,26 @@ MapMaterial *LoadMapMaterial(const char *path)
 		free(material);
 		return &fallbackMaterial;
 	}
+	DataReader *reader = CreateDataReaderFromAsset(mapMaterialAsset);
 
 	if (mapMaterialAsset->typeVersion != MAP_MATERIAL_ASSET_VERSION)
 	{
-		LogError("Failed to load map material from asset due to version mismatch (got %d, expected %d)",
+		LogError("Failed to load map material from asset due to version mismatch (got %d, expected %d)\n",
 				 mapMaterialAsset->typeVersion,
 				 MAP_MATERIAL_ASSET_VERSION);
 		return &fallbackMaterial;
 	}
-
-	size_t offset = 0;
 	size_t bytesRemaining = mapMaterialAsset->size;
 	size_t strLength = 0;
 
-	material->texture = ReadStringSafe(mapMaterialAsset->data, &offset, mapMaterialAsset->size, &strLength);
+	material->texture = ReadStringSafe(reader, &strLength);
 	bytesRemaining -= sizeof(size_t);
 	bytesRemaining -= strLength;
 	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
-	offset += sizeof(float) * 2; // default scale is lvledit side only
+	Seek(reader, sizeof(float) * 2); // default scale is lvledit side only
 	EXPECT_BYTES(2, bytesRemaining);
-	material->shader = ReadUint8(mapMaterialAsset->data, &offset, mapMaterialAsset->size);
-	material->soundClass = ReadUint8(mapMaterialAsset->data, &offset, mapMaterialAsset->size);
+	material->shader = ReadUint8(reader);
+	material->soundClass = ReadUint8(reader);
 
 	material->id = mapMaterialId;
 
@@ -94,6 +93,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 				   MAX_MAP_MATERIALS - mapMaterialId);
 	}
 
+	DestroyDataReader(reader);
 	FreeAsset(mapMaterialAsset);
 
 	return material;

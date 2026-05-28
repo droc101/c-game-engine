@@ -111,6 +111,11 @@ void DestroyUiStack(UiStack *stack)
 
 bool ProcessUiStack(UiStack *stack)
 {
+	if (UseController(mainThreadInput) && stack->focusedControl == -1u)
+	{
+		UiStackResetFocus(stack);
+	}
+
 	const Vector2 mousePos = GetMousePos(mainThreadInput);
 
 	if (stack->focusedControl != -1u)
@@ -149,7 +154,7 @@ bool ProcessUiStack(UiStack *stack)
 	stack->activeControl = -1;
 	stack->activeControlState = NORMAL;
 
-	if (UseController())
+	if (UseController(mainThreadInput))
 	{
 		stack->activeControl = stack->focusedControl;
 		stack->activeControlState = HOVER;
@@ -371,5 +376,5 @@ bool HasActivation(UiStack *stack, Control *Control)
 
 void UiStackResetFocus(UiStack *stack)
 {
-	SetFocusedControl(stack, UseController() ? 0 : -1);
+	SetFocusedControl(stack, UseController(mainThreadInput) ? 0 : -1);
 }

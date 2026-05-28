@@ -39,9 +39,6 @@ struct Options
 	bool enableDiscordRpc;
 
 	/* Controls */
-
-	/// Whether the game is in controller mode
-	bool controllerMode;
 	/// The look speed (it affects controller speed too)
 	float cameraSpeed;
 	/// The strength of the rumble

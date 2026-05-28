@@ -18,12 +18,12 @@ void *GameReallocArray(void *ptr, const size_t arrayLength, const size_t element
 {
 	if (elementSize == 0)
 	{
-		LogWarning("GameReallocArray: elementSize is zero, returning NULL");
+		LogWarning("GameReallocArray: elementSize is zero, returning NULL\n");
 		return NULL;
 	}
 	if (arrayLength > SIZE_MAX / elementSize)
 	{
-		LogWarning("GameReallocArray: arrayLength * elementSize exceeds SIZE_MAX, returning NULL");
+		LogWarning("GameReallocArray: arrayLength * elementSize exceeds SIZE_MAX, returning NULL\n");
 		errno = ENOMEM; // NOLINT(*-include-cleaner)
 		return NULL;
 	}

@@ -206,7 +206,7 @@ void MovePlayer(const Player *player, const double delta, const bool allowInput)
 
 	if (allowInput)
 	{
-		if (UseController())
+		if (UseController(physicsThreadInput))
 		{
 			moveVec.z = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTY);
 			moveVec.x = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTX);
@@ -463,7 +463,7 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 	Vector2 cameraMotion = v2s(0);
 	if (state->camera == &state->map->player.playerCamera)
 	{
-		if (UseController())
+		if (UseController(mainThreadInput))
 		{
 			cameraMotion = v2s(0);
 

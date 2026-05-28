@@ -68,6 +68,13 @@ void ExecPathInit(const int argc, const char *argv[])
 		Error("Executable path too long. Please rethink your file structure.");
 	}
 	strncpy(GetState()->executablePath, argv[0], 260); // we do not mess around with user data in c.
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(GetState()->executablePath); i++) {
+		if (GetState()->executablePath[i] == '\\') {
+			GetState()->executablePath[i] = '/';
+		}
+	}
+#endif
 	LogInfo("Executable path: %s\n", GetState()->executablePath);
 
 	const char *folder = SDL_GetBasePath();
@@ -79,8 +86,14 @@ void ExecPathInit(const int argc, const char *argv[])
 	{
 		Error("Base path too long. Please rethink your file structure.");
 	}
-
 	strncpy(GetState()->executableFolder, folder, 260);
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(GetState()->executableFolder); i++) {
+		if (GetState()->executableFolder[i] == '\\') {
+			GetState()->executableFolder[i] = '/';
+		}
+	}
+#endif
 	LogInfo("Executable folder: %s\n", GetState()->executableFolder);
 }
 
@@ -89,6 +102,15 @@ void InitSDL()
 	LogDebug("Initializing SDL...\n");
 	SDL_SetHint(SDL_HINT_APP_NAME, gameConfig.gameTitle);
 #ifdef SDL_PLATFORM_LINUX
+	if (HasCliArg("--wayland"))
+	{
+		GetState()->options.preferWayland = true;
+	} else if (HasCliArg("--x11"))
+	{
+		GetState()->options.preferWayland = false;
+	}
+
+
 	if (GetState()->options.preferWayland)
 	{
 		SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland,x11");
@@ -124,10 +146,11 @@ void WindowAndRenderInit()
 			snprintf(title, titleLen, "%s", gameConfig.gameTitle);
 			break;
 	}
+	float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 	SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1"); // TODO: GLEW won't init (error 1) with GLX
 	const Uint32 rendererFlags = currentRenderer == RENDERER_OPENGL ? SDL_WINDOW_OPENGL : SDL_WINDOW_VULKAN;
-	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH), MIN_WIDTH, MAX_WIDTH);
-	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT), MIN_HEIGHT, MAX_HEIGHT);
+	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH * dpiScale), MIN_WIDTH, MAX_WIDTH);
+	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT * dpiScale), MIN_HEIGHT, MAX_HEIGHT);
 	SDL_Window *window = SDL_CreateWindow(title,
 										  width,
 										  height,

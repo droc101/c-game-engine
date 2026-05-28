@@ -167,25 +167,28 @@ bool DecompressAsset(FILE *file, Asset *dest)
 
 	fclose(file);
 
-	size_t offset = 0;
-	const uint32_t magic = ReadUint32(assetData, &offset, fileSize);
+	DataReader *reader = CreateDataReader(assetData, fileSize, 0);
+
+	const uint32_t magic = ReadUint32(reader);
 	if (magic != ASSET_FORMAT_MAGIC)
 	{
 		free(assetData);
+		DestroyDataReader(reader);
 		LogError("Failed to read an asset because the magic was incorrect.\n");
 		return false;
 	}
-	const uint8_t assetVersion = ReadUint8(assetData, &offset, fileSize);
+	const uint8_t assetVersion = ReadUint8(reader);
 	if (assetVersion != ASSET_FORMAT_VERSION)
 	{
 		free(assetData);
+		DestroyDataReader(reader);
 		LogError("Failed to read an asset because the version was incorrect.\n");
 		return false;
 	}
-	const uint8_t assetType = ReadUint8(assetData, &offset, fileSize);
-	const uint8_t typeVersion = ReadUint8(assetData, &offset, fileSize);
-	const size_t decompressedSize = ReadSizeT(assetData, &offset, fileSize);
-	const size_t compressedSize = ReadSizeT(assetData, &offset, fileSize);
+	const uint8_t assetType = ReadUint8(reader);
+	const uint8_t typeVersion = ReadUint8(reader);
+	const size_t decompressedSize = ReadSizeT(reader);
+	const size_t compressedSize = ReadSizeT(reader);
 
 	if (fileSize - ASSET_HEADER_SIZE != compressedSize)
 	{
@@ -194,6 +197,7 @@ bool DecompressAsset(FILE *file, Asset *dest)
 				 compressedSize,
 				 fileSize - ASSET_HEADER_SIZE);
 		free(assetData);
+		DestroyDataReader(reader);
 		return false;
 	}
 
@@ -204,10 +208,12 @@ bool DecompressAsset(FILE *file, Asset *dest)
 	z_stream stream = {0};
 
 	// Initialize the zlib stream
-	stream.next_in = assetData + offset; // skip header
+	stream.next_in = assetData + DataReaderGetOffset(reader); // skip header
 	stream.avail_in = compressedSize;
 	stream.next_out = decompressedData;
 	stream.avail_out = decompressedSize;
+
+	DestroyDataReader(reader);
 
 	// Initialize the zlib stream
 	if (inflateInit2(&stream, MAX_WBITS | 16) != Z_OK)

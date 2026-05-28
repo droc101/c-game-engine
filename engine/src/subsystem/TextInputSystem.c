@@ -15,7 +15,7 @@ void SetTextInput(TextInput *input)
 {
 	if (CurrentTextInput != NULL)
 	{
-		LogError("Failed to set text input as one was already active!");
+		LogError("Failed to set text input as one was already active!\n");
 	}
 	CurrentTextInput = input;
 	SDL_StartTextInput(GetGameWindow());
@@ -25,7 +25,7 @@ void StopTextInput()
 {
 	if (CurrentTextInput == NULL)
 	{
-		LogError("Failed to stop text input as none was active!");
+		LogError("Failed to stop text input as none was active!\n");
 	}
 	SDL_StopTextInput(GetGameWindow());
 	CurrentTextInput = NULL;
@@ -35,7 +35,7 @@ void HandleTextInput(SDL_TextInputEvent *event)
 {
 	if (CurrentTextInput == NULL)
 	{
-		LogError("Failed to handle text input event as no text input was active!");
+		LogError("Failed to handle text input event as no text input was active!\n");
 		return;
 	}
 	CurrentTextInput->TextInput(CurrentTextInput, event);

@@ -76,24 +76,25 @@ Font *LoadFont(const char *asset)
 	}
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
-	size_t offset = 0;
+	DataReader *reader = CreateDataReaderFromAsset(assetData);
 	size_t bytesRemaining = assetData->size;
 	EXPECT_BYTES(8, bytesRemaining);
 
-	font->width = ReadUint8(assetData->data, &offset, assetData->size);
-	font->textureHeight = ReadUint8(assetData->data, &offset, assetData->size);
-	font->baseline = ReadUint8(assetData->data, &offset, assetData->size);
-	font->charSpacing = ReadUint8(assetData->data, &offset, assetData->size);
-	font->lineSpacing = ReadUint8(assetData->data, &offset, assetData->size);
-	font->spaceWidth = ReadUint8(assetData->data, &offset, assetData->size);
-	font->defaultSize = ReadUint8(assetData->data, &offset, assetData->size);
-	font->uppercaseOnly = ReadUint8(assetData->data, &offset, assetData->size) != 0;
+	font->width = ReadUint8(reader);
+	font->textureHeight = ReadUint8(reader);
+	font->baseline = ReadUint8(reader);
+	font->charSpacing = ReadUint8(reader);
+	font->lineSpacing = ReadUint8(reader);
+	font->spaceWidth = ReadUint8(reader);
+	font->defaultSize = ReadUint8(reader);
+	font->uppercaseOnly = ReadUint8(reader) != 0;
 	size_t fontTextureLength = 0;
-	char *fontTexture = ReadStringSafe(assetData->data, &offset, assetData->size, &fontTextureLength);
+	char *fontTexture = ReadStringSafe(reader, &fontTextureLength);
 	if (!fontTexture)
 	{
 		LogError("Failed to load font from asset (unable to read texture string)\n");
 		free(font);
+		DestroyDataReader(reader);
 		return GenerateFallbackFont();
 	}
 	bytesRemaining -= fontTextureLength;
@@ -104,20 +105,21 @@ Font *LoadFont(const char *asset)
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
 	font->image = LoadImage(font->texture);
-	font->charCount = ReadUint8(assetData->data, &offset, assetData->size);
+	font->charCount = ReadUint8(reader);
 	memset(font->charWidths, 0, sizeof(font->charWidths) / sizeof(*font->charWidths));
 	memset(font->charStartUVs, 0, sizeof(font->charStartUVs) / sizeof(*font->charStartUVs));
 	memset(font->charEndUVs, 0, sizeof(font->charEndUVs) / sizeof(*font->charEndUVs));
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{
-		const char chr = (char)ReadUint8(assetData->data, &offset, assetData->size);
-		const uint8_t width = ReadUint8(assetData->data, &offset, assetData->size);
+		const char chr = (char)ReadUint8(reader);
+		const uint8_t width = ReadUint8(reader);
 		font->charWidths[(int)chr] = width;
 		font->charStartUVs[(int)chr] = (float)((double)i / font->charCount); // Casting through double here is required
 		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount -
 											 1.0 / (double)font->image->width); // Here too
 	}
+	DestroyDataReader(reader);
 	FreeAsset(assetData);
 
 	return font;

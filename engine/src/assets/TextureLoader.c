@@ -89,15 +89,16 @@ Image *LoadImage(const char *asset)
 	CheckAlloc(img);
 
 	Asset *textureAsset = LoadAsset(asset, false, false);
-	size_t offset = 0;
+
 	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
 	{
 		GenFallbackImage(img);
 	} else
 	{
+		DataReader *reader = CreateDataReaderFromAsset(textureAsset);
 		if (textureAsset->typeVersion != TEXTURE_ASSET_VERSION)
 		{
-			LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)",
+			LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)\n",
 					 textureAsset->typeVersion,
 					 TEXTURE_ASSET_VERSION);
 			GenFallbackImage(img);
@@ -110,12 +111,12 @@ Image *LoadImage(const char *asset)
 				GenFallbackImage(img);
 			} else
 			{
-				img->width = ReadSizeT(textureAsset->data, &offset, textureAsset->size);
-				img->height = ReadSizeT(textureAsset->data, &offset, textureAsset->size);
-				img->filter = ReadUint8(textureAsset->data, &offset, textureAsset->size) != 0;
-				img->repeat = ReadUint8(textureAsset->data, &offset, textureAsset->size) != 0;
-				img->mipmaps = ReadUint8(textureAsset->data, &offset, textureAsset->size) != 0;
-				img->pixelFormat = ReadUint8(textureAsset->data, &offset, textureAsset->size);
+				img->width = ReadSizeT(reader);
+				img->height = ReadSizeT(reader);
+				img->filter = ReadUint8(reader) != 0;
+				img->repeat = ReadUint8(reader) != 0;
+				img->mipmaps = ReadUint8(reader) != 0;
+				img->pixelFormat = ReadUint8(reader);
 				size_t pixelDataSize = img->width * img->height;
 				if (img->pixelFormat == PIXEL_FORMAT_RGBA8)
 				{
@@ -132,10 +133,11 @@ Image *LoadImage(const char *asset)
 				{
 					img->pixelData = malloc(pixelDataSize);
 					CheckAlloc(img->pixelData);
-					memcpy(img->pixelData, textureAsset->data + offset, pixelDataSize);
+					ReadBuffer(reader, pixelDataSize, img->pixelData);
 				}
 			}
 		}
+		DestroyDataReader(reader);
 	}
 
 	img->id = textureId;

@@ -44,83 +44,84 @@ bool LoadMap(Map *map, Asset *mapData)
 		return false;
 	}
 
-	size_t offset = 0;
+	DataReader *reader = CreateDataReaderFromAsset(mapData);
+
 	size_t bytesRemaining = mapData->size;
 	size_t strLength = 0;
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
 	EXPECT_BYTES_BOOL(1, bytesRemaining);
-	map->renderSky = ReadUint8(mapData->data, &offset, mapData->size);
+	map->renderSky = ReadUint8(reader);
 	if (map->renderSky)
 	{
-		map->skyTexture = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+		map->skyTexture = ReadStringSafe(reader, &strLength);
 		bytesRemaining -= strLength;
 		bytesRemaining += sizeof(size_t);
 	} else
 	{
 		map->skyTexture = NULL;
 	}
-	map->discordRpcIcon = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+	map->discordRpcIcon = ReadStringSafe(reader, &strLength);
 	bytesRemaining -= strLength;
 	bytesRemaining += sizeof(size_t);
-	map->discordRpcName = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+	map->discordRpcName = ReadStringSafe(reader, &strLength);
 	bytesRemaining -= strLength;
 	bytesRemaining += sizeof(size_t);
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-	const size_t numActors = ReadSizeT(mapData->data, &offset, mapData->size);
+	const size_t numActors = ReadSizeT(reader);
 	for (size_t i = 0; i < numActors; i++)
 	{
 		size_t actorClassLength = 0;
-		char *actorClass = ReadStringSafe(mapData->data, &offset, mapData->size, &actorClassLength);
+		char *actorClass = ReadStringSafe(reader, &actorClassLength);
 		bytesRemaining -= actorClassLength;
 		bytesRemaining -= sizeof(size_t);
 
 		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
 		Transform xfm;
-		xfm.position.x = ReadFloat(mapData->data, &offset, mapData->size);
-		xfm.position.y = ReadFloat(mapData->data, &offset, mapData->size);
-		xfm.position.z = ReadFloat(mapData->data, &offset, mapData->size);
-		const float rotX = ReadFloat(mapData->data, &offset, mapData->size);
-		const float rotY = ReadFloat(mapData->data, &offset, mapData->size);
-		const float rotZ = ReadFloat(mapData->data, &offset, mapData->size);
+		xfm.position.x = ReadFloat(reader);
+		xfm.position.y = ReadFloat(reader);
+		xfm.position.z = ReadFloat(reader);
+		const float rotX = ReadFloat(reader);
+		const float rotY = ReadFloat(reader);
+		const float rotZ = ReadFloat(reader);
 		Vector3 eulerAngles = {rotX, rotY, rotZ};
 		JPH_Quat_FromEulerAngles(&eulerAngles, &xfm.rotation);
 
 		LockingList ioConnections = {0};
 		ListInit(ioConnections, LIST_POINTER);
 		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-		const size_t numConnections = ReadSizeT(mapData->data, &offset, mapData->size);
+		const size_t numConnections = ReadSizeT(reader);
 		for (size_t j = 0; j < numConnections; j++)
 		{
 			ActorConnection *connection = malloc(sizeof(ActorConnection));
 			CheckAlloc(connection);
-			connection->sourceActorOutput = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+			connection->sourceActorOutput = ReadStringSafe(reader, &strLength);
 			bytesRemaining -= strLength;
 			bytesRemaining += sizeof(size_t);
-			connection->targetActorName = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+			connection->targetActorName = ReadStringSafe(reader, &strLength);
 			bytesRemaining -= strLength;
 			bytesRemaining += sizeof(size_t);
-			connection->targetActorInput = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+			connection->targetActorInput = ReadStringSafe(reader, &strLength);
 			bytesRemaining -= strLength;
 			bytesRemaining += sizeof(size_t);
-			uint8_t hasOverride = ReadUint8(mapData->data, &offset, mapData->size);
+			uint8_t hasOverride = ReadUint8(reader);
 			// TODO data size validation for params
 			if (hasOverride)
 			{
-				size_t paramSize = ReadParam(mapData->data, mapData->size, &offset, &connection->outParamOverride);
+				size_t paramSize = ReadParam(reader, &connection->outParamOverride);
 				bytesRemaining -= paramSize;
 			} else
 			{
 				connection->outParamOverride.type = PARAM_TYPE_NONE;
 			}
-			connection->numRefires = ReadSizeT(mapData->data, &offset, mapData->size);
+			connection->numRefires = ReadSizeT(reader);
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;
 		// TODO: Add EXPECT_BYTES for this
-		bytesRemaining -= ReadKvList(mapData->data, mapData->size, &offset, params);
+		bytesRemaining -= ReadKvList(reader, params);
 
 		if (strcmp(actorClass, "player") == 0)
 		{
@@ -158,13 +159,13 @@ bool LoadMap(Map *map, Asset *mapData)
 	}
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-	map->modelCount = ReadSizeT(mapData->data, &offset, mapData->size);
+	map->modelCount = ReadSizeT(reader);
 	map->models = malloc(sizeof(MapModel) * map->modelCount);
 	CheckAlloc(map->models);
 	for (size_t i = 0; i < map->modelCount; i++)
 	{
 		MapModel *model = &map->models[i];
-		char *materialName = ReadStringSafe(mapData->data, &offset, mapData->size, &strLength);
+		char *materialName = ReadStringSafe(reader, &strLength);
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
@@ -172,27 +173,27 @@ bool LoadMap(Map *map, Asset *mapData)
 		free(materialName);
 
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
-		model->vertexCount = ReadUint32(mapData->data, &offset, mapData->size);
+		model->vertexCount = ReadUint32(reader);
 		model->vertices = malloc(sizeof(MapVertex) * model->vertexCount);
 		CheckAlloc(model->vertices);
 		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
 			MapVertex *vertex = model->vertices + j;
 			EXPECT_BYTES_BOOL(sizeof(float) * 7, bytesRemaining);
-			vertex->position.x = ReadFloat(mapData->data, &offset, mapData->size);
-			vertex->position.y = ReadFloat(mapData->data, &offset, mapData->size);
-			vertex->position.z = ReadFloat(mapData->data, &offset, mapData->size);
-			vertex->uv.x = ReadFloat(mapData->data, &offset, mapData->size);
-			vertex->uv.y = ReadFloat(mapData->data, &offset, mapData->size);
-			vertex->lightmapUv.x = ReadFloat(mapData->data, &offset, mapData->size);
-			vertex->lightmapUv.y = ReadFloat(mapData->data, &offset, mapData->size);
+			vertex->position.x = ReadFloat(reader);
+			vertex->position.y = ReadFloat(reader);
+			vertex->position.z = ReadFloat(reader);
+			vertex->uv.x = ReadFloat(reader);
+			vertex->uv.y = ReadFloat(reader);
+			vertex->lightmapUv.x = ReadFloat(reader);
+			vertex->lightmapUv.y = ReadFloat(reader);
 		}
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
-		model->indexCount = ReadUint32(mapData->data, &offset, mapData->size);
+		model->indexCount = ReadUint32(reader);
 		EXPECT_BYTES_BOOL(sizeof(uint32_t) * model->indexCount, bytesRemaining);
 		model->indices = malloc(sizeof(uint32_t) * model->indexCount);
 		CheckAlloc(model->indices);
-		ReadBuffer(mapData->data, &offset, mapData->size, sizeof(uint32_t) * model->indexCount, model->indices);
+		ReadBuffer(reader, sizeof(uint32_t) * model->indexCount, model->indices);
 	}
 
 
@@ -201,14 +202,14 @@ bool LoadMap(Map *map, Asset *mapData)
 	};
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-	const size_t numCollisionMeshes = ReadSizeT(mapData->data, &offset, mapData->size);
+	const size_t numCollisionMeshes = ReadSizeT(reader);
 	for (size_t i = 0; i < numCollisionMeshes; i++)
 	{
 		EXPECT_BYTES_BOOL((sizeof(float) * 3) + sizeof(size_t), bytesRemaining);
-		collisionXfm.position.x = ReadFloat(mapData->data, &offset, mapData->size);
-		collisionXfm.position.y = ReadFloat(mapData->data, &offset, mapData->size);
-		collisionXfm.position.z = ReadFloat(mapData->data, &offset, mapData->size);
-		const size_t subShapeCount = ReadSizeT(mapData->data, &offset, mapData->size);
+		collisionXfm.position.x = ReadFloat(reader);
+		collisionXfm.position.y = ReadFloat(reader);
+		collisionXfm.position.z = ReadFloat(reader);
+		const size_t subShapeCount = ReadSizeT(reader);
 		if (subShapeCount == 0)
 		{
 			continue;
@@ -220,7 +221,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		{
 			ModelStaticCollider staticCollider;
 			EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-			staticCollider.numTriangles = ReadSizeT(mapData->data, &offset, mapData->size);
+			staticCollider.numTriangles = ReadSizeT(reader);
 			staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
 			CheckAlloc(staticCollider.tris);
 			for (size_t k = 0; k < staticCollider.numTriangles; k++)
@@ -229,17 +230,17 @@ bool LoadMap(Map *map, Asset *mapData)
 				triangle->materialIndex = 0;
 				EXPECT_BYTES_BOOL(sizeof(float) * 9, bytesRemaining);
 
-				triangle->v1.x = ReadFloat(mapData->data, &offset, mapData->size);
-				triangle->v1.y = ReadFloat(mapData->data, &offset, mapData->size);
-				triangle->v1.z = ReadFloat(mapData->data, &offset, mapData->size);
+				triangle->v1.x = ReadFloat(reader);
+				triangle->v1.y = ReadFloat(reader);
+				triangle->v1.z = ReadFloat(reader);
 
-				triangle->v2.x = ReadFloat(mapData->data, &offset, mapData->size);
-				triangle->v2.y = ReadFloat(mapData->data, &offset, mapData->size);
-				triangle->v2.z = ReadFloat(mapData->data, &offset, mapData->size);
+				triangle->v2.x = ReadFloat(reader);
+				triangle->v2.y = ReadFloat(reader);
+				triangle->v2.z = ReadFloat(reader);
 
-				triangle->v3.x = ReadFloat(mapData->data, &offset, mapData->size);
-				triangle->v3.y = ReadFloat(mapData->data, &offset, mapData->size);
-				triangle->v3.z = ReadFloat(mapData->data, &offset, mapData->size);
+				triangle->v3.x = ReadFloat(reader);
+				triangle->v3.y = ReadFloat(reader);
+				triangle->v3.z = ReadFloat(reader);
 			}
 			JPH_Shape *subShape = CreateStaticModelShape(&staticCollider);
 
@@ -272,8 +273,8 @@ bool LoadMap(Map *map, Asset *mapData)
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
 
 	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
-	map->lightmapWidth = ReadSizeT(mapData->data, &offset, mapData->size);
-	map->lightmapHeight = ReadSizeT(mapData->data, &offset, mapData->size);
+	map->lightmapWidth = ReadSizeT(reader);
+	map->lightmapHeight = ReadSizeT(reader);
 	size_t lightmapDataSize = sizeof(uint16_t) *
 							  4 *
 							  map->lightmapHeight *
@@ -281,29 +282,30 @@ bool LoadMap(Map *map, Asset *mapData)
 	EXPECT_BYTES_BOOL(lightmapDataSize, bytesRemaining);
 	map->lightmapPixels = malloc(lightmapDataSize);
 	CheckAlloc(map->lightmapPixels);
-	ReadBuffer(mapData->data, &offset, mapData->size, lightmapDataSize, map->lightmapPixels);
+	ReadBuffer(reader, lightmapDataSize, map->lightmapPixels);
 
 	EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
-	map->numPointLights = ReadUint16(mapData->data, &offset, mapData->size);
+	map->numPointLights = ReadUint16(reader);
 	map->pointLights = malloc(sizeof(PointLight) * map->numPointLights);
 	CheckAlloc(map->pointLights);
 	EXPECT_BYTES_BOOL(sizeof(float) * 8 * map->numPointLights, bytesRemaining);
 	for (size_t i = 0; i < map->numPointLights; i++)
 	{
 		PointLight *light = &map->pointLights[i];
-		light->position[0] = ReadFloat(mapData->data, &offset, mapData->size);
-		light->position[1] = ReadFloat(mapData->data, &offset, mapData->size);
-		light->position[2] = ReadFloat(mapData->data, &offset, mapData->size);
+		light->position[0] = ReadFloat(reader);
+		light->position[1] = ReadFloat(reader);
+		light->position[2] = ReadFloat(reader);
 
-		light->color[0] = ReadFloat(mapData->data, &offset, mapData->size);
-		light->color[1] = ReadFloat(mapData->data, &offset, mapData->size);
-		light->color[2] = ReadFloat(mapData->data, &offset, mapData->size);
+		light->color[0] = ReadFloat(reader);
+		light->color[1] = ReadFloat(reader);
+		light->color[2] = ReadFloat(reader);
 
-		light->brightnessScale = ReadFloat(mapData->data, &offset, mapData->size);
-		light->range = ReadFloat(mapData->data, &offset, mapData->size);
-		light->attenuation = ReadFloat(mapData->data, &offset, mapData->size);
+		light->brightnessScale = ReadFloat(reader);
+		light->range = ReadFloat(reader);
+		light->attenuation = ReadFloat(reader);
 	}
 
+	DestroyDataReader(reader);
 	FreeAsset(mapData);
 
 	LoadMapModels(map);
