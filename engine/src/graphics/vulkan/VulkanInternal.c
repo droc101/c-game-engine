@@ -447,19 +447,6 @@ bool CreateTextureSamplers()
 	return true;
 }
 
-bool CreateBuffers()
-{
-	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
-	VulkanTest(CreateUniformBuffers(), "Failed to create uniform buffers!");
-	VulkanTest(CreateMapBuffers(), "Failed to create map buffers!");
-	VulkanTest(CreateSkyBuffers(), "Failed to create sky buffers!");
-	VulkanTest(CreateViewmodelBuffers(), "Failed to create viewmodel buffers!");
-	VulkanTest(CreateActorModelBuffers(), "Failed to create actor models buffers!");
-	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
-
-	return true;
-}
-
 // TODO: Revisit this to ensure it's as it should be (update after bind flag or usage of MAX_FRAMES_IN_FLIGHT, for example)
 bool CreateDescriptorSet()
 {

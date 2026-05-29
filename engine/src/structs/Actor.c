@@ -57,7 +57,7 @@ void FreeActor(Actor *actor)
 	actor->definition->Destroy(actor);
 	if (!actor->hasModel && actor->wall != NULL)
 	{
-		free(actor->wall->tex);
+		free(actor->wall->texture);
 		free(actor->wall);
 		actor->wall = NULL;
 	}

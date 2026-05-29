@@ -511,30 +511,62 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 				   "Failed to bind actor models vertex buffers!");
 		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.actorModels.indices, VK_INDEX_TYPE_UINT32),
 				   "Failed to bind actor models index buffer!");
+
+		if (shadedDrawCount != 0)
+		{
+			const LunaDrawIndexedIndirectInfo drawInfo = {
+				.pipeline = pipelines.shadedActorModel,
+				.pipelineBindInfo = pipelineBindInfo,
+				.buffer = buffers.actorModels.shadedDrawInfo,
+				.drawCount = shadedDrawCount,
+			};
+			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+								   "Failed to draw shaded actor models!");
+		}
+
+		if (unshadedDrawCount != 0)
+		{
+			const LunaDrawIndexedIndirectInfo drawInfo = {
+				.pipeline = pipelines.unshadedActorModel,
+				.pipelineBindInfo = pipelineBindInfo,
+				.buffer = buffers.actorModels.unshadedDrawInfo,
+				.drawCount = unshadedDrawCount,
+			};
+			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+								   "Failed to draw unshaded actor models!");
+		}
 	}
 
-	if (shadedDrawCount != 0)
+	if (buffers.actorWalls.shadedInstanceCount != 0 || buffers.actorWalls.unshadedInstanceCount != 0)
 	{
-		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = pipelines.shadedActorModel,
-			.pipelineBindInfo = pipelineBindInfo,
-			.buffer = buffers.actorModels.shadedDrawInfo,
-			.drawCount = shadedDrawCount,
-		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-							   "Failed to draw shaded actor models!");
-	}
+		VulkanTest(lunaBindVertexBuffers(device, commandBuffer, &buffers.actorWalls.vertices, 0, 1),
+				   "Failed to bind actor wall vertex buffer!");
 
-	if (unshadedDrawCount != 0)
-	{
-		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = pipelines.unshadedActorModel,
-			.pipelineBindInfo = pipelineBindInfo,
-			.buffer = buffers.actorModels.unshadedDrawInfo,
-			.drawCount = unshadedDrawCount,
-		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-							   "Failed to draw unshaded actor models!");
+		if (buffers.actorWalls.shadedInstanceCount != 0)
+		{
+			VulkanTest(lunaBindVertexBuffers(device, commandBuffer, &buffers.actorWalls.shadedInstanceData, 1, 1),
+					   "Failed to bind shaded actor wall instance data buffer!");
+			const LunaDrawInfo drawInfo = {
+				.pipeline = pipelines.shadedActorWall,
+				.pipelineBindInfo = pipelineBindInfo,
+				.vertexCount = 12,
+				.instanceCount = buffers.actorWalls.shadedInstanceCount,
+			};
+			VulkanTestReturnResult(lunaDraw(device, commandBuffer, &drawInfo), "Failed to draw shaded actor walls!");
+		}
+
+		if (buffers.actorWalls.unshadedInstanceCount != 0)
+		{
+			VulkanTest(lunaBindVertexBuffers(device, commandBuffer, &buffers.actorWalls.unshadedInstanceData, 1, 1),
+					   "Failed to bind unshaded actor wall instance data buffer!");
+			const LunaDrawInfo drawInfo = {
+				.pipeline = pipelines.unshadedActorWall,
+				.pipelineBindInfo = pipelineBindInfo,
+				.vertexCount = 12,
+				.instanceCount = buffers.actorWalls.unshadedInstanceCount,
+			};
+			VulkanTestReturnResult(lunaDraw(device, commandBuffer, &drawInfo), "Failed to draw unshaded actor walls!");
+		}
 	}
 
 	return VK_SUCCESS;

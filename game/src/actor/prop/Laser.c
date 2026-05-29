@@ -151,7 +151,7 @@ static void LaserUpdate(Actor *this, const double delta)
 		if (hit)
 		{
 			this->wall->length = MAX_DISTANCE * result.fraction;
-			this->wall->localCenter = v2(-this->wall->length / 2.0f, 0);
+			this->wall->centerOffset = v2(-this->wall->length / 2.0f, 0);
 		}
 		this->wall->uvOffset.x = (float)fmod(this->wall->uvOffset.x + delta / 8, 1.0);
 	}
@@ -182,10 +182,10 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
 	this->wall->length = 0;
-	this->wall->localCenter = v2s(0);
-	this->wall->orientation = Z_AXIS;
-	this->wall->tex = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
-	strcpy(this->wall->tex,
+	this->wall->centerOffset = v2s(0);
+	this->wall->orientation = ACTOR_WALL_ORIENTATION_Z_AXIS;
+	this->wall->texture = malloc(strlen(TEXTURE("actor/triplelaser")) + 1);
+	strcpy(this->wall->texture,
 		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
 	this->wall->uvScale = v2s(1.0f);
 	this->wall->uvOffset = v2s(0.0f);

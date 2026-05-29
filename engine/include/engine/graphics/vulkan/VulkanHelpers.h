@@ -130,6 +130,12 @@ typedef struct SkyVertex
 	Vector2 uv;
 } SkyVertex;
 
+typedef struct ActorWallVertex
+{
+	Vector2 position;
+	Vector2 uv;
+} ActorWallVertex;
+
 typedef struct DebugDrawVertex
 {
 	Vector3 position;
@@ -150,6 +156,17 @@ typedef struct ActorModelInstanceData
 	vec4 materialColor;
 	uint32_t textureIndex;
 } __attribute__((aligned(32))) ActorModelInstanceData;
+
+typedef struct ActorWallInstanceData
+{
+	Vector2 axis;
+	Vector3 origin;
+	Vector2 scale;
+	JPH_Quat rotationQuat;
+	uint32_t textureIndex;
+	Vector2 uvScale;
+	Vector2 uvOffset;
+} ActorWallInstanceData;
 
 typedef struct UiBuffer
 {
@@ -199,6 +216,20 @@ typedef struct SkyBuffer
 	LunaBuffer indices;
 } SkyBuffer;
 
+typedef struct ActorWallBuffer
+{
+	/// A buffer of the 12 ActorWallVertex values corresponding to the two faces of the quad
+	LunaBuffer vertices;
+	/// A buffer containing the ActorWallInstanceData for each shaded actor wall
+	LunaBuffer shadedInstanceData;
+	/// The number of shaded actor walls in the map
+	uint32_t shadedInstanceCount;
+	/// A buffer containing the ActorWallInstanceData for each unshaded actor wall
+	LunaBuffer unshadedInstanceData;
+	/// The number of unshaded actor walls in the map
+	uint32_t unshadedInstanceCount;
+} ActorWallBuffer;
+
 #ifdef JPH_DEBUG_RENDERER
 // TODO: Clean up both this and the whole system
 typedef struct DebugDrawBuffer
@@ -223,6 +254,7 @@ typedef struct Buffers
 	ModelBuffer actorModels;
 	ModelBuffer map;
 	SkyBuffer sky;
+	ActorWallBuffer actorWalls;
 #ifdef JPH_DEBUG_RENDERER
 	DebugDrawBuffer debugDrawLines;
 	DebugDrawBuffer debugDrawTriangles;
@@ -239,6 +271,8 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedViewmodel;
 	LunaGraphicsPipeline shadedActorModel;
 	LunaGraphicsPipeline unshadedActorModel;
+	LunaGraphicsPipeline shadedActorWall;
+	LunaGraphicsPipeline unshadedActorWall;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
 	LunaGraphicsPipeline debugDrawTriangles;

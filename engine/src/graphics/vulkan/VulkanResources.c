@@ -24,7 +24,7 @@
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
-VkResult CreateUiBuffers()
+static inline VkResult CreateUiBuffers()
 {
 	static const uint32_t MAX_UI_QUADS_INIT = 8192;
 
@@ -58,7 +58,7 @@ VkResult CreateUiBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateUniformBuffers()
+static inline VkResult CreateUniformBuffers()
 {
 	const VkDeviceSize alignment = physicalDeviceProperties.limits.minUniformBufferOffsetAlignment;
 	const LunaBufferCreationInfo cameraUniformBufferCreationInfo = {
@@ -92,7 +92,7 @@ VkResult CreateUniformBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateMapBuffers()
+static inline VkResult CreateMapBuffers()
 {
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -133,7 +133,7 @@ VkResult CreateMapBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateSkyBuffers()
+static inline VkResult CreateSkyBuffers()
 {
 	static const size_t SKY_MAX_VERTICES_INIT = 559;
 	static const size_t SKY_MAX_INDICES_INIT = 2880;
@@ -158,7 +158,7 @@ VkResult CreateSkyBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateViewmodelBuffers()
+static inline VkResult CreateViewmodelBuffers()
 {
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -203,7 +203,7 @@ VkResult CreateViewmodelBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateActorModelBuffers()
+static inline VkResult CreateActorModelBuffers()
 {
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -248,7 +248,115 @@ VkResult CreateActorModelBuffers()
 	return VK_SUCCESS;
 }
 
-VkResult CreateDebugDrawBuffers()
+static inline VkResult CreateActorWallBuffers()
+{
+	const ActorWallVertex vertices[12] = {
+		{
+			.position.x = -0.5f,
+			.position.y = -0.5f,
+			.uv.x = 1,
+			.uv.y = 1,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = 0.5f,
+			.uv.x = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = 0.5f,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = -0.5f,
+			.uv.x = 1,
+			.uv.y = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = 0.5f,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = -0.5f,
+			.uv.y = 1,
+		},
+
+		{
+			.position.x = -0.5f,
+			.position.y = -0.5f,
+			.uv.y = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = 0.5f,
+			.uv.x = 1,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = 0.5f,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = -0.5f,
+			.uv.y = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = -0.5f,
+			.uv.x = 1,
+			.uv.y = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = 0.5f,
+			.uv.x = 1,
+		},
+	};
+	const LunaBufferWriteInfo vertexDataWriteInfo = {
+		.bytes = sizeof(vertices),
+		.data = vertices,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+	};
+
+	const LunaBufferCreationInfo verticesBufferCreationInfo = {
+		.size = sizeof(ActorWallVertex) * 12,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.actorWalls.vertices),
+						   "Failed to create actor walls vertex buffer!");
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorWalls.vertices,
+												 &vertexDataWriteInfo),
+						   "Failed to write actor vertex data to buffer!");
+
+	const LunaBufferCreationInfo shadedInstanceDataBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&shadedInstanceDataBufferCreationInfo,
+											&buffers.actorWalls.shadedInstanceData),
+						   "Failed to create shaded actor walls instance data buffer!");
+
+	const LunaBufferCreationInfo unshadedInstanceDataBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&unshadedInstanceDataBufferCreationInfo,
+											&buffers.actorWalls.unshadedInstanceData),
+						   "Failed to create unshaded actor walls instance data buffer!");
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
 	const LunaBufferCreationInfo linesVertexBuffer = {
@@ -275,6 +383,20 @@ VkResult CreateDebugDrawBuffers()
 #endif
 
 	return VK_SUCCESS;
+}
+
+bool CreateBuffers()
+{
+	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
+	VulkanTest(CreateUniformBuffers(), "Failed to create uniform buffers!");
+	VulkanTest(CreateMapBuffers(), "Failed to create map buffers!");
+	VulkanTest(CreateSkyBuffers(), "Failed to create sky buffers!");
+	VulkanTest(CreateViewmodelBuffers(), "Failed to create viewmodel buffers!");
+	VulkanTest(CreateActorModelBuffers(), "Failed to create actor models buffers!");
+	VulkanTest(CreateActorWallBuffers(), "Failed to create actor wall buffers!");
+	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
+
+	return true;
 }
 
 VkResult ResizeDebugDrawBuffers()
