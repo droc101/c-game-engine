@@ -42,10 +42,11 @@ typedef enum RendererQueuedAction RendererQueuedAction;
 
 enum RendererQueuedAction
 {
-	QUEUED_ACTION_RECREATE_FRAMEBUFFERS = 1 << 0,
+	QUEUED_ACTION_UPDATE_MSAA = 1 << 0,
 	QUEUED_ACTION_CLEAR_ALL_TEXTURES = 1 << 1,
 	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
+	QUEUED_ACTION_TOGGLE_VSYNC = 1 << 4,
 };
 
 extern RendererQueuedAction rendererQueuedActions;
@@ -193,11 +194,6 @@ float Y_TO_NDC(float y);
  * @param map The map to load from
  */
 void LoadMapModels(Map *map);
-
-/**
- * Set whether vertical sync is enabled
- */
-void SetVsyncEnabled(bool enabled);
 
 /**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)

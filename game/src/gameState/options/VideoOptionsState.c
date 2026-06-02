@@ -97,7 +97,8 @@ void CbOptionsFullscreen(const bool value)
 void CbOptionsVsync(const bool value)
 {
 	GetState()->options.vsync = value;
-	SetVsyncEnabled(GetState()->options.vsync);
+	hasChangedVideoOptions = true; // Until Luna can do this
+	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
 void CbOptionsLimitFpsWhenUnfocused(const bool value)
@@ -121,7 +122,8 @@ void CbOptionsPreferWayland(const bool value)
 void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
-	rendererQueuedActions |= QUEUED_ACTION_RECREATE_FRAMEBUFFERS;
+	hasChangedVideoOptions = true; // Until Luna can do this
+	rendererQueuedActions |= QUEUED_ACTION_UPDATE_MSAA;
 }
 
 void SldOptionsAnisotropy(const float value)

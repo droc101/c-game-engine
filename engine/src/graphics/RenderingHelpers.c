@@ -208,11 +208,6 @@ void LoadMapModels(Map *map)
 	FreeLoadTimeMapData(map);
 }
 
-void SetVsyncEnabled(const bool enabled)
-{
-	// TODO
-}
-
 inline void GetColor(const uint32_t argb, Color *color)
 {
 	color->r = (float)(argb >> 16 & 0xFF) / 255.0f;
