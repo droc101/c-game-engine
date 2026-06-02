@@ -465,15 +465,18 @@ bool LoadTexture(const Image *image)
 		.signalSemaphoreCount = 1,
 		.signalSemaphores = &semaphore,
 	};
+	const VkFormat format = image->pixelFormat == PIXEL_FORMAT_RGBA16F ? VK_FORMAT_R16G16B16A16_SFLOAT
+																	   : VK_FORMAT_R8G8B8A8_UNORM;
+	const size_t bytesPerTexelChannel = image->pixelFormat == PIXEL_FORMAT_RGBA16F ? sizeof(_Float16) : sizeof(uint8_t);
 	const LunaImageCreationInfo imageCreationInfo = {
-		.format = VK_FORMAT_R8G8B8A8_UNORM,
+		.format = format,
 		.width = image->width,
 		.height = image->height,
 		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		.writeInfo.bytes = image->width * image->height * sizeof(uint32_t),
+		.writeInfo.bytes = image->width * image->height * 4 * bytesPerTexelChannel,
 		.writeInfo.pixels = image->pixelData,
 		.writeInfo.mipmapLevels = useMipmaps ? (uint8_t)log2(max(image->width, image->height)) + 1 : 1,
 		.writeInfo.generateMipmaps = useMipmaps,
