@@ -270,7 +270,7 @@ void RenderHUD()
 	}
 }
 
-void RenderMap3D(const Map *map, const Camera *cam)
+void RenderMap3D(Map *map, const Camera *cam)
 {
 	VK_RenderMap(map, cam);
 }

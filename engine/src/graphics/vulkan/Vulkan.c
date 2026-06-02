@@ -618,6 +618,71 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 	return VK_SUCCESS;
 }
 
+static inline VkResult UpdateGlobalLightingUniform(const Map *map)
+{
+	const GlobalLightingUniform globalLightingUniform = {
+		.color = map->lightColor,
+		.exposure = map->exposure,
+	};
+	const LunaBufferWriteInfo lightingBufferWriteInfo = {
+		.bytes = sizeof(GlobalLightingUniform),
+		.data = &globalLightingUniform,
+		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.uniforms.lighting,
+												 &lightingBufferWriteInfo),
+						   "Failed to update lighting data!");
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult UpdateFogUniform(const Map *map)
+{
+	FogUniform fog = {
+		.color = map->fogColor,
+		.start = map->fogStart,
+		.end = map->fogEnd,
+	};
+	const LunaBufferWriteInfo fogBufferWriteInfo = {
+		.bytes = sizeof(fog),
+		.data = &fog,
+		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.fog, &fogBufferWriteInfo),
+						   "Failed to update fog data!");
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult HandleMapChangeFlags(Map *map)
+{
+	if (map->changeFlags != 0)
+	{
+		asm("nop");
+	}
+	static_assert(MAP_LIGHT_CHANGED == MAP_EXPOSURE_CHANGED);
+	if ((map->changeFlags & MAP_LIGHT_CHANGED) == MAP_LIGHT_CHANGED)
+	{
+		VulkanTestReturnResult(UpdateGlobalLightingUniform(map), "Failed to update global lighting uniform!");
+	}
+
+	if ((map->changeFlags & MAP_FOG_CHANGED) == MAP_FOG_CHANGED)
+	{
+		VulkanTestReturnResult(UpdateFogUniform(map), "Failed to update fog uniform!");
+	}
+
+	if ((map->changeFlags & MAP_VIEWMODEL_CHANGED) == MAP_VIEWMODEL_CHANGED)
+	{
+		VulkanTestReturnResult(LoadViewmodel(&map->viewmodel), "Failed to updated load viewmodel!");
+	}
+
+	map->changeFlags = 0;
+
+	return VK_SUCCESS;
+}
+
 static inline bool HandleRendererQueuedActions()
 {
 	const RendererQueuedAction handledActionTypes = QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
@@ -749,37 +814,14 @@ bool VK_FrameStart()
 	return true;
 }
 
-bool VK_RenderMap(const Map *map, const Camera *camera)
+bool VK_RenderMap(Map *map, const Camera *camera)
 {
 	if (map != loadedMap)
 	{
 		VulkanTest(VK_LoadMap(map), "Failed to load map!");
 	}
 
-	const GlobalLightingUniform globalLightingUniform = {
-		.color = map->lightColor,
-		.exposure = map->exposure,
-	};
-	const LunaBufferWriteInfo lightingBufferWriteInfo = {
-		.bytes = sizeof(GlobalLightingUniform),
-		.data = &globalLightingUniform,
-		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lighting, &lightingBufferWriteInfo),
-			   "Failed to update lighting data!");
-
-	FogUniform fog = {
-		.color = map->fogColor,
-		.start = map->fogStart,
-		.end = map->fogEnd,
-	};
-	const LunaBufferWriteInfo fogBufferWriteInfo = {
-		.bytes = sizeof(fog),
-		.data = &fog,
-		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.fog, &fogBufferWriteInfo),
-			   "Failed to update fog data!");
+	VulkanTest(HandleMapChangeFlags(map), "Failed to handle map change flags!");
 
 	VulkanTest(UpdateCameraUniform(camera), "Failed to update transform matrix!");
 
@@ -989,6 +1031,10 @@ bool VK_LoadMap(const Map *map)
 		VulkanTestReturnResult(LoadSky(LoadModel(MODEL("sky"))), "Failed to load sky model!");
 		skyTextureIndex = TextureIndex(map->skyTexture);
 	}
+
+	VulkanTest(UpdateGlobalLightingUniform(map), "Failed to update global lighting uniform!");
+
+	VulkanTest(UpdateFogUniform(map), "Failed to update fog uniform!");
 
 	loadedMap = map;
 

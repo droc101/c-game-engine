@@ -29,6 +29,7 @@ typedef enum MapChangeFlags MapChangeFlags;
 enum MapChangeFlags
 {
 	MAP_LIGHT_CHANGED = 1 << 1,
+	MAP_EXPOSURE_CHANGED = 1 << 1,
 	MAP_FOG_CHANGED = 1 << 2,
 	MAP_VIEWMODEL_CHANGED = 1 << 3
 };
@@ -187,6 +188,6 @@ void GetActorsByName(const char *name, const Map *map, List *actors);
  * @param map The map to render
  * @param camera The camera to view from
  */
-void RenderMap(const Map *map, const Camera *camera);
+void RenderMap(Map *map, const Camera *camera);
 
 #endif //GAME_MAP_H

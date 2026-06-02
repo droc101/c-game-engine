@@ -152,10 +152,6 @@ bool FrameStart()
 void FrameEnd()
 {
 	VK_FrameEnd();
-	if (GetState()->map)
-	{
-		GetState()->map->changeFlags = 0;
-	}
 }
 
 inline void UpdateViewportSize()

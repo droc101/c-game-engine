@@ -110,6 +110,7 @@ void SwitchToItem(const ItemDefinition *definition)
 					previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
 				}
 				definition->SwitchTo(item, &state.map->viewmodel);
+				state.map->changeFlags |= MAP_VIEWMODEL_CHANGED;
 			}
 			return;
 		}
