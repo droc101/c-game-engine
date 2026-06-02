@@ -71,7 +71,7 @@ static inline VkResult CreateUniformBuffers()
 	VulkanTestReturnResult(lunaCreateBuffer(device, &cameraUniformBufferCreationInfo, &buffers.uniforms.camera),
 						   "Failed to create camera uniform buffer!");
 	const LunaBufferCreationInfo lightingBufferCreationInfo = {
-		.size = sizeof(Color),
+		.size = sizeof(GlobalLightingUniform),
 		.alignment = alignment,
 		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,

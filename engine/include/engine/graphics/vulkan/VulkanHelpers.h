@@ -99,6 +99,12 @@ typedef struct CameraUniform
 	Vector3 position;
 } CameraUniform;
 
+typedef struct GlobalLightingUniform
+{
+	Color color;
+	float exposure;
+} GlobalLightingUniform;
+
 typedef struct FogUniform
 {
 	Color color;

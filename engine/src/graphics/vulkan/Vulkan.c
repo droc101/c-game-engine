@@ -756,9 +756,13 @@ bool VK_RenderMap(const Map *map, const Camera *camera)
 		VulkanTest(VK_LoadMap(map), "Failed to load map!");
 	}
 
+	const GlobalLightingUniform globalLightingUniform = {
+		.color = map->lightColor,
+		.exposure = map->exposure,
+	};
 	const LunaBufferWriteInfo lightingBufferWriteInfo = {
-		.bytes = sizeof(map->lightColor),
-		.data = &map->lightColor,
+		.bytes = sizeof(GlobalLightingUniform),
+		.data = &globalLightingUniform,
 		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lighting, &lightingBufferWriteInfo),
