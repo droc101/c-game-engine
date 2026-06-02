@@ -372,6 +372,29 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 	return VK_SUCCESS;
 }
 
+static inline VkResult UpdateMapInstanceData(const Map *map)
+{
+	const size_t materialCount = lunaGetBufferSize(buffers.map.instanceData) / sizeof(uint32_t);
+	uint32_t textureIndices[materialCount];
+	for (size_t i = 0; i < map->modelCount; i++)
+	{
+		const MapModel *model = &map->models[i];
+		textureIndices[i] = TextureIndex(model->material->texture);
+	}
+	const LunaBufferWriteInfo instanceDataBufferWriteInfo = {
+		.bytes = lunaGetBufferSize(buffers.map.instanceData),
+		.data = textureIndices,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.map.instanceData,
+												 &instanceDataBufferWriteInfo),
+						   "Failed to update map instance data buffer!");
+
+	return VK_SUCCESS;
+}
+
 static inline VkResult LoadLightmap(const Map *map)
 {
 	if (lightmap != LUNA_NULL_HANDLE)
@@ -685,26 +708,36 @@ static inline VkResult HandleMapChangeFlags(Map *map)
 
 static inline bool HandleRendererQueuedActions()
 {
-	const RendererQueuedAction handledActionTypes = QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_TEXTURES)
 	{
 		if (!ClearTextureCache())
 		{
 			return false;
 		}
+		const Map *map = GetState()->map;
+		if (map != loadedMap)
+		{
+			if (!VK_LoadMap(map))
+			{
+				return false;
+			}
+			loadedMap = map;
+		}
+		if (loadedMap != NULL)
+		{
+			VulkanTest(UpdateMapInstanceData(loadedMap), "Failed to update map instance data when reloading textures!");
+			if (loadedMap->renderSky)
+			{
+				skyTextureIndex = TextureIndex(loadedMap->skyTexture);
+			}
+		}
+		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_MODELS)
 	{
 		ClearModelCache();
+		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
 	}
-	if ((rendererQueuedActions & handledActionTypes) != 0)
-	{
-		if (!VK_LoadMap(GetState()->map))
-		{
-			return false;
-		}
-	}
-	rendererQueuedActions &= ~handledActionTypes;
 
 	return true;
 }
@@ -818,7 +851,10 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 {
 	if (map != loadedMap)
 	{
-		VulkanTest(VK_LoadMap(map), "Failed to load map!");
+		if (!VK_LoadMap(map))
+		{
+			return false;
+		}
 	}
 
 	VulkanTest(HandleMapChangeFlags(map), "Failed to handle map change flags!");
