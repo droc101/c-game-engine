@@ -9,7 +9,8 @@
     {
       "type": "circle",
       "color": "$color",
-      "radius": "$range"
+      "radius": "$range",
+      "is_gizmo": true
     }
   ],
   "params": {
