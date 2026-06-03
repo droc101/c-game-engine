@@ -528,3 +528,14 @@ VkResult UpdateActors()
 
 	return VK_SUCCESS;
 }
+
+void ClearModelCache()
+{
+	ListClear(loadedModelIds);
+	ListFreeOnlyContents(lodMaterialSlotsData);
+	for (size_t i = 0; i < lodMaterialSlotsVertexData.length; i++)
+	{
+		ListAndContentsFree(ListGetNestedList(lodMaterialSlotsVertexData, i));
+	}
+	ListClear(lodMaterialSlotsVertexData);
+}

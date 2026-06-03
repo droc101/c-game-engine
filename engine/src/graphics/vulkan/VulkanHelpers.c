@@ -89,11 +89,6 @@ bool ClearTextureCache()
 	return CreateTextureSamplers();
 }
 
-void ClearModelCache()
-{
-	// TODO: Implement me
-}
-
 VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaShaderModule *shaderModule)
 {
 	Shader *shader = LoadShader(path);
