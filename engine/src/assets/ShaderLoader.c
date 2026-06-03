@@ -32,8 +32,7 @@ Shader *LoadShader(const char *asset)
 	CheckAlloc(shader);
 	DataReader *reader = CreateDataReaderFromAsset(assetData);
 	size_t bytesRemaining = assetData->size;
-	EXPECT_BYTES(2 + sizeof(size_t), bytesRemaining);
-	shader->platform = ReadUint8(reader);
+	EXPECT_BYTES(1 + sizeof(size_t), bytesRemaining);
 	shader->type = ReadUint8(reader);
 	shader->glslLength = ReadSizeT(reader);
 	EXPECT_BYTES(shader->glslLength, bytesRemaining);

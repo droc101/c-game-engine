@@ -10,16 +10,9 @@
 
 #define SHADER_ASSET_VERSION 1
 
-typedef enum ShaderPlatform ShaderPlatform;
 typedef enum ShaderType ShaderType;
 
 typedef struct Shader Shader;
-
-enum ShaderPlatform
-{
-	PLATFORM_OPENGL, // TODO remove
-	PLATFORM_VULKAN
-};
 
 enum ShaderType
 {
@@ -33,8 +26,6 @@ enum ShaderType
 
 struct Shader
 {
-	/// The rendering platform of this shader
-	ShaderPlatform platform; // TODO remove
 	/// The type of this shader
 	ShaderType type;
 	/// The length of the GLSL in this shader

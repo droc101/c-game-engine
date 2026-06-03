@@ -101,7 +101,6 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 	{
 		return VK_ERROR_UNKNOWN;
 	}
-	assert(shader->platform == PLATFORM_VULKAN);
 	assert(shader->type == shaderType);
 	(void)shaderType;
 
