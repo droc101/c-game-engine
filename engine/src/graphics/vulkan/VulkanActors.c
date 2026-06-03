@@ -291,6 +291,10 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		if (actor->hasModel && reallocInfo->shouldReallocModels)
 		{
 			const uint32_t lodId = actor->model->lods[actor->currentLod].id;
+			if (ListFind(loadedModelIds, actor->model->id) == SIZE_MAX)
+			{
+				VulkanTestReturnResult(LoadModelLods(actor->model), "Failed to load new model lods!");
+			}
 			LodMaterialSlotsData *materialSlotsData = ListGetPointer(lodMaterialSlotsData, lodId);
 			if (materialSlotsData->materialSlots.length == 0)
 			{
