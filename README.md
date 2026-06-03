@@ -21,10 +21,9 @@ See the [wiki page](https://wiki.droc101.dev/index.php/Building_GAME) for instru
   provided
 - A CPU with 4 or more hardware threads is strongly recommended, but not required
 ### GPU
-- Primary Vulkan 1.2 Renderer:
-    - NVIDIA GeForce 900 series or newer
-    - AMD Radeon HD 7000 series / Southern Islands / GCN 1.0 or newer
-    - Intel HD Graphics 510 or newer
+  - NVIDIA GeForce 900 series or newer
+  - AMD Radeon HD 7000 series / Southern Islands / GCN 1.0 or newer
+  - Intel HD Graphics 510 or newer
 
 ## Tested on
 - Windows 11
