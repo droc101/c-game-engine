@@ -5,8 +5,6 @@
 #include <engine/debug/JoltDebugRenderer.h>
 #include <joltc/joltc.h>
 
-// TODO: The OpenGL renderer currently only supports lines/wireframe (and in a very unoptimized manner)
-
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/graphics/Drawing.h>
 #include <engine/physics/Physics.h>

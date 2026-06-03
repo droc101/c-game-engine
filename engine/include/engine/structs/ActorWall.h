@@ -19,9 +19,9 @@ typedef struct ActorWall ActorWall;
 enum ActorWallOrientation
 {
 	/// Wall should be along the actor's local X axis
-	X_AXIS,
+	ACTOR_WALL_ORIENTATION_X_AXIS,
 	/// Wall should be along the actor's local Z axis
-	Z_AXIS,
+	ACTOR_WALL_ORIENTATION_Z_AXIS,
 };
 
 struct ActorWall
@@ -29,9 +29,9 @@ struct ActorWall
 	/// Which axis the wall extends along
 	ActorWallOrientation orientation;
 	/// The local center of the wall
-	Vector2 localCenter;
+	Vector2 centerOffset;
 	/// The fully qualified texture name (texture/level/uvtest.gtex instead of level/uvtest)
-	char *tex;
+	char *texture;
 	/// The UV scale of the wall
 	Vector2 uvScale;
 	/// The UV offset of the wall

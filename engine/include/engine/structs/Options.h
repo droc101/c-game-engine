@@ -52,8 +52,6 @@ struct Options
 
 	/* Video */
 
-	/// The renderer to use
-	Renderer renderer;
 	/// Whether the game is fullscreen
 	bool fullscreen;
 	/// Whether vsync is enabled
@@ -68,7 +66,7 @@ struct Options
 	bool limitFpsWhenUnfocused;
 	/// The LOD distance multiplier
 	float lodMultiplier;
-	// Field of view
+	/// Field of view
 	float fov;
 	/// Anisotropy level
 	OptionsAnisotropy anisotropy;

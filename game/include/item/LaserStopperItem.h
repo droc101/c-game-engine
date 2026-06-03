@@ -7,6 +7,6 @@
 
 #include <engine/structs/Item.h>
 
-extern const ItemDefinition laserStopperItemDefinition;
+extern const ItemDefinition LASER_STOPPER_ITEM_DEFINITION;
 
 #endif //GAME_LASERSTOPPERITEM_H

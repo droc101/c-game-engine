@@ -46,6 +46,7 @@ static void TonemapControllerUpdate(Actor *this, double /*delta*/)
 	{
 		GetState()->map->exposure = data->exposure;
 		data->startOn = false;
+		GetState()->map->changeFlags |= MAP_EXPOSURE_CHANGED;
 	}
 
 	if (interpolatingActor == this)
@@ -53,6 +54,7 @@ static void TonemapControllerUpdate(Actor *this, double /*delta*/)
 		const int ticksIntoInterpolation = (int)(GetState()->map->physicsTick - interpolationStartTick);
 		const float interpolationFactor = (1.0f / (float)data->interpolationTicks) * (float)ticksIntoInterpolation;
 		GetState()->map->exposure = lerp(interpolationPreviousExposure, data->exposure, interpolationFactor);
+		GetState()->map->changeFlags |= MAP_EXPOSURE_CHANGED;
 		if (ticksIntoInterpolation == data->interpolationTicks)
 		{
 			interpolatingActor = NULL;
@@ -67,11 +69,13 @@ static void TonemapControllerSetHandler(Actor *this, const Actor * /*sender*/, c
 	{
 		interpolatingActor = NULL; // stop any existing interpolation, but don't start a new one
 		GetState()->map->exposure = data->exposure;
+		GetState()->map->changeFlags |= MAP_EXPOSURE_CHANGED;
 	} else
 	{
 		interpolatingActor = this;
 		interpolationStartTick = GetState()->map->physicsTick;
 		interpolationPreviousExposure = GetState()->map->exposure;
+		GetState()->map->changeFlags |= MAP_EXPOSURE_CHANGED;
 	}
 }
 
@@ -80,6 +84,7 @@ static void TonemapControllerSetInstantHandler(Actor *this, const Actor * /*send
 	const TonemapControllerData *data = this->extraData;
 	interpolatingActor = NULL; // stop any existing interpolation, but don't start a new one
 	GetState()->map->exposure = data->exposure;
+	GetState()->map->changeFlags |= MAP_EXPOSURE_CHANGED;
 }
 
 void TonemapControllerDestroy(Actor *this)

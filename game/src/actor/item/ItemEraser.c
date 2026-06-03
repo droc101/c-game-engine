@@ -58,12 +58,12 @@ void ItemEraserInit(Actor *this, const KvList params, Transform *transform)
 void ItemEraserActivate(Actor *this)
 {
 	const ItemEraserData *data = this->extraData;
-	if (HasItem(&eraserItemDefinition) && !data->alwaysGive)
+	if (HasItem(&ERASER_ITEM_DEFINITION) && !data->alwaysGive)
 	{
-		SwitchToItem(&eraserItemDefinition);
+		SwitchToItem(&ERASER_ITEM_DEFINITION);
 	} else
 	{
-		GiveItem(&eraserItemDefinition, true);
+		GiveItem(&ERASER_ITEM_DEFINITION, true);
 		RemoveActor(this);
 	}
 }

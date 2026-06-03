@@ -5,6 +5,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/FontLoader.h>
+#include <assert.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
@@ -32,13 +33,20 @@ Font *GenerateFallbackFont()
 	CheckAlloc(font->texture);
 	strcpy(font->texture, "_generic_fallback");
 	font->image = RegisterFallbackImage();
-	font->charCount = 255;
-	memset(font->indices, 0, 255);
-	memset(font->charWidths, 0, 255);
+	static_assert(sizeof(font->charWidths) / sizeof(*font->charWidths) ==
+								  sizeof(font->charStartUVs) / sizeof(*font->charStartUVs) &&
+						  sizeof(font->charWidths) / sizeof(*font->charWidths) ==
+								  sizeof(font->charEndUVs) / sizeof(*font->charEndUVs),
+				  "Array lengths must match!");
+	static_assert((uint8_t)(sizeof(font->charWidths) / sizeof(*font->charWidths)) ==
+						  (sizeof(font->charWidths) / sizeof(*font->charWidths)),
+				  "Array must have a uint8_t element count!");
+	font->charCount = sizeof(font->charWidths) / sizeof(*font->charWidths);
 	for (int i = 0; i < font->charCount; i++)
 	{
-		font->indices[i] = i;
 		font->charWidths[i] = 16;
+		font->charStartUVs[i] = (float)((double)i / font->charCount); // Casting through double here is required
+		font->charEndUVs[i] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)font->image->width); // Here too
 	}
 	return font;
 }
@@ -98,15 +106,18 @@ Font *LoadFont(const char *asset)
 	free(fontTexture);
 	font->image = LoadImage(font->texture);
 	font->charCount = ReadUint8(reader);
-	memset(font->indices, 0, 255);
-	memset(font->charWidths, 0, 255);
+	memset(font->charWidths, 0, sizeof(font->charWidths) / sizeof(*font->charWidths));
+	memset(font->charStartUVs, 0, sizeof(font->charStartUVs) / sizeof(*font->charStartUVs));
+	memset(font->charEndUVs, 0, sizeof(font->charEndUVs) / sizeof(*font->charEndUVs));
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{
 		const char chr = (char)ReadUint8(reader);
 		const uint8_t width = ReadUint8(reader);
-		font->indices[(int)chr] = i;
 		font->charWidths[(int)chr] = width;
+		font->charStartUVs[(int)chr] = (float)((double)i / font->charCount); // Casting through double here is required
+		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount -
+											 1.0 / (double)font->image->width); // Here too
 	}
 	DestroyDataReader(reader);
 	FreeAsset(assetData);

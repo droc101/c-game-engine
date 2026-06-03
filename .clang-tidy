@@ -43,6 +43,7 @@ performance-*,
 portability-simd-intrinsics,
 portability-std-allocator-const,
 readability-*,
+-readability-duplicate-include,
 -readability-function-size,
 -readability-identifier-length,
 -readability-magic-numbers,
@@ -50,7 +51,6 @@ readability-*,
 -readability-redundant-member-init,
 -readability-uppercase-literal-suffix,
 -readability-function-cognitive-complexity,
--bugprone-unused-return-value,
 -readability-use-std-min-max'
 CheckOptions:
   bugprone-multi-level-implicit-pointer-conversion.EnableInC: false
@@ -61,6 +61,19 @@ CheckOptions:
   readability-function-cognitive-complexity.IgnoreMacros: true
   readability-operators-representation.BinaryOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
   readability-operators-representation.OverloadedOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
+
+  readability-identifier-naming.EnumCase: CamelCase
+  readability-identifier-naming.EnumConstantCase: UPPER_CASE
+  readability-identifier-naming.FunctionCase: CamelCase
+  readability-identifier-naming.GlobalConstantCase: UPPER_CASE
+  readability-identifier-naming.GlobalConstantPointerCase: UPPER_CASE
+  readability-identifier-naming.GlobalFunctionCase: CamelCase
+  readability-identifier-naming.GlobalFunctionIgnoredRegexp: '^(VK|GL)_[A-Z]'
+  readability-identifier-naming.StaticConstantCase: UPPER_CASE
+  readability-identifier-naming.StructCase: CamelCase
+  readability-identifier-naming.TypedefCase: CamelCase
+  readability-identifier-naming.UnionCase: CamelCase
+
 ImplementationFileExtensions:
   - 'c'
   - 'cpp'

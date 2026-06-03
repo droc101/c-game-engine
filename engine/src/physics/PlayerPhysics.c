@@ -76,10 +76,10 @@ static bool ActorRaycastObjectLayerShouldCollide(const JPH_ObjectLayer layer)
 	}
 }
 
-static const JPH_BroadPhaseLayerFilter_Impl actorRaycastBroadPhaseLayerFilterImpl = {
+static const JPH_BroadPhaseLayerFilter_Impl ACTOR_RAYCAST_BROAD_PHASE_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ActorRaycastBroadPhaseLayerShouldCollide,
 };
-static const JPH_ObjectLayerFilter_Impl actorRaycastObjectLayerFilterImpl = {
+static const JPH_ObjectLayerFilter_Impl ACTOR_RAYCAST_OBJECT_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ActorRaycastObjectLayerShouldCollide,
 };
 static JPH_BroadPhaseLayerFilter *actorRaycastBroadPhaseLayerFilter;
@@ -144,7 +144,7 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 	}
 }
 
-static const JPH_CharacterContactListener_Impl contactListenerImpl = {
+static const JPH_CharacterContactListener_Impl CONTACT_LISTENER_IMPL = {
 	.OnContactValidate = OnContactValidate,
 	.OnContactAdded = OnContactAdded,
 	.OnContactPersisted = OnContactPersisted,
@@ -156,10 +156,10 @@ static JPH_ShapeFilter *shapeFilter;
 
 void PlayerPersistentStateInit()
 {
-	contactListener = JPH_CharacterContactListener_Create(&contactListenerImpl);
+	contactListener = JPH_CharacterContactListener_Create(&CONTACT_LISTENER_IMPL);
 	shapeFilter = JPH_ShapeFilter_Create(NULL);
-	actorRaycastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&actorRaycastBroadPhaseLayerFilterImpl);
-	actorRaycastObjectLayerFilter = JPH_ObjectLayerFilter_Create(&actorRaycastObjectLayerFilterImpl);
+	actorRaycastBroadPhaseLayerFilter = JPH_BroadPhaseLayerFilter_Create(&ACTOR_RAYCAST_BROAD_PHASE_LAYER_FILTER_IMPL);
+	actorRaycastObjectLayerFilter = JPH_ObjectLayerFilter_Create(&ACTOR_RAYCAST_OBJECT_LAYER_FILTER_IMPL);
 }
 
 void PlayerPersistentStateDestroy()

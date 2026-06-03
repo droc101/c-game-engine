@@ -194,7 +194,7 @@ void GetActorsByName(const char *name, const Map *map, List *actors)
 	ListUnlock(map->namedActorNames);
 }
 
-void RenderMap(const Map *map, const Camera *camera)
+void RenderMap(Map *map, const Camera *camera)
 {
 	JoltDebugRendererDrawBodies(map->physicsSystem);
 	RenderMap3D(map, camera);

@@ -7,6 +7,6 @@
 
 #include <engine/structs/Item.h>
 
-extern const ItemDefinition eraserItemDefinition;
+extern const ItemDefinition ERASER_ITEM_DEFINITION;
 
 #endif //GAME_ERASERITEM_H

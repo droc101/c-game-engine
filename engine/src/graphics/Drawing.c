@@ -6,10 +6,6 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/graphics/gl/GLdebug.h>
-#include <engine/graphics/gl/GLframe.h>
-#include <engine/graphics/gl/GLui.h>
-#include <engine/graphics/gl/GLworld.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -56,72 +52,22 @@ SDL_Surface *ToSDLSurface(const char *texture)
 
 inline void DrawLine(const Vector2 start, const Vector2 end, const float thickness, const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawLine((int)start.x,
-						(int)start.y,
-						(int)end.x,
-						(int)end.y,
-						(int)(thickness * GetState()->uiScale),
-						color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawLine(start, end, color, (float)(thickness * GetState()->uiScale));
-			break;
-		default:
-			break;
-	}
+	VK_DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, (int)(thickness * GetState()->uiScale), color);
 }
 
 inline void DrawOutlineRect(const Vector2 pos, const Vector2 size, const float thickness, const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawRectOutline((int)pos.x,
-							   (int)pos.y,
-							   (int)size.x,
-							   (int)size.y,
-							   (int)(thickness * GetState()->uiScale),
-							   color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawRectOutline(pos, size, color, (float)(thickness * GetState()->uiScale));
-			break;
-		default:
-			break;
-	}
+	VK_DrawRectOutline((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, (int)(thickness * GetState()->uiScale), color);
 }
 
 inline void DrawTexture(const Vector2 pos, const Vector2 size, const char *texture)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawTexturedQuad((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, texture);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawTexture(pos, size, texture);
-			break;
-		default:
-			break;
-	}
+	VK_DrawTexturedQuad((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, texture);
 }
 
 inline void DrawTextureMod(const Vector2 pos, const Vector2 size, const char *texture, const Color *color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawTexturedQuadMod((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, texture, color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawTextureMod(pos, size, texture, *color);
-			break;
-		default:
-			break;
-	}
+	VK_DrawTexturedQuadMod((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, texture, color);
 }
 
 inline void DrawTextureRegion(const Vector2 pos,
@@ -130,25 +76,15 @@ inline void DrawTextureRegion(const Vector2 pos,
 							  const Vector2 regionStart,
 							  const Vector2 regionEnd)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawTexturedQuadRegion((int)pos.x,
-									  (int)pos.y,
-									  (int)size.x,
-									  (int)size.y,
-									  (int)regionStart.x,
-									  (int)regionStart.y,
-									  (int)regionEnd.x,
-									  (int)regionEnd.y,
-									  texture);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawTextureRegion(pos, size, texture, regionStart, regionEnd);
-			break;
-		default:
-			break;
-	}
+	VK_DrawTexturedQuadRegion((int)pos.x,
+							  (int)pos.y,
+							  (int)size.x,
+							  (int)size.y,
+							  (int)regionStart.x,
+							  (int)regionStart.y,
+							  (int)regionEnd.x,
+							  (int)regionEnd.y,
+							  texture);
 }
 
 inline void DrawTextureRegionMod(const Vector2 pos,
@@ -158,71 +94,21 @@ inline void DrawTextureRegionMod(const Vector2 pos,
 								 const Vector2 regionEnd,
 								 const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawTexturedQuadRegionMod((int)pos.x,
-										 (int)pos.y,
-										 (int)size.x,
-										 (int)size.y,
-										 (int)regionStart.x,
-										 (int)regionStart.y,
-										 (int)regionEnd.x,
-										 (int)regionEnd.y,
-										 texture,
-										 color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawTextureRegionMod(pos, size, texture, regionStart, regionEnd, color);
-			break;
-		default:
-			break;
-	}
-}
-
-inline void ClearScreen()
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			// Unused
-			break;
-		case RENDERER_OPENGL:
-			GL_ClearScreen();
-			break;
-		default:
-			break;
-	}
-}
-
-inline void ClearDepthOnly()
-{
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			// Unused
-			break;
-		case RENDERER_OPENGL:
-			GL_ClearDepthOnly();
-			break;
-		default:
-			break;
-	}
+	VK_DrawTexturedQuadRegionMod((int)pos.x,
+								 (int)pos.y,
+								 (int)size.x,
+								 (int)size.y,
+								 (int)regionStart.x,
+								 (int)regionStart.y,
+								 (int)regionEnd.x,
+								 (int)regionEnd.y,
+								 texture,
+								 color);
 }
 
 inline void DrawRect(const int x, const int y, const int w, const int h, const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawColoredQuad(x, y, w, h, color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawRect(v2((float)x, (float)y), v2((float)w, (float)h), color);
-			break;
-		default:
-			break;
-	}
+	VK_DrawColoredQuad(x, y, w, h, color);
 }
 
 void DrawNinePatchTexture(const Vector2 pos,
@@ -307,47 +193,17 @@ void DrawNinePatchTexture(const Vector2 pos,
 
 inline void DrawBatchedQuadsTextured(const BatchedQuadArray *batch, const char *texture, const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawTexturedQuadsBatched(batch->verts, batch->quadCount, texture, color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawTexturedArrays(batch->verts, batch->indices, batch->quadCount, texture, color);
-			break;
-		default:
-			break;
-	}
+	VK_DrawTexturedQuadsBatched(batch->verts, batch->quadCount, texture, color);
 }
 
 inline void DrawBatchedQuadsColored(const BatchedQuadArray *batch, const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawColoredQuadsBatched(batch->verts, batch->quadCount, color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawColoredArrays(batch->verts, batch->indices, batch->quadCount, color);
-			break;
-		default:
-			break;
-	}
+	VK_DrawColoredQuadsBatched(batch->verts, batch->quadCount, color);
 }
 
 inline void DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, const Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawUiTriangles(triangleArray, texture, color);
-			break;
-		case RENDERER_OPENGL:
-			GL_DrawUITriangles(triangleArray, texture, color);
-			break;
-		default:
-			break;
-	}
+	VK_DrawUiTriangles(triangleArray, texture, color);
 }
 
 void DrawJoltDebugRendererDrawLine(void * /*userData*/,
@@ -355,17 +211,7 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 								   const JPH_RVec3 *to,
 								   const JPH_Color color)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawJoltDebugRendererLine(from, to, color);
-			break;
-		case RENDERER_OPENGL:
-			GL_AddDebugLine(*from, *to, COLOR(color));
-			break;
-		default:
-			break;
-	}
+	VK_DrawJoltDebugRendererLine(from, to, color);
 }
 
 void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
@@ -375,15 +221,7 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 									   const JPH_Color color,
 									   JPH_DebugRenderer_CastShadow /*castShadow*/)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
-			break;
-		case RENDERER_OPENGL:
-		default:
-			break;
-	}
+	VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
 }
 
 void RenderInGameMenuBackground()
@@ -432,17 +270,7 @@ void RenderHUD()
 	}
 }
 
-void RenderMap3D(const Map *map, const Camera *cam)
+void RenderMap3D(Map *map, const Camera *cam)
 {
-	switch (currentRenderer)
-	{
-		case RENDERER_VULKAN:
-			VK_RenderLevel(map, cam, &GetState()->map->viewmodel);
-			break;
-		case RENDERER_OPENGL:
-			GL_RenderMap(map, cam);
-			break;
-		default:
-			break;
-	}
+	VK_RenderMap(map, cam);
 }

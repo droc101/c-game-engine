@@ -23,13 +23,18 @@
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+static uint64_t actorId;
 
 Actor *CreateActor(Transform *transform, const char *actorType, KvList params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = calloc(1, sizeof(Actor));
 	CheckAlloc(actor);
+	// Simply incrementing this is fine, because if one actor were loaded every nanosecond it would take ~585 years to overflow
+	actor->id = actorId++;
 	actor->definition = GetActorDefinition(actorType);
 	actor->visible = true;
 	actor->modColor = COLOR_WHITE;
@@ -52,7 +57,7 @@ void FreeActor(Actor *actor)
 	actor->definition->Destroy(actor);
 	if (!actor->hasModel && actor->wall != NULL)
 	{
-		free(actor->wall->tex);
+		free(actor->wall->texture);
 		free(actor->wall);
 		actor->wall = NULL;
 	}

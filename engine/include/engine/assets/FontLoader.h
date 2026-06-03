@@ -5,6 +5,7 @@
 #ifndef FONTLOADER_H
 #define FONTLOADER_H
 
+#include <assert.h>
 #include <engine/assets/TextureLoader.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -34,16 +35,16 @@ struct Font
 	/// Whether this font only contains uppercase characters
 	bool uppercaseOnly;
 
-	/// The texture this font uses (fully qualified)
-	char *texture;
-	/// The index of the character in the texture
-	uint8_t indices[255];
-	/// The width of each character, index directly by the character
-	uint8_t charWidths[255];
-
 	/// The image loaded from the texture
 	Image *image;
-} __attribute__((packed));
+
+	/// The texture this font uses (fully qualified)
+	char *texture;
+	/// The width of each character, index directly by the character
+	uint8_t charWidths[255];
+	float charStartUVs[255];
+	float charEndUVs[255];
+};
 
 /**
  * Generate a generic fallback font

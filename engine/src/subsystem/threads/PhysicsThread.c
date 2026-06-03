@@ -74,6 +74,7 @@ int PhysicsThreadMain(void * /*data*/)
 		for (size_t i = 0; i < physicsThreadInputEventQueue.length; i++)
 		{
 			SDL_Event *event = ListGetPointer(physicsThreadInputEventQueue, i);
+			// TODO: Should the return result be discarded here?
 			InputSystemProcessEvent(physicsThreadInput, event);
 			free(event);
 		}

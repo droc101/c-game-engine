@@ -53,8 +53,8 @@ void AssetCacheInit();
 void DestroyAssetCache();
 
 /**
- * Get a list of assets in a folder across all asset paths
- * @param folder The folder to search (recursively)
+ * Get a list of all assets of a certain type that are in a folder, across all asset paths
+ * @param folder The folder to recursively enumerate the assets of
  * @param output Where to store the list of assets
  * @param extension Asset file extension to search for
  */

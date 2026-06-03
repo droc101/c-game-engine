@@ -1,12 +1,17 @@
 //
-// Created by NBT22 on 5/8/25.
+// Created by NBT22 on 2/9/26.
 //
 
-#ifndef VULKANACTORS_H
-#define VULKANACTORS_H
+#ifndef GAME_VULKANACTORS_H
+#define GAME_VULKANACTORS_H
 
-void VulkanActorsVariablesInit();
+#include <engine/structs/List.h>
+#include <vulkan/vulkan_core.h>
 
-void VulkanActorsVariablesCleanup();
+void InitActorLoadingVariables();
 
-#endif //VULKANACTORS_H
+VkResult LoadActors(const LockingList *actors);
+
+VkResult UpdateActors();
+
+#endif //GAME_VULKANACTORS_H

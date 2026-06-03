@@ -101,15 +101,16 @@ void SwitchToItem(const ItemDefinition *definition)
 		Item *item = ListGetPointer(state.saveData->items, i);
 		if (item->definition == definition)
 		{
-			Item *previousItem = GetItem();
 			state.saveData->currentItem = i;
 			if (state.map)
 			{
+				Item *previousItem = GetItem();
 				if (previousItem)
 				{
 					previousItem->definition->SwitchFrom(previousItem, &state.map->viewmodel);
 				}
 				definition->SwitchTo(item, &state.map->viewmodel);
+				state.map->changeFlags |= MAP_VIEWMODEL_CHANGED;
 			}
 			return;
 		}

@@ -33,7 +33,7 @@ typedef void (*ControlUnfocusFunc)(const Control *);
 /**
  * Destroy functions for each control type
  */
-const ControlDestroyFunc ControlDestroyFuncs[CONTROL_TYPE_COUNT] = {
+static const ControlDestroyFunc CONTROL_DESTROY_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	DestroyButton, // BUTTON
 	DestroySlider, // SLIDER
 	DestroyCheckbox, // CHECKBOX
@@ -44,7 +44,7 @@ const ControlDestroyFunc ControlDestroyFuncs[CONTROL_TYPE_COUNT] = {
 /**
  * Draw functions for each control type
  */
-const ControlDrawFunc ControlDrawFuncs[CONTROL_TYPE_COUNT] = {
+static const ControlDrawFunc CONTROL_DRAW_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	DrawButton, // BUTTON
 	DrawSlider, // SLIDER
 	DrawCheckbox, // CHECKBOX
@@ -55,7 +55,7 @@ const ControlDrawFunc ControlDrawFuncs[CONTROL_TYPE_COUNT] = {
 /**
  * Update functions for each control type
  */
-const ControlUpdateFunc ControlUpdateFuncs[CONTROL_TYPE_COUNT] = {
+static const ControlUpdateFunc CONTROL_UPDATE_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	UpdateButton, // BUTTON
 	UpdateSlider, // SLIDER
 	UpdateCheckbox, // CHECKBOX
@@ -66,7 +66,7 @@ const ControlUpdateFunc ControlUpdateFuncs[CONTROL_TYPE_COUNT] = {
 /**
  * Focus functions for each control type
  */
-const ControlFocusFunc ControlFocusFuncs[CONTROL_TYPE_COUNT] = {
+static const ControlFocusFunc CONTROL_FOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	NULL, // BUTTON
 	NULL, // SLIDER
 	NULL, // CHECKBOX
@@ -77,7 +77,7 @@ const ControlFocusFunc ControlFocusFuncs[CONTROL_TYPE_COUNT] = {
 /**
  * Unfocus functions for each control type
  */
-const ControlUnfocusFunc ControlUnfocusFuncs[CONTROL_TYPE_COUNT] = {
+static const ControlUnfocusFunc CONTROL_UNFOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	NULL, // BUTTON
 	NULL, // SLIDER
 	NULL, // CHECKBOX
@@ -102,7 +102,7 @@ void DestroyUiStack(UiStack *stack)
 	for (size_t i = 0; i < stack->controls.length; i++)
 	{
 		const Control *c = ListGetPointer(stack->controls, i);
-		ControlDestroyFuncs[c->type](c);
+		CONTROL_DESTROY_FUNCTIONS[c->type](c);
 	}
 	ListAndContentsFree(stack->controls);
 	free(stack);
@@ -121,18 +121,18 @@ bool ProcessUiStack(UiStack *stack)
 	if (stack->focusedControl != -1u)
 	{
 		Control *c = ListGetPointer(stack->controls, stack->focusedControl);
-		ControlUpdateFuncs[c->type](stack,
-									c,
-									v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-									stack->focusedControl);
+		CONTROL_UPDATE_FUNCTIONS[c->type](stack,
+										  c,
+										  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
+										  stack->focusedControl);
 	}
 	if (stack->activeControl != -1u)
 	{
 		Control *c = ListGetPointer(stack->controls, stack->activeControl);
-		ControlUpdateFuncs[c->type](stack,
-									c,
-									v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-									stack->activeControl);
+		CONTROL_UPDATE_FUNCTIONS[c->type](stack,
+										  c,
+										  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
+										  stack->activeControl);
 	}
 
 
@@ -167,7 +167,7 @@ bool ProcessUiStack(UiStack *stack)
 		// iterate through the controls in reverse order so that the last control is on top and gets priority
 		for (int i = (int)stack->controls.length - 1; i >= 0; i--)
 		{
-			const Control *c = (Control *)ListGetPointer(stack->controls, i);
+			const Control *c = ListGetPointer(stack->controls, i);
 
 			const Vector2 localMousePos = v2(mousePos.x - c->anchoredPosition.x, mousePos.y - c->anchoredPosition.y);
 			if (localMousePos.x >= 0 &&
@@ -235,9 +235,9 @@ void SetFocusedControl(UiStack *stack, const uint32_t index)
 	if (stack->focusedControl != -1u)
 	{
 		const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
-		if (ControlUnfocusFuncs[c->type] != NULL)
+		if (CONTROL_UNFOCUS_FUNCTIONS[c->type] != NULL)
 		{
-			ControlUnfocusFuncs[c->type](c);
+			CONTROL_UNFOCUS_FUNCTIONS[c->type](c);
 		}
 	}
 
@@ -246,9 +246,9 @@ void SetFocusedControl(UiStack *stack, const uint32_t index)
 	if (stack->focusedControl != -1u)
 	{
 		const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
-		if (ControlFocusFuncs[c->type] != NULL)
+		if (CONTROL_FOCUS_FUNCTIONS[c->type] != NULL)
 		{
-			ControlFocusFuncs[c->type](c);
+			CONTROL_FOCUS_FUNCTIONS[c->type](c);
 		}
 	}
 }
@@ -258,9 +258,9 @@ void DrawUiStack(const UiStack *stack)
 	for (size_t i = 0; i < stack->controls.length; i++)
 	{
 		const Control *c = ListGetPointer(stack->controls, i);
-		ControlDrawFuncs[c->type](c,
-								  i == stack->activeControl ? stack->activeControlState : NORMAL,
-								  c->anchoredPosition);
+		CONTROL_DRAW_FUNCTIONS[c->type](c,
+										i == stack->activeControl ? stack->activeControlState : NORMAL,
+										c->anchoredPosition);
 
 		// if this is the focused control, draw a border around it
 		if (i == stack->focusedControl)
@@ -335,7 +335,7 @@ void UiStackPush(UiStack *stack, Control *control)
 
 void UiStackRemove(UiStack *stack, const Control *control)
 {
-	ControlDestroyFuncs[control->type](control);
+	CONTROL_DESTROY_FUNCTIONS[control->type](control);
 
 	ListRemoveAt(stack->controls, ListFind(stack->controls, control));
 }

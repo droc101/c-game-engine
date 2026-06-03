@@ -14,6 +14,10 @@
 /// The maximum number of textures that can be loaded in any one execution of the game
 #define MAX_TEXTURES 512
 
+#if MAX_TEXTURES > 500000
+#error "The required minimum for the maxPerStageDescriptorUpdateAfterBindSamplers limit is 500000, which should not be exceeded."
+#endif
+
 typedef struct Image Image;
 typedef enum ImagePixelFormat ImagePixelFormat;
 

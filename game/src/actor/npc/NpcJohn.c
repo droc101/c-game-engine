@@ -60,11 +60,11 @@ void JohnInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->localCenter = v2s(0);
-	this->wall->orientation = X_AXIS;
+	this->wall->centerOffset = v2s(0);
+	this->wall->orientation = ACTOR_WALL_ORIENTATION_X_AXIS;
 	this->wall->length = 1;
-	this->wall->tex = malloc(strlen(TEXTURE("actor/john")) + 1);
-	strcpy(this->wall->tex, TEXTURE("actor/john"));
+	this->wall->texture = malloc(strlen(TEXTURE("actor/john")) + 1);
+	strcpy(this->wall->texture, TEXTURE("actor/john"));
 	this->wall->uvScale = v2s(1.0f);
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 1.0f;

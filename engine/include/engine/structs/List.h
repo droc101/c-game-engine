@@ -10,18 +10,20 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// NOLINTBEGIN(*-reserved-identifier, *-identifier-naming)
 typedef struct List List;
 typedef struct LockingList LockingList;
 
-enum _ListType // NOLINT(*-reserved-identifier)
+enum _ListType
 {
 	LIST_POINTER,
 	LIST_UINT64,
 	LIST_UINT32,
 	LIST_INT32,
+	LIST_NESTED,
 };
 
-struct _ListData // NOLINT(*-reserved-identifier)
+struct _ListData
 {
 	/// The type of data the list is storing
 	enum _ListType type;
@@ -31,6 +33,7 @@ struct _ListData // NOLINT(*-reserved-identifier)
 		uint64_t *uint64Data;
 		uint32_t *uint32Data;
 		int32_t *int32Data;
+		List *nestedListData;
 	};
 };
 
@@ -52,8 +55,6 @@ struct LockingList
 	SDL_Mutex *mutex;
 };
 
-
-// NOLINTBEGIN(*-reserved-identifier)
 void _ListInit(List *list, enum _ListType listType);
 void _LockingListInit(LockingList *list, enum _ListType listType);
 
@@ -93,7 +94,7 @@ void _LockingListFreeOnlyContents(const LockingList *list);
 
 void _ListAndContentsFree(List *list);
 void _LockingListAndContentsFree(LockingList *list);
-// NOLINTEND(*-reserved-identifier)
+// NOLINTEND(*-reserved-identifier, *-identifier-naming)
 
 
 /**
@@ -189,6 +190,18 @@ void _LockingListAndContentsFree(LockingList *list);
 					(list).data->int32Data), \
 			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_INT32)), \
 						   (list).data->int32Data))[index])
+
+/**
+* Get an item of type @c List from the list by index
+* @param list The list to get from
+* @param index The index to get
+*/
+#define ListGetNestedList(list, index) \
+	(_Generic((list), \
+			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_NESTED)), \
+					(list).data->nestedListData), \
+			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_NESTED)), \
+						   (list).data->nestedListData))[index])
 
 /**
  * Set an item in the list by index

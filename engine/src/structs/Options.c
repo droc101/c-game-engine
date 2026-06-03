@@ -15,7 +15,6 @@
 void DefaultOptions(Options *options)
 {
 	options->enableDiscordRpc = true;
-	options->renderer = RENDERER_OPENGL; // TODO: RENDERER_VULKAN;
 	options->musicVolume = 1.0f;
 	options->sfxVolume = 1.0f;
 	options->uiVolume = 1.0f;
@@ -55,10 +54,6 @@ bool ValidateOptions(const Options *options)
 	}
 	// ignore invert h/v and swap a/b
 
-	if (options->renderer >= RENDERER_MAX)
-	{
-		return false;
-	}
 	// ignore fullscreen,vsync
 	if (options->msaa > MSAA_8X)
 	{
@@ -83,11 +78,11 @@ bool ValidateOptions(const Options *options)
 	}
 
 
-	if (options->musicVolume < 0 || options->musicVolume > 1)
+	if (options->sfxVolume < 0 || options->sfxVolume > 1)
 	{
 		return false;
 	}
-	if (options->sfxVolume < 0 || options->sfxVolume > 1)
+	if (options->musicVolume < 0 || options->musicVolume > 1)
 	{
 		return false;
 	}
@@ -114,7 +109,6 @@ void LoadOptions(Options *options)
 		options->invertVerticalCamera = KvGetBool(list, "invert_vertical_camera", false);
 		options->controllerSwapOkCancel = KvGetBool(list, "controller_swap_ok_cancel", false);
 
-		options->renderer = KvGetByte(list, "renderer", RENDERER_OPENGL);
 		options->fullscreen = KvGetBool(list, "fullscreen", false);
 		options->vsync = KvGetBool(list, "vsync", true);
 		options->msaa = KvGetByte(list, "msaa", MSAA_4X);
@@ -158,7 +152,6 @@ void SaveOptions(Options *options)
 	KvSetBool(list, "invert_vertical_camera", options->invertVerticalCamera);
 	KvSetBool(list, "controller_swap_ok_cancel", options->controllerSwapOkCancel);
 
-	KvSetByte(list, "renderer", options->renderer);
 	KvSetBool(list, "fullscreen", options->fullscreen);
 	KvSetBool(list, "vsync", options->vsync);
 	KvSetByte(list, "msaa", options->msaa);

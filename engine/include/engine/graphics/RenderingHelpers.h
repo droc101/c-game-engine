@@ -38,29 +38,16 @@
 /// The number of milliseconds to sleep for when in low FPS mode
 #define LOW_FPS_MODE_SLEEP_MS 33
 
-typedef enum Renderer Renderer;
-
 typedef enum RendererQueuedAction RendererQueuedAction;
-
-/**
- * Used to check which renderer the game is using
- */
-enum Renderer
-{
-	RENDERER_OPENGL,
-	RENDERER_VULKAN,
-	RENDERER_MAX
-};
 
 enum RendererQueuedAction
 {
-	QUEUED_ACTION_RECREATE_FRAMEBUFFERS = 1 << 0,
+	QUEUED_ACTION_UPDATE_MSAA = 1 << 0,
 	QUEUED_ACTION_CLEAR_ALL_TEXTURES = 1 << 1,
 	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
+	QUEUED_ACTION_TOGGLE_VSYNC = 1 << 4,
 };
-
-extern Renderer currentRenderer;
 
 extern RendererQueuedAction rendererQueuedActions;
 
@@ -207,11 +194,6 @@ float Y_TO_NDC(float y);
  * @param map The map to load from
  */
 void LoadMapModels(Map *map);
-
-/**
- * Set whether vertical sync is enabled
- */
-void SetVsyncEnabled(bool enabled);
 
 /**
  * Convert a color uint32_t (0xAARRGGBB) to a Color vec4 (RGBA 0-1)

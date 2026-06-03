@@ -59,13 +59,13 @@ static bool ObjectVsBroadPhaseLayerShouldCollide(const JPH_ObjectLayer inObjectL
 	return true;
 }
 
-static const JPH_ObjectVsBroadPhaseLayerFilter_Impl objectVsBroadPhaseLayerFilterImpl = {
+static const JPH_ObjectVsBroadPhaseLayerFilter_Impl OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL = {
 	.ShouldCollide = ObjectVsBroadPhaseLayerShouldCollide,
 };
-static const JPH_ObjectLayerPairFilter_Impl objectLayerPairFilterImpl = {
+static const JPH_ObjectLayerPairFilter_Impl OBJECT_LAYER_PAIR_FILTER_IMPL = {
 	.ShouldCollide = ObjectLayerShouldCollide,
 };
-static const JPH_BroadPhaseLayerInterface_Impl broadPhaseLayerInterfaceImpl = {
+static const JPH_BroadPhaseLayerInterface_Impl BROAD_PHASE_LAYER_INTERFACE_IMPL = {
 	.GetBroadPhaseLayer = GetBroadPhaseLayer,
 };
 
@@ -91,9 +91,9 @@ void PhysicsInitMap(Map *map)
 	const JPH_PhysicsSystemSettings physicsSystemSettings = {
 		.maxContactConstraints = MAX_CONTACT_CONSTRAINTS,
 		.broadPhaseLayerInterface = JPH_BroadPhaseLayerInterface_Create(BROADPHASE_LAYER_MAX,
-																		&broadPhaseLayerInterfaceImpl),
-		.objectLayerPairFilter = JPH_ObjectLayerPairFilter_Create(&objectLayerPairFilterImpl),
-		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&objectVsBroadPhaseLayerFilterImpl),
+																		&BROAD_PHASE_LAYER_INTERFACE_IMPL),
+		.objectLayerPairFilter = JPH_ObjectLayerPairFilter_Create(&OBJECT_LAYER_PAIR_FILTER_IMPL),
+		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL),
 	};
 	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 	JPH_PhysicsSystem_SetGravity(map->physicsSystem, &(Vector3){0, GRAVITY, 0});

@@ -2,6 +2,7 @@
 // Created by droc101 on 7/23/25.
 //
 
+#include <assert.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/TextureLoader.h>
@@ -20,6 +21,28 @@ Image *images[MAX_TEXTURES];
 #define MISSING_TEX_SIZE 2
 #define MISSING_TEX_COLOR_A 0xFF000000
 #define MISSING_TEX_COLOR_B 0xFFFF00FF
+
+static inline int ImageNameMatch(const void *imageName, const void *image)
+{
+	assert(image && *(const Image **)image);
+	return strcmp(imageName, (*(const Image **)image)->name);
+}
+
+static inline int ImagesNameCompare(const void *img1, const void *img2)
+{
+	assert(img1 && img2);
+	const Image *imageOne = *(const Image **)img1;
+	if (imageOne == NULL)
+	{
+		return 1;
+	}
+	const Image *imageTwo = *(const Image **)img2;
+	if (imageTwo == NULL)
+	{
+		return -1;
+	}
+	return strcmp(imageOne->name, imageTwo->name);
+}
 
 void GenFallbackImage(Image *src)
 {
@@ -51,17 +74,10 @@ void GenFallbackImage(Image *src)
 
 Image *LoadImage(const char *asset)
 {
-	for (int i = 0; i < MAX_TEXTURES; i++)
+	Image **foundImage = bsearch(asset, images, textureId, sizeof(Image *), ImageNameMatch);
+	if (foundImage != NULL && *foundImage != NULL)
 	{
-		Image *img = images[i];
-		if (img == NULL)
-		{
-			break;
-		}
-		if (strcmp(asset, img->name) == 0)
-		{
-			return img;
-		}
+		return *foundImage;
 	}
 
 	if (textureId >= MAX_TEXTURES)
@@ -134,6 +150,8 @@ Image *LoadImage(const char *asset)
 	images[textureId] = img;
 
 	textureId++;
+
+	qsort(images, textureId, sizeof(Image *), ImagesNameCompare);
 
 	if (textureId >= MAX_TEXTURES - 10)
 	{

@@ -7,27 +7,6 @@
 
 #include <engine/assets/TextureLoader.h>
 #include <stdbool.h>
-#include <vulkan/vulkan_core.h>
-
-VkResult CreateUiBuffers();
-
-VkResult CreateViewModelBuffers();
-
-VkResult CreateWallBuffers();
-
-VkResult CreateActorWallBuffers();
-
-VkResult CreateActorModelBuffers();
-
-VkResult CreateDebugDrawBuffers();
-
-VkResult ResizeWallBuffers();
-
-VkResult ResizeActorWallBuffers();
-
-VkResult ResizeActorModelInstanceDataBuffer();
-
-VkResult ResizeActorModelBuffers();
 
 VkResult ResizeDebugDrawBuffers();
 

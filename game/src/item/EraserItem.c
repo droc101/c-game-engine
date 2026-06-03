@@ -52,7 +52,7 @@ static bool EraserItemCanTargetFunction(Item * /*this*/,
 	return false;
 }
 
-const ItemDefinition eraserItemDefinition = {
+const ItemDefinition ERASER_ITEM_DEFINITION = {
 	.name = "Eraser",
 	.Construct = DefaultItemConstruct,
 	.Destruct = DefaultItemDestruct,

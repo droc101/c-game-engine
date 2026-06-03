@@ -47,6 +47,7 @@ int LodThreadMain(void * /*data*/)
 
 		const GlobalState *state = GetState();
 		const LockingList *actors = &state->map->actors;
+		ListLock(*actors);
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
 		bool shouldReloadActors = false;
@@ -63,22 +64,23 @@ int LodThreadMain(void * /*data*/)
 			Vector3_Subtract(&actorPosition, &state->camera->transform.position, &offsetFromCamera);
 			const float distanceSquared = Vector3_LengthSquared(&offsetFromCamera);
 			while (actor->currentLod != 0 &&
-				   actor->model->lods[actor->currentLod]->distanceSquared * lodMultiplier > distanceSquared)
+				   actor->model->lods[actor->currentLod].distanceSquared * lodMultiplier > distanceSquared)
 			{
 				actor->currentLod--;
 				shouldReloadActors = true;
 			}
 			while (actor->model->lodCount > actor->currentLod + 1 &&
-				   actor->model->lods[actor->currentLod + 1]->distanceSquared * lodMultiplier <= distanceSquared)
+				   actor->model->lods[actor->currentLod + 1].distanceSquared * lodMultiplier <= distanceSquared)
 			{
 				actor->currentLod++;
 				shouldReloadActors = true;
 			}
 		}
-		if (currentRenderer == RENDERER_VULKAN && !VK_UpdateActors(actors, shouldReloadActors))
-		{
-			Error("Failed to load actors!");
-		}
+		ListUnlock(*actors);
+		// if (currentRenderer == RENDERER_VULKAN && !VK_UpdateActors(actors, shouldReloadActors))
+		// {
+		// 	Error("Failed to load actors!");
+		// }
 
 		SDL_UnlockMutex(mutex);
 	}

@@ -123,16 +123,6 @@ void DrawTextureRegionMod(Vector2 pos,
 						  Color color);
 
 /**
- * Clear the screen with the last used color
- */
-void ClearScreen();
-
-/**
- * Clear the depth buffer
- */
-void ClearDepthOnly();
-
-/**
  * Draw a nine patch image to the screen
  * @param pos The position to draw at
  * @param size The size of the output
@@ -207,6 +197,6 @@ void RenderHUD();
  * @param cam The camera to render with
  * @note - This destroys the contents of the depth buffer in the OpenGL renderer
  */
-void RenderMap3D(const Map *map, const Camera *cam);
+void RenderMap3D(Map *map, const Camera *cam);
 
 #endif //GAME_DRAWING_H

@@ -6,6 +6,7 @@
 #define MODELLOADER_H
 
 #include <engine/structs/Color.h>
+#include <engine/structs/Vector2.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
@@ -20,9 +21,10 @@
 typedef enum ModelShader ModelShader;
 typedef enum CollisionModelType CollisionModelType;
 
-typedef struct ModelDefinition ModelDefinition;
 typedef struct Material Material;
+typedef struct ModelVertex ModelVertex;
 typedef struct ModelLod ModelLod;
+typedef struct ModelDefinition ModelDefinition;
 typedef struct ModelConvexHull ModelConvexHull;
 typedef struct ModelStaticCollider ModelStaticCollider;
 
@@ -59,25 +61,76 @@ struct Material
 	ModelShader shader;
 };
 
+struct ModelVertex
+{
+	/// The position of the vertex, in model space
+	Vector3 position;
+	/// The texture coordinate of the vertex
+	Vector2 uv;
+	/// The color of the vertex
+	Color color;
+	/// The normal of the vertex, as a unit vector
+	Vector3 normal;
+} __attribute__((packed));
+
 struct ModelLod
 {
-	/// The runtime-generated ID of this model
+	/// The runtime-generated ID of this LOD
 	uint32_t id;
 
 	/// How far away the camera must be before this LOD is used (units squared)
 	float distanceSquared;
 
-	/// The number of vertices in the model
+	/// The number of vertices in the LOD
 	size_t vertexCount;
-	/// Packed vertex data, (X Y Z) (U V) (R G B A) (NX NY NZ)
-	float *vertexData;
+	/// The vertex data for the LOD
+	ModelVertex *vertexData;
 
-	/// The total number of indices across all materials
+	/// The total number of indices across all material slots
 	uint32_t totalIndexCount;
-	/// The number of indices in each material
+	/// The number of indices in each material slot, indexed with a slot number
 	uint32_t *indexCount;
-	/// Index data for each material
+	/// Index data for each material slot, indexed with a slot number
 	uint32_t **indexData;
+};
+
+struct ModelDefinition
+{
+	/// The runtime-generated ID of this model
+	uint32_t id;
+	/// The asset name of this model
+	char *name;
+
+	/// The total number of materials in the model, across all skins
+	uint32_t materialCount;
+
+	/// The number of materials per skin
+	uint32_t materialSlotCount;
+
+	/// The number of skins in the model
+	uint32_t skinCount;
+	/// The number of LODs in the model
+	uint32_t lodCount;
+
+	/// An array of materials with length @c materialCount
+	Material *materials;
+	/// An array of length @c skinCount, where each element is an array of length @c materialSlotCount,
+	/// where each element is an index into the @c materials array
+	uint32_t **skinMaterialIndices;
+	/// The LODs for this model
+	ModelLod *lods;
+
+	/// The origin (center) of the bounding box
+	Vector3 boundingBoxOrigin;
+	/// The extends of the bounding box. The box will be twice this size.
+	Vector3 boundingBoxExtents;
+	/// The jolt shape for the bounding box
+	JPH_Shape *boundingBoxShape;
+
+	/// The type of collision model this model contains
+	CollisionModelType collisionModelType;
+	/// The jolt collision shape for this model, or @c NULL if there isn't one
+	JPH_Shape *collisionModelShape;
 };
 
 struct ModelConvexHull
@@ -96,43 +149,6 @@ struct ModelStaticCollider
 	size_t numTriangles;
 	/// The triangles in this mesh
 	JPH_Triangle *tris;
-};
-
-struct ModelDefinition
-{
-	/// The runtime-generated ID of this model
-	uint32_t id;
-	/// The asset name of this model
-	char *name;
-
-	/// The number of materials in the model
-	uint32_t materialCount;
-
-	/// The number of materials per skin
-	uint32_t materialsPerSkin;
-
-	/// The number of skins in the model
-	uint32_t skinCount;
-	/// The number of LODs in the model
-	uint32_t lodCount;
-
-	Material *materials;
-	/// The skins for this model, each an array of materialsPerSkin indices into the materials array
-	uint32_t **skins;
-	/// The LODs for this model
-	ModelLod **lods;
-
-	/// The origin (center) of the bounding box
-	Vector3 boundingBoxOrigin;
-	/// The extends of the bounding box. The box will be twice this size.
-	Vector3 boundingBoxExtents;
-	/// The jolt shape for the bounding box
-	JPH_Shape *boundingBoxShape;
-
-	/// The type of collision model this model contains
-	CollisionModelType collisionModelType;
-	/// The jolt collision shape for this model, or @c NULL if there isn't one
-	JPH_Shape *collisionModelShape;
 };
 
 /**

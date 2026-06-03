@@ -47,11 +47,11 @@ void SpriteInit(Actor *this, const KvList params, Transform *transform)
 	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->localCenter = v2s(0);
-	this->wall->orientation = X_AXIS;
+	this->wall->centerOffset = v2s(0);
+	this->wall->orientation = ACTOR_WALL_ORIENTATION_X_AXIS;
 	this->wall->length = size.x;
 	this->wall->height = size.y;
-	this->wall->tex = strdup(KvGetString(params, "texture", "level/uvtest"));
+	this->wall->texture = strdup(KvGetString(params, "texture", "level/uvtest"));
 	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
 	this->wall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->wall->unshaded = KvGetBool(params, "unshaded", false);

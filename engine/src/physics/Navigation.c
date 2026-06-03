@@ -10,8 +10,8 @@
 float PlayerRelativeAngle(const Actor *actor)
 {
 	(void)actor;
-	// const float actorPlayerAngleDifference = atan2f(GetState()->level->player.transform.position.z - actor->transform.position.z,
-	// 												GetState()->level->player.transform.position.x - actor->transform.position.x);
+	// const float actorPlayerAngleDifference = atan2f(GetState()->map->player.transform.position.z - actor->transform.position.z,
+	// 												GetState()->map->player.transform.position.x - actor->transform.position.x);
 	// return wrap(actorPlayerAngleDifference - actor->transform.rotation.y, -PIf, PIf) + PIf / 2;
 	return 0.0f;
 }
@@ -41,7 +41,7 @@ bool IsPlayerVisibleInternal(const Actor *actor,
 	return false;
 
 	// b2ShapeId raycastHit = b2_nullShapeId;
-	// b2World_CastRay(GetState()->level->worldId,
+	// b2World_CastRay(GetState()->map->worldId,
 	// 				actor->position,
 	// 				playerRelativePosition,
 	// 				(b2QueryFilter){.categoryBits = COLLISION_GROUP_ACTOR, .maskBits = ~COLLISION_GROUP_TRIGGER},
@@ -56,8 +56,8 @@ bool IsPlayerVisible(const Actor *actor, const NavigationConfig navigationConfig
 	(void)actor;
 	(void)navigationConfig;
 	// const float relativeAngle = PlayerRelativeAngle(actor);
-	// const Vector2 playerRelativePosition = Vector2Sub(GetState()->level->player.transform.position, actor->transform.position);
-	// return IsPlayerVisibleInternal(actor, navigationConfig, GetState()->level->player.transform.position, relativeAngle, playerRelativePosition);
+	// const Vector2 playerRelativePosition = Vector2Sub(GetState()->map->player.transform.position, actor->transform.position);
+	// return IsPlayerVisibleInternal(actor, navigationConfig, GetState()->map->player.transform.position, relativeAngle, playerRelativePosition);
 	return false;
 }
 
@@ -66,7 +66,7 @@ void NavigationStep(Actor *actor, NavigationConfig *navigationConfig, const doub
 	(void)actor;
 	(void)navigationConfig;
 	(void)delta;
-	// 	const Vector2 playerPosition = GetState()->level->player.transform;
+	// 	const Vector2 playerPosition = GetState()->map->player.transform;
 	// 	const float actorPlayerAngleDifference = atan2f(playerPosition.y - actor->transform.y,
 	// 													playerPosition.x - actor->transform.x);
 	// 	const float relativeAngle = wrap(actorPlayerAngleDifference - actor->rotation, -PIf, PIf) + PIf / 2;

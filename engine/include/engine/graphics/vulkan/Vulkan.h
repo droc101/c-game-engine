@@ -9,14 +9,11 @@
 #include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/List.h>
 #include <engine/structs/Map.h>
-#include <engine/structs/Viewmodel.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <vulkan/vulkan_core.h>
 
 #ifdef BUILDSTYLE_DEBUG
 /**
@@ -32,32 +29,30 @@
 #define VK_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
 #define VK_Y_TO_NDC(y) ((float)(y) / ScaledWindowHeightFloat() * 2.0f - 1.0f)
 
-/**
- * This function is used to create the Vulkan instance and surface, as well as configuring the environment properly.
- * This function (and the functions it calls) do NOT perform any drawing, though the framebuffers are initialized here.
- * @param window The window to initialize Vulkan for.
- * @see CreateInstance
- * @see PickPhysicalDevice
- * @see CreateLogicalDevice
- */
+bool VK_PreInit();
+
 bool VK_Init(SDL_Window *window);
 
-bool VK_LoadLevelWalls(const Map *level);
+bool VK_FrameStart();
 
-/// Update actors
-bool VK_UpdateActors(const LockingList *actors, bool shouldReloadActors); // This is implemented in VulkanActors.c
+/**
+ * Render a given map. This function will automatically load the map if it is not yet loaded, then it will update
+ *  descriptor sets and push constants, before making the actual draw call for the level. This function does NOT submit
+ *  any command buffers, present to the screen, or even begin the actual rendering process.
+ * @param map The map to render
+ * @param camera The camera from which the map should be rendered
+ * @return @c VK_SUCCESS if the map was rendered successfully, or a meaningful result code otherwise
+ */
+bool VK_RenderMap(Map *map, const Camera *camera);
 
-//TODO document me
-VkResult VK_FrameStart();
-
-//TODO document me
-VkResult VK_RenderLevel(const Map *level, const Camera *camera, const Viewmodel *viewmodel);
-
-//TODO document me
-VkResult VK_FrameEnd();
+bool VK_FrameEnd();
 
 /// A function used to destroy the Vulkan objects when they are no longer needed.
-bool VK_Cleanup();
+void VK_Cleanup();
+
+bool VK_LoadMap(const Map *map);
+
+bool VK_UpdateViewportSize();
 
 void VK_Minimize();
 

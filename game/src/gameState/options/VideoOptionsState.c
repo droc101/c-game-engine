@@ -94,17 +94,11 @@ void CbOptionsFullscreen(const bool value)
 	SDL_SetWindowFullscreen(GetGameWindow(), value);
 }
 
-void RbOptionsRenderer(const bool /*value*/, const uint8_t /*groupId*/, const uint8_t id)
-{
-	GetState()->options.renderer = id;
-	hasChangedVideoOptions = true;
-	// Renderer change will happen on next restart
-}
-
 void CbOptionsVsync(const bool value)
 {
 	GetState()->options.vsync = value;
-	SetVsyncEnabled(GetState()->options.vsync);
+	hasChangedVideoOptions = true; // Until Luna can do this
+	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
 void CbOptionsLimitFpsWhenUnfocused(const bool value)
@@ -128,7 +122,8 @@ void CbOptionsPreferWayland(const bool value)
 void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
-	rendererQueuedActions |= QUEUED_ACTION_RECREATE_FRAMEBUFFERS;
+	hasChangedVideoOptions = true; // Until Luna can do this
+	rendererQueuedActions |= QUEUED_ACTION_UPDATE_MSAA;
 }
 
 void SldOptionsAnisotropy(const float value)
@@ -244,25 +239,6 @@ void VideoOptionsStateSet()
 										  GetState()->options.mipmaps));
 		opY += opSpacing * 1.5f;
 
-		UiStackPush(videoOptionsStack,
-					CreateRadioButtonControl(v2(-120, opY),
-											 v2(230, 40),
-											 "Vulkan",
-											 RbOptionsRenderer,
-											 TOP_CENTER,
-											 GetState()->options.renderer == RENDERER_VULKAN,
-											 0,
-											 RENDERER_VULKAN));
-		UiStackPush(videoOptionsStack,
-					CreateRadioButtonControl(v2(120, opY),
-											 v2(230, 40),
-											 "OpenGL",
-											 RbOptionsRenderer,
-											 TOP_CENTER,
-											 GetState()->options.renderer == RENDERER_OPENGL,
-											 0,
-											 RENDERER_OPENGL));
-		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
 					CreateSliderControl(v2(0, opY),
 										v2(480, 40),

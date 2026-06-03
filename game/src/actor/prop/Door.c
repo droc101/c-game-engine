@@ -330,11 +330,11 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
 	const float width = data->width;
-	this->wall->orientation = Z_AXIS;
-	this->wall->localCenter = v2s(0);
+	this->wall->orientation = ACTOR_WALL_ORIENTATION_Z_AXIS;
+	this->wall->centerOffset = v2s(0);
 	this->wall->length = width;
 	this->wall->height = size.y;
-	this->wall->tex = strdup(KvGetString(params, "texture", TEXTURE("actor/door")));
+	this->wall->texture = strdup(KvGetString(params, "texture", TEXTURE("actor/door")));
 	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
 	this->wall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->wall->unshaded = KvGetBool(params, "unshaded", false);

@@ -3,8 +3,7 @@
 [![Windows Build](https://github.com/droc101/c-game-engine/actions/workflows/windows.yml/badge.svg)](https://github.com/droc101/c-game-engine/actions/workflows/windows.yml)[![Linux (x86_64) Build](https://github.com/droc101/c-game-engine/actions/workflows/linux-x86_64.yml/badge.svg)](https://github.com/droc101/c-game-engine/actions/workflows/linux-x86_64.yml)[![Linux (ARM64) Build](https://github.com/droc101/c-game-engine/actions/workflows/linux-arm.yml/badge.svg)](https://github.com/droc101/c-game-engine/actions/workflows/linux-arm.yml)
 
 Old-School FPS game (and engine) written in C using [SDL3](https://www.libsdl.org/) for platform
-abstraction, [OpenGL/Vulkan](https://www.khronos.org/) for graphics, [Jolt](https://github.com/jrouwe/JoltPhysics) for
-physics,
+abstraction, [Vulkan](https://www.vulkan.org/) for graphics, [Jolt](https://github.com/jrouwe/JoltPhysics) for physics,
 and [zlib](https://www.zlib.net/) for compression.
 
 Runs on x86_64 Windows and Linux.
@@ -26,8 +25,6 @@ See the [wiki page](https://wiki.droc101.dev/index.php/Building_GAME) for instru
     - NVIDIA GeForce 900 series or newer
     - AMD Radeon HD 7000 series / Southern Islands / GCN 1.0 or newer
     - Intel HD Graphics 510 or newer
-- OpenGL 4.6 Compatibility Renderer:
-  - TODO
 
 ## Tested on
 - Windows 11

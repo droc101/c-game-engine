@@ -5,23 +5,22 @@
 #include <assert.h>
 #include <cglm/cglm.h>
 #include <cglm/clipspace/persp_lh_zo.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/List.h>
-#include <engine/structs/Map.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
-#include <luna/lunaBuffer.h>
+#include <luna/lunaImage.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -32,56 +31,68 @@
 
 #pragma region variables
 bool minimized = false;
+LunaDevice device = LUNA_NULL_HANDLE;
+VkPhysicalDeviceProperties physicalDeviceProperties = {0};
+uint32_t queueFamilyIndex = -1u;
+VkQueue queue = VK_NULL_HANDLE;
+LunaCommandPool commandPool = LUNA_NULL_HANDLE;
+LunaCommandBuffer commandBuffer = LUNA_NULL_HANDLE;
+LunaCommandBuffer secondaryCommandBuffer = LUNA_NULL_HANDLE;
+LunaSemaphore semaphore = LUNA_NULL_HANDLE;
+VkSurfaceKHR surface = VK_NULL_HANDLE;
 VkExtent2D swapChainExtent = {0};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-LockingList textures = {0};
-uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
-LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
-LunaDescriptorSet descriptorSets[MAX_FRAMES_IN_FLIGHT];
-TextureSamplers textureSamplers = {
-	.linearRepeat = LUNA_NULL_HANDLE,
-	.nearestRepeat = LUNA_NULL_HANDLE,
-	.linearNoRepeat = LUNA_NULL_HANDLE,
-	.nearestNoRepeat = LUNA_NULL_HANDLE,
-};
-PushConstants pushConstants = {0};
 LunaRenderPass renderPass = LUNA_NULL_HANDLE;
-Pipelines pipelines = {
-	.ui = LUNA_NULL_HANDLE,
-	.viewModel = LUNA_NULL_HANDLE,
-	.sky = LUNA_NULL_HANDLE,
-	.floorAndCeiling = LUNA_NULL_HANDLE,
-	.walls = LUNA_NULL_HANDLE,
-	.actorWalls = LUNA_NULL_HANDLE,
-	.shadedActorModels = LUNA_NULL_HANDLE,
-	.unshadedActorModels = LUNA_NULL_HANDLE,
-#ifdef JPH_DEBUG_RENDERER
-	.debugDrawLines = LUNA_NULL_HANDLE,
-	.debugDrawTriangles = LUNA_NULL_HANDLE,
-#endif
+uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
+TextureSamplers textureSamplers = {
+	.linearRepeatAnisotropy = LUNA_NULL_HANDLE,
+	.linearNoRepeatAnisotropy = LUNA_NULL_HANDLE,
+	.linearRepeatNoAnisotropy = LUNA_NULL_HANDLE,
+	.nearestRepeatNoAnisotropy = LUNA_NULL_HANDLE,
+	.linearNoRepeatNoAnisotropy = LUNA_NULL_HANDLE,
+	.nearestNoRepeatNoAnisotropy = LUNA_NULL_HANDLE,
 };
+LockingList textures = {0};
+LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
+LunaDescriptorSet descriptorSet;
 Buffers buffers = {
-	.ui.vertices.allocatedSize = sizeof(UiVertex) * 4 * MAX_UI_QUADS_INIT,
-	.ui.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_UI_QUADS_INIT,
-	.sky.vertices.allocatedSize = 0,
-	.sky.indices.allocatedSize = 0,
-	.walls.vertices.allocatedSize = sizeof(WallVertex) * 4 * MAX_WALLS_INIT,
-	.walls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALLS_INIT,
-	.actorWalls.vertices.allocatedSize = sizeof(ActorWallVertex) * 4 * MAX_WALL_ACTORS_INIT,
-	.actorWalls.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_WALL_ACTORS_INIT,
-	.actorWalls.instanceData.allocatedSize = sizeof(ActorWallInstanceData) * MAX_WALL_ACTORS_INIT,
-	.actorWalls.drawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_WALL_ACTORS_INIT,
-	.actorModels.vertices.allocatedSize = sizeof(ModelVertex) * 4 * MAX_MODEL_ACTOR_QUADS_INIT,
-	.actorModels.indices.allocatedSize = sizeof(uint32_t) * 6 * MAX_MODEL_ACTOR_QUADS_INIT,
-	.actorModels.instanceData.allocatedSize = sizeof(ModelInstanceData) * MAX_MODEL_ACTOR_QUADS_INIT,
-	.actorModels.shadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
-	.actorModels.unshadedDrawInfo.allocatedSize = sizeof(VkDrawIndexedIndirectCommand) * MAX_MODEL_ACTOR_QUADS_INIT,
 #ifdef JPH_DEBUG_RENDERER
 	.debugDrawLines.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
 	.debugDrawTriangles.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
 #endif
 };
+Pipelines pipelines = {
+	.ui = LUNA_NULL_HANDLE,
+#ifdef JPH_DEBUG_RENDERER
+	.debugDrawLines = LUNA_NULL_HANDLE,
+	.debugDrawTriangles = LUNA_NULL_HANDLE,
+#endif
+};
+uint32_t pendingTasks = 0;
+uint32_t skyTextureIndex = 0;
 #pragma endregion variables
+
+bool ClearTextureCache()
+{
+	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
+	for (size_t i = 0; i < textures.length; i++)
+	{
+		lunaDestroyImage(device, (LunaImage)ListGetUint64(textures, i));
+	}
+	ListFree(textures);
+	lunaDestroySampler(device, textureSamplers.linearRepeatAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearNoRepeatAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.nearestRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.linearNoRepeatNoAnisotropy);
+	lunaDestroySampler(device, textureSamplers.nearestNoRepeatNoAnisotropy);
+	return CreateTextureSamplers();
+}
+
+void ClearModelCache()
+{
+	// TODO: Implement me
+}
 
 VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaShaderModule *shaderModule)
 {
@@ -95,10 +106,11 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 	(void)shaderType;
 
 	const LunaShaderModuleCreationInfo shaderModuleCreationInfo = {
-		.size = sizeof(uint32_t) * shader->spirvLength,
-		.spirv = shader->spirv,
+		.creationInfoType = LUNA_SHADER_MODULE_CREATION_INFO_TYPE_SPIRV,
+		.creationInfoUnion.spirv.size = sizeof(uint32_t) * shader->spirvLength,
+		.creationInfoUnion.spirv.spirv = shader->spirv,
 	};
-	VulkanTestReturnResult(lunaCreateShaderModule(&shaderModuleCreationInfo, shaderModule),
+	VulkanTestReturnResult(lunaCreateShaderModule(device, &shaderModuleCreationInfo, shaderModule),
 						   "Failed to create shader module!");
 
 	FreeShader(shader);
@@ -117,149 +129,15 @@ inline uint32_t ImageIndex(const Image *image)
 	{
 		if (!LoadTexture(image))
 		{
-			// TODO: If loading a texture fails it can't fall back to OpenGL.
-			//  There is no easy way to fix this with the current system, since the return value of this function is not
-			//  checked but instead is just assumed to be valid. That rules out returning something like -1 on error.
-			Error("Failed to load texture!");
+			Error("Failed to load texture into VkImage!");
 		}
 		return imageAssetIdToIndexMap[image->id];
 	}
 	return index;
 }
 
-VkResult LoadSky(const ModelDefinition *skyModel)
-{
-	buffers.sky.vertices.bytesUsed = sizeof(SkyVertex) * skyModel->lods[0]->vertexCount;
-	buffers.sky.indices.bytesUsed = sizeof(uint32_t) * skyModel->lods[0]->totalIndexCount;
-	if (buffers.sky.vertices.allocatedSize == 0 || buffers.sky.indices.allocatedSize == 0)
-	{
-		assert(buffers.sky.vertices.allocatedSize == 0 && buffers.sky.indices.allocatedSize == 0);
-		const LunaBufferCreationInfo vertexBufferCreationInfo = {
-			.size = buffers.sky.vertices.bytesUsed,
-			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.sky.vertices.buffer),
-							   "Failed to create sky vertex buffer!");
-		buffers.sky.vertices.data = malloc(buffers.sky.vertices.bytesUsed);
-		CheckAlloc(buffers.sky.vertices.data);
-		buffers.sky.vertices.allocatedSize = buffers.sky.vertices.bytesUsed;
-
-		const LunaBufferCreationInfo indexBufferCreationInfo = {
-			.size = buffers.sky.indices.bytesUsed,
-			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.sky.indices.buffer),
-							   "Failed to create sky index buffer!");
-		buffers.sky.indices.data = malloc(buffers.sky.indices.bytesUsed);
-		CheckAlloc(buffers.sky.indices.data);
-		buffers.sky.indices.allocatedSize = buffers.sky.indices.bytesUsed;
-	} else if (buffers.sky.vertices.allocatedSize < buffers.sky.vertices.bytesUsed ||
-			   buffers.sky.indices.allocatedSize < buffers.sky.indices.bytesUsed)
-	{
-		lunaDestroyBuffer(buffers.sky.vertices.buffer);
-		const LunaBufferCreationInfo vertexBufferCreationInfo = {
-			.size = buffers.sky.vertices.bytesUsed,
-			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&vertexBufferCreationInfo, &buffers.sky.vertices.buffer),
-							   "Failed to recreate sky vertex buffer!");
-		void *newVertices = realloc(buffers.sky.vertices.data, buffers.sky.vertices.bytesUsed);
-		CheckAlloc(newVertices);
-		buffers.sky.vertices.data = newVertices;
-		buffers.sky.vertices.allocatedSize = buffers.sky.vertices.bytesUsed;
-
-		lunaDestroyBuffer(buffers.sky.indices.buffer);
-		const LunaBufferCreationInfo indexBufferCreationInfo = {
-			.size = buffers.sky.indices.bytesUsed,
-			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		};
-		VulkanTestReturnResult(lunaCreateBuffer(&indexBufferCreationInfo, &buffers.sky.indices.buffer),
-							   "Failed to recreate sky index buffer!");
-		void *newIndices = realloc(buffers.sky.indices.data, buffers.sky.indices.bytesUsed);
-		CheckAlloc(newIndices);
-		buffers.sky.indices.data = newIndices;
-		buffers.sky.indices.allocatedSize = buffers.sky.indices.bytesUsed;
-	}
-
-
-	SkyVertex *vertices = buffers.sky.vertices.data;
-	uint32_t *indices = buffers.sky.indices.data;
-	for (uint32_t i = 0; i < skyModel->lods[0]->vertexCount; i++)
-	{
-		// Copy {x, y, z, u, v} and discard {r, g, b, a, nx, ny, nz}
-		memcpy(&vertices[i], skyModel->lods[0]->vertexData + i * 12, sizeof(float) * 5);
-	}
-	buffers.sky.indexCount = 0;
-	for (uint32_t i = 0; i < skyModel->materialsPerSkin; i++)
-	{
-		memcpy(indices + buffers.sky.indexCount,
-			   skyModel->lods[0]->indexData[i],
-			   sizeof(uint32_t) * skyModel->lods[0]->indexCount[i]);
-		buffers.sky.indexCount += skyModel->lods[0]->indexCount[i];
-	}
-	lunaWriteDataToBuffer(buffers.sky.vertices.buffer, vertices, buffers.sky.vertices.bytesUsed, 0);
-	lunaWriteDataToBuffer(buffers.sky.indices.buffer, indices, buffers.sky.indices.bytesUsed, 0);
-
-	return VK_SUCCESS;
-}
-
-void LoadWalls(const Map * /*level*/)
-{
-	// WallVertex *vertices = buffers.walls.vertices.data;
-	// uint32_t *indices = buffers.walls.indices.data;
-
-	// for (uint32_t i = 0; i < level->walls.length; i++)
-	// {
-	// 	const Wall *wall = ListGetPointer(level->walls, i);
-	// 	const vec2 startVertex = {(float)wall->a.x, (float)wall->a.y};
-	// 	const vec2 endVertex = {(float)wall->b.x, (float)wall->b.y};
-	// 	const vec2 startUV = {wall->uvOffset, 0};
-	// 	const vec2 endUV = {(float)(wall->uvScale * wall->length + wall->uvOffset), 1};
-	//
-	// 	vertices[4 * i].position.x = startVertex[0];
-	// 	vertices[4 * i].position.y = 0.5f;
-	// 	vertices[4 * i].position.z = startVertex[1];
-	// 	vertices[4 * i].u = startUV[0];
-	// 	vertices[4 * i].v = startUV[1];
-	// 	vertices[4 * i].textureIndex = TextureIndex(wall->tex);
-	// 	vertices[4 * i].wallAngle = (float)wall->angle;
-	//
-	// 	vertices[4 * i + 1].position.x = endVertex[0];
-	// 	vertices[4 * i + 1].position.y = 0.5f;
-	// 	vertices[4 * i + 1].position.z = endVertex[1];
-	// 	vertices[4 * i + 1].u = endUV[0];
-	// 	vertices[4 * i + 1].v = startUV[1];
-	// 	vertices[4 * i + 1].textureIndex = TextureIndex(wall->tex);
-	// 	vertices[4 * i + 1].wallAngle = (float)wall->angle;
-	//
-	// 	vertices[4 * i + 2].position.x = endVertex[0];
-	// 	vertices[4 * i + 2].position.y = -0.5f;
-	// 	vertices[4 * i + 2].position.z = endVertex[1];
-	// 	vertices[4 * i + 2].u = endUV[0];
-	// 	vertices[4 * i + 2].v = endUV[1];
-	// 	vertices[4 * i + 2].textureIndex = TextureIndex(wall->tex);
-	// 	vertices[4 * i + 2].wallAngle = (float)wall->angle;
-	//
-	// 	vertices[4 * i + 3].position.x = startVertex[0];
-	// 	vertices[4 * i + 3].position.y = -0.5f;
-	// 	vertices[4 * i + 3].position.z = startVertex[1];
-	// 	vertices[4 * i + 3].u = startUV[0];
-	// 	vertices[4 * i + 3].v = endUV[1];
-	// 	vertices[4 * i + 3].textureIndex = TextureIndex(wall->tex);
-	// 	vertices[4 * i + 3].wallAngle = (float)wall->angle;
-	//
-	// 	indices[6 * i] = i * 4;
-	// 	indices[6 * i + 1] = i * 4 + 1;
-	// 	indices[6 * i + 2] = i * 4 + 2;
-	// 	indices[6 * i + 3] = i * 4;
-	// 	indices[6 * i + 4] = i * 4 + 2;
-	// 	indices[6 * i + 5] = i * 4 + 3;
-	// }
-	// lunaWriteDataToBuffer(buffers.walls.vertices.buffer, vertices, buffers.walls.vertices.bytesUsed, 0);
-	// lunaWriteDataToBuffer(buffers.walls.indices.buffer, indices, buffers.walls.indices.bytesUsed, 0);
-}
-
-void UpdateTransformMatrix(const Camera *camera)
+// TODO: Make sure this doesn't need changes
+VkResult UpdateCameraUniform(const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(camera->fov),
@@ -278,11 +156,22 @@ void UpdateTransformMatrix(const Camera *camera)
 	mat4 viewMatrix;
 	glm_quat_look(cameraPosition, rotationQuat, viewMatrix);
 
-	glm_mat4_mul(perspectiveMatrix, viewMatrix, pushConstants.transformMatrix);
+	CameraUniform uniform;
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, uniform.transform);
+	uniform.position = camera->transform.position;
+	const LunaBufferWriteInfo bufferWriteInfo = {
+		.bytes = sizeof(CameraUniform),
+		.data = &uniform,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.camera, &bufferWriteInfo),
+						   "Failed to write camera uniform!");
+
+	return VK_SUCCESS;
 }
 
-// TODO: This positions the model slightly differently than OpenGL does
-void UpdateViewModelMatrix(const Viewmodel *viewmodel)
+// TODO: Update this
+VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(VIEWMODEL_FOV),
@@ -297,7 +186,6 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 						 -viewmodel->transform.position.y,
 						 viewmodel->transform.position.z});
 
-	// TODO rotation other than yaw
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_rotate(rotationMatrix,
 			   JPH_Quat_GetRotationAngle(&viewmodel->transform.rotation, &Vector3_AxisY),
@@ -307,32 +195,38 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	glm_mat4_mul(perspectiveMatrix, translationMatrix, viewModelMatrix);
 
-	for (uint32_t i = 0; i < buffers.viewModel.drawCount; i++)
+	const size_t instanceCount = lunaGetBufferSize(buffers.viewmodel.instanceData) / sizeof(ModelInstanceData);
+	for (size_t i = 0; i < instanceCount; i++)
 	{
-		memcpy(buffers.viewModel.instanceDatas[i].transform, viewModelMatrix, sizeof(mat4));
+		const LunaBufferWriteInfo writeInfo = {
+			.bytes = sizeof(mat4),
+			.data = viewModelMatrix,
+			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
+			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		};
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.instanceData, &writeInfo),
+							   "Failed to write viewmodel transform matrix to instance data buffer!");
 	}
-	lunaWriteDataToBuffer(buffers.viewModel.instanceDataBuffer,
-						  buffers.viewModel.instanceDatas,
-						  sizeof(ModelInstanceData) * buffers.viewModel.drawCount,
-						  0);
+
+	return VK_SUCCESS;
 }
 
-void EnsureSpaceForUiElements(const size_t vertexCount, const size_t indexCount)
+void EnsureSpaceForUiElements(const size_t quadCount)
 {
-	if (buffers.ui.vertices.allocatedSize < buffers.ui.vertices.bytesUsed + sizeof(UiVertex) * vertexCount ||
-		buffers.ui.indices.allocatedSize < buffers.ui.indices.bytesUsed + sizeof(uint32_t) * indexCount)
+	if (buffers.ui.freeQuads < quadCount)
 	{
-		buffers.ui.vertices.allocatedSize += sizeof(UiVertex) * vertexCount * 16;
-		buffers.ui.indices.allocatedSize += sizeof(uint32_t) * indexCount * 16;
-		buffers.ui.shouldResize = true;
+		buffers.ui.freeQuads += quadCount + 16;
+		buffers.ui.allocatedQuads += quadCount + 16;
 
-		UiVertex *newVertices = realloc(buffers.ui.vertices.data, buffers.ui.vertices.allocatedSize);
+		pendingTasks |= PENDING_TASK_UI_BUFFERS_RESIZE_BIT;
+
+		UiVertex *newVertices = realloc(buffers.ui.vertexData, buffers.ui.allocatedQuads * 4 * sizeof(UiVertex));
 		CheckAlloc(newVertices);
-		buffers.ui.vertices.data = newVertices;
+		buffers.ui.vertexData = newVertices;
 
-		uint32_t *newIndices = realloc(buffers.ui.indices.data, buffers.ui.indices.allocatedSize);
+		uint32_t *newIndices = realloc(buffers.ui.indexData, buffers.ui.allocatedQuads * 6 * sizeof(uint32_t));
 		CheckAlloc(newIndices);
-		buffers.ui.indices.data = newIndices;
+		buffers.ui.indexData = newIndices;
 	}
 }
 
@@ -358,57 +252,19 @@ void DrawRectInternal(const float ndcStartX,
 
 void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, const uint32_t textureIndex)
 {
-	EnsureSpaceForUiElements(4, 6);
+	EnsureSpaceForUiElements(1);
 
-	UiVertex *vertices = buffers.ui.vertices.data + buffers.ui.vertices.bytesUsed;
-	uint32_t *indices = buffers.ui.indices.data + buffers.ui.indices.bytesUsed;
+	const size_t vertexOffset = (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 4;
+	UiVertex *vertices = buffers.ui.vertexData + vertexOffset;
+	uint32_t *indices = buffers.ui.indexData + (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 6;
 
-	vertices[0] = (UiVertex){
-		.x = vertices_posXY_uvZW[0][0],
-		.y = vertices_posXY_uvZW[0][1],
-		.u = vertices_posXY_uvZW[0][2],
-		.v = vertices_posXY_uvZW[0][3],
-		.r = color->r,
-		.g = color->g,
-		.b = color->b,
-		.a = color->a,
-		.textureIndex = textureIndex,
-	};
-	vertices[1] = (UiVertex){
-		.x = vertices_posXY_uvZW[1][0],
-		.y = vertices_posXY_uvZW[1][1],
-		.u = vertices_posXY_uvZW[1][2],
-		.v = vertices_posXY_uvZW[1][3],
-		.r = color->r,
-		.g = color->g,
-		.b = color->b,
-		.a = color->a,
-		.textureIndex = textureIndex,
-	};
-	vertices[2] = (UiVertex){
-		.x = vertices_posXY_uvZW[2][0],
-		.y = vertices_posXY_uvZW[2][1],
-		.u = vertices_posXY_uvZW[2][2],
-		.v = vertices_posXY_uvZW[2][3],
-		.r = color->r,
-		.g = color->g,
-		.b = color->b,
-		.a = color->a,
-		.textureIndex = textureIndex,
-	};
-	vertices[3] = (UiVertex){
-		.x = vertices_posXY_uvZW[3][0],
-		.y = vertices_posXY_uvZW[3][1],
-		.u = vertices_posXY_uvZW[3][2],
-		.v = vertices_posXY_uvZW[3][3],
-		.r = color->r,
-		.g = color->g,
-		.b = color->b,
-		.a = color->a,
-		.textureIndex = textureIndex,
-	};
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		memcpy(vertices, vertices_posXY_uvZW[i], 16);
+		memcpy((char *)(vertices) + 16, &color->r, 16);
+		((uint32_t *)(vertices++))[8] = textureIndex;
+	}
 
-	const size_t vertexOffset = buffers.ui.vertices.bytesUsed / sizeof(UiVertex);
 	indices[0] = vertexOffset;
 	indices[1] = vertexOffset + 1;
 	indices[2] = vertexOffset + 2;
@@ -416,6 +272,5 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, const 
 	indices[4] = vertexOffset + 2;
 	indices[5] = vertexOffset + 3;
 
-	buffers.ui.vertices.bytesUsed += sizeof(UiVertex) * 4;
-	buffers.ui.indices.bytesUsed += sizeof(uint32_t) * 6;
+	buffers.ui.freeQuads--;
 }

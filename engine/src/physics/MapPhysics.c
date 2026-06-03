@@ -80,7 +80,8 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 												   v2(state->map->player.transform.position.x,
 													  state->map->player.transform.position.z));
 	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.1);
-	state->map->player.viewBobbingHeight = 0.1f + (float)sin((double)state->physicsFrame / 7.0) * bobHeight;
+	state->map->player.viewBobbingHeight = 0.1f +
+										   sinf((float)(fmod((double)state->physicsFrame / 7.0, 2 * PI))) * bobHeight;
 
 	for (size_t i = 0; i < state->map->actors.length; i++)
 	{

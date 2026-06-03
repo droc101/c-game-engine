@@ -146,18 +146,29 @@ void DrawTextAligned(const char *str,
 					 const Font *font)
 {
 	const size_t stringLength = strlen(str);
-	float *verts = calloc(stringLength, sizeof(float[4][4]));
+	float *verts = malloc(stringLength * sizeof(float[4][4]));
 	CheckAlloc(verts);
-	uint32_t *indices = calloc(stringLength, sizeof(uint32_t[6]));
+	uint32_t *indices = malloc(stringLength * sizeof(uint32_t[6]));
 	CheckAlloc(indices);
+	BatchedQuadArray quads;
+	quads.verts = verts;
+	quads.indices = indices;
+	quads.quadCount = (int)stringLength;
 
 	const double sizeMultiplier = (double)size / font->defaultSize;
-	const int width = (int)(font->width * sizeMultiplier);
-	const int quadHeight = (int)(font->textureHeight * sizeMultiplier);
-	const double uvPixel = 1.0 / (double)font->image->width;
+	const float width = (float)(font->width * sizeMultiplier);
+	const float quadHeight = (float)(font->textureHeight * sizeMultiplier);
 	int c = 0;
 
-	const int lines = StringLineCount(str);
+	int lines = 1;
+	for (size_t i = 0; i < stringLength; i++)
+	{
+		if (str[i] == '\n')
+		{
+			lines++;
+			quads.quadCount--;
+		}
+	}
 	int x = 0;
 	int y = (int)rectPos.y;
 	if (vAlign == FONT_VALIGN_MIDDLE)
@@ -183,53 +194,65 @@ void DrawTextAligned(const char *str,
 		{
 			x = (int)rectPos.x;
 		}
-		int lx = x;
-		const int ly = y;
-		int j = 0;
-		while (line[j] != '\0')
+		float lx = (float)x;
+		const float ly = (float)y;
+		for (size_t j = 0; line[j] != '\0'; j++)
 		{
 			const int fSize = (int)((font->charWidths[(int)line[j]] + font->charSpacing) * sizeMultiplier);
 
 			if (line[j] == ' ')
 			{
-				j++;
-				lx += (int)((font->spaceWidth + font->charSpacing) * sizeMultiplier);
+				lx += (float)((font->spaceWidth + font->charSpacing) * sizeMultiplier);
+				quads.quadCount--;
+				c--;
 				continue;
 			}
 
-			const Vector2 ndcPos = v2(X_TO_NDC((float)lx), Y_TO_NDC((float)ly));
-			const Vector2 ndcPosEnd = v2(X_TO_NDC((float)(lx + width)), Y_TO_NDC((float)(ly + quadHeight)));
-			const double charUVStart = (double)font->indices[(int)line[j]] / font->charCount;
-			const double charUVEnd = (font->indices[(int)line[j]] + 1.0) / font->charCount - uvPixel;
+			const Vector2 ndcPos = v2(X_TO_NDC(lx), Y_TO_NDC(ly));
+			const Vector2 ndcPosEnd = v2(X_TO_NDC(lx + width), Y_TO_NDC(ly + quadHeight));
+			const float charUVStart = font->charStartUVs[(int)line[j]];
+			const float charUVEnd = font->charEndUVs[(int)line[j]];
 
-			const mat4 quad = {
-				{(float)ndcPos.x, (float)ndcPos.y, (float)charUVStart, 0},
-				{(float)ndcPos.x, (float)ndcPosEnd.y, (float)charUVStart, 1},
-				{(float)ndcPosEnd.x, (float)ndcPosEnd.y, (float)charUVEnd, 1},
-				{(float)ndcPosEnd.x, (float)ndcPos.y, (float)charUVEnd, 0},
-			};
+			const size_t charIndex = c + j;
+			const size_t vertexOffset = charIndex * 4;
+			const size_t indexOffset = charIndex * 6;
 
-			memcpy(verts + (c + j) * 16, quad, sizeof(quad));
+			// *vert++ is used for optimization reasons (thanks compiler...)
+			float *vert = verts + vertexOffset * 4;
+			*vert++ = ndcPos.x;
+			*vert++ = ndcPos.y;
+			*vert++ = charUVStart;
+			*vert++ = 0;
+			*vert++ = ndcPos.x;
+			*vert++ = ndcPosEnd.y;
+			*vert++ = charUVStart;
+			*vert++ = 1;
+			*vert++ = ndcPosEnd.x;
+			*vert++ = ndcPosEnd.y;
+			*vert++ = charUVEnd;
+			*vert++ = 1;
+			*vert++ = ndcPosEnd.x;
+			*vert++ = ndcPos.y;
+			*vert++ = charUVEnd;
+			*vert = 0;
 
-			uint32_t quadIndices[6] = {0, 1, 2, 0, 2, 3};
+			indices[indexOffset + 0] = 0;
+			indices[indexOffset + 1] = 1;
+			indices[indexOffset + 2] = 2;
+			indices[indexOffset + 3] = 0;
+			indices[indexOffset + 4] = 2;
+			indices[indexOffset + 5] = 3;
 			for (int k = 0; k < 6; k++)
 			{
-				quadIndices[k] += (c + j) * 4;
+				indices[indexOffset + k] += vertexOffset;
 			}
 
-			memcpy(indices + (c + j) * 6, quadIndices, sizeof(quadIndices));
-
 			lx += fSize;
-			j++;
 		}
 		c += (int)strlen(line);
 		y += (int)(size + font->lineSpacing);
 	}
 
-	BatchedQuadArray quads;
-	quads.verts = verts;
-	quads.indices = indices;
-	quads.quadCount = (int)stringLength;
 	DrawBatchedQuadsTextured(&quads, font->texture, color);
 
 	free(verts);
