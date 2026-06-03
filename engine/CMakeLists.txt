@@ -31,9 +31,10 @@ fetch_dict()
 message(STATUS "Fetching Luna...")
 FetchContent_Declare(
         Luna
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/../Luna
-        EXCLUDE_FROM_ALL
-        SYSTEM
+        GIT_REPOSITORY https://github.com/NBT22/Luna
+        GIT_TAG 0.3.0
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(Luna)
 if (x86_64 AND USE_DISCORD_SDK)
