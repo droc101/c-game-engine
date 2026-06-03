@@ -252,22 +252,7 @@ static inline VkResult CreateActorWallBuffers()
 {
 	const ActorWallVertex vertices[12] = {
 		{
-			.position.x = -0.5f,
-			.position.y = -0.5f,
-			.uv.x = 1,
-			.uv.y = 1,
-		},
-		{
-			.position.x = -0.5f,
-			.position.y = 0.5f,
-			.uv.x = 1,
-		},
-		{
 			.position.x = 0.5f,
-			.position.y = 0.5f,
-		},
-		{
-			.position.x = -0.5f,
 			.position.y = -0.5f,
 			.uv.x = 1,
 			.uv.y = 1,
@@ -275,42 +260,57 @@ static inline VkResult CreateActorWallBuffers()
 		{
 			.position.x = 0.5f,
 			.position.y = 0.5f,
+			.uv.x = 1,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = 0.5f,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = -0.5f,
+			.uv.y = 1,
 		},
 		{
 			.position.x = 0.5f,
 			.position.y = -0.5f,
+			.uv.x = 1,
 			.uv.y = 1,
+		},
+		{
+			.position.x = -0.5f,
+			.position.y = 0.5f,
 		},
 
 		{
 			.position.x = -0.5f,
-			.position.y = -0.5f,
-			.uv.y = 1,
+			.position.y = 0.5f,
+			.uv.x = 1,
 		},
 		{
 			.position.x = 0.5f,
 			.position.y = 0.5f,
-			.uv.x = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = -0.5f,
+			.uv.y = 1,
 		},
 		{
 			.position.x = -0.5f,
 			.position.y = 0.5f,
+			.uv.x = 1,
+		},
+		{
+			.position.x = 0.5f,
+			.position.y = -0.5f,
+			.uv.y = 1,
 		},
 		{
 			.position.x = -0.5f,
 			.position.y = -0.5f,
-			.uv.y = 1,
-		},
-		{
-			.position.x = 0.5f,
-			.position.y = -0.5f,
 			.uv.x = 1,
 			.uv.y = 1,
-		},
-		{
-			.position.x = 0.5f,
-			.position.y = 0.5f,
-			.uv.x = 1,
 		},
 	};
 	const LunaBufferWriteInfo vertexDataWriteInfo = {

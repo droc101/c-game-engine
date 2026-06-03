@@ -419,16 +419,18 @@ static inline void UpdateActorWallInstanceData(const Actor *actor, ActorWallInst
 		.y = actor->wall->orientation == ACTOR_WALL_ORIENTATION_Z_AXIS ? 1 : 0,
 	};
 	const ActorWallInstanceData instanceData = {
-		.axis = axis,
-		.origin.x = position.x + actor->wall->centerOffset.x * axis.y,
-		.origin.y = position.y + actor->wall->centerOffset.y,
-		.origin.z = position.z + actor->wall->centerOffset.x * axis.x,
+		.position.x = position.x,
+		.position.y = position.y,
+		.position.z = position.z,
 		.scale.x = actor->wall->length,
 		.scale.y = actor->wall->height,
+		.axis = axis,
+		.centerOffset = actor->wall->centerOffset,
 		.rotationQuat = rotation,
 		.textureIndex = TextureIndex(actor->wall->texture),
 		.uvScale = actor->wall->uvScale,
 		.uvOffset = actor->wall->uvOffset,
+		.modColor = actor->modColor,
 	};
 	memcpy(actorInstanceData, &instanceData, sizeof(instanceData));
 }

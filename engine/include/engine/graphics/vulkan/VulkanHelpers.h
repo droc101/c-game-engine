@@ -165,13 +165,15 @@ typedef struct ActorModelInstanceData
 
 typedef struct ActorWallInstanceData
 {
-	Vector2 axis;
-	Vector3 origin;
+	Vector3 position;
 	Vector2 scale;
+	Vector2 axis;
+	Vector2 centerOffset;
 	JPH_Quat rotationQuat;
 	uint32_t textureIndex;
 	Vector2 uvScale;
 	Vector2 uvOffset;
+	Color modColor;
 } ActorWallInstanceData;
 
 typedef struct UiBuffer
@@ -209,11 +211,11 @@ typedef struct ModelBuffer
 	/// A buffer containing the index data to use along-side the per-vertex data
 	LunaBuffer indices;
 	/// A buffer containing the instance data for each instance of each model section
-	LunaBuffer instanceData;//[FRAMES_IN_FLIGHT];
+	LunaBuffer instanceData; //[FRAMES_IN_FLIGHT];
 	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
-	LunaBuffer shadedDrawInfo;//[FRAMES_IN_FLIGHT];
+	LunaBuffer shadedDrawInfo; //[FRAMES_IN_FLIGHT];
 	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
-	LunaBuffer unshadedDrawInfo;//[FRAMES_IN_FLIGHT];
+	LunaBuffer unshadedDrawInfo; //[FRAMES_IN_FLIGHT];
 } ModelBuffer;
 
 typedef struct SkyBuffer
@@ -254,8 +256,8 @@ typedef struct DebugDrawBuffer
 
 typedef struct Buffers
 {
-	UiBuffer ui;//[FRAMES_IN_FLIGHT];
-	UniformBuffers uniforms;//[FRAMES_IN_FLIGHT];
+	UiBuffer ui; //[FRAMES_IN_FLIGHT];
+	UniformBuffers uniforms; //[FRAMES_IN_FLIGHT];
 	ModelBuffer viewmodel;
 	ModelBuffer actorModels;
 	ModelBuffer map;
