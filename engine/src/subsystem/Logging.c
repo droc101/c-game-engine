@@ -66,10 +66,13 @@ void LogInternal(const char *type, const int color, const bool flush, const char
 	va_start(args, message);
 	char *plainTextBuffer = calloc(length + 1, sizeof(char));
 	CheckAlloc(plainTextBuffer);
-	sprintf(plainTextBuffer,
-			"[%.*s] ",
-			BUFFER_LENGTH - 8,
-			type); // Minus 8 due to color, brackets, and null not included
+	if (type)
+	{
+		sprintf(plainTextBuffer,
+				"[%.*s] ",
+				BUFFER_LENGTH - 8,
+				type); // Minus 8 due to color, brackets, and null not included
+	}
 	vsprintf(plainTextBuffer + strlen(plainTextBuffer), message, args);
 	AddConsoleMessage(plainTextBuffer, color);
 
