@@ -5,6 +5,11 @@
     {
       "type": "point",
       "color": "$color"
+    },
+    {
+      "type": "circle",
+      "color": "$color",
+      "radius": "$range"
     }
   ],
   "params": {
