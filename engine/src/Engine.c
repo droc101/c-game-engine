@@ -142,10 +142,7 @@ void WindowAndRenderInit()
 	SDL_Window *window = SDL_CreateWindow(gameConfig.gameTitle,
 										  width,
 										  height,
-										  SDL_WINDOW_RESIZABLE |
-												  SDL_WINDOW_HIGH_PIXEL_DENSITY |
-												  SDL_WINDOW_HIDDEN |
-												  SDL_WINDOW_VULKAN);
+										  SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN | SDL_WINDOW_VULKAN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
