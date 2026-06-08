@@ -9,11 +9,9 @@
   ],
   "inputs": {
     "set": {
-      "type": "none",
       "description": "Set the map's fog information from this actor"
     },
     "set_instant": {
-      "type": "none",
       "description": "Immediately set the map's fog information from this actor without interpolation"
     }
   },

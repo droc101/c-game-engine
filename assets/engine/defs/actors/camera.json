@@ -11,11 +11,9 @@
   ],
   "inputs": {
     "enable": {
-      "type": "none",
       "description": "Set the current camera to this actor"
     },
     "disable": {
-      "type": "none",
       "description": "Restore the camera to the player's camera"
     }
   },
