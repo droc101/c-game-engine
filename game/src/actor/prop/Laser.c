@@ -177,7 +177,7 @@ void LaserInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(data);
 	this->extraData = data;
 	data->height = KvGetByte(params, "height", LASER_HEIGHT_MIDDLE);
-	data->on = KvGetBool(params, "startOn", true);
+	data->on = KvGetBool(params, "start_on", true);
 
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);

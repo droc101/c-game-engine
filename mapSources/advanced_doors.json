@@ -161,7 +161,7 @@
                         "y": 1.0
                     }
                 },
-                "stayOpen": {
+                "stay_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -180,7 +180,7 @@
                     "type": "bool",
                     "value": false
                 },
-                "preventPlayerOpen": {
+                "prevent_player_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -231,7 +231,7 @@
                         "y": 2.0
                     }
                 },
-                "stayOpen": {
+                "stay_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -250,7 +250,7 @@
                     "type": "bool",
                     "value": false
                 },
-                "preventPlayerOpen": {
+                "prevent_player_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -285,7 +285,7 @@
                     "type": "float",
                     "value": 1.0
                 },
-                "preventPlayerOpen": {
+                "prevent_player_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -309,7 +309,7 @@
                         "y": 1.0
                     }
                 },
-                "stayOpen": {
+                "stay_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -348,7 +348,7 @@
                     "type": "float",
                     "value": 5.0
                 },
-                "preventPlayerOpen": {
+                "prevent_player_open": {
                     "type": "bool",
                     "value": false
                 },
@@ -356,7 +356,7 @@
                     "type": "bool",
                     "value": false
                 },
-                "stayOpen": {
+                "stay_open": {
                     "type": "bool",
                     "value": false
                 },

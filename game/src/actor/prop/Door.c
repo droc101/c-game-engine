@@ -323,7 +323,7 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	this->extraData = calloc(1, sizeof(DoorData));
 	CheckAlloc(this->extraData);
 	DoorData *data = this->extraData;
-	data->stayOpen = KvGetBool(params, "stayOpen", false);
+	data->stayOpen = KvGetBool(params, "stay_open", false);
 	data->width = size.x;
 	data->stayOpenTime = KvGetFloat(params, "delay_until_close", 1.0f);
 
@@ -340,7 +340,7 @@ void DoorInit(Actor *this, const KvList params, Transform *transform)
 	this->wall->unshaded = KvGetBool(params, "unshaded", false);
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 
-	CreateDoorBodies(this, transform, KvGetBool(params, "preventPlayerOpen", false));
+	CreateDoorBodies(this, transform, KvGetBool(params, "prevent_player_open", false));
 }
 
 ActorDefinition doorActorDefinition = {

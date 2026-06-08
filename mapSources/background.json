@@ -1102,11 +1102,11 @@
                     "type": "string",
                     "value": ""
                 },
-                "stayOpen": {
+                "stay_open": {
                     "type": "bool",
                     "value": true
                 },
-                "preventPlayerOpen": {
+                "prevent_player_open": {
                     "type": "bool",
                     "value": true
                 },
@@ -1172,11 +1172,11 @@
                     "type": "string",
                     "value": ""
                 },
-                "stayOpen": {
+                "stay_open": {
                     "type": "bool",
                     "value": true
                 },
-                "preventPlayerOpen": {
+                "prevent_player_open": {
                     "type": "bool",
                     "value": true
                 },
@@ -1374,7 +1374,7 @@
                     "type": "string",
                     "value": ""
                 },
-                "startOn": {
+                "start_on": {
                     "type": "bool",
                     "value": true
                 },
@@ -1402,7 +1402,7 @@
                     "type": "string",
                     "value": ""
                 },
-                "startOn": {
+                "start_on": {
                     "type": "bool",
                     "value": true
                 },

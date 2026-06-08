@@ -81,7 +81,7 @@ void GoalInit(Actor *this, const KvList params, Transform *transform)
 	GoalData *data = calloc(1, sizeof(GoalData));
 	CheckAlloc(data);
 	this->extraData = data;
-	data->enabled = KvGetBool(params, "startEnabled", true);
+	data->enabled = KvGetBool(params, "start_enabled", true);
 
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);

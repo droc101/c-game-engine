@@ -106,8 +106,8 @@ void TriggerInit(Actor *this, const KvList params, Transform *transform)
 	data->width = KvGetFloat(params, "width", 1.0f);
 	data->height = KvGetFloat(params, "height", 1.0f);
 	data->depth = KvGetFloat(params, "depth", 1.0f);
-	data->oneShot = KvGetBool(params, "oneShot", true);
-	data->enabled = KvGetBool(params, "startEnabled", true);
+	data->oneShot = KvGetBool(params, "one_shot", true);
+	data->enabled = KvGetBool(params, "start_enabled", true);
 
 	CreateTriggerSensor(this, transform);
 }

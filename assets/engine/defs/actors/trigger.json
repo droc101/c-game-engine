@@ -55,13 +55,13 @@
       "type": "float",
       "description": "The depth of this trigger"
     },
-    "oneShot": {
+    "one_shot": {
       "display": "One Shot",
       "default": true,
       "type": "bool",
       "description": "Whether this trigger should be removed after it is triggered"
     },
-    "startEnabled": {
+    "start_enabled": {
       "display": "Start Enabled",
       "default": true,
       "type": "bool",

@@ -31,7 +31,7 @@
       "display": "FOV",
       "default": 90,
       "type": "int",
-      "min": 0,
+      "minimum": 0,
       "description": "The field of view of this camera"
     }
   }

@@ -90,7 +90,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	this->extraData = calloc(1, sizeof(CoinData));
 	CheckAlloc(this->extraData);
 	CoinData *data = this->extraData;
-	data->isBlue = KvGetBool(params, "isBlue", false);
+	data->isBlue = KvGetBool(params, "is_blue", false);
 
 	const Transform adjustedTransform = {
 		.position.x = transform->position.x,

@@ -12,7 +12,7 @@
     }
   },
   "params": {
-    "isBlue": {
+    "is_blue": {
       "display": "Coin Type",
       "description": "Whether this coin should be blue or yellow.",
       "type": "bool",

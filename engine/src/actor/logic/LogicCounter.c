@@ -98,8 +98,8 @@ void LogicCounterInit(Actor *this, const KvList params, Transform * /*transform*
 	data->max = KvGetInt(params, "max", 100);
 	data->counter = KvGetInt(params, "counter", 0);
 	data->counter = clamp(data->counter, data->min, data->max);
-	data->clampToMax = KvGetBool(params, "clampToMax", true);
-	data->clampToMin = KvGetBool(params, "clampToMin", true);
+	data->clampToMax = KvGetBool(params, "clamp_to_max", true);
+	data->clampToMin = KvGetBool(params, "clamp_to_min", true);
 }
 
 ActorDefinition logicCounterActorDefinition = {

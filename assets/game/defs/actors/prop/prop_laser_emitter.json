@@ -20,7 +20,7 @@
     }
   },
   "params": {
-    "startOn": {
+    "start_on": {
       "display": "Start On",
       "description": "Whether this laser emitter should be on when it spawns",
       "default": true,

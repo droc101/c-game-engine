@@ -37,13 +37,13 @@
     }
   },
   "params": {
-    "stayOpen": {
+    "stay_open": {
       "display": "Stay Open",
       "description": "Whether this door should remain open until closed via I/O",
       "default": false,
       "type": "bool"
     },
-    "preventPlayerOpen": {
+    "prevent_player_open": {
       "display": "Prevent Player Open",
       "description": "Whether this door should open when the player approaches",
       "default": false,

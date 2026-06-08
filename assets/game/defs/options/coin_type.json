@@ -1,13 +1,7 @@
 {
   "type": "bool",
-  "options": [
-    [
-      false,
-      "Yellow"
-    ],
-    [
-      true,
-      "Blue"
-    ]
-  ]
+  "options": {
+    "Yellow": false,
+    "Blue": true
+  }
 }

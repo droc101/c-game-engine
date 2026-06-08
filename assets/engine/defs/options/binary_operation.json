@@ -1,17 +1,8 @@
 {
   "type": "byte",
-  "options": [
-    [
-      0,
-      "AND"
-    ],
-    [
-      1,
-      "OR"
-    ],
-    [
-      2,
-      "NOT"
-    ]
-  ]
+  "options": {
+    "AND": 0,
+    "OR": 1,
+    "NOT": 2
+  }
 }

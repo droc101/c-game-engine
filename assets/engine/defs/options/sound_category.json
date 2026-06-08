@@ -1,17 +1,8 @@
 {
   "type": "byte",
-  "options": [
-    [
-      0,
-      "Music"
-    ],
-    [
-      1,
-      "Sound Effect"
-    ],
-    [
-      2,
-      "User Interface"
-    ]
-  ]
+  "options": {
+    "Music": 0,
+    "Sound Effect": 1,
+    "User Interface": 2
+  }
 }

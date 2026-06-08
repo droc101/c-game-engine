@@ -10,7 +10,7 @@
     }
   },
   "params": {
-    "startOn": {
+    "start_on": {
       "display": "Start On",
       "description": "Whether this laser should be on when it spawns",
       "default": true,

@@ -64,7 +64,7 @@ static void LaserEmitterUpdate(Actor *this, const double /*delta*/)
 		KvList laserParams;
 		KvListCreate(laserParams);
 		KvSetByte(laserParams, "height", data->height);
-		KvSetBool(laserParams, "startOn", data->startOn);
+		KvSetBool(laserParams, "start_on", data->startOn);
 		data->laserActor = CreateActor(&data->transform,
 									   LASER_ACTOR_NAME,
 									   laserParams,
@@ -111,7 +111,7 @@ void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 
 	CreateLaserEmitterCollider(this, transform);
 
-	data->startOn = KvGetBool(params, "startOn", true);
+	data->startOn = KvGetBool(params, "start_on", true);
 }
 
 ActorDefinition laserEmitterActorDefinition = {

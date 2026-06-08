@@ -23,7 +23,7 @@
       "display": "Light Color",
       "default": -1,
       "type": "color",
-      "showAlpha": false,
+      "show_alpha": false,
       "description": "The color of this light"
     },
     "start_on": {
@@ -36,7 +36,7 @@
       "display": "Interpolation Ticks",
       "default": 60,
       "type": "int",
-      "min": 0,
+      "minimum": 0,
       "description": "The number of physics ticks (60 per second) the light color and angle transition should take"
     }
   }

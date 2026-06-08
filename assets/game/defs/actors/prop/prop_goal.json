@@ -15,7 +15,7 @@
     }
   },
   "params": {
-    "startEnabled": {
+    "start_enabled": {
       "display": "Start Enabled",
       "description": "Whether the player should be able to collect this goal when it spawns",
       "default": true,
