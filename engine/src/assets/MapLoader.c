@@ -285,24 +285,34 @@ bool LoadMap(Map *map, Asset *mapData)
 	ReadBuffer(reader, lightmapDataSize, map->lightmapPixels);
 
 	EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
-	map->numPointLights = ReadUint16(reader);
-	map->pointLights = malloc(sizeof(PointLight) * map->numPointLights);
+	map->lightCount = ReadUint16(reader);
+	map->pointLights = malloc(sizeof(Light) * map->lightCount);
 	CheckAlloc(map->pointLights);
-	EXPECT_BYTES_BOOL(sizeof(float) * 8 * map->numPointLights, bytesRemaining);
-	for (size_t i = 0; i < map->numPointLights; i++)
+	EXPECT_BYTES_BOOL((sizeof(float) * 16 + sizeof(uint32_t)) * map->lightCount, bytesRemaining);
+	for (size_t i = 0; i < map->lightCount; i++)
 	{
-		PointLight *light = &map->pointLights[i];
-		light->position[0] = ReadFloat(reader);
-		light->position[1] = ReadFloat(reader);
-		light->position[2] = ReadFloat(reader);
+		Light *light = &map->pointLights[i];
+		light->type = ReadUint32(reader);
+		light->transform.position.x = ReadFloat(reader);
+		light->transform.position.y = ReadFloat(reader);
+		light->transform.position.z = ReadFloat(reader);
+		Vector3 rotation;
+		rotation.x = ReadFloat(reader);
+		rotation.y = ReadFloat(reader);
+		rotation.z = ReadFloat(reader);
+		JPH_Quat_FromEulerAngles(&rotation, &light->transform.rotation);
 
 		light->color[0] = ReadFloat(reader);
 		light->color[1] = ReadFloat(reader);
 		light->color[2] = ReadFloat(reader);
 
-		light->brightnessScale = ReadFloat(reader);
-		light->range = ReadFloat(reader);
-		light->attenuation = ReadFloat(reader);
+		light->brightness = ReadFloat(reader);
+		light->constantAttenuation = ReadFloat(reader);
+		light->linearAttenuation = ReadFloat(reader);
+		light->quadraticAttenuation = ReadFloat(reader);
+		light->attenuationMultiplier = ReadFloat(reader);
+		light->brightAngle = ReadFloat(reader);
+		light->fadingAngle = ReadFloat(reader);
 	}
 
 	DestroyDataReader(reader);

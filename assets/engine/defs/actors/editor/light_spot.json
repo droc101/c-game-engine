@@ -12,18 +12,43 @@
     }
   ],
   "params": {
-    "angle": {
-      "display": "Spotlight Angle",
+    "constant_attenuation": {
+      "display": "Constant Attenuation",
       "type": "float",
-      "default": 45.0,
-      "minimum": 0.0,
-      "maximum": 180.0
+      "default": 0.0,
+      "minimum": 0.0
     },
-    "angle_attenuation": {
-      "display": "Angular Attenuation Factor",
+    "linear_attenuation": {
+      "display": "Linear Attenuation",
+      "type": "float",
+      "default": 0.0,
+      "minimum": 0.0
+    },
+    "quadratic_attenuation": {
+      "display": "Quadratic Attenuation",
+      "type": "float",
+      "default": 1.0,
+      "minimum": 0.0
+    },
+    "attenuation_multiplier": {
+      "display": "Attenuation Multiplier",
       "type": "float",
       "default": 2.0,
       "minimum": 0.0
+    },
+    "bright_angle": {
+      "display": "Bright Angle",
+      "type": "float",
+      "default": 45.0,
+      "minimum": 0.0,
+      "maximum": 90.0
+    },
+    "fading_angle": {
+      "display": "Fading angle",
+      "type": "float",
+      "default": 30.0,
+      "minimum": 0.0,
+      "maximum": 90.0
     }
   }
 }

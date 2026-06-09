@@ -119,9 +119,9 @@ struct Map
 	void *lightmapPixels;
 
 	/// The number of point lights in the level
-	uint16_t numPointLights;
+	uint16_t lightCount;
 	/// The point lights in this level
-	PointLight *pointLights;
+	Light *pointLights;
 };
 
 /**

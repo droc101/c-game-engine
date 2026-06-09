@@ -45,7 +45,7 @@ Map *CreateMap(void)
 	map->physicsTick = 0;
 	map->changeFlags = 0;
 	map->exposure = 1.0f;
-	map->numPointLights = 0;
+	map->lightCount = 0;
 	map->pointLights = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);

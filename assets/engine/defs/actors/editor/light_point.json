@@ -9,20 +9,32 @@
     {
       "type": "circle",
       "color": "$color",
-      "radius": "$range",
-      "is_gizmo": true
+      "radius": "falloff($constant_attenuation, $linear_attenuation, $quadratic_attenuation, $attenuation_multiplier, 1)",
+      "is_gizmo": true,
+      "num_sides": 32
     }
   ],
   "params": {
-    "range": {
-      "display": "Light Range",
+    "constant_attenuation": {
+      "display": "Constant Attenuation",
       "type": "float",
-      "default": 2.0,
-      "minimum": 0.0,
-      "description": "The radius of the light cast by this point light"
+      "default": 0.0,
+      "minimum": 0.0
     },
-    "attenuation": {
-      "display": "Attenuation Factor",
+    "linear_attenuation": {
+      "display": "Linear Attenuation",
+      "type": "float",
+      "default": 0.0,
+      "minimum": 0.0
+    },
+    "quadratic_attenuation": {
+      "display": "Quadratic Attenuation",
+      "type": "float",
+      "default": 1.0,
+      "minimum": 0.0
+    },
+    "attenuation_multiplier": {
+      "display": "Attenuation Multiplier",
       "type": "float",
       "default": 2.0,
       "minimum": 0.0

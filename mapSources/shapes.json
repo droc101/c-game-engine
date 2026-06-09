@@ -3641,13 +3641,13 @@
             },
             "connections": [],
             "params": {
-                "is_blue": {
-                    "type": "bool",
-                    "value": false
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "is_blue": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3696,9 +3696,13 @@
             },
             "connections": [],
             "params": {
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
                 },
                 "light_color": {
                     "type": "color",
@@ -3709,13 +3713,9 @@
                         "a": 1.0
                     }
                 },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
                 }
             }
         },
@@ -3733,12 +3733,43 @@
             },
             "connections": [],
             "params": {
-                "size": {
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": "goal_door"
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -3749,42 +3780,11 @@
                         "a": 1.0
                     }
                 },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "name": {
-                    "type": "string",
-                    "value": "goal_door"
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
                     }
                 }
             }
@@ -3803,12 +3803,43 @@
             },
             "connections": [],
             "params": {
-                "size": {
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": "goal_door"
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -3819,42 +3850,11 @@
                         "a": 1.0
                     }
                 },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "name": {
-                    "type": "string",
-                    "value": "goal_door"
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
                     }
                 }
             }
@@ -3873,13 +3873,13 @@
             },
             "connections": [],
             "params": {
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3897,13 +3897,13 @@
             },
             "connections": [],
             "params": {
-                "is_blue": {
-                    "type": "bool",
-                    "value": false
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "is_blue": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3921,13 +3921,13 @@
             },
             "connections": [],
             "params": {
-                "is_blue": {
-                    "type": "bool",
-                    "value": false
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "is_blue": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3945,13 +3945,13 @@
             },
             "connections": [],
             "params": {
-                "is_blue": {
-                    "type": "bool",
-                    "value": false
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "is_blue": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3969,13 +3969,13 @@
             },
             "connections": [],
             "params": {
-                "is_blue": {
-                    "type": "bool",
-                    "value": false
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "is_blue": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3993,31 +3993,16 @@
             },
             "connections": [],
             "params": {
-                "solid": {
-                    "type": "bool",
-                    "value": true
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
                 },
-                "texture": {
+                "name": {
                     "type": "string",
-                    "value": "texture/level/uvtest.gtex"
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 2.0,
-                        "y": 1.0
-                    }
+                    "value": ""
                 },
                 "color": {
                     "type": "color",
@@ -4028,16 +4013,31 @@
                         "a": 1.0
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
+                "size": {
                     "type": "vec2",
                     "value": {
-                        "x": 0.0,
-                        "y": 0.0
+                        "x": 2.0,
+                        "y": 1.0
                     }
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/uvtest.gtex"
+                },
+                "solid": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -4055,17 +4055,17 @@
             },
             "connections": [],
             "params": {
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 }
             }
         },
@@ -4083,17 +4083,17 @@
             },
             "connections": [],
             "params": {
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 }
             }
         },
@@ -4111,17 +4111,17 @@
             },
             "connections": [],
             "params": {
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 }
             }
         },
@@ -4139,17 +4139,17 @@
             },
             "connections": [],
             "params": {
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "laser_emitter"
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 }
             }
         },
@@ -4198,12 +4198,43 @@
             },
             "connections": [],
             "params": {
-                "size": {
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -4214,42 +4245,11 @@
                         "a": 1.0
                     }
                 },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
                     }
                 }
             }
@@ -4268,12 +4268,43 @@
             },
             "connections": [],
             "params": {
-                "size": {
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -4284,42 +4315,11 @@
                         "a": 1.0
                     }
                 },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
                     }
                 }
             }
@@ -4458,13 +4458,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "always_give": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4482,17 +4482,17 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 1000.0
-                },
-                "attenuation": {
+                "quadratic_attenuation": {
                     "type": "float",
                     "value": 1.0
                 },
-                "brightness": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 10.0
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "color": {
                     "type": "color",
@@ -4502,6 +4502,14 @@
                         "b": 0.19607843458652496,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 10.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
                 }
             }
         },
@@ -4519,17 +4527,17 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 1000.0
-                },
-                "attenuation": {
+                "quadratic_attenuation": {
                     "type": "float",
                     "value": 1.0
                 },
-                "brightness": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 10.0
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "color": {
                     "type": "color",
@@ -4539,6 +4547,14 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 10.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
                 }
             }
         },
@@ -4556,17 +4572,17 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 256.0
-                },
-                "attenuation": {
+                "quadratic_attenuation": {
                     "type": "float",
                     "value": 1.0
                 },
-                "brightness": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 2.0
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "color": {
                     "type": "color",
@@ -4576,6 +4592,14 @@
                         "b": 0.5611814260482788,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
                 }
             }
         },
@@ -4593,17 +4617,17 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 256.0
-                },
-                "attenuation": {
+                "quadratic_attenuation": {
                     "type": "float",
                     "value": 1.0
                 },
-                "brightness": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 2.0
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "color": {
                     "type": "color",
@@ -4613,6 +4637,14 @@
                         "b": 0.5485231876373291,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
                 }
             }
         },
@@ -4630,17 +4662,17 @@
             },
             "connections": [],
             "params": {
-                "range": {
-                    "type": "float",
-                    "value": 128.0
-                },
-                "attenuation": {
+                "quadratic_attenuation": {
                     "type": "float",
                     "value": 1.0
                 },
-                "brightness": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 2.0
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "color": {
                     "type": "color",
@@ -4650,6 +4682,14 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
                 }
             }
         },
@@ -4667,15 +4707,15 @@
             },
             "connections": [],
             "params": {
-                "range": {
+                "quadratic_attenuation": {
                     "type": "float",
-                    "value": 64.0
+                    "value": 1.0
                 },
-                "attenuation": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 2.0
+                    "value": 0.0
                 },
-                "brightness": {
+                "attenuation_multiplier": {
                     "type": "float",
                     "value": 1.0
                 },
@@ -4687,6 +4727,14 @@
                         "b": 0.9534796476364136,
                         "a": 1.0
                     }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
                 }
             }
         }

@@ -1106,13 +1106,13 @@
                     "type": "bool",
                     "value": true
                 },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
                 "unshaded": {
                     "type": "bool",
                     "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
                 },
                 "delay_until_close": {
                     "type": "float",
@@ -1176,13 +1176,13 @@
                     "type": "bool",
                     "value": true
                 },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
                 "unshaded": {
                     "type": "bool",
                     "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
                 },
                 "delay_until_close": {
                     "type": "float",
@@ -1458,13 +1458,9 @@
             },
             "connections": [],
             "params": {
-                "range": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 512.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 1.0
+                    "value": 0.0
                 },
                 "brightness": {
                     "type": "float",
@@ -1478,6 +1474,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
                 }
             }
         },
@@ -1495,13 +1503,9 @@
             },
             "connections": [],
             "params": {
-                "range": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 512.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 1.0
+                    "value": 0.0
                 },
                 "brightness": {
                     "type": "float",
@@ -1515,6 +1519,18 @@
                         "b": 0.8759280443191528,
                         "a": 1.0
                     }
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
                 }
             }
         },
@@ -1532,13 +1548,9 @@
             },
             "connections": [],
             "params": {
-                "range": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 256.0
-                },
-                "attenuation": {
-                    "type": "float",
-                    "value": 2.0
+                    "value": 0.0
                 },
                 "brightness": {
                     "type": "float",
@@ -1552,6 +1564,18 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
                 }
             }
         },
