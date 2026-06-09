@@ -4,7 +4,7 @@
   "renderers": [
     {
       "type": "point",
-      "color": 4294902015
+      "color": "#FFFF00"
     }
   ],
   "inputs": {

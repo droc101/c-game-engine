@@ -4,14 +4,14 @@
   "renderers": [
     {
       "type": "point",
-      "color": 4294902015
+      "color": "#FFFF00"
     },
     {
       "type": "box",
       "width": "$width",
       "height": "$height",
       "depth": "$depth",
-      "color": 4294902015
+      "color": "#FFFF00"
     }
   ],
   "inputs": {
