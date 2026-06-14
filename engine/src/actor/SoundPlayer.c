@@ -84,14 +84,14 @@ static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const 
 	StopSound(data->effect);
 }
 
-void SoundPlayerInit(Actor *this, const KvList params, Transform *transform)
+static void SoundPlayerInit(Actor *this, const KvList params, Transform *transform)
 {
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
 	data->effect = NULL;
 	const char *soundAsset = KvGetString(params, "sound", "sfx/click");
-	data->asset = malloc(strlen(SOUND("")) + strlen(soundAsset) + 1);
-	sprintf(data->asset, SOUND("%s"), soundAsset);
+	data->asset = malloc(strlen(soundAsset) + 1);
+	sprintf(data->asset, "%s", soundAsset);
 	data->loops = KvGetInt(params, "loops", 0);
 	data->volume = KvGetFloat(params, "volume", 1);
 	data->preload = KvGetBool(params, "preload", false);

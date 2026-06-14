@@ -134,13 +134,13 @@
             },
             "connections": [],
             "params": {
-                "skin": {
-                    "type": "int",
-                    "value": 1
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
                 },
-                "model": {
-                    "type": "string",
-                    "value": "model/quad.gmdl"
+                "collision": {
+                    "type": "byte",
+                    "value": 2
                 },
                 "color": {
                     "type": "color",
@@ -151,13 +151,13 @@
                         "a": 1.0
                     }
                 },
-                "collision": {
-                    "type": "byte",
-                    "value": 2
+                "model": {
+                    "type": "string",
+                    "value": "model/quad.gmdl"
                 },
-                "affect_lightmap": {
-                    "type": "bool",
-                    "value": true
+                "skin": {
+                    "type": "int",
+                    "value": 1
                 }
             }
         },
@@ -175,33 +175,33 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "music"
-                },
-                "volume": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "sound": {
-                    "type": "string",
-                    "value": "music/field"
-                },
-                "preload": {
-                    "type": "bool",
-                    "value": true
-                },
-                "positional": {
-                    "type": "bool",
-                    "value": true
+                "category": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "loops": {
                     "type": "int",
                     "value": -1
                 },
-                "category": {
-                    "type": "byte",
-                    "value": 1
+                "positional": {
+                    "type": "bool",
+                    "value": true
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/music/field.gsnd"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "music"
                 }
             }
         },
