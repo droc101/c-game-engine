@@ -1091,43 +1091,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -1138,11 +1107,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -1161,43 +1161,12 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
                 },
                 "color": {
                     "type": "color",
@@ -1208,11 +1177,42 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
                         "x": 1.0,
                         "y": 1.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
                     }
                 }
             }
@@ -1231,17 +1231,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "camera"
+                "fov": {
+                    "type": "int",
+                    "value": 90
                 },
                 "show_player_model": {
                     "type": "bool",
                     "value": true
                 },
-                "fov": {
-                    "type": "int",
-                    "value": 90
+                "name": {
+                    "type": "string",
+                    "value": "camera"
                 }
             }
         },
@@ -1325,21 +1325,9 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 },
                 "color": {
                     "type": "color",
@@ -1350,9 +1338,21 @@
                         "a": 1.0
                     }
                 },
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1370,17 +1370,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1398,17 +1398,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1426,21 +1426,21 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
+                "exposure": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "interpolation_ticks": {
                     "type": "int",
                     "value": 60
                 },
-                "exposure": {
-                    "type": "float",
-                    "value": 1.0
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1458,13 +1458,17 @@
             },
             "connections": [],
             "params": {
-                "constant_attenuation": {
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "linear_attenuation": {
                     "type": "float",
                     "value": 0.0
                 },
-                "brightness": {
+                "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 2.0
                 },
                 "color": {
                     "type": "color",
@@ -1475,17 +1479,13 @@
                         "a": 1.0
                     }
                 },
-                "attenuation_multiplier": {
+                "brightness": {
                     "type": "float",
                     "value": 1.0
                 },
-                "linear_attenuation": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 0.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
+                    "value": 1.5
                 }
             }
         },
@@ -1503,13 +1503,17 @@
             },
             "connections": [],
             "params": {
-                "constant_attenuation": {
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "linear_attenuation": {
                     "type": "float",
                     "value": 0.0
                 },
-                "brightness": {
+                "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 10.0
                 },
                 "color": {
                     "type": "color",
@@ -1520,17 +1524,13 @@
                         "a": 1.0
                     }
                 },
-                "attenuation_multiplier": {
+                "brightness": {
                     "type": "float",
                     "value": 1.0
                 },
-                "linear_attenuation": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 0.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
+                    "value": 1.9500000476837158
                 }
             }
         },
@@ -1548,11 +1548,15 @@
             },
             "connections": [],
             "params": {
-                "constant_attenuation": {
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "linear_attenuation": {
                     "type": "float",
                     "value": 0.0
                 },
-                "brightness": {
+                "attenuation_multiplier": {
                     "type": "float",
                     "value": 1.0
                 },
@@ -1565,17 +1569,13 @@
                         "a": 1.0
                     }
                 },
-                "attenuation_multiplier": {
+                "brightness": {
                     "type": "float",
                     "value": 1.0
                 },
-                "linear_attenuation": {
+                "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
                 }
             }
         },
@@ -1593,13 +1593,13 @@
             },
             "connections": [],
             "params": {
-                "affect_lightmap": {
-                    "type": "bool",
-                    "value": true
+                "skin": {
+                    "type": "int",
+                    "value": 1
                 },
-                "collision": {
-                    "type": "byte",
-                    "value": 2
+                "model": {
+                    "type": "string",
+                    "value": "model/quad.gmdl"
                 },
                 "color": {
                     "type": "color",
@@ -1610,13 +1610,13 @@
                         "a": 1.0
                     }
                 },
-                "model": {
-                    "type": "string",
-                    "value": "model/quad.gmdl"
+                "collision": {
+                    "type": "byte",
+                    "value": 2
                 },
-                "skin": {
-                    "type": "int",
-                    "value": 1
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         }

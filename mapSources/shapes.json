@@ -4492,7 +4492,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 2.0
                 },
                 "color": {
                     "type": "color",
@@ -4518,7 +4518,7 @@
             "position": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.0
+                "z": -0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -4529,15 +4529,15 @@
             "params": {
                 "quadratic_attenuation": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 0.20000000298023224
                 },
                 "linear_attenuation": {
                     "type": "float",
-                    "value": 0.0
+                    "value": 1.0
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 6.0
                 },
                 "color": {
                     "type": "color",
@@ -4550,7 +4550,7 @@
                 },
                 "brightness": {
                     "type": "float",
-                    "value": 10.0
+                    "value": 1.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -4582,7 +4582,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 0.5
                 },
                 "color": {
                     "type": "color",
@@ -4627,7 +4627,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 0.5
                 },
                 "color": {
                     "type": "color",
@@ -4698,7 +4698,7 @@
             "position": {
                 "x": 7.0,
                 "y": 2.0,
-                "z": 0.0
+                "z": -0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -4713,7 +4713,7 @@
                 },
                 "linear_attenuation": {
                     "type": "float",
-                    "value": 0.0
+                    "value": 0.10000000149011612
                 },
                 "attenuation_multiplier": {
                     "type": "float",
@@ -4734,7 +4734,7 @@
                 },
                 "constant_attenuation": {
                     "type": "float",
-                    "value": 0.0
+                    "value": 1.600000023841858
                 }
             }
         }
