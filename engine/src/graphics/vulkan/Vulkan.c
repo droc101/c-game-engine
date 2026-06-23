@@ -425,7 +425,7 @@ static inline VkResult LoadLightmap(const Map *map)
 		.writeInfo.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.writeInfo.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 		.writeInfo.submitInfo = &submitInfo,
-		.sampler = textureSamplers.nearestNoRepeatNoAnisotropy,
+		.sampler = textureSamplers.linearNoRepeatNoAnisotropy,
 	};
 	VulkanTestReturnResult(lunaCreateImage(device, secondaryCommandBuffer, &imageCreationInfo, &lightmap),
 						   "Failed to create texture!");
