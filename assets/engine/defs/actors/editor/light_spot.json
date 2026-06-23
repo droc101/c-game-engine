@@ -46,7 +46,7 @@
     "fading_angle": {
       "display": "Fading angle",
       "type": "float",
-      "default": 30.0,
+      "default": 60.0,
       "minimum": 0.0,
       "maximum": 90.0
     }
