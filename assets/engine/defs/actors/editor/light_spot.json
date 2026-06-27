@@ -9,6 +9,26 @@
     {
       "type": "orientation",
       "color": "$color"
+    },
+    {
+      "type": "cone",
+      "color": [
+        "$color:r*0.5",
+        "$color:g*0.5",
+        "$color:b*0.5"
+      ],
+      "angle": "$fading_angle",
+      "length": "falloff($constant_attenuation, $linear_attenuation, $quadratic_attenuation, $attenuation_multiplier, 1)",
+      "is_gizmo": true,
+      "num_sides": 32
+    },
+    {
+      "type": "cone",
+      "color": "$color",
+      "angle": "$bright_angle",
+      "length": "falloff($constant_attenuation, $linear_attenuation, $quadratic_attenuation, $attenuation_multiplier, 50)",
+      "is_gizmo": true,
+      "num_sides": 32
     }
   ],
   "params": {
