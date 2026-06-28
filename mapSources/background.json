@@ -36,7 +36,7 @@
             },
             "wallMaterials": [
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -168,7 +168,7 @@
                     "luxels_per_unit": 64
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -180,7 +180,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -192,7 +192,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/invisible.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -204,7 +204,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -216,7 +216,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/invisible.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -228,7 +228,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -240,7 +240,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_unshaded_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -1617,6 +1617,59 @@
                 "affect_lightmap": {
                     "type": "bool",
                     "value": true
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 19.25,
+                "y": 2.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": -35.0,
+                "y": -90.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 20.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 30.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 4.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
                 }
             }
         }
