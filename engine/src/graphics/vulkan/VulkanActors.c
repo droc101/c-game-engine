@@ -3,13 +3,23 @@
 
 #include <assert.h>
 #include <engine/assets/ModelLoader.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorWall.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
+#include <joltc/Math/Quat.h>
+#include <joltc/Math/RVec3.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaTypes.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

@@ -3,7 +3,6 @@
 //
 
 #include <cglm/cglm.h>
-#include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -11,7 +10,6 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/threads/LodThread.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaImage.h>

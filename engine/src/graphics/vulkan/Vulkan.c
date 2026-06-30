@@ -20,11 +20,11 @@
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/threads/LodThread.h>
 #include <joltc/Math/Vector3.h>
+#include <luna/luna.h>
 #include <luna/lunaBuffer.h>
-#include <luna/lunaDevice.h>
 #include <luna/lunaDrawing.h>
+#include <luna/lunaImage.h>
 #include <luna/lunaInstance.h>
 #include <luna/lunaTypes.h>
 #include <math.h>
@@ -35,7 +35,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include "luna/luna.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/debug/JoltDebugRenderer.h>

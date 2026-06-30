@@ -2,16 +2,20 @@
 // Created by NBT22 on 7/7/25.
 //
 
+#include <assert.h>
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/assets/ShaderLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/structs/Map.h>
 #include <luna/luna.h>
 #include <luna/lunaDrawing.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <vulkan/vulkan_core.h>
 
 // TODO: This probably won't change much since pipelines are really just a lot of boilerplate,
