@@ -1,0 +1,63 @@
+{
+  "description": "Changes maps when a player enters a box",
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    },
+    {
+      "type": "box",
+      "width": "$width",
+      "height": "$height",
+      "depth": "$depth",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "force_trigger": {
+      "description": "Forcibly change maps"
+    },
+    "enable": {
+      "description": "Enable contact sensing"
+    },
+    "disable": {
+      "description": "Disable contact sensing"
+    }
+  },
+  "params": {
+    "width": {
+      "display": "Width",
+      "default": 1.0,
+      "type": "float",
+      "description": "The width of this trigger_map"
+    },
+    "height": {
+      "display": "Height",
+      "default": 1.0,
+      "type": "float",
+      "description": "The height of this trigger_map"
+    },
+    "depth": {
+      "display": "Depth",
+      "default": 1.0,
+      "type": "float",
+      "description": "The depth of this trigger_map"
+    },
+    "start_enabled": {
+      "display": "Start Enabled",
+      "default": true,
+      "type": "bool",
+      "description": "Whether this trigger_map should be enabled and sensing contact when it spawns"
+    },
+    "map_name": {
+      "display": "Map Name",
+      "type": "string",
+      "description": "The map to change to"
+    },
+    "entrance_name": {
+      "display": "Entrance Name",
+      "type": "string"
+    }
+  }
+}

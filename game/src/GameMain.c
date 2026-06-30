@@ -1,4 +1,5 @@
 #include <engine/Engine.h>
+#include <engine/gameState/LoadingState.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
@@ -11,7 +12,18 @@
 
 #undef main // Leaked by SDL_main.h
 
-void SetInitialGameState()
+static void LoadingStateDone()
+{
+	SetGameState(&MainState);
+}
+
+static void LoadingStateError()
+{
+	menuStateFadeIn = false;
+	SetGameState(&MenuState); // get out before crash
+}
+
+static void SetInitialGameState()
 {
 	bool loadMap = false;
 	if (HasCliArg("--map"))
@@ -38,7 +50,7 @@ void SetInitialGameState()
 	}
 }
 
-void DestroyGame()
+static void DestroyGame()
 {
 	LaserRaycastFiltersDestroy();
 }
@@ -47,6 +59,8 @@ EXPORT_SYM int GameMain(const int argc, const char *argv[])
 {
 	InitEngine(argc, argv, RegisterGameActors);
 	LaserRaycastFiltersInit();
+	LoadingStateDoneCallback = LoadingStateDone;
+	LoadingStateErrorCallback = LoadingStateError;
 	SetInitialGameState();
 	LogInfo("Engine initialized, entering mainloop\n");
 	while (!EngineShouldQuit())

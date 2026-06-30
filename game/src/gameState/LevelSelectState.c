@@ -4,6 +4,7 @@
 
 #include "gameState/LevelSelectState.h"
 #include <engine/assets/AssetReader.h>
+#include <engine/gameState/LoadingState.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -16,7 +17,6 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
-#include <gameState/LoadingState.h>
 #include <gameState/MenuState.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_scancode.h>
@@ -25,10 +25,10 @@
 #include <stdio.h>
 #include <string.h>
 
-int selectedLevel = 0;
-List levelList;
+static int selectedLevel = 0;
+static List levelList;
 
-void LevelSelectStateUpdate(GlobalState *state, const double delta)
+static void LevelSelectStateUpdate(GlobalState *state, const double delta)
 {
 	UpdateMenuBackground(state, delta);
 
@@ -59,12 +59,13 @@ void LevelSelectStateUpdate(GlobalState *state, const double delta)
 	{
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
 		ConsumeButton(mainThreadInput, CONTROLLER_OK);
+		loadStateTransition = NULL;
 		loadStateLevelname = strdup(ListGetPointer(levelList, selectedLevel));
 		SetGameState(&LoadingState);
 	}
 }
 
-void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
+static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderMenuBackground(state);
 	if (!IsBackgroundMapLoaded())
@@ -120,13 +121,13 @@ void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 	}
 }
 
-void LoadLevelList()
+static void LoadLevelList()
 {
 	ListInit(levelList, LIST_POINTER);
 	EnumerateAssetsInFolder("map", &levelList, ".gmap");
 }
 
-void LevelSelectStateSet()
+static void LevelSelectStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
 	if (levelList.length == 0)
@@ -136,7 +137,7 @@ void LevelSelectStateSet()
 	EnterMenuBackgroundState();
 }
 
-void LevelSelectStateDestroy()
+static void LevelSelectStateDestroy()
 {
 	ListAndContentsFree(levelList);
 }

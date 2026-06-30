@@ -34,6 +34,7 @@ Map *CreateMap(void)
 	PhysicsInitMap(map);
 	CreatePlayer(map);
 	map->mapName = NULL;
+	map->transition = NULL;
 	map->fogColor = COLOR(0xff000000);
 	map->fogStart = 2000;
 	map->fogEnd = 2500;
@@ -97,6 +98,11 @@ void DestroyMap(Map *map)
 	}
 
 	free(map->mapName);
+	if (map->transition)
+	{
+		free(map->transition->entranceName);
+		free(map->transition);
+	}
 
 	free(map->skyTexture);
 	free(map->discordRpcIcon);

@@ -84,6 +84,10 @@ target_sources(engine INTERFACE
         include/engine/actor/Camera.h
         include/engine/actor/prop/Button.h
         src/actor/prop/Button.c
+        src/actor/TriggerMap.c
+        include/engine/actor/TriggerMap.h
+        src/actor/Entrance.c
+        include/engine/actor/Entrance.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -118,6 +122,9 @@ target_sources(engine INTERFACE
         include/engine/debug/JoltDebugRenderer.h
         src/debug/DPrintConsole.c
         include/engine/debug/DPrintConsole.h
+
+        src/gameState/LoadingState.c
+        include/engine/gameState/LoadingState.h
 
         src/graphics/Drawing.c
         include/engine/graphics/Drawing.h

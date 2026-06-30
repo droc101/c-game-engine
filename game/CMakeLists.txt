@@ -21,8 +21,6 @@ add_library(game MODULE EXCLUDE_FROM_ALL
 
         src/gameState/LevelSelectState.c
         include/gameState/LevelSelectState.h
-        src/gameState/LoadingState.c
-        include/gameState/LoadingState.h
         src/gameState/LogoSplashState.c
         include/gameState/LogoSplashState.h
         src/gameState/MainState.c

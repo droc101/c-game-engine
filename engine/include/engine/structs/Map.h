@@ -23,6 +23,7 @@
 typedef struct Map Map;
 typedef struct MapVertex MapVertex;
 typedef struct MapModel MapModel;
+typedef struct MapTransition MapTransition;
 
 typedef enum MapChangeFlags MapChangeFlags;
 
@@ -56,6 +57,13 @@ struct MapModel
 	uint32_t indexCount;
 	/// The indices in this model
 	uint32_t *indices;
+};
+
+struct MapTransition
+{
+	char *entranceName;
+	Vector3 relativePosition;
+	Vector3 relativeAngles;
 };
 
 struct Map
@@ -122,6 +130,8 @@ struct Map
 	uint16_t lightCount;
 	/// The point lights in this level
 	Light *pointLights;
+
+	MapTransition *transition;
 };
 
 /**

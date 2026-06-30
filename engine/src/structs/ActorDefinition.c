@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <engine/actor/Camera.h>
+#include <engine/actor/Entrance.h>
 #include <engine/actor/env/GlobalFog.h>
 #include <engine/actor/env/GlobalLight.h>
 #include <engine/actor/env/TonemapController.h>
@@ -17,6 +18,7 @@
 #include <engine/actor/prop/StaticModel.h>
 #include <engine/actor/SoundPlayer.h>
 #include <engine/actor/Trigger.h>
+#include <engine/actor/TriggerMap.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/subsystem/Error.h>
@@ -95,6 +97,8 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterTonemapController();
 	RegisterCamera();
 	RegisterButton();
+	RegisterTriggerMap();
+	RegisterEntrance();
 	RegisterGameActors();
 }
 
