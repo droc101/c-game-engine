@@ -2,6 +2,7 @@
 // Created by droc101 on 4/21/2024.
 //
 
+#include <assert.h>
 #include <cglm/types.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>

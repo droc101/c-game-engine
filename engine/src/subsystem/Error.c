@@ -6,7 +6,6 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <errno.h>
@@ -31,7 +30,7 @@
 #include <execinfo.h>
 #endif
 
-SDL_MessageBoxColorScheme mbColorScheme;
+static SDL_MessageBoxColorScheme mbColorScheme;
 
 _Noreturn inline void _GameAllocFailure()
 {
@@ -192,7 +191,7 @@ _Noreturn void RenderInitError()
 	exit(1);
 }
 
-void SignalHandler(const int sig)
+static void SignalHandler(const int sig)
 {
 	switch (sig)
 	{

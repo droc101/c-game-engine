@@ -18,10 +18,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *configPath = NULL;
+static char *configPath = NULL;
 GameConfig gameConfig = {0};
 
-AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags, const char *path)
+static AssetPath *CreateAssetPath(const AssetPathType type, const AssetPathFlags flags, const char *path)
 {
 	AssetPath *assetPath = malloc(sizeof(AssetPath));
 	CheckAlloc(assetPath);

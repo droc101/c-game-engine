@@ -88,7 +88,7 @@ static void LaserEmitterTurnOffHandler(Actor *this, const Actor * /*sender*/, co
 	this->currentSkinIndex = EMITTER_SKIN_OFF;
 }
 
-void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
+static void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 

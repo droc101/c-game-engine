@@ -25,9 +25,9 @@
 #include "gameState/MainState.h"
 #include "gameState/OptionsState.h"
 
-UiStack *pauseStack = NULL;
+static UiStack *pauseStack = NULL;
 
-void PauseStateUpdate(GlobalState * /*state*/, const double /*delta*/)
+static void PauseStateUpdate(GlobalState * /*state*/, const double /*delta*/)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL) ||
@@ -38,7 +38,7 @@ void PauseStateUpdate(GlobalState * /*state*/, const double /*delta*/)
 	}
 }
 
-void PauseStateRender(GlobalState *state, const double /*delta*/)
+static void PauseStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderInGameMenuBackground();
 
@@ -60,24 +60,24 @@ void PauseStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(pauseStack);
 }
 
-void BtnPauseResume()
+static void BtnPauseResume()
 {
 	SetGameState(&MainState);
 }
 
-void BtnOptions()
+static void BtnOptions()
 {
 	optionsStateInGame = true;
 	SetGameState(&OptionsState);
 }
 
-void BtnPauseExit()
+static void BtnPauseExit()
 {
 	ChangeMap(NULL);
 	SetGameState(&LevelSelectState);
 }
 
-void PauseStateSet()
+static void PauseStateSet()
 {
 	GetState()->rpcState = PAUSED;
 	if (pauseStack == NULL)
@@ -91,7 +91,7 @@ void PauseStateSet()
 	UiStackResetFocus(pauseStack);
 }
 
-void PauseStateDestroy()
+static void PauseStateDestroy()
 {
 	if (pauseStack != NULL)
 	{

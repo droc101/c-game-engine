@@ -36,7 +36,7 @@ static inline void CreatePhysboxCollider(Actor *this, const Transform *transform
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transform)
+static void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_BLOCK_LASERS | ACTOR_FLAG_CAN_BE_HELD;
 	this->hasModel = true;

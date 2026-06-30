@@ -29,7 +29,7 @@ typedef struct TonemapControllerData
 	bool startOn;
 } TonemapControllerData;
 
-void TonemapControllerInit(Actor *this, const KvList params, Transform * /*transform*/)
+static void TonemapControllerInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->extraData = calloc(1, sizeof(TonemapControllerData));
 	CheckAlloc(this->extraData);
@@ -87,7 +87,7 @@ static void TonemapControllerSetInstantHandler(Actor *this, const Actor * /*send
 	GetState()->map->changeFlags |= MAP_EXPOSURE_CHANGED;
 }
 
-void TonemapControllerDestroy(Actor *this)
+static void TonemapControllerDestroy(Actor *this)
 {
 	if (interpolatingActor == this)
 	{

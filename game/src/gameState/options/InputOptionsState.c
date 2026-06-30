@@ -10,6 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
@@ -21,15 +22,15 @@
 #include <stddef.h>
 #include "gameState/OptionsState.h"
 
-UiStack *inputOptionsStack = NULL;
+static UiStack *inputOptionsStack = NULL;
 
-void BtnInputOptionsBack()
+static void BtnInputOptionsBack()
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
 }
 
-void InputOptionsStateUpdate(GlobalState *state, const double delta)
+static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -42,33 +43,33 @@ void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-void SldOptionsMouseSensitivity(const float value)
+static void SldOptionsMouseSensitivity(const float value)
 {
 	GetState()->options.cameraSpeed = value;
 }
 
-void SldOptionsRumbleStrength(const float value)
+static void SldOptionsRumbleStrength(const float value)
 {
 	GetState()->options.rumbleStrength = value;
 	Rumble(1.0f, 200, mainThreadInput);
 }
 
-void CbOptionsInvertCameraH(const bool value)
+static void CbOptionsInvertCameraH(const bool value)
 {
 	GetState()->options.invertHorizontalCamera = value;
 }
 
-void CbOptionsInvertCameraV(const bool value)
+static void CbOptionsInvertCameraV(const bool value)
 {
 	GetState()->options.invertVerticalCamera = value;
 }
 
-void CbOptionsSwapOkCancel(const bool value)
+static void CbOptionsSwapOkCancel(const bool value)
 {
 	GetState()->options.controllerSwapOkCancel = value;
 }
 
-void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
+static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
@@ -124,7 +125,7 @@ void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 	}
 }
 
-void InputOptionsStateSet()
+static void InputOptionsStateSet()
 {
 	if (inputOptionsStack == NULL)
 	{
@@ -190,7 +191,7 @@ void InputOptionsStateSet()
 	UiStackResetFocus(inputOptionsStack);
 }
 
-void InputOptionsStateDestroy()
+static void InputOptionsStateDestroy()
 {
 	if (inputOptionsStack != NULL)
 	{

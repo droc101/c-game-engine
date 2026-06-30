@@ -73,7 +73,7 @@ static void LogicBinaryExecuteHandler(Actor *this, const Actor * /*sender*/, con
 	ActorFireOutput(this, LOGIC_BINARY_OUTPUT_EXECUTION_RESULT, PARAM_BOOL(result));
 }
 
-void LogicBinaryInit(Actor *this, const KvList params, Transform * /*transform*/)
+static void LogicBinaryInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->extraData = malloc(sizeof(LogicBinaryData));
 	CheckAlloc(this->extraData);

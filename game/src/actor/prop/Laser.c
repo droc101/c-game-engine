@@ -171,7 +171,7 @@ static void LaserTurnOffHandler(Actor *this, const Actor * /*sender*/, const Par
 	this->visible = false;
 }
 
-void LaserInit(Actor *this, const KvList params, Transform *transform)
+static void LaserInit(Actor *this, const KvList params, Transform *transform)
 {
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);

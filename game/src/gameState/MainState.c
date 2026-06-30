@@ -38,7 +38,7 @@ static const char *spawnActorOnce = NULL;
 static const char *spawnActorEveryTick = NULL;
 static double lastTickDelta = 0.0f;
 
-void MainStateUpdate(GlobalState *state, const double delta)
+static void MainStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START) ||
@@ -52,7 +52,7 @@ void MainStateUpdate(GlobalState *state, const double delta)
 	MapUpdate(state, delta);
 }
 
-void MainStateFixedUpdate(GlobalState *state, const double delta)
+static void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_L))
 	{
@@ -92,7 +92,7 @@ void MainStateFixedUpdate(GlobalState *state, const double delta)
 	lastTickDelta = delta;
 }
 
-void MainStateRender(GlobalState *state, const double delta)
+static void MainStateRender(GlobalState *state, const double delta)
 {
 	RenderMap(state->map, state->camera);
 	RenderHUD();
@@ -109,7 +109,7 @@ void MainStateRender(GlobalState *state, const double delta)
 #endif
 }
 
-void MainStateSet()
+static void MainStateSet()
 {
 	GetState()->rpcState = IN_GAME;
 }

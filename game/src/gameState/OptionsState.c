@@ -26,10 +26,10 @@
 #include "gameState/options/VideoOptionsState.h"
 #include "gameState/PauseState.h"
 
-UiStack *optionsStack = NULL;
+static UiStack *optionsStack = NULL;
 bool optionsStateInGame = false;
 
-void BtnOptionsBack()
+static void BtnOptionsBack()
 {
 	if (optionsStateInGame)
 	{
@@ -41,7 +41,7 @@ void BtnOptionsBack()
 	}
 }
 
-void OptionsStateUpdate(GlobalState *state, const double delta)
+static void OptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -63,7 +63,7 @@ void OptionsStateFixedUpdate(GlobalState *state, const double delta)
 	}
 }
 
-void OptionsStateRender(GlobalState *state, const double /*delta*/)
+static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
@@ -86,22 +86,22 @@ void OptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(optionsStack);
 }
 
-void BtnVideoOptions()
+static void BtnVideoOptions()
 {
 	SetGameState(&VideoOptionsState);
 }
 
-void BtnSoundOptions()
+static void BtnSoundOptions()
 {
 	SetGameState(&SoundOptionsState);
 }
 
-void BtnInputOptions()
+static void BtnInputOptions()
 {
 	SetGameState(&InputOptionsState);
 }
 
-void CbOptionsEnableDiscordRpc(const bool value)
+static void CbOptionsEnableDiscordRpc(const bool value)
 {
 	GetState()->options.enableDiscordRpc = value;
 	if (!value)
@@ -113,7 +113,7 @@ void CbOptionsEnableDiscordRpc(const bool value)
 	}
 }
 
-void OptionsStateSet()
+static void OptionsStateSet()
 {
 	if (optionsStack == NULL)
 	{
@@ -146,7 +146,7 @@ void OptionsStateSet()
 	UiStackResetFocus(optionsStack);
 }
 
-void OptionsStateDestroy()
+static void OptionsStateDestroy()
 {
 	if (optionsStack != NULL)
 	{

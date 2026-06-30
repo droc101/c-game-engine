@@ -3,12 +3,9 @@
 //
 
 #include <assert.h>
-#include <engine/graphics/RenderingHelpers.h>
-#include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/threads/LodThread.h>
 #include <joltc/Math/Vector3.h>
@@ -26,7 +23,7 @@ static SDL_AtomicInt canStart;
 static SDL_Mutex *mutex;
 
 // ReSharper disable once CppDFAConstantFunctionResult
-int LodThreadMain(void * /*data*/)
+static int LodThreadMain(void * /*data*/)
 {
 	while (!shouldExit)
 	{
@@ -50,7 +47,7 @@ int LodThreadMain(void * /*data*/)
 		ListLock(*actors);
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
-		bool shouldReloadActors = false;
+		bool shouldReloadActors = false; // TODO only written to, never read back?
 		Vector3 actorPosition = {};
 		Vector3 offsetFromCamera = {};
 		for (size_t i = 0; i < actorCount; i++)

@@ -19,7 +19,7 @@
 #include <stddef.h>
 #include "gameState/MenuState.h"
 
-void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
+static void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 {
 	if (state->physicsFrame == 20)
 	{
@@ -35,7 +35,7 @@ void LogoSplashStateFixedUpdate(GlobalState *state, double /*delta*/)
 	}
 }
 
-void LogoSplashStateRender(GlobalState *State, const double /*delta*/)
+static void LogoSplashStateRender(GlobalState *State, const double /*delta*/)
 {
 	if (State->physicsFrame < 20 || State->physicsFrame > 100)
 	{

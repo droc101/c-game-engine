@@ -10,6 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
@@ -22,39 +23,39 @@
 #include <stdint.h>
 #include "gameState/OptionsState.h"
 
-UiStack *soundOptionsStack = NULL;
+static UiStack *soundOptionsStack = NULL;
 
-void BtnSoundOptionsBack()
+static void BtnSoundOptionsBack()
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
 }
 
-void SldOptionsMasterVolume(const float value)
+static void SldOptionsMasterVolume(const float value)
 {
 	GetState()->options.masterVolume = value;
 	UpdateVolume();
 }
 
-void SldOptionsMusicVolume(const float value)
+static void SldOptionsMusicVolume(const float value)
 {
 	GetState()->options.musicVolume = value;
 	UpdateVolume();
 }
 
-void SldOptionsSfxVolume(const float value)
+static void SldOptionsSfxVolume(const float value)
 {
 	GetState()->options.sfxVolume = value;
 	UpdateVolume();
 }
 
-void SldOptionsUiVolume(const float value)
+static void SldOptionsUiVolume(const float value)
 {
 	GetState()->options.uiVolume = value;
 	UpdateVolume();
 }
 
-void SoundOptionsStateUpdate(GlobalState *state, const double delta)
+static void SoundOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -67,7 +68,7 @@ void SoundOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
+static void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
@@ -90,7 +91,7 @@ void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(soundOptionsStack);
 }
 
-void SoundOptionsStateSet()
+static void SoundOptionsStateSet()
 {
 	if (soundOptionsStack == NULL)
 	{
@@ -157,7 +158,7 @@ void SoundOptionsStateSet()
 	UiStackResetFocus(soundOptionsStack);
 }
 
-void SoundOptionsStateDestroy()
+static void SoundOptionsStateDestroy()
 {
 	if (soundOptionsStack != NULL)
 	{

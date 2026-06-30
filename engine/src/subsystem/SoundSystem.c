@@ -65,12 +65,12 @@ struct SoundSystem
 
 SoundSystem soundSys;
 
-void LockSoundSystem()
+static void LockSoundSystem()
 {
 	SDL_LockMutex(soundSys.mutex);
 }
 
-void UnlockSoundSystem()
+static void UnlockSoundSystem()
 {
 	SDL_UnlockMutex(soundSys.mutex);
 }
@@ -78,7 +78,7 @@ void UnlockSoundSystem()
 /**
  * callback for when a channel finishes playing (so we can free it)
  */
-void ChannelFinished(void *userdata, MIX_Track * /*track*/)
+static void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 {
 	// TODO this function might need to lock the soundsystem, but that causes a deadlock in level select state
 	if (!userdata)
@@ -213,7 +213,7 @@ void UpdateSoundSystem()
 	UnlockSoundSystem();
 }
 
-float GetCategoryVolume(const SoundCategory category)
+static float GetCategoryVolume(const SoundCategory category)
 {
 	float categoryVolumeMultiplier = 1.0f;
 	switch (category)
@@ -247,7 +247,7 @@ void UpdateVolume()
 	UnlockSoundSystem();
 }
 
-MIX_Track *FindAvailableTrack(uint8_t *index)
+static MIX_Track *FindAvailableTrack(uint8_t *index)
 {
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{

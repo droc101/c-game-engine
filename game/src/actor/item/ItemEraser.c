@@ -42,7 +42,7 @@ static inline void CreateItemEraserCollider(Actor *this, const Transform *transf
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void ItemEraserInit(Actor *this, const KvList params, Transform *transform)
+static void ItemEraserInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->hasModel = true;
 	this->model = LoadModel(MODEL("eraser_w"));
@@ -55,7 +55,7 @@ void ItemEraserInit(Actor *this, const KvList params, Transform *transform)
 	CreateItemEraserCollider(this, transform);
 }
 
-void ItemEraserActivate(Actor *this)
+static void ItemEraserActivate(Actor *this)
 {
 	const ItemEraserData *data = this->extraData;
 	if (HasItem(&ERASER_ITEM_DEFINITION) && !data->alwaysGive)

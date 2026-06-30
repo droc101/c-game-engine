@@ -15,8 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint32_t mapMaterialId;
-MapMaterial *mapMaterials[MAX_MAP_MATERIALS];
+static uint32_t mapMaterialId;
+static MapMaterial *mapMaterials[MAX_MAP_MATERIALS];
 
 static MapMaterial fallbackMaterial = {
 	.id = -1,

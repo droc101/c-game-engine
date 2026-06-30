@@ -188,7 +188,7 @@ void FreeParam(Param *param)
  * @param key The key to set
  * @param value The value to set
  */
-void KvSet(KvList list, const char *key, const Param value)
+static void KvSet(KvList list, const char *key, const Param value)
 {
 	assert(list && key);
 	KvList_set_at(list, key, value);
@@ -200,7 +200,7 @@ void KvSet(KvList list, const char *key, const Param value)
  * @param key The key to get the value for
  * @return The value associated with the key, or NULL if not found
  */
-Param *KvGet(const KvList list, const char *key)
+static Param *KvGet(const KvList list, const char *key)
 {
 	assert(list && key);
 	Param *p = KvList_get(list, key);
@@ -215,7 +215,10 @@ Param *KvGet(const KvList list, const char *key)
  * @param defaultValue The default value to return if the key does not exist or is of the wrong type
  * @return The value associated with the key, or the default value if not found or of the wrong type
  */
-Param *KvGetTypeWithDefault(const KvList list, const char *key, const ParamType expectedType, Param *defaultValue)
+static Param *KvGetTypeWithDefault(const KvList list,
+								   const char *key,
+								   const ParamType expectedType,
+								   Param *defaultValue)
 {
 	assert(list && key);
 	Param *param = KvGet(list, key);

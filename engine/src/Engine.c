@@ -19,6 +19,7 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
@@ -34,15 +35,14 @@
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
-#include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
 // Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems

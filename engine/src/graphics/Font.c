@@ -80,7 +80,7 @@ int StringLineCount(const char *str)
 	return count;
 }
 
-int MeasureLine(const char *str, const int line)
+static int MeasureLine(const char *str, const int line)
 {
 	int i = 0;
 	int count = 0;

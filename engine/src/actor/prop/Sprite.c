@@ -42,7 +42,7 @@ static inline void CreateSpriteCollider(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void SpriteInit(Actor *this, const KvList params, Transform *transform)
+static void SpriteInit(Actor *this, const KvList params, Transform *transform)
 {
 	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
 	this->wall = malloc(sizeof(ActorWall));

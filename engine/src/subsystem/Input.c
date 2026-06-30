@@ -58,15 +58,15 @@ struct InputSystem
 	bool lastInputWasController;
 };
 
-SDL_Gamepad *currentGamepad;
-SDL_Joystick *currentJoystick;
-bool gamepadHasBasicHaptics;
-bool gamepadHasTriggerHaptics;
+static SDL_Gamepad *currentGamepad;
+static SDL_Joystick *currentJoystick;
+static bool gamepadHasBasicHaptics;
+static bool gamepadHasTriggerHaptics;
 
 InputSystem *physicsThreadInput = NULL;
 InputSystem *mainThreadInput = NULL;
 
-bool FindGamepad()
+static bool FindGamepad()
 {
 	int numGamepads = 0;
 	SDL_JoystickID *gamepads = SDL_GetGamepads(&numGamepads);
@@ -131,7 +131,7 @@ void HandleGamepadConnect()
 	FindGamepad();
 }
 
-void UpdateInputState(InputState *statePtr, bool *queueReleasePtr, const InputState newState)
+static void UpdateInputState(InputState *statePtr, bool *queueReleasePtr, const InputState newState)
 {
 	if (*statePtr == INP_JUST_PRESSED && newState == INP_JUST_RELEASED)
 	{

@@ -9,7 +9,7 @@
 #include <SDL3/SDL_keyboard.h>
 #include <stddef.h>
 
-TextInput *CurrentTextInput = NULL;
+static TextInput *CurrentTextInput = NULL;
 
 void SetTextInput(TextInput *input)
 {

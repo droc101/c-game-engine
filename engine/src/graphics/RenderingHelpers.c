@@ -27,16 +27,15 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <vulkan/vulkan_core.h>
 
-bool windowFocused;
+static bool windowFocused;
 
-SDL_Window *window;
-int windowWidth;
-int windowHeight;
+static SDL_Window *window;
+static int windowWidth;
+static int windowHeight;
 
 RendererQueuedAction rendererQueuedActions = 0;
-OptionsMsaa qaNewFrameufferMsaaValue = MSAA_NONE;
+static OptionsMsaa qaNewFramebufferMsaaValue = MSAA_NONE;
 
 void SetGameWindow(SDL_Window *w)
 {

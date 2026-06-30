@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-int dprintYPosition = 10;
+static int dprintYPosition = 10;
 
 void ResetDPrintYPos()
 {

@@ -173,7 +173,7 @@ void _LockingListSet(const LockingList *list, const size_t index, void *data)
 }
 
 
-void ListRemoveAtHelper(const List *list, const size_t index)
+static void ListRemoveAtHelper(const List *list, const size_t index)
 {
 	switch (list->data->type)
 	{

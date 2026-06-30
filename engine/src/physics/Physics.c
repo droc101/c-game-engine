@@ -11,7 +11,6 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
-#include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <joltc/Physics/Collision/ObjectLayer.h>
 #include <stdbool.h>

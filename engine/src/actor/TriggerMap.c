@@ -25,6 +25,7 @@
 #include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct TriggerMapData
 {

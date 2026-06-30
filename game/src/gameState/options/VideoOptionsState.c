@@ -16,7 +16,6 @@
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/CheckBox.h>
-#include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
@@ -28,10 +27,10 @@
 #include <stdlib.h>
 #include "gameState/OptionsState.h"
 
-UiStack *videoOptionsStack = NULL;
-bool hasChangedVideoOptions = false;
+static UiStack *videoOptionsStack = NULL;
+static bool hasChangedVideoOptions = false;
 
-void BtnVideoOptionsBack()
+static void BtnVideoOptionsBack()
 {
 	SaveOptions(&GetState()->options);
 	if (hasChangedVideoOptions)
@@ -44,7 +43,7 @@ void BtnVideoOptionsBack()
 	SetGameState(&OptionsState);
 }
 
-char *SliderLabelMSAA(const Control *slider)
+static char *SliderLabelMSAA(const Control *slider)
 {
 	char *labels[] = {"Off", "2X", "4X", "8X"};
 	const SliderData *data = (SliderData *)slider->controlData;
@@ -54,7 +53,7 @@ char *SliderLabelMSAA(const Control *slider)
 	return buf;
 }
 
-char *SliderLabelAnisotropy(const Control *slider)
+static char *SliderLabelAnisotropy(const Control *slider)
 {
 	char *labels[] = {"Off", "2X", "4X", "8X", "16X"};
 	const SliderData *data = (SliderData *)slider->controlData;
@@ -64,7 +63,7 @@ char *SliderLabelAnisotropy(const Control *slider)
 	return buf;
 }
 
-char *SliderLabelLod(const Control *slider)
+static char *SliderLabelLod(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
@@ -73,7 +72,7 @@ char *SliderLabelLod(const Control *slider)
 	return buf;
 }
 
-char *SliderLabelMaxFps(const Control *slider)
+static char *SliderLabelMaxFps(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
@@ -88,61 +87,61 @@ char *SliderLabelMaxFps(const Control *slider)
 	return buf;
 }
 
-void CbOptionsFullscreen(const bool value)
+static void CbOptionsFullscreen(const bool value)
 {
 	GetState()->options.fullscreen = value;
 	SDL_SetWindowFullscreen(GetGameWindow(), value);
 }
 
-void CbOptionsVsync(const bool value)
+static void CbOptionsVsync(const bool value)
 {
 	GetState()->options.vsync = value;
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
-void CbOptionsLimitFpsWhenUnfocused(const bool value)
+static void CbOptionsLimitFpsWhenUnfocused(const bool value)
 {
 	GetState()->options.limitFpsWhenUnfocused = value;
 }
 
-void CbOptionsMipmaps(const bool value)
+static void CbOptionsMipmaps(const bool value)
 {
 	GetState()->options.mipmaps = value;
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
-void CbOptionsPreferWayland(const bool value)
+static void CbOptionsPreferWayland(const bool value)
 {
 	GetState()->options.preferWayland = value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
 }
 
-void SldOptionsMsaa(const float value)
+static void SldOptionsMsaa(const float value)
 {
 	GetState()->options.msaa = value;
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_MSAA;
 }
 
-void SldOptionsAnisotropy(const float value)
+static void SldOptionsAnisotropy(const float value)
 {
 	GetState()->options.anisotropy = value;
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
-void SldOptionsLod(const float value)
+static void SldOptionsLod(const float value)
 {
 	GetState()->options.lodMultiplier = value;
 }
 
-void SldOptionsMaxFps(const float value)
+static void SldOptionsMaxFps(const float value)
 {
 	GetState()->options.maxFps = (uint16_t)value;
 }
 
-void SldOptionsFov(const float value)
+static void SldOptionsFov(const float value)
 {
 	GetState()->options.fov = value;
 	if (GetState()->map)
@@ -151,7 +150,7 @@ void SldOptionsFov(const float value)
 	}
 }
 
-void VideoOptionsStateUpdate(GlobalState *state, const double delta)
+static void VideoOptionsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
@@ -164,7 +163,7 @@ void VideoOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
+static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 {
 	if (optionsStateInGame)
 	{
@@ -187,7 +186,7 @@ void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(videoOptionsStack);
 }
 
-void VideoOptionsStateSet()
+static void VideoOptionsStateSet()
 {
 	if (videoOptionsStack == NULL)
 	{
@@ -312,7 +311,7 @@ void VideoOptionsStateSet()
 	hasChangedVideoOptions = false;
 }
 
-void VideoOptionsStateDestroy()
+static void VideoOptionsStateDestroy()
 {
 	if (videoOptionsStack != NULL)
 	{

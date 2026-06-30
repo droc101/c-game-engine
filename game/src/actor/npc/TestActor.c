@@ -122,7 +122,7 @@ static void TestActorTargetReached(Actor *this, const double delta)
 	// this->transform.rotation.y += lerp(0, PlayerRelativeAngle(this), navigationConfig->rotationSpeed * (float)delta);
 }
 
-void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
+static void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
 	this->hasModel = true;

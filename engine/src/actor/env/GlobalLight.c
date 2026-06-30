@@ -30,7 +30,7 @@ typedef struct GlobalLightData
 	bool startOn;
 } GlobalLightData;
 
-void GlobalLightInit(Actor *this, const KvList params, Transform * /*transform*/)
+static void GlobalLightInit(Actor *this, const KvList params, Transform * /*transform*/)
 {
 	this->extraData = calloc(1, sizeof(GlobalLightData));
 	CheckAlloc(this->extraData);
@@ -90,7 +90,7 @@ static void GlobalLightSetInstantHandler(Actor *this, const Actor * /*sender*/, 
 	GetState()->map->changeFlags |= MAP_LIGHT_CHANGED;
 }
 
-void GlobalLightDestroy(Actor *this)
+static void GlobalLightDestroy(Actor *this)
 {
 	if (interpolatingActor == this)
 	{

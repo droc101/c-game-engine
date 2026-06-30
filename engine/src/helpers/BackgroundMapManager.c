@@ -22,9 +22,9 @@
 #include <stdint.h>
 #include <string.h>
 
-size_t backgroundMapLoadFrameCounter = 0;
-float placeholderOpacity = 1.0f;
-bool dontLoadBackgroundMap = false;
+static size_t backgroundMapLoadFrameCounter = 0;
+static float placeholderOpacity = 1.0f;
+static bool dontLoadBackgroundMap = false;
 
 static bool IsBackgroundMapLoadedIgnoreTicks()
 {

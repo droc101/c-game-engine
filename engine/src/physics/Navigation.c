@@ -16,8 +16,8 @@ float PlayerRelativeAngle(const Actor *actor)
 	return 0.0f;
 }
 
-bool IsPlayerVisibleInternal(const Actor *actor,
-							 const NavigationConfig navigationConfig,
+static bool IsPlayerVisibleInternal(const Actor *actor,
+									const NavigationConfig navigationConfig,
 							 const Vector3 *playerPosition,
 							 const float relativeAngle,
 							 const Vector3 *playerRelativePosition)

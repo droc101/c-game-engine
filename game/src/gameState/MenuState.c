@@ -25,27 +25,27 @@
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
 
-UiStack *menuStack = NULL;
+static UiStack *menuStack = NULL;
 bool menuStateFadeIn = false;
-bool easterEgg = false;
+static bool easterEgg = false;
 
-void StartGame()
+static void StartGame()
 {
 	SetGameState(&LevelSelectState);
 }
 
-void QuitGame()
+static void QuitGame()
 {
 	GetState()->requestExit = true;
 }
 
-void OpenOptions()
+static void OpenOptions()
 {
 	optionsStateInGame = false;
 	SetGameState(&OptionsState);
 }
 
-void ReloadAssets()
+static void ReloadAssets()
 {
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();
@@ -69,7 +69,7 @@ static void DrawMenuFadeIn(GlobalState * /*state*/)
 	// }
 }
 
-void MenuStateRender(GlobalState *state, const double /*delta*/)
+static void MenuStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderMenuBackground(state);
 	if (!IsBackgroundMapLoaded())
@@ -130,7 +130,7 @@ void MenuStateRender(GlobalState *state, const double /*delta*/)
 	DrawMenuFadeIn(state);
 }
 
-void MenuStateSet()
+static void MenuStateSet()
 {
 	GetState()->rpcState = IN_MENUS;
 	if (menuStack == NULL)
@@ -157,7 +157,7 @@ void MenuStateSet()
 	EnterMenuBackgroundState();
 }
 
-void MenuStateDestroy()
+static void MenuStateDestroy()
 {
 	if (menuStack != NULL)
 	{

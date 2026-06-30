@@ -36,7 +36,7 @@ typedef struct GlobalFogData
 	bool startOn;
 } GlobalFogData;
 
-void GlobalFogInit(Actor *this, const KvList params, Transform *transform)
+static void GlobalFogInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->extraData = calloc(1, sizeof(GlobalFogData));
 	CheckAlloc(this->extraData);
@@ -110,7 +110,7 @@ static void GlobalFogSetInstantHandler(Actor *this, const Actor * /*sender*/, co
 	GetState()->map->changeFlags |= MAP_FOG_CHANGED;
 }
 
-void GlobalFogDestroy(Actor *this)
+static void GlobalFogDestroy(Actor *this)
 {
 	if (interpolatingActor == this)
 	{

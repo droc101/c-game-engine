@@ -57,7 +57,7 @@ static void ButtonUpdate(Actor *this, const double /*delta*/)
 	}
 }
 
-void ButtonInit(Actor *this, const KvList params, Transform *transform)
+static void ButtonInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->flags = ACTOR_FLAG_INTERACTABLE;
 	this->hasModel = true;
@@ -82,7 +82,7 @@ void ButtonInit(Actor *this, const KvList params, Transform *transform)
 	this->currentSkinIndex = data->pressed ? data->onSkin : data->offSkin;
 }
 
-void ButtonInteract(Actor *this)
+static void ButtonInteract(Actor *this)
 {
 	ButtonData *data = this->extraData;
 	if (data->pressed && !data->toggleMode)

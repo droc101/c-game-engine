@@ -58,7 +58,7 @@ static inline void CreatePhysicsModelCollider(Actor *this,
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void PhysicsModelInit(Actor *this, const KvList params, Transform *transform)
+static void PhysicsModelInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->hasModel = true;
 	this->model = LoadModel(KvGetString(params, "model", "leafy"));

@@ -9,15 +9,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-bool benchRunning = false;
-uint64_t benchStartTime;
-uint64_t benchFrameCount;
-uint64_t highestFrameNs;
-uint64_t lowestFrameNs;
+static bool benchRunning = false;
+static uint64_t benchStartTime;
+static uint64_t benchFrameCount;
+static uint64_t highestFrameNs;
+static uint64_t lowestFrameNs;
 
-uint64_t benchFrameStartTime;
+static uint64_t benchFrameStartTime;
 
-void BenchStart()
+static void BenchStart()
 {
 	benchRunning = true;
 	benchStartTime = GetTimeNs();
@@ -57,7 +57,7 @@ void BenchFrameEnd()
 	}
 }
 
-void BenchFinish()
+static void BenchFinish()
 {
 	benchRunning = false;
 	const uint64_t endTime = GetTimeNs();

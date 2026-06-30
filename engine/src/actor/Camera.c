@@ -20,7 +20,7 @@ typedef struct CameraData
 	Camera camera;
 } CameraData;
 
-void CameraInit(Actor *this, const KvList params, Transform *transform)
+static void CameraInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->extraData = calloc(1, sizeof(CameraData));
 	CheckAlloc(this->extraData);

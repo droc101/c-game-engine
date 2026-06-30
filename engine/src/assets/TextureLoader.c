@@ -15,8 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint32_t textureId;
-Image *images[MAX_TEXTURES];
+static uint32_t textureId;
+static Image *images[MAX_TEXTURES];
 
 #define MISSING_TEX_SIZE 2
 #define MISSING_TEX_COLOR_A 0xFF000000

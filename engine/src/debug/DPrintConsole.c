@@ -33,7 +33,7 @@ struct ConsoleMessage
 	size_t time;
 };
 
-const Color ansiColors[] = {
+static const Color ansiColors[] = {
 	// NORMAL COLORS
 	COLOR_BLACK, // BLACK
 	COLOR(0xFFD00000), // RED

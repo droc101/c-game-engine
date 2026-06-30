@@ -43,7 +43,7 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-void StaticModelInit(Actor *this, const KvList params, Transform *transform)
+static void StaticModelInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->hasModel = true;
 	this->model = LoadModel(KvGetString(params, "model", "model/quad.gmdl"));

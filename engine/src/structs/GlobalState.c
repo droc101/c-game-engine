@@ -228,6 +228,7 @@ bool ChangeMapByName(const char *name)
 {
 	LogInfo("Loading map \"%s\"\n", name);
 
+	// TODO make this dynamically sized
 	char mapPath[MAX_MAP_PATH_LENGTH];
 	if (snprintf(mapPath, MAX_MAP_PATH_LENGTH, MAP("%s"), name) > MAX_MAP_PATH_LENGTH)
 	{

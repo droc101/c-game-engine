@@ -17,7 +17,7 @@
 /// The length of the longest value passed to the type argument of the LogInternal function (including the null) plus 7
 #define BUFFER_LENGTH 14
 
-FILE *logFile = NULL;
+static FILE *logFile = NULL;
 
 void LogInit()
 {

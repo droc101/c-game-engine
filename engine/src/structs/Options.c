@@ -3,7 +3,6 @@
 //
 
 #include <engine/assets/KvlFile.h>
-#include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Logging.h>
@@ -12,7 +11,7 @@
 
 #define OPTIONS_FILE "options.kvl"
 
-void DefaultOptions(Options *options)
+static void DefaultOptions(Options *options)
 {
 	options->enableDiscordRpc = true;
 	options->musicVolume = 1.0f;
@@ -41,7 +40,7 @@ void DefaultOptions(Options *options)
 #endif
 }
 
-bool ValidateOptions(const Options *options)
+static bool ValidateOptions(const Options *options)
 {
 	// ignore controller mode
 	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)

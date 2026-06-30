@@ -56,7 +56,7 @@ static void JohnUpdate(Actor *this, double /*delta*/)
 	ActorYBillboard(GetState()->camera, this);
 }
 
-void JohnInit(Actor *this, const KvList /*params*/, Transform *transform)
+static void JohnInit(Actor *this, const KvList /*params*/, Transform *transform)
 {
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);

@@ -32,9 +32,9 @@
 
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
-AssetCache assetCache;
+static AssetCache assetCache;
 
-FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
+static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
 	const size_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
@@ -147,7 +147,7 @@ void DestroyAssetCache()
 	DestroyMapMaterialLoader();
 }
 
-bool DecompressAsset(FILE *file, Asset *dest)
+static bool DecompressAsset(FILE *file, Asset *dest)
 {
 	CheckAlloc(dest);
 	fseek(file, 0, SEEK_END);

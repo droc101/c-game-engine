@@ -20,8 +20,8 @@ struct DiscordApplication
 	DiscordUserId user_id;
 };
 
-struct DiscordApplication app;
-IDiscordCoreEvents events;
+static struct DiscordApplication app;
+static IDiscordCoreEvents events;
 
 static void DiscordLogHook(void * /*hook_data*/, const enum EDiscordLogLevel level, const char *message)
 {
