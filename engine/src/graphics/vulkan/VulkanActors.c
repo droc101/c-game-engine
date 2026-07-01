@@ -229,7 +229,7 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 				reallocInfo->modelDrawCount += actor->model->materialSlotCount;
 			}
 			ListSet(*reallocInfo->lodInstanceCounts, lodId, ListGetUint32(*reallocInfo->lodInstanceCounts, lodId) + 1);
-		} else if (actor->wall)
+		} else if (actor->wall && actor->visible)
 		{
 			if (actor->wall->unshaded)
 			{
@@ -488,7 +488,7 @@ static inline VkResult UpdateInstanceData(const LockingList *actors,
 		if (actor->hasModel)
 		{
 			UpdateActorModelInstanceData(actor, lodInstanceCounts);
-		} else if (actor->wall)
+		} else if (actor->wall && actor->visible)
 		{
 			if (actor->wall->unshaded)
 			{

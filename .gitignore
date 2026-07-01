@@ -2,6 +2,7 @@
 /.vs
 /out
 /build
+.cache
 
 # User-specific stuff
 .idea/**/workspace.xml
