@@ -46,7 +46,7 @@ struct ActorConnection
 	char *targetActorName;
 	/// The param to send to the input
 	Param outParamOverride;
-	// TODO this should be used!!!
+	/// The number of times this output will fire before it is removed. 0 means unlimited.
 	size_t numRefires;
 };
 
@@ -125,7 +125,7 @@ void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, 
  * @param output The signal to send
  * @param defaultParam The default parameter to send with the signal
  */
-void ActorFireOutput(const Actor *sender, const char *output, Param defaultParam);
+void ActorFireOutput(Actor *sender, const char *output, Param defaultParam);
 
 /**
  * Destroy an actor connection

@@ -90,12 +90,12 @@ void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, 
 	}
 }
 
-void ActorFireOutput(const Actor *sender, const char *output, const Param defaultParam)
+void ActorFireOutput(Actor *sender, const char *output, const Param defaultParam)
 {
 	ListLock(sender->ioConnections);
 	for (size_t i = 0; i < sender->ioConnections.length; i++)
 	{
-		const ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
+		ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
 		if (strcmp(connection->sourceActorOutput, output) == 0)
 		{
 			List actors;
@@ -103,19 +103,32 @@ void ActorFireOutput(const Actor *sender, const char *output, const Param defaul
 			if (actors.length == 0)
 			{
 				LogWarning("Tried to fire signal to actor %s, but it was not found!\n", connection->targetActorName);
-				continue;
-			}
-			for (size_t j = 0; j < actors.length; j++)
+			} else
 			{
-				Actor *actor = ListGetPointer(actors, j);
-				const Param *param = &defaultParam;
-				if (connection->outParamOverride.type != PARAM_TYPE_NONE)
+				for (size_t j = 0; j < actors.length; j++)
 				{
-					param = &connection->outParamOverride;
+					Actor *actor = ListGetPointer(actors, j);
+					const Param *param = &defaultParam;
+					if (connection->outParamOverride.type != PARAM_TYPE_NONE)
+					{
+						param = &connection->outParamOverride;
+					}
+					ActorTriggerInput(sender, actor, connection->targetActorInput, param);
 				}
-				ActorTriggerInput(sender, actor, connection->targetActorInput, param);
+				ListFree(actors);
 			}
-			ListFree(actors);
+
+			// connections that have 0 refires at this point have infinite refires
+			if (connection->numRefires > 0)
+			{
+				connection->numRefires--;
+				if (connection->numRefires == 0)
+				{
+					// get vaporized idiot
+					DestroyActorConnection(connection);
+					ListRemoveAt(sender->ioConnections, i);
+				}
+			}
 		}
 	}
 	ListUnlock(sender->ioConnections);

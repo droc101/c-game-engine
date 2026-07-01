@@ -1,0 +1,223 @@
+{
+    "version": 1,
+    "discord_rpc_icon_id": "logo",
+    "discord_rpc_map_name": "Unnamed Map",
+    "has_sky": true,
+    "sky_texture": "texture/level/sky_test.gtex",
+    "light_cube_luxels_per_unit": 4,
+    "sectors": [
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 1.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": -1.0,
+                    "z": -1.0
+                },
+                {
+                    "x": 1.0,
+                    "z": -1.0
+                },
+                {
+                    "x": 1.0,
+                    "z": 1.0
+                },
+                {
+                    "x": -1.0,
+                    "z": 1.0
+                }
+            ]
+        }
+    ],
+    "actors": [
+        {
+            "class": "player",
+            "position": {
+                "x": 0.0,
+                "y": -0.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {}
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 0.0,
+                "y": -0.25,
+                "z": -1.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "sound",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 5,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": -0.75,
+                "y": 0.0,
+                "z": -0.75
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "category": {
+                    "type": "byte",
+                    "value": 1
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/sfx/coincling.gsnd"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "sound"
+                }
+            }
+        }
+    ]
+}
