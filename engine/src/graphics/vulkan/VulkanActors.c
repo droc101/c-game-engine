@@ -219,6 +219,9 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 	for (size_t i = 0; i < actors->length; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
+        if (!actor->visible) {
+            continue;
+        }
 		if (actor->hasModel)
 		{
 			reallocInfo->modelInstanceCount += actor->model->materialSlotCount;
@@ -229,7 +232,7 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 				reallocInfo->modelDrawCount += actor->model->materialSlotCount;
 			}
 			ListSet(*reallocInfo->lodInstanceCounts, lodId, ListGetUint32(*reallocInfo->lodInstanceCounts, lodId) + 1);
-		} else if (actor->wall && actor->visible)
+		} else if (actor->wall)
 		{
 			if (actor->wall->unshaded)
 			{
@@ -298,6 +301,9 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 	for (size_t i = 0; i < actors->length; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
+        if (!actor->visible) {
+            continue;
+        }
 		if (actor->hasModel && reallocInfo->shouldReallocModels)
 		{
 			const uint32_t lodId = actor->model->lods[actor->currentLod].id;
@@ -485,10 +491,13 @@ static inline VkResult UpdateInstanceData(const LockingList *actors,
 	for (size_t i = 0; i < actors->length; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
+        if (!actor->visible) {
+            continue;
+        }
 		if (actor->hasModel)
 		{
 			UpdateActorModelInstanceData(actor, lodInstanceCounts);
-		} else if (actor->wall && actor->visible)
+		} else if (actor->wall)
 		{
 			if (actor->wall->unshaded)
 			{
