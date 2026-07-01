@@ -11,7 +11,7 @@
             "floorHeight": -1.0,
             "ceilingHeight": 1.0,
             "floorMaterial": {
-                "material": "",
+                "material": "_fallback",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -23,7 +23,7 @@
                 "luxels_per_unit": 16
             },
             "ceilingMaterial": {
-                "material": "",
+                "material": "_fallback",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0

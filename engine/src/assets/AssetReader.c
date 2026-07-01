@@ -36,6 +36,10 @@ static AssetCache assetCache;
 
 static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
+    if (strlen(relPath) == 0) {
+        LogError("Asset name must not be empty!\n");
+        return NULL;
+    }
 	const size_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
