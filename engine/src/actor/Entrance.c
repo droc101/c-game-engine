@@ -61,6 +61,11 @@ static void EntranceInit(Actor *this, const KvList params, Transform *transform)
 	memcpy(&data->xfm, transform, sizeof(Transform));
 }
 
+static void EntranceDestroy(Actor *this) {
+	EntranceData *data = this->extraData;
+    free(data->entranceName);
+}
+
 ActorDefinition entranceActorDefinition = {
 	.Update = EntranceUpdate,
 	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
@@ -68,7 +73,7 @@ ActorDefinition entranceActorDefinition = {
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = DefaultActorRenderUi,
 	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
+	.Destroy = EntranceDestroy,
 	.Init = EntranceInit,
 };
 

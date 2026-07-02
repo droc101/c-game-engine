@@ -77,6 +77,14 @@ static List lodMaterialSlotsVertexData;
 /// A list of @c LodMaterialSlotsData structures, indexed using a lod id
 static List lodMaterialSlotsData;
 
+static inline void ClearLodMaterialSlotsData() {
+    for (size_t i = 0; i < lodMaterialSlotsData.length; i++) {
+        const LodMaterialSlotsData *materialSlotData = ListGetPointer(lodMaterialSlotsData, i);
+        ListAndContentsFree(materialSlotData->materialSlots);
+    }
+    ListAndContentsFree(lodMaterialSlotsData);
+}
+
 void InitActorLoadingVariables()
 {
 	ListInit(loadedModelIds, LIST_UINT32);
@@ -285,7 +293,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		modelsInstanceData = malloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
 		CheckAlloc(modelsInstanceData);
 
-		ListFree(lodMaterialSlotsData);
+        ClearLodMaterialSlotsData();
 		ListInit(lodMaterialSlotsData, LIST_POINTER);
 		for (size_t i = 0; i < reallocInfo->lodInstanceCounts->length; i++)
 		{
@@ -551,7 +559,7 @@ VkResult UpdateActors()
 void ClearModelCache()
 {
 	ListClear(loadedModelIds);
-	ListFreeOnlyContents(lodMaterialSlotsData);
+    ClearLodMaterialSlotsData();
 	for (size_t i = 0; i < lodMaterialSlotsVertexData.length; i++)
 	{
 		ListAndContentsFree(ListGetNestedList(lodMaterialSlotsVertexData, i));
