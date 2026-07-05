@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
+#include "engine/subsystem/Error.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/debug/JoltDebugRenderer.h>
@@ -66,7 +67,8 @@ static inline VkResult LoadSky(const ModelDefinition *model)
 
 	const ModelLod *lod = model->lods;
 
-	SkyVertex vertices[lod->vertexCount];
+	SkyVertex *vertices = malloc(sizeof(SkyVertex) * lod->vertexCount);
+	CheckAlloc(vertices);
 	for (size_t i = 0; i < lod->vertexCount; i++)
 	{
 		memcpy(vertices + i, lod->vertexData + i, sizeof(SkyVertex));
@@ -79,6 +81,8 @@ static inline VkResult LoadSky(const ModelDefinition *model)
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.sky.vertices, &vertexBufferWriteInfo),
 						   "Failed to write sky model vertex data to buffer!");
+
+	free(vertices);
 
 	skyModelIndexCount = lod->indexCount[0];
 	assert(lunaGetBufferSize(buffers.sky.indices) == sizeof(uint32_t) * skyModelIndexCount);
@@ -285,11 +289,17 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 	VkDeviceSize indexOffset = 0;
 	size_t shadedMaterialIndex = 0;
 	size_t unshadedMaterialIndex = 0;
-	MapVertex vertices[totalVertexCount];
-	uint32_t indices[totalIndexCount];
-	uint32_t textureIndices[totalMaterialCount];
-	VkDrawIndexedIndirectCommand shadedDrawInfo[shadedMaterialCount];
-	VkDrawIndexedIndirectCommand unshadedDrawInfo[unshadedMaterialCount];
+	MapVertex *vertices = malloc(sizeof(MapVertex) * totalVertexCount);
+	CheckAlloc(vertices);
+	uint32_t *indices = malloc(sizeof(uint32_t) * totalIndexCount);
+	CheckAlloc(indices);
+	uint32_t *textureIndices = malloc(sizeof(uint32_t) * totalMaterialCount);
+	CheckAlloc(textureIndices);
+	VkDrawIndexedIndirectCommand *shadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) * shadedMaterialCount);
+	CheckAlloc(shadedDrawInfo);
+	VkDrawIndexedIndirectCommand *unshadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) *
+															unshadedMaterialCount);
+	CheckAlloc(unshadedDrawInfo);
 	for (size_t i = 0; i < modelCount; i++)
 	{
 		const MapModel *model = models + i;
@@ -316,6 +326,11 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 				break;
 			default:
 				// Impossible to hit
+				free(vertices);
+				free(indices);
+				free(textureIndices);
+				free(shadedDrawInfo);
+				free(unshadedDrawInfo);
 				return VK_ERROR_UNKNOWN;
 		}
 
@@ -367,6 +382,12 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 												 buffers.map.unshadedDrawInfo,
 												 &unshadedDrawInfoBufferWriteInfo),
 						   "Failed to write data to map unshaded draw info buffer!");
+
+	free(vertices);
+	free(indices);
+	free(textureIndices);
+	free(shadedDrawInfo);
+	free(unshadedDrawInfo);
 
 	return VK_SUCCESS;
 }
