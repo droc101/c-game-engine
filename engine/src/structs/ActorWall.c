@@ -22,8 +22,10 @@ JPH_Shape *ActorWallCreateCollider(const ActorWall *wall)
 {
 	const float halfLength = wall->length / 2.0f;
 	const float halfHeight = wall->height / 2.0f;
-	const float xComponent = (wall->orientation == ACTOR_WALL_ORIENTATION_X_AXIS ? halfLength : 0) + wall->centerOffset.x;
-	const float zComponent = (wall->orientation == ACTOR_WALL_ORIENTATION_Z_AXIS ? halfLength : 0) + wall->centerOffset.x;
+	const float xComponent = (wall->orientation == ACTOR_WALL_ORIENTATION_X_AXIS ? halfLength : 0) +
+							 wall->centerOffset.x;
+	const float zComponent = (wall->orientation == ACTOR_WALL_ORIENTATION_Z_AXIS ? halfLength : 0) +
+							 wall->centerOffset.x;
 	const Vector3 points[4] = {
 		{
 			-xComponent,

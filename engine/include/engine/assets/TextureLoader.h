@@ -21,11 +21,12 @@
 typedef struct Image Image;
 typedef enum ImagePixelFormat ImagePixelFormat;
 
-enum ImagePixelFormat {
+enum ImagePixelFormat
+{
 	/// RGBA, uint8_t per channel
-    PIXEL_FORMAT_RGBA8,
+	PIXEL_FORMAT_RGBA8,
 	/// RGBA, Float16 per channel
-    PIXEL_FORMAT_RGBA16F,
+	PIXEL_FORMAT_RGBA16F,
 };
 
 struct Image
@@ -37,7 +38,7 @@ struct Image
 	/// The ID of the image. This is generated at runtime and not consistent between runs.
 	uint32_t id;
 	/// The pixel format of the image
-    ImagePixelFormat pixelFormat;
+	ImagePixelFormat pixelFormat;
 
 	/// Whether to use filtering on this texture
 	bool filter;

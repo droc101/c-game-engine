@@ -77,12 +77,14 @@ static List lodMaterialSlotsVertexData;
 /// A list of @c LodMaterialSlotsData structures, indexed using a lod id
 static List lodMaterialSlotsData;
 
-static inline void ClearLodMaterialSlotsData() {
-    for (size_t i = 0; i < lodMaterialSlotsData.length; i++) {
-        const LodMaterialSlotsData *materialSlotData = ListGetPointer(lodMaterialSlotsData, i);
-        ListAndContentsFree(materialSlotData->materialSlots);
-    }
-    ListAndContentsFree(lodMaterialSlotsData);
+static inline void ClearLodMaterialSlotsData()
+{
+	for (size_t i = 0; i < lodMaterialSlotsData.length; i++)
+	{
+		const LodMaterialSlotsData *materialSlotData = ListGetPointer(lodMaterialSlotsData, i);
+		ListAndContentsFree(materialSlotData->materialSlots);
+	}
+	ListAndContentsFree(lodMaterialSlotsData);
 }
 
 void InitActorLoadingVariables()
@@ -227,9 +229,10 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 	for (size_t i = 0; i < actors->length; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
-        if (!actor->visible) {
-            continue;
-        }
+		if (!actor->visible)
+		{
+			continue;
+		}
 		if (actor->hasModel)
 		{
 			reallocInfo->modelInstanceCount += actor->model->materialSlotCount;
@@ -293,7 +296,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		modelsInstanceData = malloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
 		CheckAlloc(modelsInstanceData);
 
-        ClearLodMaterialSlotsData();
+		ClearLodMaterialSlotsData();
 		ListInit(lodMaterialSlotsData, LIST_POINTER);
 		for (size_t i = 0; i < reallocInfo->lodInstanceCounts->length; i++)
 		{
@@ -309,9 +312,10 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 	for (size_t i = 0; i < actors->length; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
-        if (!actor->visible) {
-            continue;
-        }
+		if (!actor->visible)
+		{
+			continue;
+		}
 		if (actor->hasModel && reallocInfo->shouldReallocModels)
 		{
 			const uint32_t lodId = actor->model->lods[actor->currentLod].id;
@@ -499,9 +503,10 @@ static inline VkResult UpdateInstanceData(const LockingList *actors,
 	for (size_t i = 0; i < actors->length; i++)
 	{
 		const Actor *actor = ListGetPointer(*actors, i);
-        if (!actor->visible) {
-            continue;
-        }
+		if (!actor->visible)
+		{
+			continue;
+		}
 		if (actor->hasModel)
 		{
 			UpdateActorModelInstanceData(actor, lodInstanceCounts);
@@ -559,7 +564,7 @@ VkResult UpdateActors()
 void ClearModelCache()
 {
 	ListClear(loadedModelIds);
-    ClearLodMaterialSlotsData();
+	ClearLodMaterialSlotsData();
 	for (size_t i = 0; i < lodMaterialSlotsVertexData.length; i++)
 	{
 		ListAndContentsFree(ListGetNestedList(lodMaterialSlotsVertexData, i));

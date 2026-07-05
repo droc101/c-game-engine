@@ -76,8 +76,10 @@ void LoadGameConfig(const char *game)
 	}
 
 #ifdef WIN32
-	for (size_t i = 0; i < strlen(configPath); i++) {
-		if (configPath[i] == '\\') {
+	for (size_t i = 0; i < strlen(configPath); i++)
+	{
+		if (configPath[i] == '\\')
+		{
 			configPath[i] = '/';
 		}
 	}

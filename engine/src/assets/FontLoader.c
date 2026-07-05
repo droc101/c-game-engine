@@ -2,10 +2,10 @@
 // Created by droc101 on 7/23/25.
 //
 
+#include <assert.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/FontLoader.h>
-#include <assert.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>

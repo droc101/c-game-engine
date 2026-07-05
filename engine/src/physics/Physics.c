@@ -92,7 +92,8 @@ void PhysicsInitMap(Map *map)
 		.broadPhaseLayerInterface = JPH_BroadPhaseLayerInterface_Create(BROADPHASE_LAYER_MAX,
 																		&BROAD_PHASE_LAYER_INTERFACE_IMPL),
 		.objectLayerPairFilter = JPH_ObjectLayerPairFilter_Create(&OBJECT_LAYER_PAIR_FILTER_IMPL),
-		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(&OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL),
+		.objectVsBroadPhaseLayerFilter = JPH_ObjectVsBroadPhaseLayerFilter_Create(
+				&OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL),
 	};
 	map->physicsSystem = JPH_PhysicsSystem_Create(&physicsSystemSettings);
 	JPH_PhysicsSystem_SetGravity(map->physicsSystem, &(Vector3){0, GRAVITY, 0});

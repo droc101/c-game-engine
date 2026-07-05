@@ -87,7 +87,9 @@ void DiscordUpdate()
 	// it's not worth keeping this insignificant subsystem in a potentially unstable state
 	if (result != DiscordResult_Ok)
 	{
-		LogError("Discord SDK run_callbacks failed with errno %d, Discord integration will be disabled for this session.\n", result);
+		LogError("Discord SDK run_callbacks failed with errno %d, Discord integration will be disabled for this "
+				 "session.\n",
+				 result);
 		app.activityManager = NULL; // Prevent clearing activity during cleanup as it will cause SIGPIPE
 		DiscordDestroy();
 	}

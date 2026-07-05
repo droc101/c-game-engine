@@ -61,9 +61,10 @@ static void EntranceInit(Actor *this, const KvList params, Transform *transform)
 	memcpy(&data->xfm, transform, sizeof(Transform));
 }
 
-static void EntranceDestroy(Actor *this) {
+static void EntranceDestroy(Actor *this)
+{
 	EntranceData *data = this->extraData;
-    free(data->entranceName);
+	free(data->entranceName);
 }
 
 ActorDefinition entranceActorDefinition = {
