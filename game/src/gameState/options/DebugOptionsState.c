@@ -19,6 +19,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/TextBox.h>
+#include <engine/uiStack/controls/VScrollBar.h>
 #include <engine/uiStack/UiStack.h>
 #include <gameState/OptionsState.h>
 #include <SDL3/SDL_mouse.h>
@@ -30,11 +31,12 @@
 #include <string.h>
 
 static UiStack *debugOptionsStack = NULL;
-static int scrollY = 0;
 static char *filter = NULL;
 
 static const int LIST_WIDTH = 650;
 static const int ENTRY_HEIGHT = 44;
+
+static VScrollBarData scrollData = {0};
 
 static void BtnDebugOptionsBack()
 {
@@ -98,7 +100,7 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 
 	const int listX = ScaledWindowWidth() / 2 - LIST_WIDTH / 2;
 
-	int entryY = 102 + scrollY;
+	int entryY = 102 + scrollData.scrollPos;
 	int numShownEntries = 0;
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
@@ -166,56 +168,11 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 					FONT_VALIGN_MIDDLE,
 					largeFont);
 
+	scrollData.contentHeight = numShownEntries * (ENTRY_HEIGHT + 2);
+	scrollData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * ENTRY_HEIGHT / 4;
+
 	ProcessUiStack(debugOptionsStack);
 	DrawUiStack(debugOptionsStack);
-
-	const int allEntriesHeight = numShownEntries * (ENTRY_HEIGHT + 2);
-	const int listAreaHeight = ScaledWindowHeight() - 200;
-
-	if (allEntriesHeight > listAreaHeight)
-	{
-		const int SCROLLBAR_WIDTH = 16;
-
-		DrawRect((ScaledWindowWidth() / 2 + LIST_WIDTH / 2) + 4,
-				 100,
-				 SCROLLBAR_WIDTH,
-				 ScaledWindowHeight() - 200,
-				 COLOR_BLACK);
-
-		const float percentVisible = (1.0f / (float)allEntriesHeight) * (float)listAreaHeight;
-		const float percentScrolled = (1.0f / (float)allEntriesHeight) * (float)abs(scrollY);
-
-		const Vector2 scrollbarPos = v2((ScaledWindowWidthFloat() / 2 + (float)LIST_WIDTH / 2) + 5,
-										100 + listAreaHeight * percentScrolled);
-		const Vector2 scrollbarSize = v2(SCROLLBAR_WIDTH - 2, listAreaHeight * percentVisible);
-
-		Color scrollbarGrabberColor = COLOR_WHITE;
-		if (IsRectHovered(scrollbarPos, scrollbarSize))
-		{
-			if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
-			{
-				scrollY -= (int)GetMouseRel(mainThreadInput).y;
-				scrollbarGrabberColor = COLOR(0xFFc9daf8);
-			} else
-			{
-				scrollbarGrabberColor = COLOR(0xFFf0f0ff);
-			}
-		}
-		DrawRect((int)scrollbarPos.x,
-				 (int)scrollbarPos.y,
-				 (int)scrollbarSize.x,
-				 (int)scrollbarSize.y,
-				 scrollbarGrabberColor);
-	}
-
-	scrollY += (int)GetMouseWheelTicks(mainThreadInput).y * ENTRY_HEIGHT / 4;
-	if (allEntriesHeight > listAreaHeight)
-	{
-		scrollY = clamp(scrollY, -(allEntriesHeight - listAreaHeight + 2), 0);
-	} else
-	{
-		scrollY = 0;
-	}
 }
 
 static void DebugOptionsStateSet()
@@ -235,6 +192,12 @@ static void DebugOptionsStateSet()
 										BOTTOM_CENTER));
 		UiStackPush(debugOptionsStack,
 					CreateButtonControl(v2(175, -40), v2(340, 40), "Back", BtnDebugOptionsBack, BOTTOM_CENTER));
+
+		UiStackPush(debugOptionsStack,
+					CreateVScrollBarControl(v2(LIST_WIDTH / 2 + 20, 0),
+											ScaledWindowHeightFloat() - 200,
+											MIDDLE_CENTER,
+											&scrollData));
 	}
 	UiStackResetFocus(debugOptionsStack);
 }

@@ -23,6 +23,7 @@
 #include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/controls/TextBox.h>
+#include <engine/uiStack/controls/VScrollBar.h>
 
 typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
 typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
@@ -39,6 +40,7 @@ static const ControlDestroyFunc CONTROL_DESTROY_FUNCTIONS[CONTROL_TYPE_COUNT] = 
 	DestroyCheckbox, // CHECKBOX
 	DestroyRadioButton, // RADIO_BUTTON
 	DestroyTextBox, // TEXTBOX
+	DestroyVScrollBar,
 };
 
 /**
@@ -50,6 +52,7 @@ static const ControlDrawFunc CONTROL_DRAW_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	DrawCheckbox, // CHECKBOX
 	DrawRadioButton, // RADIO_BUTTON
 	DrawTextBox, // TEXTBOX
+	DrawVScrollBar,
 };
 
 /**
@@ -61,6 +64,7 @@ static const ControlUpdateFunc CONTROL_UPDATE_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	UpdateCheckbox, // CHECKBOX
 	UpdateRadioButton, // RADIO_BUTTON
 	UpdateTextBox, // TEXTBOX
+	UpdateVScrollBar,
 };
 
 /**
@@ -72,6 +76,7 @@ static const ControlFocusFunc CONTROL_FOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	NULL, // CHECKBOX
 	NULL, // RADIO_BUTTON
 	FocusTextBox, // TEXTBOX
+	NULL,
 };
 
 /**
@@ -83,6 +88,7 @@ static const ControlUnfocusFunc CONTROL_UNFOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = 
 	NULL, // CHECKBOX
 	NULL, // RADIO_BUTTON
 	UnfocusTextBox, // TEXTBOX
+	NULL,
 };
 
 UiStack *CreateUiStack()

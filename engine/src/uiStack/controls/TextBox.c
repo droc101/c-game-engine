@@ -210,9 +210,11 @@ void FocusTextBox(const Control *control)
 	SetTextInput(&((TextBoxData *)control->controlData)->input); // very readable yes
 }
 
-void UnfocusTextBox(const Control * /*control*/)
+void UnfocusTextBox(const Control *control)
 {
 	StopTextInput();
+	TextBoxData *textBoxData = control->controlData;
+	textBoxData->isActive = false;
 }
 
 void TextBoxTextEditingCallback(TextInput *data, SDL_TextEditingEvent *event)

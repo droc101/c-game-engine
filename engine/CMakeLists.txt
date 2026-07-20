@@ -229,6 +229,8 @@ target_sources(engine INTERFACE
         include/engine/uiStack/controls/Slider.h
         src/uiStack/controls/TextBox.c
         include/engine/uiStack/controls/TextBox.h
+        src/uiStack/controls/VScrollBar.c
+        include/engine/uiStack/controls/VScrollBar.h
         src/uiStack/UiStack.c
         include/engine/uiStack/UiStack.h
 
