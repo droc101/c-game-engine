@@ -47,6 +47,4 @@ struct Player
 
 void CreatePlayer(Map *map);
 
-void DPrintPlayer(const Player *player);
-
 #endif //PLAYER_H

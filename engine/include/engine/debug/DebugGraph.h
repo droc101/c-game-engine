@@ -6,7 +6,6 @@
 #define GAME_DEBUGGRAPH_H
 
 #include <engine/structs/Vector2.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -43,6 +42,8 @@ void DebugGraphPush(DebugGraph *graph, uint64_t ns);
 
 void DrawDebugGraph(DebugGraph *graph, Vector2 pos, Vector2 size);
 
-void DrawDebugGraphText(DebugGraph *graph, Vector2 pos, Vector2 size, bool alignRight);
+double DebugGraphGetValue(DebugGraph *graph);
+double DebugGraphGetLinearValue(DebugGraph *graph);
+double DebugGraphGetRawValue(DebugGraph *graph);
 
 #endif //GAME_DEBUGGRAPH_H

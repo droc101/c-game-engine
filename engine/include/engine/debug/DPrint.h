@@ -6,10 +6,7 @@
 #define GAME_DPRINT_H
 
 #include <engine/structs/Color.h>
-#include <stdbool.h>
-
-// Show debug print statements in the top left corner
-#define ENABLE_DEBUG_PRINT
+#include <stdint.h>
 
 /**
  * Resets the DPrint Y position to the top of the screen
@@ -27,10 +24,11 @@ void DPrint(const char *str, Color color);
 /**
  * Prints a string to the screen and optionally to the console (stdout)
  * @param format Format string
- * @param printToConsole Whether to print to the console
  * @param color Text color
  * @param ... Parameters to be formatted
  */
-void DPrintF(const char *format, bool printToConsole, Color color, ...);
+void DPrintF(const char *format, Color color, ...);
+
+void DPrintSpacing(uint32_t spacing);
 
 #endif //GAME_DPRINT_H

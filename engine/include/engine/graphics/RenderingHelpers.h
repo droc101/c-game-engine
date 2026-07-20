@@ -202,4 +202,6 @@ void LoadMapModels(Map *map);
  */
 void GetColor(uint32_t argb, Color *color);
 
+void DPrintGPUInfo();
+
 #endif //GAME_RENDERINGHELPERS_H

@@ -7,24 +7,11 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Vector2.h>
 #include <limits.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
-#include "engine/subsystem/Input.h"
-
-static DebugGraph *fpsGraph = NULL;
-static DebugGraph *tpsGraph = NULL;
-
-typedef enum
-{
-	FRAME_GRAPHER_HIDDEN,
-	FRAME_GRAPHER_TEXT,
-	FRAME_GRAPHER_FULL,
-	FRAME_GRAPHER_MAX
-} FrameGrapherMode;
-
-static FrameGrapherMode mode = FRAME_GRAPHER_TEXT;
+DebugGraph *fpsGraph = NULL;
+DebugGraph *tpsGraph = NULL;
 
 void InitFrameGrapher()
 {
@@ -38,17 +25,6 @@ void DestroyFrameGrapher()
 	DestroyDebugGraph(tpsGraph);
 }
 
-void ProcessFrameGrapher()
-{
-	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F4))
-	{
-		mode++;
-		if (mode == FRAME_GRAPHER_MAX)
-		{
-			mode = 0;
-		}
-	}
-}
 
 void FrameGraphUpdate(const uint64_t ns)
 {
@@ -62,25 +38,10 @@ void TickGraphUpdate(const uint64_t ns)
 
 void FrameGraphDraw()
 {
-	if (mode == FRAME_GRAPHER_FULL)
-	{
-		DrawDebugGraph(fpsGraph, v2(4, ScaledWindowHeight() - 250 - 4), v2(400, 250));
-	} else if (mode == FRAME_GRAPHER_TEXT)
-	{
-		DrawDebugGraphText(fpsGraph, v2(4, ScaledWindowHeight() - 250 - 4), v2(400, 250), false);
-	}
+	DrawDebugGraph(fpsGraph, v2(4, ScaledWindowHeight() - 250 - 4), v2(400, 250));
 }
 
 void TickGraphDraw()
 {
-	if (mode == FRAME_GRAPHER_FULL)
-	{
-		DrawDebugGraph(tpsGraph, v2(ScaledWindowWidth() - 400 - 4, ScaledWindowHeight() - 250 - 4), v2(400, 250));
-	} else if (mode == FRAME_GRAPHER_TEXT)
-	{
-		DrawDebugGraphText(tpsGraph,
-						   v2(ScaledWindowWidth() - 400 - 4, ScaledWindowHeight() - 250 - 4),
-						   v2(400, 250),
-						   true);
-	}
+	DrawDebugGraph(tpsGraph, v2(ScaledWindowWidth() - 400 - 4, ScaledWindowHeight() - 250 - 4), v2(400, 250));
 }

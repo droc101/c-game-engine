@@ -50,12 +50,6 @@ static void PauseStateRender(GlobalState *state, const double /*delta*/)
 	logoSize.y = 240;
 	DrawTexture(logoPosition, logoSize, TEXTURE("interface/pause_logo"));
 
-#ifdef BUILDSTYLE_DEBUG
-	DPrintF("Engine " ENGINE_VERSION, false, COLOR_WHITE);
-	DPrintF("DEBUG BUILD", false, COLOR_WHITE);
-	DPrintF("Map: %s", false, COLOR_WHITE, state->map->mapName);
-#endif
-
 	ProcessUiStack(pauseStack);
 	DrawUiStack(pauseStack);
 }

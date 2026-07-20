@@ -113,4 +113,6 @@ void StopSound(const SoundChannel *effect);
  */
 void StopAllSounds();
 
+void DPrintSoundSystem();
+
 #endif //SOUNDSYSTEM_H

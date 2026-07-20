@@ -24,6 +24,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "engine/debug/DPrint.h"
+#include "engine/structs/Color.h"
 
 struct SoundChannel
 {
@@ -395,6 +397,25 @@ void StopAllSounds()
 		{
 			StopSound(channel);
 		}
+	}
+	UnlockSoundSystem();
+}
+
+void DPrintSoundSystem()
+{
+	LockSoundSystem();
+	DPrintF("Sound System Active: %s", COLOR_WHITE, soundSys.isAudioStarted ? "Yes" : "No");
+	if (soundSys.isAudioStarted)
+	{
+		int numPlayingSounds = 0;
+		for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
+		{
+			if (soundSys.channels[i])
+			{
+				numPlayingSounds++;
+			}
+		}
+		DPrintF("Sounds: %d/%d", COLOR_WHITE, numPlayingSounds, SOUND_SYSTEM_CHANNEL_COUNT);
 	}
 	UnlockSoundSystem();
 }

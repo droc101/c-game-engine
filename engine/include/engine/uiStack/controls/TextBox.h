@@ -20,6 +20,7 @@ struct TextBoxData
 {
 	uint32_t maxLength;
 	char *text;
+	char *ime_edit;
 	char placeholder[32];
 	TextBoxCallback callback;
 	TextInput input;
@@ -42,6 +43,8 @@ void DestroyTextBox(const Control *control);
 void FocusTextBox(const Control *control);
 
 void UnfocusTextBox(const Control *control);
+
+void TextBoxTextEditingCallback(TextInput *data, SDL_TextEditingEvent *event);
 
 void TextBoxTextInputCallback(TextInput *data, SDL_TextInputEvent *event);
 

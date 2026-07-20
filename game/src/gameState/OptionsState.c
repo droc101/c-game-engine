@@ -21,6 +21,7 @@
 #include <stddef.h>
 
 #include "gameState/MenuState.h"
+#include "gameState/options/DebugOptionsState.h"
 #include "gameState/options/InputOptionsState.h"
 #include "gameState/options/SoundOptionsState.h"
 #include "gameState/options/VideoOptionsState.h"
@@ -101,6 +102,11 @@ static void BtnInputOptions()
 	SetGameState(&InputOptionsState);
 }
 
+static void BtnDebugOptions()
+{
+	SetGameState(&DebugOptionsState);
+}
+
 static void CbOptionsEnableDiscordRpc(const bool value)
 {
 	GetState()->options.enableDiscordRpc = value;
@@ -129,6 +135,9 @@ static void OptionsStateSet()
 		opY += opSpacing;
 		UiStackPush(optionsStack,
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", BtnInputOptions, TOP_CENTER));
+		opY += opSpacing;
+		UiStackPush(optionsStack,
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Debug Options", BtnDebugOptions, TOP_CENTER));
 #ifdef ENABLE_DISCORD_SDK
 		opY += opSpacing * 1.5f;
 		UiStackPush(optionsStack,

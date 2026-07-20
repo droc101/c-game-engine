@@ -214,3 +214,8 @@ inline void GetColor(const uint32_t argb, Color *color)
 	color->b = (float)(argb >> 0 & 0xFF) / 255.0f;
 	color->a = (float)(argb >> 24 & 0xFF) / 255.0f;
 }
+
+void DPrintGPUInfo()
+{
+	VK_DPrintDevice();
+}

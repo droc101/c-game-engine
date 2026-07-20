@@ -33,6 +33,8 @@ bool VK_PreInit();
 
 bool VK_Init(SDL_Window *window);
 
+void VK_DPrintDevice();
+
 bool VK_FrameStart();
 
 /**

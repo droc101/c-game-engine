@@ -5,12 +5,15 @@
 #ifndef TEXTINPUTSYSTEM_H
 #define TEXTINPUTSYSTEM_H
 
+#include <engine/structs/Vector2.h>
 #include <SDL3/SDL_events.h>
 #include <stddef.h>
 
 typedef struct TextInput TextInput;
 
 typedef void (*TextInputCallback)(TextInput *data, SDL_TextInputEvent *event);
+
+typedef void (*TextEditingCallback)(TextInput *data, SDL_TextEditingEvent *event);
 
 struct TextInput
 {
@@ -20,6 +23,11 @@ struct TextInput
 	void *userData;
 	/// The function to call when text is input. This is only TEXT input, you must still handle special keys like backspace and arrow keys.
 	TextInputCallback TextInput;
+	TextEditingCallback TextEditing;
+
+	Vector2 rectOrigin;
+	Vector2 rectSize;
+	int cursorOffsetPixels;
 };
 
 /**
@@ -27,6 +35,8 @@ struct TextInput
  * @param input The text input to start
  */
 void SetTextInput(TextInput *input);
+
+void UpdateTextInputRect();
 
 /**
  * Stop the current text input session
@@ -38,5 +48,7 @@ void StopTextInput();
  * @param event The text input event to handle
  */
 void HandleTextInput(SDL_TextInputEvent *event);
+
+void HandleTextEditing(SDL_TextEditingEvent *event);
 
 #endif //TEXTINPUTSYSTEM_H

@@ -37,6 +37,8 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         include/gameState/options/VideoOptionsState.h
         src/gameState/PauseState.c
         include/gameState/PauseState.h
+        src/gameState/options/DebugOptionsState.c
+        include/gameState/options/DebugOptionsState.h
 
         src/helpers/GameActorRegistration.c
         include/helpers/GameActorRegistration.h
@@ -69,10 +71,10 @@ if (x86_64)
     else ()
         message(FATAL_ERROR "Invalid x86_64 ABI version ${X86_64_VERSION}")
     endif ()
-    set_target_properties(game PROPERTIES OUTPUT_NAME "game.x86v${X86_64_VERSION}")
+    set_target_properties(game PROPERTIES OUTPUT_NAME "game.x86v${X86_64_VERSION}" SUFFIX ".そ")
     target_compile_definitions(game PUBLIC CPU_TYPE="x86v${X86_64_VERSION}")
 else ()
-    set_target_properties(game PROPERTIES OUTPUT_NAME "game.arm64")
+    set_target_properties(game PROPERTIES OUTPUT_NAME "game.arm64" SUFFIX ".そ")
     target_compile_definitions(game PUBLIC CPU_TYPE="arm64")
 endif ()
 

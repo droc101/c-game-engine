@@ -6,12 +6,14 @@
 #define GAME_FRAMEGRAPHER_H
 
 #include <stdint.h>
+#include <engine/debug/DebugGraph.h>
+
+extern DebugGraph *fpsGraph;
+extern DebugGraph *tpsGraph;
 
 void InitFrameGrapher();
 
 void DestroyFrameGrapher();
-
-void ProcessFrameGrapher();
 
 /**
  * Update the frame graph with the time it took to render the frame

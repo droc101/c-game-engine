@@ -7,6 +7,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/debug/DPrint.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
@@ -19,6 +20,7 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
@@ -35,7 +37,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-#include "engine/subsystem/Error.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/debug/JoltDebugRenderer.h>
@@ -834,6 +835,35 @@ bool VK_Init(SDL_Window *window)
 	VK_Cleanup();
 
 	return false;
+}
+
+void VK_DPrintDevice()
+{
+	const char *gpuType = "Unknown";
+	switch (physicalDeviceProperties.deviceType)
+	{
+		case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+			gpuType = "Integrated";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+			gpuType = "Discrete";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+			gpuType = "Virtual";
+			break;
+		case VK_PHYSICAL_DEVICE_TYPE_CPU:
+			gpuType = "CPU";
+			break;
+		default:
+			break;
+	}
+
+	DPrintF("GPU: %s (%s)", COLOR_WHITE, physicalDeviceProperties.deviceName, gpuType);
+	DPrintF("Vulkan: %u.%u.%u",
+			COLOR_WHITE,
+			VK_API_VERSION_MAJOR(physicalDeviceProperties.apiVersion),
+			VK_API_VERSION_MINOR(physicalDeviceProperties.apiVersion),
+			VK_API_VERSION_PATCH(physicalDeviceProperties.apiVersion));
 }
 
 bool VK_FrameStart()

@@ -2,6 +2,7 @@
 // Created by droc101 on 7/19/26.
 //
 
+#include <assert.h>
 #include <engine/debug/DebugGraph.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -15,8 +16,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define NANOSECONDS_PER_SECOND 1000000000.0
+#define NANOSECONDS_PER_MILLISECOND 1000000.0
 
 static const Color COLOR_GREAT = COLOR(0xff00ffff);
 static const Color COLOR_GOOD = COLOR(0xff00ff00);
@@ -92,20 +95,25 @@ static float DebugGraphSampleX(DebugGraph *graph, const Vector2 pos, const Vecto
 
 static void DebugGraphYLabel(DebugGraph *graph, Vector2 pos, Vector2 size, double value, Color color)
 {
+	color.a = 0.5f;
+
 	char label[40];
 	sprintf(label, "%.0f %s", value, graph->label);
-
-	color.a = 0.5f;
 
 	const float targetLineY = DebugGraphValueHeight(graph, pos, size, value);
 	DrawLine(v2(pos.x + 10, targetLineY), v2(pos.x + size.x - 10, targetLineY), 2, COLOR(0x80808080));
 	FontDrawString(v2(pos.x + 10, targetLineY + 2), label, 12, color, smallFont);
+
+	sprintf(label, "%.0f %s", floor(1000.0 / value), graph->linearLabel);
+	const float labelSize = MeasureText(label, 12, smallFont).x;
+
+	FontDrawString(v2(pos.x + size.x - 10 - labelSize, targetLineY + 2), label, 12, color, smallFont);
 }
 
 void DrawDebugGraph(DebugGraph *graph, const Vector2 pos, const Vector2 size)
 {
 	DrawRect((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, COLOR(0x80000000));
-	DrawOutlineRect(pos, size, 1, COLOR(0x80808080));
+	DrawOutlineRect(pos, size, 2, COLOR(0x80808080));
 
 	DrawLine(v2(pos.x + 10, pos.y + size.y - 10), v2(pos.x + size.x - 10, pos.y + size.y - 10), 2, COLOR(0x80808080));
 
@@ -174,9 +182,9 @@ void DrawDebugGraph(DebugGraph *graph, const Vector2 pos, const Vector2 size)
 	DebugGraphYLabel(graph, pos, size, graph->badThreshold, COLOR_BAD);
 
 	const double currentNs = graph->data[graph->numDataPoints - 1];
-	const double currentValue = 1000000000.0 / currentNs;
+	const double currentValue = NANOSECONDS_PER_SECOND / currentNs;
 	const int currentValueInt = (int)round(currentValue);
-	const double currentMs = currentNs / 1000000.0;
+	const double currentMs = currentNs / NANOSECONDS_PER_MILLISECOND;
 
 	if (currentValueInt >= graph->goodThreshold)
 	{
@@ -206,36 +214,17 @@ void DrawDebugGraph(DebugGraph *graph, const Vector2 pos, const Vector2 size)
 	FontDrawString(v2(xPos, yPos), linearLabel, fontSize, lineColor, smallFont);
 }
 
-void DrawDebugGraphText(DebugGraph *graph, Vector2 pos, Vector2 size, bool alignRight)
+double DebugGraphGetValue(DebugGraph *graph)
 {
-	Color lineColor = COLOR(0);
-	const double currentNs = graph->data[graph->numDataPoints - 1];
-	const double currentValue = 1000000000.0 / currentNs;
-	const int currentValueInt = (int)round(currentValue);
-	const double currentMs = currentNs / 1000000.0;
+	return NANOSECONDS_PER_SECOND / DebugGraphGetRawValue(graph);
+}
 
-	if (currentValueInt >= graph->goodThreshold)
-	{
-		lineColor = COLOR_GOOD;
-	} else if (currentValueInt < graph->badThreshold)
-	{
-		lineColor = COLOR_BAD;
-	} else
-	{
-		lineColor = COLOR_INTERMEDIATE;
-	}
+double DebugGraphGetLinearValue(DebugGraph *graph)
+{
+	return DebugGraphGetRawValue(graph) / NANOSECONDS_PER_MILLISECOND;
+}
 
-	const size_t fontSize = 16;
-	const float yPos = pos.y + size.y - 10 - (float)fontSize * 2 - 6;
-
-	char label[40];
-	sprintf(label, "%s: %.2f\n%s: %.2f", graph->label, currentValue, graph->linearLabel, currentMs);
-	float xPos = pos.x + 10;
-	if (alignRight)
-	{
-		const float labelSize = MeasureText(label, fontSize, smallFont).x;
-		xPos = pos.x + size.x - 10 - labelSize;
-	}
-	FontDrawString(v2(xPos + 2, yPos + 2), label, fontSize, COLOR_BLACK, smallFont);
-	FontDrawString(v2(xPos, yPos), label, fontSize, lineColor, smallFont);
+double DebugGraphGetRawValue(DebugGraph *graph)
+{
+	return graph->data[graph->numDataPoints - 1];
 }

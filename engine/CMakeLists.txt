@@ -124,6 +124,8 @@ target_sources(engine INTERFACE
         include/engine/debug/DPrintConsole.h
         src/debug/DebugGraph.c
         include/engine/debug/DebugGraph.h
+        src/debug/DebugEntryManager.c
+        include/engine/debug/DebugEntryManager.h
 
         src/gameState/LoadingState.c
         include/engine/gameState/LoadingState.h

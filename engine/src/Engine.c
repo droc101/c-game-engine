@@ -5,6 +5,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/Commit.h>
+#include <engine/debug/DebugEntryManager.h>
 #include <engine/debug/DPrint.h>
 #include <engine/debug/DPrintConsole.h>
 #include <engine/debug/FrameBenchmark.h>
@@ -217,6 +218,9 @@ void HandleEvent(void)
 		case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
 			UpdateViewportSize();
 			break;
+		case SDL_EVENT_TEXT_EDITING:
+			HandleTextEditing(&event.edit);
+			break;
 		default:
 			break;
 	}
@@ -272,6 +276,7 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	InitCommonFonts();
 
 	InitFrameGrapher();
+	InitDebugEntryManager();
 
 	if (GetState()->options.enableDiscordRpc)
 	{
@@ -329,8 +334,6 @@ void EngineIteration()
 		state->gameState->UpdateGame(state, delta);
 	}
 
-	ProcessFrameGrapher();
-
 #ifdef BENCHMARK_SYSTEM_ENABLE
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F10))
 	{
@@ -346,9 +349,7 @@ void EngineIteration()
 	}
 
 	state->gameState->RenderGame(state, delta);
-
-	FrameGraphDraw();
-	TickGraphDraw();
+	RenderDebugEntries();
 
 	ProcessDPrintConsole();
 
@@ -398,6 +399,7 @@ void DestroyEngine()
 	PhysicsThreadTerminate();
 	LodThreadDestroy();
 	DestroyFrameGrapher();
+	DestroyDebugEntryManager();
 	InputDestroy();
 	DestroyGlobalState();
 	DestroySoundSystem();

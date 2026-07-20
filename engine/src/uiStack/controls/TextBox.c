@@ -41,9 +41,12 @@ Control *CreateTextBoxControl(const char *placeholder,
 	data->maxLength = maxLength;
 	data->callback = callback;
 	data->text = calloc(1, maxLength + 1);
+	data->ime_edit = calloc(1, maxLength + 1);
 	CheckAlloc(data->text);
+	CheckAlloc(data->ime_edit);
 	data->input.userData = c;
 	data->input.TextInput = TextBoxTextInputCallback;
+	data->input.TextEditing = TextBoxTextEditingCallback;
 	strcpy(data->placeholder, placeholder); // up to caller to ensure placeholder is not too long
 
 	return c;
@@ -53,16 +56,29 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 {
 	DrawNinePatchTexture(control->anchoredPosition, control->size, 8, 8, TEXTURE("interface/textbox"));
 
-	const TextBoxData *data = (TextBoxData *)control->controlData;
+	TextBoxData *data = (TextBoxData *)control->controlData;
 
-	DrawTextAligned(strlen(data->text) == 0 ? data->placeholder : data->text,
-					16,
-					strlen(data->text) == 0 ? COLOR(0x7F000000) : COLOR_BLACK,
-					v2(position.x + 6, position.y + 6),
+	if (strlen(data->text) == 0 && strlen(data->ime_edit) == 0)
+	{
+		DrawTextAligned(data->placeholder,
+						16,
+					COLOR(0x7F000000),
+						v2(position.x + 6, position.y + 6),
 					v2(control->size.x - 12, control->size.y - 12),
 					FONT_HALIGN_LEFT,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
+	} else
+	{
+		DrawTextAligned(data->text,
+						16,
+						COLOR_BLACK,
+						v2(position.x + 6, position.y + 6),
+						v2(control->size.x - 12, control->size.y - 12),
+						FONT_HALIGN_LEFT,
+						FONT_VALIGN_MIDDLE,
+						smallFont);
+	}
 
 	const Vector2 textSize = MeasureTextNChars(data->text, 16, smallFont, data->input.cursor);
 
@@ -77,6 +93,19 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 						FONT_VALIGN_MIDDLE,
 						smallFont);
 	}
+
+	data->input.rectOrigin = control->anchoredPosition;
+	data->input.rectSize = control->size;
+	data->input.cursorOffsetPixels = (int)textSize.x;
+	UpdateTextInputRect();
+	DrawTextAligned(data->ime_edit,
+					16,
+					COLOR(0x7F000000),
+					v2(position.x + 6 + data->input.cursorOffsetPixels, position.y + 6),
+					v2(control->size.x - 12 - data->input.cursorOffsetPixels, control->size.y - 12),
+					FONT_HALIGN_LEFT,
+					FONT_VALIGN_MIDDLE,
+					smallFont);
 }
 
 void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePosition*/, const uint32_t controlIndex)
@@ -172,6 +201,7 @@ void DestroyTextBox(const Control *control)
 {
 	const TextBoxData *textBoxData = control->controlData;
 	free(textBoxData->text);
+	free(textBoxData->ime_edit);
 	free(control->controlData);
 }
 
@@ -183,6 +213,12 @@ void FocusTextBox(const Control *control)
 void UnfocusTextBox(const Control * /*control*/)
 {
 	StopTextInput();
+}
+
+void TextBoxTextEditingCallback(TextInput *data, SDL_TextEditingEvent *event)
+{
+	const TextBoxData *textBoxData = (TextBoxData *)((Control *)data->userData)->controlData;
+	strncpy(textBoxData->ime_edit, event->text, textBoxData->maxLength);
 }
 
 void TextBoxTextInputCallback(TextInput *data, SDL_TextInputEvent *event)

@@ -96,17 +96,6 @@ static void MainStateRender(GlobalState *state, const double delta)
 {
 	RenderMap(state->map, state->camera);
 	RenderHUD();
-
-#ifdef BUILDSTYLE_DEBUG
-	DPrintF("Engine " ENGINE_VERSION, false, COLOR_WHITE);
-#endif
-	DPrintPlayer(&state->map->player);
-
-#ifdef ENABLE_DEBUG_PRINT
-	DPrintF("Actors: %d", false, COLOR_WHITE, state->map->actors.length);
-	DPrintF("Frame Delta: %.3lf", false, COLOR_WHITE, delta);
-	DPrintF("Tick Delta: %.3lf", false, COLOR_WHITE, lastTickDelta);
-#endif
 }
 
 static void MainStateSet()

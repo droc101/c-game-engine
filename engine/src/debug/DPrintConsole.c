@@ -15,10 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef BUILDSTYLE_DEBUG
-#include <engine/helpers/Arguments.h>
-#endif
-
 #define CONSOLE_MESSAGE_VISIBLE_FOR_MS 2000
 
 static bool consoleEnabled = false;
@@ -59,13 +55,8 @@ static const Color ansiColors[] = {
 
 void InitDPrintConsole()
 {
-#ifndef BUILDSTYLE_DEBUG
-	if (HasCliArg("--show-console"))
-#endif
-	{
-		consoleEnabled = true;
-		ListInit(consoleMessages, LIST_POINTER);
-	}
+	consoleEnabled = true;
+	ListInit(consoleMessages, LIST_POINTER);
 }
 
 void DestroyDPrintConsole()
@@ -111,7 +102,6 @@ void ProcessDPrintConsole()
 	for (size_t i = 0; i < consoleMessages.length; i++)
 	{
 		ConsoleMessage *msg = ListGetPointer(consoleMessages, i);
-		DPrint(msg->message, msg->color);
 		if (msg->time == 0)
 		{
 			msg->time = GetTimeMs();
@@ -126,6 +116,17 @@ void ProcessDPrintConsole()
 		free(msg->message);
 		free(msg);
 		ListRemoveAt(consoleMessages, indexToRemove);
+	}
+	ListUnlock(consoleMessages);
+}
+
+void DrawDPrintConsole()
+{
+	ListLock(consoleMessages);
+	for (size_t i = 0; i < consoleMessages.length; i++)
+	{
+		const ConsoleMessage *msg = ListGetPointer(consoleMessages, i);
+		DPrint(msg->message, msg->color);
 	}
 	ListUnlock(consoleMessages);
 }

@@ -100,10 +100,6 @@ static void MenuStateRender(GlobalState *state, const double /*delta*/)
 						largeFont);
 	}
 
-#ifdef BUILDSTYLE_DEBUG
-	FontDrawString(v2(20, 20), "DEBUG BUILD", 16, COLOR(0xFF00FF00), smallFont);
-#endif
-
 	// draw version and copyright info
 	char buffer[256];
 	sprintf(buffer, "Engine %s\n%s", ENGINE_VERSION, gameConfig.gameCopyright);

@@ -27,4 +27,6 @@ void DestroyDPrintConsole();
  */
 void ProcessDPrintConsole();
 
+void DrawDPrintConsole();
+
 #endif //GAME_DPRINTCONSOLE_H
