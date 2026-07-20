@@ -15,7 +15,7 @@ typedef HMODULE LibraryHandle;
 #else
 typedef void *LibraryHandle;
 
-#define LIB_SUFFIX ".そ"
+#define LIB_SUFFIX ".so"
 #endif
 
 /**
