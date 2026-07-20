@@ -122,6 +122,8 @@ target_sources(engine INTERFACE
         include/engine/debug/JoltDebugRenderer.h
         src/debug/DPrintConsole.c
         include/engine/debug/DPrintConsole.h
+        src/debug/DebugGraph.c
+        include/engine/debug/DebugGraph.h
 
         src/gameState/LoadingState.c
         include/engine/gameState/LoadingState.h

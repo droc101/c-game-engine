@@ -2,322 +2,85 @@
 // Created by droc101 on 4/24/24.
 //
 
+#include <engine/debug/DebugGraph.h>
 #include <engine/debug/FrameGrapher.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
-#include <engine/subsystem/Timing.h>
 #include <limits.h>
-#include <math.h>
+#include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <stddef.h>
 
-static double framerates[FRAMEGRAPH_HISTORY_SIZE] = {0};
-static long framegraphLastUpdateTime = LONG_MIN;
+#include "engine/subsystem/Input.h"
 
-static double tickrates[FRAMEGRAPH_HISTORY_SIZE] = {0};
-static double tickGraphLastUpdateTime = LONG_MIN;
+static DebugGraph *fpsGraph = NULL;
+static DebugGraph *tpsGraph = NULL;
 
-static inline void FrameGraphPushIntoArray(const double value)
+typedef enum
 {
-	for (int i = 0; i < FRAMEGRAPH_HISTORY_SIZE - 1; i++)
-	{
-		framerates[i] = framerates[i + 1];
-	}
-	framerates[FRAMEGRAPH_HISTORY_SIZE - 1] = value;
+	FRAME_GRAPHER_HIDDEN,
+	FRAME_GRAPHER_TEXT,
+	FRAME_GRAPHER_FULL,
+	FRAME_GRAPHER_MAX
+} FrameGrapherMode;
+
+static FrameGrapherMode mode = FRAME_GRAPHER_TEXT;
+
+void InitFrameGrapher()
+{
+	fpsGraph = CreateDebugGraph(60, 100, 60, 30, 90, "FPS", "MSPF");
+	tpsGraph = CreateDebugGraph(60, 100, 60, 50, 60, "TPS", "MSPT");
 }
 
-static inline void TickGraphPushIntoArray(const double value)
+void DestroyFrameGrapher()
 {
-	for (int i = 0; i < FRAMEGRAPH_HISTORY_SIZE - 1; i++)
+	DestroyDebugGraph(fpsGraph);
+	DestroyDebugGraph(tpsGraph);
+}
+
+void ProcessFrameGrapher()
+{
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F4))
 	{
-		tickrates[i] = tickrates[i + 1];
+		mode++;
+		if (mode == FRAME_GRAPHER_MAX)
+		{
+			mode = 0;
+		}
 	}
-	tickrates[FRAMEGRAPH_HISTORY_SIZE - 1] = value;
 }
 
 void FrameGraphUpdate(const uint64_t ns)
 {
-	// If it's not time to update the graph, return
-	if (GetTimeMs() - framegraphLastUpdateTime < FRAMEGRAPH_INTERVAL)
-	{
-		return;
-	}
-
-	FrameGraphPushIntoArray(ns == 0 ? 1 : (double)ns);
-	framegraphLastUpdateTime = (long)GetTimeMs();
+	DebugGraphPush(fpsGraph, ns);
 }
 
 void TickGraphUpdate(const uint64_t ns)
 {
-	// If it's not time to update the graph, return
-	if ((double)GetTimeMs() - tickGraphLastUpdateTime < FRAMEGRAPH_INTERVAL)
-	{
-		return;
-	}
-
-	TickGraphPushIntoArray(ns == 0 ? 1 : (double)ns);
-	tickGraphLastUpdateTime = (double)GetTimeMs();
+	DebugGraphPush(tpsGraph, ns);
 }
 
 void FrameGraphDraw()
 {
-#ifdef FRAMEGRAPH_ENABLE
-#ifndef FRAMEGRAPH_FPS_ONLY
-	const int height = FRAMEGRAPH_THRESHOLD_GOOD * 2 * FRAMEGRAPH_V_SCALE + 20;
-	// Draw a background for the graph
-	DrawRect(0,
-			 ScaledWindowHeight() - height,
-			 FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10,
-			 height,
-			 COLOR(0x80000000));
-
-	// Draw a line at the bottom of the graph
-	DrawLine(v2(10, ScaledWindowHeightFloat() - 10),
-			 v2(FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE, ScaledWindowHeightFloat() - 10),
-			 2,
-			 COLOR(0x80808080));
-
-	// Draw a line at the target framerate
-	DrawLine(v2(10, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
-			 v2(FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE,
-				ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
-			 2,
-			 COLOR(0x80808080));
-	FontDrawString(v2(10, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE - 6),
-				   "Target",
-				   12,
-				   COLOR(0xff00ffff),
-				   smallFont);
-
-	Color lineColor = COLOR(0);
-	// Draw a line graph of all the frame rates/times
-	for (int i = FRAMEGRAPH_HISTORY_SIZE - 2; i >= 0; i--)
+	if (mode == FRAME_GRAPHER_FULL)
 	{
-		if (framerates[i] == 0)
-		{
-			break;
-		}
-
-		const double ns = framerates[i];
-		const double nextNs = framerates[i + 1];
-
-		double f = 1000000000.0 / ns;
-		double nextF = 1000000000.0 / nextNs;
-
-#ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
-		double nsRemapped = remap(ns, 0, FRAMEGRAPH_NSPF, 0, FRAMEGRAPH_THRESHOLD_GOOD);
-		double nextNsRemapped = remap(nextNs, 0, FRAMEGRAPH_NSPF, 0, FRAMEGRAPH_THRESHOLD_GOOD);
-#endif
-
-
-#ifdef FRAMEGRAPH_ENABLE_CAPPING
-		if (f > FRAMEGRAPH_THRESHOLD_GOOD * 2)
-		{
-			f = FRAMEGRAPH_THRESHOLD_GOOD * 2;
-		}
-		if (nextF > FRAMEGRAPH_THRESHOLD_GOOD * 2)
-		{
-			nextF = FRAMEGRAPH_THRESHOLD_GOOD * 2;
-		}
-#ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
-		if (nsRemapped > FRAMEGRAPH_THRESHOLD_GOOD * 2)
-		{
-			nsRemapped = FRAMEGRAPH_THRESHOLD_GOOD * 2;
-		}
-		if (nextNsRemapped > FRAMEGRAPH_THRESHOLD_GOOD * 2)
-		{
-			nextNsRemapped = FRAMEGRAPH_THRESHOLD_GOOD * 2;
-		}
-#endif
-#endif
-
-
-		// first line for fps
-		const double x1 = i * FRAMEGRAPH_H_SCALE + 10;
-		double y1 = ScaledWindowHeight() - f * FRAMEGRAPH_V_SCALE - 10;
-		const double x2 = (i + 1) * FRAMEGRAPH_H_SCALE + 10;
-		double y2 = ScaledWindowHeight() - nextF * FRAMEGRAPH_V_SCALE - 10;
-
-		if (f >= FRAMEGRAPH_THRESHOLD_GOOD)
-		{
-			lineColor = COLOR(0xff00ff00);
-		} else if (f < FRAMEGRAPH_THRESHOLD_BAD)
-		{
-			lineColor = COLOR(0xffff0000);
-		} else
-		{
-			lineColor = COLOR(0xffff8000);
-		}
-		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
-#ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
-		// 2nd line for frame time
-		y1 = (double)ScaledWindowHeight() - nsRemapped * FRAMEGRAPH_V_SCALE - 10;
-		y2 = (double)ScaledWindowHeight() - nextNsRemapped * FRAMEGRAPH_V_SCALE - 10;
-		lineColor.a = 0.5f;
-		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
-#endif
+		DrawDebugGraph(fpsGraph, v2(4, ScaledWindowHeight() - 250 - 4), v2(400, 250));
+	} else if (mode == FRAME_GRAPHER_TEXT)
+	{
+		DrawDebugGraphText(fpsGraph, v2(4, ScaledWindowHeight() - 250 - 4), v2(400, 250), false);
 	}
-#else
-	Color lineColor;
-#endif
-	const double currentNs = framerates[FRAMEGRAPH_HISTORY_SIZE - 1];
-	const double currentF = 1000000000.0 / currentNs;
-	const double currentMs = currentNs / 1000000.0;
-
-	if (currentF >= FRAMEGRAPH_THRESHOLD_GOOD)
-	{
-		lineColor = COLOR(0xff00ff00);
-	} else if (currentF < FRAMEGRAPH_THRESHOLD_BAD)
-	{
-		lineColor = COLOR(0xffff0000);
-	} else
-	{
-		lineColor = COLOR(0xffff8000);
-	}
-
-	// Draw the current framerate
-	char fps[40];
-	sprintf(fps, "FPS: %.2f\nMSPF: %2.2f", currentF, currentMs);
-	FontDrawString(v2(12, ScaledWindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
-	FontDrawString(v2(10, ScaledWindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
-
-#endif
 }
 
 void TickGraphDraw()
 {
-#ifdef TICKGRAPH_ENABLE
-#ifndef FRAMEGRAPH_FPS_ONLY
-	const int start_x = ScaledWindowWidth() - TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE;
-	const int height = TICKGRAPH_THRESHOLD_GOOD * 2 * TICKGRAPH_V_SCALE + 20;
-
-	// Draw a background for the graph
-	DrawRect(start_x - 10,
-			 ScaledWindowHeight() - height,
-			 TICKGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE + 10,
-			 height,
-			 COLOR(0x80000000));
-
-	// Draw a line at the bottom of the graph
-	DrawLine(v2(start_x, ScaledWindowHeightFloat() - 10),
-			 v2(start_x + FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE, ScaledWindowHeightFloat() - 10),
-			 2,
-			 COLOR(0x80808080));
-
-	// Draw a line at the target framerate
-	DrawLine(v2(start_x, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
-			 v2(start_x + FRAMEGRAPH_H_SCALE * FRAMEGRAPH_HISTORY_SIZE,
-				ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE),
-			 2,
-			 COLOR(0x80808080));
-	FontDrawString(v2(start_x, ScaledWindowHeightFloat() - 10 - FRAMEGRAPH_THRESHOLD_GOOD * FRAMEGRAPH_V_SCALE - 6),
-				   "Target",
-				   12,
-				   COLOR(0xff00ffff),
-				   smallFont);
-
-	Color lineColor = COLOR(0);
-	// Draw a line graph of all the frame rates/times
-	for (int i = FRAMEGRAPH_HISTORY_SIZE - 2; i >= 0; i--)
+	if (mode == FRAME_GRAPHER_FULL)
 	{
-		if (tickrates[i] == 0)
-		{
-			break;
-		}
-
-		const double ns = tickrates[i];
-		const double nextNs = tickrates[i + 1];
-
-		double f = 1000000000.0 / ns;
-		double nextF = 1000000000.0 / nextNs;
-
-#ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
-		double nsRemapped = remap(ns, 0, FRAMEGRAPH_NSPF, 0, FRAMEGRAPH_THRESHOLD_GOOD);
-		double nextNsRemapped = remap(nextNs, 0, FRAMEGRAPH_NSPF, 0, FRAMEGRAPH_THRESHOLD_GOOD);
-#endif
-
-
-#ifdef FRAMEGRAPH_ENABLE_CAPPING
-		if (f > TICKGRAPH_THRESHOLD_GOOD * 2)
-		{
-			f = TICKGRAPH_THRESHOLD_GOOD * 2;
-		}
-		if (nextF > TICKGRAPH_THRESHOLD_GOOD * 2)
-		{
-			nextF = TICKGRAPH_THRESHOLD_GOOD * 2;
-		}
-#ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
-		if (nsRemapped > TICKGRAPH_THRESHOLD_GOOD * 2)
-		{
-			nsRemapped = TICKGRAPH_THRESHOLD_GOOD * 2;
-		}
-		if (nextNsRemapped > TICKGRAPH_THRESHOLD_GOOD * 2)
-		{
-			nextNsRemapped = TICKGRAPH_THRESHOLD_GOOD * 2;
-		}
-#endif
-#endif
-
-
-		// first line for fps
-		double x1 = i * TICKGRAPH_H_SCALE + 10;
-		x1 += start_x;
-		double y1 = ScaledWindowHeight() - f * TICKGRAPH_V_SCALE - 10;
-		double x2 = (i + 1) * TICKGRAPH_H_SCALE + 10;
-		x2 += start_x;
-		double y2 = ScaledWindowHeight() - nextF * TICKGRAPH_V_SCALE - 10;
-
-		if (f >= TICKGRAPH_THRESHOLD_GOOD)
-		{
-			lineColor = COLOR(0xff00ff00);
-		} else if (f < TICKGRAPH_THRESHOLD_BAD)
-		{
-			lineColor = COLOR(0xffff0000);
-		} else
-		{
-			lineColor = COLOR(0xffff8000);
-		}
-		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
-#ifdef FRAMEGRAPH_SHOW_LINEAR_TIME_GRAPH
-		// 2nd line for frame time
-		y1 = (double)ScaledWindowHeight() - nsRemapped * TICKGRAPH_V_SCALE - 10;
-		y2 = (double)ScaledWindowHeight() - nextNsRemapped * TICKGRAPH_V_SCALE - 10;
-		lineColor.a = 0.5f;
-		DrawLine(v2((float)x1, (float)y1), v2((float)x2, (float)y2), 2, lineColor);
-#endif
+		DrawDebugGraph(tpsGraph, v2(ScaledWindowWidth() - 400 - 4, ScaledWindowHeight() - 250 - 4), v2(400, 250));
+	} else if (mode == FRAME_GRAPHER_TEXT)
+	{
+		DrawDebugGraphText(tpsGraph,
+						   v2(ScaledWindowWidth() - 400 - 4, ScaledWindowHeight() - 250 - 4),
+						   v2(400, 250),
+						   true);
 	}
-#else
-	Color lineColor;
-#endif
-	const double currentNs = tickrates[FRAMEGRAPH_HISTORY_SIZE - 1];
-	const double currentF = 1000000000.0 / currentNs;
-	const int currentFInt = (int)round(currentF);
-	const double currentMs = currentNs / 1000000.0;
-
-	if (currentFInt >= TICKGRAPH_THRESHOLD_GOOD)
-	{
-		lineColor = COLOR(0xff00ff00);
-	} else if (currentFInt < TICKGRAPH_THRESHOLD_BAD)
-	{
-		lineColor = COLOR(0xffff0000);
-	} else
-	{
-		lineColor = COLOR(0xffff8000);
-	}
-
-	// Draw the current framerate
-	char fps[40];
-	sprintf(fps, "TPS: %.2f\nMSPT: %2.2f", currentF, currentMs);
-#ifdef FRAMEGRAPH_FPS_ONLY
-	const Vector2 textSize = MeasureText(fps, 16, smallFont);
-	const float xPos = ScaledWindowWidthFloat() - textSize.x - 10;
-#else
-	const float xPos = (float)start_x;
-#endif
-	FontDrawString(v2(xPos + 2, ScaledWindowHeightFloat() - 8 - 38), fps, 16, COLOR_BLACK, smallFont);
-	FontDrawString(v2(xPos, ScaledWindowHeightFloat() - 10 - 38), fps, 16, lineColor, smallFont);
-
-#endif
 }

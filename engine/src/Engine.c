@@ -271,6 +271,8 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InitCommonFonts();
 
+	InitFrameGrapher();
+
 	if (GetState()->options.enableDiscordRpc)
 	{
 		DiscordInit();
@@ -326,6 +328,8 @@ void EngineIteration()
 	{
 		state->gameState->UpdateGame(state, delta);
 	}
+
+	ProcessFrameGrapher();
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F10))
@@ -393,6 +397,7 @@ void DestroyEngine()
 	DiscordDestroy();
 	PhysicsThreadTerminate();
 	LodThreadDestroy();
+	DestroyFrameGrapher();
 	InputDestroy();
 	DestroyGlobalState();
 	DestroySoundSystem();

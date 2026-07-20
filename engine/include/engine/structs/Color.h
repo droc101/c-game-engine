@@ -11,10 +11,10 @@
  * @return The Color struct
  */
 #define COLOR(argb) \
-	(Color){(((argb) >> 16) & 0xFF) / 255.0f, \
-			(((argb) >> 8) & 0xFF) / 255.0f, \
-			((argb) & 0xFF) / 255.0f, \
-			(((argb) >> 24) & 0xFF) / 255.0f}
+	(Color){(((uint32_t)(argb) >> 0x10u) & 0xFFu) / 255.0f, \
+			(((uint32_t)(argb) >> 0x08u) & 0xFFu) / 255.0f, \
+			((uint32_t)(argb) & 0xFFu) / 255.0f, \
+			(((uint32_t)(argb) >> 0x18u) & 0xFFu) / 255.0f}
 
 /**
  * Convert a byte to a float (0-1)
