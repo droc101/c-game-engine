@@ -56,28 +56,24 @@ void DrawVScrollBar(const Control *c, const ControlState state, const Vector2 po
 		data->scrollPos = 0;
 	}
 
-	DrawRect((int)position.x, (int)position.y, (int)c->size.x, (int)c->size.y, COLOR_BLACK);
-
 	if ((float)data->contentHeight > c->size.y)
 	{
+		DrawNinePatchTexture(position, c->size, 2, 2, TEXTURE("interface/scrollbar"));
+
 		const float percentVisible = (1.0f / (float)data->contentHeight) * c->size.y;
 		const float percentScrolled = (1.0f / (float)data->contentHeight) * (float)abs(data->scrollPos);
 
-		const Vector2 scrollbarPos = v2(position.x + 1, position.y + c->size.y * percentScrolled);
-		const Vector2 scrollbarSize = v2(c->size.x - 2, c->size.y * percentVisible);
+		const Vector2 scrollbarPos = v2(position.x, position.y + c->size.y * percentScrolled);
+		const Vector2 scrollbarSize = v2(c->size.x, c->size.y * percentVisible);
 
-		Color scrollbarGrabberColor = COLOR_WHITE;
+		const char *grabberTexture = TEXTURE("interface/scrollbar_grabber");
 		if (state == HOVER)
 		{
-			scrollbarGrabberColor = COLOR(0xFFf0f0ff);
+			grabberTexture = TEXTURE("interface/scrollbar_grabber_hover");
 		} else if (state == ACTIVE)
 		{
-			scrollbarGrabberColor = COLOR(0xFFc9daf8);
+			grabberTexture = TEXTURE("interface/scrollbar_grabber_pressed");
 		}
-		DrawRect((int)scrollbarPos.x,
-				 (int)scrollbarPos.y,
-				 (int)scrollbarSize.x,
-				 (int)scrollbarSize.y,
-				 scrollbarGrabberColor);
+		DrawNinePatchTexture(scrollbarPos, scrollbarSize, 2, 2, grabberTexture);
 	}
 }
