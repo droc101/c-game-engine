@@ -173,7 +173,7 @@ static void DebugEntrySystem()
 	DPrintF("CPUs: %d", COLOR_WHITE, SDL_GetNumLogicalCPUCores());
 	DPrintF("Memory: %d MiB", COLOR_WHITE, SDL_GetSystemRAM());
 	const Vector2 viewport = ActualWindowSizeIgnoreDPI();
-	DPrintF("Viewport: %.0fx%.0f", COLOR_WHITE, viewport.x, viewport.y);
+	DPrintF("Viewport: %.0fx%.0f @ %.0fx", COLOR_WHITE, viewport.x, viewport.y, GetState()->uiScale);
 	DPrintGPUInfo();
 }
 

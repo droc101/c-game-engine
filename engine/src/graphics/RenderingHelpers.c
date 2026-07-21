@@ -158,7 +158,7 @@ inline void UpdateViewportSize()
 	const float newScaleX = ActualWindowSize().x / DEF_WIDTH;
 	const float newScaleY = ActualWindowSize().y / DEF_HEIGHT;
 	float newScale = newScaleX < newScaleY ? newScaleX : newScaleY;
-	newScale = max(newScale, 1.0f);
+	newScale = max(floorf(newScale), 1.0f);
 	GetState()->uiScale = newScale;
 	UpdateWindowSize();
 	VK_UpdateViewportSize();
