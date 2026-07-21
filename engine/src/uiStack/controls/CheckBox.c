@@ -24,13 +24,15 @@ Control *CreateCheckboxControl(const Vector2 position,
 							   char *label,
 							   const CheckboxCallback callback,
 							   const ControlAnchor anchor,
-							   const bool checked)
+							   const bool checked,
+							   char *tooltip)
 {
 	Control *checkbox = CreateEmptyControl();
 	checkbox->type = CHECKBOX;
 	checkbox->position = position;
 	checkbox->size = size;
 	checkbox->anchor = anchor;
+	checkbox->tooltip = tooltip;
 
 	checkbox->controlData = malloc(sizeof(CheckBoxData));
 	CheckAlloc(checkbox->controlData);

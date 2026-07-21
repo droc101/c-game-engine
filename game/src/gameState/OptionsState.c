@@ -128,16 +128,16 @@ static void OptionsStateSet()
 		const float opSpacing = 45;
 
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Video Options", BtnVideoOptions, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Video Options", BtnVideoOptions, TOP_CENTER, NULL));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Sound Options", BtnSoundOptions, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Sound Options", BtnSoundOptions, TOP_CENTER, NULL));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", BtnInputOptions, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Input Options", BtnInputOptions, TOP_CENTER, NULL));
 		opY += opSpacing;
 		UiStackPush(optionsStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "Debug Options", BtnDebugOptions, TOP_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Debug Options", BtnDebugOptions, TOP_CENTER, NULL));
 #ifdef ENABLE_DISCORD_SDK
 		opY += opSpacing * 1.5f;
 		UiStackPush(optionsStack,
@@ -146,11 +146,13 @@ static void OptionsStateSet()
 										  "Enable Discord rich presence",
 										  CbOptionsEnableDiscordRpc,
 										  TOP_CENTER,
-										  GetState()->options.enableDiscordRpc));
+										  GetState()->options.enableDiscordRpc,
+										  NULL));
 #endif
 		opY += opSpacing;
 
-		UiStackPush(optionsStack, CreateButtonControl(v2(0, -40), v2(480, 40), "Done", BtnOptionsBack, BOTTOM_CENTER));
+		UiStackPush(optionsStack,
+					CreateButtonControl(v2(0, -40), v2(480, 40), "Done", BtnOptionsBack, BOTTOM_CENTER, NULL));
 	}
 	UiStackResetFocus(optionsStack);
 }

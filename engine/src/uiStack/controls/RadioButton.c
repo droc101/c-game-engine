@@ -27,13 +27,15 @@ Control *CreateRadioButtonControl(const Vector2 position,
 								  const ControlAnchor anchor,
 								  const bool checked,
 								  const uint8_t groupId,
-								  const uint8_t id)
+								  const uint8_t id,
+								  char *tooltip)
 {
 	Control *radio = CreateEmptyControl();
 	radio->type = RADIO_BUTTON;
 	radio->position = position;
 	radio->size = size;
 	radio->anchor = anchor;
+	radio->tooltip = tooltip;
 
 	radio->controlData = malloc(sizeof(RadioButtonData));
 	CheckAlloc(radio->controlData);

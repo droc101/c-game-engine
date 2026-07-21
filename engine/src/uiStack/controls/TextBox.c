@@ -27,13 +27,15 @@ Control *CreateTextBoxControl(const char *placeholder,
 							  const Vector2 size,
 							  const ControlAnchor anchor,
 							  const uint32_t maxLength,
-							  const TextBoxCallback callback)
+							  const TextBoxCallback callback,
+							  char *tooltip)
 {
 	Control *c = CreateEmptyControl();
 	c->type = TEXTBOX;
 	c->anchor = anchor;
 	c->position = position;
 	c->size = size;
+	c->tooltip = tooltip;
 
 	TextBoxData *data = calloc(1, sizeof(TextBoxData));
 	CheckAlloc(data);

@@ -18,6 +18,7 @@
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/joltc.h>
@@ -31,11 +32,13 @@
 
 List debugEntries;
 
+static bool expandedMenu = false;
+
 #define DEBUG_OPTIONS_FILE "debug_options.kvl"
 
 static void RegisterDebugEntry(const char *key,
 							   const DebugEntryFunction entry,
-							   const bool defaultEnabled,
+							   const DebugEntryMode defaultMode,
 							   const int spacing)
 {
 	DebugEntry *e = malloc(sizeof(DebugEntry));
@@ -43,8 +46,8 @@ static void RegisterDebugEntry(const char *key,
 	e->key = strdup(key);
 	CheckAlloc(e->key);
 	e->process = entry;
-	e->enabled = defaultEnabled;
-	e->defaultEnabled = defaultEnabled;
+	e->mode = defaultMode;
+	e->defaultMode = defaultMode;
 	e->spacing = spacing;
 	ListAdd(debugEntries, e);
 }
@@ -173,20 +176,20 @@ static void DebugEntrySystem()
 void InitDebugEntryManager()
 {
 	ListInit(debugEntries, LIST_POINTER);
-	RegisterDebugEntry("engine_version", DebugEntryVersion, true, 5);
-	RegisterDebugEntry("git_commit", DebugEntryGitCommit, false, 5);
-	RegisterDebugEntry("fps", DebugEntryFPS, true, 5);
-	RegisterDebugEntry("tps", DebugEntryTPS, true, 5);
-	RegisterDebugEntry("fps_graph", FrameGraphDraw, false, 0);
-	RegisterDebugEntry("tps_graph", TickGraphDraw, false, 0);
-	RegisterDebugEntry("player_position", DebugEntryPlayerPosition, false, 5);
-	RegisterDebugEntry("player_velocity", DebugEntryPlayerVelocity, false, 5);
-	RegisterDebugEntry("player_actor_interaction", DebugEntryPlayerActor, false, 5);
-	RegisterDebugEntry("map", DebugEntryMap, false, 5);
-	RegisterDebugEntry("camera", DebugEntryCamera, false, 5);
-	RegisterDebugEntry("system_specs", DebugEntrySystem, false, 5);
-	RegisterDebugEntry("sound_system", DPrintSoundSystem, false, 5);
-	RegisterDebugEntry("console", DrawDPrintConsole, true, 5);
+	RegisterDebugEntry("engine_version", DebugEntryVersion, DEBUG_ENTRY_SHOWN, 5);
+	RegisterDebugEntry("git_commit", DebugEntryGitCommit, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("fps", DebugEntryFPS, DEBUG_ENTRY_SHOWN, 5);
+	RegisterDebugEntry("tps", DebugEntryTPS, DEBUG_ENTRY_SHOWN, 5);
+	RegisterDebugEntry("fps_graph", FrameGraphDraw, DEBUG_ENTRY_TOGGLE, 0);
+	RegisterDebugEntry("tps_graph", TickGraphDraw, DEBUG_ENTRY_TOGGLE, 0);
+	RegisterDebugEntry("player_position", DebugEntryPlayerPosition, DEBUG_ENTRY_TOGGLE, 5);
+	RegisterDebugEntry("player_velocity", DebugEntryPlayerVelocity, DEBUG_ENTRY_TOGGLE, 5);
+	RegisterDebugEntry("player_actor_interaction", DebugEntryPlayerActor, DEBUG_ENTRY_TOGGLE, 5);
+	RegisterDebugEntry("map", DebugEntryMap, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("camera", DebugEntryCamera, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);
 
 	KvList list;
 	if (ReadKvlFile(DEBUG_OPTIONS_FILE, list))
@@ -194,7 +197,7 @@ void InitDebugEntryManager()
 		for (size_t i = 0; i < debugEntries.length; i++)
 		{
 			DebugEntry *ent = ListGetPointer(debugEntries, i);
-			ent->enabled = KvGetBool(list, ent->key, ent->defaultEnabled);
+			ent->mode = KvGetByte(list, ent->key, ent->defaultMode);
 		}
 
 		KvListDestroy(list);
@@ -203,10 +206,15 @@ void InitDebugEntryManager()
 
 void RenderDebugEntries()
 {
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F4))
+	{
+		expandedMenu = !expandedMenu;
+	}
+
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
-		if (ent->enabled)
+		if (ent->mode == DEBUG_ENTRY_SHOWN || (ent->mode == DEBUG_ENTRY_TOGGLE && expandedMenu))
 		{
 			ent->process();
 			DPrintSpacing(ent->spacing);
@@ -221,7 +229,7 @@ void SaveDebugEntrySettings()
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
-		KvSetBool(list, ent->key, ent->enabled);
+		KvSetByte(list, ent->key, ent->mode);
 	}
 
 	(void)WriteKvlFile(DEBUG_OPTIONS_FILE, list);

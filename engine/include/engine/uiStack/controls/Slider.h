@@ -46,6 +46,8 @@ char *SliderLabelInteger(const Control *slider);
  * @param step The step value of the slider
  * @param altStep The step value of the slider when holding shift
  * @param getLabel The function to get the label of the slider
+ * @param tooltip
+ * @param tooltip
  * @return The new Slider Control
  */
 Control *CreateSliderControl(Vector2 position,
@@ -58,7 +60,8 @@ Control *CreateSliderControl(Vector2 position,
 							 double value,
 							 double step,
 							 double altStep,
-							 SliderLabelFunction getLabel);
+							 SliderLabelFunction getLabel,
+							 char *tooltip);
 
 void DestroySlider(const Control *c);
 

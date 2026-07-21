@@ -32,7 +32,8 @@ Control *CreateTextBoxControl(const char *placeholder,
 							  Vector2 size,
 							  ControlAnchor anchor,
 							  uint32_t maxLength,
-							  TextBoxCallback callback);
+							  TextBoxCallback callback,
+							  char *tooltip);
 
 void DrawTextBox(const Control *control, ControlState state, Vector2 position);
 

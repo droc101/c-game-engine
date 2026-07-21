@@ -23,13 +23,15 @@ Control *CreateButtonControl(const Vector2 position,
 							 const Vector2 size,
 							 char *text,
 							 const ButtonCallback callback,
-							 const ControlAnchor anchor)
+							 const ControlAnchor anchor,
+							 char *tooltip)
 {
 	Control *btn = CreateEmptyControl();
 	btn->type = BUTTON;
 	btn->position = position;
 	btn->size = size;
 	btn->anchor = anchor;
+	btn->tooltip = tooltip;
 
 	btn->controlData = malloc(sizeof(ButtonData));
 	CheckAlloc(btn->controlData);

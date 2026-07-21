@@ -4,12 +4,15 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/UiStack.h>
+#include <math.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
@@ -278,6 +281,25 @@ void DrawUiStack(const UiStack *stack)
 								 TEXTURE("interface/focus_rect"));
 		}
 	}
+
+	if (UseController(mainThreadInput))
+	{
+		if (stack->focusedControl != -1u)
+		{
+			const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
+			if (c->tooltip)
+			{
+				RenderTooltipAt(c->tooltip, Vector2Add(c->anchoredPosition, v2(0, c->size.y)));
+			}
+		}
+	} else if (stack->activeControl != -1u)
+	{
+		const Control *c = ListGetPointer(stack->controls, stack->activeControl);
+		if (c->tooltip)
+		{
+			RenderTooltipAtMouse(c->tooltip);
+		}
+	}
 }
 
 Vector2 CalculateControlPosition(const Control *control)
@@ -330,6 +352,7 @@ Control *CreateEmptyControl()
 {
 	Control *c = malloc(sizeof(Control));
 	CheckAlloc(c);
+	c->tooltip = NULL;
 	c->controlData = NULL;
 	return c;
 }
@@ -352,13 +375,13 @@ bool IsMouseInRect(const Vector2 pos, const Vector2 size)
 	return mousePos.x >= pos.x && mousePos.x <= pos.x + size.x && mousePos.y >= pos.y && mousePos.y <= pos.y + size.y;
 }
 
-bool HasMouseActivation(UiStack * /*stack*/, const Control *Control)
+static bool HasMouseActivation(UiStack * /*stack*/, const Control *Control)
 {
 	return IsMouseInRect(Control->anchoredPosition, Control->size) &&
 		   IsMouseButtonJustReleased(mainThreadInput, SDL_BUTTON_LEFT);
 }
 
-bool HasKeyboardActivation(UiStack * /*stack*/, Control * /*Control*/)
+static bool HasKeyboardActivation(UiStack * /*stack*/, Control * /*Control*/)
 {
 	return IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_RETURN) ||
 		   IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_SPACE) ||
@@ -383,4 +406,28 @@ bool HasActivation(UiStack *stack, Control *Control)
 void UiStackResetFocus(UiStack *stack)
 {
 	SetFocusedControl(stack, UseController(mainThreadInput) ? 0 : -1);
+}
+
+void RenderTooltipAtMouse(const char *text)
+{
+	RenderTooltipAt(text, Vector2Add(GetMousePos(mainThreadInput), v2s(16)));
+}
+
+void RenderTooltipAt(const char *text, Vector2 origin)
+{
+	Vector2 textSize = MeasureText(text, 16, smallFont);
+	const Vector2 size = Vector2Add(textSize, v2s(24));
+	if (origin.x + size.x > ScaledWindowWidthFloat())
+	{
+		origin.x -= (origin.x + size.x) - ScaledWindowWidthFloat();
+	}
+	if (origin.y + size.y > ScaledWindowHeightFloat())
+	{
+		origin.y -= (origin.y + size.y) - ScaledWindowHeightFloat();
+	}
+	origin.x = fmaxf(0, origin.x);
+	origin.y = fmaxf(0, origin.y);
+
+	DrawNinePatchTexture(origin, size, 12, 12, TEXTURE("interface/tooltip"));
+	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, COLOR_WHITE, smallFont);
 }

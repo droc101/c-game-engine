@@ -77,10 +77,12 @@ static void PauseStateSet()
 	if (pauseStack == NULL)
 	{
 		pauseStack = CreateUiStack();
-		UiStackPush(pauseStack, CreateButtonControl(v2(0, 20), v2(300, 40), "Resume", BtnPauseResume, MIDDLE_CENTER));
-		UiStackPush(pauseStack, CreateButtonControl(v2(0, 70), v2(300, 40), "Options", BtnOptions, MIDDLE_CENTER));
 		UiStackPush(pauseStack,
-					CreateButtonControl(v2(0, 120), v2(300, 40), "Exit Level", BtnPauseExit, MIDDLE_CENTER));
+					CreateButtonControl(v2(0, 20), v2(300, 40), "Resume", BtnPauseResume, MIDDLE_CENTER, NULL));
+		UiStackPush(pauseStack,
+					CreateButtonControl(v2(0, 70), v2(300, 40), "Options", BtnOptions, MIDDLE_CENTER, NULL));
+		UiStackPush(pauseStack,
+					CreateButtonControl(v2(0, 120), v2(300, 40), "Exit Level", BtnPauseExit, MIDDLE_CENTER, NULL));
 	}
 	UiStackResetFocus(pauseStack);
 }

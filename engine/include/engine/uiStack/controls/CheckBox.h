@@ -29,6 +29,7 @@ struct CheckBoxData
  * @param callback The callback function to call when the checkbox is checked or unchecked
  * @param anchor The anchor of the checkbox
  * @param checked Whether the checkbox is checked or not
+ * @param tooltip
  * @return The new Checkbox Control
  */
 Control *CreateCheckboxControl(Vector2 position,
@@ -36,7 +37,8 @@ Control *CreateCheckboxControl(Vector2 position,
 							   char *label,
 							   CheckboxCallback callback,
 							   ControlAnchor anchor,
-							   bool checked);
+							   bool checked,
+							   char *tooltip);
 
 void DestroyCheckbox(const Control *c);
 

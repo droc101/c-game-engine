@@ -135,14 +135,20 @@ static void MenuStateSet()
 		float opY = 80;
 		const float opSpacing = 50;
 
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Start", StartGame, MIDDLE_CENTER));
-		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Options", OpenOptions, MIDDLE_CENTER));
-		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER));
+		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Start", StartGame, MIDDLE_CENTER, NULL));
 		opY += opSpacing;
 		UiStackPush(menuStack,
-					CreateButtonControl(v2(0, opY), v2(480, 40), "hot reload assets", ReloadAssets, MIDDLE_CENTER));
+					CreateButtonControl(v2(0, opY), v2(480, 40), "Options", OpenOptions, MIDDLE_CENTER, NULL));
+		opY += opSpacing;
+		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
+		opY += opSpacing * 1.5;
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(0, opY),
+										v2(480, 40),
+										"Hot Reload Assets",
+										ReloadAssets,
+										MIDDLE_CENTER,
+										NULL));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);

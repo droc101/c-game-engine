@@ -9,7 +9,6 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -48,7 +47,7 @@ static void BtnDebugOptionsReset()
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		DebugEntry *entry = ListGetPointer(debugEntries, i);
-		entry->enabled = entry->defaultEnabled;
+		entry->mode = entry->defaultMode;
 	}
 }
 
@@ -102,6 +101,8 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 
 	int entryY = 102 + scrollData.scrollPos;
 	int numShownEntries = 0;
+	bool showDebugEntryTooltip = false;
+	DebugEntryMode tooltipMode = DEBUG_ENTRY_DISABLED;
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		DebugEntry *entry = ListGetPointer(debugEntries, i);
@@ -120,8 +121,8 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 						FONT_VALIGN_MIDDLE,
 						smallFont);
 
-		const Vector2 buttonPos = v2(listX + LIST_WIDTH - 200, entryY + 2);
-		const Vector2 buttonSize = v2(200, ENTRY_HEIGHT - 4);
+		const Vector2 buttonPos = v2(listX + LIST_WIDTH - 220, entryY + 2);
+		const Vector2 buttonSize = v2(220, ENTRY_HEIGHT - 4);
 
 		const char *buttonTexture = TEXTURE("interface/button");
 		if (IsRectHovered(buttonPos, buttonSize))
@@ -133,17 +134,36 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 			}
 			if (IsMouseButtonJustReleased(mainThreadInput, SDL_BUTTON_LEFT))
 			{
-				entry->enabled = !entry->enabled;
+				entry->mode++;
+				if (entry->mode == DEBUG_ENTRY_MODE_MAX)
+				{
+					entry->mode = DEBUG_ENTRY_DISABLED;
+				}
 				SaveDebugEntrySettings();
 				UiStackResetFocus(debugOptionsStack);
 				(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 			}
+
+			showDebugEntryTooltip = true;
+			tooltipMode = entry->mode;
 		}
 
 		DrawNinePatchTexture(buttonPos, buttonSize, 8, 8, buttonTexture);
-		DrawTextAligned(entry->enabled ? "Enabled" : "Disabled",
+		const char *label = "Disabled";
+		switch (entry->mode)
+		{
+			case DEBUG_ENTRY_TOGGLE:
+				label = "In Extended Menu";
+				break;
+			case DEBUG_ENTRY_SHOWN:
+				label = "Always Visible";
+				break;
+			default:
+				break;
+		}
+		DrawTextAligned(label,
 						16,
-						entry->enabled ? COLOR(0xFF008000) : COLOR(0xFF800000),
+						COLOR_BLACK,
 						buttonPos,
 						buttonSize,
 						FONT_HALIGN_CENTER,
@@ -156,8 +176,8 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 
 	DrawRect(0, 0, ScaledWindowWidth(), 100, COLOR(0x80000000));
 	DrawRect(0, ScaledWindowHeight() - 100, ScaledWindowWidth(), 100, COLOR(0x80000000));
-	DrawLine(v2(0, 100), v2(ScaledWindowWidth(), 99), 2, COLOR_WHITE);
-	DrawLine(v2(0, ScaledWindowHeight() - 100), v2(ScaledWindowWidth(), ScaledWindowHeight() - 99), 2, COLOR_WHITE);
+	DrawLine(v2(0, 99), v2(ScaledWindowWidth(), 99), 2, COLOR_WHITE);
+	DrawLine(v2(0, ScaledWindowHeight() - 99), v2(ScaledWindowWidth(), ScaledWindowHeight() - 99), 2, COLOR_WHITE);
 
 	DrawTextAligned("Debug Options",
 					32,
@@ -173,6 +193,24 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 
 	ProcessUiStack(debugOptionsStack);
 	DrawUiStack(debugOptionsStack);
+
+	if (showDebugEntryTooltip)
+	{
+		switch (tooltipMode)
+		{
+			case DEBUG_ENTRY_DISABLED:
+				RenderTooltipAtMouse("This debug option will never be shown");
+				break;
+			case DEBUG_ENTRY_TOGGLE:
+				RenderTooltipAtMouse("This debug option will be shown in the extended menu, toggled with F4");
+				break;
+			case DEBUG_ENTRY_SHOWN:
+				RenderTooltipAtMouse("This debug option will always be shown");
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 static void DebugOptionsStateSet()
@@ -182,16 +220,23 @@ static void DebugOptionsStateSet()
 		debugOptionsStack = CreateUiStack();
 
 		UiStackPush(debugOptionsStack,
-					CreateTextBoxControl("Filter Options", v2(0, 50), v2(450, 40), TOP_CENTER, 64, FilterTextChanged));
+					CreateTextBoxControl("Filter Options",
+										 v2(0, 50),
+										 v2(450, 40),
+										 TOP_CENTER,
+										 64,
+										 FilterTextChanged,
+										 NULL));
 
 		UiStackPush(debugOptionsStack,
 					CreateButtonControl(v2(-175, -40),
 										v2(340, 40),
 										"Reset to Defaults",
 										BtnDebugOptionsReset,
-										BOTTOM_CENTER));
+										BOTTOM_CENTER,
+										NULL));
 		UiStackPush(debugOptionsStack,
-					CreateButtonControl(v2(175, -40), v2(340, 40), "Back", BtnDebugOptionsBack, BOTTOM_CENTER));
+					CreateButtonControl(v2(175, -40), v2(340, 40), "Back", BtnDebugOptionsBack, BOTTOM_CENTER, NULL));
 
 		UiStackPush(debugOptionsStack,
 					CreateVScrollBarControl(v2(LIST_WIDTH / 2 + 20, 0),

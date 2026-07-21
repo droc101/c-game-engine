@@ -59,7 +59,8 @@ Control *CreateSliderControl(const Vector2 position,
 							 const double value,
 							 const double step,
 							 const double altStep,
-							 SliderLabelFunction getLabel)
+							 SliderLabelFunction getLabel,
+							 char *tooltip)
 {
 	if (getLabel == NULL)
 	{
@@ -71,6 +72,7 @@ Control *CreateSliderControl(const Vector2 position,
 	slider->position = position;
 	slider->size = size;
 	slider->anchor = anchor;
+	slider->tooltip = tooltip;
 
 	slider->controlData = malloc(sizeof(SliderData));
 	CheckAlloc(slider->controlData);

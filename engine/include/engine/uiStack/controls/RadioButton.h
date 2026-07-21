@@ -33,6 +33,7 @@ struct RadioButtonData
  * @param checked Whether the RadioButton is checked or not
  * @param groupId The group id of the RadioButton. RadioButtons with the same group id will be mutually exclusive.
  * @param id The id of the RadioButton. This is passed to the callback function when the RadioButton is checked.
+ * @param tooltip
  * @return The new RadioButton Control
  */
 Control *CreateRadioButtonControl(Vector2 position,
@@ -42,7 +43,8 @@ Control *CreateRadioButtonControl(Vector2 position,
 								  ControlAnchor anchor,
 								  bool checked,
 								  uint8_t groupId,
-								  uint8_t id);
+								  uint8_t id,
+								  char *tooltip);
 
 void DestroyRadioButton(const Control *c);
 

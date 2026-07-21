@@ -28,9 +28,15 @@ struct ButtonData
  * @param text The text of the button
  * @param callback The callback function to call when the button is clicked
  * @param anchor The anchor of the button
+ * @param tooltip
  * @return The new Button Control
  */
-Control *CreateButtonControl(Vector2 position, Vector2 size, char *text, ButtonCallback callback, ControlAnchor anchor);
+Control *CreateButtonControl(Vector2 position,
+							 Vector2 size,
+							 char *text,
+							 ButtonCallback callback,
+							 ControlAnchor anchor,
+							 char *tooltip);
 
 void DestroyButton(const Control *c);
 

@@ -109,7 +109,8 @@ static void SoundOptionsStateSet()
 										GetState()->options.masterVolume,
 										0.01,
 										0.1,
-										SliderLabelPercent));
+										SliderLabelPercent,
+										NULL));
 		opY += opSpacing;
 		UiStackPush(soundOptionsStack,
 					CreateSliderControl(v2(0, opY),
@@ -122,7 +123,8 @@ static void SoundOptionsStateSet()
 										GetState()->options.musicVolume,
 										0.01,
 										0.1,
-										SliderLabelPercent));
+										SliderLabelPercent,
+										NULL));
 		opY += opSpacing;
 		UiStackPush(soundOptionsStack,
 					CreateSliderControl(v2(0, opY),
@@ -135,7 +137,8 @@ static void SoundOptionsStateSet()
 										GetState()->options.sfxVolume,
 										0.01,
 										0.1,
-										SliderLabelPercent));
+										SliderLabelPercent,
+										NULL));
 		opY += opSpacing;
 		UiStackPush(soundOptionsStack,
 					CreateSliderControl(v2(0, opY),
@@ -148,12 +151,13 @@ static void SoundOptionsStateSet()
 										GetState()->options.uiVolume,
 										0.01,
 										0.1,
-										SliderLabelPercent));
+										SliderLabelPercent,
+										NULL));
 		opY += opSpacing;
 
 
 		UiStackPush(soundOptionsStack,
-					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnSoundOptionsBack, BOTTOM_CENTER));
+					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnSoundOptionsBack, BOTTOM_CENTER, NULL));
 	}
 	UiStackResetFocus(soundOptionsStack);
 }

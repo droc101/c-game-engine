@@ -144,7 +144,8 @@ static void InputOptionsStateSet()
 										GetState()->options.cameraSpeed,
 										0.01,
 										0.1,
-										SliderLabelPercent));
+										SliderLabelPercent,
+										NULL));
 		opY += opSpacing;
 		UiStackPush(inputOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
@@ -152,7 +153,8 @@ static void InputOptionsStateSet()
 										  "Invert Horizontal Camera",
 										  CbOptionsInvertCameraH,
 										  TOP_CENTER,
-										  GetState()->options.invertHorizontalCamera));
+										  GetState()->options.invertHorizontalCamera,
+										  NULL));
 		opY += opSpacing;
 		UiStackPush(inputOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
@@ -160,7 +162,8 @@ static void InputOptionsStateSet()
 										  "Invert Vertical Camera",
 										  CbOptionsInvertCameraV,
 										  TOP_CENTER,
-										  GetState()->options.invertVerticalCamera));
+										  GetState()->options.invertVerticalCamera,
+										  NULL));
 		opY += opSpacing * 3;
 		UiStackPush(inputOptionsStack,
 					CreateSliderControl(v2(0, opY),
@@ -173,7 +176,8 @@ static void InputOptionsStateSet()
 										GetState()->options.rumbleStrength,
 										0.25,
 										0.25,
-										SliderLabelPercent));
+										SliderLabelPercent,
+										NULL));
 		opY += opSpacing;
 		UiStackPush(inputOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
@@ -181,12 +185,13 @@ static void InputOptionsStateSet()
 										  "Swap OK/Cancel buttons",
 										  CbOptionsSwapOkCancel,
 										  TOP_CENTER,
-										  GetState()->options.controllerSwapOkCancel));
+										  GetState()->options.controllerSwapOkCancel,
+										  NULL));
 		opY += opSpacing;
 
 
 		UiStackPush(inputOptionsStack,
-					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnInputOptionsBack, BOTTOM_CENTER));
+					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnInputOptionsBack, BOTTOM_CENTER, NULL));
 	}
 	UiStackResetFocus(inputOptionsStack);
 }

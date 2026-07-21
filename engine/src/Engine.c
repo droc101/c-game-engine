@@ -221,6 +221,12 @@ void HandleEvent(void)
 		case SDL_EVENT_TEXT_EDITING:
 			HandleTextEditing(&event.edit);
 			break;
+		case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+			GetState()->options.fullscreen = true;
+			break;
+		case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+			GetState()->options.fullscreen = false;
+			break;
 		default:
 			break;
 	}

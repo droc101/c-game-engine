@@ -59,6 +59,8 @@ struct Control
 	/// The size of the control
 	Vector2 size;
 
+	char *tooltip;
+
 	/// The absolute position of the control, calculated automatically
 	Vector2 anchoredPosition;
 
@@ -162,5 +164,9 @@ void UiStackResetFocus(UiStack *stack);
  * @param index The index of the control to focus
  */
 void SetFocusedControl(UiStack *stack, uint32_t index);
+
+void RenderTooltipAtMouse(const char *text);
+
+void RenderTooltipAt(const char *text, Vector2 origin);
 
 #endif //GAME_UISTACK_H

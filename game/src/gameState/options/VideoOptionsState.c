@@ -204,6 +204,7 @@ static void VideoOptionsStateSet()
 										GetState()->options.fov,
 										1,
 										1,
+										NULL,
 										NULL));
 
 		opY += opSpacing * 1.5f;
@@ -213,14 +214,16 @@ static void VideoOptionsStateSet()
 										  "Fullscreen",
 										  CbOptionsFullscreen,
 										  TOP_CENTER,
-										  GetState()->options.fullscreen));
+										  GetState()->options.fullscreen,
+										  NULL));
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(120, opY),
 										  v2(230, 40),
 										  "VSync",
 										  CbOptionsVsync,
 										  TOP_CENTER,
-										  GetState()->options.vsync));
+										  GetState()->options.vsync,
+										  "Synchronizes the framerate with your monitor to reduce screen tearing"));
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(-120, opY),
@@ -228,14 +231,16 @@ static void VideoOptionsStateSet()
 										  "Limit BG FPS",
 										  CbOptionsLimitFpsWhenUnfocused,
 										  TOP_CENTER,
-										  GetState()->options.limitFpsWhenUnfocused));
+										  GetState()->options.limitFpsWhenUnfocused,
+										  "Limit the framerate to 30 when the game window is not focused"));
 		UiStackPush(videoOptionsStack,
 					CreateCheckboxControl(v2(120, opY),
 										  v2(230, 40),
 										  "Mipmaps",
 										  CbOptionsMipmaps,
 										  TOP_CENTER,
-										  GetState()->options.mipmaps));
+										  GetState()->options.mipmaps,
+										  "Improves the appearance of far away textures"));
 		opY += opSpacing * 1.5f;
 
 		UiStackPush(videoOptionsStack,
@@ -249,7 +254,8 @@ static void VideoOptionsStateSet()
 										GetState()->options.msaa,
 										1,
 										1,
-										SliderLabelMSAA));
+										SliderLabelMSAA,
+										"Smooths the edges of objects"));
 
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
@@ -263,7 +269,8 @@ static void VideoOptionsStateSet()
 										GetState()->options.anisotropy,
 										1,
 										1,
-										SliderLabelAnisotropy));
+										SliderLabelAnisotropy,
+										"Improves the appearance of textures viewed at sharp angles"));
 
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
@@ -277,7 +284,8 @@ static void VideoOptionsStateSet()
 										GetState()->options.lodMultiplier,
 										0.5,
 										1,
-										SliderLabelLod));
+										SliderLabelLod,
+										"Changes the level of detail on far away objects"));
 		opY += opSpacing;
 		UiStackPush(videoOptionsStack,
 					CreateSliderControl(v2(0, opY),
@@ -290,7 +298,8 @@ static void VideoOptionsStateSet()
 										GetState()->options.maxFps,
 										10,
 										10,
-										SliderLabelMaxFps));
+										SliderLabelMaxFps,
+										NULL));
 #ifdef SDL_PLATFORM_LINUX
 		opY += opSpacing * 1.5f;
 		UiStackPush(videoOptionsStack,
@@ -299,13 +308,14 @@ static void VideoOptionsStateSet()
 										  "Prefer Wayland over X11",
 										  CbOptionsPreferWayland,
 										  TOP_CENTER,
-										  GetState()->options.preferWayland));
+										  GetState()->options.preferWayland,
+										  NULL));
 #endif
 		opY += opSpacing;
 
 
 		UiStackPush(videoOptionsStack,
-					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnVideoOptionsBack, BOTTOM_CENTER));
+					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnVideoOptionsBack, BOTTOM_CENTER, NULL));
 	}
 	UiStackResetFocus(videoOptionsStack);
 	hasChangedVideoOptions = false;
