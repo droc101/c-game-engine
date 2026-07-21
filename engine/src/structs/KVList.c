@@ -257,7 +257,7 @@ size_t ReadKvList(DataReader *reader, KvList out)
 
 void WriteKvList(const KvList list, DataWriter *writer)
 {
-	assert(DataWriterIsEmpty(writer));
+	// assert(DataWriterIsEmpty(writer));
 	const size_t numKeys = KvList_size(list);
 	WriteSizeT(writer, numKeys);
 	KvList_iterator iter;
@@ -379,6 +379,17 @@ ParamArray *KvGetArray(const KvList list, const char *key)
 	return &p->arrayValue;
 }
 
+bool KvGetList(const KvList list, const char *key, KvList out)
+{
+	Param *p = KvGetTypeWithDefault(list, key, PARAM_TYPE_KV_LIST, NULL);
+	if (!p)
+	{
+		return false;
+	}
+	KvListCopy(p->kvListValue, out);
+	return true;
+}
+
 Vector2 KvGetVec2(const KvList list, const char *key, const Vector2 defaultValue)
 {
 	const Param *p = KvGetTypeWithDefault(list,
@@ -446,6 +457,11 @@ inline void KvSetUint64(KvList list, const char *key, const uint64_t value)
 void KvSetParamArray(KvList list, const char *key, const ParamArray array)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_ARRAY, .arrayValue = array});
+}
+
+void KvSetList(KvList list, const char *key, const KvList value)
+{
+	KvSet(list, key, (Param){PARAM_TYPE_KV_LIST, .kvListValue = value});
 }
 
 inline void KvSetVec2(KvList list, const char *key, const Vector2 value)

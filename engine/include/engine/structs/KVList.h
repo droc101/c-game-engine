@@ -240,6 +240,8 @@ uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
  */
 ParamArray *KvGetArray(const KvList list, const char *key);
 
+bool KvGetList(const KvList list, const char *key, KvList out);
+
 /**
  * Get a Vector2 value from the key-value list.
  * @param list The list to get the value from.
@@ -325,6 +327,8 @@ void KvSetUint64(KvList list, const char *key, uint64_t value);
  * @param array The ParamArray value to set.
  */
 void KvSetParamArray(KvList list, const char *key, ParamArray array);
+
+void KvSetList(KvList list, const char *key, const KvList value);
 
 /**
  * Set a Vector2 value in the key-value list.

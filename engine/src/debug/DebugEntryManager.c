@@ -30,6 +30,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "engine/subsystem/Logging.h"
+
 List debugEntries;
 
 static bool expandedMenu = false;
@@ -194,12 +196,23 @@ void InitDebugEntryManager()
 	KvList list;
 	if (ReadKvlFile(DEBUG_OPTIONS_FILE, list))
 	{
-		for (size_t i = 0; i < debugEntries.length; i++)
+		KvList debugEntrySettings;
+		if (KvGetList(list, "debug_entries", debugEntrySettings))
 		{
-			DebugEntry *ent = ListGetPointer(debugEntries, i);
-			ent->mode = KvGetByte(list, ent->key, ent->defaultMode);
+			for (size_t i = 0; i < debugEntries.length; i++)
+			{
+				DebugEntry *ent = ListGetPointer(debugEntries, i);
+				ent->mode = KvGetByte(debugEntrySettings, ent->key, ent->defaultMode);
+				if (ent->mode >= DEBUG_ENTRY_MODE_MAX)
+				{
+					LogWarning("Invalid saved mode %d for debug entry \"%s\"\n", ent->mode, ent->key);
+					ent->mode = ent->defaultMode;
+				}
+			}
 		}
+		expandedMenu = KvGetBool(list, "extended_menu_visible", false);
 
+		KvListDestroy(debugEntrySettings);
 		KvListDestroy(list);
 	}
 }
@@ -226,13 +239,19 @@ void SaveDebugEntrySettings()
 {
 	KvList list;
 	KvListCreate(list);
+
+	KvList debugEntrySettings;
+	KvListCreate(debugEntrySettings);
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
-		KvSetByte(list, ent->key, ent->mode);
+		KvSetByte(debugEntrySettings, ent->key, ent->mode);
 	}
+	KvSetList(list, "debug_entries", debugEntrySettings);
+	KvSetBool(list, "extended_menu_visible", expandedMenu);
 
 	(void)WriteKvlFile(DEBUG_OPTIONS_FILE, list);
+	KvListDestroy(debugEntrySettings);
 }
 
 void DestroyDebugEntryManager()
