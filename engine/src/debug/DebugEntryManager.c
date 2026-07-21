@@ -221,10 +221,10 @@ void InitDebugEntryManager()
 					ent->mode = ent->defaultMode;
 				}
 			}
+			KvListDestroy(debugEntrySettings);
 		}
 		expandedMenu = KvGetBool(list, "extended_menu_visible", false);
 
-		KvListDestroy(debugEntrySettings);
 		KvListDestroy(list);
 	}
 }
