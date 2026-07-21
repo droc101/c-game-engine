@@ -76,4 +76,6 @@ Image *RegisterFallbackImage();
  */
 void DestroyTextureLoader();
 
+void DPrintTextureLoader();
+
 #endif //TEXTURELOADER_H

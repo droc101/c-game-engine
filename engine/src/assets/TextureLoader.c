@@ -6,7 +6,9 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/debug/DPrint.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
@@ -224,4 +226,9 @@ void DestroyTextureLoader()
 		}
 	}
 	textureId = 0;
+}
+
+void DPrintTextureLoader()
+{
+	DPrintF("Texture Cache: %zu/%zu textures", COLOR_WHITE, textureId, MAX_TEXTURES);
 }

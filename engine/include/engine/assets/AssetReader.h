@@ -90,6 +90,8 @@ void RemoveAssetFromCache(const char *relPath);
  */
 void HotReloadAssets();
 
+void DPrintAssetReader();
+
 #define TEXTURE(assetName) ("texture/" assetName ".gtex")
 #define SOUND(assetName) ("sound/" assetName ".gsnd")
 #define MAP(assetName) ("map/" assetName ".gmap")

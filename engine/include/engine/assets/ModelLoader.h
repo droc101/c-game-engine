@@ -203,4 +203,6 @@ JPH_Shape *CreateDynamicModelShape(size_t numHulls, const ModelConvexHull *hulls
  */
 JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollider);
 
+void DPrintModelLoader();
+
 #endif //MODELLOADER_H

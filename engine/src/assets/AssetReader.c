@@ -10,9 +10,11 @@
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/debug/DPrint.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
@@ -331,4 +333,9 @@ void HotReloadAssets()
 	InitCommonFonts();
 
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
+}
+
+void DPrintAssetReader()
+{
+	DPrintF("Primary Asset Cache: %zu asset(s)", COLOR_WHITE, AssetCache_size(assetCache));
 }

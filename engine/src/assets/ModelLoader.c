@@ -5,7 +5,9 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/ModelLoader.h>
+#include <engine/debug/DPrint.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/constants.h>
@@ -348,4 +350,9 @@ inline JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollid
 	JPH_Shape *meshShape = (JPH_Shape *)JPH_MeshShapeSettings_CreateShape(settings);
 	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)settings);
 	return meshShape;
+}
+
+void DPrintModelLoader()
+{
+	DPrintF("Model Cache: %zu/%zu models", COLOR_WHITE, modelId, MAX_MODELS);
 }

@@ -2,7 +2,11 @@
 // Created by droc101 on 7/19/26.
 //
 
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/KvlFile.h>
+#include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
+#include <engine/Commit.h>
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/debug/DebugGraph.h>
 #include <engine/debug/DPrint.h>
@@ -19,6 +23,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
+#include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/joltc.h>
@@ -26,11 +31,10 @@
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_cpuinfo.h>
 #include <SDL3/SDL_platform.h>
+#include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-#include "engine/subsystem/Logging.h"
 
 List debugEntries;
 
@@ -173,6 +177,13 @@ static void DebugEntrySystem()
 	DPrintGPUInfo();
 }
 
+static void DebugEntryAssetLoaders()
+{
+	DPrintAssetReader();
+	DPrintTextureLoader();
+	DPrintModelLoader();
+}
+
 #pragma endregion
 
 void InitDebugEntryManager()
@@ -191,6 +202,7 @@ void InitDebugEntryManager()
 	RegisterDebugEntry("camera", DebugEntryCamera, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);
 
 	KvList list;
