@@ -37,7 +37,6 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_mouse.h>
-#include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
@@ -341,7 +340,7 @@ void EngineIteration()
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
-	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F10))
+	if (IsInputActionJustPressed(mainThreadInput, &GetState()->options.benchmark))
 	{
 		BenchToggle();
 	}

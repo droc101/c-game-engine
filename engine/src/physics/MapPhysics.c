@@ -92,13 +92,12 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 	// TODO proper UI for switching items
 	if (allowMovement)
 	{
-		const float scroll = GetMouseWheel(physicsThreadInput).y;
-		if (scroll > 0)
-		{
-			PreviousItem();
-		} else if (scroll < 0)
+		if (IsInputActionJustPressed(physicsThreadInput, &state->options.nextItem))
 		{
 			NextItem();
+		} else if (IsInputActionJustPressed(physicsThreadInput, &state->options.previousItem))
+		{
+			PreviousItem();
 		}
 	}
 

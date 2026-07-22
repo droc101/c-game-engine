@@ -39,6 +39,8 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         include/gameState/PauseState.h
         src/gameState/options/DebugOptionsState.c
         include/gameState/options/DebugOptionsState.h
+        src/gameState/options/ControlsOptionsState.c
+        include/gameState/options/ControlsOptionsState.h
 
         src/helpers/GameActorRegistration.c
         include/helpers/GameActorRegistration.h

@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "SDL3/SDL_oldnames.h"
+
 typedef enum InputState : uint8_t
 {
 	/// The input is not pressed
@@ -384,6 +386,14 @@ void ConsumeAllMouseButtons(InputSystem *system)
 	}
 }
 
+void ConsumeMouseWheel(InputSystem *system)
+{
+	system->mouseWheelRelativeTicksX = 0;
+	system->mouseWheelRelativeTicksY = 0;
+	system->mouseWheelRelativeX = 0;
+	system->mouseWheelRelativeY = 0;
+}
+
 float GetAxis(const InputSystem *system, const SDL_GamepadAxis axis)
 {
 	return system->gamepadAxes[axis];
@@ -406,6 +416,42 @@ const char *GetControllerName()
 		return NULL;
 	}
 	return SDL_GetGamepadName(currentGamepad);
+}
+
+SDL_Scancode GetPressedScancode(InputSystem *system)
+{
+	for (int i = 0; i < SDL_SCANCODE_COUNT; i++)
+	{
+		if (system->keys[i] == INP_PRESSED || system->keys[i] == INP_JUST_PRESSED)
+		{
+			return i;
+		}
+	}
+	return SDL_SCANCODE_UNKNOWN;
+}
+
+uint8_t GetPressedMouseButton(InputSystem *system)
+{
+	for (int i = 0; i < MAX_RECOGNIZED_MOUSE_BUTTONS; i++)
+	{
+		if (system->mouseButtons[i] == INP_PRESSED || system->mouseButtons[i] == INP_JUST_PRESSED)
+		{
+			return i;
+		}
+	}
+	return 0xFF;
+}
+
+SDL_GamepadButton GetPressedButton(InputSystem *system)
+{
+	for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; i++)
+	{
+		if (system->controllerButtons[i] == INP_PRESSED || system->controllerButtons[i] == INP_JUST_PRESSED)
+		{
+			return i;
+		}
+	}
+	return SDL_GAMEPAD_BUTTON_INVALID;
 }
 
 void InputInit()

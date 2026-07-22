@@ -197,6 +197,8 @@ target_sources(engine INTERFACE
         src/structs/Item.c
         include/engine/structs/GameState.h
         include/engine/structs/Light.h
+        src/structs/InputAction.c
+        include/engine/structs/InputAction.h
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h

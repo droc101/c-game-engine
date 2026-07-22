@@ -31,7 +31,6 @@
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_cpuinfo.h>
 #include <SDL3/SDL_platform.h>
-#include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -231,7 +230,7 @@ void InitDebugEntryManager()
 
 void RenderDebugEntries()
 {
-	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_F4))
+	if (IsInputActionJustPressed(mainThreadInput, &GetState()->options.debugMenu))
 	{
 		expandedMenu = !expandedMenu;
 	}

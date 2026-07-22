@@ -201,6 +201,7 @@ void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePositio
 
 void DestroyTextBox(const Control *control)
 {
+	StopTextInput();
 	const TextBoxData *textBoxData = control->controlData;
 	free(textBoxData->text);
 	free(textBoxData->ime_edit);

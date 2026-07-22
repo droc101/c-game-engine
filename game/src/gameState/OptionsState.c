@@ -32,6 +32,7 @@ bool optionsStateInGame = false;
 
 static void BtnOptionsBack()
 {
+	SaveOptions(&GetState()->options);
 	if (optionsStateInGame)
 	{
 		SetGameState(&PauseState);

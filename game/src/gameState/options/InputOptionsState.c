@@ -20,6 +20,7 @@
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "gameState/options/ControlsOptionsState.h"
 #include "gameState/OptionsState.h"
 
 static UiStack *inputOptionsStack = NULL;
@@ -43,15 +44,25 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-static void SldOptionsMouseSensitivity(const float value)
+static void BtnControlsOptions()
 {
-	GetState()->options.cameraSpeed = value;
+	SetGameState(&ControlsOptionsState);
 }
 
 static void SldOptionsRumbleStrength(const float value)
 {
 	GetState()->options.rumbleStrength = value;
 	Rumble(1.0f, 200, mainThreadInput);
+}
+
+static void SldOptionsStickDeadzone(const float value)
+{
+	GetState()->options.controllerDeadzone = value;
+}
+
+static void SldOptionsMouseSensitivity(const float value)
+{
+	GetState()->options.cameraSpeed = value;
 }
 
 static void CbOptionsInvertCameraH(const bool value)
@@ -90,39 +101,27 @@ static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 
 	ProcessUiStack(inputOptionsStack);
 	DrawUiStack(inputOptionsStack);
-
-	DrawTextAligned("Controller Options",
-					16,
+	DrawTextAligned("Controller Name:",
+					12,
 					COLOR_WHITE,
-					v2(0, 260),
+					v2(0, 460),
 					v2(ScaledWindowWidthFloat(), 40),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
 					smallFont);
-
+	const char *controllerName = GetControllerName();
+	if (!controllerName)
 	{
-		DrawTextAligned("Controller Name:",
-						12,
-						COLOR_WHITE,
-						v2(0, 460),
-						v2(ScaledWindowWidthFloat(), 40),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
-		const char *controllerName = GetControllerName();
-		if (!controllerName)
-		{
-			controllerName = "No Controller Connected";
-		}
-		DrawTextAligned(controllerName,
-						12,
-						COLOR_WHITE,
-						v2(0, 480),
-						v2(ScaledWindowWidthFloat(), 40),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
+		controllerName = "No Controller Connected";
 	}
+	DrawTextAligned(controllerName,
+					12,
+					COLOR_WHITE,
+					v2(0, 480),
+					v2(ScaledWindowWidthFloat(), 40),
+					FONT_HALIGN_CENTER,
+					FONT_VALIGN_MIDDLE,
+					smallFont);
 }
 
 static void InputOptionsStateSet()
@@ -132,7 +131,14 @@ static void InputOptionsStateSet()
 		inputOptionsStack = CreateUiStack();
 		float opY = 80;
 		const float opSpacing = 45;
-
+		UiStackPush(inputOptionsStack,
+					CreateButtonControl(v2(0, opY),
+										v2(480, 40),
+										"Edit Controls",
+										BtnControlsOptions,
+										TOP_CENTER,
+										NULL));
+		opY += opSpacing * 1.5;
 		UiStackPush(inputOptionsStack,
 					CreateSliderControl(v2(0, opY),
 										v2(480, 40),
@@ -164,7 +170,7 @@ static void InputOptionsStateSet()
 										  TOP_CENTER,
 										  GetState()->options.invertVerticalCamera,
 										  NULL));
-		opY += opSpacing * 3;
+		opY += opSpacing * 1.5;
 		UiStackPush(inputOptionsStack,
 					CreateSliderControl(v2(0, opY),
 										v2(480, 40),
@@ -180,9 +186,23 @@ static void InputOptionsStateSet()
 										NULL));
 		opY += opSpacing;
 		UiStackPush(inputOptionsStack,
+					CreateSliderControl(v2(0, opY),
+										v2(480, 40),
+										"Stick Deadzone",
+										SldOptionsStickDeadzone,
+										TOP_CENTER,
+										0.0,
+										0.5,
+										GetState()->options.controllerDeadzone,
+										0.01,
+										0.01,
+										NULL,
+										NULL));
+		opY += opSpacing;
+		UiStackPush(inputOptionsStack,
 					CreateCheckboxControl(v2(0, opY),
 										  v2(480, 40),
-										  "Swap OK/Cancel buttons",
+										  "Swap controller OK/Cancel buttons",
 										  CbOptionsSwapOkCancel,
 										  TOP_CENTER,
 										  GetState()->options.controllerSwapOkCancel,

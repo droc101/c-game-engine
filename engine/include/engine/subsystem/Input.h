@@ -5,6 +5,7 @@
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
 
+#include <SDL3/SDL_scancode.h>
 #include <engine/structs/GlobalState.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Vector2.h>
 #include <SDL3/SDL_events.h>
@@ -17,8 +18,6 @@ typedef struct InputSystem InputSystem;
 
 extern InputSystem *physicsThreadInput;
 extern InputSystem *mainThreadInput;
-
-#define STICK_DEADZONE 0.1
 
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
 
@@ -194,6 +193,12 @@ void ConsumeAllKeys(InputSystem *system);
 void ConsumeAllMouseButtons(InputSystem *system);
 
 /**
+ * Consume mouse wheel motion so no other input check can see it
+ * @param system The input system to modify
+ */
+void ConsumeMouseWheel(InputSystem *system);
+
+/**
  * Gets the value of a controller axis
  * @param system The input system to check
  * @param axis The axis to get the value of
@@ -225,6 +230,24 @@ void Rumble(float strength, uint32_t time, const InputSystem *system);
  * @return The name of the connected controller, or NULL if no controller is connected
  */
 const char *GetControllerName();
+
+/**
+ * Get the scancode that is currently pressed, or @c SDL_SCANCODE_UNKNOWN if none are pressed
+ * @param system The input system to check
+ */
+SDL_Scancode GetPressedScancode(InputSystem *system);
+
+/**
+ * Get the mouse button that is currently pressed, or @c 0xFF if none are pressed
+ * @param system The input system to check
+ */
+uint8_t GetPressedMouseButton(InputSystem *system);
+
+/**
+ * Get the controller button that is currently pressed, or @c SDL_GAMEPAD_BUTTON_INVALID if none are pressed
+ * @param system The input system to check
+ */
+SDL_GamepadButton GetPressedButton(InputSystem *system);
 
 /**
  * Initializes the input system

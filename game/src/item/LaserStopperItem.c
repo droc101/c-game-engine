@@ -12,8 +12,6 @@
 #include <engine/structs/Player.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Input.h>
-#include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
 #include <wchar.h>
 #include "actor/prop/LaserEmitter.h"
@@ -35,13 +33,11 @@ static bool LaserStopperItemCanTargetFunction(Item *this,
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsMouseButtonJustPressed(physicsThreadInput, SDL_BUTTON_LEFT) ||
-			IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_WEST))
+		if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.primaryAttack))
 		{
 			const GlobalState *state = GetState();
 			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_OFF, &PARAM_NONE);
-		} else if (IsMouseButtonJustPressed(physicsThreadInput, SDL_BUTTON_RIGHT) ||
-				   IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_NORTH))
+		} else if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.secondaryAttack))
 		{
 			const GlobalState *state = GetState();
 			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_ON, &PARAM_NONE);

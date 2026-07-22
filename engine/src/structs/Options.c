@@ -3,13 +3,204 @@
 //
 
 #include <engine/assets/KvlFile.h>
+#include <engine/structs/InputAction.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Logging.h>
+#include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 
 #define OPTIONS_FILE "options.kvl"
+
+#pragma region Default Input Actions
+
+const InputAction DEFAULT_MOVE_FORWARD = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_W,
+			},
+	.controllerBind = {.axisBind = LEFT_STICK_UP},
+};
+const InputAction DEFAULT_MOVE_BACKWARD = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_S,
+			},
+	.controllerBind = {.axisBind = LEFT_STICK_DOWN},
+};
+const InputAction DEFAULT_MOVE_LEFT = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_A,
+			},
+	.controllerBind = {.axisBind = LEFT_STICK_LEFT},
+};
+const InputAction DEFAULT_MOVE_RIGHT = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_D,
+			},
+	.controllerBind = {.axisBind = LEFT_STICK_RIGHT},
+};
+const InputAction DEFAULT_SPRINT = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_LSHIFT,
+			},
+	.controllerBind =
+			{
+				.axisBind = LEFT_TRIGGER,
+			},
+};
+const InputAction DEFAULT_SNEAK = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_LCTRL,
+			},
+	.controllerBind = {.axisBind = RIGHT_TRIGGER},
+};
+const InputAction DEFAULT_JUMP = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_BUTTON,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_SPACE,
+			},
+	.controllerBind = {.buttonBind = SDL_GAMEPAD_BUTTON_EAST},
+};
+
+const InputAction DEFAULT_INTERACT = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_CONTROLLER_BUTTON,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_E,
+			},
+	.controllerBind =
+			{
+				.buttonBind = SDL_GAMEPAD_BUTTON_SOUTH,
+			},
+};
+const InputAction DEFAULT_PRIMARY_ATTACK = {
+	.keyboardMouseBindType = IA_MOUSE_BUTTON,
+	.controllerBindType = IA_CONTROLLER_BUTTON,
+	.keyboardMouseBind =
+			{
+				.mouseButtonBind = SDL_BUTTON_LEFT,
+			},
+	.controllerBind =
+			{
+				.buttonBind = SDL_GAMEPAD_BUTTON_WEST,
+			},
+};
+const InputAction DEFAULT_SECONDARY_ATTACK = {
+	.keyboardMouseBindType = IA_MOUSE_BUTTON,
+	.controllerBindType = IA_CONTROLLER_BUTTON,
+	.keyboardMouseBind =
+			{
+				.mouseButtonBind = SDL_BUTTON_RIGHT,
+			},
+	.controllerBind =
+			{
+				.buttonBind = SDL_GAMEPAD_BUTTON_NORTH,
+			},
+};
+const InputAction DEFAULT_PREVIOUS_ITEM = {
+	.keyboardMouseBindType = IA_MOUSE_WHEEL,
+	.controllerBindType = IA_CONTROLLER_BUTTON,
+	.keyboardMouseBind =
+			{
+				.mouseWheelBind = MOUSE_WHEEL_UP,
+			},
+	.controllerBind =
+			{
+				.buttonBind = SDL_GAMEPAD_BUTTON_LEFT_SHOULDER,
+			},
+};
+const InputAction DEFAULT_NEXT_ITEM = {
+	.keyboardMouseBindType = IA_MOUSE_WHEEL,
+	.controllerBindType = IA_CONTROLLER_BUTTON,
+	.keyboardMouseBind =
+			{
+				.mouseWheelBind = MOUSE_WHEEL_DOWN,
+			},
+	.controllerBind =
+			{
+				.buttonBind = SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER,
+			},
+};
+
+const InputAction DEFAULT_LOOK_UP = {
+	.keyboardMouseBindType = IA_UNBOUND,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.controllerBind = {.axisBind = RIGHT_STICK_UP},
+};
+const InputAction DEFAULT_LOOK_DOWN = {
+	.keyboardMouseBindType = IA_UNBOUND,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.controllerBind = {.axisBind = RIGHT_STICK_DOWN},
+};
+const InputAction DEFAULT_LOOK_LEFT = {
+	.keyboardMouseBindType = IA_UNBOUND,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.controllerBind = {.axisBind = RIGHT_STICK_LEFT},
+};
+const InputAction DEFAULT_LOOK_RIGHT = {
+	.keyboardMouseBindType = IA_UNBOUND,
+	.controllerBindType = IA_CONTROLLER_AXIS,
+	.controllerBind = {.axisBind = RIGHT_STICK_RIGHT},
+};
+
+const InputAction DEFAULT_DEBUG_MENU = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_UNBOUND,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F4,
+			},
+};
+const InputAction DEFAULT_NOCLIP = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_UNBOUND,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_V,
+			},
+};
+const InputAction DEFAULT_FREECAM = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_UNBOUND,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F8,
+			},
+};
+const InputAction DEFAULT_BENCHMARK = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_UNBOUND,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F10,
+			},
+};
+
+#pragma endregion
 
 static void DefaultOptions(Options *options)
 {
@@ -24,8 +215,7 @@ static void DefaultOptions(Options *options)
 	options->msaa = MSAA_4X;
 	options->mipmaps = true;
 	options->rumbleStrength = 1.0f;
-	options->invertHorizontalCamera = false;
-	options->invertVerticalCamera = false;
+	options->controllerDeadzone = 0.1f;
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = true;
 	options->fov = 90.0f;
@@ -38,6 +228,30 @@ static void DefaultOptions(Options *options)
 	options->vsync = true;
 	options->limitFpsWhenUnfocused = true;
 #endif
+
+	memcpy(&options->moveForward, &DEFAULT_MOVE_FORWARD, sizeof(InputAction));
+	memcpy(&options->moveBackward, &DEFAULT_MOVE_BACKWARD, sizeof(InputAction));
+	memcpy(&options->moveLeft, &DEFAULT_MOVE_LEFT, sizeof(InputAction));
+	memcpy(&options->moveRight, &DEFAULT_MOVE_RIGHT, sizeof(InputAction));
+	memcpy(&options->sprint, &DEFAULT_SPRINT, sizeof(InputAction));
+	memcpy(&options->sneak, &DEFAULT_SNEAK, sizeof(InputAction));
+	memcpy(&options->jump, &DEFAULT_JUMP, sizeof(InputAction));
+
+	memcpy(&options->interact, &DEFAULT_INTERACT, sizeof(InputAction));
+	memcpy(&options->primaryAttack, &DEFAULT_PRIMARY_ATTACK, sizeof(InputAction));
+	memcpy(&options->secondaryAttack, &DEFAULT_SECONDARY_ATTACK, sizeof(InputAction));
+	memcpy(&options->previousItem, &DEFAULT_PREVIOUS_ITEM, sizeof(InputAction));
+	memcpy(&options->nextItem, &DEFAULT_NEXT_ITEM, sizeof(InputAction));
+
+	memcpy(&options->lookUp, &DEFAULT_LOOK_UP, sizeof(InputAction));
+	memcpy(&options->lookDown, &DEFAULT_LOOK_DOWN, sizeof(InputAction));
+	memcpy(&options->lookLeft, &DEFAULT_LOOK_LEFT, sizeof(InputAction));
+	memcpy(&options->lookRight, &DEFAULT_LOOK_RIGHT, sizeof(InputAction));
+
+	memcpy(&options->debugMenu, &DEFAULT_DEBUG_MENU, sizeof(InputAction));
+	memcpy(&options->noclip, &DEFAULT_NOCLIP, sizeof(InputAction));
+	memcpy(&options->freecam, &DEFAULT_FREECAM, sizeof(InputAction));
+	memcpy(&options->benchmark, &DEFAULT_BENCHMARK, sizeof(InputAction));
 }
 
 static bool ValidateOptions(const Options *options)
@@ -104,9 +318,34 @@ void LoadOptions(Options *options)
 		options->enableDiscordRpc = KvGetBool(list, "enable_discord_rpc", true);
 		options->cameraSpeed = KvGetFloat(list, "camera_speed", 1.0f);
 		options->rumbleStrength = KvGetFloat(list, "rumble_strength", 1.0f);
-		options->invertHorizontalCamera = KvGetBool(list, "invert_horizontal_camera", false);
-		options->invertVerticalCamera = KvGetBool(list, "invert_vertical_camera", false);
+		options->controllerDeadzone = KvGetFloat(list, "controller_deadzone", 0.1f);
 		options->controllerSwapOkCancel = KvGetBool(list, "controller_swap_ok_cancel", false);
+
+		LoadInputAction("move_forward", list, DEFAULT_MOVE_FORWARD, &options->moveForward);
+		LoadInputAction("move_backward", list, DEFAULT_MOVE_BACKWARD, &options->moveBackward);
+		LoadInputAction("move_left", list, DEFAULT_MOVE_LEFT, &options->moveLeft);
+		LoadInputAction("move_right", list, DEFAULT_MOVE_RIGHT, &options->moveRight);
+		LoadInputAction("sprint", list, DEFAULT_SPRINT, &options->sprint);
+		LoadInputAction("sneak", list, DEFAULT_SNEAK, &options->sneak);
+		LoadInputAction("jump", list, DEFAULT_JUMP, &options->jump);
+
+
+		LoadInputAction("interact", list, DEFAULT_INTERACT, &options->interact);
+		LoadInputAction("primary_attack", list, DEFAULT_PRIMARY_ATTACK, &options->primaryAttack);
+		LoadInputAction("secondary_attack", list, DEFAULT_SECONDARY_ATTACK, &options->secondaryAttack);
+		LoadInputAction("previous_item", list, DEFAULT_PREVIOUS_ITEM, &options->previousItem);
+		LoadInputAction("next_item", list, DEFAULT_NEXT_ITEM, &options->nextItem);
+
+		LoadInputAction("look_up", list, DEFAULT_LOOK_UP, &options->lookUp);
+		LoadInputAction("look_down", list, DEFAULT_LOOK_DOWN, &options->lookDown);
+		LoadInputAction("look_left", list, DEFAULT_LOOK_LEFT, &options->lookLeft);
+		LoadInputAction("look_right", list, DEFAULT_LOOK_RIGHT, &options->lookRight);
+
+		LoadInputAction("toggle_debug_menu", list, DEFAULT_DEBUG_MENU, &options->debugMenu);
+		LoadInputAction("toggle_noclip", list, DEFAULT_NOCLIP, &options->noclip);
+		LoadInputAction("toggle_freecam", list, DEFAULT_FREECAM, &options->freecam);
+		LoadInputAction("toggle_benchmark", list, DEFAULT_BENCHMARK, &options->benchmark);
+
 
 		options->fullscreen = KvGetBool(list, "fullscreen", false);
 		options->vsync = KvGetBool(list, "vsync", true);
@@ -147,9 +386,29 @@ void SaveOptions(Options *options)
 
 	KvSetFloat(list, "camera_speed", options->cameraSpeed);
 	KvSetFloat(list, "rumble_strength", options->rumbleStrength);
-	KvSetBool(list, "invert_horizontal_camera", options->invertHorizontalCamera);
-	KvSetBool(list, "invert_vertical_camera", options->invertVerticalCamera);
+	KvSetFloat(list, "controller_deadzone", options->controllerDeadzone);
 	KvSetBool(list, "controller_swap_ok_cancel", options->controllerSwapOkCancel);
+
+	SaveInputAction("move_forward", list, &options->moveForward);
+	SaveInputAction("move_backward", list, &options->moveBackward);
+	SaveInputAction("move_left", list, &options->moveLeft);
+	SaveInputAction("move_right", list, &options->moveRight);
+	SaveInputAction("sprint", list, &options->sprint);
+	SaveInputAction("sneak", list, &options->sneak);
+	SaveInputAction("jump", list, &options->jump);
+	SaveInputAction("interact", list, &options->interact);
+	SaveInputAction("primary_attack", list, &options->primaryAttack);
+	SaveInputAction("secondary_attack", list, &options->secondaryAttack);
+	SaveInputAction("previous_item", list, &options->previousItem);
+	SaveInputAction("next_item", list, &options->nextItem);
+	SaveInputAction("look_up", list, &options->lookUp);
+	SaveInputAction("look_down", list, &options->lookDown);
+	SaveInputAction("look_left", list, &options->lookLeft);
+	SaveInputAction("look_right", list, &options->lookRight);
+	SaveInputAction("toggle_debug_menu", list, &options->debugMenu);
+	SaveInputAction("toggle_noclip", list, &options->noclip);
+	SaveInputAction("toggle_freecam", list, &options->freecam);
+	SaveInputAction("toggle_benchmark", list, &options->benchmark);
 
 	KvSetBool(list, "fullscreen", options->fullscreen);
 	KvSetBool(list, "vsync", options->vsync);

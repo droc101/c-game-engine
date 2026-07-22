@@ -32,7 +32,7 @@
 static UiStack *debugOptionsStack = NULL;
 static char *filter = NULL;
 
-static const int LIST_WIDTH = 650;
+static const int LIST_WIDTH = 750;
 static const int ENTRY_HEIGHT = 44;
 
 static VScrollBarData scrollData = {0};
@@ -95,6 +95,7 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 	} else
 	{
 		RenderMenuBackground(state);
+		DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0x40000000));
 	}
 
 	const int listX = ScaledWindowWidth() / 2 - LIST_WIDTH / 2;
@@ -189,7 +190,7 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 					largeFont);
 
 	scrollData.contentHeight = numShownEntries * (ENTRY_HEIGHT + 2);
-	scrollData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * ENTRY_HEIGHT / 4;
+	scrollData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * ENTRY_HEIGHT / 2;
 
 	ProcessUiStack(debugOptionsStack);
 	DrawUiStack(debugOptionsStack);
@@ -202,7 +203,7 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 				RenderTooltipAtMouse("This debug option will never be shown");
 				break;
 			case DEBUG_ENTRY_TOGGLE:
-				RenderTooltipAtMouse("This debug option will be shown in the extended menu, toggled with F4");
+				RenderTooltipAtMouse("This debug option will be shown in the extended menu");
 				break;
 			case DEBUG_ENTRY_SHOWN:
 				RenderTooltipAtMouse("This debug option will always be shown");
@@ -222,7 +223,7 @@ static void DebugOptionsStateSet()
 		UiStackPush(debugOptionsStack,
 					CreateTextBoxControl("Filter Options",
 										 v2(0, 50),
-										 v2(450, 40),
+										 v2(480, 40),
 										 TOP_CENTER,
 										 64,
 										 FilterTextChanged,

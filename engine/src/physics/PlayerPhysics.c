@@ -9,6 +9,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/InputAction.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
@@ -31,8 +32,6 @@
 #include <joltc/Physics/Collision/Shape/SubShapeID.h>
 #include <joltc/Physics/Collision/ShapeFilter.h>
 #include <math.h>
-#include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -206,49 +205,30 @@ void MovePlayer(const Player *player, const double delta, const bool allowInput)
 
 	if (allowInput)
 	{
-		if (UseController(physicsThreadInput))
+		if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveForward))
 		{
-			moveVec.z = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTY);
-			moveVec.x = GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFTX);
-			if (fabsf(moveVec.x) < STICK_DEADZONE)
-			{
-				moveVec.x = 0;
-			}
-			if (fabsf(moveVec.z) < STICK_DEADZONE)
-			{
-				moveVec.z = 0;
-			}
-		} else
+			moveVec.z -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveForward);
+		} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveBackward))
 		{
-			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_W))
-			{
-				moveVec.z -= 1;
-			}
-			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_S))
-			{
-				moveVec.z += 1;
-			}
+			moveVec.z += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveBackward);
+		}
 
-			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_D))
-			{
-				moveVec.x += 1;
-			}
-			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_A))
-			{
-				moveVec.x -= 1;
-			}
+		if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveRight))
+		{
+			moveVec.x += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveRight);
+		} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveLeft))
+		{
+			moveVec.x -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveLeft);
 		}
 
 		if (moveVec.x != 0 || moveVec.z != 0)
 		{
 			Vector3_Normalized(&moveVec, &moveVec);
-			if (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LCTRL) ||
-				GetAxis(physicsThreadInput, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5)
+			if (IsInputActionPressed(physicsThreadInput, &GetState()->options.sneak))
 			{
 				Vector3_MultiplyScalar(&moveVec, SLOW_MOVE_SPEED, &moveVec);
 			} else if ((player->isFreecamActive || player->isNoclipActive) &&
-					   (IsKeyPressed(physicsThreadInput, SDL_SCANCODE_LSHIFT) ||
-						IsKeyPressed(physicsThreadInput, SDL_SCANCODE_RSHIFT)))
+					   IsInputActionPressed(physicsThreadInput, &GetState()->options.sprint))
 			{
 				Vector3_MultiplyScalar(&moveVec, MOVE_SPEED * 2, &moveVec);
 			} else
@@ -286,8 +266,7 @@ void MovePlayer(const Player *player, const double delta, const bool allowInput)
 		Vector3 oldVelocity;
 		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
 		moveVec.y += oldVelocity.y + (float)(GRAVITY * (delta / PHYSICS_TARGET_TPS));
-	} else if (allowInput && (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_SPACE) ||
-							  IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_EAST)))
+	} else if (allowInput && IsInputActionJustPressed(physicsThreadInput, &GetState()->options.jump))
 	{
 		moveVec.y = JUMP_SPEED;
 	}
@@ -316,7 +295,9 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime, const bool allowInput)
 {
-	if (allowInput && !player->isNoclipActive && IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_F8))
+	if (allowInput &&
+		!player->isNoclipActive &&
+		IsInputActionJustPressed(physicsThreadInput, &GetState()->options.freecam))
 	{
 		player->isFreecamActive = !player->isFreecamActive;
 		Viewmodel *viewmodel = &GetState()->map->viewmodel;
@@ -334,9 +315,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 	{
 		if (player->hasHeldActor)
 		{
-			if ((IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
-				 IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH)) &&
-				canDropHeldActor)
+			if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.interact) && canDropHeldActor)
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
@@ -404,8 +383,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 						(raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
-						if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
-							IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH))
+						if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.interact))
 						{
 							player->heldActor = player->targetedActor;
 							player->hasHeldActor = true;
@@ -415,8 +393,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
-						if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_E) ||
-							IsButtonJustPressed(physicsThreadInput, SDL_GAMEPAD_BUTTON_SOUTH))
+						if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.interact))
 						{
 							player->targetedActor->definition->Interact(player->targetedActor);
 						}
@@ -430,7 +407,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			}
 		}
-		if (IsKeyJustReleased(physicsThreadInput, SDL_SCANCODE_V))
+		if (IsInputActionJustReleased(physicsThreadInput, &GetState()->options.noclip))
 		{
 			player->isNoclipActive = !player->isNoclipActive;
 		}
@@ -463,34 +440,42 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 	Vector2 cameraMotion = v2s(0);
 	if (state->camera == &state->map->player.playerCamera)
 	{
-		if (UseController(mainThreadInput))
+		cameraMotion = GetMouseRel(mainThreadInput);
+		if (fabsf(cameraMotion.x) < 1e-6 && fabsf(cameraMotion.y) < 1e-6)
 		{
 			cameraMotion = v2s(0);
 
-			float cx = -GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTX);
-			if (state->options.invertHorizontalCamera)
+			if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookUp))
 			{
-				cx *= -1;
-			}
-			if (fabsf(cx) > STICK_DEADZONE)
+				cameraMotion.y += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookUp);
+			} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookDown))
 			{
-				cameraMotion.x = cx * state->options.cameraSpeed / 6.0f;
+				cameraMotion.y -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookDown);
 			}
 
-			float cy = -GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTY);
+			if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookLeft))
+			{
+				cameraMotion.x += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookLeft);
+			} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookRight))
+			{
+				cameraMotion.x -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookRight);
+			}
+			if (state->options.invertHorizontalCamera)
+			{
+				cameraMotion.x *= -1;
+			}
+			cameraMotion.x *= state->options.cameraSpeed / 6.0f;
+
 			if (state->options.invertVerticalCamera)
 			{
-				cy *= -1;
+				cameraMotion.y *= -1;
 			}
-			if (fabsf(cy) > STICK_DEADZONE)
-			{
-				cameraMotion.y = cy * state->options.cameraSpeed / 6.0f;
-			}
+			cameraMotion.y *= state->options.cameraSpeed / 6.0f;
+
 			cameraMotion.x *= (float)delta;
 			cameraMotion.y *= (float)delta;
 		} else
 		{
-			cameraMotion = GetMouseRel(mainThreadInput);
 			cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
 			cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
 			if (state->options.invertHorizontalCamera)
