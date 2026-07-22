@@ -561,7 +561,7 @@ VkResult UpdateActors()
 	return VK_SUCCESS;
 }
 
-void ClearModelCache()
+bool ClearModelCache()
 {
 	ListClear(loadedModelIds);
 	ClearLodMaterialSlotsData();
@@ -570,4 +570,12 @@ void ClearModelCache()
 		ListAndContentsFree(ListGetNestedList(lodMaterialSlotsVertexData, i));
 	}
 	ListClear(lodMaterialSlotsVertexData);
+	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.actorModels.vertices, 0),
+			   "Failed to empty actor model vertex buffer!");
+	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.actorModels.indices, 0),
+			   "Failed to empty actor model index buffer!");
+	bufferVertexCount = 0;
+	bufferIndexCount = 0;
+
+	return true;
 }

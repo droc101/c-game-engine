@@ -756,7 +756,10 @@ static inline bool HandleRendererQueuedActions()
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_MODELS)
 	{
-		ClearModelCache();
+		if (!ClearModelCache())
+		{
+			return false;
+		}
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
 	}
 

@@ -335,7 +335,7 @@ extern uint32_t skyTextureIndex;
 
 bool ClearTextureCache();
 
-void ClearModelCache();
+bool ClearModelCache();
 
 VkResult CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
 
