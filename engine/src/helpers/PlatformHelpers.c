@@ -100,3 +100,47 @@ bool IsPathAbsolute(const char *path)
 
 	return false;
 }
+
+const char *GameStrCaseStr(const char *haystack, const char *needle)
+{
+	if (!haystack)
+	{
+		return NULL;
+	}
+	if (!needle)
+	{
+		return haystack;
+	}
+
+	const size_t haystackLen = strlen(haystack);
+	const size_t needleLen = strlen(needle);
+
+	if (needleLen == 0)
+	{
+		return haystack;
+	}
+	if (needleLen > haystackLen)
+	{
+		return NULL;
+	}
+
+	for (size_t i = 0; i < haystackLen - needleLen; i++)
+	{
+		const char *base = &haystack[i];
+		bool match = true;
+		for (size_t j = 0; j < needleLen; j++)
+		{
+			if (tolower(base[j]) != tolower(needle[j]))
+			{
+				match = false;
+				break;
+			}
+		}
+		if (match)
+		{
+			return base;
+		}
+	}
+
+	return NULL;
+}

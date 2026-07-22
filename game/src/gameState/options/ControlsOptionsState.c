@@ -32,6 +32,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "engine/helpers/PlatformHelpers.h"
 #include "gameState/options/InputOptionsState.h"
 
 typedef struct ControlOption
@@ -281,9 +283,9 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 	int numShownEntries = 0;
 	for (size_t i = 0; i < controlOptions.length; i++)
 	{
-		ControlOption *entry = ListGetPointer(controlOptions, i);
+		const ControlOption *entry = ListGetPointer(controlOptions, i);
 
-		if (entry->action != NULL && filter != NULL && strcasestr(entry->name, filter) == NULL)
+		if (entry->action != NULL && filter != NULL && GameStrCaseStr(entry->name, filter) == NULL)
 		{
 			continue;
 		}

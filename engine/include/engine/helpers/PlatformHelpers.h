@@ -25,4 +25,6 @@ _Noreturn void RestartProgram();
  */
 bool IsPathAbsolute(const char *path);
 
+const char *GameStrCaseStr(const char *haystack, const char *needle);
+
 #endif //PLATFORMHELPERS_H
