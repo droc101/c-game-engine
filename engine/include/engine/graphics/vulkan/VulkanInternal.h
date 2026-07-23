@@ -32,4 +32,6 @@ bool CreateBuffers();
 
 bool CreateDescriptorSet();
 
+void WriteDescriptorSet();
+
 #endif //VULKANINTERNAL_H

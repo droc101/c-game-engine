@@ -22,6 +22,8 @@
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
@@ -638,7 +640,7 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 	if (shadedDrawCount != 0)
 	{
 		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = pipelines.shadedViewmodel,
+			.pipeline = pipelines.shadedModel,
 			.pipelineBindInfo = pipelineBindInfo,
 			.buffer = buffers.viewmodel.shadedDrawInfo,
 			.drawCount = shadedDrawCount,
@@ -650,13 +652,77 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 	if (unshadedDrawCount != 0)
 	{
 		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = pipelines.unshadedViewmodel,
+			.pipeline = pipelines.unshadedModel,
 			.pipelineBindInfo = pipelineBindInfo,
 			.buffer = buffers.viewmodel.unshadedDrawInfo,
 			.drawCount = unshadedDrawCount,
 		};
 		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
 							   "Failed to draw unshaded viewmodel!");
+	}
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult DrawPlayer(const Map *map, const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+	const size_t shadedDrawCount = lunaGetBufferSize(buffers.player.buffers.shadedDrawInfo) /
+								   sizeof(VkDrawIndexedIndirectCommand);
+	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.player.buffers.unshadedDrawInfo) /
+									 sizeof(VkDrawIndexedIndirectCommand);
+
+	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
+	{
+		JPH_RMat44 transformMatrix;
+		JPH_CharacterVirtual_GetWorldTransform(map->player.joltCharacter, &transformMatrix);
+		for (uint32_t slotIndex = 0; slotIndex < buffers.player.modelDefinition->materialSlotCount; slotIndex++)
+		{
+			memcpy(buffers.player.instanceData + slotIndex, &transformMatrix, sizeof(transformMatrix));
+		}
+		const LunaBufferWriteInfo instanceDataWriteInfo = {
+			.bytes = sizeof(ModelInstanceData) * buffers.player.modelDefinition->materialSlotCount,
+			.data = buffers.player.instanceData,
+			.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		};
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+													 commandBuffer,
+													 buffers.player.buffers.instanceData,
+													 &instanceDataWriteInfo),
+							   "Failed to write player instance data to buffer!");
+
+		VulkanTest(lunaBindVertexBuffers(device,
+										 commandBuffer,
+										 (LunaBuffer[]){buffers.player.buffers.vertices,
+														buffers.player.buffers.instanceData},
+										 0,
+										 2),
+				   "Failed to bind player vertex buffers!");
+		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.player.buffers.indices, VK_INDEX_TYPE_UINT32),
+				   "Failed to bind player index buffer!");
+	}
+
+	if (shadedDrawCount != 0)
+	{
+		const LunaDrawIndexedIndirectInfo drawInfo = {
+			.pipeline = pipelines.shadedModel,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.player.buffers.shadedDrawInfo,
+			.drawCount = shadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw shaded portions of player model!");
+	}
+
+	if (unshadedDrawCount != 0)
+	{
+		const LunaDrawIndexedIndirectInfo drawInfo = {
+			.pipeline = pipelines.unshadedModel,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.player.buffers.unshadedDrawInfo,
+			.drawCount = unshadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw unshaded portions of player model!");
 	}
 
 	return VK_SUCCESS;
@@ -785,8 +851,10 @@ bool VK_Init(SDL_Window *window)
 	// clang-format off
 	if (CreateSurface(window) && CreateLogicalDevice() && CreateCommandBuffers() && CreateSwapchain() &&
 		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
-		CreateBuffers() && CreateDescriptorSet())
+		CreateDescriptorSet() && CreateBuffers())
 	{
+		WriteDescriptorSet();
+
 		// clang-format on
 		char vendor[32] = {};
 		switch (physicalDeviceProperties.vendorID)
@@ -956,6 +1024,10 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 	}
 	VulkanTest(DrawMap(&pipelineBindInfo), "Failed to draw map!");
 	VulkanTest(DrawActors(&pipelineBindInfo), "Failed to draw actors!");
+	if (camera->showPlayerModel)
+	{
+		VulkanTest(DrawPlayer(map, &pipelineBindInfo), "Failed to draw player!");
+	}
 	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
 	{
 		VulkanTest(DrawViewmodel(&pipelineBindInfo), "Failed to draw viewmodel!");

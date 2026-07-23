@@ -61,6 +61,7 @@ CheckOptions:
   readability-function-cognitive-complexity.IgnoreMacros: true
   readability-operators-representation.BinaryOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
   readability-operators-representation.OverloadedOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
+  readability-trailing-comma.SingleLineCommaPolicy: Ignore
 
   readability-identifier-naming.EnumCase: CamelCase
   readability-identifier-naming.EnumConstantCase: UPPER_CASE

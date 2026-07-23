@@ -479,6 +479,11 @@ bool CreateDescriptorSet()
 	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, &descriptorSet),
 			   "Failed to allocate descriptor sets!");
 
+	return true;
+}
+
+void WriteDescriptorSet()
+{
 	const LunaDescriptorBufferInfo transformMatrixBufferInfo = {
 		.buffer = buffers.uniforms.camera,
 	};
@@ -507,6 +512,4 @@ bool CreateDescriptorSet()
 		.bufferInfo = &fogBufferInfo,
 	};
 	lunaWriteDescriptorSets(device, 3, (LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite});
-
-	return true;
 }

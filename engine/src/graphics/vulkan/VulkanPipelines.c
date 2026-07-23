@@ -415,15 +415,15 @@ static inline bool CreateSkyPipeline()
 	return true;
 }
 
-static inline bool CreateShadedViewmodelPipeline()
+static inline bool CreateShadedModelPipeline()
 {
 	// Layout of textureIndex and materialColor is assumed to be a known promise, so ensure that is true
 	static_assert(offsetof(ModelInstanceData, textureIndex) ==
 				  offsetof(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, materialColor));
 
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("viewmodel_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
-			   "Failed to load shaded viewmodel vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to load shaded model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -532,17 +532,17 @@ static inline bool CreateShadedViewmodelPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedViewmodel),
-			   "Failed to create shaded viewmodel graphics pipeline!");
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedModel),
+			   "Failed to create shaded model graphics pipeline!");
 
 	return true;
 }
 
-static inline bool CreateUnshadedViewmodelPipeline()
+static inline bool CreateUnshadedModelPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("viewmodel_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
-			   "Failed to load unshaded viewmodel vertex shader!");
+	VulkanTest(CreateShaderModule(SHADER("model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+			   "Failed to load unshaded model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -645,8 +645,8 @@ static inline bool CreateUnshadedViewmodelPipeline()
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedViewmodel),
-			   "Failed to create unshaded viewmodel graphics pipeline!");
+	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedModel),
+			   "Failed to create unshaded model graphics pipeline!");
 
 	return true;
 }
@@ -1154,8 +1154,8 @@ bool CreateGraphicsPipelines()
 		   CreateShadedMapPipeline() &&
 		   CreateUnshadedMapPipeline() &&
 		   CreateSkyPipeline() &&
-		   CreateShadedViewmodelPipeline() &&
-		   CreateUnshadedViewmodelPipeline() &&
+		   CreateShadedModelPipeline() &&
+		   CreateUnshadedModelPipeline() &&
 		   CreateShadedActorModelPipeline() &&
 		   CreateUnshadedActorModelPipeline() &&
 		   CreateActorWallPipelines() &&

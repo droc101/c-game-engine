@@ -3,6 +3,8 @@
 //
 
 #include <cglm/cglm.h>
+#include <engine/assets/AssetReader.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -354,6 +356,154 @@ static inline VkResult CreateActorWallBuffers()
 	return VK_SUCCESS;
 }
 
+// TODO: Only skin 0 of LOD 0 is ever loaded and used currently
+static inline VkResult CreatePlayerBuffers()
+{
+	buffers.player.modelDefinition = LoadModel(MODEL("player"));
+	const ModelDefinition *model = buffers.player.modelDefinition;
+	const ModelLod *lod = model->lods;
+
+	const VkDeviceSize vertexBufferSize = sizeof(ModelVertex) * lod->vertexCount;
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.size = vertexBufferSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &vertexBufferCreationInfo, &buffers.player.buffers.vertices),
+						   "Failed to create player model vertex buffer!");
+	const LunaBufferWriteInfo vertexDataWriteInfo = {
+		.bytes = vertexBufferSize,
+		.data = lod->vertexData,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.player.buffers.vertices,
+												 &vertexDataWriteInfo),
+						   "Failed to write player vertex data to buffer!");
+
+	const VkDeviceSize indexBufferSize = sizeof(uint32_t) * lod->totalIndexCount;
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.size = indexBufferSize,
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &indexBufferCreationInfo, &buffers.player.buffers.indices),
+						   "Failed to create player model index buffer!");
+
+	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
+		.size = sizeof(ModelInstanceData) * model->materialSlotCount,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&instanceDataBufferCreationInfo,
+											&buffers.player.buffers.instanceData),
+						   "Failed to create player model instance data buffer!");
+
+	VkDeviceSize indexOffset = 0;
+	uint32_t shadedDrawCount = 0;
+	uint32_t unshadedDrawCount = 0;
+	uint32_t *indices = malloc(sizeof(uint32_t) * lod->totalIndexCount);
+	CheckAlloc(indices);
+	buffers.player.instanceData = malloc(sizeof(ModelInstanceData) * model->materialSlotCount);
+	CheckAlloc(buffers.player.instanceData);
+	VkDrawIndexedIndirectCommand *shadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) *
+														  model->materialSlotCount);
+	CheckAlloc(shadedDrawInfo);
+	VkDrawIndexedIndirectCommand *unshadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) *
+															model->materialSlotCount);
+	CheckAlloc(unshadedDrawInfo);
+	for (uint32_t slotIndex = 0; slotIndex < model->materialSlotCount; slotIndex++)
+	{
+		const Material *material = &model->materials[model->skinMaterialIndices[0][slotIndex]];
+
+		memcpy(indices + indexOffset, lod->indexData[slotIndex], lod->indexCount[slotIndex] * sizeof(uint32_t));
+		indexOffset += lod->indexCount[slotIndex];
+
+		buffers.player.instanceData[slotIndex].materialColor = material->color;
+		buffers.player.instanceData[slotIndex].textureIndex = TextureIndex(material->texture);
+
+		if (material->shader == SHADER_SHADED)
+		{
+			shadedDrawInfo[shadedDrawCount].indexCount = lod->indexCount[slotIndex];
+			shadedDrawInfo[shadedDrawCount].instanceCount = 1;
+			shadedDrawInfo[shadedDrawCount].firstIndex = 0;
+			shadedDrawInfo[shadedDrawCount].vertexOffset = 0;
+			shadedDrawInfo[shadedDrawCount].firstInstance = 0;
+			shadedDrawCount++;
+		} else if (material->shader == SHADER_UNSHADED)
+		{
+			unshadedDrawInfo[unshadedDrawCount].indexCount = lod->indexCount[slotIndex];
+			unshadedDrawInfo[unshadedDrawCount].instanceCount = 1;
+			unshadedDrawInfo[unshadedDrawCount].firstIndex = 0;
+			unshadedDrawInfo[unshadedDrawCount].vertexOffset = 0;
+			unshadedDrawInfo[unshadedDrawCount].firstInstance = 0;
+			unshadedDrawCount++;
+		}
+	}
+
+	const LunaBufferWriteInfo indexDataWriteInfo = {
+		.bytes = indexBufferSize,
+		.data = indices,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.player.buffers.indices,
+												 &indexDataWriteInfo),
+						   "Failed to write player index data to buffer!");
+
+	const VkDeviceSize shadedDrawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * shadedDrawCount;
+	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
+		.size = shadedDrawInfoSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&shadedDrawInfoBufferCreationInfo,
+											&buffers.player.buffers.shadedDrawInfo),
+						   "Failed to create player model shaded draw info buffer!");
+	const LunaBufferWriteInfo shadedDrawInfoDataWriteInfo = {
+		.bytes = shadedDrawInfoSize,
+		.data = shadedDrawInfo,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.player.buffers.shadedDrawInfo,
+												 &shadedDrawInfoDataWriteInfo),
+						   "Failed to write player shaded draw info data to buffer!");
+
+	const VkDeviceSize unshadedDrawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * unshadedDrawCount;
+	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
+		.size = unshadedDrawInfoSize,
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&unshadedDrawInfoBufferCreationInfo,
+											&buffers.player.buffers.unshadedDrawInfo),
+						   "Failed to create player model unshaded draw info buffer!");
+	const LunaBufferWriteInfo unshadedDrawInfoDataWriteInfo = {
+		.bytes = unshadedDrawInfoSize,
+		.data = unshadedDrawInfo,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.player.buffers.unshadedDrawInfo,
+												 &unshadedDrawInfoDataWriteInfo),
+						   "Failed to write player unshaded draw info data to buffer!");
+
+	return VK_SUCCESS;
+}
+
 static inline VkResult CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
@@ -392,6 +542,7 @@ bool CreateBuffers()
 	VulkanTest(CreateViewmodelBuffers(), "Failed to create viewmodel buffers!");
 	VulkanTest(CreateActorModelBuffers(), "Failed to create actor models buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create actor wall buffers!");
+	VulkanTest(CreatePlayerBuffers(), "Failed to create player buffers!");
 	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
 
 	return true;

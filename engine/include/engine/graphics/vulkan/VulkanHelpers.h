@@ -6,6 +6,7 @@
 #define VULKANHELPERS_H
 
 #include <cglm/types.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Camera.h>
@@ -238,6 +239,13 @@ typedef struct ActorWallBuffer
 	uint32_t unshadedInstanceCount;
 } ActorWallBuffer;
 
+typedef struct PlayerModelBuffer
+{
+	ModelBuffer buffers;
+	ModelInstanceData *instanceData;
+	ModelDefinition *modelDefinition;
+} PlayerModelBuffer;
+
 #ifdef JPH_DEBUG_RENDERER
 // TODO: Clean up both this and the whole system
 typedef struct DebugDrawBuffer
@@ -263,6 +271,7 @@ typedef struct Buffers
 	ModelBuffer map;
 	SkyBuffer sky;
 	ActorWallBuffer actorWalls;
+	PlayerModelBuffer player;
 #ifdef JPH_DEBUG_RENDERER
 	DebugDrawBuffer debugDrawLines;
 	DebugDrawBuffer debugDrawTriangles;
@@ -275,8 +284,8 @@ typedef struct Pipelines
 	LunaGraphicsPipeline shadedMap;
 	LunaGraphicsPipeline unshadedMap;
 	LunaGraphicsPipeline sky;
-	LunaGraphicsPipeline shadedViewmodel;
-	LunaGraphicsPipeline unshadedViewmodel;
+	LunaGraphicsPipeline shadedModel;
+	LunaGraphicsPipeline unshadedModel;
 	LunaGraphicsPipeline shadedActorModel;
 	LunaGraphicsPipeline unshadedActorModel;
 	LunaGraphicsPipeline shadedActorWall;

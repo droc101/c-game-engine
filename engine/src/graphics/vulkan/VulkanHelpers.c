@@ -71,6 +71,8 @@ Pipelines pipelines = {
 };
 uint32_t pendingTasks = 0;
 uint32_t skyTextureIndex = 0;
+
+static mat4 cameraViewMatrix;
 #pragma endregion variables
 
 bool ClearTextureCache()
@@ -148,11 +150,10 @@ VkResult UpdateCameraUniform(const Camera *camera)
 	glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
 
 	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
-	mat4 viewMatrix;
-	glm_quat_look(cameraPosition, rotationQuat, viewMatrix);
+	glm_quat_look(cameraPosition, rotationQuat, cameraViewMatrix);
 
 	CameraUniform uniform;
-	glm_mat4_mul(perspectiveMatrix, viewMatrix, uniform.transform);
+	glm_mat4_mul(perspectiveMatrix, cameraViewMatrix, uniform.transform);
 	uniform.position = camera->transform.position;
 	const LunaBufferWriteInfo bufferWriteInfo = {
 		.bytes = sizeof(CameraUniform),
@@ -165,37 +166,32 @@ VkResult UpdateCameraUniform(const Camera *camera)
 	return VK_SUCCESS;
 }
 
-// TODO: Update this
 VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 {
-	mat4 perspectiveMatrix;
-	glm_perspective_lh_zo(glm_rad(VIEWMODEL_FOV),
-						  (float)swapChainExtent.width / (float)swapChainExtent.height,
-						  NEAR_Z,
-						  FAR_Z,
-						  perspectiveMatrix);
-
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix,
-				  (vec3){viewmodel->transform.position.x,
-						 -viewmodel->transform.position.y,
-						 viewmodel->transform.position.z});
+				  (vec3){
+					  viewmodel->transform.position.x,
+					  -viewmodel->transform.position.y,
+					  viewmodel->transform.position.z,
+				  });
 
 	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_rotate(rotationMatrix,
 			   JPH_Quat_GetRotationAngle(&viewmodel->transform.rotation, &Vector3_AxisY),
 			   (vec3){0.0f, -1.0f, 0.0f});
 
-	mat4 viewModelMatrix;
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
-	glm_mat4_mul(perspectiveMatrix, translationMatrix, viewModelMatrix);
+	mat4 viewmodelMatrix;
+	glm_mat4_inv(cameraViewMatrix, viewmodelMatrix);
+	glm_mat4_mul(viewmodelMatrix, translationMatrix, viewmodelMatrix);
 
 	const size_t instanceCount = lunaGetBufferSize(buffers.viewmodel.instanceData) / sizeof(ModelInstanceData);
 	for (size_t i = 0; i < instanceCount; i++)
 	{
 		const LunaBufferWriteInfo writeInfo = {
 			.bytes = sizeof(mat4),
-			.data = viewModelMatrix,
+			.data = viewmodelMatrix,
 			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
 			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 		};
