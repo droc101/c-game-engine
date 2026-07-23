@@ -9,7 +9,7 @@
         {
             "name": "",
             "floorHeight": -1.0,
-            "ceilingHeight": 3.0,
+            "ceilingHeight": 2.0,
             "floorMaterial": {
                 "material": "material/dev/floor_test.gmtl",
                 "uvOffset": {
@@ -226,12 +226,60 @@
                         "y": 1.0
                     },
                     "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
                 }
             ],
             "points": [
                 {
-                    "x": 13.25,
-                    "z": -4.25
+                    "x": 10.5,
+                    "z": -3.0
                 },
                 {
                     "x": 10.5,
@@ -266,16 +314,32 @@
                     "z": 4.25
                 },
                 {
-                    "x": 13.25,
-                    "z": 4.25
+                    "x": 10.5,
+                    "z": 3.0
                 },
                 {
-                    "x": 13.25,
-                    "z": 2.0
+                    "x": 9.5,
+                    "z": 3.0
                 },
                 {
-                    "x": 13.25,
-                    "z": -2.0
+                    "x": 9.5,
+                    "z": 1.0
+                },
+                {
+                    "x": 10.5,
+                    "z": 1.0
+                },
+                {
+                    "x": 10.5,
+                    "z": -1.0
+                },
+                {
+                    "x": 9.5,
+                    "z": -1.0
+                },
+                {
+                    "x": 9.5,
+                    "z": -3.0
                 }
             ]
         },
@@ -767,7 +831,7 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_unshaded_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -809,12 +873,12 @@
                     "z": 10.75
                 },
                 {
-                    "x": 8.25,
+                    "x": 8.5,
                     "z": 10.75
                 },
                 {
                     "x": 7.5,
-                    "z": 10.0
+                    "z": 9.75
                 }
             ]
         },
@@ -848,7 +912,7 @@
             },
             "wallMaterials": [
                 {
-                    "material": "material/dev/wall_unshaded_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -923,10 +987,10 @@
             "points": [
                 {
                     "x": 7.5,
-                    "z": -10.25
+                    "z": -10.0
                 },
                 {
-                    "x": 8.0,
+                    "x": 8.25,
                     "z": -10.75
                 },
                 {
@@ -2113,7 +2177,7 @@
         {
             "name": "",
             "floorHeight": -1.5,
-            "ceilingHeight": 2.125,
+            "ceilingHeight": 2.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -2127,7 +2191,7 @@
                 "luxels_per_unit": 16
             },
             "ceilingMaterial": {
-                "material": "material/dev/wall_unshaded_test.gmtl",
+                "material": "material/white_light.gmtl",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -3882,6 +3946,393 @@
                     "z": -2.0
                 }
             ]
+        },
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 2.0,
+            "floorMaterial": {
+                "material": "material/dev/floor_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/ceiling_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": 10.5,
+                    "z": -4.25
+                },
+                {
+                    "x": 13.25,
+                    "z": -4.25
+                },
+                {
+                    "x": 13.25,
+                    "z": -2.0
+                },
+                {
+                    "x": 13.25,
+                    "z": 2.0
+                },
+                {
+                    "x": 13.25,
+                    "z": 4.25
+                },
+                {
+                    "x": 10.5,
+                    "z": 4.25
+                },
+                {
+                    "x": 10.5,
+                    "z": 3.0
+                },
+                {
+                    "x": 10.5,
+                    "z": 1.0
+                },
+                {
+                    "x": 10.5,
+                    "z": -1.0
+                },
+                {
+                    "x": 10.5,
+                    "z": -3.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 2.0,
+            "floorMaterial": {
+                "material": "material/dev/floor_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/white_light.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": 9.5,
+                    "z": -3.0
+                },
+                {
+                    "x": 10.5,
+                    "z": -3.0
+                },
+                {
+                    "x": 10.5,
+                    "z": -1.0
+                },
+                {
+                    "x": 9.5,
+                    "z": -1.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -1.0,
+            "ceilingHeight": 2.0,
+            "floorMaterial": {
+                "material": "material/dev/floor_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "ceilingMaterial": {
+                "material": "material/white_light.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "luxels_per_unit": 16
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "luxels_per_unit": 16
+                }
+            ],
+            "points": [
+                {
+                    "x": 9.5,
+                    "z": 1.0
+                },
+                {
+                    "x": 10.5,
+                    "z": 1.0
+                },
+                {
+                    "x": 10.5,
+                    "z": 3.0
+                },
+                {
+                    "x": 9.5,
+                    "z": 3.0
+                }
+            ]
         }
     ],
     "actors": [
@@ -4630,687 +5081,6 @@
                         "b": 0.8312236070632935,
                         "a": 1.0
                     }
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 10.0,
-                "y": 0.0,
-                "z": -2.75
-            },
-            "rotation": {
-                "x": -90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 75.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 50.0
-                }
-            }
-        },
-        {
-            "class": "prop_sprite",
-            "position": {
-                "x": 10.0,
-                "y": 2.75,
-                "z": -2.0
-            },
-            "rotation": {
-                "x": 90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": true
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/flashbang.gtex"
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": false
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 2.0
-                    }
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 10.0,
-                "y": 0.0,
-                "z": 2.75
-            },
-            "rotation": {
-                "x": -90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 75.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 50.0
-                }
-            }
-        },
-        {
-            "class": "prop_sprite",
-            "position": {
-                "x": 10.0,
-                "y": 2.75,
-                "z": 2.0
-            },
-            "rotation": {
-                "x": 90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": true
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/flashbang.gtex"
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": false
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 2.0
-                    }
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 10.0,
-                "y": 0.0,
-                "z": -1.25
-            },
-            "rotation": {
-                "x": -90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 75.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 50.0
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 10.0,
-                "y": 0.0,
-                "z": 1.25
-            },
-            "rotation": {
-                "x": -90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 75.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 50.0
-                }
-            }
-        },
-        {
-            "class": "prop_sprite",
-            "position": {
-                "x": 7.75,
-                "y": 0.0,
-                "z": -10.375
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 45.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": true
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/flashbang.gtex"
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": true
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.5,
-                        "y": 2.0
-                    }
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 7.75,
-                "y": -0.0,
-                "z": -10.375
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 225.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 0.5
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 89.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 60.0
-                }
-            }
-        },
-        {
-            "class": "prop_sprite",
-            "position": {
-                "x": 8.0,
-                "y": 0.0,
-                "z": 10.375
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": -45.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": true
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/flashbang.gtex"
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": true
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.5,
-                        "y": 2.0
-                    }
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 8.0,
-                "y": -0.0,
-                "z": 10.375
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": -45.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 0.5
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 89.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 60.0
-                }
-            }
-        },
-        {
-            "class": "light_spot",
-            "position": {
-                "x": 28.0,
-                "y": 1.75,
-                "z": -0.0
-            },
-            "rotation": {
-                "x": -90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "bright_angle": {
-                    "type": "float",
-                    "value": 10.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 30.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 4.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 0.6751054525375366,
-                        "b": 0.8478342890739441,
-                        "a": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "class": "prop_sprite",
-            "position": {
-                "x": 28.0,
-                "y": 2.0,
-                "z": 0.0
-            },
-            "rotation": {
-                "x": 90.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 0.6745098233222961,
-                        "b": 0.8470588326454163,
-                        "a": 1.0
-                    }
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 2.0,
-                        "y": 2.0
-                    }
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": false
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/flashbang.gtex"
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": true
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
                 }
             }
         }

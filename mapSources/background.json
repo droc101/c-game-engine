@@ -48,16 +48,16 @@
                     "luxels_per_unit": 16
                 },
                 {
-                    "material": "material/dev/wall_test.gmtl",
+                    "material": "material/glowing_blob.gmtl",
                     "uvOffset": {
-                        "x": 0.0,
+                        "x": 0.5,
                         "y": 0.0
                     },
                     "uvScale": {
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "luxels_per_unit": 16
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -1441,51 +1441,6 @@
                 "name": {
                     "type": "string",
                     "value": ""
-                }
-            }
-        },
-        {
-            "class": "light_point",
-            "position": {
-                "x": 18.0,
-                "y": 0.0,
-                "z": 6.0
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 2.0
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 1.5
                 }
             }
         },
