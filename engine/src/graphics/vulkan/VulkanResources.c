@@ -460,7 +460,7 @@ static inline VkResult CreatePlayerBuffers()
 	const VkDeviceSize shadedDrawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * shadedDrawCount;
 	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
 		.size = shadedDrawInfoSize,
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
@@ -482,7 +482,7 @@ static inline VkResult CreatePlayerBuffers()
 	const VkDeviceSize unshadedDrawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * unshadedDrawCount;
 	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
 		.size = unshadedDrawInfoSize,
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
@@ -500,6 +500,10 @@ static inline VkResult CreatePlayerBuffers()
 												 buffers.player.buffers.unshadedDrawInfo,
 												 &unshadedDrawInfoDataWriteInfo),
 						   "Failed to write player unshaded draw info data to buffer!");
+
+	free(indices);
+	free(shadedDrawInfo);
+	free(unshadedDrawInfo);
 
 	return VK_SUCCESS;
 }

@@ -826,6 +826,7 @@ static inline bool HandleRendererQueuedActions()
 		{
 			return false;
 		}
+		buffers.player.modelDefinition = LoadModel(MODEL("player"));
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
 	}
 
@@ -1152,6 +1153,7 @@ void VK_Cleanup()
 	LogDebug("Cleaning up Vulkan renderer...\n");
 	free(buffers.ui.vertexData);
 	free(buffers.ui.indexData);
+	free(buffers.player.instanceData);
 	VulkanTestInternal(lunaDestroyInstance(), (void)0, "Cleanup failed!");
 }
 
