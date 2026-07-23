@@ -454,6 +454,16 @@ SDL_GamepadButton GetPressedButton(InputSystem *system)
 	return SDL_GAMEPAD_BUTTON_INVALID;
 }
 
+SDL_GamepadButtonLabel GetButtonLabel(SDL_GamepadButton btn)
+{
+	if (ControllerConnected())
+	{
+		return SDL_GetGamepadButtonLabel(currentGamepad, btn);
+		;
+	}
+	return SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN;
+}
+
 void InputInit()
 {
 	LogDebug("Initializing input system...\n");

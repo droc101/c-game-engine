@@ -249,6 +249,8 @@ uint8_t GetPressedMouseButton(InputSystem *system);
  */
 SDL_GamepadButton GetPressedButton(InputSystem *system);
 
+SDL_GamepadButtonLabel GetButtonLabel(SDL_GamepadButton btn);
+
 /**
  * Initializes the input system
  */

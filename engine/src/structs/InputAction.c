@@ -39,6 +39,18 @@ static const char *controllerAxisNames[] = {
 	"Right Trigger",
 };
 
+static const char *gamepadButtonLabelNames[] = {
+	"UNKNOWN",
+	"A Button",
+	"B Button",
+	"X Button",
+	"Y Button",
+	"Cross",
+	"Circle",
+	"Square",
+	"Triangle",
+};
+
 static const char *controllerButtonNames[] = {
 	"A Button",	   "B Button",	  "X Button",	   "Y Button",		 "Back",	 "Guide",	   "Start",
 	"Left Stick",  "Right Stick", "Left Shoulder", "Right Shoulder", "D-Pad Up", "D-Pad Down", "D-Pad Left",
@@ -231,7 +243,11 @@ const char *InputActionGetControllerString(const InputAction *action)
 	switch (action->controllerBindType)
 	{
 		case IA_CONTROLLER_BUTTON:
-			// TODO: handle different controller types (SDL_GetGamepadButtonLabel)
+			SDL_GamepadButtonLabel label = GetButtonLabel(action->controllerBind.buttonBind);
+			if (label != SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN)
+			{
+				return gamepadButtonLabelNames[label];
+			}
 			return controllerButtonNames[action->controllerBind.buttonBind];
 		case IA_CONTROLLER_AXIS:
 			return controllerAxisNames[action->controllerBind.axisBind];
