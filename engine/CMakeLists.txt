@@ -32,7 +32,7 @@ message(STATUS "Fetching Luna...")
 FetchContent_Declare(
         Luna
         GIT_REPOSITORY https://github.com/NBT22/Luna
-        GIT_TAG 0.3.0
+        GIT_TAG main
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
 )
