@@ -33,14 +33,11 @@ static const VkPipelineRasterizationStateCreateInfo RASTERIZER = {
 	.polygonMode = VK_POLYGON_MODE_FILL,
 	.cullMode = VK_CULL_MODE_BACK_BIT,
 	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
-	.lineWidth = 1,
-};
-
-static const VkPipelineRasterizationStateCreateInfo NON_CULLING_RASTERIZER = {
-	.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-	.polygonMode = VK_POLYGON_MODE_FILL,
-	.cullMode = VK_CULL_MODE_NONE,
-	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+#ifdef JPH_DEBUG_RENDERER
+	.depthBiasEnable = VK_TRUE,
+	.depthBiasConstantFactor = 10,
+	.depthBiasSlopeFactor = 10,
+#endif
 	.lineWidth = 1,
 };
 
@@ -1106,7 +1103,14 @@ static inline bool CreateDebugDrawPipeline()
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
-	const VkPipelineInputAssemblyStateCreateInfo linesInputAssembly = {
+	static const VkPipelineRasterizationStateCreateInfo DEBUG_DRAW_RASTERIZER = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+		.polygonMode = VK_POLYGON_MODE_FILL,
+		.cullMode = VK_CULL_MODE_NONE,
+		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		.lineWidth = 1,
+	};
+	static const VkPipelineInputAssemblyStateCreateInfo LINES_INPUT_ASSEMBLY = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 		.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
 	};
@@ -1114,9 +1118,9 @@ static inline bool CreateDebugDrawPipeline()
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
-		.inputAssemblyState = &linesInputAssembly,
+		.inputAssemblyState = &LINES_INPUT_ASSEMBLY,
 		.viewportState = &VIEWPORT_STATE,
-		.rasterizationState = &NON_CULLING_RASTERIZER,
+		.rasterizationState = &DEBUG_DRAW_RASTERIZER,
 		.multisampleState = &multisampling,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
@@ -1133,7 +1137,7 @@ static inline bool CreateDebugDrawPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
 		.viewportState = &VIEWPORT_STATE,
-		.rasterizationState = &NON_CULLING_RASTERIZER,
+		.rasterizationState = &DEBUG_DRAW_RASTERIZER,
 		.multisampleState = &multisampling,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
