@@ -28,6 +28,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "engine/debug/DebugEntryManager.h"
+
 SDL_Surface *ToSDLSurface(const char *texture)
 {
 	const Image *img = LoadImage(texture);
@@ -211,7 +213,13 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 								   const JPH_RVec3 *to,
 								   const JPH_Color color)
 {
+#ifdef JPH_DEBUG_RENDERER
+	if (!IsDebugEntryVisible("jolt_debug_renderer"))
+	{
+		return;
+	}
 	VK_DrawJoltDebugRendererLine(from, to, color);
+#endif
 }
 
 void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
@@ -221,7 +229,13 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 									   const JPH_Color color,
 									   JPH_DebugRenderer_CastShadow /*castShadow*/)
 {
+#ifdef JPH_DEBUG_RENDERER
+	if (!IsDebugEntryVisible("jolt_debug_renderer"))
+	{
+		return;
+	}
 	VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
+#endif
 }
 
 void RenderInGameMenuBackground()

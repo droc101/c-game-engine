@@ -40,6 +40,8 @@
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
+#include "engine/graphics/vulkan/VulkanResources.h"
+
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/subsystem/Error.h>
@@ -618,52 +620,6 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 	return VK_SUCCESS;
 }
 
-static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
-{
-	const size_t shadedDrawCount = lunaGetBufferSize(buffers.viewmodel.shadedDrawInfo) /
-								   sizeof(VkDrawIndexedIndirectCommand);
-	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.viewmodel.unshadedDrawInfo) /
-									 sizeof(VkDrawIndexedIndirectCommand);
-
-	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
-	{
-		VulkanTest(lunaBindVertexBuffers(device,
-										 commandBuffer,
-										 (LunaBuffer[]){buffers.viewmodel.vertices, buffers.viewmodel.instanceData},
-										 0,
-										 2),
-				   "Failed to bind viewmodel vertex buffers!");
-		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.viewmodel.indices, VK_INDEX_TYPE_UINT32),
-				   "Failed to bind viewmodel index buffer!");
-	}
-
-	if (shadedDrawCount != 0)
-	{
-		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = pipelines.shadedModel,
-			.pipelineBindInfo = pipelineBindInfo,
-			.buffer = buffers.viewmodel.shadedDrawInfo,
-			.drawCount = shadedDrawCount,
-		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-							   "Failed to draw shaded viewmodel!");
-	}
-
-	if (unshadedDrawCount != 0)
-	{
-		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = pipelines.unshadedModel,
-			.pipelineBindInfo = pipelineBindInfo,
-			.buffer = buffers.viewmodel.unshadedDrawInfo,
-			.drawCount = unshadedDrawCount,
-		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-							   "Failed to draw unshaded viewmodel!");
-	}
-
-	return VK_SUCCESS;
-}
-
 static inline VkResult DrawPlayer(const Map *map, const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
 {
 	const size_t shadedDrawCount = lunaGetBufferSize(buffers.player.buffers.shadedDrawInfo) /
@@ -724,6 +680,101 @@ static inline VkResult DrawPlayer(const Map *map, const LunaGraphicsPipelineBind
 		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
 							   "Failed to draw unshaded portions of player model!");
 	}
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+	const size_t shadedDrawCount = lunaGetBufferSize(buffers.viewmodel.shadedDrawInfo) /
+								   sizeof(VkDrawIndexedIndirectCommand);
+	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.viewmodel.unshadedDrawInfo) /
+									 sizeof(VkDrawIndexedIndirectCommand);
+
+	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
+	{
+		VulkanTest(lunaBindVertexBuffers(device,
+										 commandBuffer,
+										 (LunaBuffer[]){buffers.viewmodel.vertices, buffers.viewmodel.instanceData},
+										 0,
+										 2),
+				   "Failed to bind viewmodel vertex buffers!");
+		VulkanTest(lunaBindIndexBuffer(device, commandBuffer, buffers.viewmodel.indices, VK_INDEX_TYPE_UINT32),
+				   "Failed to bind viewmodel index buffer!");
+	}
+
+	if (shadedDrawCount != 0)
+	{
+		const LunaDrawIndexedIndirectInfo drawInfo = {
+			.pipeline = pipelines.shadedModel,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.viewmodel.shadedDrawInfo,
+			.drawCount = shadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw shaded viewmodel!");
+	}
+
+	if (unshadedDrawCount != 0)
+	{
+		const LunaDrawIndexedIndirectInfo drawInfo = {
+			.pipeline = pipelines.unshadedModel,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.viewmodel.unshadedDrawInfo,
+			.drawCount = unshadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+							   "Failed to draw unshaded viewmodel!");
+	}
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+#ifdef JPH_DEBUG_RENDERER
+	VulkanTestReturnResult(ResizeDebugDrawBuffers(), "Failed to resize debug draw buffer!");
+
+	if (buffers.debugDrawLines.bytesUsed != 0)
+	{
+		const LunaBufferWriteInfo writeInfo = {
+			.bytes = buffers.debugDrawLines.bytesUsed,
+			.data = buffers.debugDrawLines.vertices,
+			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		};
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.debugDrawLines.buffer, &writeInfo),
+							   "Failed to write debug Jolt debug renderer lines to buffer!");
+		const LunaDrawInfo drawInfo = {
+			.pipeline = pipelines.debugDrawLines,
+			.pipelineBindInfo = pipelineBindInfo,
+			.vertexCount = buffers.debugDrawLines.bytesUsed / sizeof(DebugDrawVertex),
+			.instanceCount = 1,
+		};
+		VulkanTestReturnResult(lunaDrawBuffer(device, commandBuffer, buffers.debugDrawLines.buffer, &drawInfo),
+							   "Failed to draw Jolt debug renderer lines!");
+	}
+	if (buffers.debugDrawTriangles.bytesUsed != 0)
+	{
+		const LunaBufferWriteInfo writeInfo = {
+			.bytes = buffers.debugDrawTriangles.bytesUsed,
+			.data = buffers.debugDrawTriangles.vertices,
+			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		};
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+													 commandBuffer,
+													 buffers.debugDrawTriangles.buffer,
+													 &writeInfo),
+							   "Failed to write Jolt debug renderer triangles to buffer!");
+		const LunaDrawInfo drawInfo = {
+			.pipeline = pipelines.debugDrawTriangles,
+			.pipelineBindInfo = pipelineBindInfo,
+			.vertexCount = buffers.debugDrawTriangles.bytesUsed / sizeof(DebugDrawVertex),
+			.instanceCount = 1,
+		};
+		VulkanTestReturnResult(lunaDrawBuffer(device, commandBuffer, buffers.debugDrawTriangles.buffer, &drawInfo),
+							   "Failed to draw Jolt debug renderer triangles!");
+	}
+#endif
 
 	return VK_SUCCESS;
 }
@@ -960,10 +1011,8 @@ bool VK_FrameStart()
 
 	buffers.ui.freeQuads = buffers.ui.allocatedQuads;
 #ifdef JPH_DEBUG_RENDERER
-	buffers.debugDrawLines.vertexCount = 0;
-	buffers.debugDrawLines.vertices.bytesUsed = 0;
-	buffers.debugDrawTriangles.vertexCount = 0;
-	buffers.debugDrawTriangles.vertices.bytesUsed = 0;
+	buffers.debugDrawLines.bytesUsed = 0;
+	buffers.debugDrawTriangles.bytesUsed = 0;
 #endif
 
 	return true;
@@ -1025,10 +1074,12 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 	}
 	VulkanTest(DrawMap(&pipelineBindInfo), "Failed to draw map!");
 	VulkanTest(DrawActors(&pipelineBindInfo), "Failed to draw actors!");
+	VulkanTest(DrawDebugRenderer(&pipelineBindInfo), "Failed to draw Jolt debug renderer!");
 	if (camera->showPlayerModel)
 	{
 		VulkanTest(DrawPlayer(map, &pipelineBindInfo), "Failed to draw player!");
 	}
+	// Viewmodel must be drawn last
 	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
 	{
 		VulkanTest(DrawViewmodel(&pipelineBindInfo), "Failed to draw viewmodel!");
@@ -1431,16 +1482,13 @@ void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *textur
 void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, const uint32_t color)
 {
 #ifdef JPH_DEBUG_RENDERER
-	if (buffers.debugDrawLines.vertices.allocatedSize <
-		buffers.debugDrawLines.vertices.bytesUsed + sizeof(DebugDrawVertex) * 2)
+	if (buffers.debugDrawLines.allocatedSize < buffers.debugDrawLines.bytesUsed + sizeof(DebugDrawVertex) * 2)
 	{
-		buffers.debugDrawLines.vertices.allocatedSize += sizeof(DebugDrawVertex) * 2 * 16;
-		buffers.debugDrawLines.shouldResize = true;
+		buffers.debugDrawLines.allocatedSize += sizeof(DebugDrawVertex) * 2 * 16;
 
-		DebugDrawVertex *newVertices = realloc(buffers.debugDrawLines.vertices.data,
-											   buffers.debugDrawLines.vertices.allocatedSize);
+		DebugDrawVertex *newVertices = realloc(buffers.debugDrawLines.vertices, buffers.debugDrawLines.allocatedSize);
 		CheckAlloc(newVertices);
-		buffers.debugDrawLines.vertices.data = newVertices;
+		buffers.debugDrawLines.vertices = newVertices;
 	}
 
 	const float a = 1;
@@ -1448,7 +1496,7 @@ void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, const 
 	const float g = (float)(color >> 8 & 0xFF) / 255.0f;
 	const float b = (float)(color & 0xFF) / 255.0f;
 
-	DebugDrawVertex *bufferVertices = buffers.debugDrawLines.vertices.data + buffers.debugDrawLines.vertices.bytesUsed;
+	DebugDrawVertex *bufferVertices = buffers.debugDrawLines.vertices + buffers.debugDrawLines.bytesUsed;
 
 	bufferVertices[0] = (DebugDrawVertex){
 		.position = *from,
@@ -1459,8 +1507,7 @@ void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, const 
 		.color = {r, g, b, a},
 	};
 
-	buffers.debugDrawLines.vertexCount += 2;
-	buffers.debugDrawLines.vertices.bytesUsed += sizeof(DebugDrawVertex) * 2;
+	buffers.debugDrawLines.bytesUsed += 2 * sizeof(DebugDrawVertex);
 #else
 	(void)from;
 	(void)to;
@@ -1471,25 +1518,22 @@ void VK_DrawJoltDebugRendererLine(const Vector3 *from, const Vector3 *to, const 
 void VK_DrawJoltDebugRendererTriangle(const Vector3 *vertices, const uint32_t color)
 {
 #ifdef JPH_DEBUG_RENDERER
-	if (buffers.debugDrawTriangles.vertices.allocatedSize <
-		buffers.debugDrawTriangles.vertices.bytesUsed + sizeof(DebugDrawVertex) * 3)
+	if (buffers.debugDrawTriangles.allocatedSize < buffers.debugDrawTriangles.bytesUsed + sizeof(DebugDrawVertex) * 3)
 	{
-		buffers.debugDrawTriangles.vertices.allocatedSize += sizeof(DebugDrawVertex) * 3 * 16;
-		buffers.debugDrawTriangles.shouldResize = true;
+		buffers.debugDrawTriangles.allocatedSize += sizeof(DebugDrawVertex) * 3 * 16;
 
-		DebugDrawVertex *newVertices = realloc(buffers.debugDrawTriangles.vertices.data,
-											   buffers.debugDrawTriangles.vertices.allocatedSize);
+		DebugDrawVertex *newVertices = realloc(buffers.debugDrawTriangles.vertices,
+											   buffers.debugDrawTriangles.allocatedSize);
 		CheckAlloc(newVertices);
-		buffers.debugDrawTriangles.vertices.data = newVertices;
+		buffers.debugDrawTriangles.vertices = newVertices;
 	}
 
-	const float a = 1;
+	const float a = 0.5f;
 	const float r = (float)(color >> 16 & 0xFF) / 255.0f;
 	const float g = (float)(color >> 8 & 0xFF) / 255.0f;
 	const float b = (float)(color & 0xFF) / 255.0f;
 
-	DebugDrawVertex *bufferVertices = buffers.debugDrawTriangles.vertices.data +
-									  buffers.debugDrawTriangles.vertices.bytesUsed;
+	DebugDrawVertex *bufferVertices = buffers.debugDrawTriangles.vertices + buffers.debugDrawTriangles.bytesUsed;
 
 	bufferVertices[0] = (DebugDrawVertex){
 		.position = vertices[0],
@@ -1504,8 +1548,7 @@ void VK_DrawJoltDebugRendererTriangle(const Vector3 *vertices, const uint32_t co
 		.color = {r, g, b, a},
 	};
 
-	buffers.debugDrawTriangles.vertexCount += 3;
-	buffers.debugDrawTriangles.vertices.bytesUsed += sizeof(DebugDrawVertex) * 3;
+	buffers.debugDrawTriangles.bytesUsed += 3 * sizeof(DebugDrawVertex);
 #else
 	(void)vertices;
 	(void)color;

@@ -56,12 +56,7 @@ TextureSamplers textureSamplers = {
 LockingList textures = {0};
 LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
 LunaDescriptorSet descriptorSet;
-Buffers buffers = {
-#ifdef JPH_DEBUG_RENDERER
-	.debugDrawLines.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
-	.debugDrawTriangles.vertices.allocatedSize = sizeof(DebugDrawVertex) * MAX_DEBUG_DRAW_VERTICES_INIT,
-#endif
-};
+Buffers buffers = {0};
 Pipelines pipelines = {
 	.ui = LUNA_NULL_HANDLE,
 #ifdef JPH_DEBUG_RENDERER

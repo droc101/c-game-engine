@@ -34,6 +34,7 @@
 #include <SDL3/SDL_cpuinfo.h>
 #include <SDL3/SDL_platform.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -185,6 +186,20 @@ static void DebugEntryAssetLoaders()
 
 #pragma endregion
 
+bool IsDebugEntryVisible(const char *key)
+{
+	for (size_t i = 0; i < debugEntries.length; i++)
+	{
+		const DebugEntry *ent = ListGetPointer(debugEntries, i);
+		if (strcmp(key, ent->key) == 0 &&
+			(ent->mode == DEBUG_ENTRY_SHOWN || (ent->mode == DEBUG_ENTRY_TOGGLE && expandedMenu)))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void InitDebugEntryManager()
 {
 	ListInit(debugEntries, LIST_POINTER);
@@ -203,6 +218,9 @@ void InitDebugEntryManager()
 	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);
+#ifdef JPH_DEBUG_RENDERER
+	RegisterDebugEntry("jolt_debug_renderer", NULL, DEBUG_ENTRY_TOGGLE, 0);
+#endif
 }
 
 void RenderDebugEntries()
@@ -215,7 +233,7 @@ void RenderDebugEntries()
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
-		if (ent->mode == DEBUG_ENTRY_SHOWN || (ent->mode == DEBUG_ENTRY_TOGGLE && expandedMenu))
+		if (ent->process && (ent->mode == DEBUG_ENTRY_SHOWN || (ent->mode == DEBUG_ENTRY_TOGGLE && expandedMenu)))
 		{
 			ent->process();
 			DPrintSpacing(ent->spacing);

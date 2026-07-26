@@ -512,26 +512,20 @@ static inline VkResult CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
 	const LunaBufferCreationInfo linesVertexBuffer = {
-		.size = buffers.debugDrawLines.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&linesVertexBuffer, &buffers.debugDrawLines.vertices.buffer),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &linesVertexBuffer, &buffers.debugDrawLines.buffer),
 						   "Failed to create debug draw lines buffer!");
-	buffers.debugDrawLines.vertices.data = malloc(buffers.debugDrawLines.vertices.allocatedSize);
-	CheckAlloc(buffers.debugDrawLines.vertices.data);
 
 	const LunaBufferCreationInfo vertexVertexBuffer = {
-		.size = buffers.debugDrawTriangles.vertices.allocatedSize,
 		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(&vertexVertexBuffer, &buffers.debugDrawTriangles.vertices.buffer),
+	VulkanTestReturnResult(lunaCreateBuffer(device, &vertexVertexBuffer, &buffers.debugDrawTriangles.buffer),
 						   "Failed to create debug draw triangles buffer!");
-	buffers.debugDrawTriangles.vertices.data = malloc(buffers.debugDrawTriangles.vertices.allocatedSize);
-	CheckAlloc(buffers.debugDrawTriangles.vertices.data);
 #endif
 
 	return VK_SUCCESS;
@@ -555,30 +549,16 @@ bool CreateBuffers()
 VkResult ResizeDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
-	if (buffers.debugDrawLines.vertices.allocatedSize < buffers.debugDrawLines.vertices.bytesUsed)
-	{
-		VulkanTestReturnResult(lunaResizeBuffer(&buffers.debugDrawLines.vertices.buffer,
-												buffers.debugDrawLines.vertices.bytesUsed),
-							   "Failed to resize debug draw lines buffer!");
-		buffers.debugDrawLines.vertices.allocatedSize = buffers.debugDrawLines.vertices.bytesUsed;
-	}
-	void *newData = realloc(buffers.debugDrawLines.vertices.data, buffers.debugDrawLines.vertices.allocatedSize);
-	CheckAlloc(newData);
-	buffers.debugDrawLines.vertices.data = newData;
-	buffers.debugDrawLines.shouldResize = false;
-
-	if (buffers.debugDrawTriangles.vertices.allocatedSize < buffers.debugDrawTriangles.vertices.bytesUsed)
-	{
-		VulkanTestReturnResult(lunaResizeBuffer(&buffers.debugDrawTriangles.vertices.buffer,
-												buffers.debugDrawTriangles.vertices.bytesUsed),
-							   "Failed to resize debug draw triangles buffer!");
-		buffers.debugDrawTriangles.vertices.allocatedSize = buffers.debugDrawTriangles.vertices.bytesUsed;
-	}
-
-	newData = realloc(buffers.debugDrawTriangles.vertices.data, buffers.debugDrawTriangles.vertices.allocatedSize);
-	CheckAlloc(newData);
-	buffers.debugDrawTriangles.vertices.data = newData;
-	buffers.debugDrawTriangles.shouldResize = false;
+	VulkanTestReturnResult(lunaGrowBuffer(device,
+										  commandBuffer,
+										  &buffers.debugDrawLines.buffer,
+										  buffers.debugDrawLines.allocatedSize),
+						   "Failed to grow debug draw lines buffer!");
+	VulkanTestReturnResult(lunaGrowBuffer(device,
+										  commandBuffer,
+										  &buffers.debugDrawTriangles.buffer,
+										  buffers.debugDrawTriangles.allocatedSize),
+						   "Failed to grow debug draw triangles buffer!");
 #endif
 
 	return VK_SUCCESS;

@@ -7,6 +7,7 @@
 
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
+#include <stdbool.h>
 
 typedef void (*DebugEntryFunction)();
 
@@ -28,6 +29,8 @@ typedef struct DebugEntry
 } DebugEntry;
 
 extern List debugEntries;
+
+bool IsDebugEntryVisible(const char *key);
 
 void InitDebugEntryManager();
 

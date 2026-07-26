@@ -36,6 +36,14 @@ static const VkPipelineRasterizationStateCreateInfo RASTERIZER = {
 	.lineWidth = 1,
 };
 
+static const VkPipelineRasterizationStateCreateInfo NON_CULLING_RASTERIZER = {
+	.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+	.polygonMode = VK_POLYGON_MODE_FILL,
+	.cullMode = VK_CULL_MODE_NONE,
+	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+	.lineWidth = 1,
+};
+
 static VkPipelineMultisampleStateCreateInfo multisampling = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 	.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
@@ -1107,16 +1115,16 @@ static inline bool CreateDebugDrawPipeline()
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &linesInputAssembly,
-		.viewportState = &viewportState,
-		.rasterizationState = &nonCullingRasterizer,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &NON_CULLING_RASTERIZER,
 		.multisampleState = &multisampling,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
-		.dynamicState = &dynamicState,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&linesPipelineInfo, &pipelines.debugDrawLines),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &linesPipelineInfo, &pipelines.debugDrawLines),
 			   "Failed to create graphics pipeline for Jolt debug renderer lines!");
 
 	const LunaGraphicsPipelineCreationInfo trianglesPipelineInfo = {
@@ -1124,16 +1132,16 @@ static inline bool CreateDebugDrawPipeline()
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
-		.viewportState = &viewportState,
-		.rasterizationState = &nonCullingRasterizer,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &NON_CULLING_RASTERIZER,
 		.multisampleState = &multisampling,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
-		.dynamicState = &dynamicState,
+		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
 		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(&trianglesPipelineInfo, &pipelines.debugDrawTriangles),
+	VulkanTest(lunaCreateGraphicsPipeline(device, &trianglesPipelineInfo, &pipelines.debugDrawTriangles),
 			   "Failed to create graphics pipeline for Jolt debug renderer triangles!");
 #endif
 

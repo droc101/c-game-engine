@@ -5,7 +5,6 @@
 #ifndef GAME_OPTIONS_H
 #define GAME_OPTIONS_H
 
-#include <engine/structs/InputAction.h>
 #include <stdbool.h>
 #include <stdint.h>
 

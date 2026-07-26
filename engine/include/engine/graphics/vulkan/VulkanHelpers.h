@@ -24,10 +24,6 @@
 #include <vulkan/vulkan_core.h>
 
 #pragma region macros
-#ifdef JPH_DEBUG_RENDERER
-#define MAX_DEBUG_DRAW_VERTICES_INIT 1024
-#endif
-
 #define FRAMES_IN_FLIGHT 1
 
 #define SizeofMember(Type, member) (sizeof(((Type *)0)->member))
@@ -250,15 +246,10 @@ typedef struct PlayerModelBuffer
 // TODO: Clean up both this and the whole system
 typedef struct DebugDrawBuffer
 {
-	struct
-	{
-		LunaBuffer buffer;
-		VkDeviceSize bytesUsed;
-		VkDeviceSize allocatedSize;
-		void *data;
-	} vertices;
-	uint32_t vertexCount;
-	bool shouldResize;
+	LunaBuffer buffer;
+	void *vertices;
+	VkDeviceSize bytesUsed;
+	VkDeviceSize allocatedSize;
 } DebugDrawBuffer;
 #endif
 
