@@ -12,6 +12,7 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/InputAction.h>
 #include <engine/structs/Item.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>

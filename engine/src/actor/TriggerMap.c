@@ -22,7 +22,6 @@
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>

@@ -459,7 +459,7 @@ void KvSetParamArray(KvList list, const char *key, const ParamArray array)
 	KvSet(list, key, (Param){PARAM_TYPE_ARRAY, .arrayValue = array});
 }
 
-void KvSetList(KvList list, const char *key, const KvList value)
+void KvSetList(KvList list, const char *key, KvList value)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_KV_LIST, .kvListValue = value});
 }

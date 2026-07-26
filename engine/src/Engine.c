@@ -20,6 +20,7 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/InputAction.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
@@ -136,7 +137,7 @@ void InitSDL()
 void WindowAndRenderInit()
 {
 	LogDebug("Creating window...\n");
-	float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	const float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 	const int width = clamp(GetCliArgInt("--width", DEF_WIDTH * dpiScale), MIN_WIDTH, MAX_WIDTH);
 	const int height = clamp(GetCliArgInt("--height", DEF_HEIGHT * dpiScale), MIN_HEIGHT, MAX_HEIGHT);
 	SDL_Window *window = SDL_CreateWindow(gameConfig.gameTitle,

@@ -17,6 +17,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/InputAction.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
@@ -31,9 +32,9 @@
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_cpuinfo.h>
 #include <SDL3/SDL_platform.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 List debugEntries;
 
@@ -105,7 +106,7 @@ static void DebugEntryPlayerPosition()
 {
 	if (GetState()->map)
 	{
-		Player *player = &GetState()->map->player;
+		const Player *player = &GetState()->map->player;
 		DPrintF("Position: %.2f %.2f %.2f",
 				COLOR_WHITE,
 				player->transform.position.x,
@@ -118,7 +119,7 @@ static void DebugEntryPlayerVelocity()
 {
 	if (GetState()->map)
 	{
-		Player *player = &GetState()->map->player;
+		const Player *player = &GetState()->map->player;
 
 		Vector3 playerVelocity;
 		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &playerVelocity);
@@ -136,7 +137,7 @@ static void DebugEntryPlayerActor()
 {
 	if (GetState()->map)
 	{
-		Player *player = &GetState()->map->player;
+		const Player *player = &GetState()->map->player;
 
 		PhysicsThreadLockTickMutex();
 		DPrintF("%s Actor: %s %p",

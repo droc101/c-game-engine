@@ -3,7 +3,6 @@
 //
 
 #include <engine/actor/SoundPlayer.h>
-#include <engine/assets/AssetReader.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>

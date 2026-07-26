@@ -23,7 +23,6 @@
 #include <gameState/OptionsState.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>

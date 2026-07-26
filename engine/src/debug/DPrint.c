@@ -8,6 +8,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 
 static int dprintYPosition = 10;

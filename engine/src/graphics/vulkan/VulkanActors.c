@@ -81,7 +81,7 @@ static inline void ClearLodMaterialSlotsData()
 {
 	for (size_t i = 0; i < lodMaterialSlotsData.length; i++)
 	{
-		const LodMaterialSlotsData *materialSlotData = ListGetPointer(lodMaterialSlotsData, i);
+		LodMaterialSlotsData *materialSlotData = ListGetPointer(lodMaterialSlotsData, i);
 		ListAndContentsFree(materialSlotData->materialSlots);
 	}
 	ListAndContentsFree(lodMaterialSlotsData);

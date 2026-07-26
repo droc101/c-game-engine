@@ -19,8 +19,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "SDL3/SDL_oldnames.h"
-
 typedef enum InputState : uint8_t
 {
 	/// The input is not pressed
@@ -454,12 +452,11 @@ SDL_GamepadButton GetPressedButton(InputSystem *system)
 	return SDL_GAMEPAD_BUTTON_INVALID;
 }
 
-SDL_GamepadButtonLabel GetButtonLabel(SDL_GamepadButton btn)
+SDL_GamepadButtonLabel GetButtonLabel(const SDL_GamepadButton btn)
 {
 	if (ControllerConnected())
 	{
 		return SDL_GetGamepadButtonLabel(currentGamepad, btn);
-		;
 	}
 	return SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN;
 }

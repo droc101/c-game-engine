@@ -21,7 +21,7 @@ typedef struct LogicCounterData
 	bool clampToMax;
 } LogicCounterData;
 
-static inline void ChangeValue(const int change, LogicCounterData *data, const Actor *this)
+static inline void ChangeValue(const int change, LogicCounterData *data, Actor *this)
 {
 	const int prevValue = data->counter;
 	data->counter += change;

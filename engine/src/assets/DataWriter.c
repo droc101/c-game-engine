@@ -54,6 +54,7 @@ bool DataWriterIsEmpty(const DataWriter *writer)
 
 /**
  * Ensure that a DataWriter has enough space to write a given number of bytes
+ * @param writer The DataWriter to check and/or expand
  * @param neededSpace The amount of free memory needed in bytes
  */
 static void DataWriterEnsureSpace(DataWriter *writer, const size_t neededSpace)

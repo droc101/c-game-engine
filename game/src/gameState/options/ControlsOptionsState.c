@@ -8,11 +8,13 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
@@ -26,14 +28,11 @@
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "engine/helpers/PlatformHelpers.h"
 #include "gameState/options/InputOptionsState.h"
 
 typedef struct ControlOption
@@ -460,7 +459,7 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 
 	if (listenMode == KBM_LISTEN)
 	{
-		ControlOption *option = ListGetPointer(controlOptions, listenIndex);
+		const ControlOption *option = ListGetPointer(controlOptions, listenIndex);
 		if (option->allowAxisBind)
 		{
 			RenderTooltipAt("Press a key, click a mouse button, or move the mouse wheel to bind this action.\nPress "
@@ -475,7 +474,7 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 		}
 	} else if (listenMode == CTLR_LISTEN)
 	{
-		ControlOption *option = ListGetPointer(controlOptions, listenIndex);
+		const ControlOption *option = ListGetPointer(controlOptions, listenIndex);
 		if (option->allowAxisBind)
 		{
 			RenderTooltipAt("Click a controller button, press a trigger, or move a joystick to bind this "

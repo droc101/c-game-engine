@@ -10,6 +10,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
@@ -19,7 +20,6 @@
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
-
 #include "gameState/MenuState.h"
 #include "gameState/options/DebugOptionsState.h"
 #include "gameState/options/InputOptionsState.h"

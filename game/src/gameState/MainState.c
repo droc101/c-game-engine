@@ -6,18 +6,14 @@
 #include <cglm/euler.h>
 #include <cglm/quat.h>
 #include <engine/assets/AssetReader.h>
-#include <engine/debug/DPrint.h>
-#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/physics/MapPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
-#include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Discord.h>
@@ -92,7 +88,7 @@ static void MainStateFixedUpdate(GlobalState *state, const double delta)
 	lastTickDelta = delta;
 }
 
-static void MainStateRender(GlobalState *state, const double delta)
+static void MainStateRender(GlobalState *state, const double /*delta*/)
 {
 	RenderMap(state->map, state->camera);
 	RenderHUD();

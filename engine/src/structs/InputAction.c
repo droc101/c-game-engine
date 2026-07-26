@@ -2,6 +2,7 @@
 // Created by droc101 on 7/22/26.
 //
 
+#include <SDL3/SDL_keyboard.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/KVList.h>
@@ -58,7 +59,7 @@ static const char *controllerButtonNames[] = {
 	"Misc 2",	   "Misc 3",	  "Misc 4",		   "Misc 5",		 "Misc 6",
 };
 
-static int GetMouseWheelAxisTicks(const InputSystem *system, InputActionMouseWheelAxis axis)
+static int GetMouseWheelAxisTicks(const InputSystem *system, const InputActionMouseWheelAxis axis)
 {
 	const Vector2 wheel = GetMouseWheelTicks(system);
 	switch (axis)
@@ -75,7 +76,7 @@ static int GetMouseWheelAxisTicks(const InputSystem *system, InputActionMouseWhe
 	return 0;
 }
 
-static float GetMouseWheelAxis(const InputSystem *system, InputActionMouseWheelAxis axis)
+static float GetMouseWheelAxis(const InputSystem *system, const InputActionMouseWheelAxis axis)
 {
 	const Vector2 wheel = GetMouseWheel(system);
 	switch (axis)
@@ -243,7 +244,7 @@ const char *InputActionGetControllerString(const InputAction *action)
 	switch (action->controllerBindType)
 	{
 		case IA_CONTROLLER_BUTTON:
-			SDL_GamepadButtonLabel label = GetButtonLabel(action->controllerBind.buttonBind);
+			const SDL_GamepadButtonLabel label = GetButtonLabel(action->controllerBind.buttonBind);
 			if (label != SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN)
 			{
 				return gamepadButtonLabelNames[label];
@@ -291,7 +292,7 @@ static void CopyCtlBind(const InputAction *src, InputAction *dst)
 	}
 }
 
-void LoadInputAction(const char *key, const KvList list, const InputAction defaults, InputAction *out)
+void LoadInputAction(const char *key, KvList list, const InputAction defaults, InputAction *out)
 {
 	if (KvHas(list, key, PARAM_TYPE_KV_LIST))
 	{
@@ -380,7 +381,7 @@ void LoadInputAction(const char *key, const KvList list, const InputAction defau
 	memcpy(out, &defaults, sizeof(InputAction));
 }
 
-void SaveInputAction(const char *key, const KvList list, const InputAction *action)
+void SaveInputAction(const char *key, KvList list, const InputAction *action)
 {
 	KvList actionConfig;
 	KvListCreate(actionConfig);

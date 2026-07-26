@@ -14,7 +14,6 @@
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -63,7 +62,7 @@ static void EntranceInit(Actor *this, const KvList params, Transform *transform)
 
 static void EntranceDestroy(Actor *this)
 {
-	EntranceData *data = this->extraData;
+	const EntranceData *data = this->extraData;
 	free(data->entranceName);
 }
 

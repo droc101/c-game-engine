@@ -4,11 +4,8 @@
 
 #include "gameState/PauseState.h"
 #include <engine/assets/AssetReader.h>
-#include <engine/debug/DPrint.h>
-#include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
@@ -38,7 +35,7 @@ static void PauseStateUpdate(GlobalState * /*state*/, const double /*delta*/)
 	}
 }
 
-static void PauseStateRender(GlobalState *state, const double /*delta*/)
+static void PauseStateRender(GlobalState * /*state*/, const double /*delta*/)
 {
 	RenderInGameMenuBackground();
 

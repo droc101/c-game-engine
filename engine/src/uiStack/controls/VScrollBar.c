@@ -5,17 +5,12 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/helpers/MathEx.h>
-#include <engine/structs/Color.h>
-#include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/VScrollBar.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_mouse.h>
-#include <SDL3/SDL_scancode.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 

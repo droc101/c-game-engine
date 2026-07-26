@@ -117,7 +117,7 @@ const char *InputActionGetControllerString(const InputAction *action);
  * @param defaults Default values in case parts of or all of loading fails
  * @param out The InputAction to load into
  */
-void LoadInputAction(const char *key, const KvList list, InputAction defaults, InputAction *out);
+void LoadInputAction(const char *key, KvList list, InputAction defaults, InputAction *out);
 
 /**
  * Save an InputAction to a KvList
@@ -125,6 +125,6 @@ void LoadInputAction(const char *key, const KvList list, InputAction defaults, I
  * @param list The list to write into
  * @param action The action to write
  */
-void SaveInputAction(const char *key, const KvList list, const InputAction *action);
+void SaveInputAction(const char *key, KvList list, const InputAction *action);
 
 #endif //GAME_INPUTACTION_H

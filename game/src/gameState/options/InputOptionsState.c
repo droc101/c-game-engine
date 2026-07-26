@@ -138,7 +138,7 @@ static void InputOptionsStateSet()
 										BtnControlsOptions,
 										TOP_CENTER,
 										NULL));
-		opY += opSpacing * 1.5;
+		opY += opSpacing * 1.5f;
 		UiStackPush(inputOptionsStack,
 					CreateSliderControl(v2(0, opY),
 										v2(480, 40),
@@ -170,7 +170,7 @@ static void InputOptionsStateSet()
 										  TOP_CENTER,
 										  GetState()->options.invertVerticalCamera,
 										  NULL));
-		opY += opSpacing * 1.5;
+		opY += opSpacing * 1.5f;
 		UiStackPush(inputOptionsStack,
 					CreateSliderControl(v2(0, opY),
 										v2(480, 40),

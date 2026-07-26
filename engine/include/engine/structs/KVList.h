@@ -328,7 +328,7 @@ void KvSetUint64(KvList list, const char *key, uint64_t value);
  */
 void KvSetParamArray(KvList list, const char *key, ParamArray array);
 
-void KvSetList(KvList list, const char *key, const KvList value);
+void KvSetList(KvList list, const char *key, KvList value);
 
 /**
  * Set a Vector2 value in the key-value list.

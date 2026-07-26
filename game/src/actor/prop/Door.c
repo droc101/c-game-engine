@@ -70,7 +70,7 @@ static inline void DoorSetCloseVector(const Actor *this)
 	JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &movementVector);
 }
 
-static inline void DoorSetState(const Actor *this, const DoorState state, const double animationTime)
+static inline void DoorSetState(Actor *this, const DoorState state, const double animationTime)
 {
 	DoorData *data = this->extraData;
 	data->state = state;

@@ -93,7 +93,7 @@ static float DebugGraphSampleX(DebugGraph *graph, const Vector2 pos, const Vecto
 	return pos.x + size.x - 10 - remap(sample, 0, graph->numDataPoints, availWidth, 0);
 }
 
-static void DebugGraphYLabel(DebugGraph *graph, Vector2 pos, Vector2 size, double value, Color color)
+static void DebugGraphYLabel(DebugGraph *graph, const Vector2 pos, const Vector2 size, const double value, Color color)
 {
 	color.a = 0.5f;
 

@@ -34,13 +34,13 @@ static List physicsThreadInputEventQueue;
  * The function to run in the physics thread
  * @warning Only touch this when you have a lock on the mutex
  */
-GameStateFixedUpdateFunction PhysicsThreadFunction;
+static GameStateFixedUpdateFunction PhysicsThreadFunction;
 
 /**
  * Whether to quit the physics thread on the next iteration
  * @warning Only touch this when you have a lock on the mutex
  */
-bool physicsThreadPostQuit = false;
+static bool physicsThreadPostQuit = false;
 
 void PhysicsThreadQueueInputEvent(const SDL_Event *event)
 {
@@ -56,7 +56,7 @@ void PhysicsThreadQueueInputEvent(const SDL_Event *event)
  * The main function for the physics thread
  * @return 0
  */
-int PhysicsThreadMain(void * /*data*/)
+static int PhysicsThreadMain(void * /*data*/)
 {
 	double lastTickTime = PHYSICS_TARGET_NS_D;
 	while (true)

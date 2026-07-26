@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char *DefaultSliderLabelCallback(const Control *slider)
+static char *DefaultSliderLabelCallback(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
