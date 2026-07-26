@@ -8,6 +8,7 @@
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/Item.h>
@@ -205,30 +206,30 @@ void MovePlayer(const Player *player, const double delta, const bool allowInput)
 
 	if (allowInput)
 	{
-		if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveForward))
+		if (IsInputActionPastDeadzone(physicsThreadInput, &moveForward))
 		{
-			moveVec.z -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveForward);
-		} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveBackward))
+			moveVec.z -= InputActionGetAnalogValue(physicsThreadInput, &moveForward);
+		} else if (IsInputActionPastDeadzone(physicsThreadInput, &moveBackward))
 		{
-			moveVec.z += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveBackward);
+			moveVec.z += InputActionGetAnalogValue(physicsThreadInput, &moveBackward);
 		}
 
-		if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveRight))
+		if (IsInputActionPastDeadzone(physicsThreadInput, &moveRight))
 		{
-			moveVec.x += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveRight);
-		} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.moveLeft))
+			moveVec.x += InputActionGetAnalogValue(physicsThreadInput, &moveRight);
+		} else if (IsInputActionPastDeadzone(physicsThreadInput, &moveLeft))
 		{
-			moveVec.x -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.moveLeft);
+			moveVec.x -= InputActionGetAnalogValue(physicsThreadInput, &moveLeft);
 		}
 
 		if (moveVec.x != 0 || moveVec.z != 0)
 		{
 			Vector3_Normalized(&moveVec, &moveVec);
-			if (IsInputActionPressed(physicsThreadInput, &GetState()->options.sneak))
+			if (IsInputActionPressed(physicsThreadInput, &sneak))
 			{
 				Vector3_MultiplyScalar(&moveVec, SLOW_MOVE_SPEED, &moveVec);
 			} else if ((player->isFreecamActive || player->isNoclipActive) &&
-					   IsInputActionPressed(physicsThreadInput, &GetState()->options.sprint))
+					   IsInputActionPressed(physicsThreadInput, &sprint))
 			{
 				Vector3_MultiplyScalar(&moveVec, MOVE_SPEED * 2, &moveVec);
 			} else
@@ -266,7 +267,7 @@ void MovePlayer(const Player *player, const double delta, const bool allowInput)
 		Vector3 oldVelocity;
 		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
 		moveVec.y += oldVelocity.y + (float)(GRAVITY * (delta / PHYSICS_TARGET_TPS));
-	} else if (allowInput && IsInputActionJustPressed(physicsThreadInput, &GetState()->options.jump))
+	} else if (allowInput && IsInputActionJustPressed(physicsThreadInput, &jump))
 	{
 		moveVec.y = JUMP_SPEED;
 	}
@@ -295,9 +296,7 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime, const bool allowInput)
 {
-	if (allowInput &&
-		!player->isNoclipActive &&
-		IsInputActionJustPressed(physicsThreadInput, &GetState()->options.freecam))
+	if (allowInput && !player->isNoclipActive && IsInputActionJustPressed(physicsThreadInput, &freecam))
 	{
 		player->isFreecamActive = !player->isFreecamActive;
 		Viewmodel *viewmodel = &GetState()->map->viewmodel;
@@ -315,7 +314,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 	{
 		if (player->hasHeldActor)
 		{
-			if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.interact) && canDropHeldActor)
+			if (IsInputActionJustPressed(physicsThreadInput, &interact) && canDropHeldActor)
 			{
 				player->heldActor = NULL;
 				player->hasHeldActor = false;
@@ -383,7 +382,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 						(raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
-						if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.interact))
+						if (IsInputActionJustPressed(physicsThreadInput, &interact))
 						{
 							player->heldActor = player->targetedActor;
 							player->hasHeldActor = true;
@@ -393,7 +392,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
-						if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.interact))
+						if (IsInputActionJustPressed(physicsThreadInput, &interact))
 						{
 							player->targetedActor->definition->Interact(player->targetedActor);
 						}
@@ -407,7 +406,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				crosshairColor = CROSSHAIR_COLOR_NORMAL;
 			}
 		}
-		if (IsInputActionJustReleased(physicsThreadInput, &GetState()->options.noclip))
+		if (IsInputActionJustReleased(physicsThreadInput, &noclip))
 		{
 			player->isNoclipActive = !player->isNoclipActive;
 		}
@@ -445,20 +444,20 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 		{
 			cameraMotion = v2s(0);
 
-			if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookUp))
+			if (IsInputActionPastDeadzone(physicsThreadInput, &lookUp))
 			{
-				cameraMotion.y += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookUp);
-			} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookDown))
+				cameraMotion.y += InputActionGetAnalogValue(physicsThreadInput, &lookUp);
+			} else if (IsInputActionPastDeadzone(physicsThreadInput, &lookDown))
 			{
-				cameraMotion.y -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookDown);
+				cameraMotion.y -= InputActionGetAnalogValue(physicsThreadInput, &lookDown);
 			}
 
-			if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookLeft))
+			if (IsInputActionPastDeadzone(physicsThreadInput, &lookLeft))
 			{
-				cameraMotion.x += InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookLeft);
-			} else if (IsInputActionPastDeadzone(physicsThreadInput, &GetState()->options.lookRight))
+				cameraMotion.x += InputActionGetAnalogValue(physicsThreadInput, &lookLeft);
+			} else if (IsInputActionPastDeadzone(physicsThreadInput, &lookRight))
 			{
-				cameraMotion.x -= InputActionGetAnalogValue(physicsThreadInput, &GetState()->options.lookRight);
+				cameraMotion.x -= InputActionGetAnalogValue(physicsThreadInput, &lookRight);
 			}
 			if (state->options.invertHorizontalCamera)
 			{

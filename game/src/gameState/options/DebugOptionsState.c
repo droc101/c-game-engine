@@ -13,6 +13,7 @@
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
@@ -139,7 +140,7 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 				{
 					entry->mode = DEBUG_ENTRY_DISABLED;
 				}
-				SaveDebugEntrySettings();
+				SaveOptions(&GetState()->options);
 				UiStackResetFocus(debugOptionsStack);
 				(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 			}

@@ -199,6 +199,8 @@ target_sources(engine INTERFACE
         include/engine/structs/Light.h
         src/structs/InputAction.c
         include/engine/structs/InputAction.h
+        src/structs/ControlOptions.c
+        include/engine/structs/ControlOptions.h
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h

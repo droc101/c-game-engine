@@ -16,6 +16,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/KVList.h>
@@ -39,8 +40,6 @@
 List debugEntries;
 
 static bool expandedMenu = false;
-
-#define DEBUG_OPTIONS_FILE "debug_options.kvl"
 
 static void RegisterDebugEntry(const char *key,
 							   const DebugEntryFunction entry,
@@ -204,34 +203,11 @@ void InitDebugEntryManager()
 	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);
-
-	KvList list;
-	if (ReadKvlFile(DEBUG_OPTIONS_FILE, list))
-	{
-		KvList debugEntrySettings;
-		if (KvGetList(list, "debug_entries", debugEntrySettings))
-		{
-			for (size_t i = 0; i < debugEntries.length; i++)
-			{
-				DebugEntry *ent = ListGetPointer(debugEntries, i);
-				ent->mode = KvGetByte(debugEntrySettings, ent->key, ent->defaultMode);
-				if (ent->mode >= DEBUG_ENTRY_MODE_MAX)
-				{
-					LogWarning("Invalid saved mode %d for debug entry \"%s\"\n", ent->mode, ent->key);
-					ent->mode = ent->defaultMode;
-				}
-			}
-			KvListDestroy(debugEntrySettings);
-		}
-		expandedMenu = KvGetBool(list, "extended_menu_visible", false);
-
-		KvListDestroy(list);
-	}
 }
 
 void RenderDebugEntries()
 {
-	if (IsInputActionJustPressed(mainThreadInput, &GetState()->options.debugMenu))
+	if (IsInputActionJustPressed(mainThreadInput, &debugMenu))
 	{
 		expandedMenu = !expandedMenu;
 	}
@@ -247,11 +223,38 @@ void RenderDebugEntries()
 	}
 }
 
-void SaveDebugEntrySettings()
+void LoadDebugEntrySettings(KvList from)
 {
-	KvList list;
-	KvListCreate(list);
+	KvList debugEntrySettings;
+	if (KvGetList(from, "debug_entries", debugEntrySettings))
+	{
+		for (size_t i = 0; i < debugEntries.length; i++)
+		{
+			DebugEntry *ent = ListGetPointer(debugEntries, i);
+			ent->mode = KvGetByte(debugEntrySettings, ent->key, ent->defaultMode);
+			if (ent->mode >= DEBUG_ENTRY_MODE_MAX)
+			{
+				LogWarning("Invalid saved mode %d for debug entry \"%s\"\n", ent->mode, ent->key);
+				ent->mode = ent->defaultMode;
+			}
+		}
+		KvListDestroy(debugEntrySettings);
+	}
+	expandedMenu = KvGetBool(from, "extended_menu_visible", false);
+}
 
+void DefaultDebugEntrySettings()
+{
+	for (size_t i = 0; i < debugEntries.length; i++)
+	{
+		DebugEntry *ent = ListGetPointer(debugEntries, i);
+		ent->mode = ent->defaultMode;
+	}
+	expandedMenu = false;
+}
+
+void SaveDebugEntrySettings(KvList to)
+{
 	KvList debugEntrySettings;
 	KvListCreate(debugEntrySettings);
 	for (size_t i = 0; i < debugEntries.length; i++)
@@ -259,17 +262,14 @@ void SaveDebugEntrySettings()
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
 		KvSetByte(debugEntrySettings, ent->key, ent->mode);
 	}
-	KvSetList(list, "debug_entries", debugEntrySettings);
-	KvSetBool(list, "extended_menu_visible", expandedMenu);
+	KvSetList(to, "debug_entries", debugEntrySettings);
+	KvSetBool(to, "extended_menu_visible", expandedMenu);
 
-	(void)WriteKvlFile(DEBUG_OPTIONS_FILE, list);
 	KvListDestroy(debugEntrySettings);
 }
 
 void DestroyDebugEntryManager()
 {
-	SaveDebugEntrySettings();
-
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);

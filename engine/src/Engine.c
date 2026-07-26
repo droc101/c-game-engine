@@ -19,6 +19,7 @@
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/Vector2.h>
@@ -232,17 +233,17 @@ void HandleEvent(void)
 	}
 }
 
-void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunction RegisterGameActors)
+void InitEngine(const EngineInitializationInfo initInfo)
 {
 	ErrorHandlerInit();
-	ExecPathInit(argc, argv);
+	ExecPathInit(initInfo.argc, initInfo.argv);
 	LogInit();
 	LogInfo("Build time: %s at %s\n", __DATE__, __TIME__);
 	LogInfo("Engine Version: %s\n", ENGINE_VERSION);
 	LogInfo("Full Engine Commit: %s\n", ENGINE_GIT_HASH);
 	LogInfo("Initializing Engine\n");
 
-	InitArguments(argc, argv);
+	InitArguments(initInfo.argc, initInfo.argv);
 
 	if (HasCliArg("--game"))
 	{
@@ -252,6 +253,9 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	{
 		LoadGameConfig("assets/game");
 	}
+
+	RegisterControls(initInfo.RegisterGameControls);
+	InitDebugEntryManager();
 
 	InitOptions();
 
@@ -265,7 +269,7 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 
 	InputInit();
 
-	RegisterActors(RegisterGameActors);
+	RegisterActors(initInfo.RegisterGameActors);
 
 	InitState();
 	PhysicsThreadInit();
@@ -282,7 +286,6 @@ void InitEngine(const int argc, const char *argv[], const RegisterGameActorsFunc
 	InitCommonFonts();
 
 	InitFrameGrapher();
-	InitDebugEntryManager();
 
 	if (GetState()->options.enableDiscordRpc)
 	{
@@ -341,7 +344,7 @@ void EngineIteration()
 	}
 
 #ifdef BENCHMARK_SYSTEM_ENABLE
-	if (IsInputActionJustPressed(mainThreadInput, &GetState()->options.benchmark))
+	if (IsInputActionJustPressed(mainThreadInput, &benchmark))
 	{
 		BenchToggle();
 	}
@@ -405,10 +408,11 @@ void DestroyEngine()
 	PhysicsThreadTerminate();
 	LodThreadDestroy();
 	DestroyFrameGrapher();
-	DestroyDebugEntryManager();
 	InputDestroy();
 	DestroyGlobalState();
 	DestroySoundSystem();
+	DestroyControls();
+	DestroyDebugEntryManager();
 	RenderDestroy();
 	LogDebug("Cleaning up window...\n");
 	SDL_DestroyWindow(GetGameWindow());

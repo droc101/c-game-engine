@@ -29,6 +29,7 @@
 #include "actor/npc/TestActor.h"
 #include "actor/prop/Physbox.h"
 #include "gameState/PauseState.h"
+#include "helpers/GameControls.h"
 
 static const char *spawnActorOnce = NULL;
 static const char *spawnActorEveryTick = NULL;
@@ -50,7 +51,7 @@ static void MainStateUpdate(GlobalState *state, const double delta)
 
 static void MainStateFixedUpdate(GlobalState *state, const double delta)
 {
-	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_L))
+	if (IsInputActionJustPressed(physicsThreadInput, &spawnTestActor))
 	{
 		if (spawnActorEveryTick == NULL || strcmp(spawnActorEveryTick, TEST_ACTOR_NAME) != 0)
 		{
@@ -60,7 +61,7 @@ static void MainStateFixedUpdate(GlobalState *state, const double delta)
 			spawnActorEveryTick = NULL;
 		}
 	}
-	if (IsKeyJustPressed(physicsThreadInput, SDL_SCANCODE_C))
+	if (IsInputActionJustPressed(physicsThreadInput, &spawnCube))
 	{
 		spawnActorOnce = PHYSBOX_ACTOR_NAME;
 	}

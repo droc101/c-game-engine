@@ -406,7 +406,7 @@ void SaveInputAction(const char *key, KvList list, const InputAction *action)
 		case IA_CONTROLLER_BUTTON:
 			KvSetByte(actionConfig, "controller_button_bind", action->controllerBind.buttonBind);
 			break;
-		case IA_MOUSE_BUTTON:
+		case IA_CONTROLLER_AXIS:
 			KvSetByte(actionConfig, "controller_axis_bind", action->controllerBind.axisBind);
 			break;
 		default:

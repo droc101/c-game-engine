@@ -5,6 +5,7 @@
 #include "item/LaserStopperItem.h"
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/Item.h>
@@ -34,11 +35,11 @@ static bool LaserStopperItemCanTargetFunction(Item *this,
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.primaryAttack))
+		if (IsInputActionJustPressed(physicsThreadInput, &primaryAttack))
 		{
 			const GlobalState *state = GetState();
 			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_OFF, &PARAM_NONE);
-		} else if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.secondaryAttack))
+		} else if (IsInputActionJustPressed(physicsThreadInput, &secondaryAttack))
 		{
 			const GlobalState *state = GetState();
 			ActorTriggerInput(NULL, state->map->player.targetedActor, LASER_EMITTER_INPUT_TURN_ON, &PARAM_NONE);

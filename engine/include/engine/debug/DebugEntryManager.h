@@ -5,6 +5,7 @@
 #ifndef GAME_DEBUGENTRYMANAGER_H
 #define GAME_DEBUGENTRYMANAGER_H
 
+#include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 
 typedef void (*DebugEntryFunction)();
@@ -32,7 +33,11 @@ void InitDebugEntryManager();
 
 void RenderDebugEntries();
 
-void SaveDebugEntrySettings();
+void DefaultDebugEntrySettings();
+
+void LoadDebugEntrySettings(KvList from);
+
+void SaveDebugEntrySettings(KvList to);
 
 void DestroyDebugEntryManager();
 

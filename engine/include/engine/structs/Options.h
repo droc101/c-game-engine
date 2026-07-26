@@ -52,30 +52,6 @@ struct Options
 	/// Whether to swap the controller A and B buttons
 	bool controllerSwapOkCancel;
 
-	InputAction moveForward;
-	InputAction moveBackward;
-	InputAction moveLeft;
-	InputAction moveRight;
-	InputAction sprint;
-	InputAction sneak;
-	InputAction jump;
-
-	InputAction interact;
-	InputAction primaryAttack;
-	InputAction secondaryAttack;
-	InputAction previousItem;
-	InputAction nextItem;
-
-	InputAction lookUp;
-	InputAction lookDown;
-	InputAction lookLeft;
-	InputAction lookRight;
-
-	InputAction debugMenu;
-	InputAction noclip;
-	InputAction freecam;
-	InputAction benchmark;
-
 	/* Video */
 
 	/// Whether the game is fullscreen
@@ -110,34 +86,6 @@ struct Options
 	/// The master volume
 	float masterVolume;
 };
-
-#pragma region Default Input Actions
-
-extern const InputAction DEFAULT_MOVE_FORWARD;
-extern const InputAction DEFAULT_MOVE_BACKWARD;
-extern const InputAction DEFAULT_MOVE_LEFT;
-extern const InputAction DEFAULT_MOVE_RIGHT;
-extern const InputAction DEFAULT_SPRINT;
-extern const InputAction DEFAULT_SNEAK;
-extern const InputAction DEFAULT_JUMP;
-
-extern const InputAction DEFAULT_INTERACT;
-extern const InputAction DEFAULT_PRIMARY_ATTACK;
-extern const InputAction DEFAULT_SECONDARY_ATTACK;
-extern const InputAction DEFAULT_PREVIOUS_ITEM;
-extern const InputAction DEFAULT_NEXT_ITEM;
-
-extern const InputAction DEFAULT_LOOK_UP;
-extern const InputAction DEFAULT_LOOK_DOWN;
-extern const InputAction DEFAULT_LOOK_LEFT;
-extern const InputAction DEFAULT_LOOK_RIGHT;
-
-extern const InputAction DEFAULT_DEBUG_MENU;
-extern const InputAction DEFAULT_NOCLIP;
-extern const InputAction DEFAULT_FREECAM;
-extern const InputAction DEFAULT_BENCHMARK;
-
-#pragma endregion
 
 /**
  * Read options from disk, or load defaults if no options file is found or is invalid

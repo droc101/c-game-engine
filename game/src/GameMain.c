@@ -9,6 +9,7 @@
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
 #include "helpers/GameActorRegistration.h"
+#include "helpers/GameControls.h"
 
 #undef main // Leaked by SDL_main.h
 
@@ -57,7 +58,14 @@ static void DestroyGame()
 
 EXPORT_SYM int GameMain(const int argc, const char *argv[])
 {
-	InitEngine(argc, argv, RegisterGameActors);
+	const EngineInitializationInfo initInfo = {
+		.argc = argc,
+		.argv = argv,
+		.RegisterGameActors = RegisterGameActors,
+		.RegisterGameControls = RegisterGameControls,
+	};
+
+	InitEngine(initInfo);
 	LaserRaycastFiltersInit();
 	LoadingStateDoneCallback = LoadingStateDone;
 	LoadingStateErrorCallback = LoadingStateError;

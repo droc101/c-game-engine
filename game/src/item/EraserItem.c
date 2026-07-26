@@ -7,6 +7,7 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/Item.h>
@@ -39,7 +40,7 @@ static bool EraserItemCanTargetFunction(Item * /*this*/,
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsInputActionJustPressed(physicsThreadInput, &GetState()->options.primaryAttack))
+		if (IsInputActionJustPressed(physicsThreadInput, &primaryAttack))
 		{
 			const GlobalState *state = GetState();
 			RemoveActor(state->map->player.targetedActor);

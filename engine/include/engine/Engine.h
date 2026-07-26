@@ -7,6 +7,7 @@
 
 #include <engine/Commit.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ControlOptions.h>
 #include <stdbool.h>
 
 #define TARGET_FPS 60
@@ -32,13 +33,19 @@
 #define EXPORT_SYM __attribute__((visibility("default")))
 #endif
 
+typedef struct EngineInitializationInfo
+{
+	const int argc;
+	const char **argv;
+	const RegisterGameActorsFunction RegisterGameActors;
+	const ControlRegisterFunction RegisterGameControls;
+} EngineInitializationInfo;
+
 /**
  * Initialize the engine
- * @param argc Argument count
- * @param argv Argument values
- * @param RegisterGameActors Function to register all actors not defined in the engine
+ * @param initInfo Engine configuration and initialization parameters
  */
-void InitEngine(int argc, const char *argv[], RegisterGameActorsFunction RegisterGameActors);
+void InitEngine(EngineInitializationInfo initInfo);
 
 /**
  * Perform an iteration of the engine's main loop

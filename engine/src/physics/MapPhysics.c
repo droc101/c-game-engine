@@ -10,6 +10,7 @@
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
@@ -93,10 +94,10 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 	// TODO proper UI for switching items
 	if (allowMovement)
 	{
-		if (IsInputActionJustPressed(physicsThreadInput, &state->options.nextItem))
+		if (IsInputActionJustPressed(physicsThreadInput, &nextItem))
 		{
 			NextItem();
-		} else if (IsInputActionJustPressed(physicsThreadInput, &state->options.previousItem))
+		} else if (IsInputActionJustPressed(physicsThreadInput, &previousItem))
 		{
 			PreviousItem();
 		}
