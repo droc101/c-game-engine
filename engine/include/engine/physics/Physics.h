@@ -31,7 +31,7 @@
 	(dest).z = (src)[2]; \
 	(dest).w = (src)[3];
 
-#define GRAVITY (-9.81f)
+#define GRAVITY (-156.96f) // -9.81 * 16
 
 enum ObjectLayers
 {

@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const float SIZE = 0.25f;
+static const float SIZE = 4.0f;
 
 typedef struct CoinData
 {
@@ -109,7 +109,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	strcpy(this->wall->texture, data->isBlue ? TEXTURE("actor/bluecoin") : TEXTURE("actor/coin"));
 	this->wall->uvScale = v2(1.0f, 4.0f);
 	this->wall->uvOffset = v2s(0.0f);
-	this->wall->height = 0.25f;
+	this->wall->height = SIZE;
 	this->wall->unshaded = false;
 }
 

@@ -47,7 +47,7 @@
     "attenuation_multiplier": {
       "display": "Attenuation Multiplier",
       "type": "float",
-      "default": 2.0,
+      "default": 32.0,
       "minimum": 0.0
     }
   }

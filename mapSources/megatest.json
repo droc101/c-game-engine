@@ -1,0 +1,4181 @@
+{
+    "version": 1,
+    "discord_rpc_icon_id": "logo",
+    "discord_rpc_map_name": "Unnamed Map",
+    "has_sky": true,
+    "sky_texture": "texture/level/sky_test.gtex",
+    "light_cube_luxels_per_unit": 4,
+    "sectors": [
+        {
+            "name": "",
+            "floorHeight": -8.0,
+            "ceilingHeight": 128.0,
+            "floorMaterial": {
+                "material": "material/floor.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/skip.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/tools/skip.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/tools/skip.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/tools/skip.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/tools/skip.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -192.0,
+                    "z": -128.0
+                },
+                {
+                    "x": 320.0,
+                    "z": -128.0
+                },
+                {
+                    "x": 320.0,
+                    "z": 128.0
+                },
+                {
+                    "x": -192.0,
+                    "z": 128.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -16.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 96.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 112.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 112.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 96.0,
+                    "z": -64.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -16.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 120.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 136.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 136.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 120.0,
+                    "z": -64.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -16.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 144.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 160.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 160.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 144.0,
+                    "z": -64.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -16.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 104.0,
+                    "z": -104.0
+                },
+                {
+                    "x": 120.0,
+                    "z": -104.0
+                },
+                {
+                    "x": 120.0,
+                    "z": -88.0
+                },
+                {
+                    "x": 104.0,
+                    "z": -88.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -16.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 132.0,
+                    "z": -104.0
+                },
+                {
+                    "x": 148.0,
+                    "z": -104.0
+                },
+                {
+                    "x": 148.0,
+                    "z": -88.0
+                },
+                {
+                    "x": 132.0,
+                    "z": -88.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -24.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/tools/invisible.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 104.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 152.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 152.0,
+                    "z": 120.0
+                },
+                {
+                    "x": 104.0,
+                    "z": 120.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -10.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 264.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 296.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 296.0,
+                    "z": 112.0
+                },
+                {
+                    "x": 264.0,
+                    "z": 112.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -10.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 216.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 248.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 248.0,
+                    "z": 112.0
+                },
+                {
+                    "x": 216.0,
+                    "z": 112.0
+                }
+            ]
+        }
+    ],
+    "actors": [
+        {
+            "class": "player",
+            "position": {
+                "x": -176.0,
+                "y": -0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 270.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {}
+        },
+        {
+            "class": "prop_door",
+            "position": {
+                "x": -128.0,
+                "y": 8.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 64.0,
+                        "y": 32.0
+                    }
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "prop_door",
+            "position": {
+                "x": -96.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 5.0
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "prop_door",
+            "position": {
+                "x": -64.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/monster2.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -96.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "prop_door"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -128.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "size"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -96.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "close delay"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -64.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "texture"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -96.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "prop_button"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": -96.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 3000
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": -128.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": -1
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": true
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": -64.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": -1
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -128.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "toggle"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -96.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "normal"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -64.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "stay pressed"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 32.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "camera"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "camera",
+            "position": {
+                "x": 48.0,
+                "y": 16.0,
+                "z": 80.0
+            },
+            "rotation": {
+                "x": -30.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "fov": {
+                    "type": "int",
+                    "value": 90
+                },
+                "show_player_model": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": "hide_player_camera"
+                }
+            }
+        },
+        {
+            "class": "camera",
+            "position": {
+                "x": 16.0,
+                "y": 16.0,
+                "z": 80.0
+            },
+            "rotation": {
+                "x": -30.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "fov": {
+                    "type": "int",
+                    "value": 30
+                },
+                "show_player_model": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": "fov_camera"
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 16.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "fov_camera",
+                    "targetInput": "enable",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                },
+                {
+                    "targetName": "fov_camera",
+                    "targetInput": "disable",
+                    "sourceOutput": "unpressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 3000
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 48.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "hide_player_camera",
+                    "targetInput": "enable",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                },
+                {
+                    "targetName": "hide_player_camera",
+                    "targetInput": "disable",
+                    "sourceOutput": "unpressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 3000
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 16.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "custom fov (30)"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 48.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "hide player model"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 32.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "I/O # refires"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 16.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 5,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": 32.0,
+                "y": 0.0,
+                "z": -80.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "coin_cling"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/sfx/coincling.gsnd"
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "category": {
+                    "type": "byte",
+                    "value": 1
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 48.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 16.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "can fire 5 times"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 48.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "unlimited"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 128.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "prop_model_physics"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 140.0,
+                "y": -8.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 128.0,
+                "y": -8.0,
+                "z": -72.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 152.0,
+                "y": -8.0,
+                "z": -72.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 104.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "mass override"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 128.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "normal"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 152.0,
+                "y": -0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "disallow pickup"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 92.0,
+                "y": 0.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/player.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 92.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "no collision shape"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 160.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "static collision"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 160.0,
+                "y": 0.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/laseremitter.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 104.0,
+                "y": -8.0,
+                "z": -72.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 112.0,
+                "y": -8.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 112.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "color"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 140.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "skin"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_laser_emitter",
+            "position": {
+                "x": 110.0,
+                "y": -16.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "height": {
+                    "type": "byte",
+                    "value": 3
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_laser_emitter",
+            "position": {
+                "x": 146.0,
+                "y": -16.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "height": {
+                    "type": "byte",
+                    "value": 2
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_laser_emitter",
+            "position": {
+                "x": 134.0,
+                "y": -16.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "height": {
+                    "type": "byte",
+                    "value": 1
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_laser_emitter",
+            "position": {
+                "x": 122.0,
+                "y": -16.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "height": {
+                    "type": "byte",
+                    "value": 0
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 128.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "prop_laser_emitter"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_sprite",
+            "position": {
+                "x": 128.0,
+                "y": -16.0,
+                "z": 92.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 0.7843137383460999
+                    }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 48.0,
+                        "y": 16.0
+                    }
+                },
+                "solid": {
+                    "type": "bool",
+                    "value": true
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/wall_test.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 128.0,
+                "y": -16.0,
+                "z": 92.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "solid w/o ACTOR_FLAG_CAN_BLOCK_LASERS"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_door",
+            "position": {
+                "x": -112.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_door",
+            "position": {
+                "x": -80.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -112.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "prevent player open"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -80.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "stay open"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 128.0,
+                "y": -16.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "invisible but solid"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 256.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "sound_player"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": 236.0,
+                "y": 0.0,
+                "z": -68.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "looping_sound"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/sfx/popup.gsnd"
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 5
+                },
+                "category": {
+                    "type": "byte",
+                    "value": 1
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": 276.0,
+                "y": 0.0,
+                "z": -68.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "positional_music"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/music/field.gsnd"
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": false
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": true
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "category": {
+                    "type": "byte",
+                    "value": 0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 236.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "loop 5 times"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 276.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "positional music"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 236.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "looping_sound",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 276.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "positional_music",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                },
+                {
+                    "targetName": "positional_music",
+                    "targetInput": "stop",
+                    "sourceOutput": "unpressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": true
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": -1
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "trigger",
+            "position": {
+                "x": 232.0,
+                "y": 6.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "triggered",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "width": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "one_shot": {
+                    "type": "bool",
+                    "value": true
+                },
+                "height": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "depth": {
+                    "type": "float",
+                    "value": 48.0
+                }
+            }
+        },
+        {
+            "class": "trigger",
+            "position": {
+                "x": 280.0,
+                "y": 6.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "entered",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                },
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "exited",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "width": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "one_shot": {
+                    "type": "bool",
+                    "value": false
+                },
+                "height": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "depth": {
+                    "type": "float",
+                    "value": 48.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 256.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "trigger"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 232.0,
+                "y": 0.0,
+                "z": 56.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "one shot"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 280.0,
+                "y": 0.0,
+                "z": 56.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "multi shot"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        }
+    ]
+}

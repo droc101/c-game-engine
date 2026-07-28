@@ -88,6 +88,8 @@ target_sources(engine INTERFACE
         include/engine/actor/TriggerMap.h
         src/actor/Entrance.c
         include/engine/actor/Entrance.h
+        src/actor/prop/WorldText.c
+        include/engine/actor/prop/WorldText.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

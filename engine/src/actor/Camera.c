@@ -26,7 +26,7 @@ static void CameraInit(Actor *this, const KvList params, Transform *transform)
 	CheckAlloc(this->extraData);
 	CameraData *data = this->extraData;
 	memcpy(&data->camera.transform, transform, sizeof(Transform));
-	data->camera.fov = KvGetFloat(params, "fov", 90.0f);
+	data->camera.fov = (float)KvGetInt(params, "fov", 90);
 	data->camera.showPlayerModel = KvGetBool(params, "show_player_model", true);
 	ActorCreateEmptyBody(this, transform);
 }

@@ -8,8 +8,8 @@
     "sectors": [
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "_fallback",
                 "uvOffset": {
@@ -20,7 +20,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "_fallback",
@@ -32,7 +32,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -45,7 +45,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "",
@@ -57,7 +57,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "",
@@ -69,7 +69,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "",
@@ -81,25 +81,25 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -2.0,
-                    "z": -2.0
+                    "x": -32.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 2.0,
-                    "z": -2.0
+                    "x": 32.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 2.0,
-                    "z": 2.0
+                    "x": 32.0,
+                    "z": 32.0
                 },
                 {
-                    "x": -2.0,
-                    "z": 2.0
+                    "x": -32.0,
+                    "z": 32.0
                 }
             ]
         }

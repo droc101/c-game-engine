@@ -40,9 +40,8 @@ typedef struct TriggerMapData
 static inline void CreateTriggerMapSensor(Actor *this, const Transform *transform)
 {
 	const TriggerMapData *data = this->extraData;
-	JPH_Shape *shape = (JPH_Shape *)
-			JPH_BoxShape_Create((Vector3[]){{data->width / 2, data->height / 2, data->depth / 2}},
-								JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, data->height, data->depth / 2}},
+														JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -107,9 +106,9 @@ static void TriggerMapInit(Actor *this, const KvList params, Transform *transfor
 	this->extraData = malloc(sizeof(TriggerMapData));
 	CheckAlloc(this->extraData);
 	TriggerMapData *data = this->extraData;
-	data->width = KvGetFloat(params, "width", 1.0f);
-	data->height = KvGetFloat(params, "height", 1.0f);
-	data->depth = KvGetFloat(params, "depth", 1.0f);
+	data->width = KvGetFloat(params, "width", 16.0f);
+	data->height = KvGetFloat(params, "height", 16.0f);
+	data->depth = KvGetFloat(params, "depth", 16.0f);
 	data->enabled = KvGetBool(params, "start_enabled", true);
 	data->mapName = strdup(KvGetString(params, "map_name", ""));
 	data->entranceName = strdup(KvGetString(params, "entrance_name", ""));

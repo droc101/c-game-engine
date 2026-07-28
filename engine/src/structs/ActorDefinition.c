@@ -16,6 +16,7 @@
 #include <engine/actor/prop/PhysicsModel.h>
 #include <engine/actor/prop/Sprite.h>
 #include <engine/actor/prop/StaticModel.h>
+#include <engine/actor/prop/WorldText.h>
 #include <engine/actor/SoundPlayer.h>
 #include <engine/actor/Trigger.h>
 #include <engine/actor/TriggerMap.h>
@@ -99,6 +100,8 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterButton();
 	RegisterTriggerMap();
 	RegisterEntrance();
+	RegisterWorldText();
+
 	RegisterGameActors();
 }
 

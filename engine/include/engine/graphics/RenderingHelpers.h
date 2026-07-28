@@ -18,9 +18,11 @@
 #define VIEWMODEL_FOV 70
 /// Near clipping plane
 #define NEAR_Z 0.01
-#define VIEWMODEL_NEAR_Z 0.01
 /// Far clipping plane
-#define FAR_Z 2000
+#define FAR_Z 16384
+
+// TODO: use viewmodel near and far planes
+#define VIEWMODEL_NEAR_Z 0.01
 #define VIEWMODEL_FAR_Z 4
 
 // Default window size
@@ -203,5 +205,7 @@ void LoadMapModels(Map *map);
 void GetColor(uint32_t argb, Color *color);
 
 void DPrintGPUInfo();
+
+Vector2 ProjectPosition(vec3 position, Camera *camera);
 
 #endif //GAME_RENDERINGHELPERS_H

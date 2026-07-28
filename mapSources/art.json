@@ -8,8 +8,8 @@
     "sectors": [
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -20,7 +20,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -32,7 +32,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -45,7 +45,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -57,7 +57,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -69,7 +69,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -81,7 +81,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -93,7 +93,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -105,7 +105,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -117,7 +117,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -129,48 +129,48 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 511.0,
-                    "z": 511.0
+                    "x": 8176.0,
+                    "z": 8176.0
                 },
                 {
-                    "x": 506.0,
-                    "z": 511.0
+                    "x": 8096.0,
+                    "z": 8176.0
                 },
                 {
-                    "x": 506.0,
-                    "z": 510.0
+                    "x": 8096.0,
+                    "z": 8160.0
                 },
                 {
-                    "x": 508.0,
-                    "z": 510.0
+                    "x": 8128.0,
+                    "z": 8160.0
                 },
                 {
-                    "x": 508.0,
-                    "z": 506.0
+                    "x": 8128.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 509.0,
-                    "z": 506.0
+                    "x": 8144.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 509.0,
-                    "z": 510.0
+                    "x": 8144.0,
+                    "z": 8160.0
                 },
                 {
-                    "x": 511.0,
-                    "z": 510.0
+                    "x": 8176.0,
+                    "z": 8160.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -181,7 +181,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -193,7 +193,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -206,7 +206,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -218,7 +218,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -230,7 +230,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -242,7 +242,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -254,7 +254,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -266,7 +266,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -278,7 +278,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -290,7 +290,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -302,7 +302,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -314,7 +314,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -326,7 +326,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -338,64 +338,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 505.0,
-                    "z": 511.0
+                    "x": 8080.0,
+                    "z": 8176.0
                 },
                 {
-                    "x": 505.0,
-                    "z": 506.0
+                    "x": 8080.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 506.0
+                    "x": 8064.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 508.0
+                    "x": 8064.0,
+                    "z": 8128.0
                 },
                 {
-                    "x": 502.0,
-                    "z": 508.0
+                    "x": 8032.0,
+                    "z": 8128.0
                 },
                 {
-                    "x": 502.0,
-                    "z": 506.0
+                    "x": 8032.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 501.0,
-                    "z": 506.0
+                    "x": 8016.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 501.0,
-                    "z": 511.0
+                    "x": 8016.0,
+                    "z": 8176.0
                 },
                 {
-                    "x": 502.0,
-                    "z": 511.0
+                    "x": 8032.0,
+                    "z": 8176.0
                 },
                 {
-                    "x": 502.0,
-                    "z": 509.0
+                    "x": 8032.0,
+                    "z": 8144.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 509.0
+                    "x": 8064.0,
+                    "z": 8144.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 511.0
+                    "x": 8064.0,
+                    "z": 8176.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -406,7 +406,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -418,7 +418,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -431,7 +431,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -443,7 +443,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -455,7 +455,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -467,7 +467,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -479,7 +479,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -491,7 +491,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -503,7 +503,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -515,7 +515,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -527,7 +527,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -539,7 +539,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -551,7 +551,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -563,64 +563,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 500.0,
-                    "z": 511.0
+                    "x": 8000.0,
+                    "z": 8176.0
                 },
                 {
-                    "x": 500.0,
-                    "z": 506.0
+                    "x": 8000.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 506.0
+                    "x": 7936.0,
+                    "z": 8096.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 507.0
+                    "x": 7936.0,
+                    "z": 8112.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 507.0
+                    "x": 7984.0,
+                    "z": 8112.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 508.0
+                    "x": 7984.0,
+                    "z": 8128.0
                 },
                 {
-                    "x": 497.0,
-                    "z": 508.0
+                    "x": 7952.0,
+                    "z": 8128.0
                 },
                 {
-                    "x": 497.0,
-                    "z": 509.0
+                    "x": 7952.0,
+                    "z": 8144.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 509.0
+                    "x": 7984.0,
+                    "z": 8144.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 510.0
+                    "x": 7984.0,
+                    "z": 8160.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 510.0
+                    "x": 7936.0,
+                    "z": 8160.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 511.0
+                    "x": 7936.0,
+                    "z": 8176.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -631,7 +631,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -643,7 +643,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -656,7 +656,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -668,7 +668,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -680,7 +680,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -692,7 +692,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -704,7 +704,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -716,7 +716,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -728,7 +728,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -740,48 +740,48 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 506.0,
-                    "z": 499.0
+                    "x": 8096.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 506.0,
-                    "z": 502.0
+                    "x": 8096.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 503.0,
-                    "z": 502.0
+                    "x": 8048.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 503.0,
-                    "z": 499.0
+                    "x": 8048.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 499.0
+                    "x": 8064.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 501.0
+                    "x": 8064.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 505.0,
-                    "z": 501.0
+                    "x": 8080.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 505.0,
-                    "z": 499.0
+                    "x": 8080.0,
+                    "z": 7984.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -792,7 +792,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -804,7 +804,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -817,7 +817,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -829,7 +829,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -841,7 +841,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -853,7 +853,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -865,7 +865,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -877,7 +877,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -889,7 +889,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -901,48 +901,48 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 506.0,
-                    "z": 502.0
+                    "x": 8096.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 505.0,
-                    "z": 502.0
+                    "x": 8080.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 505.0,
-                    "z": 503.0
+                    "x": 8080.0,
+                    "z": 8048.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 503.0
+                    "x": 8064.0,
+                    "z": 8048.0
                 },
                 {
-                    "x": 504.0,
-                    "z": 502.0
+                    "x": 8064.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 503.0,
-                    "z": 502.0
+                    "x": 8048.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 503.0,
-                    "z": 504.0
+                    "x": 8048.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 506.0,
-                    "z": 504.0
+                    "x": 8096.0,
+                    "z": 8064.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -953,7 +953,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -965,7 +965,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -978,7 +978,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -990,7 +990,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1002,7 +1002,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1014,7 +1014,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1026,7 +1026,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1038,7 +1038,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1050,7 +1050,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1062,7 +1062,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1074,7 +1074,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1086,7 +1086,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1098,7 +1098,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1110,64 +1110,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 502.0,
-                    "z": 499.0
+                    "x": 8032.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 502.0,
-                    "z": 504.0
+                    "x": 8032.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 501.0,
-                    "z": 504.0
+                    "x": 8016.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 500.0,
-                    "z": 503.0
+                    "x": 8000.0,
+                    "z": 8048.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 504.0
+                    "x": 7984.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 498.0,
-                    "z": 504.0
+                    "x": 7968.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 498.0,
-                    "z": 499.0
+                    "x": 7968.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 499.0
+                    "x": 7984.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 499.0,
-                    "z": 502.0
+                    "x": 7984.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 500.0,
-                    "z": 501.0
+                    "x": 8000.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 501.0,
-                    "z": 502.0
+                    "x": 8016.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 501.0,
-                    "z": 499.0
+                    "x": 8016.0,
+                    "z": 7984.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -1178,7 +1178,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -1190,7 +1190,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -1203,7 +1203,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1215,7 +1215,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1227,7 +1227,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1239,7 +1239,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1251,7 +1251,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1263,7 +1263,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1275,7 +1275,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1287,7 +1287,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1299,7 +1299,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1311,7 +1311,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1323,7 +1323,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1335,64 +1335,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 497.0,
-                    "z": 504.0
+                    "x": 7952.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 493.0,
-                    "z": 504.0
+                    "x": 7888.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 493.0,
-                    "z": 503.0
+                    "x": 7888.0,
+                    "z": 8048.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 503.0
+                    "x": 7936.0,
+                    "z": 8048.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 502.0
+                    "x": 7936.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 494.0,
-                    "z": 502.0
+                    "x": 7904.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 494.0,
-                    "z": 501.0
+                    "x": 7904.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 501.0
+                    "x": 7936.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 496.0,
-                    "z": 500.0
+                    "x": 7936.0,
+                    "z": 8000.0
                 },
                 {
-                    "x": 493.0,
-                    "z": 500.0
+                    "x": 7888.0,
+                    "z": 8000.0
                 },
                 {
-                    "x": 493.0,
-                    "z": 499.0
+                    "x": 7888.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 497.0,
-                    "z": 499.0
+                    "x": 7952.0,
+                    "z": 7984.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -1403,7 +1403,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -1415,7 +1415,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -1428,7 +1428,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1440,7 +1440,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1452,7 +1452,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1464,7 +1464,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1476,7 +1476,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1488,7 +1488,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1500,7 +1500,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1512,7 +1512,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1524,7 +1524,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1536,7 +1536,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1548,7 +1548,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1560,64 +1560,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 507.0,
-                    "z": 504.0
+                    "x": 8112.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 511.0,
-                    "z": 504.0
+                    "x": 8176.0,
+                    "z": 8064.0
                 },
                 {
-                    "x": 511.0,
-                    "z": 499.0
+                    "x": 8176.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 507.0,
-                    "z": 499.0
+                    "x": 8112.0,
+                    "z": 7984.0
                 },
                 {
-                    "x": 507.0,
-                    "z": 502.0
+                    "x": 8112.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 509.0,
-                    "z": 502.0
+                    "x": 8144.0,
+                    "z": 8032.0
                 },
                 {
-                    "x": 509.0,
-                    "z": 501.0
+                    "x": 8144.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 508.0,
-                    "z": 501.0
+                    "x": 8128.0,
+                    "z": 8016.0
                 },
                 {
-                    "x": 508.0,
-                    "z": 500.0
+                    "x": 8128.0,
+                    "z": 8000.0
                 },
                 {
-                    "x": 510.0,
-                    "z": 500.0
+                    "x": 8160.0,
+                    "z": 8000.0
                 },
                 {
-                    "x": 510.0,
-                    "z": 503.0
+                    "x": 8160.0,
+                    "z": 8048.0
                 },
                 {
-                    "x": 507.0,
-                    "z": 503.0
+                    "x": 8112.0,
+                    "z": 8048.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": 496.0,
-            "ceilingHeight": 512.0,
+            "floorHeight": 7936.0,
+            "ceilingHeight": 8192.0,
             "floorMaterial": {
                 "material": "material/dev/uv_test.gmtl",
                 "uvOffset": {
@@ -1628,7 +1628,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -1640,7 +1640,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -1653,7 +1653,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1665,7 +1665,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1677,7 +1677,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1689,7 +1689,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1701,7 +1701,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1713,7 +1713,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1725,44 +1725,44 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -4.0,
+                    "x": -64.0,
                     "z": 0.0
                 },
                 {
                     "x": 0.0,
-                    "z": -4.0
+                    "z": -64.0
                 },
                 {
-                    "x": 8.0,
-                    "z": 4.0
+                    "x": 128.0,
+                    "z": 64.0
                 },
                 {
-                    "x": 12.0,
+                    "x": 192.0,
                     "z": 0.0
                 },
                 {
-                    "x": 12.0,
-                    "z": 12.0
+                    "x": 192.0,
+                    "z": 192.0
                 },
                 {
                     "x": 0.0,
-                    "z": 12.0
+                    "z": 192.0
                 },
                 {
-                    "x": 4.0,
-                    "z": 8.0
+                    "x": 64.0,
+                    "z": 128.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -1773,7 +1773,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -1785,7 +1785,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -1798,7 +1798,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1810,7 +1810,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1822,7 +1822,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1834,32 +1834,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -510.0,
-                    "z": -510.0
+                    "x": -8160.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -502.0,
-                    "z": -510.0
+                    "x": -8032.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -502.0,
-                    "z": -508.0
+                    "x": -8032.0,
+                    "z": -8128.0
                 },
                 {
-                    "x": -510.0,
-                    "z": -508.0
+                    "x": -8160.0,
+                    "z": -8128.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -1870,7 +1870,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -1882,7 +1882,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -1895,7 +1895,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1907,7 +1907,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1919,7 +1919,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -1931,32 +1931,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -500.0,
-                    "z": -510.0
+                    "x": -8000.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -498.0,
-                    "z": -510.0
+                    "x": -7968.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -498.0,
-                    "z": -498.0
+                    "x": -7968.0,
+                    "z": -7968.0
                 },
                 {
-                    "x": -500.0,
-                    "z": -498.0
+                    "x": -8000.0,
+                    "z": -7968.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -1967,7 +1967,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -1979,7 +1979,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -1992,7 +1992,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2004,7 +2004,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2016,7 +2016,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2028,32 +2028,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -492.0,
-                    "z": -510.0
+                    "x": -7872.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -490.0,
-                    "z": -510.0
+                    "x": -7840.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -490.0,
-                    "z": -498.0
+                    "x": -7840.0,
+                    "z": -7968.0
                 },
                 {
-                    "x": -492.0,
-                    "z": -498.0
+                    "x": -7872.0,
+                    "z": -7968.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -2064,7 +2064,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -2076,7 +2076,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -2089,7 +2089,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2101,7 +2101,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2113,7 +2113,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2125,32 +2125,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -484.0,
-                    "z": -510.0
+                    "x": -7744.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -482.0,
-                    "z": -510.0
+                    "x": -7712.0,
+                    "z": -8160.0
                 },
                 {
-                    "x": -482.0,
-                    "z": -498.0
+                    "x": -7712.0,
+                    "z": -7968.0
                 },
                 {
-                    "x": -484.0,
-                    "z": -498.0
+                    "x": -7744.0,
+                    "z": -7968.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -2161,7 +2161,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -2173,7 +2173,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -2186,7 +2186,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2198,7 +2198,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2210,7 +2210,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2222,32 +2222,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -488.0,
-                    "z": -494.0
+                    "x": -7808.0,
+                    "z": -7904.0
                 },
                 {
-                    "x": -486.0,
-                    "z": -494.0
+                    "x": -7776.0,
+                    "z": -7904.0
                 },
                 {
-                    "x": -486.0,
-                    "z": -482.0
+                    "x": -7776.0,
+                    "z": -7712.0
                 },
                 {
-                    "x": -488.0,
-                    "z": -482.0
+                    "x": -7808.0,
+                    "z": -7712.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -2258,7 +2258,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -2270,7 +2270,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -2283,7 +2283,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2295,7 +2295,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2307,7 +2307,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2319,32 +2319,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -502.0,
-                    "z": -494.0
+                    "x": -8032.0,
+                    "z": -7904.0
                 },
                 {
-                    "x": -500.0,
-                    "z": -494.0
+                    "x": -8000.0,
+                    "z": -7904.0
                 },
                 {
-                    "x": -500.0,
-                    "z": -482.0
+                    "x": -8000.0,
+                    "z": -7712.0
                 },
                 {
-                    "x": -502.0,
-                    "z": -482.0
+                    "x": -8032.0,
+                    "z": -7712.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/floor.gmtl",
                 "uvOffset": {
@@ -2355,7 +2355,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/skip.gmtl",
@@ -2367,7 +2367,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -2380,7 +2380,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2392,7 +2392,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2404,7 +2404,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -2416,25 +2416,25 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -508.0,
-                    "z": -494.0
+                    "x": -8128.0,
+                    "z": -7904.0
                 },
                 {
-                    "x": -506.0,
-                    "z": -494.0
+                    "x": -8096.0,
+                    "z": -7904.0
                 },
                 {
-                    "x": -506.0,
-                    "z": -484.0
+                    "x": -8096.0,
+                    "z": -7744.0
                 },
                 {
-                    "x": -508.0,
-                    "z": -484.0
+                    "x": -8128.0,
+                    "z": -7744.0
                 }
             ]
         }
@@ -2444,7 +2444,7 @@
             "class": "player",
             "position": {
                 "x": 0.0,
-                "y": 508.0,
+                "y": 8128.0,
                 "z": -0.0
             },
             "rotation": {
@@ -2458,9 +2458,9 @@
         {
             "class": "prop_sprite",
             "position": {
-                "x": 488.0,
-                "y": 8.0,
-                "z": 496.0
+                "x": 7808.0,
+                "y": 128.0,
+                "z": 7936.0
             },
             "rotation": {
                 "x": 45.0,
@@ -2507,8 +2507,8 @@
                 "size": {
                     "type": "vec2",
                     "value": {
-                        "x": 40.0,
-                        "y": 40.0
+                        "x": 640.0,
+                        "y": 640.0
                     }
                 },
                 "name": {

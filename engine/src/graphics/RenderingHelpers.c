@@ -4,6 +4,8 @@
 
 #include <assert.h>
 #include <cglm/affine.h>
+#include <cglm/cglm.h>
+#include <cglm/clipspace/persp_lh_zo.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
@@ -11,7 +13,9 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/helpers/MathEx.h>
+#include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
@@ -19,11 +23,12 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <float.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <SDL3/SDL_video.h>
 #include <math.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -219,4 +224,40 @@ inline void GetColor(const uint32_t argb, Color *color)
 void DPrintGPUInfo()
 {
 	VK_DPrintDevice();
+}
+
+Vector2 ProjectPosition(vec3 position, Camera *camera)
+{
+	const Vector2 windowSize = ActualWindowSize();
+	const float aspect = windowSize.x / windowSize.y;
+	mat4 perspectiveMatrix;
+	glm_perspective_lh_zo(glm_rad(camera->fov), aspect, NEAR_Z, FAR_Z, perspectiveMatrix);
+
+	versor rotationQuat;
+	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
+	versor rotationOffset;
+	glm_quatv(rotationOffset, GLM_PIf, GLM_XUP);
+	glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
+
+	mat4 viewMatrix = GLM_MAT4_IDENTITY_INIT;
+	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
+	glm_quat_look(cameraPosition, rotationQuat, viewMatrix);
+
+	mat4 transform = GLM_MAT4_IDENTITY_INIT;
+	glm_mat4_mul(perspectiveMatrix, viewMatrix, transform);
+
+	vec4 clip = {position[0], position[1], position[2], 1.0f};
+	glm_mat4_mulv(transform, clip, clip);
+
+	if (clip[3] <= 0.0f)
+	{
+		return v2(FLT_MAX, FLT_MAX);
+	}
+
+	const vec3 ndc = {clip[0] / clip[3], clip[1] / clip[3], clip[2] / clip[3]};
+
+	const float x = (ndc[0] + 1.0f) * 0.5f * windowSize.x;
+	const float y = ((ndc[1] + 1.0f) * 0.5f) * windowSize.y;
+
+	return v2(x, y);
 }

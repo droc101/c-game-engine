@@ -8,8 +8,8 @@
     "sectors": [
         {
             "name": "",
-            "floorHeight": -2.0,
-            "ceilingHeight": 2.0,
+            "floorHeight": -32.0,
+            "ceilingHeight": 32.0,
             "floorMaterial": {
                 "material": "material/dev/floor_test.gmtl",
                 "uvOffset": {
@@ -20,7 +20,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 128
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -32,7 +32,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -45,7 +45,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/glowing_blob.gmtl",
@@ -57,7 +57,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -69,7 +69,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -81,7 +81,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -93,7 +93,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -105,7 +105,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -117,7 +117,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -129,7 +129,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -141,7 +141,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -153,7 +153,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -165,7 +165,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 64
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -177,7 +177,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -189,7 +189,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -201,7 +201,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -213,7 +213,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -225,7 +225,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -237,7 +237,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -249,7 +249,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -261,7 +261,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -273,88 +273,88 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 12.0,
-                    "z": 10.0
+                    "x": 192.0,
+                    "z": 160.0
                 },
                 {
-                    "x": 18.0,
-                    "z": 10.0
+                    "x": 288.0,
+                    "z": 160.0
                 },
                 {
-                    "x": 24.0,
-                    "z": 4.0
+                    "x": 384.0,
+                    "z": 64.0
                 },
                 {
-                    "x": 24.0,
-                    "z": 2.0
+                    "x": 384.0,
+                    "z": 32.0
                 },
                 {
-                    "x": 21.0,
-                    "z": 2.0
+                    "x": 336.0,
+                    "z": 32.0
                 },
                 {
-                    "x": 20.0,
-                    "z": 1.0
+                    "x": 320.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 20.0,
-                    "z": -1.0
+                    "x": 320.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 21.0,
-                    "z": -2.0
+                    "x": 336.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -2.0
+                    "x": 384.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -4.0
+                    "x": 384.0,
+                    "z": -64.0
                 },
                 {
-                    "x": 18.0,
-                    "z": -10.0
+                    "x": 288.0,
+                    "z": -160.0
                 },
                 {
-                    "x": 12.0,
-                    "z": -10.0
+                    "x": 192.0,
+                    "z": -160.0
                 },
                 {
-                    "x": 12.0,
-                    "z": -8.0
+                    "x": 192.0,
+                    "z": -128.0
                 },
                 {
-                    "x": 16.0,
-                    "z": -4.0
+                    "x": 256.0,
+                    "z": -64.0
                 },
                 {
-                    "x": 16.0,
-                    "z": -1.0
+                    "x": 256.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 16.0,
-                    "z": 1.0
+                    "x": 256.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 16.0,
-                    "z": 4.0
+                    "x": 256.0,
+                    "z": 64.0
                 },
                 {
-                    "x": 12.0,
-                    "z": 8.0
+                    "x": 192.0,
+                    "z": 128.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.75,
-            "ceilingHeight": 2.0,
+            "floorHeight": -28.0,
+            "ceilingHeight": 32.0,
             "floorMaterial": {
                 "material": "material/dev/floor_test.gmtl",
                 "uvOffset": {
@@ -365,7 +365,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 128
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -377,7 +377,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -390,7 +390,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -402,7 +402,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -414,7 +414,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -426,7 +426,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -438,7 +438,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -450,7 +450,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -462,7 +462,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -474,7 +474,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -486,7 +486,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -498,7 +498,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -510,7 +510,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -522,7 +522,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -534,64 +534,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 24.0,
-                    "z": 2.0
+                    "x": 384.0,
+                    "z": 32.0
                 },
                 {
-                    "x": 21.0,
-                    "z": 2.0
+                    "x": 336.0,
+                    "z": 32.0
                 },
                 {
-                    "x": 20.0,
-                    "z": 1.0
+                    "x": 320.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 20.0,
-                    "z": -1.0
+                    "x": 320.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 21.0,
-                    "z": -2.0
+                    "x": 336.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -2.0
+                    "x": 384.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -1.5
+                    "x": 384.0,
+                    "z": -24.0
                 },
                 {
-                    "x": 21.25,
-                    "z": -1.5
+                    "x": 340.0,
+                    "z": -24.0
                 },
                 {
-                    "x": 20.5,
-                    "z": -0.75
+                    "x": 328.0,
+                    "z": -12.0
                 },
                 {
-                    "x": 20.5,
-                    "z": 0.75
+                    "x": 328.0,
+                    "z": 12.0
                 },
                 {
-                    "x": 21.25,
-                    "z": 1.5
+                    "x": 340.0,
+                    "z": 24.0
                 },
                 {
-                    "x": 24.0,
-                    "z": 1.5
+                    "x": 384.0,
+                    "z": 24.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.5,
-            "ceilingHeight": 2.0,
+            "floorHeight": -24.0,
+            "ceilingHeight": 32.0,
             "floorMaterial": {
                 "material": "material/dev/floor_test.gmtl",
                 "uvOffset": {
@@ -602,7 +602,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 128
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -614,7 +614,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -627,7 +627,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/floor.gmtl",
@@ -639,7 +639,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/floor.gmtl",
@@ -651,7 +651,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -663,7 +663,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -675,7 +675,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -687,7 +687,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -699,7 +699,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -711,48 +711,48 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 24.0,
-                    "z": 1.5
+                    "x": 384.0,
+                    "z": 24.0
                 },
                 {
-                    "x": 24.0,
-                    "z": 1.0
+                    "x": 384.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -1.0
+                    "x": 384.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -1.5
+                    "x": 384.0,
+                    "z": -24.0
                 },
                 {
-                    "x": 21.25,
-                    "z": -1.5
+                    "x": 340.0,
+                    "z": -24.0
                 },
                 {
-                    "x": 20.5,
-                    "z": -0.75
+                    "x": 328.0,
+                    "z": -12.0
                 },
                 {
-                    "x": 20.5,
-                    "z": 0.75
+                    "x": 328.0,
+                    "z": 12.0
                 },
                 {
-                    "x": 21.25,
-                    "z": 1.5
+                    "x": 340.0,
+                    "z": 24.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -0.75,
-            "ceilingHeight": 0.25,
+            "floorHeight": -12.0,
+            "ceilingHeight": 4.0,
             "floorMaterial": {
                 "material": "material/dev/wall_test.gmtl",
                 "uvOffset": {
@@ -763,7 +763,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 128
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/dev/wall_test.gmtl",
@@ -775,7 +775,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 128
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -788,7 +788,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -800,7 +800,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -812,7 +812,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 128
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -824,32 +824,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 15.0,
-                    "z": -1.0
+                    "x": 240.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 16.0,
-                    "z": -1.0
+                    "x": 256.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 16.0,
-                    "z": 1.0
+                    "x": 256.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 15.0,
-                    "z": 1.0
+                    "x": 240.0,
+                    "z": 16.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.5,
-            "ceilingHeight": -0.5,
+            "floorHeight": -24.0,
+            "ceilingHeight": -8.0,
             "floorMaterial": {
                 "material": "material/dev/floor_test.gmtl",
                 "uvOffset": {
@@ -860,7 +860,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/dev/ceiling_test.gmtl",
@@ -872,7 +872,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -885,7 +885,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/skip.gmtl",
@@ -897,7 +897,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -909,7 +909,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_test.gmtl",
@@ -921,32 +921,32 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 24.0,
-                    "z": 1.0
+                    "x": 384.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 25.0,
-                    "z": 1.0
+                    "x": 400.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 25.0,
-                    "z": -1.0
+                    "x": 400.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 24.0,
-                    "z": -1.0
+                    "x": 384.0,
+                    "z": -16.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
+            "floorHeight": -16.0,
+            "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/tools/invisible.gmtl",
                 "uvOffset": {
@@ -957,7 +957,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/tools/invisible.gmtl",
@@ -969,7 +969,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -982,7 +982,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/invisible.gmtl",
@@ -994,7 +994,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/invisible.gmtl",
@@ -1006,7 +1006,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/tools/invisible.gmtl",
@@ -1018,25 +1018,25 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": 13.0,
-                    "z": 1.0
+                    "x": 208.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 12.0,
-                    "z": 1.0
+                    "x": 192.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 12.0,
-                    "z": -1.0
+                    "x": 192.0,
+                    "z": -16.0
                 },
                 {
-                    "x": 13.0,
-                    "z": -1.0
+                    "x": 208.0,
+                    "z": -16.0
                 }
             ]
         }
@@ -1045,9 +1045,9 @@
         {
             "class": "player",
             "position": {
-                "x": 12.5,
-                "y": -0.5,
-                "z": 0.5
+                "x": 200.0,
+                "y": -8.0,
+                "z": 8.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1060,8 +1060,8 @@
         {
             "class": "test_actor",
             "position": {
-                "x": 22.75,
-                "y": -0.75,
+                "x": 364.0,
+                "y": -12.0,
                 "z": -0.0
             },
             "rotation": {
@@ -1080,9 +1080,9 @@
         {
             "class": "prop_door",
             "position": {
-                "x": 24.5,
-                "y": -1.0,
-                "z": -1.0
+                "x": 392.0,
+                "y": -16.0,
+                "z": -16.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1094,8 +1094,8 @@
                 "size": {
                     "type": "vec2",
                     "value": {
-                        "x": 1.0,
-                        "y": 1.0
+                        "x": 16.0,
+                        "y": 16.0
                     }
                 },
                 "color": {
@@ -1150,9 +1150,9 @@
         {
             "class": "prop_door",
             "position": {
-                "x": 24.5,
-                "y": -1.0,
-                "z": 1.0
+                "x": 392.0,
+                "y": -16.0,
+                "z": 16.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1164,8 +1164,8 @@
                 "size": {
                     "type": "vec2",
                     "value": {
-                        "x": 1.0,
-                        "y": 1.0
+                        "x": 16.0,
+                        "y": 16.0
                     }
                 },
                 "color": {
@@ -1220,9 +1220,9 @@
         {
             "class": "camera",
             "position": {
-                "x": 15.75,
-                "y": -0.25,
-                "z": 0.75
+                "x": 252.0,
+                "y": -4.0,
+                "z": 12.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1248,9 +1248,9 @@
         {
             "class": "io_proxy",
             "position": {
-                "x": 12.5,
-                "y": -0.5,
-                "z": -0.5
+                "x": 200.0,
+                "y": -8.0,
+                "z": -8.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1274,9 +1274,9 @@
         {
             "class": "npc_john",
             "position": {
-                "x": 18.25,
-                "y": -1.5,
-                "z": -1.0
+                "x": 292.0,
+                "y": -24.0,
+                "z": -16.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1294,9 +1294,9 @@
         {
             "class": "prop_physbox",
             "position": {
-                "x": 18.75,
-                "y": -1.75,
-                "z": 1.0
+                "x": 300.0,
+                "y": -28.0,
+                "z": 16.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1314,8 +1314,8 @@
         {
             "class": "prop_model_physics",
             "position": {
-                "x": 20.25,
-                "y": -1.25,
+                "x": 324.0,
+                "y": -20.0,
                 "z": -0.0
             },
             "rotation": {
@@ -1359,9 +1359,9 @@
         {
             "class": "prop_laser_emitter",
             "position": {
-                "x": 24.0,
-                "y": -1.0,
-                "z": -1.25
+                "x": 384.0,
+                "y": -16.0,
+                "z": -20.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1387,9 +1387,9 @@
         {
             "class": "prop_laser_emitter",
             "position": {
-                "x": 24.0,
-                "y": -1.0,
-                "z": 1.25
+                "x": 384.0,
+                "y": -16.0,
+                "z": 20.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1415,7 +1415,7 @@
         {
             "class": "tonemap_controller",
             "position": {
-                "x": 12.5,
+                "x": 200.0,
                 "y": 0.0,
                 "z": -0.0
             },
@@ -1447,9 +1447,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": 16.0,
+                "x": 256.0,
                 "y": 0.0,
-                "z": -8.0
+                "z": -128.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1468,7 +1468,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 10.0
+                    "value": 160.0
                 },
                 "color": {
                     "type": "color",
@@ -1492,8 +1492,8 @@
         {
             "class": "light_point",
             "position": {
-                "x": 23.75,
-                "y": 0.75,
+                "x": 380.0,
+                "y": 12.0,
                 "z": -0.0
             },
             "rotation": {
@@ -1513,7 +1513,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.0
+                    "value": 16.0
                 },
                 "color": {
                     "type": "color",
@@ -1537,8 +1537,8 @@
         {
             "class": "prop_model_static",
             "position": {
-                "x": 23.75,
-                "y": 0.75,
+                "x": 380.0,
+                "y": 12.0,
                 "z": -0.0
             },
             "rotation": {
@@ -1578,8 +1578,8 @@
         {
             "class": "light_spot",
             "position": {
-                "x": 19.25,
-                "y": 2.0,
+                "x": 308.0,
+                "y": 32.0,
                 "z": -0.0
             },
             "rotation": {

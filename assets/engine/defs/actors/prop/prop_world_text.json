@@ -1,0 +1,26 @@
+{
+  "extends": "actor",
+  "params": {
+    "text": {
+      "default": "",
+      "type": "string"
+    },
+    "font_size": {
+      "default": 16,
+      "min": 1,
+      "type": "int"
+    },
+    "text_color": {
+      "type": "color",
+      "default": -1
+    },
+    "background_color": {
+      "type": "color",
+      "default": 128
+    },
+    "visible_distance": {
+      "type": "float",
+      "default": 80
+    }
+  }
+}

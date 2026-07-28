@@ -260,7 +260,7 @@ bool LoadMap(Map *map, Asset *mapData)
 																							   JPH_MotionType_Static,
 																							   OBJECT_LAYER_STATIC,
 																							   0);
-		JPH_BodyCreationSettings_SetFriction(bodyCreationSettings, 4.25f);
+		JPH_BodyCreationSettings_SetFriction(bodyCreationSettings, 68.0f);
 		const JPH_BodyID body = JPH_BodyInterface_CreateAndAddBody(bodyInterface,
 																   bodyCreationSettings,
 																   JPH_Activation_Activate);

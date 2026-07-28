@@ -52,8 +52,8 @@
     "size": {
       "display": "Size",
       "type": "vec2",
-      "default_x": 1.0,
-      "default_y": 1.0,
+      "default_x": 16.0,
+      "default_y": 16.0,
       "description": "The in-game size of the door"
     },
     "uv_scale": {

@@ -107,7 +107,7 @@ static JPH_BroadPhaseLayerFilter *tripleLaserBroadPhaseLayerFilter;
 static JPH_ObjectLayerFilter *tripleLaserObjectLayerFilter;
 static JPH_BodyFilter *bodyFilter;
 
-static const float MAX_DISTANCE = 50.0f;
+static const float MAX_DISTANCE = 1024.0f;
 
 static inline void LaserCreateBody(Actor *this, const Transform *transform)
 {
@@ -189,17 +189,17 @@ static void LaserInit(Actor *this, const KvList params, Transform *transform)
 		   data->height == LASER_HEIGHT_TRIPLE ? TEXTURE("actor/triplelaser") : TEXTURE("actor/laser"));
 	this->wall->uvScale = v2s(1.0f);
 	this->wall->uvOffset = v2s(0.0f);
-	this->wall->height = 1.0f;
+	this->wall->height = 16.0f;
 	this->wall->unshaded = true;
 	this->visible = data->on;
 
 	switch (data->height)
 	{
 		case LASER_HEIGHT_FLOOR:
-			transform->position.y += -0.3f;
+			transform->position.y += -4.8f;
 			break;
 		case LASER_HEIGHT_CEILING:
-			transform->position.y += 0.3f;
+			transform->position.y += 4.8f;
 			break;
 		case LASER_HEIGHT_MIDDLE:
 		default:

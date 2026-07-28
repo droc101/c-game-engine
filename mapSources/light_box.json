@@ -8,8 +8,8 @@
     "sectors": [
         {
             "name": "",
-            "floorHeight": -4.0,
-            "ceilingHeight": 4.0,
+            "floorHeight": -64.0,
+            "ceilingHeight": 64.0,
             "floorMaterial": {
                 "material": "material/dev/uv_test.gmtl",
                 "uvOffset": {
@@ -20,7 +20,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 128
+                "units_per_luxel": 0.25
             },
             "ceilingMaterial": {
                 "material": "material/dev/uv_test.gmtl",
@@ -32,7 +32,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -45,7 +45,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -57,7 +57,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -69,7 +69,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -81,7 +81,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -93,7 +93,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -105,7 +105,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -117,7 +117,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -129,7 +129,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -141,7 +141,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -153,7 +153,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -165,7 +165,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -177,7 +177,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -189,7 +189,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -201,532 +201,64 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -6.0,
-                    "z": -6.0
+                    "x": -96.0,
+                    "z": -96.0
                 },
                 {
-                    "x": -3.5,
-                    "z": -6.0
+                    "x": -64.0,
+                    "z": -96.0
                 },
                 {
-                    "x": 3.5,
-                    "z": -6.0
+                    "x": 64.0,
+                    "z": -96.0
                 },
                 {
-                    "x": 6.0,
-                    "z": -6.0
+                    "x": 96.0,
+                    "z": -96.0
                 },
                 {
-                    "x": 6.0,
-                    "z": -2.0
+                    "x": 96.0,
+                    "z": -32.0
                 },
                 {
-                    "x": 6.0,
-                    "z": -1.0
-                },
-                {
-                    "x": 6.0,
-                    "z": 1.0
-                },
-                {
-                    "x": 6.0,
-                    "z": 2.0
-                },
-                {
-                    "x": 6.0,
-                    "z": 6.0
-                },
-                {
-                    "x": 2.0,
-                    "z": 6.0
-                },
-                {
-                    "x": -2.0,
-                    "z": 6.0
-                },
-                {
-                    "x": -6.0,
-                    "z": 6.0
-                }
-            ]
-        },
-        {
-            "name": "",
-            "floorHeight": -2.0,
-            "ceilingHeight": 2.0,
-            "floorMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "ceilingMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "wallMaterials": [
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                }
-            ],
-            "points": [
-                {
-                    "x": 6.0,
-                    "z": 6.0
-                },
-                {
-                    "x": 12.0,
-                    "z": 4.0
-                },
-                {
-                    "x": 12.0,
-                    "z": -4.0
-                },
-                {
-                    "x": 6.0,
-                    "z": -6.0
-                },
-                {
-                    "x": 6.0,
-                    "z": -2.0
-                },
-                {
-                    "x": 7.0,
-                    "z": -1.0
-                },
-                {
-                    "x": 6.0,
-                    "z": -1.0
-                },
-                {
-                    "x": 6.0,
-                    "z": 1.0
-                },
-                {
-                    "x": 7.0,
-                    "z": 1.0
-                },
-                {
-                    "x": 6.0,
-                    "z": 2.0
-                }
-            ]
-        },
-        {
-            "name": "",
-            "floorHeight": -4.0,
-            "ceilingHeight": 4.0,
-            "floorMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "ceilingMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "wallMaterials": [
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                }
-            ],
-            "points": [
-                {
-                    "x": 6.0,
-                    "z": 6.0
-                },
-                {
-                    "x": 12.0,
-                    "z": 4.0
-                },
-                {
-                    "x": 12.0,
-                    "z": 8.0
-                }
-            ]
-        },
-        {
-            "name": "",
-            "floorHeight": -4.0,
-            "ceilingHeight": 4.0,
-            "floorMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "ceilingMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "wallMaterials": [
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                }
-            ],
-            "points": [
-                {
-                    "x": 12.0,
-                    "z": -4.0
-                },
-                {
-                    "x": 12.0,
-                    "z": -8.0
-                },
-                {
-                    "x": 6.0,
-                    "z": -6.0
-                }
-            ]
-        },
-        {
-            "name": "",
-            "floorHeight": -4.0,
-            "ceilingHeight": 4.0,
-            "floorMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 128
-            },
-            "ceilingMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 16
-            },
-            "wallMaterials": [
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                }
-            ],
-            "points": [
-                {
-                    "x": -6.0,
-                    "z": 6.0
-                },
-                {
-                    "x": -24.0,
-                    "z": 16.0
-                },
-                {
-                    "x": -16.0,
-                    "z": 0.0
-                },
-                {
-                    "x": -24.0,
+                    "x": 96.0,
                     "z": -16.0
                 },
                 {
-                    "x": -6.0,
-                    "z": -6.0
+                    "x": 96.0,
+                    "z": 16.0
+                },
+                {
+                    "x": 96.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 96.0,
+                    "z": 96.0
+                },
+                {
+                    "x": 32.0,
+                    "z": 96.0
+                },
+                {
+                    "x": -32.0,
+                    "z": 96.0
+                },
+                {
+                    "x": -96.0,
+                    "z": 96.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -2.0,
-            "ceilingHeight": 2.0,
+            "floorHeight": -32.0,
+            "ceilingHeight": 32.0,
             "floorMaterial": {
                 "material": "material/dev/uv_test.gmtl",
                 "uvOffset": {
@@ -737,7 +269,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
                 "material": "material/dev/uv_test.gmtl",
@@ -749,7 +281,475 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 96.0,
+                    "z": 96.0
+                },
+                {
+                    "x": 192.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 192.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 96.0,
+                    "z": -96.0
+                },
+                {
+                    "x": 96.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 112.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 96.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 96.0,
+                    "z": 16.0
+                },
+                {
+                    "x": 112.0,
+                    "z": 16.0
+                },
+                {
+                    "x": 96.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -64.0,
+            "ceilingHeight": 64.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 96.0,
+                    "z": 96.0
+                },
+                {
+                    "x": 192.0,
+                    "z": 64.0
+                },
+                {
+                    "x": 192.0,
+                    "z": 128.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -64.0,
+            "ceilingHeight": 64.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 192.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 192.0,
+                    "z": -128.0
+                },
+                {
+                    "x": 96.0,
+                    "z": -96.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -64.0,
+            "ceilingHeight": 64.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 0.25
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -96.0,
+                    "z": 96.0
+                },
+                {
+                    "x": -384.0,
+                    "z": 256.0
+                },
+                {
+                    "x": -256.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -384.0,
+                    "z": -256.0
+                },
+                {
+                    "x": -96.0,
+                    "z": -96.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -32.0,
+            "ceilingHeight": 32.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -762,7 +762,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -774,7 +774,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/glowing_blob.gmtl",
@@ -786,7 +786,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/wall_unshaded_test.gmtl",
@@ -798,128 +798,31 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -2.0,
-                    "z": 6.0
+                    "x": -32.0,
+                    "z": 96.0
                 },
                 {
-                    "x": 2.0,
-                    "z": 6.0
+                    "x": 32.0,
+                    "z": 96.0
                 },
                 {
-                    "x": 2.0,
-                    "z": 8.0
+                    "x": 32.0,
+                    "z": 128.0
                 },
                 {
-                    "x": -2.0,
-                    "z": 8.0
+                    "x": -32.0,
+                    "z": 128.0
                 }
             ]
         },
         {
             "name": "",
-            "floorHeight": -1.0,
-            "ceilingHeight": 1.0,
-            "floorMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 128
-            },
-            "ceilingMaterial": {
-                "material": "material/dev/uv_test.gmtl",
-                "uvOffset": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "uvScale": {
-                    "x": 1.0,
-                    "y": 1.0
-                },
-                "luxels_per_unit": 128
-            },
-            "wallMaterials": [
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 128
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 128
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 128
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 128
-                }
-            ],
-            "points": [
-                {
-                    "x": -3.5,
-                    "z": -8.0
-                },
-                {
-                    "x": 3.5,
-                    "z": -8.0
-                },
-                {
-                    "x": 3.5,
-                    "z": -6.0
-                },
-                {
-                    "x": -3.5,
-                    "z": -6.0
-                }
-            ]
-        },
-        {
-            "name": "",
-            "floorHeight": 4.0,
+            "floorHeight": -16.0,
             "ceilingHeight": 16.0,
             "floorMaterial": {
                 "material": "material/dev/uv_test.gmtl",
@@ -931,10 +834,10 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
-                "material": "material/tools/invisible.gmtl",
+                "material": "material/dev/uv_test.gmtl",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -943,7 +846,7 @@
                     "x": 1.0,
                     "y": 1.0
                 },
-                "luxels_per_unit": 16
+                "units_per_luxel": 1.0
             },
             "wallMaterials": [
                 {
@@ -956,7 +859,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -968,7 +871,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -980,7 +883,7 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 },
                 {
                     "material": "material/dev/uv_test.gmtl",
@@ -992,153 +895,250 @@
                         "x": 1.0,
                         "y": 1.0
                     },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
-                },
-                {
-                    "material": "material/dev/uv_test.gmtl",
-                    "uvOffset": {
-                        "x": 0.0,
-                        "y": 0.0
-                    },
-                    "uvScale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    },
-                    "luxels_per_unit": 16
+                    "units_per_luxel": 1.0
                 }
             ],
             "points": [
                 {
-                    "x": -12.5,
-                    "z": 2.0
+                    "x": -56.0,
+                    "z": -128.0
                 },
                 {
-                    "x": -13.5,
-                    "z": 2.0
+                    "x": 56.0,
+                    "z": -128.0
                 },
                 {
-                    "x": -14.5,
-                    "z": 1.5
+                    "x": 56.0,
+                    "z": -96.0
                 },
                 {
-                    "x": -15.0,
-                    "z": 0.5
+                    "x": -56.0,
+                    "z": -96.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 64.0,
+            "ceilingHeight": 256.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -15.0,
-                    "z": -0.5
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -14.5,
-                    "z": -1.5
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -13.5,
-                    "z": -2.0
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -12.5,
-                    "z": -2.0
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -11.5,
-                    "z": -1.5
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -11.0,
-                    "z": -0.5
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -11.0,
-                    "z": 0.5
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
                 },
                 {
-                    "x": -11.5,
-                    "z": 1.5
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -200.0,
+                    "z": 32.0
+                },
+                {
+                    "x": -216.0,
+                    "z": 32.0
+                },
+                {
+                    "x": -232.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -240.0,
+                    "z": 8.0
+                },
+                {
+                    "x": -240.0,
+                    "z": -8.0
+                },
+                {
+                    "x": -232.0,
+                    "z": -24.0
+                },
+                {
+                    "x": -216.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -200.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -184.0,
+                    "z": -24.0
+                },
+                {
+                    "x": -176.0,
+                    "z": -8.0
+                },
+                {
+                    "x": -176.0,
+                    "z": 8.0
+                },
+                {
+                    "x": -184.0,
+                    "z": 24.0
                 }
             ]
         }
@@ -1147,9 +1147,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": 10.0,
-                "y": 1.0,
-                "z": 0.0
+                "x": 160.0,
+                "y": 16.0,
+                "z": -0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1168,7 +1168,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 2.5
+                    "value": 40.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1192,9 +1192,9 @@
         {
             "class": "tonemap_controller",
             "position": {
-                "x": 8.0,
+                "x": 128.0,
                 "y": 0.0,
-                "z": 2.0
+                "z": 32.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1224,9 +1224,9 @@
         {
             "class": "tonemap_controller",
             "position": {
-                "x": 8.0,
+                "x": 128.0,
                 "y": 0.0,
-                "z": -2.0
+                "z": -32.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1256,9 +1256,9 @@
         {
             "class": "prop_button",
             "position": {
-                "x": 12.0,
-                "y": -1.5,
-                "z": 2.0
+                "x": 192.0,
+                "y": -24.0,
+                "z": 32.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1311,9 +1311,9 @@
         {
             "class": "prop_button",
             "position": {
-                "x": 12.0,
-                "y": -1.5,
-                "z": -2.0
+                "x": 192.0,
+                "y": -24.0,
+                "z": -32.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1366,7 +1366,7 @@
         {
             "class": "prop_sprite",
             "position": {
-                "x": -10.0,
+                "x": -160.0,
                 "y": 0.0,
                 "z": -0.0
             },
@@ -1410,8 +1410,8 @@
                 "size": {
                     "type": "vec2",
                     "value": {
-                        "x": 1.0,
-                        "y": 1.0
+                        "x": 16.0,
+                        "y": 16.0
                     }
                 },
                 "color": {
@@ -1428,9 +1428,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": -16.0,
+                "x": -256.0,
                 "y": 0.0,
-                "z": -8.0
+                "z": -128.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1449,7 +1449,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 3.0
+                    "value": 48.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1473,9 +1473,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": -16.0,
+                "x": -256.0,
                 "y": 0.0,
-                "z": 8.0
+                "z": 128.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1494,7 +1494,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 3.0
+                    "value": 48.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1518,9 +1518,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": 10.0,
-                "y": -3.0,
-                "z": -6.0
+                "x": 160.0,
+                "y": -48.0,
+                "z": -96.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1539,7 +1539,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 2.0
+                    "value": 32.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1563,9 +1563,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": 2.5,
+                "x": 40.0,
                 "y": 0.0,
-                "z": -7.0
+                "z": -112.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1584,7 +1584,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.75
+                    "value": 12.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1608,9 +1608,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": 1.5,
+                "x": 24.0,
                 "y": 0.0,
-                "z": -7.0
+                "z": -112.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1629,7 +1629,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.75
+                    "value": 12.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1653,9 +1653,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": 0.5,
+                "x": 8.0,
                 "y": 0.0,
-                "z": -7.0
+                "z": -112.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1674,7 +1674,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.75
+                    "value": 12.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1698,9 +1698,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": -0.5,
+                "x": -8.0,
                 "y": 0.0,
-                "z": -7.0
+                "z": -112.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1719,7 +1719,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.75
+                    "value": 12.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1743,9 +1743,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": -1.5,
+                "x": -24.0,
                 "y": 0.0,
-                "z": -7.0
+                "z": -112.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1764,7 +1764,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.75
+                    "value": 12.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1788,9 +1788,9 @@
         {
             "class": "light_point",
             "position": {
-                "x": -2.5,
+                "x": -40.0,
                 "y": 0.0,
-                "z": -7.0
+                "z": -112.0
             },
             "rotation": {
                 "x": 0.0,
@@ -1809,7 +1809,7 @@
                 },
                 "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.75
+                    "value": 12.0
                 },
                 "constant_attenuation": {
                     "type": "float",
@@ -1833,8 +1833,8 @@
         {
             "class": "light_directional",
             "position": {
-                "x": -13.0,
-                "y": 15.0,
+                "x": -208.0,
+                "y": 240.0,
                 "z": 0.0
             },
             "rotation": {
@@ -1862,8 +1862,8 @@
         {
             "class": "player",
             "position": {
-                "x": 8.0,
-                "y": -1.5,
+                "x": 128.0,
+                "y": -24.0,
                 "z": -0.0
             },
             "rotation": {
@@ -1877,8 +1877,8 @@
         {
             "class": "item_eraser",
             "position": {
-                "x": 8.0,
-                "y": -1.5,
+                "x": 128.0,
+                "y": -24.0,
                 "z": 0.0
             },
             "rotation": {
@@ -1899,55 +1899,10 @@
             }
         },
         {
-            "class": "light_point",
-            "position": {
-                "x": -2.5,
-                "y": 0.0,
-                "z": -7.0
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "connections": [],
-            "params": {
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 0.75
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.4588235318660736,
-                        "g": 0.027450980618596077,
-                        "b": 0.529411792755127,
-                        "a": 1.0
-                    }
-                }
-            }
-        },
-        {
             "class": "light_spot",
             "position": {
                 "x": 0.0,
-                "y": 3.75,
+                "y": 60.0,
                 "z": -0.0
             },
             "rotation": {

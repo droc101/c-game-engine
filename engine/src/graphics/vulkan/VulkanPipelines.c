@@ -18,6 +18,11 @@
 #include <stdint.h>
 #include <vulkan/vulkan_core.h>
 
+#ifdef JPH_DEBUG_RENDERER
+// Needed to #ifndef JPH_DEBUG_RENDERER_WIREFRAME
+#include <engine/debug/JoltDebugRenderer.h>
+#endif
+
 // TODO: This probably won't change much since pipelines are really just a lot of boilerplate,
 //  but make sure to go through and add documentation as well as ensuring there aren't any cut corners left in.
 
@@ -34,9 +39,11 @@ static const VkPipelineRasterizationStateCreateInfo RASTERIZER = {
 	.cullMode = VK_CULL_MODE_BACK_BIT,
 	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 #ifdef JPH_DEBUG_RENDERER
+#ifndef JPH_DEBUG_RENDERER_WIREFRAME
 	.depthBiasEnable = VK_TRUE,
 	.depthBiasConstantFactor = 10,
 	.depthBiasSlopeFactor = 10,
+#endif
 #endif
 	.lineWidth = 1,
 };

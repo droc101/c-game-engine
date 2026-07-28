@@ -28,19 +28,19 @@
   "params": {
     "width": {
       "display": "Width",
-      "default": 1.0,
+      "default": 16.0,
       "type": "float",
       "description": "The width of this trigger_map"
     },
     "height": {
       "display": "Height",
-      "default": 1.0,
+      "default": 16.0,
       "type": "float",
       "description": "The height of this trigger_map"
     },
     "depth": {
       "display": "Depth",
-      "default": 1.0,
+      "default": 16.0,
       "type": "float",
       "description": "The depth of this trigger_map"
     },

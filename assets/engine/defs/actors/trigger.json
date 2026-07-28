@@ -39,19 +39,19 @@
   "params": {
     "width": {
       "display": "Width",
-      "default": 1.0,
+      "default": 16.0,
       "type": "float",
       "description": "The width of this trigger"
     },
     "height": {
       "display": "Height",
-      "default": 1.0,
+      "default": 16.0,
       "type": "float",
       "description": "The height of this trigger"
     },
     "depth": {
       "display": "Depth",
-      "default": 1.0,
+      "default": 16.0,
       "type": "float",
       "description": "The depth of this trigger"
     },

@@ -44,7 +44,7 @@ static inline void CreateSpriteCollider(Actor *this, const Transform *transform)
 
 static void SpriteInit(Actor *this, const KvList params, Transform *transform)
 {
-	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
+	const Vector2 size = KvGetVec2(params, "size", v2s(16.0f));
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
 	this->wall->centerOffset = v2s(0);

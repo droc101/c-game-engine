@@ -14,6 +14,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/graphics/vulkan/VulkanResources.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
@@ -40,11 +41,8 @@
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
-#include "engine/graphics/vulkan/VulkanResources.h"
-
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/debug/JoltDebugRenderer.h>
-#include <engine/subsystem/Error.h>
 #endif
 
 static const Map *loadedMap;

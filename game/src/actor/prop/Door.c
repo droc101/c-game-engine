@@ -56,6 +56,7 @@ static inline void DoorSetOpenVector(const Actor *this)
 	JPH_BodyInterface_GetRotation(this->bodyInterface, this->bodyId, &rotation);
 	Vector3 movementVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &movementVector);
+	Vector3_MultiplyScalar(&movementVector, 16, &movementVector);
 	JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &movementVector);
 }
 
@@ -66,7 +67,7 @@ static inline void DoorSetCloseVector(const Actor *this)
 	Vector3 forwardVector = {};
 	JPH_Quat_RotateAxisZ(&rotation, &forwardVector);
 	Vector3 movementVector = {};
-	Vector3_MultiplyScalar(&forwardVector, -1, &movementVector);
+	Vector3_MultiplyScalar(&forwardVector, -16, &movementVector);
 	JPH_BodyInterface_SetLinearVelocity(this->bodyInterface, this->bodyId, &movementVector);
 }
 
@@ -113,7 +114,7 @@ static inline void CreateDoorCollider(Actor *this, const Transform *transform)
 																						   OBJECT_LAYER_STATIC,
 																						   this);
 	const JPH_MassProperties massProperties = {
-		.mass = 1.0f,
+		.mass = 16.0f,
 	};
 	JPH_BodyCreationSettings_SetMassPropertiesOverride(bodyCreationSettings, &massProperties);
 	JPH_BodyCreationSettings_SetOverrideMassProperties(bodyCreationSettings,
@@ -130,7 +131,7 @@ static inline void CreateDoorSensor(Actor *this, const Transform *transform)
 	DoorData *data = this->extraData;
 
 	JPH_Shape *shape = (JPH_Shape *)
-			JPH_BoxShape_Create((Vector3[]){{0.5f, this->wall->height / 2.0f, data->width / 2.0f}},
+			JPH_BoxShape_Create((Vector3[]){{4.0f, this->wall->height / 2.0f, data->width / 2.0f}},
 								JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
@@ -174,7 +175,7 @@ static void DoorUpdate(Actor *this, const double delta)
 	switch (data->state)
 	{
 		case DOOR_OPENING:
-			if (data->animationTime >= data->width)
+			if (data->animationTime >= data->width / 16.0f)
 			{
 				DoorSetState(this, DOOR_OPEN, 0);
 			}
@@ -187,7 +188,7 @@ static void DoorUpdate(Actor *this, const double delta)
 			}
 			break;
 		case DOOR_CLOSING:
-			if (data->animationTime >= data->width)
+			if (data->animationTime >= data->width / 16.0f)
 			{
 				DoorSetState(this, DOOR_CLOSED, 0);
 				data->shouldClose = false;
@@ -217,7 +218,7 @@ static void DoorOpenHandler(Actor *this, const Actor * /*sender*/, const Param *
 			DoorSetState(this, DOOR_OPENING, 0);
 			return;
 		case DOOR_CLOSING:
-			DoorSetState(this, DOOR_OPENING, data->width - data->animationTime);
+			DoorSetState(this, DOOR_OPENING, data->width / 16.0f - data->animationTime);
 		default:
 	}
 }
@@ -231,7 +232,7 @@ static void DoorCloseHandler(Actor *this, const Actor * /*sender*/, const Param 
 			DoorSetState(this, DOOR_CLOSING, 0);
 			return;
 		case DOOR_OPENING:
-			DoorSetState(this, DOOR_CLOSING, data->width - data->animationTime);
+			DoorSetState(this, DOOR_CLOSING, data->width / 16.0f - data->animationTime);
 		default:
 	}
 }
@@ -250,7 +251,7 @@ static void DoorOnPlayerContactAdded(Actor *this, const JPH_BodyID bodyId)
 			DoorSetState(this, DOOR_OPENING, 0);
 			break;
 		case DOOR_CLOSING:
-			DoorSetState(this, DOOR_OPENING, data->width - data->animationTime);
+			DoorSetState(this, DOOR_OPENING, data->width / 16.0f - data->animationTime);
 			break;
 		case DOOR_OPEN:
 		case DOOR_OPENING:
@@ -271,7 +272,7 @@ static void DoorOnPlayerContactPersisted(Actor *this, const JPH_BodyID bodyId)
 	switch (data->state)
 	{
 		case DOOR_OPENING:
-			if (data->animationTime >= data->width)
+			if (data->animationTime >= data->width / 16.0f)
 			{
 				DoorSetState(this, DOOR_OPEN, 0);
 			}
@@ -294,7 +295,7 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 	switch (data->state)
 	{
 		case DOOR_OPEN:
-			if (!data->stayOpen && data->animationTime >= data->width)
+			if (!data->stayOpen && data->animationTime >= data->width / 16.0f)
 			{
 				DoorSetState(this, DOOR_CLOSING, 0);
 			} else
@@ -318,7 +319,7 @@ static void DoorInit(Actor *this, const KvList params, Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 
-	const Vector2 size = KvGetVec2(params, "size", v2s(1.0f));
+	const Vector2 size = KvGetVec2(params, "size", v2s(16.0f));
 
 	this->extraData = calloc(1, sizeof(DoorData));
 	CheckAlloc(this->extraData);

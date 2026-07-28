@@ -34,7 +34,7 @@ typedef struct GoalData
 
 static inline void CreateGoalSensor(Actor *this, const Transform *transform)
 {
-	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{0.5f, 0.5f, 0.5f}}, JPH_DefaultConvexRadius);
+	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{4.0f, 4.0f, 4.0f}}, JPH_DefaultConvexRadius);
 	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																						   transform,
 																						   JPH_MotionType_Static,
@@ -85,14 +85,14 @@ static void GoalInit(Actor *this, const KvList params, Transform *transform)
 
 	this->wall = malloc(sizeof(ActorWall));
 	CheckAlloc(this->wall);
-	this->wall->length = 1;
+	this->wall->length = 16;
 	this->wall->centerOffset = v2s(0);
 	this->wall->orientation = ACTOR_WALL_ORIENTATION_X_AXIS;
 	this->wall->texture = malloc(strlen(TEXTURE("actor/goal0")) + 1);
 	strcpy(this->wall->texture, data->enabled ? TEXTURE("actor/goal0") : TEXTURE("actor/goal1"));
 	this->wall->uvScale = v2s(1.0f);
 	this->wall->uvOffset = v2s(0.0f);
-	this->wall->height = 1.0f;
+	this->wall->height = 16.0f;
 	this->wall->unshaded = false;
 
 	const Transform adjustedTransform = {

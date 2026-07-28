@@ -36,8 +36,8 @@ Map *CreateMap(void)
 	map->mapName = NULL;
 	map->transition = NULL;
 	map->fogColor = COLOR(0xff000000);
-	map->fogStart = 2000;
-	map->fogEnd = 2500;
+	map->fogStart = 32000;
+	map->fogEnd = 40000;
 	map->discordRpcIcon = NULL;
 	map->discordRpcName = NULL;
 	map->renderSky = false;

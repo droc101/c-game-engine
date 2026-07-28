@@ -37,15 +37,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-const float MOVE_SPEED = 6.0f;
-const float SLOW_MOVE_SPEED = 0.6f;
+const float MOVE_SPEED = 96.0f;
+const float SLOW_MOVE_SPEED = 9.6f;
 const float MAX_WALKABLE_SLOPE = 50.0f;
-static const float JUMP_SPEED = 4.25f;
-static const float ACTOR_RAYCAST_MAX_DISTANCE = 10.0f;
-static const float OFFSET = 1.0f;
+static const float JUMP_SPEED = 68.0f;
+static const float ACTOR_RAYCAST_MAX_DISTANCE = 160.0f;
+static const float HELD_ACTOR_OFFSET = 14.0f;
 /// Lower values are smoother
-static const float SMOOTH_FACTOR = 17.5f;
-static const float HELD_ACTOR_MAX_DISTANCE_SQUARED = 6.0f;
+static const float SMOOTH_FACTOR = 32.0f;
+static const float HELD_ACTOR_MAX_DISTANCE_SQUARED = 400.0f;
 
 static Color crosshairColor = CROSSHAIR_COLOR_NORMAL;
 static bool viewmodelStateBeforeFreecam = false;
@@ -173,14 +173,14 @@ void PlayerPersistentStateDestroy()
 void CreatePlayerPhysics(Map *map)
 {
 	assert(map);
-	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(0.2f, 0.25f);
+	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(3.2f, 4.0f);
 	JPH_CharacterVirtualSettings characterSettings = {
 		.base.supportingVolume.normal = Vector3_AxisY,
-		.base.supportingVolume.distance = 0.25f,
+		.base.supportingVolume.distance = 4.0f,
 		.base.maxSlopeAngle = degToRad(MAX_WALKABLE_SLOPE),
 		.base.enhancedInternalEdgeRemoval = true,
 		.base.shape = shape,
-		.mass = 10.0f,
+		.mass = 160.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
 	map->player.joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
@@ -335,7 +335,9 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				} else
 				{
 					Vector3 forward;
-					JPH_Quat_Rotate(&player->transform.rotation, (Vector3[]){{0.0f, 0.0f, -OFFSET}}, &forward);
+					JPH_Quat_Rotate(&player->transform.rotation,
+									(Vector3[]){{0.0f, 0.0f, -HELD_ACTOR_OFFSET}},
+									&forward);
 					Vector3 offsetFromTarget;
 					Vector3_Subtract(&forward, &heldActorPositionOffset, &offsetFromTarget);
 					Vector3 heldActorLinearVelocity;
@@ -379,7 +381,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 				if (!itemTarget)
 				{
 					if (((player->targetedActor->flags & ACTOR_FLAG_CAN_BE_HELD) == ACTOR_FLAG_CAN_BE_HELD) &&
-						(raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
+						(raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 16.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
 						if (IsInputActionJustPressed(physicsThreadInput, &interact))
@@ -389,7 +391,7 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 							crosshairColor = CROSSHAIR_COLOR_INVISIBLE;
 						}
 					} else if (((player->targetedActor->flags & ACTOR_FLAG_INTERACTABLE) == ACTOR_FLAG_INTERACTABLE) &&
-							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 1.0f))
+							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 16.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
 						if (IsInputActionJustPressed(physicsThreadInput, &interact))
@@ -413,10 +415,10 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 	}
 	canDropHeldActor = allowInput;
 	const JPH_ExtendedUpdateSettings extendedUpdateSettings = {
-		.stickToFloorStepDown.y = -0.25f,
-		.walkStairsStepUp.y = 0.25f,
-		.walkStairsMinStepForward = 0.02f,
-		.walkStairsStepForwardTest = 0.15f,
+		.stickToFloorStepDown.y = -4.0f,
+		.walkStairsStepUp.y = 4.0f,
+		.walkStairsMinStepForward = 0.32f,
+		.walkStairsStepForwardTest = 2.4f,
 		.walkStairsCosAngleForwardContact = cosf(degToRad(75)),
 		.walkStairsStepDownExtra = Vector3_Zero,
 	};
@@ -506,7 +508,7 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 	float yPos = transform->position.y;
 	if (!state->map->player.isFreecamActive)
 	{
-		yPos += 0.25f;
+		yPos += 4.0f + state->map->player.viewBobbingHeight * 2.0f;
 	}
 	playerCamera->transform.position.y = yPos;
 	playerCamera->showPlayerModel = state->map->player.isFreecamActive;

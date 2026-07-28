@@ -204,6 +204,7 @@ void UpdateSoundSystem()
 				glm_quat_conjugate(listenerRotation, inverse);
 				vec3 relPosition;
 				glm_quat_rotatev(inverse, delta, relPosition);
+				glm_vec3_scale(relPosition, 0.0625f, relPosition); // account for 16u scale
 
 				channel->position->x = relPosition[0];
 				channel->position->y = relPosition[1];

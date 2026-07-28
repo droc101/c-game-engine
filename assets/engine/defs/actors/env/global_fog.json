@@ -26,14 +26,14 @@
     },
     "fog_start": {
       "display": "Fog Start Depth",
-      "default": 10.0,
+      "default": 160.0,
       "type": "float",
       "minimum": 0.0,
       "description": "How far away from the camera the fog should start (be at 0% opacity)"
     },
     "fog_end": {
       "display": "Fog End Depth",
-      "default": 20.0,
+      "default": 320.0,
       "type": "float",
       "minimum": 0.0,
       "description": "How far away from the camera the fog should end (be at 100% opacity)"
