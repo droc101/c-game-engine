@@ -113,6 +113,9 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		EXPECT_BYTES(sizeof(float) * 2 + sizeof(size_t), bytesRemaining);
 		Seek(reader, sizeof(float)); // skip non-squared lod distance
 		lod->distanceSquared = ReadFloat(reader);
+		Seek(reader, sizeof(float)); // Skip unitsPerLuxel
+		lod->lightmapWidth = ReadUint32(reader);
+		lod->lightmapHeight = ReadUint32(reader);
 		lod->vertexCount = ReadSizeT(reader);
 
 		const size_t vertexDataSize = lod->vertexCount * sizeof(ModelVertex);

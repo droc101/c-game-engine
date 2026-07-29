@@ -71,6 +71,8 @@ struct ModelVertex
 	Color color;
 	/// The normal of the vertex, as a unit vector
 	Vector3 normal;
+	/// The lightmap UV for the vertex
+	Vector2 lightmapUv;
 } __attribute__((packed));
 
 struct ModelLod
@@ -80,6 +82,9 @@ struct ModelLod
 
 	/// How far away the camera must be before this LOD is used (units squared)
 	float distanceSquared;
+
+	uint32_t lightmapWidth;
+	uint32_t lightmapHeight;
 
 	/// The number of vertices in the LOD
 	size_t vertexCount;
