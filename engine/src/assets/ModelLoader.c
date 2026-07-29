@@ -55,10 +55,6 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	ModelDefinition *model = malloc(sizeof(ModelDefinition));
 	CheckAlloc(model);
 
-	model->id = modelId;
-	models[modelId] = model;
-	modelId++;
-
 	const size_t nameLength = strlen(asset) + 1;
 	model->name = malloc(nameLength);
 	CheckAlloc(model->name);
@@ -244,11 +240,13 @@ ModelDefinition *LoadModel(const char *asset)
 		if (errorModel != NULL)
 		{
 			model = errorModel;
-		} else
-		{
-			Error("Failed to load a model and could not find an error model.\n");
+			return model;
 		}
+		Error("Failed to load a model and could not find an error model.\n");
 	}
+	model->id = modelId;
+	models[modelId] = model;
+	modelId++;
 
 	if (modelId >= MAX_MODELS - 10)
 	{
