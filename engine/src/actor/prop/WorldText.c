@@ -85,7 +85,7 @@ ActorDefinition worldTextActorDefinition = {
 	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = WorldTextRenderUi,
 	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
+	.Destroy = WorldTextDestroy,
 	.Init = WorldTextInit,
 };
 
