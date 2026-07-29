@@ -144,3 +144,29 @@ const char *GameStrCaseStr(const char *haystack, const char *needle)
 
 	return NULL;
 }
+char *CanonicalFilePath(const char *path)
+{
+#ifdef WIN32
+	char *buffer = malloc(MAX_PATH);
+	CheckAlloc(buffer);
+	const DWORD result = GetFullPathName(path, MAX_PATH, buffer, NULL);
+	if (result == 0)
+	{
+		free(buffer);
+		return NULL;
+	}
+
+	// windows why do you have to be special
+	for (size_t i = 0; i < result; i++)
+	{
+		if (buffer[i] == '\\')
+		{
+			buffer[i] = '/';
+		}
+	}
+
+	return buffer;
+#else
+	return realpath(path, NULL);
+#endif
+}

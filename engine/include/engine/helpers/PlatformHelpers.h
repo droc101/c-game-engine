@@ -27,4 +27,6 @@ bool IsPathAbsolute(const char *path);
 
 const char *GameStrCaseStr(const char *haystack, const char *needle);
 
+char *CanonicalFilePath(const char *path);
+
 #endif //PLATFORMHELPERS_H

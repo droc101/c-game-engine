@@ -29,8 +29,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <zconf.h>
 #include <zlib.h>
+#include <engine/helpers/PlatformHelpers.h>
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
@@ -43,6 +49,7 @@ static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 		LogError("Asset name must not be empty!\n");
 		return NULL;
 	}
+
 	const size_t maxPathLength = 300;
 	char *path = calloc(maxPathLength, sizeof(char));
 	CheckAlloc(path);
@@ -65,9 +72,37 @@ static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 			continue;
 		}
 
+		if (access(path, F_OK) != 0)
+		{
+			continue;
+		}
+
+		char *cPath = CanonicalFilePath(path);
+		if (cPath)
+		{
+			if (strcmp(path, cPath) != 0)
+			{
+				LogError("Resolved asset path \"%s\" was not absolute, refusing to read!\n", path);
+				LogDebug("cPath=%s", cPath);
+				free(cPath);
+				continue;
+			}
+		} else
+		{
+#ifdef WIN32
+			LogError("CanonicalFilePath failed! LastError=%d", GetLastError());
+#else
+			LogError("CanonicalFilePath failed! errno=%s", strerror(errno));
+#endif
+			continue;
+		}
+		free(cPath);
+
+
 		FILE *file = fopen(path, "rb");
 		if (file == NULL)
 		{
+			LogError("Asset fopen on \"%s\" failed! errno=%s", path, strerror(errno));
 			continue;
 		}
 
@@ -75,7 +110,6 @@ static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 
 		return file;
 	}
-	LogError("Failed to open asset file: %s\n", relPath);
 
 	free(path);
 	return NULL;
