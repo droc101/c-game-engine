@@ -3,7 +3,6 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/KvlFile.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/Commit.h>
@@ -33,6 +32,7 @@
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_cpuinfo.h>
 #include <SDL3/SDL_platform.h>
+#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -174,6 +174,7 @@ static void DebugEntrySystem()
 	DPrintF("Memory: %d MiB", COLOR_WHITE, SDL_GetSystemRAM());
 	const Vector2 viewport = ActualWindowSizeIgnoreDPI();
 	DPrintF("Viewport: %.0fx%.0f @ %.0fx", COLOR_WHITE, viewport.x, viewport.y, GetState()->uiScale);
+	DPrintF("Windowing Platform: %s", COLOR_WHITE, SDL_GetCurrentVideoDriver());
 	DPrintGPUInfo();
 }
 
