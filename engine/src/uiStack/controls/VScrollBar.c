@@ -39,10 +39,10 @@ void UpdateVScrollBar(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uin
 	}
 }
 
-void DrawVScrollBar(const Control *c, const ControlState state, const Vector2 position)
+void AlwaysUpdateVScrollBar(UiStack * /*stack*/, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	VScrollBarData *data = (VScrollBarData *)c->controlData;
-
+	c->allowFocus = !UseController(mainThreadInput) && data->contentHeight > c->size.y;
 	if (data->contentHeight > c->size.y)
 	{
 		data->scrollPos = clamp(data->scrollPos, -(data->contentHeight - c->size.y + 2), 0);
@@ -50,6 +50,11 @@ void DrawVScrollBar(const Control *c, const ControlState state, const Vector2 po
 	{
 		data->scrollPos = 0;
 	}
+}
+
+void DrawVScrollBar(const Control *c, const ControlState state, const Vector2 position)
+{
+	VScrollBarData *data = (VScrollBarData *)c->controlData;
 
 	if ((float)data->contentHeight > c->size.y)
 	{

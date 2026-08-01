@@ -22,6 +22,8 @@ void DestroyVScrollBar(const Control *c);
 
 void UpdateVScrollBar(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
+void AlwaysUpdateVScrollBar(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t ctlIndex);
+
 void DrawVScrollBar(const Control *c, ControlState state, Vector2 position);
 
 #endif //GAME_VSCROLLBAR_H

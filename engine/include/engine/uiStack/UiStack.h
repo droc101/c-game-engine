@@ -176,6 +176,8 @@ void UiStackResetFocus(UiStack *stack);
  */
 void SetFocusedControl(UiStack *stack, uint32_t index);
 
+void ChangeFocusedControl(UiStack *stack, int32_t by);
+
 void RenderTooltipAtMouse(const char *text);
 
 void RenderTooltipAt(const char *text, Vector2 origin);

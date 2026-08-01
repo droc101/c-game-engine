@@ -62,6 +62,7 @@ static void BtnDebugOptionsReset(Control *, void *)
 	{
 		DebugEntry *entry = ListGetPointer(debugEntries, i);
 		entry->mode = entry->defaultMode;
+		SetGameState(&DebugOptionsState);
 	}
 }
 

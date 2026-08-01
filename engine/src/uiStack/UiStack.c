@@ -6,11 +6,22 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
+#include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/controls/CheckBox.h>
+#include <engine/uiStack/controls/HeaderFooterControl.h>
+#include <engine/uiStack/controls/IconButton.h>
+#include <engine/uiStack/controls/LabelControl.h>
+#include <engine/uiStack/controls/OptionsButton.h>
+#include <engine/uiStack/controls/RadioButton.h>
+#include <engine/uiStack/controls/Slider.h>
+#include <engine/uiStack/controls/TextBox.h>
+#include <engine/uiStack/controls/VScrollBar.h>
 #include <engine/uiStack/UiStack.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
@@ -20,17 +31,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/CheckBox.h>
-#include <engine/uiStack/controls/HeaderFooterControl.h>
-#include <engine/uiStack/controls/LabelControl.h>
-#include <engine/uiStack/controls/OptionsButton.h>
-#include <engine/uiStack/controls/RadioButton.h>
-#include <engine/uiStack/controls/Slider.h>
-#include <engine/uiStack/controls/TextBox.h>
-#include <engine/uiStack/controls/VScrollBar.h>
-#include <engine/uiStack/controls/IconButton.h>
 
 typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
 typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
@@ -92,7 +92,7 @@ static const ControlUpdateFunc CONTROL_ALWAYS_UPDATE_FUNCTIONS[CONTROL_TYPE_COUN
 	NULL,
 	NULL,
 	NULL,
-	NULL,
+	AlwaysUpdateVScrollBar,
 	AlwaysUpdateHeaderFooterControl,
 	NULL,
 	NULL,
@@ -167,7 +167,11 @@ bool ProcessUiStack(UiStack *stack)
 	if (stack->focusedControl != -1u)
 	{
 		Control *c = ListGetPointer(stack->controls, stack->focusedControl);
-		if (CONTROL_UPDATE_FUNCTIONS[c->type])
+
+		if (!c->allowFocus)
+		{
+			stack->focusedControl = -1u;
+		} else if (CONTROL_UPDATE_FUNCTIONS[c->type])
 		{
 			CONTROL_UPDATE_FUNCTIONS[c->type](stack,
 											  c,
@@ -258,24 +262,12 @@ bool ProcessUiStack(UiStack *stack)
 	if ((IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_TAB) && !IsKeyPressed(mainThreadInput, SDL_SCANCODE_LSHIFT)) ||
 		IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_DOWN))
 	{
-		if (stack->focusedControl == -1u)
-		{
-			SetFocusedControl(stack, 0);
-		} else
-		{
-			SetFocusedControl(stack, (stack->focusedControl + 1) % stack->controls.length);
-		}
+		ChangeFocusedControl(stack, 1);
 	} else if ((IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_TAB) &&
 				IsKeyPressed(mainThreadInput, SDL_SCANCODE_LSHIFT)) ||
 			   IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_DPAD_UP))
 	{
-		if (stack->focusedControl == -1u || stack->focusedControl == 0)
-		{
-			SetFocusedControl(stack, stack->controls.length - 1);
-		} else
-		{
-			SetFocusedControl(stack, (stack->focusedControl - 1) % stack->controls.length);
-		}
+		ChangeFocusedControl(stack, -1);
 	}
 
 
@@ -311,6 +303,23 @@ void SetFocusedControl(UiStack *stack, const uint32_t index)
 		if (CONTROL_FOCUS_FUNCTIONS[c->type] != NULL)
 		{
 			CONTROL_FOCUS_FUNCTIONS[c->type](c);
+		}
+	}
+}
+
+void ChangeFocusedControl(UiStack *stack, const int32_t by)
+{
+	const int64_t focusedCtrl = stack->focusedControl;
+	// for loop here to prevent going forever if there is no focusable control
+	for (size_t i = 1; i <= stack->controls.length; i++)
+	{
+		int64_t controlIndex = focusedCtrl + (i * by);
+		controlIndex = wrap(controlIndex, 0, stack->controls.length);
+		const Control *control = ListGetPointer(stack->controls, controlIndex);
+		if (control->allowFocus)
+		{
+			SetFocusedControl(stack, controlIndex);
+			return;
 		}
 	}
 }
@@ -461,7 +470,11 @@ bool HasActivation(UiStack *stack, Control *Control)
 
 void UiStackResetFocus(UiStack *stack)
 {
-	SetFocusedControl(stack, UseController(mainThreadInput) ? 0 : -1);
+	SetFocusedControl(stack, -1);
+	if (UseController(mainThreadInput))
+	{
+		ChangeFocusedControl(stack, 1);
+	}
 }
 
 void RenderTooltipAtMouse(const char *text)

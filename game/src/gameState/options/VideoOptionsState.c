@@ -46,7 +46,7 @@ static void BtnVideoOptionsBack(Control *, void *)
 
 static char *SliderLabelMSAA(const Control *slider)
 {
-	char *labels[] = {"Off", "2X", "4X", "8X"};
+	char *labels[] = {"Off", "2x MSAA", "4x MSAA", "8x MSAA"};
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
@@ -56,7 +56,7 @@ static char *SliderLabelMSAA(const Control *slider)
 
 static char *SliderLabelAnisotropy(const Control *slider)
 {
-	char *labels[] = {"Off", "2X", "4X", "8X", "16X"};
+	char *labels[] = {"Off", "2x", "4x", "8x", "16x"};
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
@@ -224,7 +224,7 @@ static void VideoOptionsStateSet()
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateCheckboxControl(v2(-185, opY),
 												 v2(370, 40),
-												 "Limit BG FPS",
+												 "Limit Background FPS",
 												 CbOptionsLimitFpsWhenUnfocused,
 												 TOP_CENTER,
 												 GetState()->options.limitFpsWhenUnfocused,
@@ -242,7 +242,7 @@ static void VideoOptionsStateSet()
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
-											   "MSAA",
+											   "Anti-Aliasing",
 											   SldOptionsMsaa,
 											   TOP_CENTER,
 											   0.0,
