@@ -29,6 +29,7 @@ static void DefaultOptions(Options *options)
 	options->controllerDeadzone = 0.1f;
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = true;
+	options->shadowMapQuality = SHADOW_MAP_RESOLUTION_256;
 	options->fov = 90.0f;
 	options->anisotropy = ANISOTROPY_16X;
 	options->maxFps = 0;
@@ -138,6 +139,7 @@ void LoadOptions(Options *options)
 		options->preferWayland = KvGetBool(list, "prefer_wayland", true);
 		options->limitFpsWhenUnfocused = KvGetBool(list, "limit_fps_when_unfocused", true);
 		options->lodMultiplier = KvGetFloat(list, "lod_multiplier", 1.0f);
+		options->shadowMapQuality = KvGetByte(list, "shadow_map_quality", SHADOW_MAP_RESOLUTION_256);
 		options->fov = KvGetFloat(list, "fov", 90.0f);
 		options->anisotropy = KvGetByte(list, "anisotropy", ANISOTROPY_16X);
 		options->maxFps = KvGetInt(list, "max_fps", 0);
@@ -190,6 +192,7 @@ void SaveOptions(Options *options)
 	KvSetBool(list, "prefer_wayland", options->preferWayland);
 	KvSetBool(list, "limit_fps_when_unfocused", options->limitFpsWhenUnfocused);
 	KvSetFloat(list, "lod_multiplier", options->lodMultiplier);
+	KvSetByte(list, "shadow_map_quality", options->shadowMapQuality);
 	KvSetFloat(list, "fov", options->fov);
 	KvSetByte(list, "anisotropy", options->anisotropy);
 	KvSetInt(list, "max_fps", options->maxFps);

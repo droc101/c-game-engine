@@ -356,6 +356,19 @@ static inline VkResult CreateActorWallBuffers()
 	return VK_SUCCESS;
 }
 
+static inline VkResult CreateLightsBuffer()
+{
+	const LunaBufferCreationInfo creationInfo = {
+		.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment,
+		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &creationInfo, &buffers.uniforms.lights), "Failed to create lights buffer!");
+
+	return VK_SUCCESS;
+}
+
 // TODO: Only skin 0 of LOD 0 is ever loaded and used currently
 static inline VkResult CreatePlayerBuffers()
 {
@@ -540,6 +553,7 @@ bool CreateBuffers()
 	VulkanTest(CreateViewmodelBuffers(), "Failed to create viewmodel buffers!");
 	VulkanTest(CreateActorModelBuffers(), "Failed to create actor models buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create actor wall buffers!");
+	VulkanTest(CreateLightsBuffer(), "Failed to create lights buffer!");
 	VulkanTest(CreatePlayerBuffers(), "Failed to create player buffers!");
 	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
 

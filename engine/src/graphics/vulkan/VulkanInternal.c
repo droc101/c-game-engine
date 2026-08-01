@@ -86,6 +86,7 @@ bool CreateLogicalDevice()
 		.runtimeDescriptorArray = VK_TRUE,
 		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
 		.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
+		.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE,
 	};
 	const VkPhysicalDeviceFeatures2 requiredFeatures = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
@@ -148,8 +149,8 @@ bool CreateSwapchain()
 		return true;
 	}
 
-	swapChainExtent = capabilities.currentExtent;
-	if (swapChainExtent.width == UINT32_MAX || swapChainExtent.height == UINT32_MAX)
+	swapchainExtent = capabilities.currentExtent;
+	if (swapchainExtent.width == UINT32_MAX || swapchainExtent.height == UINT32_MAX)
 	{
 		int32_t width = 0;
 		int32_t height = 0;
@@ -158,10 +159,10 @@ bool CreateSwapchain()
 			LogError("Failed to get window size with error: %s", SDL_GetError());
 			return false;
 		}
-		swapChainExtent.width = clamp((uint32_t)width,
+		swapchainExtent.width = clamp((uint32_t)width,
 									  capabilities.minImageExtent.width,
 									  capabilities.maxImageExtent.width);
-		swapChainExtent.height = clamp((uint32_t)height,
+		swapchainExtent.height = clamp((uint32_t)height,
 									   capabilities.minImageExtent.height,
 									   capabilities.maxImageExtent.height);
 	}
@@ -180,8 +181,8 @@ bool CreateSwapchain()
 
 	const LunaSwapchainCreationInfo swapChainCreationInfo = {
 		.surface = surface,
-		.width = swapChainExtent.width,
-		.height = swapChainExtent.height,
+		.width = swapchainExtent.width,
+		.height = swapchainExtent.height,
 		.formatCount = 2,
 		.formatPriorityList = (VkSurfaceFormatKHR[]){{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
 													 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}},
@@ -273,7 +274,7 @@ bool CreateRenderPass()
 		.subpasses = &subpassCreationInfo,
 		.dependencyCount = 1,
 		.dependencies = &dependency,
-		.extent = (VkExtent3D){.width = swapChainExtent.width, .height = swapChainExtent.height, .depth = 1},
+		.extent = (VkExtent3D){.width = swapchainExtent.width, .height = swapchainExtent.height, .depth = 1},
 		.maxExtent = (VkExtent3D){.width = bounds.w, .height = bounds.h, .depth = 1},
 
 		.queueFamilyIndexCount = 1,
@@ -315,6 +316,19 @@ bool CreateDescriptorSetLayouts()
 		{
 			.bindingName = "Fog",
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		},
+		{
+			.bindingName = "Lights",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+			.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+		},
+		{
+			.bindingName = "Shadow Map Atlas",
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
@@ -455,11 +469,15 @@ bool CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES + 1,
+			.descriptorCount = MAX_TEXTURES + 2,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 3,
+		},
+		{
+			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {

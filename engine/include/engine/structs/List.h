@@ -149,11 +149,8 @@ void _LockingListAndContentsFree(LockingList *list);
 * @param index The index to get
 */
 #define ListGetPointer(list, index) \
-	(_Generic((list), \
-			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), \
-					(list).data->pointerData), \
-			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), \
-						   (list).data->pointerData))[index])
+	(_Generic((list), List: (list).data->pointerData, LockingList: (list).data->pointerData) \
+			 [((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), index)])
 
 /**
 * Get an item of type @c uint64_t from the list by index

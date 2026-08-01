@@ -6,6 +6,7 @@
 #define GAME_LIGHT_H
 
 #include <cglm/vec3.h>
+#include <stdint.h>
 
 typedef enum LightType LightType;
 
@@ -24,6 +25,7 @@ struct Light
 	LightType type;
 	/// The world space transform of the light
 	Transform transform;
+	Vector3 negativeForwardDirection;
 	/// The color of the light
 	vec3 color;
 	/// The brightness scale of the light
@@ -34,6 +36,10 @@ struct Light
 	float attenuationMultiplier;
 	float brightAngle;
 	float fadingAngle;
+	uint32_t layer;
+	uint32_t index;
+	float _padding;
+	mat4 transformMatrix;
 };
 
 #endif //GAME_LIGHT_H

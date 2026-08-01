@@ -2191,7 +2191,7 @@
                 "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
-                "material": "material/white_light.gmtl",
+                "material": "material/dev/ceiling_test.gmtl",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -5060,7 +5060,7 @@
             "position": {
                 "x": -216.0,
                 "y": 0.0,
-                "z": -132.0
+                "z": -120.0
             },
             "rotation": {
                 "x": 240.0,
@@ -5080,7 +5080,113 @@
                 },
                 "brightness": {
                     "type": "float",
+                    "value": 0.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 448.0,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 270.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 30.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
                     "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 324.0,
+                "y": 0.0,
+                "z": -44.0
+            },
+            "rotation": {
+                "x": 235.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
                 }
             }
         }

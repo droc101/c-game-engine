@@ -47,7 +47,7 @@ Map *CreateMap(void)
 	map->changeFlags = 0;
 	map->exposure = 1.0f;
 	map->lightCount = 0;
-	map->pointLights = NULL;
+	map->lights = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
@@ -110,7 +110,7 @@ void DestroyMap(Map *map)
 
 	free(map->lightmapPixels);
 
-	free(map->pointLights);
+	free(map->lights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 

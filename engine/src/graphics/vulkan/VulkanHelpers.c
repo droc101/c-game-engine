@@ -14,13 +14,18 @@
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
+#include <luna/lunaDevice.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
@@ -28,6 +33,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <volk.h>
 #include <vulkan/vulkan_core.h>
 
 #pragma region variables
@@ -41,7 +47,7 @@ LunaCommandBuffer commandBuffer = LUNA_NULL_HANDLE;
 LunaCommandBuffer secondaryCommandBuffer = LUNA_NULL_HANDLE;
 LunaSemaphore semaphore = LUNA_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
-VkExtent2D swapChainExtent = {0};
+VkExtent2D swapchainExtent = {0};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 LunaRenderPass renderPass = LUNA_NULL_HANDLE;
 uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
@@ -66,6 +72,11 @@ Pipelines pipelines = {
 };
 uint32_t pendingTasks = 0;
 uint32_t skyTextureIndex = 0;
+uint32_t lightIndex = 0;
+LunaImage shadowMapAtlas = LUNA_NULL_HANDLE;
+VkRenderPass shadowMapRenderPass = VK_NULL_HANDLE;
+List shadowMapFramebuffers = {0};
+List shadowMapImageViews = {0};
 
 static mat4 cameraViewMatrix;
 #pragma endregion variables
@@ -128,12 +139,204 @@ inline uint32_t ImageIndex(const Image *image)
 	return index;
 }
 
+inline uint32_t ShadowMapResolution()
+{
+	switch (GetState()->options.shadowMapQuality)
+	{
+		case SHADOW_MAP_RESOLUTION_128:
+			return 128;
+		case SHADOW_MAP_RESOLUTION_256:
+			return 256;
+		case SHADOW_MAP_RESOLUTION_512:
+			return 512;
+		case SHADOW_MAP_RESOLUTION_1024:
+			return 1024;
+		case SHADOW_MAP_RESOLUTION_2048:
+			return 2048;
+		case SHADOW_MAP_RESOLUTION_4096:
+			return 4096;
+		default:
+			return 0;
+	}
+}
+
+VkResult CreateShadowMapRenderPass(const Map *map)
+{
+	const VkDevice vkDevice = lunaGetVkDevice(device);
+	if (shadowMapRenderPass != VK_NULL_HANDLE)
+	{
+		assert(shadowMapFramebuffers.length == shadowMapImageViews.length);
+		for (uint32_t i = 0; i < shadowMapFramebuffers.length; i++)
+		{
+			vkDestroyFramebuffer(vkDevice, ListGetPointer(shadowMapFramebuffers, i), NULL);
+			vkDestroyImageView(vkDevice, ListGetPointer(shadowMapImageViews, i), NULL);
+		}
+		ListFree(shadowMapFramebuffers);
+		ListFree(shadowMapImageViews);
+		lunaDestroyImage(device, shadowMapAtlas);
+		vkDestroyRenderPass(vkDevice, shadowMapRenderPass, NULL);
+		shadowMapRenderPass = VK_NULL_HANDLE;
+	}
+	if (map == NULL)
+	{
+		return VK_SUCCESS;
+	}
+
+	uint32_t shadowMapRegionCount = 0;
+	for (uint32_t i = 0; i < map->lightCount; i++)
+	{
+		Light *light = &map->lights[i];
+		switch (light->type)
+		{
+			case LIGHT_TYPE_SPOT:
+				shadowMapRegionCount += 1;
+				break;
+			case LIGHT_TYPE_POINT:
+				shadowMapRegionCount += 6;
+				break;
+			default:
+		}
+	}
+
+	if (shadowMapRegionCount == 0)
+	{
+		return VK_SUCCESS;
+	}
+
+	const uint32_t size = 4 * ShadowMapResolution();
+	const uint32_t layers = (shadowMapRegionCount - 1) / 16 + 1;
+
+	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT;
+	const LunaCommandBufferSubmitInfo submitInfo = {
+		.queue = queue,
+		.waitSemaphoreCount = 1,
+		.waitSemaphores = &semaphore,
+		.waitDstStageMasks = &waitStage,
+		.signalSemaphoreCount = 1,
+		.signalSemaphores = &semaphore,
+	};
+	const LunaImageWriteInfo writeInfo = {
+		.destinationStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
+								VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
+		.destinationAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		.submitInfo = &submitInfo,
+	};
+	const LunaImageCreationInfo shadowMapCreationInfo = {
+		.format = VK_FORMAT_D32_SFLOAT,
+		.width = size,
+		.height = size,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+		.layout = VK_IMAGE_LAYOUT_GENERAL,
+		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+		.writeInfo = writeInfo,
+	};
+	VulkanTestReturnResult(lunaCreateImageArray(device, commandBuffer, &shadowMapCreationInfo, layers, &shadowMapAtlas),
+						   "Failed to create shadow map image!");
+	const VkAttachmentDescription attachmentDescription = {
+		.format = VK_FORMAT_D32_SFLOAT,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+		.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
+		.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
+	};
+	const VkAttachmentReference attachmentReference = {
+		.layout = VK_IMAGE_LAYOUT_GENERAL,
+	};
+	const VkSubpassDescription subpassDescription = {
+		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+		.pDepthStencilAttachment = &attachmentReference,
+	};
+	const VkSubpassDependency dependency = {
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	};
+	const VkRenderPassCreateInfo renderPassCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+		.attachmentCount = 1,
+		.pAttachments = &attachmentDescription,
+		.subpassCount = 1,
+		.pSubpasses = &subpassDescription,
+		.dependencyCount = 1,
+		.pDependencies = &dependency,
+	};
+	VulkanTestReturnResult(vkCreateRenderPass(vkDevice, &renderPassCreateInfo, NULL, &shadowMapRenderPass),
+						   "Failed to create shadow map render pass!");
+
+
+	ListInit(shadowMapImageViews, LIST_POINTER);
+	ListInit(shadowMapFramebuffers, LIST_POINTER);
+	for (uint32_t i = 0; i < layers; i++)
+	{
+		ListAdd(shadowMapImageViews, VK_NULL_HANDLE);
+		const VkImageViewCreateInfo imageViewCreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.image = lunaGetVkImage(shadowMapAtlas),
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = VK_FORMAT_D32_SFLOAT,
+			.components.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.components.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.components.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.components.a = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+			.subresourceRange.levelCount = 1,
+			.subresourceRange.baseArrayLayer = i,
+			.subresourceRange.layerCount = 1,
+		};
+		VkImageView *imageView = (VkImageView *)&ListGetPointer(shadowMapImageViews, shadowMapImageViews.length - 1);
+		VulkanTestReturnResult(vkCreateImageView(vkDevice, &imageViewCreateInfo, NULL, imageView),
+							   "Failed to create image view for layer %u of shadow maps!",
+							   i);
+
+		ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
+		const VkFramebufferCreateInfo framebufferCreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+			.renderPass = shadowMapRenderPass,
+			.attachmentCount = 1,
+			.pAttachments = imageView,
+			.width = size,
+			.height = size,
+			.layers = 1,
+		};
+		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice,
+												   &framebufferCreateInfo,
+												   NULL,
+												   (VkFramebuffer *)&ListGetPointer(shadowMapFramebuffers,
+																					shadowMapFramebuffers.length - 1)),
+							   "Failed to create shadow map frame buffer %u!",
+							   i);
+	}
+
+	const LunaDescriptorImageInfo shadowMapAtlasImageInfo = {
+		.sampler = textureSamplers.nearestNoRepeatNoAnisotropy,
+		.image = shadowMapAtlas,
+		.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+	};
+	const LunaWriteDescriptorSet shadowMapAtlasDescriptorWrite = {
+		.descriptorSet = descriptorSet,
+		.bindingName = "Shadow Map Atlas",
+		.descriptorCount = 1,
+		.imageInfo = &shadowMapAtlasImageInfo,
+	};
+	lunaWriteDescriptorSets(device, 1, &shadowMapAtlasDescriptorWrite);
+
+	return VK_SUCCESS;
+}
+
 // TODO: Make sure this doesn't need changes
 VkResult UpdateCameraUniform(const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(camera->fov),
-						  (float)swapChainExtent.width / (float)swapChainExtent.height,
+						  (float)swapchainExtent.width / (float)swapchainExtent.height,
 						  NEAR_Z,
 						  FAR_Z,
 						  perspectiveMatrix);

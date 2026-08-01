@@ -44,6 +44,16 @@ static void BtnVideoOptionsBack(Control *, void *)
 	SetGameState(&OptionsState);
 }
 
+static char *SliderLabelShadowMapQuality(const Control *slider)
+{
+	char *labels[] = {"Disabled", "128px", "256px", "512px", "1024px", "2048px", "4096px"};
+	const SliderData *data = (SliderData *)slider->controlData;
+	char *buf = malloc(64);
+	CheckAlloc(buf);
+	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
+	return buf;
+}
+
 static char *SliderLabelMSAA(const Control *slider)
 {
 	char *labels[] = {"Off", "2x MSAA", "4x MSAA", "8x MSAA"};
@@ -110,6 +120,12 @@ static void CbOptionsMipmaps(const bool value)
 {
 	GetState()->options.mipmaps = value;
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
+}
+
+static void SldOptionsShadowMapQuality(const float value)
+{
+	GetState()->options.shadowMapQuality = value;
+	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 }
 
 static void CbOptionsPreferWayland(const bool value)
@@ -239,6 +255,20 @@ static void VideoOptionsStateSet()
 												 "Improves the appearance of far away textures"));
 		opY += opSpacing * 1.5f;
 
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateSliderControl(v2(0, opY),
+											   v2(750, 40),
+											   "Shadow Resolution",
+											   SldOptionsShadowMapQuality,
+											   TOP_CENTER,
+											   0.0,
+											   6.0,
+											   GetState()->options.shadowMapQuality,
+											   1,
+											   1,
+											   SliderLabelShadowMapQuality,
+											   "The resolution to use for shadow maps"));
+		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),

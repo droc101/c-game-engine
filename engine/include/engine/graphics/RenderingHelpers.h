@@ -49,6 +49,7 @@ enum RendererQueuedAction
 	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
 	QUEUED_ACTION_TOGGLE_VSYNC = 1 << 4,
+	QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION = 1 << 5,
 };
 
 extern RendererQueuedAction rendererQueuedActions;

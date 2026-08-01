@@ -126,10 +126,10 @@ struct Map
 	/// The lightmap data in RGBA16F format
 	void *lightmapPixels;
 
-	/// The number of point lights in the level
-	uint16_t lightCount;
-	/// The point lights in this level
-	Light *pointLights;
+	/// The number of lights in the level
+	uint32_t lightCount;
+	/// The lights in this level
+	Light *lights;
 
 	MapTransition *transition;
 };

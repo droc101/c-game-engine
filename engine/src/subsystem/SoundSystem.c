@@ -5,8 +5,10 @@
 #include <cglm/quat.h>
 #include <cglm/vec3.h>
 #include <engine/assets/AssetReader.h>
+#include <engine/debug/DPrint.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -24,8 +26,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "engine/debug/DPrint.h"
-#include "engine/structs/Color.h"
 
 struct SoundChannel
 {

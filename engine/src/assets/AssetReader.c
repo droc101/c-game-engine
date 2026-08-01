@@ -13,6 +13,7 @@
 #include <engine/debug/DPrint.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
@@ -32,7 +33,6 @@
 #include <unistd.h>
 #include <zconf.h>
 #include <zlib.h>
-#include <engine/helpers/PlatformHelpers.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -44,7 +44,7 @@ static AssetCache assetCache;
 
 static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	if (strlen(relPath) == 0)
+	if (relPath && *relPath == '\0')
 	{
 		LogError("Asset name must not be empty!\n");
 		return NULL;

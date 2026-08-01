@@ -240,9 +240,23 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 			while (lodId >= reallocInfo->lodInstanceCounts->length)
 			{
 				ListAdd(*reallocInfo->lodInstanceCounts, 0);
-				reallocInfo->modelDrawCount += actor->model->materialSlotCount;
 			}
-			ListSet(*reallocInfo->lodInstanceCounts, lodId, ListGetUint32(*reallocInfo->lodInstanceCounts, lodId) + 1);
+			const uint32_t currentInstanceCount = ListGetUint32(*reallocInfo->lodInstanceCounts, lodId);
+			if (currentInstanceCount == 0)
+			{
+				reallocInfo->modelDrawCount += actor->model->materialSlotCount;
+				if (lodId < lodMaterialSlotsData.length)
+				{
+					const LodMaterialSlotsData *materialSlotDatas = ListGetPointer(lodMaterialSlotsData, lodId);
+					for (uint32_t j = 0; j < materialSlotDatas->materialSlots.length; j++)
+					{
+						const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotDatas->materialSlots, j);
+						materialSlotData->shadedDrawInfo->instanceCount = 0;
+						materialSlotData->unshadedDrawInfo->instanceCount = 0;
+					}
+				}
+			}
+			ListSet(*reallocInfo->lodInstanceCounts, lodId, currentInstanceCount + 1);
 		} else if (actor->wall)
 		{
 			if (actor->wall->unshaded)
@@ -333,7 +347,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 					MaterialSlotData *materialSlotData = malloc(sizeof(MaterialSlotData));
 					materialSlotData->shadedDrawInfo = shadedModelsDrawInfo + drawInfoOffset;
 					materialSlotData->shadedDrawInfo->indexCount = materialSlotVertexData->indexCount;
-					materialSlotData->shadedDrawInfo->instanceCount = materialSlotsData->instanceCount;
+					materialSlotData->shadedDrawInfo->instanceCount = 0;
 					materialSlotData->shadedDrawInfo->firstIndex = materialSlotVertexData->firstIndex;
 					materialSlotData->shadedDrawInfo->vertexOffset = materialSlotVertexData->vertexOffset;
 					materialSlotData->shadedDrawInfo->firstInstance = instanceDataOffset;
@@ -343,6 +357,14 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 					ListAdd(materialSlotsData->materialSlots, materialSlotData);
 					drawInfoOffset++;
 					instanceDataOffset += materialSlotsData->instanceCount;
+				}
+			} else
+			{
+				for (uint32_t j = 0; j < actor->model->materialSlotCount; j++)
+				{
+					const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
+					materialSlotData->shadedDrawInfo->instanceCount = 0;
+					materialSlotData->unshadedDrawInfo->instanceCount = 0;
 				}
 			}
 		}
@@ -365,27 +387,6 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 												&buffers.actorModels.unshadedDrawInfo,
 												drawInfoBytes),
 							   "Failed to resize actor models unshaded draw info buffer!");
-
-		const LunaBufferWriteInfo shadedWriteInfo = {
-			.bytes = drawInfoBytes,
-			.data = shadedModelsDrawInfo,
-			.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
-		};
-		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-													 commandBuffer,
-													 buffers.actorModels.shadedDrawInfo,
-													 &shadedWriteInfo),
-							   "Failed to write actor models shaded draw info to buffer!");
-		const LunaBufferWriteInfo unshadedWriteInfo = {
-			.bytes = drawInfoBytes,
-			.data = unshadedModelsDrawInfo,
-			.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
-		};
-		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-													 commandBuffer,
-													 buffers.actorModels.unshadedDrawInfo,
-													 &unshadedWriteInfo),
-							   "Failed to write actor models unshaded draw info to buffer!");
 	}
 
 	if (reallocInfo->shouldReallocShadedWalls)
@@ -424,8 +425,8 @@ static inline void UpdateActorModelInstanceData(const Actor *actor, List *lodIns
 	assert(lodInstanceCounts->length == lodMaterialSlotsData.length &&
 		   ListGetUint32(*lodInstanceCounts, lodId) <= materialSlotsData->instanceCount);
 	assert(actor->model->materialSlotCount == materialSlotsData->materialSlots.length);
-	const uint32_t instanceIndex = ListGetUint32(*lodInstanceCounts, lodId) - 1;
-	ListSet(*lodInstanceCounts, lodId, instanceIndex);
+	const uint32_t remainingInstances = ListGetUint32(*lodInstanceCounts, lodId) - 1;
+	ListSet(*lodInstanceCounts, lodId, remainingInstances);
 	mat4 transformMatrix;
 	ActorTransformMatrix(actor, &transformMatrix);
 	for (uint32_t j = 0; j < materialSlotsData->materialSlots.length; j++)
@@ -433,7 +434,24 @@ static inline void UpdateActorModelInstanceData(const Actor *actor, List *lodIns
 		const uint32_t materialIndex = actor->model->skinMaterialIndices[actor->currentSkinIndex][j];
 		const Material *material = &actor->model->materials[materialIndex];
 		const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
-		ActorModelInstanceData *instanceData = &materialSlotData->instanceData[instanceIndex];
+
+		ActorModelInstanceData *instanceData = NULL;
+		switch (material->shader)
+		{
+			case SHADER_SHADED:
+				instanceData = &materialSlotData->instanceData[materialSlotData->shadedDrawInfo->instanceCount];
+				materialSlotData->shadedDrawInfo->instanceCount++;
+				break;
+			case SHADER_UNSHADED:
+				instanceData = &materialSlotData->instanceData[materialSlotsData->instanceCount -
+															   materialSlotData->unshadedDrawInfo->instanceCount -
+															   1];
+				materialSlotData->unshadedDrawInfo->instanceCount++;
+				break;
+			default:
+				assert(material->shader != SHADER_SKY);
+				continue;
+		}
 		memcpy(instanceData->transformMatrix, transformMatrix, sizeof(transformMatrix));
 		memcpy(instanceData->modColor, &actor->modColor, sizeof(Color));
 		memcpy(instanceData->materialColor, &material->color, sizeof(Color));
@@ -496,7 +514,7 @@ static inline VkResult WriteWallsInstanceData()
 
 static inline VkResult UpdateInstanceData(const LockingList *actors,
 										  List *lodInstanceCounts,
-										  const uint32_t modelInstanceCount)
+										  const InstanceDataReallocInfo *reallocInfo)
 {
 	size_t shadedWallsInstanceIndex = 0;
 	size_t unshadedWallsInstanceIndex = 0;
@@ -523,8 +541,9 @@ static inline VkResult UpdateInstanceData(const LockingList *actors,
 			}
 		}
 	}
+
 	const LunaBufferWriteInfo modelsInstanceDataWriteInfo = {
-		.bytes = modelInstanceCount * sizeof(ActorModelInstanceData),
+		.bytes = reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData),
 		.data = modelsInstanceData,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
@@ -533,6 +552,27 @@ static inline VkResult UpdateInstanceData(const LockingList *actors,
 												 buffers.actorModels.instanceData,
 												 &modelsInstanceDataWriteInfo),
 						   "Failed to write actor models instance data to buffer!");
+	const uint32_t drawInfoBytes = reallocInfo->modelDrawCount * sizeof(VkDrawIndexedIndirectCommand);
+	const LunaBufferWriteInfo shadedWriteInfo = {
+		.bytes = drawInfoBytes,
+		.data = shadedModelsDrawInfo,
+		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.shadedDrawInfo,
+												 &shadedWriteInfo),
+						   "Failed to write actor models shaded draw info to buffer!");
+	const LunaBufferWriteInfo unshadedWriteInfo = {
+		.bytes = drawInfoBytes,
+		.data = unshadedModelsDrawInfo,
+		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.unshadedDrawInfo,
+												 &unshadedWriteInfo),
+						   "Failed to write actor models unshaded draw info to buffer!");
 
 	VulkanTestReturnResult(WriteWallsInstanceData(), "Failed to write actor walls instance data!");
 
@@ -552,7 +592,7 @@ VkResult UpdateActors()
 		VulkanTestReturnResult(ReallocateInstanceData(actors, &reallocInfo),
 							   "Failed to reallocate actor instance data!");
 	}
-	VulkanTestReturnResult(UpdateInstanceData(actors, &lodInstanceCounts, reallocInfo.modelInstanceCount),
+	VulkanTestReturnResult(UpdateInstanceData(actors, &lodInstanceCounts, &reallocInfo),
 						   "Failed to update actor models instance data!");
 	ListUnlock(*actors);
 

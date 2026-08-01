@@ -12,6 +12,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Logging.h>
@@ -54,10 +55,10 @@
 			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR || resizeCheckResult == VK_SUBOPTIMAL_KHR) \
 			{ \
 				const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
-				swapChainExtent.width = windowSize.x; \
-				swapChainExtent.height = windowSize.y; \
+				swapchainExtent.width = windowSize.x; \
+				swapchainExtent.height = windowSize.y; \
 				const LunaSwapchainResizeInfo swapchainResizeInfo = { \
-					.newSize = swapChainExtent, \
+					.newSize = swapchainExtent, \
 					.renderPassCount = 1, \
 					.renderPasses = &renderPass, \
 					.queueFamilyIndexCount = 1, \
@@ -269,6 +270,13 @@ typedef struct Buffers
 #endif
 } Buffers;
 
+typedef struct ShadowMapPipelines
+{
+	LunaGraphicsPipeline map;
+	LunaGraphicsPipeline modelActors;
+	LunaGraphicsPipeline wallActors;
+} ShadowMapPipelines;
+
 typedef struct Pipelines
 {
 	LunaGraphicsPipeline ui;
@@ -281,6 +289,7 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorModel;
 	LunaGraphicsPipeline shadedActorWall;
 	LunaGraphicsPipeline unshadedActorWall;
+	ShadowMapPipelines shadowMaps;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
 	LunaGraphicsPipeline debugDrawTriangles;
@@ -319,7 +328,7 @@ extern LunaCommandBuffer commandBuffer;
 extern LunaCommandBuffer secondaryCommandBuffer;
 extern LunaSemaphore semaphore;
 extern VkSurfaceKHR surface;
-extern VkExtent2D swapChainExtent;
+extern VkExtent2D swapchainExtent;
 extern VkSampleCountFlagBits msaaSamples;
 extern LunaRenderPass renderPass;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
@@ -331,6 +340,11 @@ extern Buffers buffers;
 extern Pipelines pipelines;
 extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
 extern uint32_t skyTextureIndex;
+extern uint32_t lightIndex;
+extern LunaImage shadowMapAtlas;
+extern VkRenderPass shadowMapRenderPass;
+extern List shadowMapFramebuffers;
+extern List shadowMapImageViews;
 #pragma endregion variables
 
 bool ClearTextureCache();
@@ -342,6 +356,12 @@ VkResult CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderM
 uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
+
+uint32_t ShadowMapResolution();
+
+VkResult CreateShadowMapRenderPass(const Map *map);
+
+VkResult CreateShadowMapGraphicsPipelines();
 
 VkResult UpdateCameraUniform(const Camera *camera);
 
