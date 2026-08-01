@@ -15,7 +15,10 @@
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/CheckBox.h>
+#include <engine/uiStack/controls/HeaderFooterControl.h>
+#include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/Slider.h>
+#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -24,8 +27,11 @@
 #include "gameState/OptionsState.h"
 
 static UiStack *inputOptionsStack = NULL;
+static ScrollView *inputOptionsScrollView = NULL;
 
-static void BtnInputOptionsBack()
+static char controllerNameBuffer[256];
+
+static void BtnInputOptionsBack(Control *, void *)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
@@ -36,7 +42,7 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		BtnInputOptionsBack();
+		BtnInputOptionsBack(NULL, NULL);
 	}
 	if (!optionsStateInGame)
 	{
@@ -44,7 +50,7 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-static void BtnControlsOptions()
+static void BtnControlsOptions(Control *, void *)
 {
 	SetGameState(&ControlsOptionsState);
 }
@@ -90,38 +96,17 @@ static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderMenuBackground(state);
 	}
 
-	DrawTextAligned("Input Options",
-					32,
-					COLOR_WHITE,
-					v2s(0),
-					v2(ScaledWindowWidthFloat(), 100),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					largeFont);
-
+	inputOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
+	ProcessScrollView(inputOptionsScrollView);
 	ProcessUiStack(inputOptionsStack);
 	DrawUiStack(inputOptionsStack);
-	DrawTextAligned("Controller Name:",
-					12,
-					COLOR_WHITE,
-					v2(0, 460),
-					v2(ScaledWindowWidthFloat(), 40),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					smallFont);
+
 	const char *controllerName = GetControllerName();
 	if (!controllerName)
 	{
 		controllerName = "No Controller Connected";
 	}
-	DrawTextAligned(controllerName,
-					12,
-					COLOR_WHITE,
-					v2(0, 480),
-					v2(ScaledWindowWidthFloat(), 40),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					smallFont);
+	snprintf(controllerNameBuffer, 128, "Controller: %s", controllerName);
 }
 
 static void InputOptionsStateSet()
@@ -129,87 +114,123 @@ static void InputOptionsStateSet()
 	if (inputOptionsStack == NULL)
 	{
 		inputOptionsStack = CreateUiStack();
-		float opY = 80;
+		inputOptionsScrollView = CreateScrollView(inputOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
+		float opY = 0;
 		const float opSpacing = 45;
-		UiStackPush(inputOptionsStack,
-					CreateButtonControl(v2(0, opY),
-										v2(480, 40),
-										"Edit Controls",
-										BtnControlsOptions,
-										TOP_CENTER,
-										NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateButtonControl(v2(0, opY),
+											   v2(750, 40),
+											   "Edit Controls",
+											   BtnControlsOptions,
+											   TOP_CENTER,
+											   NULL));
 		opY += opSpacing * 1.5f;
-		UiStackPush(inputOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"Camera Sensitivity",
-										SldOptionsMouseSensitivity,
-										TOP_CENTER,
-										0.01,
-										2.00,
-										GetState()->options.cameraSpeed,
-										0.01,
-										0.1,
-										SliderLabelPercent,
-										NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateLabelControl("Camera Options",
+											  16,
+											  COLOR_WHITE,
+											  v2(0, opY),
+											  v2(750, 40),
+											  TOP_CENTER,
+											  FONT_HALIGN_CENTER,
+											  FONT_VALIGN_MIDDLE,
+											  smallFont,
+											  true));
 		opY += opSpacing;
-		UiStackPush(inputOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Invert Horizontal Camera",
-										  CbOptionsInvertCameraH,
-										  TOP_CENTER,
-										  GetState()->options.invertHorizontalCamera,
-										  NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateSliderControl(v2(0, opY),
+											   v2(750, 40),
+											   "Camera Sensitivity",
+											   SldOptionsMouseSensitivity,
+											   TOP_CENTER,
+											   0.01,
+											   2.00,
+											   GetState()->options.cameraSpeed,
+											   0.01,
+											   0.1,
+											   SliderLabelPercent,
+											   NULL));
 		opY += opSpacing;
-		UiStackPush(inputOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Invert Vertical Camera",
-										  CbOptionsInvertCameraV,
-										  TOP_CENTER,
-										  GetState()->options.invertVerticalCamera,
-										  NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateCheckboxControl(v2(-185, opY),
+												 v2(370, 40),
+												 "Invert Horizontal Camera",
+												 CbOptionsInvertCameraH,
+												 TOP_CENTER,
+												 GetState()->options.invertHorizontalCamera,
+												 NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateCheckboxControl(v2(190, opY),
+												 v2(370, 40),
+												 "Invert Vertical Camera",
+												 CbOptionsInvertCameraV,
+												 TOP_CENTER,
+												 GetState()->options.invertVerticalCamera,
+												 NULL));
 		opY += opSpacing * 1.5f;
-		UiStackPush(inputOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"Rumble Strength",
-										SldOptionsRumbleStrength,
-										TOP_CENTER,
-										0.0,
-										1.0,
-										GetState()->options.rumbleStrength,
-										0.25,
-										0.25,
-										SliderLabelPercent,
-										NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateLabelControl("Controller Options",
+											  16,
+											  COLOR_WHITE,
+											  v2(0, opY),
+											  v2(750, 40),
+											  TOP_CENTER,
+											  FONT_HALIGN_CENTER,
+											  FONT_VALIGN_MIDDLE,
+											  smallFont,
+											  true));
 		opY += opSpacing;
-		UiStackPush(inputOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"Stick Deadzone",
-										SldOptionsStickDeadzone,
-										TOP_CENTER,
-										0.0,
-										0.5,
-										GetState()->options.controllerDeadzone,
-										0.01,
-										0.01,
-										NULL,
-										NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateSliderControl(v2(-185, opY),
+											   v2(370, 40),
+											   "Rumble Strength",
+											   SldOptionsRumbleStrength,
+											   TOP_CENTER,
+											   0.0,
+											   1.0,
+											   GetState()->options.rumbleStrength,
+											   0.25,
+											   0.25,
+											   SliderLabelPercent,
+											   NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateSliderControl(v2(190, opY),
+											   v2(370, 40),
+											   "Stick Deadzone",
+											   SldOptionsStickDeadzone,
+											   TOP_CENTER,
+											   0.0,
+											   0.5,
+											   GetState()->options.controllerDeadzone,
+											   0.01,
+											   0.01,
+											   NULL,
+											   NULL));
 		opY += opSpacing;
-		UiStackPush(inputOptionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Swap controller OK/Cancel buttons",
-										  CbOptionsSwapOkCancel,
-										  TOP_CENTER,
-										  GetState()->options.controllerSwapOkCancel,
-										  NULL));
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateCheckboxControl(v2(0, opY),
+												 v2(750, 40),
+												 "Swap controller OK/Cancel buttons",
+												 CbOptionsSwapOkCancel,
+												 TOP_CENTER,
+												 GetState()->options.controllerSwapOkCancel,
+												 NULL));
+		opY += opSpacing;
+		ScrollViewAddChild(inputOptionsScrollView,
+						   CreateLabelControl(controllerNameBuffer,
+											  16,
+											  COLOR_WHITE,
+											  v2(0, opY),
+											  v2(750, 40),
+											  TOP_CENTER,
+											  FONT_HALIGN_CENTER,
+											  FONT_VALIGN_MIDDLE,
+											  smallFont,
+											  true));
 		opY += opSpacing;
 
-
+		UiStackPush(inputOptionsStack, CreateHeaderFooterControl(100, true, "Input Options"));
+		UiStackPush(inputOptionsStack, CreateHeaderFooterControl(100, false, NULL));
 		UiStackPush(inputOptionsStack,
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnInputOptionsBack, BOTTOM_CENTER, NULL));
 	}
@@ -220,6 +241,7 @@ static void InputOptionsStateDestroy()
 {
 	if (inputOptionsStack != NULL)
 	{
+		FreeScrollView(inputOptionsScrollView);
 		DestroyUiStack(inputOptionsStack);
 		inputOptionsStack = NULL;
 	}

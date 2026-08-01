@@ -4,10 +4,8 @@
 
 #include "gameState/options/SoundOptionsState.h"
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
@@ -15,7 +13,9 @@
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/controls/Slider.h>
+#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -24,8 +24,9 @@
 #include "gameState/OptionsState.h"
 
 static UiStack *soundOptionsStack = NULL;
+static ScrollView *soundOptionsScrollView = NULL;
 
-static void BtnSoundOptionsBack()
+static void BtnSoundOptionsBack(Control *, void *)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
@@ -60,7 +61,7 @@ static void SoundOptionsStateUpdate(GlobalState *state, const double delta)
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		BtnSoundOptionsBack();
+		BtnSoundOptionsBack(NULL, NULL);
 	}
 	if (!optionsStateInGame)
 	{
@@ -78,15 +79,8 @@ static void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderMenuBackground(state);
 	}
 
-	DrawTextAligned("Sound Options",
-					32,
-					COLOR_WHITE,
-					v2s(0),
-					v2(ScaledWindowWidthFloat(), 100),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					largeFont);
-
+	soundOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
+	ProcessScrollView(soundOptionsScrollView);
 	ProcessUiStack(soundOptionsStack);
 	DrawUiStack(soundOptionsStack);
 }
@@ -96,66 +90,68 @@ static void SoundOptionsStateSet()
 	if (soundOptionsStack == NULL)
 	{
 		soundOptionsStack = CreateUiStack();
-		uint16_t opY = 80;
+		soundOptionsScrollView = CreateScrollView(soundOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
+		uint16_t opY = 0;
 		const uint16_t opSpacing = 45;
-		UiStackPush(soundOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"Master Volume",
-										SldOptionsMasterVolume,
-										TOP_CENTER,
-										0.0,
-										1.0,
-										GetState()->options.masterVolume,
-										0.01,
-										0.1,
-										SliderLabelPercent,
-										NULL));
+		ScrollViewAddChild(soundOptionsScrollView,
+						   CreateSliderControl(v2(0, opY),
+											   v2(750, 40),
+											   "Master Volume",
+											   SldOptionsMasterVolume,
+											   TOP_CENTER,
+											   0.0,
+											   1.0,
+											   GetState()->options.masterVolume,
+											   0.01,
+											   0.1,
+											   SliderLabelPercent,
+											   NULL));
+		opY += opSpacing * 1.5;
+		ScrollViewAddChild(soundOptionsScrollView,
+						   CreateSliderControl(v2(-185, opY),
+											   v2(370, 40),
+											   "Music Volume",
+											   SldOptionsMusicVolume,
+											   TOP_CENTER,
+											   0.0,
+											   1.0,
+											   GetState()->options.musicVolume,
+											   0.01,
+											   0.1,
+											   SliderLabelPercent,
+											   NULL));
+		ScrollViewAddChild(soundOptionsScrollView,
+						   CreateSliderControl(v2(190, opY),
+											   v2(370, 40),
+											   "SFX Volume",
+											   SldOptionsSfxVolume,
+											   TOP_CENTER,
+											   0.0,
+											   1.0,
+											   GetState()->options.sfxVolume,
+											   0.01,
+											   0.1,
+											   SliderLabelPercent,
+											   NULL));
 		opY += opSpacing;
-		UiStackPush(soundOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"Music Volume",
-										SldOptionsMusicVolume,
-										TOP_CENTER,
-										0.0,
-										1.0,
-										GetState()->options.musicVolume,
-										0.01,
-										0.1,
-										SliderLabelPercent,
-										NULL));
-		opY += opSpacing;
-		UiStackPush(soundOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"SFX Volume",
-										SldOptionsSfxVolume,
-										TOP_CENTER,
-										0.0,
-										1.0,
-										GetState()->options.sfxVolume,
-										0.01,
-										0.1,
-										SliderLabelPercent,
-										NULL));
-		opY += opSpacing;
-		UiStackPush(soundOptionsStack,
-					CreateSliderControl(v2(0, opY),
-										v2(480, 40),
-										"UI Volume",
-										SldOptionsUiVolume,
-										TOP_CENTER,
-										0.0,
-										1.0,
-										GetState()->options.uiVolume,
-										0.01,
-										0.1,
-										SliderLabelPercent,
-										NULL));
+		ScrollViewAddChild(soundOptionsScrollView,
+						   CreateSliderControl(v2(-185, opY),
+											   v2(370, 40),
+											   "UI Volume",
+											   SldOptionsUiVolume,
+											   TOP_CENTER,
+											   0.0,
+											   1.0,
+											   GetState()->options.uiVolume,
+											   0.01,
+											   0.1,
+											   SliderLabelPercent,
+											   NULL));
 		opY += opSpacing;
 
 
+		UiStackPush(soundOptionsStack, CreateHeaderFooterControl(100, true, "Sound Options"));
+		UiStackPush(soundOptionsStack, CreateHeaderFooterControl(100, false, NULL));
 		UiStackPush(soundOptionsStack,
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnSoundOptionsBack, BOTTOM_CENTER, NULL));
 	}
@@ -166,6 +162,7 @@ static void SoundOptionsStateDestroy()
 {
 	if (soundOptionsStack != NULL)
 	{
+		FreeScrollView(soundOptionsScrollView);
 		DestroyUiStack(soundOptionsStack);
 		soundOptionsStack = NULL;
 	}

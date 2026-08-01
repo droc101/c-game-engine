@@ -8,7 +8,6 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/GameState.h>
@@ -17,21 +16,22 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/TextBox.h>
-#include <engine/uiStack/controls/VScrollBar.h>
+#include <engine/uiStack/controls/HeaderFooterControl.h>
+#include <engine/uiStack/controls/IconButton.h>
+#include <engine/uiStack/controls/LabelControl.h>
+#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <gameState/OptionsState.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "engine/subsystem/Error.h"
 #include "gameState/options/InputOptionsState.h"
 
 typedef enum ListenMode
@@ -41,20 +41,87 @@ typedef enum ListenMode
 	CTLR_LISTEN,
 } ListenMode;
 
+typedef struct ControlRowData
+{
+	ControlOption *option;
+	Control *kbmButton;
+	Control *ctlrButton;
+	Control *resetButton;
+} ControlRowData;
+
 static UiStack *controlsOptionsStack = NULL;
+static ScrollView *controlsOptionsScrollView = NULL;
 static char *filter = NULL;
 
-static const int LIST_WIDTH = 750;
 static const int ENTRY_HEIGHT = 44;
 
 static ListenMode listenMode;
-static ControlOption *listenOption;
+static ControlRowData *listenRow;
 
-static VScrollBarData scrollData = {0};
+static List controlRows;
 
-static void BtnControlsOptionsBack()
+static void BtnControlsOptionsBack(Control *, void *)
 {
 	SetGameState(&InputOptionsState);
+}
+
+static void UpdateControlRow(ControlRowData *row)
+{
+	ButtonData *kbmButtonData = row->kbmButton->controlData;
+	ButtonData *ctlrButtonData = row->ctlrButton->controlData;
+	IconButtonData *resetButtonData = row->resetButton->controlData;
+
+	if (listenRow == row && listenMode == KBM_LISTEN)
+	{
+		kbmButtonData->text = "...";
+	} else
+	{
+		kbmButtonData->text = InputActionGetKbmString(row->option->action);
+	}
+
+	if (listenRow == row && listenMode == CTLR_LISTEN)
+	{
+		ctlrButtonData->text = "...";
+	} else
+	{
+		ctlrButtonData->text = InputActionGetControllerString(row->option->action);
+	}
+
+	kbmButtonData->extraData = row;
+	ctlrButtonData->extraData = row;
+	resetButtonData->extraData = row;
+}
+
+static void BtnResetBinding(Control *, void *extraData)
+{
+	ControlRowData *row = extraData;
+	listenMode = NOT_LISTNENING;
+	memcpy(row->option->action, row->option->defaultAction, sizeof(InputAction));
+	UpdateControlRow(row);
+}
+
+static void BtnEditKbmBinding(Control *, void *extraData)
+{
+	if (listenMode != NOT_LISTNENING)
+	{
+		return;
+	}
+	ControlRowData *row = extraData;
+	listenMode = KBM_LISTEN;
+	listenRow = row;
+	UpdateControlRow(row);
+}
+
+static void BtnEditCtlrBinding(Control *, void *extraData)
+{
+	if (listenMode != NOT_LISTNENING)
+	{
+		return;
+	}
+	ControlRowData *row = extraData;
+	listenMode = CTLR_LISTEN;
+	listenRow = row;
+	UpdateControlRow(row);
 }
 
 static void FilterTextChanged(const char *newFilter)
@@ -71,7 +138,7 @@ static void ProcessListening()
 {
 	if (listenMode != NOT_LISTNENING)
 	{
-		InputAction *action = listenOption->action;
+		InputAction *action = listenRow->option->action;
 		if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 			IsButtonJustPressed(mainThreadInput, SDL_GAMEPAD_BUTTON_START))
 		{
@@ -85,6 +152,7 @@ static void ProcessListening()
 			listenMode = NOT_LISTNENING;
 			ConsumeKey(mainThreadInput, SDL_SCANCODE_ESCAPE);
 			ConsumeButton(mainThreadInput, SDL_GAMEPAD_BUTTON_START);
+			UpdateControlRow(listenRow);
 		}
 		if (listenMode == KBM_LISTEN)
 		{
@@ -95,6 +163,7 @@ static void ProcessListening()
 				action->keyboardMouseBind.keyBind = pressedScancode;
 				listenMode = NOT_LISTNENING;
 				ConsumeKey(mainThreadInput, pressedScancode);
+				UpdateControlRow(listenRow);
 				return;
 			}
 
@@ -105,10 +174,11 @@ static void ProcessListening()
 				action->keyboardMouseBind.mouseButtonBind = pressedMouseButton;
 				listenMode = NOT_LISTNENING;
 				ConsumeMouseButton(mainThreadInput, pressedMouseButton);
+				UpdateControlRow(listenRow);
 				return;
 			}
 
-			if (listenOption->allowAxisBind)
+			if (listenRow->option->allowAxisBind)
 			{
 				const Vector2 mouseWheel = GetMouseWheelTicks(mainThreadInput);
 				if (fabsf(mouseWheel.x) > 0 || fabsf(mouseWheel.y) > 0)
@@ -129,6 +199,7 @@ static void ProcessListening()
 					}
 					listenMode = NOT_LISTNENING;
 					ConsumeMouseWheel(mainThreadInput);
+					UpdateControlRow(listenRow);
 					return;
 				}
 			}
@@ -141,16 +212,18 @@ static void ProcessListening()
 				action->controllerBind.buttonBind = pressedButton;
 				listenMode = NOT_LISTNENING;
 				ConsumeButton(mainThreadInput, pressedButton);
+				UpdateControlRow(listenRow);
 				return;
 			}
 
-			if (listenOption->allowAxisBind)
+			if (listenRow->option->allowAxisBind)
 			{
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.0f)
 				{
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = LEFT_TRIGGER;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 0.0f)
@@ -158,6 +231,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = RIGHT_TRIGGER;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 
@@ -166,6 +240,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = LEFT_STICK_DOWN;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_LEFTY) < -0.5f)
@@ -173,6 +248,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = LEFT_STICK_UP;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_LEFTX) > 0.5f)
@@ -180,6 +256,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = LEFT_STICK_RIGHT;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_LEFTX) < -0.5f)
@@ -187,6 +264,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = LEFT_STICK_LEFT;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 
@@ -195,6 +273,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = RIGHT_STICK_DOWN;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTY) < -0.5f)
@@ -202,6 +281,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = RIGHT_STICK_UP;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTX) > 0.5f)
@@ -209,6 +289,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = RIGHT_STICK_RIGHT;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 				if (GetAxis(mainThreadInput, SDL_GAMEPAD_AXIS_RIGHTX) < -0.5f)
@@ -216,6 +297,7 @@ static void ProcessListening()
 					action->controllerBindType = IA_CONTROLLER_AXIS;
 					action->controllerBind.axisBind = RIGHT_STICK_LEFT;
 					listenMode = NOT_LISTNENING;
+					UpdateControlRow(listenRow);
 					return;
 				}
 			}
@@ -230,25 +312,12 @@ static void ControlsOptionsStateUpdate(GlobalState *state, const double delta)
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		BtnControlsOptionsBack();
+		BtnControlsOptionsBack(NULL, NULL);
 	}
 	if (!optionsStateInGame)
 	{
 		UpdateMenuBackground(state, delta);
 	}
-}
-
-static bool IsRectHovered(Vector2 pos, Vector2 size)
-{
-	const Vector2 endPos = Vector2Add(pos, size);
-	const Vector2 mousePos = GetMousePos(mainThreadInput);
-
-	if (mousePos.y < 100 || mousePos.y > ScaledWindowHeightFloat() - 100)
-	{
-		return false;
-	}
-
-	return mousePos.x >= pos.x && mousePos.x <= endPos.x && mousePos.y > pos.y && mousePos.y <= endPos.y;
 }
 
 static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*/)
@@ -259,199 +328,17 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 	} else
 	{
 		RenderMenuBackground(state);
-		DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0x40000000));
 	}
 
-	const int listX = ScaledWindowWidth() / 2 - LIST_WIDTH / 2;
-
-	Vector2 tooltipPos = v2s(0);
-	bool resetTooltip = false;
-
-	int entryY = 102 + scrollData.scrollPos;
-	int numShownEntries = 0;
-	for (size_t c = 0; c < controlCategories.length; c++)
-	{
-		const ControlCategory *cat = ListGetPointer(controlCategories, c);
-
-		DrawTextAligned(cat->categoryName,
-						16,
-						COLOR_WHITE,
-						v2(listX, entryY),
-						v2(LIST_WIDTH, ENTRY_HEIGHT),
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
-		entryY += ENTRY_HEIGHT + 2;
-		numShownEntries++;
-
-		for (size_t i = 0; i < cat->controlOptions.length; i++)
-		{
-			ControlOption *entry = ListGetPointer(cat->controlOptions, i);
-
-			if (entry->action != NULL && filter != NULL && GameStrCaseStr(entry->displayName, filter) == NULL)
-			{
-				continue;
-			}
-
-			DrawTextAligned(entry->displayName,
-							20,
-							COLOR_WHITE,
-							v2(listX, entryY),
-							v2(LIST_WIDTH, ENTRY_HEIGHT),
-							FONT_HALIGN_LEFT,
-							FONT_VALIGN_MIDDLE,
-							smallFont);
-
-			const Vector2 buttonSize = v2(190, ENTRY_HEIGHT - 4);
-			const Vector2 resetButtonSize = v2(ENTRY_HEIGHT - 4, ENTRY_HEIGHT - 4);
-			const Vector2
-					leftButtonPos = v2(listX + LIST_WIDTH - buttonSize.x - 4 - buttonSize.x - 4 - resetButtonSize.x,
-									   entryY + 2);
-			const Vector2 rightButtonPos = v2(listX + LIST_WIDTH - buttonSize.x - 4 - resetButtonSize.x, entryY + 2);
-			const Vector2 resetButtonPos = v2(listX + LIST_WIDTH - resetButtonSize.x, entryY + 2);
-
-			const char *leftButtonTexture = TEXTURE("interface/button");
-			if (listenMode == KBM_LISTEN && listenOption == entry)
-			{
-				leftButtonTexture = TEXTURE("interface/button_pressed");
-				tooltipPos = Vector2Add(leftButtonPos, v2(0, 40));
-			} else if (IsRectHovered(leftButtonPos, buttonSize))
-			{
-				leftButtonTexture = TEXTURE("interface/button_hover");
-				if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
-				{
-					leftButtonTexture = TEXTURE("interface/button_pressed");
-				}
-				if (IsMouseButtonJustPressed(mainThreadInput, SDL_BUTTON_LEFT))
-				{
-					listenMode = KBM_LISTEN;
-					listenOption = entry;
-					ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
-					UiStackResetFocus(controlsOptionsStack);
-					(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
-				}
-			}
-
-			const char *rightButtonTexture = TEXTURE("interface/button");
-			if (listenMode == CTLR_LISTEN && listenOption == entry)
-			{
-				rightButtonTexture = TEXTURE("interface/button_pressed");
-				tooltipPos = Vector2Add(rightButtonPos, v2(0, 40));
-			} else if (IsRectHovered(rightButtonPos, buttonSize))
-			{
-				rightButtonTexture = TEXTURE("interface/button_hover");
-				if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
-				{
-					rightButtonTexture = TEXTURE("interface/button_pressed");
-				}
-				if (IsMouseButtonJustPressed(mainThreadInput, SDL_BUTTON_LEFT))
-				{
-					listenMode = CTLR_LISTEN;
-					listenOption = entry;
-					ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
-					UiStackResetFocus(controlsOptionsStack);
-					(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
-				}
-			}
-
-			const char *resetButtonTexture = TEXTURE("interface/button");
-			if (IsRectHovered(resetButtonPos, resetButtonSize))
-			{
-				resetTooltip = true;
-				resetButtonTexture = TEXTURE("interface/button_hover");
-				if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
-				{
-					resetButtonTexture = TEXTURE("interface/button_pressed");
-				}
-				if (IsMouseButtonJustReleased(mainThreadInput, SDL_BUTTON_LEFT))
-				{
-					listenMode = NOT_LISTNENING;
-					memcpy(entry->action, entry->defaultAction, sizeof(InputAction));
-					ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
-					UiStackResetFocus(controlsOptionsStack);
-					(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
-				}
-			}
-
-			DrawNinePatchTexture(resetButtonPos, resetButtonSize, 8, 8, resetButtonTexture);
-			DrawTexture(resetButtonPos, resetButtonSize, TEXTURE("interface/reset"));
-
-			DrawNinePatchTexture(leftButtonPos, buttonSize, 8, 8, leftButtonTexture);
-			if (listenMode == KBM_LISTEN && listenOption == entry)
-			{
-				DrawTextAligned("...",
-								16,
-								COLOR_BLACK,
-								leftButtonPos,
-								buttonSize,
-								FONT_HALIGN_CENTER,
-								FONT_VALIGN_MIDDLE,
-								smallFont);
-			} else
-			{
-				const char *leftButtonLabel = InputActionGetKbmString(entry->action);
-				DrawTextAligned(leftButtonLabel,
-								16,
-								COLOR_BLACK,
-								leftButtonPos,
-								buttonSize,
-								FONT_HALIGN_CENTER,
-								FONT_VALIGN_MIDDLE,
-								smallFont);
-			}
-
-			DrawNinePatchTexture(rightButtonPos, buttonSize, 8, 8, rightButtonTexture);
-			const char *rightButtonLabel = InputActionGetControllerString(entry->action);
-			if (listenMode == CTLR_LISTEN && listenOption == entry)
-			{
-				DrawTextAligned("...",
-								16,
-								COLOR_BLACK,
-								rightButtonPos,
-								buttonSize,
-								FONT_HALIGN_CENTER,
-								FONT_VALIGN_MIDDLE,
-								smallFont);
-			} else
-			{
-				DrawTextAligned(rightButtonLabel,
-								16,
-								COLOR_BLACK,
-								rightButtonPos,
-								buttonSize,
-								FONT_HALIGN_CENTER,
-								FONT_VALIGN_MIDDLE,
-								smallFont);
-			}
-
-			entryY += ENTRY_HEIGHT + 2;
-			numShownEntries++;
-		}
-	}
-
-	DrawRect(0, 0, ScaledWindowWidth(), 100, COLOR(0x80000000));
-	DrawRect(0, ScaledWindowHeight() - 100, ScaledWindowWidth(), 100, COLOR(0x80000000));
-	DrawLine(v2(0, 99), v2(ScaledWindowWidth(), 99), 2, COLOR_WHITE);
-	DrawLine(v2(0, ScaledWindowHeight() - 99), v2(ScaledWindowWidth(), ScaledWindowHeight() - 99), 2, COLOR_WHITE);
-
-	DrawTextAligned("Controls",
-					32,
-					COLOR_WHITE,
-					v2s(0),
-					v2(ScaledWindowWidthFloat(), 50),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					largeFont);
-
-	scrollData.contentHeight = numShownEntries * (ENTRY_HEIGHT + 2);
-	scrollData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * ENTRY_HEIGHT / 2;
-
+	controlsOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
+	ProcessScrollView(controlsOptionsScrollView);
 	ProcessUiStack(controlsOptionsStack);
 	DrawUiStack(controlsOptionsStack);
 
 	if (listenMode == KBM_LISTEN)
 	{
-		if (listenOption->allowAxisBind)
+		const Vector2 tooltipPos = Vector2Add(listenRow->kbmButton->anchoredPosition, v2(0, 40));
+		if (listenRow->option->allowAxisBind)
 		{
 			RenderTooltipAt("Press a key, click a mouse button, or move the mouse wheel to bind this action.\nPress "
 							"escape "
@@ -465,7 +352,8 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 		}
 	} else if (listenMode == CTLR_LISTEN)
 	{
-		if (listenOption->allowAxisBind)
+		const Vector2 tooltipPos = Vector2Add(listenRow->ctlrButton->anchoredPosition, v2(0, 40));
+		if (listenRow->option->allowAxisBind)
 		{
 			RenderTooltipAt("Click a controller button, press a trigger, or move a joystick to bind this "
 							"action.\nPress start or escape to unbind this action.",
@@ -477,11 +365,6 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 							tooltipPos);
 		}
 	}
-
-	if (resetTooltip)
-	{
-		RenderTooltipAtMouse("Reset Binding");
-	}
 }
 
 
@@ -489,25 +372,99 @@ static void ControlsOptionsStateSet()
 {
 	if (controlsOptionsStack == NULL)
 	{
+		ListInit(controlRows, LIST_POINTER);
+
 		controlsOptionsStack = CreateUiStack();
 
-		UiStackPush(controlsOptionsStack,
-					CreateTextBoxControl("Filter Controls",
-										 v2(0, 50),
-										 v2(480, 40),
-										 TOP_CENTER,
-										 64,
-										 FilterTextChanged,
-										 NULL));
+		controlsOptionsScrollView = CreateScrollView(controlsOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
+
+		int entryY = 0;
+		for (size_t ci = 0; ci < controlCategories.length; ci++)
+		{
+			ControlCategory *cat = ListGetPointer(controlCategories, ci);
+			ScrollViewAddChild(controlsOptionsScrollView,
+							   CreateLabelControl(cat->categoryName,
+												  16,
+												  COLOR_WHITE,
+												  v2(0, entryY),
+												  v2(750, 40),
+												  TOP_LEFT,
+												  FONT_HALIGN_CENTER,
+												  FONT_VALIGN_MIDDLE,
+												  smallFont,
+												  true));
+			for (size_t i = 0; i < cat->controlOptions.length; i++)
+			{
+				entryY += ENTRY_HEIGHT;
+
+				ControlOption *entry = ListGetPointer(cat->controlOptions, i);
+				ScrollViewAddChild(controlsOptionsScrollView,
+								   CreateLabelControl(entry->displayName,
+													  16,
+													  COLOR_WHITE,
+													  v2(0, entryY),
+													  v2(750 - 40 - 6 - 190 - 6 - 190 - 6, 40),
+													  TOP_LEFT,
+													  FONT_HALIGN_LEFT,
+													  FONT_VALIGN_MIDDLE,
+													  smallFont,
+													  true));
+
+				Control *kbmButton = CreateButtonControl(v2(0 - 40 - 6 - 190 - 6, entryY),
+														 v2(190, 40),
+														 "KBM",
+														 BtnEditKbmBinding,
+														 TOP_RIGHT,
+														 NULL);
+				Control *ctlrButton = CreateButtonControl(v2(0 - 40 - 6, entryY),
+														  v2(190, 40),
+														  "CTLR",
+														  BtnEditCtlrBinding,
+														  TOP_RIGHT,
+														  NULL);
+				Control *resetButton = CreateIconButtonControl(v2(0, entryY),
+															   TEXTURE("interface/reset"),
+															   BtnResetBinding,
+															   TOP_RIGHT,
+															   "Reset Binding");
+
+				ControlRowData *row = malloc(sizeof(ControlRowData));
+				CheckAlloc(row);
+				row->option = entry;
+				row->kbmButton = kbmButton;
+				row->ctlrButton = ctlrButton;
+				row->resetButton = resetButton;
+				ListAdd(controlRows, row);
+
+				UpdateControlRow(row);
+
+				ScrollViewAddChild(controlsOptionsScrollView, kbmButton);
+				ScrollViewAddChild(controlsOptionsScrollView, ctlrButton);
+				ScrollViewAddChild(controlsOptionsScrollView, resetButton);
+			}
+			entryY += ENTRY_HEIGHT * 1.5f;
+		}
+
+		UiStackPush(controlsOptionsStack, CreateHeaderFooterControl(100, true, "Controls"));
+		UiStackPush(controlsOptionsStack, CreateHeaderFooterControl(100, false, NULL));
+
+		// UiStackPush(controlsOptionsStack,
+		// 			CreateTextBoxControl("Filter Controls",
+		// 								 v2(0, 50),
+		// 								 v2(480, 40),
+		// 								 TOP_CENTER,
+		// 								 64,
+		// 								 FilterTextChanged,
+		// 								 NULL));
 
 		UiStackPush(controlsOptionsStack,
 					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnControlsOptionsBack, BOTTOM_CENTER, NULL));
 
-		UiStackPush(controlsOptionsStack,
-					CreateVScrollBarControl(v2(LIST_WIDTH / 2 + 20, 0),
-											ScaledWindowHeightFloat() - 200,
-											MIDDLE_CENTER,
-											&scrollData));
+		// UiStackPush(controlsOptionsStack,
+		// 			CreateVScrollBarControl(v2(LIST_WIDTH / 2 + 20, 0),
+		// 									ScaledWindowHeightFloat() - 200,
+		// 									MIDDLE_CENTER,
+		// 									&scrollData));
 	}
 	UiStackResetFocus(controlsOptionsStack);
 	listenMode = NOT_LISTNENING;
@@ -517,7 +474,9 @@ static void ControlsOptionsStateDestroy()
 {
 	if (controlsOptionsStack != NULL)
 	{
+		FreeScrollView(controlsOptionsScrollView);
 		DestroyUiStack(controlsOptionsStack);
+		ListAndContentsFree(controlRows);
 		controlsOptionsStack = NULL;
 	}
 }

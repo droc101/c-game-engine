@@ -237,8 +237,18 @@ target_sources(engine INTERFACE
         include/engine/uiStack/controls/TextBox.h
         src/uiStack/controls/VScrollBar.c
         include/engine/uiStack/controls/VScrollBar.h
+        src/uiStack/controls/HeaderFooterControl.c
+        include/engine/uiStack/controls/HeaderFooterControl.h
+        src/uiStack/controls/LabelControl.c
+        include/engine/uiStack/controls/LabelControl.h
+        src/uiStack/controls/OptionsButton.c
+        include/engine/uiStack/controls/OptionsButton.h
+        src/uiStack/controls/IconButton.c
+        include/engine/uiStack/controls/IconButton.h
         src/uiStack/UiStack.c
         include/engine/uiStack/UiStack.h
+        src/uiStack/ScrollView.c
+        include/engine/uiStack/ScrollView.h
 
         src/Engine.c
         include/engine/Engine.h

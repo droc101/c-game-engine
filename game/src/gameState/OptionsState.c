@@ -30,7 +30,7 @@
 static UiStack *optionsStack = NULL;
 bool optionsStateInGame = false;
 
-static void BtnOptionsBack()
+static void BtnOptionsBack(Control *, void *)
 {
 	SaveOptions(&GetState()->options);
 	if (optionsStateInGame)
@@ -48,7 +48,7 @@ static void OptionsStateUpdate(GlobalState *state, const double delta)
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		BtnOptionsBack();
+		BtnOptionsBack(NULL, NULL);
 	}
 
 	if (!optionsStateInGame)
@@ -88,22 +88,22 @@ static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(optionsStack);
 }
 
-static void BtnVideoOptions()
+static void BtnVideoOptions(Control *, void *)
 {
 	SetGameState(&VideoOptionsState);
 }
 
-static void BtnSoundOptions()
+static void BtnSoundOptions(Control *, void *)
 {
 	SetGameState(&SoundOptionsState);
 }
 
-static void BtnInputOptions()
+static void BtnInputOptions(Control *, void *)
 {
 	SetGameState(&InputOptionsState);
 }
 
-static void BtnDebugOptions()
+static void BtnDebugOptions(Control *, void *)
 {
 	SetGameState(&DebugOptionsState);
 }

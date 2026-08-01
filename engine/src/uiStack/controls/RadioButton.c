@@ -100,7 +100,14 @@ void DrawRadioButton(const Control *c, ControlState /*state*/, const Vector2 pos
 	const RadioButtonData *data = (RadioButtonData *)c->controlData;
 
 	const Color textColor = data->checked ? COLOR_WHITE : COLOR(0xFFc0c0c0);
-
+	DrawTextAligned(data->label,
+					16,
+					COLOR_BLACK,
+					v2(c->anchoredPosition.x + 42, c->anchoredPosition.y + 2),
+					v2(c->size.x - 40, c->size.y),
+					FONT_HALIGN_LEFT,
+					FONT_VALIGN_MIDDLE,
+					smallFont);
 	DrawTextAligned(data->label,
 					16,
 					textColor,

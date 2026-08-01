@@ -135,11 +135,6 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 		}
 	}
 
-	// if (!IsMouseInRect(c->anchoredPosition, c->size))
-	// {
-	//     return;
-	// }
-
 	if (stack->activeControl != ctlIndex)
 	{
 		return;

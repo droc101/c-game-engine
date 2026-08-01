@@ -23,10 +23,14 @@
 
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/CheckBox.h>
+#include <engine/uiStack/controls/HeaderFooterControl.h>
+#include <engine/uiStack/controls/LabelControl.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/controls/TextBox.h>
 #include <engine/uiStack/controls/VScrollBar.h>
+#include <engine/uiStack/controls/IconButton.h>
 
 typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
 typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
@@ -44,6 +48,10 @@ static const ControlDestroyFunc CONTROL_DESTROY_FUNCTIONS[CONTROL_TYPE_COUNT] = 
 	DestroyRadioButton, // RADIO_BUTTON
 	DestroyTextBox, // TEXTBOX
 	DestroyVScrollBar,
+	DestroyHeaderFooterControl,
+	DestroyLabelControl,
+	DestroyOptionsButton,
+	DestroyIconButton,
 };
 
 /**
@@ -56,6 +64,10 @@ static const ControlDrawFunc CONTROL_DRAW_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	DrawRadioButton, // RADIO_BUTTON
 	DrawTextBox, // TEXTBOX
 	DrawVScrollBar,
+	DrawHeaderFooterControl,
+	DrawLabelControl,
+	DrawOptionsButton,
+	DrawIconButton,
 };
 
 /**
@@ -68,6 +80,23 @@ static const ControlUpdateFunc CONTROL_UPDATE_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	UpdateRadioButton, // RADIO_BUTTON
 	UpdateTextBox, // TEXTBOX
 	UpdateVScrollBar,
+	NULL,
+	NULL,
+	UpdateOptionsButton,
+	UpdateIconButton,
+};
+
+static const ControlUpdateFunc CONTROL_ALWAYS_UPDATE_FUNCTIONS[CONTROL_TYPE_COUNT] = {
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	AlwaysUpdateHeaderFooterControl,
+	NULL,
+	NULL,
+	NULL,
 };
 
 /**
@@ -80,6 +109,10 @@ static const ControlFocusFunc CONTROL_FOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	NULL, // RADIO_BUTTON
 	FocusTextBox, // TEXTBOX
 	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 };
 
 /**
@@ -91,6 +124,10 @@ static const ControlUnfocusFunc CONTROL_UNFOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = 
 	NULL, // CHECKBOX
 	NULL, // RADIO_BUTTON
 	UnfocusTextBox, // TEXTBOX
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	NULL,
 };
 
@@ -130,18 +167,24 @@ bool ProcessUiStack(UiStack *stack)
 	if (stack->focusedControl != -1u)
 	{
 		Control *c = ListGetPointer(stack->controls, stack->focusedControl);
-		CONTROL_UPDATE_FUNCTIONS[c->type](stack,
-										  c,
-										  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-										  stack->focusedControl);
+		if (CONTROL_UPDATE_FUNCTIONS[c->type])
+		{
+			CONTROL_UPDATE_FUNCTIONS[c->type](stack,
+											  c,
+											  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
+											  stack->focusedControl);
+		}
 	}
 	if (stack->activeControl != -1u)
 	{
 		Control *c = ListGetPointer(stack->controls, stack->activeControl);
-		CONTROL_UPDATE_FUNCTIONS[c->type](stack,
-										  c,
-										  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-										  stack->activeControl);
+		if (CONTROL_UPDATE_FUNCTIONS[c->type])
+		{
+			CONTROL_UPDATE_FUNCTIONS[c->type](stack,
+											  c,
+											  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
+											  stack->activeControl);
+		}
 	}
 
 
@@ -149,13 +192,20 @@ bool ProcessUiStack(UiStack *stack)
 	{
 		Control *c = ListGetPointer(stack->controls, i);
 
-		c->anchoredPosition = CalculateControlPosition(c);
+		if (CONTROL_ALWAYS_UPDATE_FUNCTIONS[c->type])
+		{
+			CONTROL_ALWAYS_UPDATE_FUNCTIONS[c->type](stack,
+													 c,
+													 v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
+													 stack->activeControl);
+		}
+
+		c->anchoredPosition = c->CalculatePosition(c, c->positioningData);
 	}
 
 	if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT) || IsButtonPressed(mainThreadInput, CONTROLLER_OK))
 	{
 		SetFocusedControl(stack, stack->activeControl);
-		//stack->focusedControl = stack->activeControl;
 		stack->activeControlState = ACTIVE;
 		return stack->activeControl != -1u;
 	}
@@ -184,17 +234,20 @@ bool ProcessUiStack(UiStack *stack)
 				localMousePos.y >= 0 &&
 				localMousePos.y <= c->size.y)
 			{
-				stack->activeControl = i;
-				if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT) ||
-					IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_SPACE) ||
-					IsButtonJustPressed(mainThreadInput, CONTROLLER_OK))
+				if (c->allowFocus)
 				{
-					stack->activeControlState = ACTIVE;
-					// make this control the focused control
-					SetFocusedControl(stack, i);
-				} else
-				{
-					stack->activeControlState = HOVER;
+					stack->activeControl = i;
+					if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT) ||
+						IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_SPACE) ||
+						IsButtonJustPressed(mainThreadInput, CONTROLLER_OK))
+					{
+						stack->activeControlState = ACTIVE;
+						// make this control the focused control
+						SetFocusedControl(stack, i);
+					} else
+					{
+						stack->activeControlState = HOVER;
+					}
 				}
 				break;
 			}
@@ -302,7 +355,7 @@ void DrawUiStack(const UiStack *stack)
 	}
 }
 
-Vector2 CalculateControlPosition(const Control *control)
+Vector2 CalculateControlPosition(const Control *control, const void *positioningData)
 {
 	Vector2 pos = control->position;
 	const ControlAnchor anchor = control->anchor;
@@ -354,6 +407,9 @@ Control *CreateEmptyControl()
 	CheckAlloc(c);
 	c->tooltip = NULL;
 	c->controlData = NULL;
+	c->CalculatePosition = CalculateControlPosition;
+	c->positioningData = NULL;
+	c->allowFocus = true;
 	return c;
 }
 

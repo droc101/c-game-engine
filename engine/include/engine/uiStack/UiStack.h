@@ -17,6 +17,8 @@ typedef enum ControlAnchor ControlAnchor;
 typedef struct Control Control;
 typedef struct UiStack UiStack;
 
+typedef Vector2 (*CalculateControlPositionFunc)(const Control *, const void *positioningData);
+
 enum ControlType
 {
 	BUTTON,
@@ -25,6 +27,10 @@ enum ControlType
 	RADIO_BUTTON,
 	TEXTBOX,
 	V_SCROLL_BAR,
+	HEADER_FOOTER,
+	LABEL,
+	OPTIONS_BUTTON,
+	ICON_BUTTON,
 	CONTROL_TYPE_COUNT
 };
 
@@ -60,6 +66,11 @@ struct Control
 	Vector2 size;
 
 	char *tooltip;
+
+	CalculateControlPositionFunc CalculatePosition;
+	void *positioningData;
+
+	bool allowFocus;
 
 	/// The absolute position of the control, calculated automatically
 	Vector2 anchoredPosition;
@@ -113,7 +124,7 @@ void DrawUiStack(const UiStack *stack);
  * @param control The control to calculate the position for
  * @return The anchored position of the control
  */
-Vector2 CalculateControlPosition(const Control *control);
+Vector2 CalculateControlPosition(const Control *control, const void *positioningData);
 
 /**
  * Create an empty control.

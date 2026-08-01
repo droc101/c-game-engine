@@ -1,42 +1,39 @@
 //
-// Created by droc101 on 10/7/2024.
+// Created by droc101 on 7/31/26.
 //
 
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
-#include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/controls/IconButton.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-Control *CreateButtonControl(const Vector2 position,
-							 const Vector2 size,
-							 const char *text,
-							 const ButtonCallback callback,
-							 const ControlAnchor anchor,
-							 char *tooltip)
+Control *CreateIconButtonControl(Vector2 position,
+								 char *icon,
+								 IconButtonCallback callback,
+								 ControlAnchor anchor,
+								 char *tooltip)
 {
 	Control *btn = CreateEmptyControl();
-	btn->type = BUTTON;
+	btn->type = ICON_BUTTON;
 	btn->position = position;
-	btn->size = size;
+	btn->size = v2s(40);
 	btn->anchor = anchor;
 	btn->tooltip = tooltip;
 
-	btn->controlData = malloc(sizeof(ButtonData));
+	btn->controlData = malloc(sizeof(IconButtonData));
 	CheckAlloc(btn->controlData);
-	ButtonData *data = btn->controlData;
-	data->text = text;
+	IconButtonData *data = btn->controlData;
+	data->icon = icon;
 	data->callback = callback;
 	data->enabled = true;
 	data->extraData = NULL;
@@ -44,15 +41,14 @@ Control *CreateButtonControl(const Vector2 position,
 	return btn;
 }
 
-void DestroyButton(const Control *c)
+void DestroyIconButton(const Control *c)
 {
-	ButtonData *data = c->controlData;
-	free(data);
+	free(c->controlData);
 }
 
-void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
+void UpdateIconButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex)
 {
-	const ButtonData *data = (ButtonData *)c->controlData;
+	const IconButtonData *data = (IconButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
 		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
@@ -63,7 +59,7 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_
 	}
 }
 
-void DrawButton(const Control *c, const ControlState state, const Vector2 position)
+void DrawIconButton(const Control *c, ControlState state, Vector2 position)
 {
 	switch (state)
 	{
@@ -78,7 +74,6 @@ void DrawButton(const Control *c, const ControlState state, const Vector2 positi
 			break;
 	}
 
-	const ButtonData *data = (ButtonData *)c->controlData;
-
-	DrawTextAligned(data->text, 16, COLOR_BLACK, position, c->size, FONT_HALIGN_CENTER, FONT_VALIGN_MIDDLE, smallFont);
+	const IconButtonData *data = (IconButtonData *)c->controlData;
+	DrawTexture(position, c->size, data->icon);
 }

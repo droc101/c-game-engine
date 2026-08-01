@@ -29,23 +29,23 @@ static UiStack *menuStack = NULL;
 bool menuStateFadeIn = false;
 static bool easterEgg = false;
 
-static void StartGame()
+static void StartGame(Control *, void *)
 {
 	SetGameState(&LevelSelectState);
 }
 
-static void QuitGame()
+static void QuitGame(Control *, void *)
 {
 	GetState()->requestExit = true;
 }
 
-static void OpenOptions()
+static void OpenOptions(Control *, void *)
 {
 	optionsStateInGame = false;
 	SetGameState(&OptionsState);
 }
 
-static void ReloadAssets()
+static void ReloadAssets(Control *, void *)
 {
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();

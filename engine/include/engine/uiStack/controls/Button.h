@@ -12,13 +12,14 @@
 
 typedef struct ButtonData ButtonData;
 
-typedef void (*ButtonCallback)();
+typedef void (*ButtonCallback)(Control *button, void *extraData);
 
 struct ButtonData
 {
-	char *text;
+	const char *text;
 	ButtonCallback callback;
 	bool enabled;
+	void *extraData;
 };
 
 /**
@@ -33,7 +34,7 @@ struct ButtonData
  */
 Control *CreateButtonControl(Vector2 position,
 							 Vector2 size,
-							 char *text,
+							 const char *text,
 							 ButtonCallback callback,
 							 ControlAnchor anchor,
 							 char *tooltip);

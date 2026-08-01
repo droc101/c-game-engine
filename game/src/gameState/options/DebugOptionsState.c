@@ -3,7 +3,6 @@
 //
 
 #include "gameState/options/DebugOptionsState.h"
-#include <engine/assets/AssetReader.h>
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -13,16 +12,15 @@
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
-#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
-#include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/TextBox.h>
-#include <engine/uiStack/controls/VScrollBar.h>
+#include <engine/uiStack/controls/HeaderFooterControl.h>
+#include <engine/uiStack/controls/LabelControl.h>
+#include <engine/uiStack/controls/OptionsButton.h>
+#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <gameState/OptionsState.h>
-#include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -30,25 +28,47 @@
 #include <string.h>
 
 static UiStack *debugOptionsStack = NULL;
+static ScrollView *debugOptionsScrollView = NULL;
 static char *filter = NULL;
 
-static const int LIST_WIDTH = 750;
+static OptionsButtonValue buttonValues[3] = {
+	{
+		.text = "Disabled",
+		.tooltip = "This debug option will never be shown",
+		.value = DEBUG_ENTRY_DISABLED,
+	},
+	{
+		.text = "In Extended Menu",
+		.tooltip = "This debug option will be shown in the extended menu",
+		.value = DEBUG_ENTRY_TOGGLE,
+	},
+	{
+		.text = "Always Visible",
+		.tooltip = "This debug option will always be shown",
+		.value = DEBUG_ENTRY_SHOWN,
+	},
+};
+
 static const int ENTRY_HEIGHT = 44;
 
-static VScrollBarData scrollData = {0};
-
-static void BtnDebugOptionsBack()
+static void BtnDebugOptionsBack(Control *, void *)
 {
 	SetGameState(&OptionsState);
 }
 
-static void BtnDebugOptionsReset()
+static void BtnDebugOptionsReset(Control *, void *)
 {
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		DebugEntry *entry = ListGetPointer(debugEntries, i);
 		entry->mode = entry->defaultMode;
 	}
+}
+
+static void OptBtnEntryChanged(const size_t value, void *extraData)
+{
+	DebugEntry *entry = extraData;
+	entry->mode = buttonValues[value].value;
 }
 
 static void FilterTextChanged(const char *newFilter)
@@ -66,25 +86,12 @@ static void DebugOptionsStateUpdate(GlobalState *state, const double delta)
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
 		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
 	{
-		BtnDebugOptionsBack();
+		BtnDebugOptionsBack(NULL, NULL);
 	}
 	if (!optionsStateInGame)
 	{
 		UpdateMenuBackground(state, delta);
 	}
-}
-
-static bool IsRectHovered(Vector2 pos, Vector2 size)
-{
-	const Vector2 endPos = Vector2Add(pos, size);
-	const Vector2 mousePos = GetMousePos(mainThreadInput);
-
-	if (mousePos.y < 100 || mousePos.y > ScaledWindowHeightFloat() - 100)
-	{
-		return false;
-	}
-
-	return mousePos.x >= pos.x && mousePos.x <= endPos.x && mousePos.y > pos.y && mousePos.y <= endPos.y;
 }
 
 static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
@@ -95,123 +102,12 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 	} else
 	{
 		RenderMenuBackground(state);
-		DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0x40000000));
 	}
 
-	const int listX = ScaledWindowWidth() / 2 - LIST_WIDTH / 2;
-
-	int entryY = 102 + scrollData.scrollPos;
-	int numShownEntries = 0;
-	bool showDebugEntryTooltip = false;
-	DebugEntryMode tooltipMode = DEBUG_ENTRY_DISABLED;
-	for (size_t i = 0; i < debugEntries.length; i++)
-	{
-		DebugEntry *entry = ListGetPointer(debugEntries, i);
-
-		if (filter != NULL && strstr(entry->key, filter) == NULL)
-		{
-			continue;
-		}
-
-		DrawTextAligned(entry->key,
-						20,
-						COLOR_WHITE,
-						v2(listX, entryY),
-						v2(LIST_WIDTH, ENTRY_HEIGHT),
-						FONT_HALIGN_LEFT,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
-
-		const Vector2 buttonPos = v2(listX + LIST_WIDTH - 220, entryY + 2);
-		const Vector2 buttonSize = v2(220, ENTRY_HEIGHT - 4);
-
-		const char *buttonTexture = TEXTURE("interface/button");
-		if (IsRectHovered(buttonPos, buttonSize))
-		{
-			buttonTexture = TEXTURE("interface/button_hover");
-			if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
-			{
-				buttonTexture = TEXTURE("interface/button_pressed");
-			}
-			if (IsMouseButtonJustReleased(mainThreadInput, SDL_BUTTON_LEFT))
-			{
-				entry->mode++;
-				if (entry->mode == DEBUG_ENTRY_MODE_MAX)
-				{
-					entry->mode = DEBUG_ENTRY_DISABLED;
-				}
-				SaveOptions(&GetState()->options);
-				UiStackResetFocus(debugOptionsStack);
-				(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
-			}
-
-			showDebugEntryTooltip = true;
-			tooltipMode = entry->mode;
-		}
-
-		DrawNinePatchTexture(buttonPos, buttonSize, 8, 8, buttonTexture);
-		const char *label = "Disabled";
-		switch (entry->mode)
-		{
-			case DEBUG_ENTRY_TOGGLE:
-				label = "In Extended Menu";
-				break;
-			case DEBUG_ENTRY_SHOWN:
-				label = "Always Visible";
-				break;
-			default:
-				break;
-		}
-		DrawTextAligned(label,
-						16,
-						COLOR_BLACK,
-						buttonPos,
-						buttonSize,
-						FONT_HALIGN_CENTER,
-						FONT_VALIGN_MIDDLE,
-						smallFont);
-
-		entryY += ENTRY_HEIGHT + 2;
-		numShownEntries++;
-	}
-
-	DrawRect(0, 0, ScaledWindowWidth(), 100, COLOR(0x80000000));
-	DrawRect(0, ScaledWindowHeight() - 100, ScaledWindowWidth(), 100, COLOR(0x80000000));
-	DrawLine(v2(0, 99), v2(ScaledWindowWidth(), 99), 2, COLOR_WHITE);
-	DrawLine(v2(0, ScaledWindowHeight() - 99), v2(ScaledWindowWidth(), ScaledWindowHeight() - 99), 2, COLOR_WHITE);
-
-	DrawTextAligned("Debug Options",
-					32,
-					COLOR_WHITE,
-					v2s(0),
-					v2(ScaledWindowWidthFloat(), 50),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					largeFont);
-
-	scrollData.contentHeight = numShownEntries * (ENTRY_HEIGHT + 2);
-	scrollData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * ENTRY_HEIGHT / 2;
-
+	debugOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
+	ProcessScrollView(debugOptionsScrollView);
 	ProcessUiStack(debugOptionsStack);
 	DrawUiStack(debugOptionsStack);
-
-	if (showDebugEntryTooltip)
-	{
-		switch (tooltipMode)
-		{
-			case DEBUG_ENTRY_DISABLED:
-				RenderTooltipAtMouse("This debug option will never be shown");
-				break;
-			case DEBUG_ENTRY_TOGGLE:
-				RenderTooltipAtMouse("This debug option will be shown in the extended menu");
-				break;
-			case DEBUG_ENTRY_SHOWN:
-				RenderTooltipAtMouse("This debug option will always be shown");
-				break;
-			default:
-				break;
-		}
-	}
 }
 
 static void DebugOptionsStateSet()
@@ -219,15 +115,48 @@ static void DebugOptionsStateSet()
 	if (debugOptionsStack == NULL)
 	{
 		debugOptionsStack = CreateUiStack();
+		debugOptionsScrollView = CreateScrollView(debugOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
 
-		UiStackPush(debugOptionsStack,
-					CreateTextBoxControl("Filter Options",
-										 v2(0, 50),
-										 v2(480, 40),
-										 TOP_CENTER,
-										 64,
-										 FilterTextChanged,
-										 NULL));
+		int entryY = 0;
+		for (size_t i = 0; i < debugEntries.length; i++)
+		{
+			DebugEntry *entry = ListGetPointer(debugEntries, i);
+			ScrollViewAddChild(debugOptionsScrollView,
+							   CreateLabelControl(entry->key,
+												  16,
+												  COLOR_WHITE,
+												  v2(0, entryY),
+												  v2(750 - 220 - 6, 40),
+												  TOP_LEFT,
+												  FONT_HALIGN_LEFT,
+												  FONT_VALIGN_MIDDLE,
+												  smallFont,
+												  true));
+			ScrollViewAddChild(debugOptionsScrollView,
+							   CreateOptionsButtonControl(v2(0, entryY),
+														  v2(220, 40),
+														  "%s",
+														  OptBtnEntryChanged,
+														  TOP_RIGHT,
+														  buttonValues,
+														  DEBUG_ENTRY_MODE_MAX - 1,
+														  entry,
+														  entry->mode));
+
+			entryY += ENTRY_HEIGHT;
+		}
+
+		UiStackPush(debugOptionsStack, CreateHeaderFooterControl(100, true, "Debug Options"));
+		UiStackPush(debugOptionsStack, CreateHeaderFooterControl(100, false, NULL));
+
+		// UiStackPush(debugOptionsStack,
+		// 			CreateTextBoxControl("Filter Options",
+		// 								 v2(0, 50),
+		// 								 v2(480, 40),
+		// 								 TOP_CENTER,
+		// 								 64,
+		// 								 FilterTextChanged,
+		// 								 NULL));
 
 		UiStackPush(debugOptionsStack,
 					CreateButtonControl(v2(-175, -40),
@@ -238,12 +167,6 @@ static void DebugOptionsStateSet()
 										NULL));
 		UiStackPush(debugOptionsStack,
 					CreateButtonControl(v2(175, -40), v2(340, 40), "Back", BtnDebugOptionsBack, BOTTOM_CENTER, NULL));
-
-		UiStackPush(debugOptionsStack,
-					CreateVScrollBarControl(v2(LIST_WIDTH / 2 + 20, 0),
-											ScaledWindowHeightFloat() - 200,
-											MIDDLE_CENTER,
-											&scrollData));
 	}
 	UiStackResetFocus(debugOptionsStack);
 }
@@ -252,6 +175,7 @@ static void DebugOptionsStateDestroy()
 {
 	if (debugOptionsStack != NULL)
 	{
+		FreeScrollView(debugOptionsScrollView);
 		DestroyUiStack(debugOptionsStack);
 		debugOptionsStack = NULL;
 	}
