@@ -175,9 +175,11 @@ static inline bool CreateUIPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.ui),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.ui),
 			   "Failed to create UI graphics pipeline!");
 
 	return true;
@@ -261,9 +263,11 @@ static inline bool CreateShadedMapPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedMap),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.shadedMap),
 			   "Failed to create shaded map graphics pipeline!");
 
 	return true;
@@ -338,9 +342,11 @@ static inline bool CreateUnshadedMapPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedMap),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.unshadedMap),
 			   "Failed to create unshaded map graphics pipeline!");
 
 	return true;
@@ -419,9 +425,11 @@ static inline bool CreateSkyPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = skyPipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.sky),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.sky),
 			   "Failed to create sky graphics pipeline!");
 
 	return true;
@@ -542,9 +550,11 @@ static inline bool CreateShadedModelPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedModel),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.shadedModel),
 			   "Failed to create shaded model graphics pipeline!");
 
 	return true;
@@ -655,9 +665,11 @@ static inline bool CreateUnshadedModelPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedModel),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.unshadedModel),
 			   "Failed to create unshaded model graphics pipeline!");
 
 	return true;
@@ -780,9 +792,11 @@ static inline bool CreateShadedActorModelPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.shadedActorModel),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.shadedActorModel),
 			   "Failed to create shaded actor model graphics pipeline!");
 
 	return true;
@@ -899,9 +913,11 @@ static inline bool CreateUnshadedActorModelPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &pipelineInfo, &pipelines.unshadedActorModel),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.unshadedActorModel),
 			   "Failed to create unshaded actor model graphics pipeline!");
 
 	return true;
@@ -1037,9 +1053,11 @@ static inline bool CreateActorWallPipelines()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &shadedPipelineInfo, &pipelines.shadedActorWall),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &shadedPipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.shadedActorWall),
 			   "Failed to create shaded actor wall graphics pipeline!");
 
 	const LunaGraphicsPipelineCreationInfo unshadedPipelineInfo = {
@@ -1054,9 +1072,11 @@ static inline bool CreateActorWallPipelines()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &unshadedPipelineInfo, &pipelines.unshadedActorWall),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &unshadedPipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.unshadedActorWall),
 			   "Failed to create unshaded actor wall graphics pipeline!");
 
 	return true;
