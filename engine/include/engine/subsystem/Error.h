@@ -48,15 +48,6 @@ _Noreturn void FriendlyError(const char *title, const char *description);
 void ShowWarning(const char *title, const char *description);
 
 /**
- * Ask the user if they want to restart the program (or continue running)
- * @param title The title of the prompt
- * @param description The description/message of the prompt
- * @param yesBtn The text of the yes/restart button
- * @param noBtn The text of the no/continue button
- */
-void PromptRelaunch(const char *title, const char *description, const char *yesBtn, const char *noBtn);
-
-/**
  * Shows an error message saying that vk/gl failed to initialize and offers to switch to the other or exit
  */
 _Noreturn void RenderInitError();
