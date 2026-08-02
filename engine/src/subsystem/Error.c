@@ -135,37 +135,6 @@ void ShowWarning(const char *title, const char *description)
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, description, NULL);
 }
 
-void PromptRelaunch(const char *title, const char *description, const char *yesBtn, const char *noBtn)
-{
-	SDL_MessageBoxData mb;
-	mb.message = description;
-	mb.title = title;
-
-	SDL_MessageBoxButtonData buttons[2];
-	buttons[0].buttonID = 0;
-	buttons[0].text = noBtn;
-	buttons[0].flags = 0;
-	buttons[1].buttonID = 1;
-	buttons[1].text = yesBtn;
-	buttons[1].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-
-	mb.buttons = buttons;
-	mb.numbuttons = 2;
-
-	mb.colorScheme = &mbColorScheme;
-
-	mb.window = GetGameWindow();
-	mb.flags = SDL_MESSAGEBOX_ERROR;
-
-	int pressedButtonID = 0;
-	SDL_ShowMessageBox(&mb, &pressedButtonID);
-
-	if (pressedButtonID == 1)
-	{
-		RestartProgram();
-	}
-}
-
 _Noreturn void RenderInitError()
 {
 	LogError("Failed to initialize renderer\n");
@@ -201,6 +170,8 @@ static void SignalHandler(const int sig)
 			Error("Floating Point Exception");
 		case SIGILL:
 			Error("Illegal Instruction");
+		case SIGABRT:
+			Error("Abort");
 		default:
 			break;
 	}
@@ -238,6 +209,7 @@ void ErrorHandlerInit()
 	signal(SIGSEGV, SignalHandler);
 	signal(SIGFPE, SignalHandler);
 	signal(SIGILL, SignalHandler);
+	signal(SIGABRT, SignalHandler);
 #endif
 }
 

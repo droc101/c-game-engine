@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "gameState/options/RestartPromptState.h"
 #include "gameState/OptionsState.h"
 
 static UiStack *videoOptionsStack = NULL;
@@ -70,10 +71,8 @@ static void BtnVideoOptionsBack(Control *, void *)
 	SaveOptions(&GetState()->options);
 	if (hasChangedVideoOptions)
 	{
-		PromptRelaunch("Restart Game?",
-					   "You have changed options that require a relaunch. Would you like to relaunch now?",
-					   "Yes",
-					   "No");
+		SetGameState(&RestartPromptState);
+		return;
 	}
 	SetGameState(&OptionsState);
 }
