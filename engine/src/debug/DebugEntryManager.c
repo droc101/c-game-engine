@@ -204,8 +204,11 @@ bool IsDebugEntryVisible(const char *key)
 void InitDebugEntryManager()
 {
 	ListInit(debugEntries, LIST_POINTER);
+	// Version group
 	RegisterDebugEntry("engine_version", DebugEntryVersion, DEBUG_ENTRY_SHOWN, 5);
 	RegisterDebugEntry("git_commit", DebugEntryGitCommit, DEBUG_ENTRY_DISABLED, 5);
+
+	// Normal debug entries
 	RegisterDebugEntry("fps", DebugEntryFPS, DEBUG_ENTRY_SHOWN, 5);
 	RegisterDebugEntry("tps", DebugEntryTPS, DEBUG_ENTRY_SHOWN, 5);
 	RegisterDebugEntry("fps_graph", FrameGraphDraw, DEBUG_ENTRY_TOGGLE, 0);
@@ -218,7 +221,12 @@ void InitDebugEntryManager()
 	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, 5);
+
+	// Console
 	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);
+
+	// Nonstandard debug entries
+	RegisterDebugEntry("ui_stack_layout_bounds", NULL, DEBUG_ENTRY_DISABLED, 0);
 #ifdef JPH_DEBUG_RENDERER
 	RegisterDebugEntry("jolt_debug_renderer", NULL, DEBUG_ENTRY_TOGGLE, 0);
 #endif

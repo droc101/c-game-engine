@@ -4,8 +4,10 @@
 
 #include "gameState/options/VideoOptionsState.h"
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
@@ -13,8 +15,9 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/controls/HeaderFooterControl.h>
+#include <engine/uiStack/controls/LabelControl.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
@@ -30,6 +33,37 @@
 static UiStack *videoOptionsStack = NULL;
 static ScrollView *videoOptionsScrollView = NULL;
 static bool hasChangedVideoOptions = false;
+
+static OptionsButtonValue gpuTypeButtonValues[3] = {
+	{
+		.text = "Dedicated",
+		.tooltip = "Prefer using a dedicated GPU, which usually provides the best performance.",
+		.value = GPU_TYPE_DEDICATED,
+	},
+	{
+		.text = "Integrated",
+		.tooltip = "Prefer using an integrated GPU, which usually provides less performance than a dedicated GPU.",
+		.value = GPU_TYPE_INTEGRATED,
+	},
+	{
+		.text = "Software",
+		.tooltip = "Prefer using a software emulated GPU, which usually provides the worst performance.",
+		.value = GPU_TYPE_SOFTWARE,
+	},
+};
+
+static OptionsButtonValue preferWaylandButtonValues[2] = {
+	{
+		.text = "Prefer X11",
+		.tooltip = NULL,
+		.value = false,
+	},
+	{
+		.text = "Prefer Wayland",
+		.tooltip = NULL,
+		.value = true,
+	},
+};
 
 static void BtnVideoOptionsBack(Control *, void *)
 {
@@ -88,33 +122,33 @@ static char *SliderLabelMaxFps(const Control *slider)
 	return buf;
 }
 
-static void CbOptionsFullscreen(const bool value)
+static void OptBtnFullscreenChanged(size_t value, void *)
 {
-	GetState()->options.fullscreen = value;
-	SDL_SetWindowFullscreen(GetGameWindow(), value);
+	GetState()->options.fullscreen = onOffButtonValues[value].value;
+	SDL_SetWindowFullscreen(GetGameWindow(), onOffButtonValues[value].value);
 }
 
-static void CbOptionsVsync(const bool value)
+static void OptBtnVsyncChanged(size_t value, void *)
 {
-	GetState()->options.vsync = value;
+	GetState()->options.vsync = onOffButtonValues[value].value;
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
-static void CbOptionsLimitFpsWhenUnfocused(const bool value)
+static void OptBtnLimitFpsWhenUnfocusedChanged(size_t value, void *)
 {
-	GetState()->options.limitFpsWhenUnfocused = value;
+	GetState()->options.limitFpsWhenUnfocused = yesNoButtonValues[value].value;
 }
 
-static void CbOptionsMipmaps(const bool value)
+static void OptButtonMipmapsChanged(const size_t value, void * /*extraData*/)
 {
-	GetState()->options.mipmaps = value;
+	GetState()->options.mipmaps = onOffButtonValues[value].value;
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
-static void CbOptionsPreferWayland(const bool value)
+static void CbOptionsPreferWayland(size_t value, void *)
 {
-	GetState()->options.preferWayland = value;
+	GetState()->options.preferWayland = preferWaylandButtonValues[value].value;
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
 }
@@ -149,6 +183,12 @@ static void SldOptionsFov(const float value)
 	{
 		GetState()->map->player.playerCamera.fov = GetState()->options.fov;
 	}
+}
+
+static void OptBtnPreferredGpuTypeChanged(const size_t value, void * /*extraData*/)
+{
+	GetState()->options.preferredGpuType = gpuTypeButtonValues[value].value;
+	hasChangedVideoOptions = true;
 }
 
 static void VideoOptionsStateUpdate(GlobalState *state, const double delta)
@@ -204,41 +244,104 @@ static void VideoOptionsStateSet()
 
 		opY += opSpacing * 1.5f;
 		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateCheckboxControl(v2(-185, opY),
-												 v2(370, 40),
-												 "Fullscreen",
-												 CbOptionsFullscreen,
-												 TOP_CENTER,
-												 GetState()->options.fullscreen,
-												 NULL));
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateCheckboxControl(v2(190, opY),
-												 v2(370, 40),
-												 "VSync",
-												 CbOptionsVsync,
-												 TOP_CENTER,
-												 GetState()->options.vsync,
-												 "Synchronizes the framerate with your monitor to reduce screen "
-												 "tearing"));
+						   CreateLabelControl("Display Options",
+											  16,
+											  COLOR_WHITE,
+											  v2(0, opY),
+											  v2(750, 40),
+											  TOP_CENTER,
+											  FONT_HALIGN_LEFT,
+											  FONT_VALIGN_MIDDLE,
+											  smallFont,
+											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateCheckboxControl(v2(-185, opY),
-												 v2(370, 40),
-												 "Limit Background FPS",
-												 CbOptionsLimitFpsWhenUnfocused,
-												 TOP_CENTER,
-												 GetState()->options.limitFpsWhenUnfocused,
-												 "Limit the framerate to 30 when the game window is not focused"));
+						   CreateSliderControl(v2(0, opY),
+											   v2(750, 40),
+											   "Maximum FPS",
+											   SldOptionsMaxFps,
+											   TOP_CENTER,
+											   0,
+											   500,
+											   GetState()->options.maxFps,
+											   10,
+											   10,
+											   SliderLabelMaxFps,
+											   NULL));
+		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateCheckboxControl(v2(190, opY),
-												 v2(370, 40),
-												 "Mipmaps",
-												 CbOptionsMipmaps,
-												 TOP_CENTER,
-												 GetState()->options.mipmaps,
-												 "Improves the appearance of far away textures"));
+						   CreateOptionsButtonControl(v2(-190, opY),
+													  v2(370, 40),
+													  "VSync: %s",
+													  OptBtnVsyncChanged,
+													  TOP_CENTER,
+													  onOffButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.vsync,
+													  "Limits the framerate to your monitor to reduce screen "
+													  "tearing"));
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateOptionsButtonControl(v2(190, opY),
+													  v2(370, 40),
+													  "Limit Background FPS: %s",
+													  OptBtnLimitFpsWhenUnfocusedChanged,
+													  TOP_CENTER,
+													  yesNoButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.limitFpsWhenUnfocused,
+													  "Limit the framerate to 30 when the game window is not focused"));
+		opY += opSpacing;
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateOptionsButtonControl(v2(-190, opY),
+													  v2(370, 40),
+													  "Fullscreen: %s",
+													  OptBtnFullscreenChanged,
+													  TOP_CENTER,
+													  onOffButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.fullscreen,
+													  NULL));
+#ifdef SDL_PLATFORM_LINUX
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateOptionsButtonControl(v2(190, opY),
+													  v2(370, 40),
+													  "Video Platform: %s",
+													  CbOptionsPreferWayland,
+													  TOP_CENTER,
+													  preferWaylandButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.preferWayland,
+													  NULL));
+#endif
 		opY += opSpacing * 1.5f;
-
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateLabelControl("Quality Options",
+											  16,
+											  COLOR_WHITE,
+											  v2(0, opY),
+											  v2(750, 40),
+											  TOP_CENTER,
+											  FONT_HALIGN_LEFT,
+											  FONT_VALIGN_MIDDLE,
+											  smallFont,
+											  true));
+		opY += opSpacing;
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateOptionsButtonControl(v2(0, opY),
+													  v2(750, 40),
+													  "Preferred GPU Type: %s",
+													  OptBtnPreferredGpuTypeChanged,
+													  TOP_CENTER,
+													  gpuTypeButtonValues,
+													  3,
+													  NULL,
+													  GetState()->options.preferredGpuType,
+													  NULL));
+		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
@@ -252,22 +355,6 @@ static void VideoOptionsStateSet()
 											   1,
 											   SliderLabelMSAA,
 											   "Smooths the edges of objects"));
-
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "Anisotropic Filtering",
-											   SldOptionsAnisotropy,
-											   TOP_CENTER,
-											   0.0,
-											   4.0,
-											   GetState()->options.anisotropy,
-											   1,
-											   1,
-											   SliderLabelAnisotropy,
-											   "Improves the appearance of textures viewed at sharp angles"));
-
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(0, opY),
@@ -284,31 +371,30 @@ static void VideoOptionsStateSet()
 											   "Changes the level of detail on far away objects"));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "Maximum FPS",
-											   SldOptionsMaxFps,
-											   TOP_CENTER,
-											   0,
-											   500,
-											   GetState()->options.maxFps,
-											   10,
-											   10,
-											   SliderLabelMaxFps,
-											   NULL));
-#ifdef SDL_PLATFORM_LINUX
-		opY += opSpacing * 1.5f;
+						   CreateOptionsButtonControl(v2(-190, opY),
+													  v2(370, 40),
+													  "Mipmaps: %s",
+													  OptButtonMipmapsChanged,
+													  TOP_CENTER,
+													  onOffButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.mipmaps,
+													  NULL));
 		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateCheckboxControl(v2(0, opY),
-												 v2(750, 40),
-												 "Prefer Wayland over X11",
-												 CbOptionsPreferWayland,
-												 TOP_CENTER,
-												 GetState()->options.preferWayland,
-												 NULL));
-#endif
+						   CreateSliderControl(v2(190, opY),
+											   v2(370, 40),
+											   "Anisotropic Filtering",
+											   SldOptionsAnisotropy,
+											   TOP_CENTER,
+											   0.0,
+											   4.0,
+											   GetState()->options.anisotropy,
+											   1,
+											   1,
+											   SliderLabelAnisotropy,
+											   "Improves the appearance of textures viewed at sharp angles"));
 		opY += opSpacing;
-
 
 		UiStackPush(videoOptionsStack, CreateHeaderFooterControl(100, true, "Video Options"));
 		UiStackPush(videoOptionsStack, CreateHeaderFooterControl(100, false, NULL));

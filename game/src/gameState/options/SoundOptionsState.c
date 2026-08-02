@@ -108,7 +108,7 @@ static void SoundOptionsStateSet()
 											   NULL));
 		opY += opSpacing * 1.5;
 		ScrollViewAddChild(soundOptionsScrollView,
-						   CreateSliderControl(v2(-185, opY),
+						   CreateSliderControl(v2(-190, opY),
 											   v2(370, 40),
 											   "Music Volume",
 											   SldOptionsMusicVolume,
@@ -135,7 +135,7 @@ static void SoundOptionsStateSet()
 											   NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(soundOptionsScrollView,
-						   CreateSliderControl(v2(-185, opY),
+						   CreateSliderControl(v2(-190, opY),
 											   v2(370, 40),
 											   "UI Volume",
 											   SldOptionsUiVolume,

@@ -140,9 +140,10 @@ static void DebugOptionsStateSet()
 														  OptBtnEntryChanged,
 														  TOP_RIGHT,
 														  buttonValues,
-														  DEBUG_ENTRY_MODE_MAX - 1,
+														  DEBUG_ENTRY_MODE_MAX,
 														  entry,
-														  entry->mode));
+														  entry->mode,
+														  NULL));
 
 			entryY += ENTRY_HEIGHT;
 		}

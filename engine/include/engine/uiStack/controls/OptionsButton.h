@@ -26,6 +26,7 @@ struct OptionsButtonValue
 struct OptionsButtonData
 {
 	char *text;
+	char *alwaysTooltip;
 	OptionsButtonCallback callback;
 	bool enabled;
 	OptionsButtonValue *values;
@@ -42,12 +43,16 @@ Control *CreateOptionsButtonControl(Vector2 position,
 									OptionsButtonValue *values,
 									size_t numValues,
 									void *extraData,
-									size_t value);
+									size_t value,
+									char *alwaysTooltip);
 
 void DestroyOptionsButton(const Control *c);
 
 void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
 void DrawOptionsButton(const Control *c, ControlState state, Vector2 position);
+
+extern OptionsButtonValue onOffButtonValues[2];
+extern OptionsButtonValue yesNoButtonValues[2];
 
 #endif //GAME_OPTIONSBUTTON_H

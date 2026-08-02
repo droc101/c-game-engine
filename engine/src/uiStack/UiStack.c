@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
+#include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -341,6 +342,11 @@ void DrawUiStack(const UiStack *stack)
 								 16,
 								 16,
 								 TEXTURE("interface/focus_rect"));
+		}
+
+		if (IsDebugEntryVisible("ui_stack_layout_bounds"))
+		{
+			DrawRect(c->anchoredPosition.x, c->anchoredPosition.y, c->size.x, c->size.y, COLOR(0x80FF0000));
 		}
 	}
 

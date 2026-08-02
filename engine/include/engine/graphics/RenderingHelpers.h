@@ -146,6 +146,10 @@ bool FrameStart();
  */
 void FrameEnd();
 
+float GetAutoUiScale();
+
+void UpdateUiScale();
+
 /**
  * Update the viewport size
  */

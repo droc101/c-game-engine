@@ -32,6 +32,7 @@ static void DefaultOptions(Options *options)
 	options->fov = 90.0f;
 	options->anisotropy = ANISOTROPY_16X;
 	options->maxFps = 0;
+	options->preferredGpuType = GPU_TYPE_DEDICATED;
 #ifdef BUILDSTYLE_DEBUG
 	options->vsync = false;
 	options->limitFpsWhenUnfocused = false;
@@ -141,6 +142,7 @@ void LoadOptions(Options *options)
 		options->fov = KvGetFloat(list, "fov", 90.0f);
 		options->anisotropy = KvGetByte(list, "anisotropy", ANISOTROPY_16X);
 		options->maxFps = KvGetInt(list, "max_fps", 0);
+		options->preferredGpuType = KvGetByte(list, "preferred_gpu_type", GPU_TYPE_DEDICATED);
 
 		options->musicVolume = KvGetFloat(list, "music_volume", 1.0f);
 		options->sfxVolume = KvGetFloat(list, "sfx_volume", 1.0f);
@@ -193,6 +195,7 @@ void SaveOptions(Options *options)
 	KvSetFloat(list, "fov", options->fov);
 	KvSetByte(list, "anisotropy", options->anisotropy);
 	KvSetInt(list, "max_fps", options->maxFps);
+	KvSetByte(list, "preferred_gpu_type", options->preferredGpuType);
 
 	KvSetFloat(list, "music_volume", options->musicVolume);
 	KvSetFloat(list, "sfx_volume", options->sfxVolume);

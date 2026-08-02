@@ -72,8 +72,21 @@ bool CreateSurface(SDL_Window *window)
 
 bool CreateLogicalDevice()
 {
+	VkPhysicalDeviceType preferred = VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+	switch (GetState()->options.preferredGpuType)
+	{
+		case GPU_TYPE_INTEGRATED:
+			preferred = VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
+			break;
+		case GPU_TYPE_DEDICATED:
+			preferred = VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+			break;
+		case GPU_TYPE_SOFTWARE:
+			preferred = VK_PHYSICAL_DEVICE_TYPE_CPU;
+			break;
+	}
 	const LunaPhysicalDevicePreferenceDefinition devicePreferenceDefinition = {
-		.preferredDeviceType = VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU,
+		.preferredDeviceType = preferred,
 	};
 	const VkPhysicalDeviceFeatures vulkan10Features = {
 		.samplerAnisotropy = VK_TRUE,
