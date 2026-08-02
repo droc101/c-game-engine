@@ -45,6 +45,7 @@ void DestroyHeaderFooterControl(const Control *c)
 {
 	const HeaderFooterControlData *data = c->controlData;
 	free(data->label);
+	free(data);
 }
 
 void AlwaysUpdateHeaderFooterControl(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex)

@@ -15,6 +15,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
+#include <engine/subsystem/Logging.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
@@ -49,26 +50,12 @@ static void OpenOptions(Control *, void *)
 
 static void ReloadAssets(Control *, void *)
 {
+	LogInfo("Reloading all assets");
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
-}
-
-static void DrawMenuFadeIn(GlobalState * /*state*/)
-{
-	// TODO: how to make this play nice with the big lag frame from the background map load
-	// if (menuStateFadeIn)
-	// {
-	// 	const float alpha = 1.0f - ((float)(state->physicsFrame) / 20.0f);
-	// 	Color color = COLOR_BLACK;
-	// 	color.a = alpha;
-	// 	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), color);
-	//
-	// 	if (GetState()->physicsFrame >= 20)
-	// 	{
-	// 		menuStateFadeIn = false;
-	// 	}
-	// }
+	/* TODO need to recreate the ui stack once assets are reload but before it is next processed and drawn to avoid a
+	 *  use-after-free on the fonts (label controls) */
 }
 
 static void MenuStateRender(GlobalState *state, const double /*delta*/)
@@ -76,14 +63,11 @@ static void MenuStateRender(GlobalState *state, const double /*delta*/)
 	RenderMenuBackground(state);
 	if (!IsBackgroundMapLoaded())
 	{
-		DrawMenuFadeIn(state);
 		return;
 	}
 
 	ProcessUiStack(menuStack);
 	DrawUiStack(menuStack);
-
-	DrawMenuFadeIn(state);
 }
 
 static void MenuStateSet()
