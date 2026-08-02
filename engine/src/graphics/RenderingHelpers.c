@@ -159,14 +159,24 @@ void FrameEnd()
 	VK_FrameEnd();
 }
 
-inline void UpdateViewportSize()
+inline float GetAutoUiScale()
 {
 	const float newScaleX = ActualWindowSize().x / DEF_WIDTH;
 	const float newScaleY = ActualWindowSize().y / DEF_HEIGHT;
 	float newScale = newScaleX < newScaleY ? newScaleX : newScaleY;
 	newScale = max(floorf(newScale), 1.0f);
-	GetState()->uiScale = newScale;
+	return newScale;
+}
+
+void UpdateUiScale()
+{
+	GetState()->uiScale = GetAutoUiScale();
 	UpdateWindowSize();
+}
+
+inline void UpdateViewportSize()
+{
+	UpdateUiScale();
 	VK_UpdateViewportSize();
 }
 

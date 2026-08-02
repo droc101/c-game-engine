@@ -10,6 +10,7 @@
 
 typedef enum OptionsMsaa OptionsMsaa;
 typedef enum OptionsAnisotropy OptionsAnisotropy;
+typedef enum OptionsGpuType OptionsGpuType;
 typedef enum OptionsShadowMapResolution OptionsShadowMapResolution;
 
 typedef struct Options Options;
@@ -32,6 +33,13 @@ enum OptionsAnisotropy
 	ANISOTROPY_4X = 2,
 	ANISOTROPY_8X = 3,
 	ANISOTROPY_16X = 4
+};
+
+enum OptionsGpuType
+{
+	GPU_TYPE_INTEGRATED,
+	GPU_TYPE_DEDICATED,
+	GPU_TYPE_SOFTWARE,
 };
 
 enum OptionsShadowMapResolution
@@ -87,6 +95,7 @@ struct Options
 	OptionsAnisotropy anisotropy;
 	/// The FPS cap, or 0 for no cap
 	uint16_t maxFps;
+	OptionsGpuType preferredGpuType;
 
 	/* Audio */
 

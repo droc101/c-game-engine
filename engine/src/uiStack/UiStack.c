@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
+#include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -336,11 +337,16 @@ void DrawUiStack(const UiStack *stack)
 		// if this is the focused control, draw a border around it
 		if (i == stack->focusedControl)
 		{
-			DrawNinePatchTexture(v2(c->anchoredPosition.x - 4, c->anchoredPosition.y - 4),
-								 v2(c->size.x + 8, c->size.y + 8),
+			DrawNinePatchTexture(v2(c->anchoredPosition.x - 6, c->anchoredPosition.y - 6),
+								 v2(c->size.x + 12, c->size.y + 12),
 								 16,
 								 16,
 								 TEXTURE("interface/focus_rect"));
+		}
+
+		if (IsDebugEntryVisible("ui_stack_layout_bounds"))
+		{
+			DrawRect(c->anchoredPosition.x, c->anchoredPosition.y, c->size.x, c->size.y, COLOR(0x80FF0000));
 		}
 	}
 

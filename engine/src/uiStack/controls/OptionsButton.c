@@ -14,18 +14,20 @@
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-Control *CreateOptionsButtonControl(Vector2 position,
-									Vector2 size,
+Control *CreateOptionsButtonControl(const Vector2 position,
+									const Vector2 size,
 									char *text,
-									OptionsButtonCallback callback,
-									ControlAnchor anchor,
+									const OptionsButtonCallback callback,
+									const ControlAnchor anchor,
 									OptionsButtonValue *values,
-									size_t numValues,
+									const size_t numValues,
 									void *extraData,
-									size_t value)
+									const size_t value,
+									char *alwaysTooltip)
 {
 	Control *btn = CreateEmptyControl();
 	btn->type = OPTIONS_BUTTON;
@@ -37,14 +39,29 @@ Control *CreateOptionsButtonControl(Vector2 position,
 	CheckAlloc(btn->controlData);
 	OptionsButtonData *data = btn->controlData;
 	data->text = text;
+	data->alwaysTooltip = alwaysTooltip;
 	data->callback = callback;
 	data->enabled = true;
 	data->values = values;
 	data->numValues = numValues;
 	data->callbackExtraData = extraData;
-	data->value = value;
 
-	btn->tooltip = data->values[data->value].tooltip;
+	data->value = 0;
+	for (size_t i = 0; i < numValues; i++)
+	{
+		if (values[i].value == value)
+		{
+			data->value = i;
+		}
+	}
+
+	if (data->alwaysTooltip)
+	{
+		btn->tooltip = data->alwaysTooltip;
+	} else
+	{
+		btn->tooltip = data->values[data->value].tooltip;
+	}
 
 	return btn;
 }
@@ -60,11 +77,14 @@ void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 localMousePos, uint
 	if (data->enabled && HasActivation(stack, c))
 	{
 		data->value++;
-		if (data->value > data->numValues)
+		if (data->value >= data->numValues)
 		{
 			data->value = 0;
 		}
-		c->tooltip = data->values[data->value].tooltip;
+		if (!data->alwaysTooltip)
+		{
+			c->tooltip = data->values[data->value].tooltip;
+		}
 		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
@@ -95,3 +115,29 @@ void DrawOptionsButton(const Control *c, ControlState state, Vector2 position)
 
 	DrawTextAligned(label, 16, COLOR_BLACK, position, c->size, FONT_HALIGN_CENTER, FONT_VALIGN_MIDDLE, smallFont);
 }
+
+OptionsButtonValue onOffButtonValues[2] = {
+	{
+		.text = "Off",
+		.tooltip = NULL,
+		.value = false,
+	},
+	{
+		.text = "On",
+		.tooltip = NULL,
+		.value = true,
+	},
+};
+
+OptionsButtonValue yesNoButtonValues[2] = {
+	{
+		.text = "No",
+		.tooltip = NULL,
+		.value = false,
+	},
+	{
+		.text = "Yes",
+		.tooltip = NULL,
+		.value = true,
+	},
+};

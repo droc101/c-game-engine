@@ -14,9 +14,9 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/controls/LabelControl.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
@@ -30,6 +30,19 @@ static UiStack *inputOptionsStack = NULL;
 static ScrollView *inputOptionsScrollView = NULL;
 
 static char controllerNameBuffer[256];
+
+static OptionsButtonValue invertCameraButtonValues[2] = {
+	{
+		.text = "Normal",
+		.tooltip = NULL,
+		.value = false,
+	},
+	{
+		.text = "Inverted",
+		.tooltip = NULL,
+		.value = true,
+	},
+};
 
 static void BtnInputOptionsBack(Control *, void *)
 {
@@ -71,19 +84,19 @@ static void SldOptionsMouseSensitivity(const float value)
 	GetState()->options.cameraSpeed = value;
 }
 
-static void CbOptionsInvertCameraH(const bool value)
+static void CbOptionsInvertCameraH(const size_t value, void *)
 {
-	GetState()->options.invertHorizontalCamera = value;
+	GetState()->options.invertHorizontalCamera = invertCameraButtonValues[value].value;
 }
 
-static void CbOptionsInvertCameraV(const bool value)
+static void CbOptionsInvertCameraV(const size_t value, void *)
 {
-	GetState()->options.invertVerticalCamera = value;
+	GetState()->options.invertVerticalCamera = invertCameraButtonValues[value].value;
 }
 
-static void CbOptionsSwapOkCancel(const bool value)
+static void CbOptionsSwapOkCancel(const size_t value, void *)
 {
-	GetState()->options.controllerSwapOkCancel = value;
+	GetState()->options.controllerSwapOkCancel = yesNoButtonValues[value].value;
 }
 
 static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
@@ -132,7 +145,7 @@ static void InputOptionsStateSet()
 											  v2(0, opY),
 											  v2(750, 40),
 											  TOP_CENTER,
-											  FONT_HALIGN_CENTER,
+											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
 											  smallFont,
 											  true));
@@ -152,21 +165,27 @@ static void InputOptionsStateSet()
 											   NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,
-						   CreateCheckboxControl(v2(-185, opY),
-												 v2(370, 40),
-												 "Invert Horizontal Camera",
-												 CbOptionsInvertCameraH,
-												 TOP_CENTER,
-												 GetState()->options.invertHorizontalCamera,
-												 NULL));
+						   CreateOptionsButtonControl(v2(-190, opY),
+													  v2(370, 40),
+													  "Horizontal Camera: %s",
+													  CbOptionsInvertCameraH,
+													  TOP_CENTER,
+													  invertCameraButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.invertHorizontalCamera,
+													  NULL));
 		ScrollViewAddChild(inputOptionsScrollView,
-						   CreateCheckboxControl(v2(190, opY),
-												 v2(370, 40),
-												 "Invert Vertical Camera",
-												 CbOptionsInvertCameraV,
-												 TOP_CENTER,
-												 GetState()->options.invertVerticalCamera,
-												 NULL));
+						   CreateOptionsButtonControl(v2(190, opY),
+													  v2(370, 40),
+													  "Vertical Camera: %s",
+													  CbOptionsInvertCameraV,
+													  TOP_CENTER,
+													  invertCameraButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.invertVerticalCamera,
+													  NULL));
 		opY += opSpacing * 1.5f;
 		ScrollViewAddChild(inputOptionsScrollView,
 						   CreateLabelControl("Controller Options",
@@ -175,13 +194,13 @@ static void InputOptionsStateSet()
 											  v2(0, opY),
 											  v2(750, 40),
 											  TOP_CENTER,
-											  FONT_HALIGN_CENTER,
+											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
 											  smallFont,
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,
-						   CreateSliderControl(v2(-185, opY),
+						   CreateSliderControl(v2(-190, opY),
 											   v2(370, 40),
 											   "Rumble Strength",
 											   SldOptionsRumbleStrength,
@@ -208,13 +227,16 @@ static void InputOptionsStateSet()
 											   NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,
-						   CreateCheckboxControl(v2(0, opY),
-												 v2(750, 40),
-												 "Swap controller OK/Cancel buttons",
-												 CbOptionsSwapOkCancel,
-												 TOP_CENTER,
-												 GetState()->options.controllerSwapOkCancel,
-												 NULL));
+						   CreateOptionsButtonControl(v2(0, opY),
+													  v2(750, 40),
+													  "Swap controller OK/Cancel buttons: %s",
+													  CbOptionsSwapOkCancel,
+													  TOP_CENTER,
+													  yesNoButtonValues,
+													  2,
+													  NULL,
+													  GetState()->options.controllerSwapOkCancel,
+													  NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,
 						   CreateLabelControl(controllerNameBuffer,

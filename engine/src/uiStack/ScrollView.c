@@ -3,6 +3,8 @@
 //
 
 #include <assert.h>
+#include <engine/debug/DebugEntryManager.h>
+#include <engine/graphics/Drawing.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -73,6 +75,11 @@ void ProcessScrollView(ScrollView *view)
 	view->anchoredPosition = CalculateControlPosition(&imposter, NULL);
 
 	view->scrollBarData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * 20;
+
+	if (IsDebugEntryVisible("ui_stack_layout_bounds"))
+	{
+		DrawRect(view->anchoredPosition.x, view->anchoredPosition.y, view->size.x, view->size.y, COLOR(0x800000ff));
+	}
 }
 
 Vector2 CalculateScrollViewScrollBarPosition(const Control *control, const void *positioningData)

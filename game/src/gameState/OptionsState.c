@@ -15,7 +15,7 @@
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/CheckBox.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -108,10 +108,10 @@ static void BtnDebugOptions(Control *, void *)
 	SetGameState(&DebugOptionsState);
 }
 
-static void CbOptionsEnableDiscordRpc(const bool value)
+static void CbOptionsEnableDiscordRpc(const size_t value, void *)
 {
-	GetState()->options.enableDiscordRpc = value;
-	if (!value)
+	GetState()->options.enableDiscordRpc = onOffButtonValues[value].value;
+	if (!GetState()->options.enableDiscordRpc)
 	{
 		DiscordDestroy();
 	} else
@@ -142,13 +142,16 @@ static void OptionsStateSet()
 #ifdef ENABLE_DISCORD_SDK
 		opY += opSpacing * 1.5f;
 		UiStackPush(optionsStack,
-					CreateCheckboxControl(v2(0, opY),
-										  v2(480, 40),
-										  "Enable Discord rich presence",
-										  CbOptionsEnableDiscordRpc,
-										  TOP_CENTER,
-										  GetState()->options.enableDiscordRpc,
-										  NULL));
+					CreateOptionsButtonControl(v2(0, opY),
+											   v2(480, 40),
+											   "Discord Integration: %s",
+											   CbOptionsEnableDiscordRpc,
+											   TOP_CENTER,
+											   onOffButtonValues,
+											   2,
+											   NULL,
+											   GetState()->options.enableDiscordRpc,
+											   NULL));
 #endif
 		opY += opSpacing;
 
