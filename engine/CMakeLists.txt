@@ -245,6 +245,8 @@ target_sources(engine INTERFACE
         include/engine/uiStack/controls/OptionsButton.h
         src/uiStack/controls/IconButton.c
         include/engine/uiStack/controls/IconButton.h
+        src/uiStack/controls/Image.c
+        include/engine/uiStack/controls/Image.h
         src/uiStack/UiStack.c
         include/engine/uiStack/UiStack.h
         src/uiStack/ScrollView.c

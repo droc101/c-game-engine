@@ -5,7 +5,6 @@
 #include "gameState/OptionsState.h"
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
@@ -15,6 +14,7 @@
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
+#include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
@@ -75,15 +75,6 @@ static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderMenuBackground(state);
 	}
 
-	DrawTextAligned("Options",
-					32,
-					COLOR_WHITE,
-					v2s(0),
-					v2(ScaledWindowWidthFloat(), 100),
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					largeFont);
-
 	ProcessUiStack(optionsStack);
 	DrawUiStack(optionsStack);
 }
@@ -125,6 +116,19 @@ static void OptionsStateSet()
 	if (optionsStack == NULL)
 	{
 		optionsStack = CreateUiStack();
+
+		UiStackPush(optionsStack,
+					CreateLabelControl("Options",
+									   32,
+									   COLOR_WHITE,
+									   v2s(0),
+									   v2(480, 100),
+									   TOP_CENTER,
+									   FONT_HALIGN_CENTER,
+									   FONT_VALIGN_MIDDLE,
+									   largeFont,
+									   false));
+
 		float opY = 80;
 		const float opSpacing = 45;
 
