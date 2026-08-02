@@ -336,8 +336,8 @@ void DrawUiStack(const UiStack *stack)
 		// if this is the focused control, draw a border around it
 		if (i == stack->focusedControl)
 		{
-			DrawNinePatchTexture(v2(c->anchoredPosition.x - 4, c->anchoredPosition.y - 4),
-								 v2(c->size.x + 8, c->size.y + 8),
+			DrawNinePatchTexture(v2(c->anchoredPosition.x - 6, c->anchoredPosition.y - 6),
+								 v2(c->size.x + 12, c->size.y + 12),
 								 16,
 								 16,
 								 TEXTURE("interface/focus_rect"));
