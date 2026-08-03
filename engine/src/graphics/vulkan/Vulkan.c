@@ -1419,17 +1419,19 @@ bool VK_FrameEnd()
 				   "Failed to write UI vertex buffer!");
 		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.ui.indexBuffer, &indexBufferWriteInfo),
 				   "Failed to write UI index buffer!");
+	}
 
-		if (!renderPassStarted)
-		{
-			const LunaRenderPassBeginInfo beginInfo = {
-				.renderArea.extent = swapchainExtent,
-				.depthAttachmentClearValue.depthStencil.depth = 1,
-			};
-			VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo),
-					   "Failed to begin render pass!");
-		}
+	if (!renderPassStarted)
+	{
+		const LunaRenderPassBeginInfo beginInfo = {
+			.renderArea.extent = swapchainExtent,
+			.depthAttachmentClearValue.depthStencil.depth = 1,
+		};
+		VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
+	}
 
+	if (buffers.ui.freeQuads != buffers.ui.allocatedQuads)
+	{
 		const VkViewport viewport = {
 			.width = (float)swapchainExtent.width,
 			.height = (float)swapchainExtent.height,

@@ -55,7 +55,7 @@ static const VkPipelineRasterizationStateCreateInfo SHADOW_MAP_RASTERIZER = {
 	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 	.depthBiasEnable = VK_TRUE,
 	.depthBiasConstantFactor = 2.0f,
-	.depthBiasSlopeFactor = 2.0f,
+	.depthBiasSlopeFactor = 4.25f,
 	.lineWidth = 1,
 };
 
