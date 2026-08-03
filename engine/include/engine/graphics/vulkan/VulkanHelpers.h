@@ -304,6 +304,7 @@ typedef struct TextureSamplers
 	LunaSampler nearestRepeatNoAnisotropy;
 	LunaSampler linearNoRepeatNoAnisotropy;
 	LunaSampler nearestNoRepeatNoAnisotropy;
+	LunaSampler shadowMapAtlas;
 } TextureSamplers;
 
 typedef struct DescriptorSetLayouts

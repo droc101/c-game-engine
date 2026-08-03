@@ -107,15 +107,15 @@ static LunaPushConstantsRange shadowMapPushConstantRanges[2] = {
 		.size = sizeof(uint32_t),
 		.dataPointerOffset = 0,
 	},
-	{
-		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		.size = sizeof(uint32_t),
-		.dataPointerOffset = 0,
-	},
+	// {
+	// 	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	// 	.size = sizeof(uint32_t),
+	// 	.dataPointerOffset = 0,
+	// },
 };
 static LunaPipelineLayoutCreationInfo shadowMapPipelineLayoutCreationInfo = {
 	.descriptorSetLayoutCount = 1,
-	.pushConstantRangeCount = 2,
+	.pushConstantRangeCount = 1,
 	.pushConstantsRanges = shadowMapPushConstantRanges,
 };
 

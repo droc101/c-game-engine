@@ -443,6 +443,16 @@ bool CreateTextureSamplers()
 		.mipmapLodBias = -1.5f,
 		.maxLod = VK_LOD_CLAMP_NONE,
 	};
+	const LunaSamplerCreationInfo shadowMapAtlasSamplerCreateInfo = {
+		.magFilter = VK_FILTER_LINEAR,
+		.minFilter = VK_FILTER_LINEAR,
+		.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST,
+		.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+		.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+		.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+		.compareEnable = VK_TRUE,
+		.compareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
+	};
 
 	VulkanTest(lunaCreateSampler(device,
 								 &linearRepeatSamplerAnisotropyCreateInfo,
@@ -468,6 +478,8 @@ bool CreateTextureSamplers()
 								 &nearestNoRepeatSamplerNoAnisotropyCreateInfo,
 								 &textureSamplers.nearestNoRepeatNoAnisotropy),
 			   "Failed to create nearest non-repeating no anisotropy texture sampler!");
+	VulkanTest(lunaCreateSampler(device, &shadowMapAtlasSamplerCreateInfo, &textureSamplers.shadowMapAtlas),
+			   "Failed to create shadow map atlas texture sampler!");
 
 	ListInit(textures, LIST_UINT64);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);

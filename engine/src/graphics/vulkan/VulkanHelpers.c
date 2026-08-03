@@ -317,7 +317,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	}
 
 	const LunaDescriptorImageInfo shadowMapAtlasImageInfo = {
-		.sampler = textureSamplers.nearestNoRepeatNoAnisotropy,
+		.sampler = textureSamplers.shadowMapAtlas,
 		.image = shadowMapAtlas,
 		.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
 	};
