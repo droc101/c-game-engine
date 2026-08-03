@@ -253,6 +253,8 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 						const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotDatas->materialSlots, j);
 						materialSlotData->shadedDrawInfo->instanceCount = 0;
 						materialSlotData->unshadedDrawInfo->instanceCount = 0;
+						materialSlotData->unshadedDrawInfo->firstInstance = materialSlotData->shadedDrawInfo
+																					->firstInstance;
 					}
 				}
 			}
@@ -365,6 +367,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 					const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
 					materialSlotData->shadedDrawInfo->instanceCount = 0;
 					materialSlotData->unshadedDrawInfo->instanceCount = 0;
+					materialSlotData->unshadedDrawInfo->firstInstance = materialSlotData->shadedDrawInfo->firstInstance;
 				}
 			}
 		}
@@ -441,6 +444,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor, List *lodIns
 			case SHADER_SHADED:
 				instanceData = &materialSlotData->instanceData[materialSlotData->shadedDrawInfo->instanceCount];
 				materialSlotData->shadedDrawInfo->instanceCount++;
+				materialSlotData->unshadedDrawInfo->firstInstance++;
 				break;
 			case SHADER_UNSHADED:
 				instanceData = &materialSlotData->instanceData[materialSlotsData->instanceCount -
