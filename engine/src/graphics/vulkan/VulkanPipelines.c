@@ -280,6 +280,12 @@ static inline bool CreateShadedMapPipeline()
 		},
 		{
 			.location = 3,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(MapVertex, normal),
+		},
+		{
+			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = 0,

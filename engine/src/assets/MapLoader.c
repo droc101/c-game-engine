@@ -187,6 +187,9 @@ bool LoadMap(Map *map, Asset *mapData)
 			vertex->uv.y = ReadFloat(reader);
 			vertex->lightmapUv.x = ReadFloat(reader);
 			vertex->lightmapUv.y = ReadFloat(reader);
+			vertex->normal.x = ReadFloat(reader);
+			vertex->normal.y = ReadFloat(reader);
+			vertex->normal.z = ReadFloat(reader);
 		}
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->indexCount = ReadUint32(reader);

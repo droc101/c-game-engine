@@ -43,6 +43,8 @@ struct MapVertex
 	Vector2 uv;
 	/// The Lightmap UV coordinate
 	Vector2 lightmapUv;
+	/// The normal vector at the vertex
+	Vector3 normal;
 };
 
 struct MapModel
