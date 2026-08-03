@@ -12,7 +12,6 @@
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/helpers/MathEx.h>
@@ -283,8 +282,6 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	WindowAndRenderInit();
 
-	InitCommonFonts();
-
 	InitFrameGrapher();
 
 	if (GetState()->options.enableDiscordRpc)
@@ -349,6 +346,12 @@ void EngineIteration()
 		BenchToggle();
 	}
 #endif
+
+	if (IsInputActionJustPressed(mainThreadInput, &fullscreen))
+	{
+		GetState()->options.fullscreen = !GetState()->options.fullscreen;
+		SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
+	}
 
 	if (state->gameState->enableRelativeMouseMode)
 	{
@@ -418,7 +421,6 @@ void DestroyEngine()
 	SDL_DestroyWindow(GetGameWindow());
 	LogDebug("Cleaning up icon...\n");
 	SDL_DestroySurface(windowIcon);
-	DestroyCommonFonts();
 	DestroyAssetCache(); // Free all assets
 	DestroyGameConfig();
 	LogDebug("Cleaning up SDL...\n");

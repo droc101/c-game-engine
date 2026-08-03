@@ -3,6 +3,7 @@
 //
 
 #include <engine/actor/prop/WorldText.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -65,10 +66,10 @@ static void WorldTextRenderUi(Actor *this)
 		}
 
 		const Vector2 screenPosition = ProjectPosition((float *)&position, cam);
-		const Vector2 textSize = MeasureText(data->text, data->size, smallFont);
+		const Vector2 textSize = MeasureText(data->text, data->size, FONT("small_font"));
 		const Vector2 textPosition = v2(screenPosition.x - textSize.x / 2, screenPosition.y - textSize.y / 2);
 		DrawRect(textPosition.x - 4, textPosition.y - 4, textSize.x + 8, textSize.y + 8, data->backgroundColor);
-		FontDrawString(textPosition, data->text, data->size, data->textColor, smallFont);
+		FontDrawString(textPosition, data->text, data->size, data->textColor, FONT("small_font"));
 	}
 }
 

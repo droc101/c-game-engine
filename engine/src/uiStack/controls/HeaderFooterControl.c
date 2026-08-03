@@ -45,6 +45,7 @@ void DestroyHeaderFooterControl(const Control *c)
 {
 	const HeaderFooterControlData *data = c->controlData;
 	free(data->label);
+	free(data);
 }
 
 void AlwaysUpdateHeaderFooterControl(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex)
@@ -77,6 +78,6 @@ void DrawHeaderFooterControl(const Control *c, ControlState state, Vector2 posit
 						c->size,
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
-						largeFont);
+						FONT("large_font"));
 	}
 }

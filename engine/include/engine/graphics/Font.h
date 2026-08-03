@@ -42,7 +42,7 @@ extern Font *largeFont;
  * @return Bottom right position of the text
  * @note This is a wrapper for DrawTextAligned with h_align = FONT_HALIGN_LEFT and v_align = FONT_VALIGN_TOP
  */
-void FontDrawString(Vector2 pos, const char *str, uint32_t size, Color color, const Font *font);
+void FontDrawString(Vector2 pos, const char *str, uint32_t size, Color color, const char *font);
 
 /**
  * Count the number of lines in a string
@@ -59,7 +59,7 @@ int StringLineCount(const char *str);
  * @return Size of the text
  * @note This is a wrapper for @c MeasureTextNChars where @c n is @code strlen(str) @endcode
  */
-Vector2 MeasureText(const char *str, uint32_t size, const Font *font);
+Vector2 MeasureText(const char *str, uint32_t size, const char *font);
 
 /**
  * Measure the size of a string of text up to a certain number of characters
@@ -70,7 +70,7 @@ Vector2 MeasureText(const char *str, uint32_t size, const Font *font);
  * @return The size of the text up to n characters
  * @note It is up to the caller to ensure @c n is within the bounds of @c str
  */
-Vector2 MeasureTextNChars(const char *str, uint32_t size, const Font *font, size_t n);
+Vector2 MeasureTextNChars(const char *str, uint32_t size, const char *font, size_t n);
 
 /**
  * Get a line of text from a string
@@ -101,16 +101,6 @@ void DrawTextAligned(const char *str,
 					 Vector2 rectSize,
 					 FontHorizontalAlign hAlign,
 					 FontVerticalAlign vAlign,
-					 const Font *font);
-
-/**
- * Initialize common fonts
- */
-void InitCommonFonts();
-
-/**
- * Free any common fonts that were allocated
- */
-void DestroyCommonFonts();
+					 const char *font);
 
 #endif //GAME_FONT_H

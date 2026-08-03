@@ -80,5 +80,12 @@ void DrawButton(const Control *c, const ControlState state, const Vector2 positi
 
 	const ButtonData *data = (ButtonData *)c->controlData;
 
-	DrawTextAligned(data->text, 16, COLOR_BLACK, position, c->size, FONT_HALIGN_CENTER, FONT_VALIGN_MIDDLE, smallFont);
+	DrawTextAligned(data->text,
+					16,
+					COLOR_BLACK,
+					position,
+					c->size,
+					FONT_HALIGN_CENTER,
+					FONT_VALIGN_MIDDLE,
+					FONT("small_font"));
 }

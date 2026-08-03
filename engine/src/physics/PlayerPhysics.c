@@ -267,7 +267,7 @@ void MovePlayer(const Player *player, const double delta, const bool allowInput)
 		Vector3 oldVelocity;
 		JPH_CharacterVirtual_GetLinearVelocity(player->joltCharacter, &oldVelocity);
 		moveVec.y += oldVelocity.y + (float)(GRAVITY * (delta / PHYSICS_TARGET_TPS));
-	} else if (allowInput && IsInputActionJustPressed(physicsThreadInput, &jump))
+	} else if (allowInput && IsInputActionJustPressed(physicsThreadInput, &jump) && !player->isNoclipActive)
 	{
 		moveVec.y = JUMP_SPEED;
 	}

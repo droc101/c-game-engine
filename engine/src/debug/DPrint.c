@@ -2,6 +2,7 @@
 // Created by droc101 on 4/26/2024.
 //
 
+#include <engine/assets/AssetReader.h>
 #include <engine/debug/DPrint.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -20,9 +21,9 @@ void ResetDPrintYPos()
 
 void DPrint(const char *str, const Color color)
 {
-	const Vector2 textSize = MeasureText(str, 16, smallFont);
+	const Vector2 textSize = MeasureText(str, 16, FONT("small_font"));
 	DrawRect(5, dprintYPosition - 5, (int)textSize.x + 10, (int)textSize.y + 10, COLOR(0x80000000));
-	FontDrawString(v2(10, (float)dprintYPosition), str, 16, color, smallFont);
+	FontDrawString(v2(10, (float)dprintYPosition), str, 16, color, FONT("small_font"));
 	dprintYPosition += (int)textSize.y + 10;
 }
 

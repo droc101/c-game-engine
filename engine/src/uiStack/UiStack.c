@@ -17,6 +17,7 @@
 #include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/controls/IconButton.h>
+#include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/RadioButton.h>
@@ -53,6 +54,7 @@ static const ControlDestroyFunc CONTROL_DESTROY_FUNCTIONS[CONTROL_TYPE_COUNT] = 
 	DestroyLabelControl,
 	DestroyOptionsButton,
 	DestroyIconButton,
+	DestroyImage,
 };
 
 /**
@@ -69,6 +71,7 @@ static const ControlDrawFunc CONTROL_DRAW_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	DrawLabelControl,
 	DrawOptionsButton,
 	DrawIconButton,
+	DrawImage,
 };
 
 /**
@@ -85,6 +88,7 @@ static const ControlUpdateFunc CONTROL_UPDATE_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	NULL,
 	UpdateOptionsButton,
 	UpdateIconButton,
+	NULL,
 };
 
 static const ControlUpdateFunc CONTROL_ALWAYS_UPDATE_FUNCTIONS[CONTROL_TYPE_COUNT] = {
@@ -95,6 +99,7 @@ static const ControlUpdateFunc CONTROL_ALWAYS_UPDATE_FUNCTIONS[CONTROL_TYPE_COUN
 	NULL,
 	AlwaysUpdateVScrollBar,
 	AlwaysUpdateHeaderFooterControl,
+	NULL,
 	NULL,
 	NULL,
 	NULL,
@@ -114,6 +119,7 @@ static const ControlFocusFunc CONTROL_FOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = {
 	NULL,
 	NULL,
 	NULL,
+	NULL,
 };
 
 /**
@@ -125,6 +131,7 @@ static const ControlUnfocusFunc CONTROL_UNFOCUS_FUNCTIONS[CONTROL_TYPE_COUNT] = 
 	NULL, // CHECKBOX
 	NULL, // RADIO_BUTTON
 	UnfocusTextBox, // TEXTBOX
+	NULL,
 	NULL,
 	NULL,
 	NULL,
@@ -346,7 +353,11 @@ void DrawUiStack(const UiStack *stack)
 
 		if (IsDebugEntryVisible("ui_stack_layout_bounds"))
 		{
-			DrawRect(c->anchoredPosition.x, c->anchoredPosition.y, c->size.x, c->size.y, COLOR(0x80FF0000));
+			DrawRect(c->anchoredPosition.x,
+					 c->anchoredPosition.y,
+					 c->size.x,
+					 c->size.y,
+					 c->allowFocus ? COLOR(0x8000FF00) : COLOR(0x80FF0000));
 		}
 	}
 
@@ -490,7 +501,7 @@ void RenderTooltipAtMouse(const char *text)
 
 void RenderTooltipAt(const char *text, Vector2 origin)
 {
-	Vector2 textSize = MeasureText(text, 16, smallFont);
+	Vector2 textSize = MeasureText(text, 16, FONT("small_font"));
 	const Vector2 size = Vector2Add(textSize, v2s(24));
 	if (origin.x + size.x > ScaledWindowWidthFloat())
 	{
@@ -504,5 +515,5 @@ void RenderTooltipAt(const char *text, Vector2 origin)
 	origin.y = fmaxf(0, origin.y);
 
 	DrawNinePatchTexture(origin, size, 12, 12, TEXTURE("interface/tooltip"));
-	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, COLOR_WHITE, smallFont);
+	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, COLOR_WHITE, FONT("small_font"));
 }

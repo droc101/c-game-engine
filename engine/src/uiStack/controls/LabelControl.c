@@ -2,7 +2,6 @@
 // Created by droc101 on 7/31/26.
 //
 
-#include <engine/assets/FontLoader.h>
 #include <engine/graphics/Font.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
@@ -21,7 +20,7 @@ Control *CreateLabelControl(char *str,
 							const ControlAnchor anchor,
 							const FontHorizontalAlign hAlign,
 							const FontVerticalAlign vAlign,
-							const Font *font,
+							char *font,
 							const bool shadow)
 {
 	Control *label = CreateEmptyControl();

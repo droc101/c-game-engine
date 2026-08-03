@@ -6,9 +6,11 @@
 #define FONTLOADER_H
 
 #include <assert.h>
-#include <engine/assets/TextureLoader.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+/// The maximum number of fonts that can be loaded in any one execution of the game
+#define MAX_FONTS 16
 
 #define FONT_ASSET_VERSION 1
 
@@ -16,6 +18,8 @@ typedef struct Font Font;
 
 struct Font
 {
+	char *name;
+
 	/// The texture width of one character
 	uint8_t width;
 	/// The texture height (including below baseline)
@@ -35,9 +39,6 @@ struct Font
 	/// Whether this font only contains uppercase characters
 	bool uppercaseOnly;
 
-	/// The image loaded from the texture
-	Image *image;
-
 	/// The texture this font uses (fully qualified)
 	char *texture;
 	/// The width of each character, index directly by the character
@@ -47,11 +48,6 @@ struct Font
 };
 
 /**
- * Generate a generic fallback font
- */
-Font *GenerateFallbackFont();
-
-/**
  * Load a font from an asset
  * @param asset The asset to load the font from
  * @return The loaded font, or NULL if it failed
@@ -59,10 +55,8 @@ Font *GenerateFallbackFont();
  */
 Font *LoadFont(const char *asset);
 
-/**
- * Free a font asset
- * @param font The font to free
- */
-void FreeFont(Font *font);
+void DestroyFontLoader();
+
+void DPrintFontLoader();
 
 #endif //FONTLOADER_H

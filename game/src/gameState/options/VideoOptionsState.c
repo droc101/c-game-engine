@@ -3,6 +3,7 @@
 //
 
 #include "gameState/options/VideoOptionsState.h"
+#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -267,7 +268,7 @@ static void VideoOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
@@ -342,7 +343,7 @@ static void VideoOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
@@ -409,7 +410,7 @@ static void VideoOptionsStateSet()
 													  2,
 													  NULL,
 													  GetState()->options.mipmaps,
-													  NULL));
+													  "Improves the appearance of far away textures"));
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(190, opY),
 											   v2(370, 40),
@@ -422,7 +423,8 @@ static void VideoOptionsStateSet()
 											   1,
 											   1,
 											   SliderLabelAnisotropy,
-											   "Improves the appearance of textures viewed at sharp angles"));
+											   "Improves the appearance of textures viewed at sharp angles. Requires "
+											   "mipmaps to be enabled."));
 		opY += opSpacing;
 
 		UiStackPush(videoOptionsStack, CreateHeaderFooterControl(100, true, "Video Options"));

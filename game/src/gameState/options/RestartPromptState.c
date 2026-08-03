@@ -3,6 +3,7 @@
 //
 
 #include "gameState/options/RestartPromptState.h"
+#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -77,7 +78,7 @@ static void RestartPromptStateSet()
 									   MIDDLE_CENTER,
 									   FONT_HALIGN_CENTER,
 									   FONT_VALIGN_MIDDLE,
-									   largeFont,
+									   FONT("large_font"),
 									   false));
 		UiStackPush(menuStack,
 					CreateLabelControl("You have changed options that require a relaunch. Would you like to relaunch "
@@ -89,7 +90,7 @@ static void RestartPromptStateSet()
 									   MIDDLE_CENTER,
 									   FONT_HALIGN_CENTER,
 									   FONT_VALIGN_MIDDLE,
-									   smallFont,
+									   FONT("small_font"),
 									   true));
 
 		UiStackPush(menuStack, CreateButtonControl(v2(-190, 50), v2(370, 40), "Yes", BtnRelaunch, MIDDLE_CENTER, NULL));

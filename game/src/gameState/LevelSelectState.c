@@ -87,11 +87,11 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 						v2(ScaledWindowWidthFloat() - 50, 60),
 						FONT_HALIGN_LEFT,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 	}
 
-	FontDrawString(v2(52, 52), "Map Select", 64, COLOR_BLACK, smallFont);
-	FontDrawString(v2(50, 50), "Map Select", 64, COLOR_WHITE, smallFont);
+	FontDrawString(v2(52, 52), "Map Select", 64, COLOR_BLACK, FONT("small_font"));
+	FontDrawString(v2(50, 50), "Map Select", 64, COLOR_WHITE, FONT("small_font"));
 
 	DrawRect(0, 315, ScaledWindowWidth(), 120, COLOR(0x80000000));
 	if (levelList.length == 0)
@@ -103,7 +103,7 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 						v2(ScaledWindowWidthFloat() - 50, 60),
 						FONT_HALIGN_LEFT,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 	} else
 	{
 		DrawTextAligned(ListGetPointer(levelList, selectedLevel),
@@ -113,11 +113,11 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 						v2(ScaledWindowWidthFloat() - 50, 60),
 						FONT_HALIGN_LEFT,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 		char progress[64];
 		snprintf(progress, 64, "Map %02d/%02zu", selectedLevel + 1, levelList.length);
-		FontDrawString(v2(50, 325), progress, 16, COLOR_WHITE, smallFont);
-		FontDrawString(v2(50, 409), "Up/Down to change, space to play", 16, COLOR_WHITE, smallFont);
+		FontDrawString(v2(50, 325), progress, 16, COLOR_WHITE, FONT("small_font"));
+		FontDrawString(v2(50, 409), "Up/Down to change, space to play", 16, COLOR_WHITE, FONT("small_font"));
 	}
 }
 

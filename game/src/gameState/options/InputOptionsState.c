@@ -3,6 +3,7 @@
 //
 
 #include "gameState/options/InputOptionsState.h"
+#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -147,7 +148,7 @@ static void InputOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,
@@ -196,7 +197,7 @@ static void InputOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,
@@ -247,7 +248,7 @@ static void InputOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_CENTER,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 
