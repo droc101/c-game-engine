@@ -514,31 +514,34 @@ static inline VkResult LoadLights(const Map *map)
 	{
 		Light *light = &map->lights[i];
 
+		mat4 perspectiveMatrix;
+		const float farPlaneDistance = GetMaxLightDistance(light);
+		glm_perspective_lh_zo(180, 1, NEAR_Z, farPlaneDistance, perspectiveMatrix);
+		mat4 transformMatrix;
+
 		light->layer = shadowMapRegionCount / 16;
 		light->index = shadowMapRegionCount % 16;
 		switch (light->type)
 		{
 			case LIGHT_TYPE_SPOT:
 				shadowMapRegionCount += 1;
+				versor rotationQuat;
+				QUAT_TO_VERSOR(light->transform.rotation, rotationQuat);
+				versor rotationOffset;
+				glm_quatv(rotationOffset, GLM_PIf, GLM_XUP);
+				glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
+				mat4 viewMatrix;
+				glm_quat_look(VECTOR3_TO_VEC3(light->transform.position), rotationQuat, viewMatrix);
+				glm_mat4_mul(perspectiveMatrix, viewMatrix, transformMatrix);
 				break;
 			case LIGHT_TYPE_POINT:
 				shadowMapRegionCount += 6;
+				glm_translate_make(transformMatrix, VECTOR3_TO_VEC3(light->transform.position));
+				glm_mat4_mul(perspectiveMatrix, transformMatrix, transformMatrix);
 				break;
 			default:
 		}
 
-		mat4 perspectiveMatrix;
-		const float farPlaneDistance = GetMaxLightDistance(light);
-		glm_perspective_lh_zo(180, 1, NEAR_Z, farPlaneDistance, perspectiveMatrix);
-		versor rotationQuat;
-		QUAT_TO_VERSOR(light->transform.rotation, rotationQuat);
-		versor rotationOffset;
-		glm_quatv(rotationOffset, GLM_PIf, GLM_XUP);
-		glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
-		mat4 viewMatrix;
-		glm_quat_look(VECTOR3_TO_VEC3(light->transform.position), rotationQuat, viewMatrix);
-		mat4 transformMatrix;
-		glm_mat4_mul(perspectiveMatrix, viewMatrix, transformMatrix);
 		memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
 	}
 
@@ -942,6 +945,12 @@ static inline VkResult DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pip
 
 static inline VkResult UpdateShadowMaps(const Map *map)
 {
+	const uint32_t size = ShadowMapResolution();
+	if (size == 0)
+	{
+		return VK_SUCCESS;
+	}
+
 	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
 	const LunaCommandBufferSubmitInfo submitInfo = {
 		.queue = queue,
@@ -956,79 +965,87 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 	VulkanTestReturnResult(lunaBeginSingleUseCommandBuffer(device, commandBuffer),
 						   "Failed to begin command buffer for updating shadow maps!");
-
-	const uint32_t size = ShadowMapResolution();
 	const VkCommandBuffer vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
 
 	uint32_t shadowMapRegionIndex = 0;
 	for (lightIndex = 0; lightIndex < map->lightCount; lightIndex++)
 	{
 		const Light *light = &map->lights[lightIndex];
-		if (light->type != LIGHT_TYPE_SPOT)
+		uint32_t faceCount = 0;
+		switch (light->type)
 		{
-			continue;
+			case LIGHT_TYPE_SPOT:
+				faceCount = 1;
+				break;
+			case LIGHT_TYPE_POINT:
+				faceCount = 6;
+				break;
+			default:
+				break;
 		}
+		for (faceIndex = 0; faceIndex < faceCount; faceIndex++)
+		{
+			const VkClearValue clearValue = {
+				.depthStencil.depth = 1,
+			};
+			const VkRenderPassBeginInfo beginInfo = {
+				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+				.renderPass = shadowMapRenderPass,
+				.framebuffer = ListGetPointer(shadowMapFramebuffers, shadowMapRegionIndex / 16),
+				.renderArea.extent.width = size,
+				.renderArea.extent.height = size,
+				.renderArea.offset.x = (int)(size * (shadowMapRegionIndex % 4)),
+				.renderArea.offset.y = (int)(size * ((shadowMapRegionIndex % 16) / 4)),
+				.clearValueCount = 1,
+				.pClearValues = &clearValue,
+			};
+			vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		const VkClearValue clearValue = {
-			.depthStencil.depth = 1,
-		};
-		const VkRenderPassBeginInfo beginInfo = {
-			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-			.renderPass = shadowMapRenderPass,
-			.framebuffer = ListGetPointer(shadowMapFramebuffers, shadowMapRegionIndex / 16),
-			.renderArea.extent.width = size,
-			.renderArea.extent.height = size,
-			.renderArea.offset.x = (int)(size * (shadowMapRegionIndex % 4)),
-			.renderArea.offset.y = (int)(size * ((shadowMapRegionIndex % 16) / 4)),
-			.clearValueCount = 1,
-			.pClearValues = &clearValue,
-		};
-		vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			const VkViewport viewport = {
+				.x = (float)(size * (shadowMapRegionIndex % 4)),
+				.y = (float)(size * ((shadowMapRegionIndex % 16) / 4)), // NOLINT(*-integer-division)
+				.width = (float)size,
+				.height = (float)size,
+				.maxDepth = 1,
+			};
+			const LunaViewportBindInfo viewportBindInfo = {
+				.viewportCount = 1,
+				.viewports = &viewport,
+			};
+			const VkRect2D scissor = {
+				.extent.width = size,
+				.extent.height = size,
+				.offset.x = (int)(size * (shadowMapRegionIndex % 4)),
+				.offset.y = (int)(size * ((shadowMapRegionIndex % 16) / 4)),
+			};
+			const LunaScissorBindInfo scissorBindInfo = {
+				.scissorCount = 1,
+				.scissors = &scissor,
+			};
+			const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+				{
+					.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+					.bindInfo.viewportBindInfo = &viewportBindInfo,
+				},
+				{
+					.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+					.bindInfo.scissorBindInfo = &scissorBindInfo,
+				},
+			};
+			const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+				.descriptorSetBindInfo.descriptorSetCount = 1,
+				.descriptorSetBindInfo.descriptorSets = &descriptorSet,
+				.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+				.dynamicStates = dynamicStateBindInfos,
+			};
 
-		const VkViewport viewport = {
-			.x = (float)(size * (shadowMapRegionIndex % 4)),
-			.y = (float)(size * ((shadowMapRegionIndex % 16) / 4)), // NOLINT(*-integer-division)
-			.width = (float)size,
-			.height = (float)size,
-			.maxDepth = 1,
-		};
-		const LunaViewportBindInfo viewportBindInfo = {
-			.viewportCount = 1,
-			.viewports = &viewport,
-		};
-		const VkRect2D scissor = {
-			.extent.width = size,
-			.extent.height = size,
-			.offset.x = (int)(size * (shadowMapRegionIndex % 4)),
-			.offset.y = (int)(size * ((shadowMapRegionIndex % 16) / 4)),
-		};
-		const LunaScissorBindInfo scissorBindInfo = {
-			.scissorCount = 1,
-			.scissors = &scissor,
-		};
-		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
-			{
-				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
-				.bindInfo.viewportBindInfo = &viewportBindInfo,
-			},
-			{
-				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
-				.bindInfo.scissorBindInfo = &scissorBindInfo,
-			},
-		};
-		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetBindInfo.descriptorSetCount = 1,
-			.descriptorSetBindInfo.descriptorSets = &descriptorSet,
-			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
-			.dynamicStates = dynamicStateBindInfos,
-		};
+			VulkanTestReturnResult(DrawMap(&pipelineBindInfo, true), "Failed to draw map!");
+			VulkanTestReturnResult(DrawActors(&pipelineBindInfo, true), "Failed to draw actors!");
 
-		VulkanTestReturnResult(DrawMap(&pipelineBindInfo, true), "Failed to draw map!");
-		VulkanTestReturnResult(DrawActors(&pipelineBindInfo, true), "Failed to draw actors!");
+			vkCmdEndRenderPass(vkCommandBuffer);
 
-		vkCmdEndRenderPass(vkCommandBuffer);
-
-		shadowMapRegionIndex++;
+			shadowMapRegionIndex++;
+		}
 	}
 
 	VulkanTestReturnResult(lunaEndAndSubmitCommandBuffer(device, commandBuffer, &submitInfo),
@@ -1136,16 +1153,24 @@ static inline bool HandleRendererQueuedActions()
 	{
 		if (GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED && GetMap() != NULL)
 		{
-			if (lunaGetBufferSize(buffers.uniforms.lights) == 0)
+			if (shadowMapRenderPass == VK_NULL_HANDLE)
 			{
 				VulkanTest(LoadLights(loadedMap), "Failed to load lights into buffer!");
 			}
 			VulkanTest(CreateShadowMaps(loadedMap), "Failed to create shadow maps!");
 		} else
 		{
-			VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
-					   "Failed to empty lights buffer!");
-			VulkanTest(CreateShadowMapRenderPass(NULL), "Failed to clean up shadow maps!");
+			if (lunaGetBufferSize(buffers.uniforms.lights) != sizeof(uint32_t))
+			{
+				VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, sizeof(uint32_t)),
+						   "Failed to empty lights buffer!");
+				VulkanTest(lunaFillBuffer(device, commandBuffer, buffers.uniforms.lights, 0, NULL),
+						   "Failed to clear lights buffer!");
+			}
+			if (shadowMapRenderPass != VK_NULL_HANDLE)
+			{
+				VulkanTest(CreateShadowMapRenderPass(NULL), "Failed to clean up shadow maps!");
+			}
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 	}

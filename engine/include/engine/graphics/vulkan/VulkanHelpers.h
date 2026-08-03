@@ -341,6 +341,7 @@ extern Pipelines pipelines;
 extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
 extern uint32_t skyTextureIndex;
 extern uint32_t lightIndex;
+extern uint32_t faceIndex;
 extern LunaImage shadowMapAtlas;
 extern VkRenderPass shadowMapRenderPass;
 extern List shadowMapFramebuffers;

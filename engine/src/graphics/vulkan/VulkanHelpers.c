@@ -73,6 +73,7 @@ Pipelines pipelines = {
 uint32_t pendingTasks = 0;
 uint32_t skyTextureIndex = 0;
 uint32_t lightIndex = 0;
+uint32_t faceIndex = 0;
 LunaImage shadowMapAtlas = LUNA_NULL_HANDLE;
 VkRenderPass shadowMapRenderPass = VK_NULL_HANDLE;
 List shadowMapFramebuffers = {0};

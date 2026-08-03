@@ -101,15 +101,22 @@ static LunaPipelineLayoutCreationInfo pipelineLayoutCreationInfo = {
 	.descriptorSetLayoutCount = 1,
 };
 
-static LunaPushConstantsRange shadowMapPushConstantRange = {
-	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-	.size = sizeof(uint32_t),
-	.dataPointerOffset = 0,
+static LunaPushConstantsRange shadowMapPushConstantRanges[2] = {
+	{
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		.size = sizeof(uint32_t),
+		.dataPointerOffset = 0,
+	},
+	{
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		.size = sizeof(uint32_t),
+		.dataPointerOffset = 0,
+	},
 };
 static LunaPipelineLayoutCreationInfo shadowMapPipelineLayoutCreationInfo = {
 	.descriptorSetLayoutCount = 1,
-	.pushConstantRangeCount = 1,
-	.pushConstantsRanges = &shadowMapPushConstantRange,
+	.pushConstantRangeCount = 2,
+	.pushConstantsRanges = shadowMapPushConstantRanges,
 };
 
 static const VkPipelineInputAssemblyStateCreateInfo INPUT_ASSEMBLY = {
@@ -1487,8 +1494,6 @@ bool CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
 	pipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
-	shadowMapPushConstantRange.dataPointer = &lightIndex;
-	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
 
 	VulkanTest(CreateShaderModule(SHADER("model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
 			   "Failed to load shaded model fragment shader!");
@@ -1510,6 +1515,10 @@ bool CreateGraphicsPipelines()
 VkResult CreateShadowMapGraphicsPipelines()
 {
 	assert(shadowMapRenderPass != VK_NULL_HANDLE);
+
+	shadowMapPushConstantRanges[0].dataPointer = &lightIndex;
+	shadowMapPushConstantRanges[1].dataPointer = &faceIndex;
+	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
 
 	VulkanTestReturnResult(CreateMapShadowMapPipeline(), "Failed to create map shadow maps pipeline!");
 	VulkanTestReturnResult(CreateModelActorShadowMapPipeline(), "Failed to create model actor shadow maps pipeline!");
