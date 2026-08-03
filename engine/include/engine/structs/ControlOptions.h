@@ -56,6 +56,8 @@ extern InputAction noclip;
 extern InputAction freecam;
 extern InputAction benchmark;
 
+extern InputAction fullscreen;
+
 #pragma endregion
 
 ControlCategory *GetControlCategory(const char *key);

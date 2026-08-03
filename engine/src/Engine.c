@@ -350,6 +350,12 @@ void EngineIteration()
 	}
 #endif
 
+	if (IsInputActionJustPressed(mainThreadInput, &fullscreen))
+	{
+		GetState()->options.fullscreen = !GetState()->options.fullscreen;
+		SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
+	}
+
 	if (state->gameState->enableRelativeMouseMode)
 	{
 		// warp the mouse to the center of the screen

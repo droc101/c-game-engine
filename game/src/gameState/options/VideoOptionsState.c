@@ -379,7 +379,7 @@ static void VideoOptionsStateSet()
 													  2,
 													  NULL,
 													  GetState()->options.mipmaps,
-													  NULL));
+													  "Improves the appearance of far away textures"));
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(190, opY),
 											   v2(370, 40),
@@ -392,7 +392,8 @@ static void VideoOptionsStateSet()
 											   1,
 											   1,
 											   SliderLabelAnisotropy,
-											   "Improves the appearance of textures viewed at sharp angles"));
+											   "Improves the appearance of textures viewed at sharp angles. Requires "
+											   "mipmaps to be enabled."));
 		opY += opSpacing;
 
 		UiStackPush(videoOptionsStack, CreateHeaderFooterControl(100, true, "Video Options"));

@@ -198,6 +198,14 @@ static const InputAction DEFAULT_BENCHMARK = {
 				.keyBind = SDL_SCANCODE_F10,
 			},
 };
+static const InputAction DEFAULT_TOGGLE_FULLSCREEN = {
+	.keyboardMouseBindType = IA_KEY,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F11,
+			},
+	.controllerBindType = IA_UNBOUND,
+};
 
 #pragma endregion
 
@@ -226,6 +234,8 @@ InputAction debugMenu;
 InputAction noclip;
 InputAction freecam;
 InputAction benchmark;
+
+InputAction fullscreen;
 
 #pragma endregion
 
@@ -307,6 +317,9 @@ void RegisterControls(const ControlRegisterFunction RegisterGameControls)
 	RegisterControl("look_down", "Look Down", &lookDown, true, &DEFAULT_LOOK_DOWN, cameraCat);
 	RegisterControl("look_left", "Look Left", &lookLeft, true, &DEFAULT_LOOK_LEFT, cameraCat);
 	RegisterControl("look_right", "Look Right", &lookRight, true, &DEFAULT_LOOK_RIGHT, cameraCat);
+
+	ControlCategory *miscCat = RegisterControlCategory("Miscellaneous", "miscellaneous");
+	RegisterControl("toggle_fullscreen", "Toggle Fullscreen", &fullscreen, false, &DEFAULT_TOGGLE_FULLSCREEN, miscCat);
 
 	ControlCategory *debugCat = RegisterControlCategory("Debug", "debug");
 	RegisterControl("toggle_debug_menu", "Toggle Debug Menu", &debugMenu, false, &DEFAULT_DEBUG_MENU, debugCat);

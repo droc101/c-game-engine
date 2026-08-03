@@ -127,7 +127,7 @@ static void MenuStateSet()
 										"Hot Reload Assets",
 										ReloadAssets,
 										MIDDLE_CENTER,
-										NULL));
+										"top 10 ways to kill the engine"));
 		opY += opSpacing;
 	}
 	UiStackResetFocus(menuStack);
