@@ -3,6 +3,7 @@
 //
 
 #include "gameState/options/DebugOptionsState.h"
+#include <engine/assets/AssetReader.h>
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -131,7 +132,7 @@ static void DebugOptionsStateSet()
 												  TOP_LEFT,
 												  FONT_HALIGN_LEFT,
 												  FONT_VALIGN_MIDDLE,
-												  smallFont,
+												  FONT("small_font"),
 												  true));
 			ScrollViewAddChild(debugOptionsScrollView,
 							   CreateOptionsButtonControl(v2(0, entryY),

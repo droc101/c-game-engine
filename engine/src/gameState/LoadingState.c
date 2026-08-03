@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/gameState/LoadingState.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -107,7 +108,7 @@ static void LoadingStateRender(GlobalState * /*state*/, const double /*delta*/)
 					v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
-					smallFont);
+					FONT("small_font"));
 	if (stage == LSS_WAITING_FOR_FRAME)
 	{
 		stage = LSS_LOADING_LEVEL;

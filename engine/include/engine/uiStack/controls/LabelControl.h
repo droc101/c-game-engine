@@ -5,7 +5,6 @@
 #ifndef GAME_LABELCONTROL_H
 #define GAME_LABELCONTROL_H
 
-#include <engine/assets/FontLoader.h>
 #include <engine/graphics/Font.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
@@ -22,7 +21,7 @@ struct LabelControlData
 	Color color;
 	FontHorizontalAlign hAlign;
 	FontVerticalAlign vAlign;
-	const Font *font;
+	char *font;
 	bool shadow;
 };
 
@@ -34,7 +33,7 @@ Control *CreateLabelControl(char *str,
 							ControlAnchor anchor,
 							FontHorizontalAlign hAlign,
 							FontVerticalAlign vAlign,
-							const Font *font,
+							char *font,
 							bool shadow);
 
 void DestroyLabelControl(const Control *c);

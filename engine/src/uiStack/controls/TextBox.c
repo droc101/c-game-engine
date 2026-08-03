@@ -69,7 +69,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 					v2(control->size.x - 12, control->size.y - 12),
 					FONT_HALIGN_LEFT,
 					FONT_VALIGN_MIDDLE,
-					smallFont);
+						FONT("small_font"));
 	} else
 	{
 		DrawTextAligned(data->text,
@@ -79,10 +79,10 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 						v2(control->size.x - 12, control->size.y - 12),
 						FONT_HALIGN_LEFT,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 	}
 
-	const Vector2 textSize = MeasureTextNChars(data->text, 16, smallFont, data->input.cursor);
+	const Vector2 textSize = MeasureTextNChars(data->text, 16, FONT("small_font"), data->input.cursor);
 
 	if (data->isActive && (GetTimeMs() % 1000) < 500)
 	{
@@ -93,7 +93,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 						v2(12, control->size.y - 12),
 						FONT_HALIGN_LEFT,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 	}
 
 	data->input.rectOrigin = control->anchoredPosition;
@@ -107,7 +107,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 					v2(control->size.x - 12 - data->input.cursorOffsetPixels, control->size.y - 12),
 					FONT_HALIGN_LEFT,
 					FONT_VALIGN_MIDDLE,
-					smallFont);
+					FONT("small_font"));
 }
 
 void UpdateTextBox(UiStack *stack, Control *control, Vector2 /*localMousePosition*/, const uint32_t controlIndex)

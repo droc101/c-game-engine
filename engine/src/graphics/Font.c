@@ -4,7 +4,6 @@
 
 #include <cglm/types.h>
 #include <ctype.h>
-#include <engine/assets/AssetReader.h>
 #include <engine/assets/FontLoader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -13,7 +12,6 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <float.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -25,39 +23,40 @@
 Font *smallFont;
 Font *largeFont;
 
-inline void FontDrawString(const Vector2 pos, const char *str, const uint32_t size, const Color color, const Font *font)
+inline void FontDrawString(const Vector2 pos, const char *str, const uint32_t size, const Color color, const char *font)
 {
 	DrawTextAligned(str, size, color, pos, v2s(FLT_MAX), FONT_HALIGN_LEFT, FONT_VALIGN_TOP, font);
 }
 
-inline Vector2 MeasureText(const char *str, const uint32_t size, const Font *font)
+inline Vector2 MeasureText(const char *str, const uint32_t size, const char *font)
 {
 	return MeasureTextNChars(str, size, font, strlen(str));
 }
 
-Vector2 MeasureTextNChars(const char *str, const uint32_t size, const Font *font, const size_t n)
+Vector2 MeasureTextNChars(const char *str, const uint32_t size, const char *font, const size_t n)
 {
 	int textWidth = 0;
 	int textHeight = (int)size;
 	int tempWidth = 0;
-	const double sizeMultiplier = (double)size / font->defaultSize;
+	Font *fontAsset = LoadFont(font);
+	const double sizeMultiplier = (double)size / fontAsset->defaultSize;
 	for (size_t j = 0; j < n; j++)
 	{
-		const int fSize = (int)((font->charWidths[(int)str[j]] + font->charSpacing) * sizeMultiplier);
+		const int fSize = (int)((fontAsset->charWidths[(int)str[j]] + fontAsset->charSpacing) * sizeMultiplier);
 		tempWidth += fSize;
 		if (str[j] == ' ')
 		{
 			tempWidth -= fSize;
-			tempWidth += (int)((font->spaceWidth + font->charSpacing) * sizeMultiplier);
+			tempWidth += (int)((fontAsset->spaceWidth + fontAsset->charSpacing) * sizeMultiplier);
 		} else if (str[j + 1] == '\0')
 		{
-			tempWidth -= (int)(font->charSpacing * sizeMultiplier); // fix extra spacing at the end of the string
+			tempWidth -= (int)(fontAsset->charSpacing * sizeMultiplier); // fix extra spacing at the end of the string
 		} else if (str[j] == '\n')
 		{
 			tempWidth -= fSize;
 			textWidth = max(textWidth, tempWidth);
 			tempWidth = 0;
-			textHeight += (int)((size + font->lineSpacing) * sizeMultiplier);
+			textHeight += (int)((size + fontAsset->lineSpacing) * sizeMultiplier);
 		}
 	}
 
@@ -143,8 +142,9 @@ void DrawTextAligned(const char *str,
 					 const Vector2 rectSize,
 					 const FontHorizontalAlign hAlign,
 					 const FontVerticalAlign vAlign,
-					 const Font *font)
+					 const char *font)
 {
+	Font *fontAsset = LoadFont(font);
 	const size_t stringLength = strlen(str);
 	float *verts = malloc(stringLength * sizeof(float[4][4]));
 	CheckAlloc(verts);
@@ -155,9 +155,9 @@ void DrawTextAligned(const char *str,
 	quads.indices = indices;
 	quads.quadCount = (int)stringLength;
 
-	const double sizeMultiplier = (double)size / font->defaultSize;
-	const float width = (float)(font->width * sizeMultiplier);
-	const float quadHeight = (float)(font->textureHeight * sizeMultiplier);
+	const double sizeMultiplier = (double)size / fontAsset->defaultSize;
+	const float width = (float)(fontAsset->width * sizeMultiplier);
+	const float quadHeight = (float)(fontAsset->textureHeight * sizeMultiplier);
 	int c = 0;
 
 	int lines = 1;
@@ -182,7 +182,7 @@ void DrawTextAligned(const char *str,
 	for (int i = 0; i < lines; i++)
 	{
 		char line[256];
-		TextGetLine(str, i, line, 256, font->uppercaseOnly);
+		TextGetLine(str, i, line, 256, fontAsset->uppercaseOnly);
 		const Vector2 textSize = MeasureText(line, size, font);
 		if (hAlign == FONT_HALIGN_CENTER)
 		{
@@ -198,11 +198,11 @@ void DrawTextAligned(const char *str,
 		const float ly = (float)y;
 		for (size_t j = 0; line[j] != '\0'; j++)
 		{
-			const int fSize = (int)((font->charWidths[(int)line[j]] + font->charSpacing) * sizeMultiplier);
+			const int fSize = (int)((fontAsset->charWidths[(int)line[j]] + fontAsset->charSpacing) * sizeMultiplier);
 
 			if (line[j] == ' ')
 			{
-				lx += (float)((font->spaceWidth + font->charSpacing) * sizeMultiplier);
+				lx += (float)((fontAsset->spaceWidth + fontAsset->charSpacing) * sizeMultiplier);
 				quads.quadCount--;
 				c--;
 				continue;
@@ -210,8 +210,8 @@ void DrawTextAligned(const char *str,
 
 			const Vector2 ndcPos = v2(X_TO_NDC(lx), Y_TO_NDC(ly));
 			const Vector2 ndcPosEnd = v2(X_TO_NDC(lx + width), Y_TO_NDC(ly + quadHeight));
-			const float charUVStart = font->charStartUVs[(int)line[j]];
-			const float charUVEnd = font->charEndUVs[(int)line[j]];
+			const float charUVStart = fontAsset->charStartUVs[(int)line[j]];
+			const float charUVEnd = fontAsset->charEndUVs[(int)line[j]];
 
 			const size_t charIndex = c + j;
 			const size_t vertexOffset = charIndex * 4;
@@ -250,25 +250,11 @@ void DrawTextAligned(const char *str,
 			lx += fSize;
 		}
 		c += (int)strlen(line);
-		y += (int)(size + font->lineSpacing);
+		y += (int)(size + fontAsset->lineSpacing);
 	}
 
-	DrawBatchedQuadsTextured(&quads, font->texture, color);
+	DrawBatchedQuadsTextured(&quads, fontAsset->texture, color);
 
 	free(verts);
 	free(indices);
-}
-
-void InitCommonFonts()
-{
-	LogDebug("Loading fonts...\n");
-	smallFont = LoadFont(FONT("small_font"));
-	largeFont = LoadFont(FONT("large_font"));
-}
-
-void DestroyCommonFonts()
-{
-	LogDebug("Cleaning up fonts...\n");
-	FreeFont(smallFont);
-	FreeFont(largeFont);
 }

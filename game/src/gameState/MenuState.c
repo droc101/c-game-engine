@@ -54,8 +54,6 @@ static void ReloadAssets(Control *, void *)
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
-	/* TODO need to recreate the ui stack once assets are reload but before it is next processed and drawn to avoid a
-	 *  use-after-free on the fonts (label controls) */
 }
 
 static void MenuStateRender(GlobalState *state, const double /*delta*/)
@@ -91,7 +89,7 @@ static void MenuStateSet()
 									   BOTTOM_CENTER,
 									   FONT_HALIGN_CENTER,
 									   FONT_VALIGN_MIDDLE,
-									   smallFont,
+									   FONT("small_font"),
 									   true));
 		UiStackPush(menuStack,
 					CreateImageControl(v2(0, 32), v2(480, 320), TEXTURE("interface/menu_logo"), TOP_CENTER, NULL));
@@ -107,7 +105,7 @@ static void MenuStateSet()
 										   TOP_CENTER,
 										   FONT_HALIGN_CENTER,
 										   FONT_VALIGN_MIDDLE,
-										   largeFont,
+										   FONT("large_font"),
 										   false));
 		}
 

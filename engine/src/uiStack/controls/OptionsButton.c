@@ -113,7 +113,14 @@ void DrawOptionsButton(const Control *c, ControlState state, Vector2 position)
 	char label[256] = {0};
 	snprintf(label, 256, data->text, data->values[data->value].text);
 
-	DrawTextAligned(label, 16, COLOR_BLACK, position, c->size, FONT_HALIGN_CENTER, FONT_VALIGN_MIDDLE, smallFont);
+	DrawTextAligned(label,
+					16,
+					COLOR_BLACK,
+					position,
+					c->size,
+					FONT_HALIGN_CENTER,
+					FONT_VALIGN_MIDDLE,
+					FONT("small_font"));
 }
 
 OptionsButtonValue onOffButtonValues[2] = {

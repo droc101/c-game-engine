@@ -196,7 +196,14 @@ void DrawSlider(const Control *c, const ControlState /*state*/, const Vector2 po
 					c->size,
 					FONT_HALIGN_CENTER,
 					FONT_VALIGN_MIDDLE,
-					smallFont);
-	DrawTextAligned(buf, 16, COLOR_WHITE, position, c->size, FONT_HALIGN_CENTER, FONT_VALIGN_MIDDLE, smallFont);
+					FONT("small_font"));
+	DrawTextAligned(buf,
+					16,
+					COLOR_WHITE,
+					position,
+					c->size,
+					FONT_HALIGN_CENTER,
+					FONT_VALIGN_MIDDLE,
+					FONT("small_font"));
 	free(buf);
 }

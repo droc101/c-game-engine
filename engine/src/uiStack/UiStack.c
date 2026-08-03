@@ -501,7 +501,7 @@ void RenderTooltipAtMouse(const char *text)
 
 void RenderTooltipAt(const char *text, Vector2 origin)
 {
-	Vector2 textSize = MeasureText(text, 16, smallFont);
+	Vector2 textSize = MeasureText(text, 16, FONT("small_font"));
 	const Vector2 size = Vector2Add(textSize, v2s(24));
 	if (origin.x + size.x > ScaledWindowWidthFloat())
 	{
@@ -515,5 +515,5 @@ void RenderTooltipAt(const char *text, Vector2 origin)
 	origin.y = fmaxf(0, origin.y);
 
 	DrawNinePatchTexture(origin, size, 12, 12, TEXTURE("interface/tooltip"));
-	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, COLOR_WHITE, smallFont);
+	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, COLOR_WHITE, FONT("small_font"));
 }

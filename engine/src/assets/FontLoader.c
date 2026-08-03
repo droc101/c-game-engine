@@ -7,7 +7,9 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/FontLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/debug/DPrint.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
@@ -17,7 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-Font *GenerateFallbackFont()
+static uint32_t fontId;
+static Font *fonts[MAX_FONTS];
+
+static Font *GenerateFallbackFont(const char *asset)
 {
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
@@ -32,7 +37,7 @@ Font *GenerateFallbackFont()
 	font->texture = calloc(strlen("_generic_fallback") + 1, sizeof(char));
 	CheckAlloc(font->texture);
 	strcpy(font->texture, "_generic_fallback");
-	font->image = RegisterFallbackImage();
+	const Image *img = RegisterFallbackImage();
 	static_assert(sizeof(font->charWidths) / sizeof(*font->charWidths) ==
 								  sizeof(font->charStartUVs) / sizeof(*font->charStartUVs) &&
 						  sizeof(font->charWidths) / sizeof(*font->charWidths) ==
@@ -46,25 +51,26 @@ Font *GenerateFallbackFont()
 	{
 		font->charWidths[i] = 16;
 		font->charStartUVs[i] = (float)((double)i / font->charCount); // Casting through double here is required
-		font->charEndUVs[i] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)font->image->width); // Here too
+		font->charEndUVs[i] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)img->width); // Here too
 	}
+	font->name = strdup(asset);
 	return font;
 }
 
-Font *LoadFont(const char *asset)
+static Font *LoadFontInternal(const char *asset)
 {
 	Asset *assetData = LoadAsset(asset, false, false);
 	if (assetData == NULL)
 	{
 		LogError("Failed to load font from asset, asset was NULL!\n");
-		return GenerateFallbackFont();
+		return GenerateFallbackFont(asset);
 	}
 	if (assetData->typeVersion != FONT_ASSET_VERSION)
 	{
 		LogError("Failed to load font from asset due to version mismatch (got %d, expected %d)\n",
 				 assetData->typeVersion,
 				 FONT_ASSET_VERSION);
-		return GenerateFallbackFont();
+		return GenerateFallbackFont(asset);
 	}
 	const size_t baseSize = (sizeof(uint8_t) * 8) + sizeof(bool);
 	if (assetData->size < baseSize)
@@ -72,7 +78,7 @@ Font *LoadFont(const char *asset)
 		LogError("Failed to load font from asset due to size mismatch (got %d bytes, expected at least %d bytes)\n",
 				 assetData->size,
 				 baseSize);
-		return GenerateFallbackFont();
+		return GenerateFallbackFont(asset);
 	}
 	Font *font = malloc(sizeof(Font));
 	CheckAlloc(font);
@@ -95,7 +101,7 @@ Font *LoadFont(const char *asset)
 		LogError("Failed to load font from asset (unable to read texture string)\n");
 		free(font);
 		DestroyDataReader(reader);
-		return GenerateFallbackFont();
+		return GenerateFallbackFont(asset);
 	}
 	bytesRemaining -= fontTextureLength;
 	bytesRemaining += sizeof(size_t);
@@ -104,7 +110,7 @@ Font *LoadFont(const char *asset)
 	CheckAlloc(font->texture);
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
-	font->image = LoadImage(font->texture);
+	const Image *img = LoadImage(font->texture);
 	font->charCount = ReadUint8(reader);
 	memset(font->charWidths, 0, sizeof(font->charWidths) / sizeof(*font->charWidths));
 	memset(font->charStartUVs, 0, sizeof(font->charStartUVs) / sizeof(*font->charStartUVs));
@@ -116,17 +122,50 @@ Font *LoadFont(const char *asset)
 		const uint8_t width = ReadUint8(reader);
 		font->charWidths[(int)chr] = width;
 		font->charStartUVs[(int)chr] = (float)((double)i / font->charCount); // Casting through double here is required
-		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount -
-											 1.0 / (double)font->image->width); // Here too
+		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)img->width); // Here too
 	}
+	font->name = strdup(asset);
 	DestroyDataReader(reader);
 	FreeAsset(assetData);
 
 	return font;
 }
 
-void FreeFont(Font *font)
+Font *LoadFont(const char *asset)
 {
-	free(font->texture);
-	free(font);
+	for (size_t i = 0; i < fontId; i++)
+	{
+		Font *compare = fonts[i];
+		if (compare && strcmp(asset, compare->name) == 0)
+		{
+			return compare;
+		}
+	}
+
+	Font *loaded = LoadFontInternal(asset);
+	fonts[fontId] = loaded;
+	fontId++;
+
+	return loaded;
+}
+
+void DestroyFontLoader()
+{
+	LogDebug("Cleaning up font cache...\n");
+	for (int i = 0; i < MAX_FONTS; i++)
+	{
+		if (fonts[i] != NULL)
+		{
+			free(fonts[i]->name);
+			free(fonts[i]->texture);
+			free(fonts[i]);
+			fonts[i] = NULL;
+		}
+	}
+	fontId = 0;
+}
+
+void DPrintFontLoader()
+{
+	DPrintF("Font Cache: %zu/%zu fonts", COLOR_WHITE, fontId, MAX_FONTS);
 }

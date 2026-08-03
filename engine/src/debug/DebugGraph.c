@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/debug/DebugGraph.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -102,12 +103,12 @@ static void DebugGraphYLabel(DebugGraph *graph, const Vector2 pos, const Vector2
 
 	const float targetLineY = DebugGraphValueHeight(graph, pos, size, value);
 	DrawLine(v2(pos.x + 10, targetLineY), v2(pos.x + size.x - 10, targetLineY), 2, COLOR(0x80808080));
-	FontDrawString(v2(pos.x + 10, targetLineY + 2), label, 12, color, smallFont);
+	FontDrawString(v2(pos.x + 10, targetLineY + 2), label, 12, color, FONT("small_font"));
 
 	sprintf(label, "%.0f %s", floor(1000.0 / value), graph->linearLabel);
-	const float labelSize = MeasureText(label, 12, smallFont).x;
+	const float labelSize = MeasureText(label, 12, FONT("small_font")).x;
 
-	FontDrawString(v2(pos.x + size.x - 10 - labelSize, targetLineY + 2), label, 12, color, smallFont);
+	FontDrawString(v2(pos.x + size.x - 10 - labelSize, targetLineY + 2), label, 12, color, FONT("small_font"));
 }
 
 void DrawDebugGraph(DebugGraph *graph, const Vector2 pos, const Vector2 size)
@@ -203,15 +204,15 @@ void DrawDebugGraph(DebugGraph *graph, const Vector2 pos, const Vector2 size)
 	char label[40];
 	sprintf(label, "%s: %.2f", graph->label, currentValue);
 	float xPos = pos.x + 10;
-	FontDrawString(v2(xPos + 2, yPos + 2), label, fontSize, COLOR_BLACK, smallFont);
-	FontDrawString(v2(xPos, yPos), label, fontSize, lineColor, smallFont);
+	FontDrawString(v2(xPos + 2, yPos + 2), label, fontSize, COLOR_BLACK, FONT("small_font"));
+	FontDrawString(v2(xPos, yPos), label, fontSize, lineColor, FONT("small_font"));
 
 	char linearLabel[40];
 	sprintf(linearLabel, "%.2f %s", currentMs, graph->linearLabel);
-	const float labelSize = MeasureText(linearLabel, fontSize, smallFont).x;
+	const float labelSize = MeasureText(linearLabel, fontSize, FONT("small_font")).x;
 	xPos = pos.x + size.x - 10 - labelSize;
-	FontDrawString(v2(xPos + 2, yPos + 2), linearLabel, fontSize, COLOR_BLACK, smallFont);
-	FontDrawString(v2(xPos, yPos), linearLabel, fontSize, lineColor, smallFont);
+	FontDrawString(v2(xPos + 2, yPos + 2), linearLabel, fontSize, COLOR_BLACK, FONT("small_font"));
+	FontDrawString(v2(xPos, yPos), linearLabel, fontSize, lineColor, FONT("small_font"));
 }
 
 double DebugGraphGetValue(DebugGraph *graph)

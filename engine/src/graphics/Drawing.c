@@ -4,6 +4,7 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -19,7 +20,6 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
-#include <joltc/Math/Vector3.h>
 #include <joltc/types.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_pixels.h>
@@ -27,8 +27,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include "engine/debug/DebugEntryManager.h"
 
 SDL_Surface *ToSDLSurface(const char *texture)
 {
@@ -260,7 +258,7 @@ void RenderHUD()
 
 	char coinStr[16];
 	sprintf(coinStr, "%d", state->saveData->coins);
-	FontDrawString(v2(ScaledWindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, largeFont);
+	FontDrawString(v2(ScaledWindowWidthFloat() - 210, 16), coinStr, 40, COLOR_WHITE, FONT("large_font"));
 
 	coinIconPos.y = 64;
 

@@ -78,6 +78,6 @@ void DrawHeaderFooterControl(const Control *c, ControlState state, Vector2 posit
 						c->size,
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
-						largeFont);
+						FONT("large_font"));
 	}
 }

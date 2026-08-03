@@ -3,6 +3,7 @@
 //
 
 #include "gameState/OptionsState.h"
+#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
@@ -126,7 +127,7 @@ static void OptionsStateSet()
 									   TOP_CENTER,
 									   FONT_HALIGN_CENTER,
 									   FONT_VALIGN_MIDDLE,
-									   largeFont,
+									   FONT("large_font"),
 									   false));
 
 		float opY = 80;

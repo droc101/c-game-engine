@@ -186,6 +186,7 @@ void DestroyAssetCache()
 	DestroyTextureLoader();
 	DestroyModelLoader();
 	DestroyMapMaterialLoader();
+	DestroyFontLoader();
 }
 
 static bool DecompressAsset(FILE *file, Asset *dest)
@@ -360,11 +361,9 @@ void HotReloadAssets()
 	//  image that has been freed. This could be fixed by moving this function into RenderingHelpers.c and only allowing
 	//  it to be called by FrameStart. Doing so would also allow this function to directly clear the textures and models
 	//  instead of queuing it.
-	DestroyCommonFonts();
 	DestroyAssetCache();
 
 	AssetCacheInit();
-	InitCommonFonts();
 
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 }

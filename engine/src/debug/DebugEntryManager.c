@@ -3,6 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
+#include <engine/assets/FontLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/Commit.h>
@@ -183,6 +184,7 @@ static void DebugEntryAssetLoaders()
 	DPrintAssetReader();
 	DPrintTextureLoader();
 	DPrintModelLoader();
+	DPrintFontLoader();
 }
 
 #pragma endregion

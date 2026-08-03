@@ -3,6 +3,7 @@
 //
 
 #include "gameState/options/VideoOptionsState.h"
+#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -251,7 +252,7 @@ static void VideoOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
@@ -326,7 +327,7 @@ static void VideoOptionsStateSet()
 											  TOP_CENTER,
 											  FONT_HALIGN_LEFT,
 											  FONT_VALIGN_MIDDLE,
-											  smallFont,
+											  FONT("small_font"),
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,

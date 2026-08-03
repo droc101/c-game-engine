@@ -15,6 +15,7 @@
 #include <engine/structs/InputAction.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/HeaderFooterControl.h>
@@ -31,7 +32,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "engine/subsystem/Error.h"
 #include "gameState/options/InputOptionsState.h"
 
 typedef enum ListenMode
@@ -391,7 +391,7 @@ static void ControlsOptionsStateSet()
 												  TOP_LEFT,
 												  FONT_HALIGN_CENTER,
 												  FONT_VALIGN_MIDDLE,
-												  smallFont,
+												  FONT("small_font"),
 												  true));
 			for (size_t i = 0; i < cat->controlOptions.length; i++)
 			{
@@ -407,7 +407,7 @@ static void ControlsOptionsStateSet()
 													  TOP_LEFT,
 													  FONT_HALIGN_LEFT,
 													  FONT_VALIGN_MIDDLE,
-													  smallFont,
+													  FONT("small_font"),
 													  true));
 
 				Control *kbmButton = CreateButtonControl(v2(0 - 40 - 6 - 190 - 6, entryY),

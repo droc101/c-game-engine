@@ -63,7 +63,7 @@ static void TestActorRenderUi(Actor *this)
 						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_BOTTOM,
-						smallFont);
+						FONT("small_font"));
 		DrawTextAligned("I'm TestActor!",
 						16,
 						COLOR_WHITE,
@@ -71,7 +71,7 @@ static void TestActorRenderUi(Actor *this)
 						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_BOTTOM,
-						smallFont);
+						FONT("small_font"));
 	}
 
 	if (!GetState()->map->player.hasHeldActor && GetState()->map->player.targetedActor == this)
@@ -83,7 +83,7 @@ static void TestActorRenderUi(Actor *this)
 						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 		DrawTextAligned("please spare me",
 						16,
 						COLOR_WHITE,
@@ -91,7 +91,7 @@ static void TestActorRenderUi(Actor *this)
 						v2(ScaledWindowWidth() - 40, ScaledWindowHeight() - 40),
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
-						smallFont);
+						FONT("small_font"));
 	}
 }
 

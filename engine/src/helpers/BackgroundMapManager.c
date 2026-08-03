@@ -105,7 +105,7 @@ void RenderMenuBackground(GlobalState *state)
 							v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
 							FONT_HALIGN_CENTER,
 							FONT_VALIGN_MIDDLE,
-							smallFont);
+							FONT("small_font"));
 			DrawTextAligned("LOADING",
 							16,
 							COLOR_WHITE,
@@ -113,7 +113,7 @@ void RenderMenuBackground(GlobalState *state)
 							v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
 							FONT_HALIGN_CENTER,
 							FONT_VALIGN_MIDDLE,
-							smallFont);
+							FONT("small_font"));
 		}
 	}
 	backgroundMapLoadFrameCounter++;
