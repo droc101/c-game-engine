@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SHADER_ASSET_VERSION 1
+#define SHADER_ASSET_VERSION 2
 
 typedef enum ShaderType ShaderType;
 
@@ -22,16 +22,14 @@ enum ShaderType
 	SHADER_TYPE_VERT,
 	/// Compute shader
 	SHADER_TYPE_COMP,
+	/// Geometry Shader
+	SHADER_TYPE_GEOM,
 };
 
 struct Shader
 {
 	/// The type of this shader
 	ShaderType type;
-	/// The length of the GLSL in this shader
-	size_t glslLength;
-	/// The GLSL source code of this shader
-	char *glsl;
 	/// The length of the SPIRV code (in number of @code uint32_t@endcode s
 	size_t spirvLength;
 	/// The SPIRV code
