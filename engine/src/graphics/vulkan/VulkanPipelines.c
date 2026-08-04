@@ -55,7 +55,7 @@ static const VkPipelineRasterizationStateCreateInfo SHADOW_MAP_RASTERIZER = {
 	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 	.depthBiasEnable = VK_TRUE,
 	.depthBiasConstantFactor = -1.0f,
-	.depthBiasSlopeFactor = -1.5f,
+	.depthBiasSlopeFactor = -2.5f,
 	.lineWidth = 1,
 };
 
@@ -138,6 +138,7 @@ static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
 	.pDynamicStates = (VkDynamicState[]){VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR},
 };
 
+static LunaShaderModule shadowMapsFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
 #pragma endregion shared
@@ -1258,6 +1259,10 @@ static inline VkResult CreateMapShadowMapPipeline()
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
 		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = shadowMapsFragShaderModule,
+		},
 	};
 
 	const VkVertexInputBindingDescription bindingDescriptions[] = {
@@ -1266,6 +1271,11 @@ static inline VkResult CreateMapShadowMapPipeline()
 			.stride = sizeof(MapVertex),
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		},
+		{
+			.binding = 1,
+			.stride = sizeof(uint32_t),
+			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
+		},
 	};
 	const VkVertexInputAttributeDescription attributeDescriptions[] = {
 		{
@@ -1273,6 +1283,18 @@ static inline VkResult CreateMapShadowMapPipeline()
 			.binding = 0,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(MapVertex, position),
+		},
+		{
+			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(MapVertex, uv),
+		},
+		{
+			.location = 2,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = 0,
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -1322,6 +1344,10 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
 		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = shadowMapsFragShaderModule,
+		},
 	};
 
 	const VkVertexInputBindingDescription bindingDescriptions[] = {
@@ -1346,32 +1372,56 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		{
 			.location = 1,
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, normal),
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ModelVertex, uv),
 		},
 		{
 			.location = 2,
-			.binding = 1,
+			.binding = 0,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
+			.offset = offsetof(ModelVertex, color),
 		},
 		{
 			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
+		},
+		{
+			.location = 6,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
+		},
+		{
+			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, modColor),
+		},
+		{
+			.location = 8,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, materialColor),
+		},
+		{
+			.location = 9,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ActorModelInstanceData, textureIndex),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -1421,6 +1471,10 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
 		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = shadowMapsFragShaderModule,
+		},
 	};
 
 	const VkVertexInputBindingDescription bindingDescriptions[] = {
@@ -1444,33 +1498,63 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		},
 		{
 			.location = 1,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ActorWallVertex, uv),
+		},
+		{
+			.location = 2,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32_SFLOAT,
 			.offset = offsetof(ActorWallInstanceData, position),
 		},
 		{
-			.location = 2,
+			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32_SFLOAT,
 			.offset = offsetof(ActorWallInstanceData, scale),
 		},
 		{
-			.location = 3,
+			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32_SFLOAT,
 			.offset = offsetof(ActorWallInstanceData, axis),
 		},
 		{
-			.location = 4,
+			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32_SFLOAT,
 			.offset = offsetof(ActorWallInstanceData, centerOffset),
 		},
 		{
-			.location = 5,
+			.location = 6,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 			.offset = offsetof(ActorWallInstanceData, rotationQuat),
+		},
+		{
+			.location = 7,
+			.binding = 1,
+			.format = VK_FORMAT_R32_UINT,
+			.offset = offsetof(ActorWallInstanceData, textureIndex),
+		},
+		{
+			.location = 8,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ActorWallInstanceData, uvScale),
+		},
+		{
+			.location = 9,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32_SFLOAT,
+			.offset = offsetof(ActorWallInstanceData, uvOffset),
+		},
+		{
+			.location = 10,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorWallInstanceData, modColor),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -1533,6 +1617,9 @@ VkResult CreateShadowMapGraphicsPipelines()
 	shadowMapPushConstantRanges[0].dataPointer = &lightIndex;
 	shadowMapPushConstantRanges[1].dataPointer = &faceIndex;
 	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
+
+	VulkanTestReturnResult(CreateShaderModule(SHADER("shadow_maps_f"), SHADER_TYPE_FRAG, &shadowMapsFragShaderModule),
+						   "Failed to load shadow maps fragment shader!");
 
 	VulkanTestReturnResult(CreateMapShadowMapPipeline(), "Failed to create map shadow maps pipeline!");
 	VulkanTestReturnResult(CreateModelActorShadowMapPipeline(), "Failed to create model actor shadow maps pipeline!");
