@@ -54,8 +54,8 @@ static const VkPipelineRasterizationStateCreateInfo SHADOW_MAP_RASTERIZER = {
 	.cullMode = VK_CULL_MODE_BACK_BIT,
 	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 	.depthBiasEnable = VK_TRUE,
-	.depthBiasConstantFactor = 2.0f,
-	.depthBiasSlopeFactor = 4.25f,
+	.depthBiasConstantFactor = -1.0f,
+	.depthBiasSlopeFactor = -1.5f,
 	.lineWidth = 1,
 };
 
@@ -76,6 +76,14 @@ static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE = {
 	.depthTestEnable = VK_TRUE,
 	.depthWriteEnable = VK_TRUE,
 	.depthCompareOp = VK_COMPARE_OP_LESS,
+	.maxDepthBounds = 1,
+};
+
+static const VkPipelineDepthStencilStateCreateInfo SHADOW_MAP_DEPTH_STENCIL_STATE = {
+	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+	.depthTestEnable = VK_TRUE,
+	.depthWriteEnable = VK_TRUE,
+	.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL,
 	.maxDepthBounds = 1,
 };
 
@@ -1283,7 +1291,7 @@ static inline VkResult CreateMapShadowMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
-		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
 		.colorBlendState = &SHADOW_MAP_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
@@ -1337,24 +1345,30 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		},
 		{
 			.location = 1,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ModelVertex, normal),
 		},
 		{
 			.location = 2,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 4,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
+		},
+		{
+			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
@@ -1376,7 +1390,7 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
-		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
 		.colorBlendState = &SHADOW_MAP_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
@@ -1475,7 +1489,7 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
-		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
 		.colorBlendState = &SHADOW_MAP_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,

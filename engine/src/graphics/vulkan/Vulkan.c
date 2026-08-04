@@ -516,7 +516,7 @@ static inline VkResult LoadLights(const Map *map)
 
 		mat4 perspectiveMatrix;
 		const float farPlaneDistance = GetMaxLightDistance(light);
-		glm_perspective_lh_zo(180, 1, NEAR_Z, farPlaneDistance, perspectiveMatrix);
+		glm_perspective_lh_zo(180, 1, farPlaneDistance, NEAR_Z, perspectiveMatrix);
 		mat4 transformMatrix;
 
 		light->layer = shadowMapRegionCount / 16;
@@ -986,7 +986,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		for (faceIndex = 0; faceIndex < faceCount; faceIndex++)
 		{
 			const VkClearValue clearValue = {
-				.depthStencil.depth = 1,
+				.depthStencil.depth = 0,
 			};
 			const VkRenderPassBeginInfo beginInfo = {
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,

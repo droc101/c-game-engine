@@ -451,7 +451,7 @@ bool CreateTextureSamplers()
 		.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.compareEnable = VK_TRUE,
-		.compareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
+		.compareOp = VK_COMPARE_OP_GREATER_OR_EQUAL,
 	};
 
 	VulkanTest(lunaCreateSampler(device,
