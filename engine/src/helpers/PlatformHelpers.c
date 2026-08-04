@@ -170,3 +170,27 @@ char *CanonicalFilePath(const char *path)
 	return realpath(path, NULL);
 #endif
 }
+
+bool RedirectFd(const int originalFd, int *pipeFds, int *originalFdCopy)
+{
+#ifdef SDL_PLATFORM_LINUX
+	*originalFdCopy = dup(originalFd);
+	if (pipe(pipeFds) != 0)
+	{
+		return false;
+	}
+	dup2(pipeFds[1], originalFd);
+	close(pipeFds[1]);
+	return true;
+#else
+	return false;
+#endif
+}
+
+void RestoreFd(const int modifiedFd, int *pipeFds, const int originalFd)
+{
+#ifdef SDL_PLATFORM_LINUX
+	dup2(originalFd, modifiedFd);
+	close(pipeFds[0]);
+#endif
+}
