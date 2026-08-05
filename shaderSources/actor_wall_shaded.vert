@@ -18,10 +18,11 @@ layout(location = 8) in vec2 inUvScale;
 layout(location = 9) in vec2 inUvOffset;
 layout(location = 10) in vec4 inModColor;
 
-layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec2 outUV;
-layout(location = 2) out vec3 outNormal;
-layout(location = 3) flat out uint outTextureIndex;
+layout(location = 0) out vec4 outPosition;
+layout(location = 1) out vec4 outColor;
+layout(location = 2) out vec2 outUV;
+layout(location = 3) out vec3 outNormal;
+layout(location = 4) flat out uint outTextureIndex;
 
 vec3 rotateVec3ByQuat(vec3 point, vec4 quat){ 
   return point + 2.0 * cross(quat.xyz, cross(quat.xyz, point) + quat.w * point);
@@ -32,9 +33,11 @@ vec3 getVec3FromVec2(vec2 vec) {
 }
 
 void main() {
+	outPosition = vec4(rotateVec3ByQuat(getVec3FromVec2(inVertexPosition * inScale + inCenterOffset), inRotationQuat) + inActorPosition, 1);
     outColor = inModColor;
     outUV = inUV * inUvScale * (inScale / vec2(16.0)) + inUvOffset;
-    outNormal = rotateVec3ByQuat(vec3(inAxis.x, 0, inAxis.y), inRotationQuat);
+    const float normalMultiplier = gl_VertexIndex < 6 ? 1 : -1;
+    outNormal = rotateVec3ByQuat(normalMultiplier * vec3(-inAxis.y, 0, inAxis.x), inRotationQuat);
     outTextureIndex = inTextureIndex;
-    gl_Position = transform.matrix * vec4(rotateVec3ByQuat(getVec3FromVec2(inVertexPosition * inScale + inCenterOffset), inRotationQuat) + inActorPosition, 1);
+    gl_Position = transform.matrix * outPosition;
 }

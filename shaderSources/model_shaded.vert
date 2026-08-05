@@ -14,15 +14,17 @@ layout(location = 4) in mat4 inTransformMatrix;
 layout(location = 8) in vec4 inMaterialColor;
 layout(location = 9) in uint inTextureIndex;
 
-layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec2 outUV;
-layout(location = 2) out vec3 outNormal;
-layout(location = 3) flat out uint outTextureIndex;
+layout(location = 0) out vec4 outPosition;
+layout(location = 1) out vec4 outColor;
+layout(location = 2) out vec2 outUV;
+layout(location = 3) out vec3 outNormal;
+layout(location = 4) flat out uint outTextureIndex;
 
 void main() {
+	outPosition = inTransformMatrix * vec4(inPosition, 1);
     outColor = inColor * inMaterialColor;
     outUV = inUV;
-    outNormal = inNormal;
+    outNormal = (inTransformMatrix * vec4(inNormal, 0)).xyz;
     outTextureIndex = inTextureIndex;
-    gl_Position = transform.matrix * inTransformMatrix * vec4(inPosition, 1);
+    gl_Position = transform.matrix * outPosition;
 }
