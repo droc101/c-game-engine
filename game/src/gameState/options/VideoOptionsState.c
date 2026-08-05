@@ -13,6 +13,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
+#include <engine/structs/VideoPreset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
@@ -34,6 +35,8 @@
 static UiStack *videoOptionsStack = NULL;
 static ScrollView *videoOptionsScrollView = NULL;
 static bool hasChangedVideoOptions = false;
+
+VideoPreset currentVideoPreset;
 
 static OptionsButtonValue gpuTypeButtonValues[3] = {
 	{
@@ -105,12 +108,13 @@ static char *SliderLabelAnisotropy(const Control *slider)
 	return buf;
 }
 
-static char *SliderLabelLod(const Control *slider)
+static char *SliderLabelVideoPreset(const Control *slider)
 {
+	char *labels[] = {"Very Low", "Low", "Medium", "High", "Ultra", "Custom"};
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	sprintf(buf, "%s: %.1fx", data->label, GetSliderValueAsFloat(slider->controlData));
+	sprintf(buf, "%s: %s", data->label, labels[(int)GetSliderValueAsFloat(slider->controlData)]);
 	return buf;
 }
 
@@ -163,6 +167,13 @@ static void UpdateMsaaCallback(const ControlValue * /*value*/)
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_MSAA;
 }
 
+static void UpdateVideoPresetCallback(const ControlValue * /*value*/)
+{
+	ApplyVideoPreset(&GetState()->options, currentVideoPreset);
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_UPDATE_MSAA;
+	hasChangedVideoOptions = true; // until luna can change msaa
+}
+
 static void UpdateFovCallback(const ControlValue * /*value*/)
 {
 	if (GetState()->map)
@@ -182,6 +193,8 @@ static void VideoOptionsStateUpdate(GlobalState *state, const double delta)
 	{
 		UpdateMenuBackground(state, delta);
 	}
+
+	currentVideoPreset = GetCurrentVideoPreset(&state->options);
 }
 
 static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
@@ -315,18 +328,6 @@ static void VideoOptionsStateSet()
 													  },
 													  NULL));
 #endif
-		opY += opSpacing * 1.5f;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateLabelControl("Quality Options",
-											  16,
-											  COLOR_WHITE,
-											  v2(0, opY),
-											  v2(750, 40),
-											  TOP_CENTER,
-											  FONT_HALIGN_LEFT,
-											  FONT_VALIGN_MIDDLE,
-											  FONT("small_font"),
-											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateOptionsButtonControl(v2(0, opY),
@@ -342,6 +343,35 @@ static void VideoOptionsStateSet()
 														  .dwordValue = &GetState()->options.preferredGpuType,
 													  },
 													  NULL));
+		opY += opSpacing * 1.5f;
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateLabelControl("Quality Options",
+											  16,
+											  COLOR_WHITE,
+											  v2(0, opY),
+											  v2(750, 40),
+											  TOP_CENTER,
+											  FONT_HALIGN_LEFT,
+											  FONT_VALIGN_MIDDLE,
+											  FONT("small_font"),
+											  true));
+		opY += opSpacing;
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateSliderControl(v2(0, opY),
+											   v2(750, 40),
+											   "Preset",
+											   UpdateVideoPresetCallback,
+											   TOP_CENTER,
+											   0.0f,
+											   VIDEO_PRESET_CUSTOM,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_DWORD,
+												   .dwordValue = &currentVideoPreset,
+											   },
+											   1.0f,
+											   1.0f,
+											   SliderLabelVideoPreset,
+											   NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(0, opY),
@@ -374,7 +404,7 @@ static void VideoOptionsStateSet()
 											   },
 											   0.5f,
 											   1.0f,
-											   SliderLabelLod,
+											   SliderLabelPercent,
 											   "Changes the level of detail on far away objects"));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
