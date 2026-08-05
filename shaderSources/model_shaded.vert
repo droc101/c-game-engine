@@ -26,5 +26,3 @@ void main() {
     outTextureIndex = inTextureIndex;
     gl_Position = transform.matrix * inTransformMatrix * vec4(inPosition, 1);
 }
-
-

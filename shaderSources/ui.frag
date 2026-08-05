@@ -18,5 +18,3 @@ void main() {
     	outColor = texture(textureSampler[nonuniformEXT(textureIndex)], uv) * inColor;
     }
 }
-
-

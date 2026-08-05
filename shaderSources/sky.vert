@@ -16,4 +16,3 @@ void main() {
     outUV = inUV;
     gl_Position = camera.transformMatrix * vec4(inPosition + camera.position, 1);
 }
-

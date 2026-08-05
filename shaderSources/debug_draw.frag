@@ -10,7 +10,3 @@ void main() {
 	}
 	outColor = vec4(inColor.rgb, 1);
 }
-
-
-
-

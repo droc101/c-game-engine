@@ -36,9 +36,3 @@ void main() {
     outTextureIndex = inTextureIndex;
     gl_Position = transform.matrix * vec4(rotateVec3ByQuat(getVec3FromVec2(inVertexPosition * inScale + inCenterOffset), inRotationQuat) + inActorPosition, 1);
 }
-
-
-
-
-
-

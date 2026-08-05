@@ -37,9 +37,3 @@ void main() {
 	outColor.rgb = mix(outColor.rgb * inColor.rgb, fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);
 }
-
-
-
-
-
-

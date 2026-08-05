@@ -22,5 +22,3 @@ void main() {
     outColor = texture(textureSampler[nonuniformEXT(pushConstants.textureIndex)], inUV);
    	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);
 }
-
-

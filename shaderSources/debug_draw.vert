@@ -15,4 +15,3 @@ void main() {
 	outColor = inColor;
 	gl_Position = transform.matrix * vec4(inVertex, 1.0);
 }
-
