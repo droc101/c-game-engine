@@ -13,6 +13,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
+#include <engine/structs/VideoPreset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
@@ -26,7 +27,6 @@
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "gameState/options/RestartPromptState.h"
@@ -36,21 +36,23 @@ static UiStack *videoOptionsStack = NULL;
 static ScrollView *videoOptionsScrollView = NULL;
 static bool hasChangedVideoOptions = false;
 
+VideoPreset currentVideoPreset;
+
 static OptionsButtonValue gpuTypeButtonValues[3] = {
 	{
 		.text = "Dedicated",
 		.tooltip = "Prefer using a dedicated GPU, which usually provides the best performance.",
-		.value = GPU_TYPE_DEDICATED,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = GPU_TYPE_DEDICATED},
 	},
 	{
 		.text = "Integrated",
 		.tooltip = "Prefer using an integrated GPU, which usually provides less performance than a dedicated GPU.",
-		.value = GPU_TYPE_INTEGRATED,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = GPU_TYPE_INTEGRATED},
 	},
 	{
 		.text = "Software",
 		.tooltip = "Prefer using a software emulated GPU, which usually provides the worst performance.",
-		.value = GPU_TYPE_SOFTWARE,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = GPU_TYPE_SOFTWARE},
 	},
 };
 
@@ -58,12 +60,20 @@ static OptionsButtonValue preferWaylandButtonValues[2] = {
 	{
 		.text = "Prefer X11",
 		.tooltip = NULL,
-		.value = false,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = false,
+				},
 	},
 	{
 		.text = "Prefer Wayland",
 		.tooltip = NULL,
-		.value = true,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = true,
+				},
 	},
 };
 
@@ -94,7 +104,7 @@ static char *SliderLabelMSAA(const Control *slider)
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
+	sprintf(buf, "%s: %s", data->label, labels[(int)GetSliderValueAsFloat(slider->controlData)]);
 	return buf;
 }
 
@@ -104,16 +114,17 @@ static char *SliderLabelAnisotropy(const Control *slider)
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
+	sprintf(buf, "%s: %s", data->label, labels[(int)GetSliderValueAsFloat(slider->controlData)]);
 	return buf;
 }
 
-static char *SliderLabelLod(const Control *slider)
+static char *SliderLabelVideoPreset(const Control *slider)
 {
+	char *labels[] = {"Very Low", "Low", "Medium", "High", "Ultra", "Custom"};
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	sprintf(buf, "%s: %.1fx", data->label, data->value);
+	sprintf(buf, "%s: %s", data->label, labels[(int)GetSliderValueAsFloat(slider->controlData)]);
 	return buf;
 }
 
@@ -122,38 +133,42 @@ static char *SliderLabelMaxFps(const Control *slider)
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	if (data->value == 0)
+	float value = GetSliderValueAsFloat(slider->controlData);
+	if (value == 0)
 	{
 		sprintf(buf, "%s: Unlimited", data->label);
 	} else
 	{
-		sprintf(buf, "%s: %.0f", data->label, data->value);
+		sprintf(buf, "%s: %.0f", data->label, value);
 	}
 	return buf;
 }
 
-static void OptBtnFullscreenChanged(size_t value, void *)
+static void OptBtnFullscreenChanged(const OptionsButtonValue *value, void *)
 {
-	GetState()->options.fullscreen = onOffButtonValues[value].value;
-	SDL_SetWindowFullscreen(GetGameWindow(), onOffButtonValues[value].value);
+	SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
 }
 
-static void OptBtnVsyncChanged(size_t value, void *)
+static void ToggleVsyncCallback(const OptionsButtonValue *value, void *)
 {
-	GetState()->options.vsync = onOffButtonValues[value].value;
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
-static void OptBtnLimitFpsWhenUnfocusedChanged(size_t value, void *)
+static void ClearTexturesOptBtnCallback(const OptionsButtonValue *value, void * /*extraData*/)
 {
-	GetState()->options.limitFpsWhenUnfocused = yesNoButtonValues[value].value;
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
-static void OptButtonMipmapsChanged(const size_t value, void * /*extraData*/)
+static void ClearTexturesSliderCallback(const ControlValue * /*value*/)
 {
-	GetState()->options.mipmaps = onOffButtonValues[value].value;
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
+}
+
+static void RequireRestartCallback(const OptionsButtonValue *value, void *)
+{
+	hasChangedVideoOptions = true;
+	// Change will happen next restart
 }
 
 static void SldOptionsShadowMapQuality(const float value)
@@ -162,49 +177,25 @@ static void SldOptionsShadowMapQuality(const float value)
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 }
 
-static void CbOptionsPreferWayland(size_t value, void *)
+static void UpdateMsaaCallback(const ControlValue * /*value*/)
 {
-	GetState()->options.preferWayland = preferWaylandButtonValues[value].value;
-	hasChangedVideoOptions = true;
-	// Change will happen next restart
-}
-
-static void SldOptionsMsaa(const float value)
-{
-	GetState()->options.msaa = value;
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_MSAA;
 }
 
-static void SldOptionsAnisotropy(const float value)
+static void UpdateVideoPresetCallback(const ControlValue * /*value*/)
 {
-	GetState()->options.anisotropy = value;
-	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
+	ApplyVideoPreset(&GetState()->options, currentVideoPreset);
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_UPDATE_MSAA;
+	hasChangedVideoOptions = true; // until luna can change msaa
 }
 
-static void SldOptionsLod(const float value)
+static void UpdateFovCallback(const ControlValue * /*value*/)
 {
-	GetState()->options.lodMultiplier = value;
-}
-
-static void SldOptionsMaxFps(const float value)
-{
-	GetState()->options.maxFps = (uint16_t)value;
-}
-
-static void SldOptionsFov(const float value)
-{
-	GetState()->options.fov = value;
 	if (GetState()->map)
 	{
 		GetState()->map->player.playerCamera.fov = GetState()->options.fov;
 	}
-}
-
-static void OptBtnPreferredGpuTypeChanged(const size_t value, void * /*extraData*/)
-{
-	GetState()->options.preferredGpuType = gpuTypeButtonValues[value].value;
-	hasChangedVideoOptions = true;
 }
 
 static void VideoOptionsStateUpdate(GlobalState *state, const double delta)
@@ -218,6 +209,8 @@ static void VideoOptionsStateUpdate(GlobalState *state, const double delta)
 	{
 		UpdateMenuBackground(state, delta);
 	}
+
+	currentVideoPreset = GetCurrentVideoPreset(&state->options);
 }
 
 static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
@@ -248,13 +241,16 @@ static void VideoOptionsStateSet()
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
 											   "FOV",
-											   SldOptionsFov,
+											   UpdateFovCallback,
 											   TOP_CENTER,
-											   30.0,
-											   120.0,
-											   GetState()->options.fov,
-											   1,
-											   1,
+											   30.0f,
+											   120.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.fov,
+											   },
+											   1.0f,
+											   1.0f,
 											   NULL,
 											   NULL));
 
@@ -275,13 +271,16 @@ static void VideoOptionsStateSet()
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
 											   "Maximum FPS",
-											   SldOptionsMaxFps,
+											   NULL,
 											   TOP_CENTER,
-											   0,
-											   500,
-											   GetState()->options.maxFps,
-											   10,
-											   10,
+											   0.0f,
+											   500.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_WORD,
+												   .wordValue = &GetState()->options.maxFps,
+											   },
+											   10.0f,
+											   10.0f,
 											   SliderLabelMaxFps,
 											   NULL));
 		opY += opSpacing;
@@ -289,24 +288,30 @@ static void VideoOptionsStateSet()
 						   CreateOptionsButtonControl(v2(-190, opY),
 													  v2(370, 40),
 													  "VSync: %s",
-													  OptBtnVsyncChanged,
+													  ToggleVsyncCallback,
 													  TOP_CENTER,
 													  onOffButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.vsync,
-													  "Limits the framerate to your monitor to reduce screen "
-													  "tearing"));
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.vsync,
+													  },
+													  "Limits the framerate to match your monitor's refresh rate to "
+													  "reduce screen tearing"));
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateOptionsButtonControl(v2(190, opY),
 													  v2(370, 40),
 													  "Limit Background FPS: %s",
-													  OptBtnLimitFpsWhenUnfocusedChanged,
+													  NULL,
 													  TOP_CENTER,
 													  yesNoButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.limitFpsWhenUnfocused,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.limitFpsWhenUnfocused,
+													  },
 													  "Limit the framerate to 30 when the game window is not focused"));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
@@ -318,21 +323,42 @@ static void VideoOptionsStateSet()
 													  onOffButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.fullscreen,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.fullscreen,
+													  },
 													  NULL));
 #ifdef SDL_PLATFORM_LINUX
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateOptionsButtonControl(v2(190, opY),
 													  v2(370, 40),
 													  "Video Platform: %s",
-													  CbOptionsPreferWayland,
+													  RequireRestartCallback,
 													  TOP_CENTER,
 													  preferWaylandButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.preferWayland,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.preferWayland,
+													  },
 													  NULL));
 #endif
+		opY += opSpacing;
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateOptionsButtonControl(v2(0, opY),
+													  v2(750, 40),
+													  "Preferred GPU Type: %s",
+													  RequireRestartCallback,
+													  TOP_CENTER,
+													  gpuTypeButtonValues,
+													  3,
+													  NULL,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_DWORD,
+														  .dwordValue = &GetState()->options.preferredGpuType,
+													  },
+													  NULL));
 		opY += opSpacing * 1.5f;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateLabelControl("Quality Options",
@@ -347,16 +373,21 @@ static void VideoOptionsStateSet()
 											  true));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(0, opY),
-													  v2(750, 40),
-													  "Preferred GPU Type: %s",
-													  OptBtnPreferredGpuTypeChanged,
-													  TOP_CENTER,
-													  gpuTypeButtonValues,
-													  3,
-													  NULL,
-													  GetState()->options.preferredGpuType,
-													  NULL));
+						   CreateSliderControl(v2(0, opY),
+											   v2(750, 40),
+											   "Preset",
+											   UpdateVideoPresetCallback,
+											   TOP_CENTER,
+											   0.0f,
+											   VIDEO_PRESET_CUSTOM,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_DWORD,
+												   .dwordValue = &currentVideoPreset,
+											   },
+											   1.0f,
+											   1.0f,
+											   SliderLabelVideoPreset,
+											   NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(0, opY),
@@ -366,7 +397,10 @@ static void VideoOptionsStateSet()
 											   TOP_CENTER,
 											   0.0,
 											   8.0,
-											   GetState()->options.shadowMapQuality,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_DWORD,
+												   .dwordValue = &GetState()->options.shadowMapQuality,
+											   },
 											   1,
 											   1,
 											   SliderLabelShadowMapQuality,
@@ -376,13 +410,16 @@ static void VideoOptionsStateSet()
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
 											   "Anti-Aliasing",
-											   SldOptionsMsaa,
+											   UpdateMsaaCallback,
 											   TOP_CENTER,
-											   0.0,
-											   3.0,
-											   GetState()->options.msaa,
-											   1,
-											   1,
+											   0.0f,
+											   3.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_DWORD,
+												   .dwordValue = &GetState()->options.msaa,
+											   },
+											   1.0f,
+											   1.0f,
 											   SliderLabelMSAA,
 											   "Smooths the edges of objects"));
 		opY += opSpacing;
@@ -390,38 +427,47 @@ static void VideoOptionsStateSet()
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
 											   "LOD Distance",
-											   SldOptionsLod,
+											   NULL,
 											   TOP_CENTER,
-											   0.5,
-											   2.0,
-											   GetState()->options.lodMultiplier,
-											   0.5,
-											   1,
-											   SliderLabelLod,
+											   0.5f,
+											   2.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.lodMultiplier,
+											   },
+											   0.5f,
+											   1.0f,
+											   SliderLabelPercent,
 											   "Changes the level of detail on far away objects"));
 		opY += opSpacing;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateOptionsButtonControl(v2(-190, opY),
 													  v2(370, 40),
 													  "Mipmaps: %s",
-													  OptButtonMipmapsChanged,
+													  ClearTexturesOptBtnCallback,
 													  TOP_CENTER,
 													  onOffButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.mipmaps,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.mipmaps,
+													  },
 													  "Improves the appearance of far away textures"));
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateSliderControl(v2(190, opY),
 											   v2(370, 40),
 											   "Anisotropic Filtering",
-											   SldOptionsAnisotropy,
+											   ClearTexturesSliderCallback,
 											   TOP_CENTER,
-											   0.0,
-											   4.0,
-											   GetState()->options.anisotropy,
-											   1,
-											   1,
+											   0.0f,
+											   4.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_DWORD,
+												   .dwordValue = &GetState()->options.anisotropy,
+											   },
+											   1.0f,
+											   1.0f,
 											   SliderLabelAnisotropy,
 											   "Improves the appearance of textures viewed at sharp angles. Requires "
 											   "mipmaps to be enabled."));

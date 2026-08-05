@@ -7,6 +7,7 @@
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Options.h>
+#include <engine/structs/VideoPreset.h>
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -21,17 +22,13 @@ static void DefaultOptions(Options *options)
 	options->uiVolume = 1.0f;
 	options->masterVolume = 1.0f;
 	options->fullscreen = false;
-	options->lodMultiplier = 1.0f;
 	options->cameraSpeed = 1;
-	options->msaa = MSAA_4X;
-	options->mipmaps = true;
 	options->rumbleStrength = 1.0f;
 	options->controllerDeadzone = 0.1f;
 	options->controllerSwapOkCancel = false;
 	options->preferWayland = true;
 	options->shadowMapQuality = SHADOW_MAP_RESOLUTION_256;
 	options->fov = 90.0f;
-	options->anisotropy = ANISOTROPY_16X;
 	options->maxFps = 0;
 	options->preferredGpuType = GPU_TYPE_DEDICATED;
 #ifdef BUILDSTYLE_DEBUG
@@ -42,6 +39,7 @@ static void DefaultOptions(Options *options)
 	options->limitFpsWhenUnfocused = true;
 #endif
 
+	ApplyVideoPreset(options, VIDEO_PRESET_MEDIUM);
 	DefaultControls();
 	DefaultDebugEntrySettings();
 }
@@ -135,16 +133,24 @@ void LoadOptions(Options *options)
 
 		options->fullscreen = KvGetBool(list, "fullscreen", false);
 		options->vsync = KvGetBool(list, "vsync", true);
-		options->msaa = KvGetByte(list, "msaa", MSAA_4X);
-		options->mipmaps = KvGetBool(list, "mipmaps", true);
 		options->preferWayland = KvGetBool(list, "prefer_wayland", true);
 		options->limitFpsWhenUnfocused = KvGetBool(list, "limit_fps_when_unfocused", true);
-		options->lodMultiplier = KvGetFloat(list, "lod_multiplier", 1.0f);
-		options->shadowMapQuality = KvGetByte(list, "shadow_map_quality", SHADOW_MAP_RESOLUTION_256);
 		options->fov = KvGetFloat(list, "fov", 90.0f);
-		options->anisotropy = KvGetByte(list, "anisotropy", ANISOTROPY_16X);
 		options->maxFps = KvGetInt(list, "max_fps", 0);
 		options->preferredGpuType = KvGetByte(list, "preferred_gpu_type", GPU_TYPE_DEDICATED);
+
+		if (KvHas(list, "video_preset", PARAM_TYPE_BYTE))
+		{
+			const VideoPreset preset = KvGetByte(list, "video_preset", VIDEO_PRESET_MEDIUM);
+			ApplyVideoPreset(options, preset);
+		} else
+		{
+			options->msaa = KvGetByte(list, "msaa", MSAA_4X);
+			options->mipmaps = KvGetBool(list, "mipmaps", true);
+			options->lodMultiplier = KvGetFloat(list, "lod_multiplier", 1.0f);
+			options->anisotropy = KvGetByte(list, "anisotropy", ANISOTROPY_16X);
+			options->shadowMapQuality = KvGetByte(list, "shadow_map_quality", SHADOW_MAP_RESOLUTION_256);
+		}
 
 		options->musicVolume = KvGetFloat(list, "music_volume", 1.0f);
 		options->sfxVolume = KvGetFloat(list, "sfx_volume", 1.0f);
@@ -189,16 +195,24 @@ void SaveOptions(Options *options)
 
 	KvSetBool(list, "fullscreen", options->fullscreen);
 	KvSetBool(list, "vsync", options->vsync);
-	KvSetByte(list, "msaa", options->msaa);
-	KvSetBool(list, "mipmaps", options->mipmaps);
 	KvSetBool(list, "prefer_wayland", options->preferWayland);
 	KvSetBool(list, "limit_fps_when_unfocused", options->limitFpsWhenUnfocused);
-	KvSetFloat(list, "lod_multiplier", options->lodMultiplier);
-	KvSetByte(list, "shadow_map_quality", options->shadowMapQuality);
 	KvSetFloat(list, "fov", options->fov);
-	KvSetByte(list, "anisotropy", options->anisotropy);
 	KvSetInt(list, "max_fps", options->maxFps);
 	KvSetByte(list, "preferred_gpu_type", options->preferredGpuType);
+
+	const VideoPreset currentPreset = GetCurrentVideoPreset(options);
+	if (currentPreset != VIDEO_PRESET_CUSTOM)
+	{
+		KvSetByte(list, "video_preset", currentPreset);
+	} else
+	{
+		KvSetByte(list, "msaa", options->msaa);
+		KvSetBool(list, "mipmaps", options->mipmaps);
+		KvSetFloat(list, "lod_multiplier", options->lodMultiplier);
+		KvSetByte(list, "anisotropy", options->anisotropy);
+		KvSetByte(list, "shadow_map_quality", options->shadowMapQuality);
+	}
 
 	KvSetFloat(list, "music_volume", options->musicVolume);
 	KvSetFloat(list, "sfx_volume", options->sfxVolume);

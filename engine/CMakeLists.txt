@@ -203,6 +203,8 @@ target_sources(engine INTERFACE
         include/engine/structs/InputAction.h
         src/structs/ControlOptions.c
         include/engine/structs/ControlOptions.h
+        src/structs/VideoPreset.c
+        include/engine/structs/VideoPreset.h
 
         src/subsystem/CommandParser.c
         include/engine/subsystem/CommandParser.h

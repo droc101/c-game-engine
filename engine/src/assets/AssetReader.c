@@ -355,14 +355,8 @@ void HotReloadAssets()
 {
 	assert(GetState()->map == NULL);
 	StopAllSounds();
-	// TODO: This causes a bug where the image IDs will be reset at whatever point within the frame this function is
-	//  called, which could cause the image be associated with the wrong GPU texture. This is not simple to fix though,
-	//  since reloading the fonts requires that the image cache already be reset, otherwise the font will reference an
-	//  image that has been freed. This could be fixed by moving this function into RenderingHelpers.c and only allowing
-	//  it to be called by FrameStart. Doing so would also allow this function to directly clear the textures and models
-	//  instead of queuing it.
-	DestroyAssetCache();
 
+	DestroyAssetCache();
 	AssetCacheInit();
 
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;

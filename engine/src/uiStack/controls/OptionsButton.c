@@ -2,6 +2,7 @@
 // Created by droc101 on 7/31/26.
 //
 
+#include <assert.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
@@ -15,8 +16,46 @@
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+static size_t FindCurrentValueIndex(const OptionsButtonData *data)
+{
+	for (size_t i = 0; i < data->numValues; i++)
+	{
+		const LiteralControlValue *current = &data->values[i].value;
+		bool same = false;
+		switch (data->value.type)
+		{
+			case CONTROL_VALUE_BOOL:
+				same = *data->value.boolValue == current->boolValue;
+				break;
+			case CONTROL_VALUE_BYTE:
+				same = *data->value.byteValue == current->byteValue;
+				break;
+			case CONTROL_VALUE_WORD:
+				same = *data->value.wordValue == current->wordValue;
+				break;
+			case CONTROL_VALUE_DWORD:
+				same = *data->value.dwordValue == current->dwordValue;
+				break;
+			case CONTROL_VALUE_FLOAT:
+				same = *data->value.floatValue == current->floatValue;
+				break;
+		}
+		if (same)
+		{
+			return i;
+		}
+	}
+	return 0;
+}
+
+static const OptionsButtonValue *FindCurrentValue(const OptionsButtonData *data)
+{
+	return &data->values[FindCurrentValueIndex(data)];
+}
 
 Control *CreateOptionsButtonControl(const Vector2 position,
 									const Vector2 size,
@@ -26,7 +65,7 @@ Control *CreateOptionsButtonControl(const Vector2 position,
 									OptionsButtonValue *values,
 									const size_t numValues,
 									void *extraData,
-									const size_t value,
+									const ControlValue value,
 									char *alwaysTooltip)
 {
 	Control *btn = CreateEmptyControl();
@@ -45,14 +84,11 @@ Control *CreateOptionsButtonControl(const Vector2 position,
 	data->values = values;
 	data->numValues = numValues;
 	data->callbackExtraData = extraData;
+	data->value = value;
 
-	data->value = 0;
 	for (size_t i = 0; i < numValues; i++)
 	{
-		if (values[i].value == value)
-		{
-			data->value = i;
-		}
+		assert(values[i].value.type == value.type);
 	}
 
 	if (data->alwaysTooltip)
@@ -60,7 +96,7 @@ Control *CreateOptionsButtonControl(const Vector2 position,
 		btn->tooltip = data->alwaysTooltip;
 	} else
 	{
-		btn->tooltip = data->values[data->value].tooltip;
+		btn->tooltip = FindCurrentValue(data)->tooltip;
 	}
 
 	return btn;
@@ -71,25 +107,45 @@ void DestroyOptionsButton(const Control *c)
 	free(c->controlData);
 }
 
-void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex)
+void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	OptionsButtonData *data = (OptionsButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
-		data->value++;
-		if (data->value >= data->numValues)
+		size_t index = FindCurrentValueIndex(data);
+		index++;
+		if (index >= data->numValues)
 		{
-			data->value = 0;
+			index = 0;
 		}
 		if (!data->alwaysTooltip)
 		{
-			c->tooltip = data->values[data->value].tooltip;
+			c->tooltip = data->values[index].tooltip;
 		}
+		const LiteralControlValue *value = &data->values[index].value;
+		switch (data->value.type)
+		{
+			case CONTROL_VALUE_BOOL:
+				*data->value.boolValue = value->boolValue;
+				break;
+			case CONTROL_VALUE_BYTE:
+				*data->value.byteValue = value->byteValue;
+				break;
+			case CONTROL_VALUE_WORD:
+				*data->value.wordValue = value->wordValue;
+				break;
+			case CONTROL_VALUE_DWORD:
+				*data->value.dwordValue = value->dwordValue;
+				break;
+			case CONTROL_VALUE_FLOAT:
+				*data->value.floatValue = value->floatValue;
+				break;
+		}
+		data->callback(&data->values[index], data->callbackExtraData);
 		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
 		ConsumeButton(mainThreadInput, CONTROLLER_OK);
-		data->callback(data->value, data->callbackExtraData);
 	}
 }
 
@@ -111,7 +167,7 @@ void DrawOptionsButton(const Control *c, ControlState state, Vector2 position)
 	const OptionsButtonData *data = (OptionsButtonData *)c->controlData;
 
 	char label[256] = {0};
-	snprintf(label, 256, data->text, data->values[data->value].text);
+	snprintf(label, 256, data->text, FindCurrentValue(data)->text);
 
 	DrawTextAligned(label,
 					16,
@@ -127,12 +183,20 @@ OptionsButtonValue onOffButtonValues[2] = {
 	{
 		.text = "Off",
 		.tooltip = NULL,
-		.value = false,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = false,
+				},
 	},
 	{
 		.text = "On",
 		.tooltip = NULL,
-		.value = true,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = true,
+				},
 	},
 };
 
@@ -140,11 +204,19 @@ OptionsButtonValue yesNoButtonValues[2] = {
 	{
 		.text = "No",
 		.tooltip = NULL,
-		.value = false,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = false,
+				},
 	},
 	{
 		.text = "Yes",
 		.tooltip = NULL,
-		.value = true,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = true,
+				},
 	},
 };

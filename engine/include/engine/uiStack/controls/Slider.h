@@ -11,19 +11,19 @@
 
 typedef struct SliderData SliderData;
 
-typedef void (*SliderCallback)(float value);
+typedef void (*SliderCallback)(const ControlValue *value);
 typedef char *(*SliderLabelFunction)(const Control *slider);
 
 struct SliderData
 {
 	char *label;
 
-	double min;
-	double max;
-	double value;
+	float min;
+	float max;
+	ControlValue value;
 
-	double step;
-	double altStep; // Step when holding shift
+	float step;
+	float altStep; // Step when holding shift
 
 	SliderCallback callback;
 	SliderLabelFunction getLabel;
@@ -32,6 +32,8 @@ struct SliderData
 char *SliderLabelPercent(const Control *slider);
 
 char *SliderLabelInteger(const Control *slider);
+
+float GetSliderValueAsFloat(const SliderData *data);
 
 /**
  * Create a new Slider Control
@@ -55,11 +57,11 @@ Control *CreateSliderControl(Vector2 position,
 							 char *label,
 							 SliderCallback callback,
 							 ControlAnchor anchor,
-							 double min,
-							 double max,
-							 double value,
-							 double step,
-							 double altStep,
+							 float min,
+							 float max,
+							 ControlValue value,
+							 float step,
+							 float altStep,
 							 SliderLabelFunction getLabel,
 							 char *tooltip);
 

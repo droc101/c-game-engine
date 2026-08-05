@@ -32,27 +32,8 @@ static void BtnSoundOptionsBack(Control *, void *)
 	SetGameState(&OptionsState);
 }
 
-static void SldOptionsMasterVolume(const float value)
+static void SldOptionsVolume(const ControlValue * /*value*/)
 {
-	GetState()->options.masterVolume = value;
-	UpdateVolume();
-}
-
-static void SldOptionsMusicVolume(const float value)
-{
-	GetState()->options.musicVolume = value;
-	UpdateVolume();
-}
-
-static void SldOptionsSfxVolume(const float value)
-{
-	GetState()->options.sfxVolume = value;
-	UpdateVolume();
-}
-
-static void SldOptionsUiVolume(const float value)
-{
-	GetState()->options.uiVolume = value;
 	UpdateVolume();
 }
 
@@ -97,13 +78,16 @@ static void SoundOptionsStateSet()
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
 											   "Master Volume",
-											   SldOptionsMasterVolume,
+											   SldOptionsVolume,
 											   TOP_CENTER,
-											   0.0,
-											   1.0,
-											   GetState()->options.masterVolume,
-											   0.01,
-											   0.1,
+											   0.0f,
+											   1.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.masterVolume,
+											   },
+											   0.01f,
+											   0.1f,
 											   SliderLabelPercent,
 											   NULL));
 		opY += opSpacing * 1.5;
@@ -111,26 +95,32 @@ static void SoundOptionsStateSet()
 						   CreateSliderControl(v2(-190, opY),
 											   v2(370, 40),
 											   "Music Volume",
-											   SldOptionsMusicVolume,
+											   SldOptionsVolume,
 											   TOP_CENTER,
-											   0.0,
-											   1.0,
-											   GetState()->options.musicVolume,
-											   0.01,
-											   0.1,
+											   0.0f,
+											   1.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.musicVolume,
+											   },
+											   0.01f,
+											   0.1f,
 											   SliderLabelPercent,
 											   NULL));
 		ScrollViewAddChild(soundOptionsScrollView,
 						   CreateSliderControl(v2(190, opY),
 											   v2(370, 40),
 											   "SFX Volume",
-											   SldOptionsSfxVolume,
+											   SldOptionsVolume,
 											   TOP_CENTER,
-											   0.0,
-											   1.0,
-											   GetState()->options.sfxVolume,
-											   0.01,
-											   0.1,
+											   0.0f,
+											   1.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.sfxVolume,
+											   },
+											   0.01f,
+											   0.1f,
 											   SliderLabelPercent,
 											   NULL));
 		opY += opSpacing;
@@ -138,13 +128,16 @@ static void SoundOptionsStateSet()
 						   CreateSliderControl(v2(-190, opY),
 											   v2(370, 40),
 											   "UI Volume",
-											   SldOptionsUiVolume,
+											   SldOptionsVolume,
 											   TOP_CENTER,
-											   0.0,
-											   1.0,
-											   GetState()->options.uiVolume,
-											   0.01,
-											   0.1,
+											   0.0f,
+											   1.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.uiVolume,
+											   },
+											   0.01f,
+											   0.1f,
 											   SliderLabelPercent,
 											   NULL));
 		opY += opSpacing;

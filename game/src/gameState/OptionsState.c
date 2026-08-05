@@ -100,9 +100,8 @@ static void BtnDebugOptions(Control *, void *)
 	SetGameState(&DebugOptionsState);
 }
 
-static void CbOptionsEnableDiscordRpc(const size_t value, void *)
+static void CbOptionsEnableDiscordRpc(const OptionsButtonValue *, void *)
 {
-	GetState()->options.enableDiscordRpc = onOffButtonValues[value].value;
 	if (!GetState()->options.enableDiscordRpc)
 	{
 		DiscordDestroy();
@@ -146,6 +145,10 @@ static void OptionsStateSet()
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Debug Options", BtnDebugOptions, TOP_CENTER, NULL));
 #ifdef ENABLE_DISCORD_SDK
 		opY += opSpacing * 1.5f;
+		const ControlValue discordRpcValue = {
+			.type = CONTROL_VALUE_BOOL,
+			.boolValue = &GetState()->options.enableDiscordRpc,
+		};
 		UiStackPush(optionsStack,
 					CreateOptionsButtonControl(v2(0, opY),
 											   v2(480, 40),
@@ -155,7 +158,7 @@ static void OptionsStateSet()
 											   onOffButtonValues,
 											   2,
 											   NULL,
-											   GetState()->options.enableDiscordRpc,
+											   discordRpcValue,
 											   NULL));
 #endif
 		opY += opSpacing;

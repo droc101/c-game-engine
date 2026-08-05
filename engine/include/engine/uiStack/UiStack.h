@@ -13,7 +13,10 @@
 typedef enum ControlType ControlType;
 typedef enum ControlState ControlState;
 typedef enum ControlAnchor ControlAnchor;
+typedef enum ControlValueType ControlValueType;
 
+typedef struct ControlValue ControlValue;
+typedef struct LiteralControlValue LiteralControlValue;
 typedef struct Control Control;
 typedef struct UiStack UiStack;
 
@@ -52,7 +55,42 @@ enum ControlAnchor
 	MIDDLE_RIGHT,
 	BOTTOM_LEFT,
 	BOTTOM_CENTER,
-	BOTTOM_RIGHT
+	BOTTOM_RIGHT,
+};
+
+enum ControlValueType
+{
+	CONTROL_VALUE_BOOL,
+	CONTROL_VALUE_BYTE,
+	CONTROL_VALUE_WORD,
+	CONTROL_VALUE_DWORD,
+	CONTROL_VALUE_FLOAT,
+};
+
+struct ControlValue
+{
+	ControlValueType type;
+	union
+	{
+		bool *boolValue;
+		uint8_t *byteValue;
+		uint16_t *wordValue;
+		uint32_t *dwordValue;
+		float *floatValue;
+	};
+};
+
+struct LiteralControlValue
+{
+	ControlValueType type;
+	union
+	{
+		bool boolValue;
+		uint8_t byteValue;
+		uint16_t wordValue;
+		uint32_t dwordValue;
+		float floatValue;
+	};
 };
 
 struct Control

@@ -14,13 +14,13 @@
 typedef struct OptionsButtonData OptionsButtonData;
 typedef struct OptionsButtonValue OptionsButtonValue;
 
-typedef void (*OptionsButtonCallback)(size_t value, void *extraData);
+typedef void (*OptionsButtonCallback)(const OptionsButtonValue *value, void *extraData);
 
 struct OptionsButtonValue
 {
 	char *text;
 	char *tooltip;
-	uint64_t value;
+	LiteralControlValue value;
 };
 
 struct OptionsButtonData
@@ -31,7 +31,7 @@ struct OptionsButtonData
 	bool enabled;
 	OptionsButtonValue *values;
 	size_t numValues;
-	size_t value;
+	ControlValue value;
 	void *callbackExtraData;
 };
 
@@ -43,7 +43,7 @@ Control *CreateOptionsButtonControl(Vector2 position,
 									OptionsButtonValue *values,
 									size_t numValues,
 									void *extraData,
-									size_t value,
+									ControlValue value,
 									char *alwaysTooltip);
 
 void DestroyOptionsButton(const Control *c);
