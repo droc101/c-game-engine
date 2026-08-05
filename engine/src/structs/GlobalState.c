@@ -240,6 +240,8 @@ bool ChangeMapByName(const char *name)
 	ChangeMap(map);
 	if (!LoadMap(map, LoadAsset(mapPath, false, false)))
 	{
+		state.map =
+				NULL; // This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
 		ChangeMap(NULL);
 		return false;
 	}

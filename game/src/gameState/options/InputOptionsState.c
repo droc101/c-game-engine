@@ -24,6 +24,7 @@
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include "gameState/options/ControlsOptionsState.h"
 #include "gameState/OptionsState.h"
 
@@ -36,12 +37,20 @@ static OptionsButtonValue invertCameraButtonValues[2] = {
 	{
 		.text = "Normal",
 		.tooltip = NULL,
-		.value = false,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = false,
+				},
 	},
 	{
 		.text = "Inverted",
 		.tooltip = NULL,
-		.value = true,
+		.value =
+				{
+					.type = CONTROL_VALUE_BOOL,
+					.boolValue = true,
+				},
 	},
 };
 
@@ -67,37 +76,6 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 static void BtnControlsOptions(Control *, void *)
 {
 	SetGameState(&ControlsOptionsState);
-}
-
-static void SldOptionsRumbleStrength(const float value)
-{
-	GetState()->options.rumbleStrength = value;
-	Rumble(1.0f, 200, mainThreadInput);
-}
-
-static void SldOptionsStickDeadzone(const float value)
-{
-	GetState()->options.controllerDeadzone = value;
-}
-
-static void SldOptionsMouseSensitivity(const float value)
-{
-	GetState()->options.cameraSpeed = value;
-}
-
-static void CbOptionsInvertCameraH(const size_t value, void *)
-{
-	GetState()->options.invertHorizontalCamera = invertCameraButtonValues[value].value;
-}
-
-static void CbOptionsInvertCameraV(const size_t value, void *)
-{
-	GetState()->options.invertVerticalCamera = invertCameraButtonValues[value].value;
-}
-
-static void CbOptionsSwapOkCancel(const size_t value, void *)
-{
-	GetState()->options.controllerSwapOkCancel = yesNoButtonValues[value].value;
 }
 
 static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
@@ -155,13 +133,16 @@ static void InputOptionsStateSet()
 						   CreateSliderControl(v2(0, opY),
 											   v2(750, 40),
 											   "Camera Sensitivity",
-											   SldOptionsMouseSensitivity,
+											   NULL,
 											   TOP_CENTER,
-											   0.01,
-											   2.00,
-											   GetState()->options.cameraSpeed,
-											   0.01,
-											   0.1,
+											   0.01f,
+											   2.00f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.cameraSpeed,
+											   },
+											   0.01f,
+											   0.1f,
 											   SliderLabelPercent,
 											   NULL));
 		opY += opSpacing;
@@ -169,23 +150,29 @@ static void InputOptionsStateSet()
 						   CreateOptionsButtonControl(v2(-190, opY),
 													  v2(370, 40),
 													  "Horizontal Camera: %s",
-													  CbOptionsInvertCameraH,
+													  NULL,
 													  TOP_CENTER,
 													  invertCameraButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.invertHorizontalCamera,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.invertHorizontalCamera,
+													  },
 													  NULL));
 		ScrollViewAddChild(inputOptionsScrollView,
 						   CreateOptionsButtonControl(v2(190, opY),
 													  v2(370, 40),
 													  "Vertical Camera: %s",
-													  CbOptionsInvertCameraV,
+													  NULL,
 													  TOP_CENTER,
 													  invertCameraButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.invertVerticalCamera,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.invertVerticalCamera,
+													  },
 													  NULL));
 		opY += opSpacing * 1.5f;
 		ScrollViewAddChild(inputOptionsScrollView,
@@ -204,26 +191,32 @@ static void InputOptionsStateSet()
 						   CreateSliderControl(v2(-190, opY),
 											   v2(370, 40),
 											   "Rumble Strength",
-											   SldOptionsRumbleStrength,
+											   NULL,
 											   TOP_CENTER,
-											   0.0,
-											   1.0,
-											   GetState()->options.rumbleStrength,
-											   0.25,
-											   0.25,
+											   0.0f,
+											   1.0f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.rumbleStrength,
+											   },
+											   0.25f,
+											   0.25f,
 											   SliderLabelPercent,
 											   NULL));
 		ScrollViewAddChild(inputOptionsScrollView,
 						   CreateSliderControl(v2(190, opY),
 											   v2(370, 40),
 											   "Stick Deadzone",
-											   SldOptionsStickDeadzone,
+											   NULL,
 											   TOP_CENTER,
-											   0.0,
-											   0.5,
-											   GetState()->options.controllerDeadzone,
-											   0.01,
-											   0.01,
+											   0.0f,
+											   0.5f,
+											   (ControlValue){
+												   .type = CONTROL_VALUE_FLOAT,
+												   .floatValue = &GetState()->options.controllerDeadzone,
+											   },
+											   0.01f,
+											   0.01f,
 											   NULL,
 											   NULL));
 		opY += opSpacing;
@@ -231,12 +224,15 @@ static void InputOptionsStateSet()
 						   CreateOptionsButtonControl(v2(0, opY),
 													  v2(750, 40),
 													  "Swap controller OK/Cancel buttons: %s",
-													  CbOptionsSwapOkCancel,
+													  NULL,
 													  TOP_CENTER,
 													  yesNoButtonValues,
 													  2,
 													  NULL,
-													  GetState()->options.controllerSwapOkCancel,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_BOOL,
+														  .boolValue = &GetState()->options.controllerSwapOkCancel,
+													  },
 													  NULL));
 		opY += opSpacing;
 		ScrollViewAddChild(inputOptionsScrollView,

@@ -36,17 +36,29 @@ static OptionsButtonValue buttonValues[3] = {
 	{
 		.text = "Disabled",
 		.tooltip = "This debug option will never be shown",
-		.value = DEBUG_ENTRY_DISABLED,
+		.value =
+				{
+					.type = CONTROL_VALUE_DWORD,
+					.dwordValue = DEBUG_ENTRY_DISABLED,
+				},
 	},
 	{
 		.text = "In Extended Menu",
 		.tooltip = "This debug option will be shown in the extended menu",
-		.value = DEBUG_ENTRY_TOGGLE,
+		.value =
+				{
+					.type = CONTROL_VALUE_DWORD,
+					.dwordValue = DEBUG_ENTRY_TOGGLE,
+				},
 	},
 	{
 		.text = "Always Visible",
 		.tooltip = "This debug option will always be shown",
-		.value = DEBUG_ENTRY_SHOWN,
+		.value =
+				{
+					.type = CONTROL_VALUE_DWORD,
+					.dwordValue = DEBUG_ENTRY_SHOWN,
+				},
 	},
 };
 
@@ -67,10 +79,10 @@ static void BtnDebugOptionsReset(Control *, void *)
 	}
 }
 
-static void OptBtnEntryChanged(const size_t value, void *extraData)
+static void OptBtnEntryChanged(const OptionsButtonValue *value, void *extraData)
 {
 	DebugEntry *entry = extraData;
-	entry->mode = buttonValues[value].value;
+	entry->mode = value->value.dwordValue;
 }
 
 static void FilterTextChanged(const char *newFilter)
@@ -143,7 +155,10 @@ static void DebugOptionsStateSet()
 														  buttonValues,
 														  DEBUG_ENTRY_MODE_MAX,
 														  entry,
-														  entry->mode,
+														  (ControlValue){
+															  .type = CONTROL_VALUE_DWORD,
+															  .dwordValue = &entry->mode,
+														  },
 														  NULL));
 
 			entryY += ENTRY_HEIGHT;
