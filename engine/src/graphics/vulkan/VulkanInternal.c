@@ -99,7 +99,6 @@ bool CreateLogicalDevice()
 		.runtimeDescriptorArray = VK_TRUE,
 		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
 		.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
-		.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE,
 	};
 	const VkPhysicalDeviceFeatures2 requiredFeatures = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
@@ -300,6 +299,12 @@ bool CreateRenderPass()
 // TODO: Look into using alternative methods to remove the dependency on non-uniform indexing
 bool CreateDescriptorSetLayouts()
 {
+	const uint32_t freeResourceCount = physicalDeviceProperties.limits.maxPerStageResources - 5;
+	const uint32_t sampledImageCount = min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
+										   freeResourceCount);
+	const uint32_t textureCount = min(MAX_TEXTURES, sampledImageCount);
+	// TODO: This assert can actually be hit. We should account for the device limits when loading textures
+	assert(MAX_TEXTURES < sampledImageCount);
 	const LunaDescriptorSetLayoutBinding bindings[] = {
 		{
 			.bindingName = "Lightmap",
@@ -310,7 +315,7 @@ bool CreateDescriptorSetLayouts()
 		{
 			.bindingName = "Textures",
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES,
+			.descriptorCount = textureCount,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
 		},
@@ -337,22 +342,49 @@ bool CreateDescriptorSetLayouts()
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-			.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
-		},
-		{
-			.bindingName = "Shadow Map Atlas",
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
 	};
 	const LunaDescriptorSetLayoutCreationInfo descriptorSetLayoutCreationInfo = {
-		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
+		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
 		.bindingCount = sizeof(bindings) / sizeof(*bindings),
 		.bindings = bindings,
 	};
 	VulkanTest(lunaCreateDescriptorSetLayout(device, &descriptorSetLayoutCreationInfo, &descriptorSetLayout),
-			   "Failed to create pipeline descriptor set layout!");
+			   "Failed to create descriptor set layout!");
+
+
+	const uint32_t shadowMapDescriptorSlots = freeResourceCount < textureCount ? 0 : freeResourceCount - textureCount;
+	shadowMapSlotsAvailable = min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
+								  shadowMapDescriptorSlots / 2);
+	const LunaDescriptorSetLayoutBinding spotLightShadowMapsBinding = {
+		.bindingName = "Shadow Maps",
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = shadowMapSlotsAvailable,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	const LunaDescriptorSetLayoutCreationInfo spotLightShadowMapsDescriptorSetLayoutCreationInfo = {
+		.bindingCount = 1,
+		.bindings = &spotLightShadowMapsBinding,
+	};
+	VulkanTest(lunaCreateDescriptorSetLayout(device,
+											 &spotLightShadowMapsDescriptorSetLayoutCreationInfo,
+											 &spotLightShadowMapsDescriptorSetLayout),
+			   "Failed to create spot light shadow maps descriptor set layout!");
+
+	const LunaDescriptorSetLayoutBinding pointLightShadowMapsBinding = {
+		.bindingName = "Shadow Maps",
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = shadowMapSlotsAvailable,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	const LunaDescriptorSetLayoutCreationInfo pointLightShadowMapsDescriptorSetLayoutCreationInfo = {
+		.bindingCount = 1,
+		.bindings = &pointLightShadowMapsBinding,
+	};
+	VulkanTest(lunaCreateDescriptorSetLayout(device,
+											 &pointLightShadowMapsDescriptorSetLayoutCreationInfo,
+											 &pointLightShadowMapsDescriptorSetLayout),
+			   "Failed to create point light shadow maps descriptor set layout!");
 
 	return true;
 }
@@ -443,7 +475,7 @@ bool CreateTextureSamplers()
 		.mipmapLodBias = -1.5f,
 		.maxLod = VK_LOD_CLAMP_NONE,
 	};
-	const LunaSamplerCreationInfo shadowMapAtlasSamplerCreateInfo = {
+	const LunaSamplerCreationInfo spotLightShadowMapAtlasSamplerCreateInfo = {
 		.magFilter = VK_FILTER_LINEAR,
 		.minFilter = VK_FILTER_LINEAR,
 		.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST,
@@ -452,6 +484,16 @@ bool CreateTextureSamplers()
 		.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 		.compareEnable = VK_TRUE,
 		.compareOp = VK_COMPARE_OP_GREATER_OR_EQUAL,
+	};
+	const LunaSamplerCreationInfo pointLightShadowMapAtlasSamplerCreateInfo = {
+		.magFilter = VK_FILTER_LINEAR,
+		.minFilter = VK_FILTER_LINEAR,
+		.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST,
+		.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+		.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+		.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+		.compareEnable = VK_TRUE,
+		.compareOp = VK_COMPARE_OP_LESS_OR_EQUAL,
 	};
 
 	VulkanTest(lunaCreateSampler(device,
@@ -478,8 +520,14 @@ bool CreateTextureSamplers()
 								 &nearestNoRepeatSamplerNoAnisotropyCreateInfo,
 								 &textureSamplers.nearestNoRepeatNoAnisotropy),
 			   "Failed to create nearest non-repeating no anisotropy texture sampler!");
-	VulkanTest(lunaCreateSampler(device, &shadowMapAtlasSamplerCreateInfo, &textureSamplers.shadowMapAtlas),
-			   "Failed to create shadow map atlas texture sampler!");
+	VulkanTest(lunaCreateSampler(device,
+								 &spotLightShadowMapAtlasSamplerCreateInfo,
+								 &textureSamplers.spotLightShadowMaps),
+			   "Failed to create spot light shadow map atlas texture sampler!");
+	VulkanTest(lunaCreateSampler(device,
+								 &pointLightShadowMapAtlasSamplerCreateInfo,
+								 &textureSamplers.pointLightShadowMaps),
+			   "Failed to create point light shadow map atlas texture sampler!");
 
 	ListInit(textures, LIST_UINT64);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
@@ -490,11 +538,15 @@ bool CreateTextureSamplers()
 // TODO: Revisit this to ensure it's as it should be (update after bind flag or usage of MAX_FRAMES_IN_FLIGHT, for example)
 bool CreateDescriptorSet()
 {
+	const uint32_t sampledImageCount = min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
+										   physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages);
 	LunaDescriptorPool descriptorPool = LUNA_NULL_HANDLE;
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES + 2,
+			// TODO: This is allocating 1GiB
+			.descriptorCount = min((uint64_t)UINT32_MAX,
+								   (uint64_t)min(MAX_TEXTURES, sampledImageCount) + 2 * (uint64_t)sampledImageCount),
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -506,21 +558,34 @@ bool CreateDescriptorSet()
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
-		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
-		.maxSets = 1,
+		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
+		.maxSets = 3,
 		.poolSizeCount = sizeof(poolSizes) / sizeof(*poolSizes),
 		.poolSizes = poolSizes,
 	};
 	VulkanTest(lunaCreateDescriptorPool(device, &descriptorPoolCreationInfo, &descriptorPool),
 			   "Failed to create descriptor pool!");
 
+	const LunaDescriptorSetLayout layouts[] = {
+		descriptorSetLayout,
+		spotLightShadowMapsDescriptorSetLayout,
+		pointLightShadowMapsDescriptorSetLayout,
+	};
+	LunaDescriptorSet descriptorSets[] = {
+		descriptorSet,
+		spotLightShadowMapsDescriptorSet,
+		pointLightShadowMapsDescriptorSet,
+	};
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,
-		.setLayoutCount = 1,
-		.setLayouts = &descriptorSetLayout,
+		.setLayoutCount = sizeof(layouts) / sizeof(*layouts),
+		.setLayouts = layouts,
 	};
-	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, &descriptorSet),
+	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, descriptorSets),
 			   "Failed to allocate descriptor sets!");
+	descriptorSet = descriptorSets[0];
+	spotLightShadowMapsDescriptorSet = descriptorSets[1];
+	pointLightShadowMapsDescriptorSet = descriptorSets[2];
 
 	return true;
 }

@@ -36,9 +36,8 @@ struct Light
 	float attenuationMultiplier;
 	float brightAngle;
 	float fadingAngle;
-	uint32_t layer;
-	uint32_t index;
-	float _padding;
+	uint32_t shadowMapIndex;
+	float _padding[2];
 	mat4 transformMatrix;
 };
 

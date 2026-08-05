@@ -289,7 +289,8 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorModel;
 	LunaGraphicsPipeline shadedActorWall;
 	LunaGraphicsPipeline unshadedActorWall;
-	ShadowMapPipelines shadowMaps;
+	ShadowMapPipelines spotLightShadowMaps;
+	ShadowMapPipelines pointLightShadowMaps;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
 	LunaGraphicsPipeline debugDrawTriangles;
@@ -304,16 +305,15 @@ typedef struct TextureSamplers
 	LunaSampler nearestRepeatNoAnisotropy;
 	LunaSampler linearNoRepeatNoAnisotropy;
 	LunaSampler nearestNoRepeatNoAnisotropy;
-	LunaSampler shadowMapAtlas;
+	LunaSampler spotLightShadowMaps;
+	LunaSampler pointLightShadowMaps;
 } TextureSamplers;
 
-typedef struct DescriptorSetLayouts
+typedef struct ShadowMapPushConstants
 {
-	LunaDescriptorSetLayout transform;
-	LunaDescriptorSetLayout all;
-	LunaDescriptorSetLayout globalLighting;
-	LunaDescriptorSetLayout fog;
-} DescriptorSetLayouts;
+	uint32_t lightIndex;
+	uint32_t faceIndex;
+} ShadowMapPushConstants;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -336,17 +336,23 @@ extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 extern TextureSamplers textureSamplers;
 extern LockingList textures;
 extern LunaDescriptorSetLayout descriptorSetLayout;
+extern LunaDescriptorSetLayout spotLightShadowMapsDescriptorSetLayout;
+extern LunaDescriptorSetLayout pointLightShadowMapsDescriptorSetLayout;
 extern LunaDescriptorSet descriptorSet;
+extern LunaDescriptorSet spotLightShadowMapsDescriptorSet;
+extern LunaDescriptorSet pointLightShadowMapsDescriptorSet;
 extern Buffers buffers;
 extern Pipelines pipelines;
 extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
 extern uint32_t skyTextureIndex;
-extern uint32_t lightIndex;
-extern uint32_t faceIndex;
-extern LunaImage shadowMapAtlas;
-extern VkRenderPass shadowMapRenderPass;
+extern uint32_t shadowMapSlotsAvailable;
+extern ShadowMapPushConstants shadowMapPushConstants;
+extern VkRenderPass spotLightShadowMapRenderPass;
+extern VkRenderPass pointLightShadowMapRenderPass;
+extern LunaImage pointLightShadowMapDepthAttachment;
+extern List shadowMaps;
 extern List shadowMapFramebuffers;
-extern List shadowMapImageViews;
+extern List pointLightShadowMapImageViews;
 #pragma endregion variables
 
 bool ClearTextureCache();
