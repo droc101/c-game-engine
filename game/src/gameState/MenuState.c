@@ -50,7 +50,7 @@ static void OpenOptions(Control *, void *)
 
 static void ReloadAssets(Control *, void *)
 {
-	LogInfo("Reloading all assets");
+	LogInfo("Reloading all assets\n");
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;

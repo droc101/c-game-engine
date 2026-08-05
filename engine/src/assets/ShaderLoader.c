@@ -32,13 +32,8 @@ Shader *LoadShader(const char *asset)
 	CheckAlloc(shader);
 	DataReader *reader = CreateDataReaderFromAsset(assetData);
 	size_t bytesRemaining = assetData->size;
-	EXPECT_BYTES(1 + sizeof(size_t), bytesRemaining);
+	EXPECT_BYTES(1, bytesRemaining);
 	shader->type = ReadUint8(reader);
-	shader->glslLength = ReadSizeT(reader);
-	EXPECT_BYTES(shader->glslLength, bytesRemaining);
-	shader->glsl = calloc(shader->glslLength, sizeof(char));
-	CheckAlloc(shader->glsl);
-	ReadBuffer(reader, shader->glslLength * sizeof(char), shader->glsl);
 	EXPECT_BYTES(sizeof(size_t), bytesRemaining);
 	shader->spirvLength = ReadSizeT(reader);
 	EXPECT_BYTES(shader->spirvLength * sizeof(uint32_t), bytesRemaining);
@@ -53,7 +48,6 @@ Shader *LoadShader(const char *asset)
 
 void FreeShader(Shader *shader)
 {
-	free(shader->glsl);
 	free(shader->spirv);
 	free(shader);
 }

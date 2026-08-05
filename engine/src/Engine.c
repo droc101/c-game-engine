@@ -423,10 +423,12 @@ void DestroyEngine()
 	SDL_DestroySurface(windowIcon);
 	DestroyAssetCache(); // Free all assets
 	DestroyGameConfig();
+	// Need to clean up logging system before cleaning SDL as logging uses and SDL thread
+	// Logs beyond this point will not be written to the log file, but will still print to stdout
+	LogDestroy();
 	LogDebug("Cleaning up SDL...\n");
 	SDL_QuitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	SDL_Quit();
-	LogDestroy();
 }
 
 bool EngineShouldQuit()
