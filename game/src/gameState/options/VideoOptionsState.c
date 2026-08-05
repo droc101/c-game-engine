@@ -94,7 +94,7 @@ static char *SliderLabelShadowMapQuality(const Control *slider)
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	sprintf(buf, "%s: %s", data->label, labels[(int)data->value]);
+	sprintf(buf, "%s: %s", data->label, labels[(int)GetSliderValueAsFloat(slider->controlData)]);
 	return buf;
 }
 
@@ -171,9 +171,8 @@ static void RequireRestartCallback(const OptionsButtonValue *value, void *)
 	// Change will happen next restart
 }
 
-static void SldOptionsShadowMapQuality(const float value)
+static void SldOptionsShadowMapQuality(const ControlValue * /*value*/)
 {
-	GetState()->options.shadowMapQuality = value;
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 }
 
@@ -186,7 +185,9 @@ static void UpdateMsaaCallback(const ControlValue * /*value*/)
 static void UpdateVideoPresetCallback(const ControlValue * /*value*/)
 {
 	ApplyVideoPreset(&GetState()->options, currentVideoPreset);
-	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_UPDATE_MSAA;
+	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES |
+							 QUEUED_ACTION_UPDATE_MSAA |
+							 QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 	hasChangedVideoOptions = true; // until luna can change msaa
 }
 

@@ -13,6 +13,7 @@ typedef struct VideoPresetData
 	bool mipmaps;
 	float lodMultiplier;
 	OptionsAnisotropy anisotropy;
+	OptionsShadowMapResolution shadowMapQuality;
 } VideoPresetData;
 
 static const VideoPresetData VERY_LOW_PRESET = {
@@ -20,6 +21,7 @@ static const VideoPresetData VERY_LOW_PRESET = {
 	.mipmaps = false,
 	.lodMultiplier = 0.5f,
 	.anisotropy = ANISOTROPY_NONE,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_DISABLED,
 };
 
 static const VideoPresetData LOW_PRESET = {
@@ -27,6 +29,7 @@ static const VideoPresetData LOW_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_4X,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_512,
 };
 
 static const VideoPresetData MEDIUM_PRESET = {
@@ -34,6 +37,7 @@ static const VideoPresetData MEDIUM_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_8X,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_2048,
 };
 
 static const VideoPresetData HIGH_PRESET = {
@@ -41,6 +45,7 @@ static const VideoPresetData HIGH_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.5f,
 	.anisotropy = ANISOTROPY_16X,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_4096,
 };
 
 static const VideoPresetData ULTRA_PRESET = {
@@ -48,6 +53,7 @@ static const VideoPresetData ULTRA_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 2.0f,
 	.anisotropy = ANISOTROPY_16X,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_8192,
 };
 
 static bool IsPresetDataActive(const VideoPresetData *preset, const Options *options)
@@ -55,7 +61,8 @@ static bool IsPresetDataActive(const VideoPresetData *preset, const Options *opt
 	return options->msaa == preset->msaa &&
 		   options->mipmaps == preset->mipmaps &&
 		   options->lodMultiplier == preset->lodMultiplier &&
-		   options->anisotropy == preset->anisotropy;
+		   options->anisotropy == preset->anisotropy &&
+		   options->shadowMapQuality == preset->shadowMapQuality;
 }
 
 static void ApplyPresetData(const VideoPresetData *preset, Options *options)
@@ -64,6 +71,7 @@ static void ApplyPresetData(const VideoPresetData *preset, Options *options)
 	options->mipmaps = preset->mipmaps;
 	options->lodMultiplier = preset->lodMultiplier;
 	options->anisotropy = preset->anisotropy;
+	options->shadowMapQuality = preset->shadowMapQuality;
 }
 
 VideoPreset GetCurrentVideoPreset(const Options *options)
