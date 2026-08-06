@@ -141,7 +141,10 @@ void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, 
 				*data->value.floatValue = value->floatValue;
 				break;
 		}
-		data->callback(&data->values[index], data->callbackExtraData);
+		if (data->callback)
+		{
+			data->callback(&data->values[index], data->callbackExtraData);
+		}
 		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
