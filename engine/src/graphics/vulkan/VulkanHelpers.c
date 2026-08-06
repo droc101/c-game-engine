@@ -201,6 +201,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		}
 		ListFree(pointLightShadowMapImageViews);
 
+		lunaDestroyImage(device, pointLightShadowMapDepthAttachment);
+
 		vkDestroyRenderPass(vkDevice, pointLightShadowMapRenderPass, NULL);
 		pointLightShadowMapRenderPass = VK_NULL_HANDLE;
 	}

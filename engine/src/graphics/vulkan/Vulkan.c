@@ -55,7 +55,7 @@
 #include <engine/debug/JoltDebugRenderer.h>
 #endif
 
-static const Map *loadedMap;
+static Map *loadedMap;
 static LunaImage lightmap = LUNA_NULL_HANDLE;
 static size_t skyModelIndexCount;
 static bool renderPassStarted;
@@ -1172,6 +1172,7 @@ static inline bool HandleRendererQueuedActions()
 			{
 				skyTextureIndex = TextureIndex(loadedMap->skyTexture);
 			}
+			loadedMap->changeFlags |= MAP_VIEWMODEL_CHANGED;
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 	}
@@ -1183,6 +1184,10 @@ static inline bool HandleRendererQueuedActions()
 		}
 		buffers.player.modelDefinition = LoadModel(MODEL("player"));
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
+		if (GetMap() != NULL)
+		{
+			loadedMap->changeFlags |= MAP_VIEWMODEL_CHANGED;
+		}
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{
