@@ -329,9 +329,24 @@ static void VideoOptionsStateSet()
 														  .boolValue = &GetState()->options.fullscreen,
 													  },
 													  NULL));
-#ifdef SDL_PLATFORM_LINUX
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateOptionsButtonControl(v2(190, opY),
+													  v2(370, 40),
+													  "Preferred GPU Type: %s",
+													  RequireRestartCallback,
+													  TOP_CENTER,
+													  gpuTypeButtonValues,
+													  3,
+													  NULL,
+													  (ControlValue){
+														  .type = CONTROL_VALUE_DWORD,
+														  .dwordValue = &GetState()->options.preferredGpuType,
+													  },
+													  NULL));
+#ifdef SDL_PLATFORM_LINUX
+		opY += opSpacing;
+		ScrollViewAddChild(videoOptionsScrollView,
+						   CreateOptionsButtonControl(v2(-190, opY),
 													  v2(370, 40),
 													  "Video Platform: %s",
 													  RequireRestartCallback,
@@ -345,21 +360,6 @@ static void VideoOptionsStateSet()
 													  },
 													  NULL));
 #endif
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(0, opY),
-													  v2(750, 40),
-													  "Preferred GPU Type: %s",
-													  RequireRestartCallback,
-													  TOP_CENTER,
-													  gpuTypeButtonValues,
-													  3,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_DWORD,
-														  .dwordValue = &GetState()->options.preferredGpuType,
-													  },
-													  NULL));
 		opY += opSpacing * 1.5f;
 		ScrollViewAddChild(videoOptionsScrollView,
 						   CreateLabelControl("Quality Options",
