@@ -46,6 +46,10 @@ add_library(game MODULE EXCLUDE_FROM_ALL
 
         src/helpers/GameActorRegistration.c
         include/helpers/GameActorRegistration.h
+        src/helpers/GameControls.c
+        include/helpers/GameControls.h
+        src/helpers/OptionsMenu.c
+        include/helpers/OptionsMenu.h
 
         src/GameMain.c
 
@@ -55,8 +59,6 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         src/item/LaserStopperItem.c
         include/actor/item/ItemEraser.h
         src/actor/item/ItemEraser.c
-        src/helpers/GameControls.c
-        include/helpers/GameControls.h
 )
 
 if (x86_64)
