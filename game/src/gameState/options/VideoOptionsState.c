@@ -3,12 +3,9 @@
 //
 
 #include "gameState/options/VideoOptionsState.h"
-#include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
@@ -16,12 +13,8 @@
 #include <engine/structs/VideoPreset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
-#include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/HeaderFooterControl.h>
-#include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/Slider.h>
-#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <SDL3/SDL_video.h>
@@ -31,9 +24,9 @@
 #include <stdlib.h>
 #include "gameState/options/RestartPromptState.h"
 #include "gameState/OptionsState.h"
+#include "helpers/OptionsMenu.h"
 
-static UiStack *videoOptionsStack = NULL;
-static ScrollView *videoOptionsScrollView = NULL;
+static OptionsMenu *videoOptionsMenu = NULL;
 static bool hasChangedVideoOptions = false;
 
 VideoPreset currentVideoPreset;
@@ -224,272 +217,234 @@ static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderMenuBackground(state);
 	}
 
-	videoOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
-	ProcessScrollView(videoOptionsScrollView);
-	ProcessUiStack(videoOptionsStack);
-	DrawUiStack(videoOptionsStack);
+	ProcessOptionsMenu(videoOptionsMenu);
 }
 
 static void VideoOptionsStateSet()
 {
-	if (videoOptionsStack == NULL)
+	if (videoOptionsMenu == NULL)
 	{
-		videoOptionsStack = CreateUiStack();
-		videoOptionsScrollView = CreateScrollView(videoOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
-		float opY = 0;
-		const float opSpacing = 45;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "FOV",
-											   UpdateFovCallback,
-											   TOP_CENTER,
-											   30.0f,
-											   120.0f,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_FLOAT,
-												   .floatValue = &GetState()->options.fov,
-											   },
-											   1.0f,
-											   1.0f,
-											   NULL,
-											   NULL));
+		videoOptionsMenu = CreateOptionsMenu();
 
-		opY += opSpacing * 1.5f;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateLabelControl("Display Options",
-											  16,
-											  COLOR_WHITE,
-											  v2(0, opY),
-											  v2(750, 40),
-											  TOP_CENTER,
-											  FONT_HALIGN_LEFT,
-											  FONT_VALIGN_MIDDLE,
-											  FONT("small_font"),
-											  true));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "Maximum FPS",
-											   NULL,
-											   TOP_CENTER,
-											   0.0f,
-											   500.0f,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_WORD,
-												   .wordValue = &GetState()->options.maxFps,
-											   },
-											   10.0f,
-											   10.0f,
-											   SliderLabelMaxFps,
-											   NULL));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(-190, opY),
-													  v2(370, 40),
-													  "VSync: %s",
-													  ToggleVsyncCallback,
-													  TOP_CENTER,
-													  onOffButtonValues,
-													  2,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_BOOL,
-														  .boolValue = &GetState()->options.vsync,
-													  },
-													  "Limits the framerate to match your monitor's refresh rate to "
-													  "reduce screen tearing"));
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(190, opY),
-													  v2(370, 40),
-													  "Limit Background FPS: %s",
-													  NULL,
-													  TOP_CENTER,
-													  yesNoButtonValues,
-													  2,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_BOOL,
-														  .boolValue = &GetState()->options.limitFpsWhenUnfocused,
-													  },
-													  "Limit the framerate to 30 when the game window is not focused"));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(-190, opY),
-													  v2(370, 40),
-													  "Fullscreen: %s",
-													  OptBtnFullscreenChanged,
-													  TOP_CENTER,
-													  onOffButtonValues,
-													  2,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_BOOL,
-														  .boolValue = &GetState()->options.fullscreen,
-													  },
-													  NULL));
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(190, opY),
-													  v2(370, 40),
-													  "Preferred GPU Type: %s",
-													  RequireRestartCallback,
-													  TOP_CENTER,
-													  gpuTypeButtonValues,
-													  3,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_DWORD,
-														  .dwordValue = &GetState()->options.preferredGpuType,
-													  },
-													  NULL));
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "FOV",
+													   UpdateFovCallback,
+													   TOP_CENTER,
+													   30.0f,
+													   120.0f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_FLOAT,
+														   .floatValue = &GetState()->options.fov,
+													   },
+													   1.0f,
+													   1.0f,
+													   NULL,
+													   NULL));
+		OptionsMenuAddSection(videoOptionsMenu, "Display Options");
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "Maximum FPS",
+													   NULL,
+													   TOP_CENTER,
+													   0.0f,
+													   500.0f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_WORD,
+														   .wordValue = &GetState()->options.maxFps,
+													   },
+													   10.0f,
+													   10.0f,
+													   SliderLabelMaxFps,
+													   NULL));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "VSync: %s",
+															  ToggleVsyncCallback,
+															  TOP_CENTER,
+															  onOffButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()->options.vsync,
+															  },
+															  "Limits the framerate to match your monitor's refresh "
+															  "rate to "
+															  "reduce screen tearing"));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Limit Background FPS: %s",
+															  NULL,
+															  TOP_CENTER,
+															  yesNoButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()
+																						->options.limitFpsWhenUnfocused,
+															  },
+															  "Limit the framerate to 30 when the game window is not "
+															  "focused"));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Fullscreen: %s",
+															  OptBtnFullscreenChanged,
+															  TOP_CENTER,
+															  onOffButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()->options.fullscreen,
+															  },
+															  NULL));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Preferred GPU Type: %s",
+															  RequireRestartCallback,
+															  TOP_CENTER,
+															  gpuTypeButtonValues,
+															  3,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_DWORD,
+																  .dwordValue = &GetState()->options.preferredGpuType,
+															  },
+															  NULL));
 #ifdef SDL_PLATFORM_LINUX
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(-190, opY),
-													  v2(370, 40),
-													  "Video Platform: %s",
-													  RequireRestartCallback,
-													  TOP_CENTER,
-													  preferWaylandButtonValues,
-													  2,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_BOOL,
-														  .boolValue = &GetState()->options.preferWayland,
-													  },
-													  NULL));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Video Platform: %s",
+															  RequireRestartCallback,
+															  TOP_CENTER,
+															  preferWaylandButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()->options.preferWayland,
+															  },
+															  NULL));
 #endif
-		opY += opSpacing * 1.5f;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateLabelControl("Quality Options",
-											  16,
-											  COLOR_WHITE,
-											  v2(0, opY),
-											  v2(750, 40),
-											  TOP_CENTER,
-											  FONT_HALIGN_LEFT,
-											  FONT_VALIGN_MIDDLE,
-											  FONT("small_font"),
-											  true));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "Preset",
-											   UpdateVideoPresetCallback,
-											   TOP_CENTER,
-											   0.0f,
-											   VIDEO_PRESET_CUSTOM,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_DWORD,
-												   .dwordValue = &currentVideoPreset,
-											   },
-											   1.0f,
-											   1.0f,
-											   SliderLabelVideoPreset,
-											   NULL));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "Shadow Resolution",
-											   SldOptionsShadowMapQuality,
-											   TOP_CENTER,
-											   0.0,
-											   8.0,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_DWORD,
-												   .dwordValue = &GetState()->options.shadowMapQuality,
-											   },
-											   1,
-											   1,
-											   SliderLabelShadowMapQuality,
-											   "The resolution to use for shadow maps"));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "Anti-Aliasing",
-											   UpdateMsaaCallback,
-											   TOP_CENTER,
-											   0.0f,
-											   3.0f,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_DWORD,
-												   .dwordValue = &GetState()->options.msaa,
-											   },
-											   1.0f,
-											   1.0f,
-											   SliderLabelMSAA,
-											   "Smooths the edges of objects"));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(0, opY),
-											   v2(750, 40),
-											   "LOD Distance",
-											   NULL,
-											   TOP_CENTER,
-											   0.5f,
-											   2.0f,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_FLOAT,
-												   .floatValue = &GetState()->options.lodMultiplier,
-											   },
-											   0.5f,
-											   1.0f,
-											   SliderLabelPercent,
-											   "Changes the level of detail on far away objects"));
-		opY += opSpacing;
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateOptionsButtonControl(v2(-190, opY),
-													  v2(370, 40),
-													  "Mipmaps: %s",
-													  ClearTexturesOptBtnCallback,
-													  TOP_CENTER,
-													  onOffButtonValues,
-													  2,
-													  NULL,
-													  (ControlValue){
-														  .type = CONTROL_VALUE_BOOL,
-														  .boolValue = &GetState()->options.mipmaps,
-													  },
-													  "Improves the appearance of far away textures"));
-		ScrollViewAddChild(videoOptionsScrollView,
-						   CreateSliderControl(v2(190, opY),
-											   v2(370, 40),
-											   "Anisotropic Filtering",
-											   ClearTexturesSliderCallback,
-											   TOP_CENTER,
-											   0.0f,
-											   4.0f,
-											   (ControlValue){
-												   .type = CONTROL_VALUE_DWORD,
-												   .dwordValue = &GetState()->options.anisotropy,
-											   },
-											   1.0f,
-											   1.0f,
-											   SliderLabelAnisotropy,
-											   "Improves the appearance of textures viewed at sharp angles. Requires "
-											   "mipmaps to be enabled."));
-		opY += opSpacing;
+		OptionsMenuAddSection(videoOptionsMenu, "Quality Options");
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "Preset",
+													   UpdateVideoPresetCallback,
+													   TOP_CENTER,
+													   0.0f,
+													   VIDEO_PRESET_CUSTOM,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_DWORD,
+														   .dwordValue = &currentVideoPreset,
+													   },
+													   1.0f,
+													   1.0f,
+													   SliderLabelVideoPreset,
+													   NULL));
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "Shadow Resolution",
+													   SldOptionsShadowMapQuality,
+													   TOP_CENTER,
+													   0.0,
+													   8.0,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_DWORD,
+														   .dwordValue = &GetState()->options.shadowMapQuality,
+													   },
+													   1,
+													   1,
+													   SliderLabelShadowMapQuality,
+													   "The resolution to use for shadow maps"));
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "Anti-Aliasing",
+													   UpdateMsaaCallback,
+													   TOP_CENTER,
+													   0.0f,
+													   3.0f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_DWORD,
+														   .dwordValue = &GetState()->options.msaa,
+													   },
+													   1.0f,
+													   1.0f,
+													   SliderLabelMSAA,
+													   "Smooths the edges of objects"));
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "LOD Distance",
+													   NULL,
+													   TOP_CENTER,
+													   0.5f,
+													   2.0f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_FLOAT,
+														   .floatValue = &GetState()->options.lodMultiplier,
+													   },
+													   0.5f,
+													   1.0f,
+													   SliderLabelPercent,
+													   "Changes the level of detail on far away objects"));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Mipmaps: %s",
+															  ClearTexturesOptBtnCallback,
+															  TOP_CENTER,
+															  onOffButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()->options.mipmaps,
+															  },
+															  "Improves the appearance of far away textures"));
+		OptionsMenuAddSmallControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "Anisotropic Filtering",
+													   ClearTexturesSliderCallback,
+													   TOP_CENTER,
+													   0.0f,
+													   4.0f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_DWORD,
+														   .dwordValue = &GetState()->options.anisotropy,
+													   },
+													   1.0f,
+													   1.0f,
+													   SliderLabelAnisotropy,
+													   "Improves the appearance of textures viewed at sharp angles. "
+													   "Requires "
+													   "mipmaps to be enabled."));
 
-		UiStackPush(videoOptionsStack, CreateHeaderFooterControl(100, true, "Video Options"));
-		UiStackPush(videoOptionsStack, CreateHeaderFooterControl(100, false, NULL));
-		UiStackPush(videoOptionsStack,
-					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnVideoOptionsBack, BOTTOM_CENTER, NULL));
+		OptionsMenuAddHeaderFooter(videoOptionsMenu, "Video Options", BtnVideoOptionsBack);
 	}
-	UiStackResetFocus(videoOptionsStack);
+	UiStackResetFocus(videoOptionsMenu->stack);
 	hasChangedVideoOptions = false;
 }
 
 static void VideoOptionsStateDestroy()
 {
-	if (videoOptionsStack != NULL)
+	if (videoOptionsMenu != NULL)
 	{
-		FreeScrollView(videoOptionsScrollView);
-		DestroyUiStack(videoOptionsStack);
-		videoOptionsStack = NULL;
+		DestroyOptionsMenu(videoOptionsMenu);
+		videoOptionsMenu = NULL;
 	}
 }
 
