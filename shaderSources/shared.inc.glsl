@@ -1,3 +1,6 @@
+// Include only. This file will not compile as a standalone module.
+
+#extension GL_EXT_debug_printf : require
 #extension GL_EXT_scalar_block_layout : require
 #extension GL_EXT_nonuniform_qualifier : require
 

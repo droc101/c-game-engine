@@ -118,7 +118,7 @@ void main() {
             if (factor < 1e-6) {
                 continue;
             }
-            lightingColor += factor * getLightColor(light, depth, 0) * max(dot(normalize(lightToWorld), normalize(inNormal)), 0);
+            lightingColor += getLightColor(light, depth, 0) * max(dot(normalize(lightToWorld), normalize(inNormal)), 0);
         }
     }
 

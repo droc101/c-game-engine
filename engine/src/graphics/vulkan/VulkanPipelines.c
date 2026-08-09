@@ -112,7 +112,7 @@ static const LunaPipelineLayoutCreationInfo PIPELINE_LAYOUT_CREATION_INFO = {
 };
 
 static LunaPushConstantsRange shadowMapPushConstantRange = {
-	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 	.size = sizeof(ShadowMapPushConstants),
 	.dataPointerOffset = 0,
 };
@@ -1291,6 +1291,12 @@ static inline VkResult CreateMapShadowMapPipeline()
 		},
 		{
 			.location = 2,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(MapVertex, normal),
+		},
+		{
+			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = 0,
@@ -1395,47 +1401,53 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		{
 			.location = 2,
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ModelVertex, color),
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(ModelVertex, normal),
 		},
 		{
 			.location = 3,
-			.binding = 1,
+			.binding = 0,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
+			.offset = offsetof(ModelVertex, color),
 		},
 		{
 			.location = 4,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
 		},
 		{
 			.location = 5,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
 		},
 		{
 			.location = 6,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
 		},
 		{
 			.location = 7,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, modColor),
+			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
 		},
 		{
 			.location = 8,
 			.binding = 1,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, materialColor),
+			.offset = offsetof(ActorModelInstanceData, modColor),
 		},
 		{
 			.location = 9,
+			.binding = 1,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.offset = offsetof(ActorModelInstanceData, materialColor),
+		},
+		{
+			.location = 10,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
 			.offset = offsetof(ActorModelInstanceData, textureIndex),
