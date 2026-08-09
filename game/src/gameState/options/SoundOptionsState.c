@@ -134,7 +134,7 @@ static void SoundOptionsStateSet()
 													   SliderLabelPercent,
 													   NULL));
 
-		OptionsMenuAddHeaderFooter(soundOptionsMenu, "Sound Options", BtnSoundOptionsBack);
+		OptionsMenuAddSimpleHeaderFooter(soundOptionsMenu, "Sound Options", BtnSoundOptionsBack);
 	}
 	UiStackResetFocus(soundOptionsMenu->stack);
 }
