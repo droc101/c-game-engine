@@ -14,6 +14,7 @@
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>
@@ -219,6 +220,7 @@ void InitDebugEntryManager()
 	RegisterDebugEntry("player_velocity", DebugEntryPlayerVelocity, DEBUG_ENTRY_TOGGLE, 5);
 	RegisterDebugEntry("player_actor_interaction", DebugEntryPlayerActor, DEBUG_ENTRY_TOGGLE, 5);
 	RegisterDebugEntry("map", DebugEntryMap, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("scene_statistics", VK_DPrintSceneStatistics, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("camera", DebugEntryCamera, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);

@@ -1323,6 +1323,23 @@ void VK_DPrintDevice()
 			VK_API_VERSION_PATCH(physicalDeviceProperties.apiVersion));
 }
 
+void VK_DPrintSceneStatistics()
+{
+	DPrintF("Vulkan scene statistics:", COLOR_WHITE);
+	DPrintF("Map vertex/index count: %u/%u",
+			COLOR_WHITE,
+			lunaGetBufferSize(buffers.map.vertices) / sizeof(ModelVertex),
+			lunaGetBufferSize(buffers.map.indices) / sizeof(uint32_t));
+	DPrintF("Actor model vertex/index count: %u/%u",
+			COLOR_WHITE,
+			lunaGetBufferSize(buffers.actorModels.vertices) / sizeof(ModelVertex),
+			lunaGetBufferSize(buffers.actorModels.indices) / sizeof(uint32_t));
+	DPrintF("Actor wall shaded/unshaded count: %u/%u",
+			COLOR_WHITE,
+			buffers.actorWalls.shadedInstanceCount,
+			buffers.actorWalls.unshadedInstanceCount);
+}
+
 bool VK_FrameStart()
 {
 	if (minimized)
