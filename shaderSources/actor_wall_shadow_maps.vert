@@ -1,67 +1,6 @@
 #version 460
 
-#extension GL_EXT_scalar_block_layout: require
-
-const mat4 transforms[6] = {
-	mat4(
-         0,  0,  1,  0,
-         0, -1,  0,  0,
-         1,  0,  0,  0,
-         0,  0,  0,  1
-	),
-    mat4(
-         0,  0, -1,  0,
-         0, -1,  0,  0,
-        -1,  0,  0,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-         1,  0,  0,  0,
-         0,  0,  1,  0,
-         0, -1,  0,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-         1,  0,  0,  0,
-         0,  0, -1,  0,
-         0,  1,  0,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-         1,  0,  0,  0,
-         0, -1,  0,  0,
-         0,  0, -1,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-        -1,  0,  0,  0,
-         0, -1,  0,  0,
-         0,  0,  1,  0,
-         0,  0,  0,  1
-	),
-};
-
-const uint LIGHT_TYPE_POINT = 0u;
-const uint LIGHT_TYPE_SPOT = 1u;
-const uint LIGHT_TYPE_AREA = 2u;
-const uint LIGHT_TYPE_DIRECTIONAL = 3u;
-
-struct Light {
-    uint type; // Maps to an enum in C
-    vec3 position;
-    vec4 rotation;
-    vec3 negativeForwardDirection;
-    vec3 color;
-    float brightness;
-    float constantAttenuation;
-    float linearAttenuation;
-    float quadraticAttenuation;
-    float attenuationMultiplier;
-    float brightAngle; // 0-90 degrees
-    float fadingAngle;
-    float _padding[3];
-	mat4 transformMatrix;
-};
+#include "shared.inc.glsl"
 
 layout(push_constant) uniform PushConstants {
     uint lightIndex;

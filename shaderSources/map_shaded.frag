@@ -1,34 +1,6 @@
 #version 460
 
-#extension GL_EXT_scalar_block_layout : require
-#extension GL_EXT_nonuniform_qualifier : require
-
-const uint LIGHT_TYPE_POINT = 0u;
-const uint LIGHT_TYPE_SPOT = 1u;
-const uint LIGHT_TYPE_AREA = 2u;
-const uint LIGHT_TYPE_DIRECTIONAL = 3u;
-
-struct Light {
-    uint type; // Maps to an enum in C
-    vec3 position;
-    vec4 rotation;
-    vec3 negativeForwardDirection;
-    vec3 color;
-    float brightness;
-    float constantAttenuation;
-    float linearAttenuation;
-    float quadraticAttenuation;
-    float attenuationMultiplier;
-    float brightAngle; // 0-90 degrees
-    float fadingAngle;
-    uint shadowMapIndex;
-    float _padding[2];
-	mat4 transformMatrix;
-};
-
-const float MIN_BRIGHTNESS = 1.0 / 256.0;
-const vec2 MAGIC_XY = vec2(0.06711056, 0.00583715);
-const float MAGIC_Z = 52.9829189;
+#include "shared.inc.glsl"
 
 layout(set = 0, binding = 0) uniform sampler2D lightmap;
 layout(set = 0, binding = 1) uniform sampler2D textureSampler[];
@@ -178,7 +150,7 @@ void main() {
             if (factor < 1e-6) {
                 continue;
             }
-            lightingColor += factor * getLightColor(light, depth, 0) * max(dot(normalize(lightToWorld), normalize(inNormal)), 0);
+            lightingColor += factor * getLightColor(light, depth, 0);// * max(dot(normalize(lightToWorld), normalize(inNormal)), 0);
         }
     }
 
@@ -188,7 +160,7 @@ void main() {
         discard;
     }
 	outColor.a = 1.0;
-    lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
+    // lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
 	float fogFactor = clamp((gl_FragCoord.z / gl_FragCoord.w - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);
