@@ -4,7 +4,6 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
-#include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -18,6 +17,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/types.h>
@@ -284,5 +284,7 @@ void RenderHUD()
 
 void RenderMap3D(Map *map, const Camera *cam)
 {
+	PhysicsThreadLockTickMutex();
 	VK_RenderMap(map, cam);
+	PhysicsThreadUnlockTickMutex();
 }
