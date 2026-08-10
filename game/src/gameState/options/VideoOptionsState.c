@@ -433,7 +433,7 @@ static void VideoOptionsStateSet()
 													   "Requires "
 													   "mipmaps to be enabled."));
 
-		OptionsMenuAddHeaderFooter(videoOptionsMenu, "Video Options", BtnVideoOptionsBack);
+		OptionsMenuAddSimpleHeaderFooter(videoOptionsMenu, "Video Options", BtnVideoOptionsBack);
 	}
 	UiStackResetFocus(videoOptionsMenu->stack);
 	hasChangedVideoOptions = false;

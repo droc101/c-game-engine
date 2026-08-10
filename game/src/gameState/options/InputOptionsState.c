@@ -216,7 +216,7 @@ static void InputOptionsStateSet()
 													  FONT("small_font"),
 													  true));
 
-		OptionsMenuAddHeaderFooter(inputOptionsMenu, "Input Options", BtnInputOptionsBack);
+		OptionsMenuAddSimpleHeaderFooter(inputOptionsMenu, "Input Options", BtnInputOptionsBack);
 	}
 	UiStackResetFocus(inputOptionsMenu->stack);
 }

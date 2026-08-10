@@ -7,7 +7,6 @@
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
@@ -15,21 +14,18 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
-#include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
-#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <gameState/OptionsState.h>
+#include <helpers/OptionsMenu.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-static UiStack *debugOptionsStack = NULL;
-static ScrollView *debugOptionsScrollView = NULL;
+static OptionsMenu *debugOptionsMenu;
 static char *filter = NULL;
 
 static OptionsButtonValue buttonValues[3] = {
@@ -118,54 +114,52 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderMenuBackground(state);
 	}
 
-	debugOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
-	ProcessScrollView(debugOptionsScrollView);
-	ProcessUiStack(debugOptionsStack);
-	DrawUiStack(debugOptionsStack);
+	ProcessOptionsMenu(debugOptionsMenu);
 }
 
 static void DebugOptionsStateSet()
 {
-	if (debugOptionsStack == NULL)
+	if (debugOptionsMenu == NULL)
 	{
-		debugOptionsStack = CreateUiStack();
-		debugOptionsScrollView = CreateScrollView(debugOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
+		debugOptionsMenu = CreateOptionsMenu();
 
-		int entryY = 0;
 		for (size_t i = 0; i < debugEntries.length; i++)
 		{
 			DebugEntry *entry = ListGetPointer(debugEntries, i);
-			ScrollViewAddChild(debugOptionsScrollView,
-							   CreateLabelControl(entry->key,
-												  16,
-												  COLOR_WHITE,
-												  v2(0, entryY),
-												  v2(750 - 220 - 6, 40),
-												  TOP_LEFT,
-												  FONT_HALIGN_LEFT,
-												  FONT_VALIGN_MIDDLE,
-												  FONT("small_font"),
-												  true));
-			ScrollViewAddChild(debugOptionsScrollView,
-							   CreateOptionsButtonControl(v2(0, entryY),
-														  v2(220, 40),
-														  "%s",
-														  OptBtnEntryChanged,
-														  TOP_RIGHT,
-														  buttonValues,
-														  DEBUG_ENTRY_MODE_MAX,
-														  entry,
-														  (ControlValue){
-															  .type = CONTROL_VALUE_DWORD,
-															  .dwordValue = &entry->mode,
-														  },
-														  NULL));
-
-			entryY += ENTRY_HEIGHT;
+			OptionsMenuAddControl(debugOptionsMenu,
+								  CreateLabelControl(entry->key,
+													 16,
+													 COLOR_WHITE,
+													 v2(0, 0),
+													 v2(750 - 220 - 6, 40),
+													 TOP_LEFT,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+			OptionsMenuAddControl(debugOptionsMenu,
+								  CreateOptionsButtonControl(v2(0, 0),
+															 v2(220, 40),
+															 "%s",
+															 OptBtnEntryChanged,
+															 TOP_RIGHT,
+															 buttonValues,
+															 DEBUG_ENTRY_MODE_MAX,
+															 entry,
+															 (ControlValue){
+																 .type = CONTROL_VALUE_DWORD,
+																 .dwordValue = &entry->mode,
+															 },
+															 NULL));
+			OptionsMenuNextRow(debugOptionsMenu);
 		}
 
-		UiStackPush(debugOptionsStack, CreateHeaderFooterControl(100, true, "Debug Options"));
-		UiStackPush(debugOptionsStack, CreateHeaderFooterControl(100, false, NULL));
+		OptionsMenuAddTwoButtonHeaderFooter(debugOptionsMenu,
+											"Debug Options",
+											"Reset to Defaults",
+											BtnDebugOptionsReset,
+											"Back",
+											BtnDebugOptionsBack);
 
 		// UiStackPush(debugOptionsStack,
 		// 			CreateTextBoxControl("Filter Options",
@@ -175,27 +169,16 @@ static void DebugOptionsStateSet()
 		// 								 64,
 		// 								 FilterTextChanged,
 		// 								 NULL));
-
-		UiStackPush(debugOptionsStack,
-					CreateButtonControl(v2(-175, -40),
-										v2(340, 40),
-										"Reset to Defaults",
-										BtnDebugOptionsReset,
-										BOTTOM_CENTER,
-										NULL));
-		UiStackPush(debugOptionsStack,
-					CreateButtonControl(v2(175, -40), v2(340, 40), "Back", BtnDebugOptionsBack, BOTTOM_CENTER, NULL));
 	}
-	UiStackResetFocus(debugOptionsStack);
+	UiStackResetFocus(debugOptionsMenu->stack);
 }
 
 static void DebugOptionsStateDestroy()
 {
-	if (debugOptionsStack != NULL)
+	if (debugOptionsMenu != NULL)
 	{
-		FreeScrollView(debugOptionsScrollView);
-		DestroyUiStack(debugOptionsStack);
-		debugOptionsStack = NULL;
+		DestroyOptionsMenu(debugOptionsMenu);
+		debugOptionsMenu = NULL;
 	}
 }
 

@@ -6,7 +6,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>
@@ -18,10 +17,8 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/controls/IconButton.h>
 #include <engine/uiStack/controls/LabelControl.h>
-#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <gameState/OptionsState.h>
 #include <math.h>
@@ -33,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gameState/options/InputOptionsState.h"
+#include "helpers/OptionsMenu.h"
 
 typedef enum ListenMode
 {
@@ -49,8 +47,7 @@ typedef struct ControlRowData
 	Control *resetButton;
 } ControlRowData;
 
-static UiStack *controlsOptionsStack = NULL;
-static ScrollView *controlsOptionsScrollView = NULL;
+static OptionsMenu *controlOptionsMenu;
 static char *filter = NULL;
 
 static const int ENTRY_HEIGHT = 44;
@@ -330,10 +327,7 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 		RenderMenuBackground(state);
 	}
 
-	controlsOptionsScrollView->size.y = ScaledWindowHeightFloat() - 200;
-	ProcessScrollView(controlsOptionsScrollView);
-	ProcessUiStack(controlsOptionsStack);
-	DrawUiStack(controlsOptionsStack);
+	ProcessOptionsMenu(controlOptionsMenu);
 
 	if (listenMode == KBM_LISTEN)
 	{
@@ -370,45 +364,45 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 
 static void ControlsOptionsStateSet()
 {
-	if (controlsOptionsStack == NULL)
+	if (controlOptionsMenu == NULL)
 	{
 		ListInit(controlRows, LIST_POINTER);
 
-		controlsOptionsStack = CreateUiStack();
-
-		controlsOptionsScrollView = CreateScrollView(controlsOptionsStack, TOP_CENTER, v2(0, 100), v2(750, 200));
+		controlOptionsMenu = CreateOptionsMenu();
 
 		int entryY = 0;
 		for (size_t ci = 0; ci < controlCategories.length; ci++)
 		{
 			ControlCategory *cat = ListGetPointer(controlCategories, ci);
-			ScrollViewAddChild(controlsOptionsScrollView,
-							   CreateLabelControl(cat->categoryName,
-												  16,
-												  COLOR_WHITE,
-												  v2(0, entryY),
-												  v2(750, 40),
-												  TOP_LEFT,
-												  FONT_HALIGN_CENTER,
-												  FONT_VALIGN_MIDDLE,
-												  FONT("small_font"),
-												  true));
+			OptionsMenuAddControl(controlOptionsMenu,
+								  CreateLabelControl(cat->categoryName,
+													 16,
+													 COLOR_WHITE,
+													 v2(0, entryY),
+													 v2(750, 40),
+													 TOP_LEFT,
+													 FONT_HALIGN_CENTER,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+			OptionsMenuNextRow(controlOptionsMenu);
+
 			for (size_t i = 0; i < cat->controlOptions.length; i++)
 			{
 				entryY += ENTRY_HEIGHT;
 
 				ControlOption *entry = ListGetPointer(cat->controlOptions, i);
-				ScrollViewAddChild(controlsOptionsScrollView,
-								   CreateLabelControl(entry->displayName,
-													  16,
-													  COLOR_WHITE,
-													  v2(0, entryY),
-													  v2(750 - 40 - 6 - 190 - 6 - 190 - 6, 40),
-													  TOP_LEFT,
-													  FONT_HALIGN_LEFT,
-													  FONT_VALIGN_MIDDLE,
-													  FONT("small_font"),
-													  true));
+				OptionsMenuAddControl(controlOptionsMenu,
+									  CreateLabelControl(entry->displayName,
+														 16,
+														 COLOR_WHITE,
+														 v2(0, entryY),
+														 v2(750 - 40 - 6 - 190 - 6 - 190 - 6, 40),
+														 TOP_LEFT,
+														 FONT_HALIGN_LEFT,
+														 FONT_VALIGN_MIDDLE,
+														 FONT("small_font"),
+														 true));
 
 				Control *kbmButton = CreateButtonControl(v2(0 - 40 - 6 - 190 - 6, entryY),
 														 v2(190, 40),
@@ -438,15 +432,15 @@ static void ControlsOptionsStateSet()
 
 				UpdateControlRow(row);
 
-				ScrollViewAddChild(controlsOptionsScrollView, kbmButton);
-				ScrollViewAddChild(controlsOptionsScrollView, ctlrButton);
-				ScrollViewAddChild(controlsOptionsScrollView, resetButton);
+				OptionsMenuAddControl(controlOptionsMenu, kbmButton);
+				OptionsMenuAddControl(controlOptionsMenu, ctlrButton);
+				OptionsMenuAddControl(controlOptionsMenu, resetButton);
+				OptionsMenuNextRow(controlOptionsMenu);
 			}
 			entryY += ENTRY_HEIGHT * 1.5f;
 		}
 
-		UiStackPush(controlsOptionsStack, CreateHeaderFooterControl(100, true, "Controls"));
-		UiStackPush(controlsOptionsStack, CreateHeaderFooterControl(100, false, NULL));
+		OptionsMenuAddSimpleHeaderFooter(controlOptionsMenu, "Controls", BtnControlsOptionsBack);
 
 		// UiStackPush(controlsOptionsStack,
 		// 			CreateTextBoxControl("Filter Controls",
@@ -456,28 +450,18 @@ static void ControlsOptionsStateSet()
 		// 								 64,
 		// 								 FilterTextChanged,
 		// 								 NULL));
-
-		UiStackPush(controlsOptionsStack,
-					CreateButtonControl(v2(0, -40), v2(480, 40), "Back", BtnControlsOptionsBack, BOTTOM_CENTER, NULL));
-
-		// UiStackPush(controlsOptionsStack,
-		// 			CreateVScrollBarControl(v2(LIST_WIDTH / 2 + 20, 0),
-		// 									ScaledWindowHeightFloat() - 200,
-		// 									MIDDLE_CENTER,
-		// 									&scrollData));
 	}
-	UiStackResetFocus(controlsOptionsStack);
+	UiStackResetFocus(controlOptionsMenu->stack);
 	listenMode = NOT_LISTNENING;
 }
 
 static void ControlsOptionsStateDestroy()
 {
-	if (controlsOptionsStack != NULL)
+	if (controlOptionsMenu != NULL)
 	{
-		FreeScrollView(controlsOptionsScrollView);
-		DestroyUiStack(controlsOptionsStack);
+		DestroyOptionsMenu(controlOptionsMenu);
 		ListAndContentsFree(controlRows);
-		controlsOptionsStack = NULL;
+		controlOptionsMenu = NULL;
 	}
 }
 
