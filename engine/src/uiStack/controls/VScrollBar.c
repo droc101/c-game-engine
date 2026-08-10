@@ -33,9 +33,25 @@ void DestroyVScrollBar(const Control *) {}
 void UpdateVScrollBar(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t ctlIndex)
 {
 	VScrollBarData *data = (VScrollBarData *)c->controlData;
-	if (stack->activeControl == ctlIndex && IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
+	if (stack->activeControl == ctlIndex)
 	{
-		data->scrollPos -= (int)GetMouseRel(mainThreadInput).y;
+		const float trackHeight = c->size.y;
+		const float maxScroll = (float)data->contentHeight - trackHeight;
+		const float thumbSize = trackHeight * (trackHeight / (float)data->contentHeight);
+		const float maxThumbPosition = trackHeight - thumbSize;
+		const float mouseY = GetMousePos(mainThreadInput).y;
+
+		if (IsMouseButtonJustPressed(mainThreadInput, SDL_BUTTON_LEFT))
+		{
+			const float scrollRatio = maxScroll > 0.0f ? -(float)data->scrollPos / maxScroll : 0.0f;
+			data->dragPos = mouseY - (scrollRatio * maxThumbPosition);
+		}
+		if (IsMouseButtonPressed(mainThreadInput, SDL_BUTTON_LEFT))
+		{
+			const float newThumbPosition = clamp(mouseY - data->dragPos, 0.0f, maxThumbPosition);
+			const float newScrollRatio = maxThumbPosition > 0.0f ? newThumbPosition / maxThumbPosition : 0.0f;
+			data->scrollPos = (int)(-newScrollRatio * maxScroll);
+		}
 	}
 }
 
@@ -54,7 +70,7 @@ void AlwaysUpdateVScrollBar(UiStack * /*stack*/, Control *c, Vector2 /*localMous
 
 void DrawVScrollBar(const Control *c, const ControlState state, const Vector2 position)
 {
-	VScrollBarData *data = (VScrollBarData *)c->controlData;
+	const VScrollBarData *data = (VScrollBarData *)c->controlData;
 
 	if ((float)data->contentHeight > c->size.y)
 	{
