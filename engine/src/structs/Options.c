@@ -12,6 +12,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "engine/helpers/Arguments.h"
+
 #define OPTIONS_FILE "options.kvl"
 
 static void DefaultOptions(Options *options)
@@ -101,6 +103,13 @@ static bool ValidateOptions(const Options *options)
 
 void LoadOptions(Options *options)
 {
+	if (HasCliArg("--reset-options"))
+	{
+		LogInfo("Resetting options...");
+		DefaultOptions(options);
+		return;
+	}
+
 	KvList list;
 	if (ReadKvlFile(OPTIONS_FILE, list))
 	{
