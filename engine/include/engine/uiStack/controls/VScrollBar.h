@@ -14,6 +14,7 @@ struct VScrollBarData
 {
 	int scrollPos;
 	int contentHeight;
+	float dragPos;
 };
 
 Control *CreateVScrollBarControl(Vector2 position, float height, ControlAnchor anchor, VScrollBarData *scrollBarData);
