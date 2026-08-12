@@ -79,14 +79,6 @@ static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE = {
 	.maxDepthBounds = 1,
 };
 
-static const VkPipelineDepthStencilStateCreateInfo SHADOW_MAP_DEPTH_STENCIL_STATE = {
-	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-	.depthTestEnable = VK_TRUE,
-	.depthWriteEnable = VK_TRUE,
-	.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL,
-	.maxDepthBounds = 1,
-};
-
 static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE_UNUSED = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 };
@@ -1241,17 +1233,21 @@ static inline bool CreateDebugDrawPipeline()
 
 static inline VkResult CreateMapShadowMapPipeline()
 {
-	if (pipelines.spotLightShadowMaps.mapFrontFaces != LUNA_NULL_HANDLE)
+	if (pipelines.spotLightShadowMaps.map != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.mapFrontFaces);
+		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.map);
 	}
-	if (pipelines.spotLightShadowMaps.mapBackFaces != LUNA_NULL_HANDLE)
+	if (pipelines.pointLightShadowMaps.map != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.mapBackFaces);
+		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.map);
 	}
-	if (pipelines.pointLightShadowMaps.mapFrontFaces != LUNA_NULL_HANDLE)
+	if (pipelines.directionalLightShadowMaps.mapFrontFaces != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.mapFrontFaces);
+		lunaDestroyGraphicsPipeline(device, pipelines.directionalLightShadowMaps.mapFrontFaces);
+	}
+	if (pipelines.directionalLightShadowMaps.mapBackFaces != LUNA_NULL_HANDLE)
+	{
+		lunaDestroyGraphicsPipeline(device, pipelines.directionalLightShadowMaps.mapBackFaces);
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
@@ -1321,7 +1317,7 @@ static inline VkResult CreateMapShadowMapPipeline()
 		.inputAssemblyState = &INPUT_ASSEMBLY,
 		.viewportState = &VIEWPORT_STATE,
 		.multisampleState = &MULTISAMPLING_DISABLED,
-		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
 	};
@@ -1334,8 +1330,16 @@ static inline VkResult CreateMapShadowMapPipeline()
 																		  &pipelineInfo,
 																		  spotLightShadowMapRenderPass,
 																		  0,
-																		  &pipelines.spotLightShadowMaps.mapFrontFaces),
-							   "Failed to create map front faces spot light shadow map graphics pipeline!");
+																		  &pipelines.spotLightShadowMaps.map),
+							   "Failed to create map spot light shadow map graphics pipeline!");
+		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																		  &pipelineInfo,
+																		  spotLightShadowMapRenderPass,
+																		  0,
+																		  &pipelines.directionalLightShadowMaps
+																				   .mapFrontFaces),
+							   "Failed to create map directional light front faces shadow map graphics pipeline!");
+
 		static const VkPipelineRasterizationStateCreateInfo BACK_FACES_RASTERIZER = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.polygonMode = VK_POLYGON_MODE_FILL,
@@ -1351,8 +1355,9 @@ static inline VkResult CreateMapShadowMapPipeline()
 																		  &pipelineInfo,
 																		  spotLightShadowMapRenderPass,
 																		  0,
-																		  &pipelines.spotLightShadowMaps.mapBackFaces),
-							   "Failed to create map back faces spot light shadow map graphics pipeline!");
+																		  &pipelines.directionalLightShadowMaps
+																				   .mapBackFaces),
+							   "Failed to create map directional light back faces shadow map graphics pipeline!");
 	}
 	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
 	{
@@ -1363,8 +1368,7 @@ static inline VkResult CreateMapShadowMapPipeline()
 																		  &pipelineInfo,
 																		  pointLightShadowMapRenderPass,
 																		  0,
-																		  &pipelines.pointLightShadowMaps
-																				   .mapFrontFaces),
+																		  &pipelines.pointLightShadowMaps.map),
 							   "Failed to create map point light shadow map graphics pipeline!");
 	}
 
@@ -1380,6 +1384,10 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 	if (pipelines.pointLightShadowMaps.modelActors != LUNA_NULL_HANDLE)
 	{
 		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.modelActors);
+	}
+	if (pipelines.directionalLightShadowMaps.modelActors != LUNA_NULL_HANDLE)
+	{
+		lunaDestroyGraphicsPipeline(device, pipelines.directionalLightShadowMaps.modelActors);
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
@@ -1492,7 +1500,7 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
-		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
 	};
@@ -1506,6 +1514,13 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 																		  0,
 																		  &pipelines.spotLightShadowMaps.modelActors),
 							   "Failed to create model actor spot light shadow map graphics pipeline!");
+		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																		  &pipelineInfo,
+																		  spotLightShadowMapRenderPass,
+																		  0,
+																		  &pipelines.directionalLightShadowMaps
+																				   .modelActors),
+							   "Failed to create model actor directional light shadow map graphics pipeline!");
 	}
 	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
 	{
@@ -1531,6 +1546,10 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 	if (pipelines.pointLightShadowMaps.wallActors != LUNA_NULL_HANDLE)
 	{
 		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.wallActors);
+	}
+	if (pipelines.directionalLightShadowMaps.wallActors != LUNA_NULL_HANDLE)
+	{
+		lunaDestroyGraphicsPipeline(device, pipelines.directionalLightShadowMaps.wallActors);
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
@@ -1643,7 +1662,7 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
-		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
 	};
@@ -1657,6 +1676,13 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 																		  0,
 																		  &pipelines.spotLightShadowMaps.wallActors),
 							   "Failed to create wall actor spot light shadow map graphics pipeline!");
+		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																		  &pipelineInfo,
+																		  spotLightShadowMapRenderPass,
+																		  0,
+																		  &pipelines.directionalLightShadowMaps
+																				   .wallActors),
+							   "Failed to create wall actor directional light shadow map graphics pipeline!");
 	}
 	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
 	{

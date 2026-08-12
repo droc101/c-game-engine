@@ -32,12 +32,12 @@
       "minimum": 0,
       "description": "The field of view of this camera"
     },
-    "near_z": {
+    "near_plane": {
       "default": 0.01,
       "type": "float",
       "minimum": 0
     },
-    "far_z": {
+    "far_plane": {
       "default": 4096,
       "type": "float",
       "minimum": 0

@@ -125,8 +125,8 @@ bool LoadMap(Map *map, Asset *mapData)
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			map->player.playerCamera.nearZ = KvGetFloat(params, "near_z", DEFAULT_NEAR_Z);
-			map->player.playerCamera.farZ = KvGetFloat(params, "far_z", DEFAULT_FAR_Z);
+			map->player.playerCamera.nearPlane = KvGetFloat(params, "near_plane", DEFAULT_NEAR_PLANE);
+			map->player.playerCamera.farPlane = KvGetFloat(params, "far_plane", DEFAULT_FAR_PLANE);
 			SetPlayerTransform(&map->player, &xfm);
 			KvListDestroy(params);
 			ListFree(ioConnections);

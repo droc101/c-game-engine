@@ -343,6 +343,14 @@ bool CreateDescriptorSetLayouts()
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
+		{
+			// Directional light shadow maps
+			.bindingName = "Shadow Maps",
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			// TODO: This is count is unchecked and not used when checking how many other shadow maps to make
+			.descriptorCount = 4,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+		},
 	};
 	const LunaDescriptorSetLayoutCreationInfo descriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
@@ -545,8 +553,8 @@ bool CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = min(UINT32_MAX,
-								   min(MAX_TEXTURES, sampledImageCount) + 2 * min(sampledImageCount, 16384) + 1),
+			// I'm not sure why I need the +1 but for some reason it breaks without it
+			.descriptorCount = min(MAX_TEXTURES, sampledImageCount) + 2 * min(sampledImageCount, 16384) + 4 + 1,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -599,7 +607,7 @@ void WriteDescriptorSet()
 		.descriptorSet = descriptorSet,
 		.bindingName = "Camera",
 		.descriptorCount = 1,
-		.bufferInfo = &transformMatrixBufferInfo,
+		.bufferInfos = &transformMatrixBufferInfo,
 	};
 	const LunaDescriptorBufferInfo lightingBufferInfo = {
 		.buffer = buffers.uniforms.lighting,
@@ -608,7 +616,7 @@ void WriteDescriptorSet()
 		.descriptorSet = descriptorSet,
 		.bindingName = "Global Lighting",
 		.descriptorCount = 1,
-		.bufferInfo = &lightingBufferInfo,
+		.bufferInfos = &lightingBufferInfo,
 	};
 	const LunaDescriptorBufferInfo fogBufferInfo = {
 		.buffer = buffers.uniforms.fog,
@@ -617,7 +625,7 @@ void WriteDescriptorSet()
 		.descriptorSet = descriptorSet,
 		.bindingName = "Fog",
 		.descriptorCount = 1,
-		.bufferInfo = &fogBufferInfo,
+		.bufferInfos = &fogBufferInfo,
 	};
 	lunaWriteDescriptorSets(device, 3, (LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite});
 }

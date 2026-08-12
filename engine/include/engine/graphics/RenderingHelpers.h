@@ -18,8 +18,8 @@
 #define VIEWMODEL_FOV 70
 
 // default near & far planes also defined in camera.json and player.json actor definitions
-#define DEFAULT_NEAR_Z 0.01
-#define DEFAULT_FAR_Z 4096
+#define DEFAULT_NEAR_PLANE 0.01
+#define DEFAULT_FAR_PLANE 4096
 
 // TODO: use viewmodel near and far planes
 #define VIEWMODEL_NEAR_Z 0.01

@@ -33,7 +33,9 @@ void main() {
 	if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_POINT) {
         const vec3 lightToWorld = outPosition - lightsData.lights[pushConstants.lightIndex].position;
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (transforms[pushConstants.faceIndex] * vec4(-lightToWorld.xy, lightToWorld.z, 1));
-	} else {
+	} else if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_SPOT) {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * vec4(outPosition, 1);
+	} else {
+	    gl_Position = lightsData.cascadeMatrices[pushConstants.cascadeIndex] * vec4(outPosition, 1);
 	}
 }

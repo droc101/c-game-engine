@@ -4,6 +4,7 @@
 
 layout(binding = 2, scalar) uniform CameraBuffer {
 	mat4 transformMatrix;
+	mat4 viewMatrix;
 	vec3 position;
 } camera;
 

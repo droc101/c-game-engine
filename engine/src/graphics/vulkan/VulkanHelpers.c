@@ -4,7 +4,9 @@
 
 #include <assert.h>
 #include <cglm/cglm.h>
+#include <cglm/clipspace/ortho_lh_zo.h>
 #include <cglm/clipspace/persp_lh_zo.h>
+#include <cglm/clipspace/view_lh_zo.h>
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
@@ -22,6 +24,7 @@
 #include <engine/structs/Options.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
+#include <float.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
@@ -29,6 +32,7 @@
 #include <luna/lunaDevice.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaTypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -86,7 +90,7 @@ List shadowMaps = {0};
 List shadowMapFramebuffers = {0};
 List pointLightShadowMapImageViews = {0};
 
-static mat4 cameraViewMatrix;
+static CameraUniform uniform;
 #pragma endregion variables
 
 bool ClearTextureCache()
@@ -174,10 +178,10 @@ inline uint32_t ShadowMapResolution(const LightType type)
 			{
 				return 4096;
 			}
-			// if (type == LIGHT_TYPE_DIRECTIONAL)
-			// {
-			// 	return 8192;
-			// }
+			if (type == LIGHT_TYPE_DIRECTIONAL)
+			{
+				return 8192;
+			}
 			return 16384;
 		default:
 			return 0;
@@ -383,20 +387,46 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 		.writeInfo = colorAttachmentWriteInfo,
 	};
+	const LunaImageCreationInfo directionalLightShadowMapCreationInfo = {
+		.format = VK_FORMAT_D32_SFLOAT,
+		.width = directionalLightSize,
+		.height = directionalLightSize,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+		.layout = VK_IMAGE_LAYOUT_GENERAL,
+		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+		.writeInfo = depthAttachmentWriteInfo,
+	};
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
 		Light *light = &map->lights[i];
 
 		ListAdd(shadowMaps, LUNA_NULL_HANDLE);
 		LunaImage *image = (LunaImage *)&ListGetPointer(shadowMaps, shadowMaps.length - 1);
+		LunaDescriptorImageInfo shadowMapImageInfos[4] = {
+			{
+				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+			},
+			{
+				.sampler = textureSamplers.spotLightShadowMaps,
+				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+			},
+			{
+				.sampler = textureSamplers.spotLightShadowMaps,
+				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+			},
+			{
+				.sampler = textureSamplers.spotLightShadowMaps,
+				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+			},
+		};
 		LunaWriteDescriptorSet shadowMapDescriptorWrite = {
 			.bindingName = "Shadow Maps",
-			.descriptorCount = 1,
+			.imageInfos = shadowMapImageInfos,
 		};
-		LunaDescriptorImageInfo shadowMapImageInfo = {
-			.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
-		};
-		if (light->type == LIGHT_TYPE_SPOT || light->type == LIGHT_TYPE_DIRECTIONAL)
+		if (light->type == LIGHT_TYPE_SPOT)
 		{
 			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &spotLightShadowMapCreationInfo, image),
 								   "Failed to create spot light shadow map image!");
@@ -422,7 +452,45 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 
 			shadowMapDescriptorWrite.descriptorSet = spotLightShadowMapsDescriptorSet;
 			shadowMapDescriptorWrite.descriptorArrayElement = spotLightCount++;
-			shadowMapImageInfo.sampler = textureSamplers.spotLightShadowMaps;
+			shadowMapDescriptorWrite.descriptorCount = 1;
+			shadowMapImageInfos->sampler = textureSamplers.spotLightShadowMaps;
+			shadowMapImageInfos->image = *image;
+		} else if (light->type == LIGHT_TYPE_DIRECTIONAL)
+		{
+			for (uint32_t cascade = 0; cascade < 4; cascade++)
+			{
+				VulkanTestReturnResult(lunaCreateImage(device,
+													   commandBuffer,
+													   &directionalLightShadowMapCreationInfo,
+													   image),
+									   "Failed to create directional light shadow map image!");
+
+				ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
+				const VkImageView imageView = lunaGetVkImageView(*image);
+				const VkFramebufferCreateInfo framebufferCreateInfo = {
+					.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+					.renderPass = spotLightShadowMapRenderPass,
+					.attachmentCount = 1,
+					.pAttachments = &imageView,
+					.width = directionalLightSize,
+					.height = directionalLightSize,
+					.layers = 1,
+				};
+				VulkanTestReturnResult(vkCreateFramebuffer(vkDevice,
+														   &framebufferCreateInfo,
+														   NULL,
+														   (VkFramebuffer *)&ListGetPointer(shadowMapFramebuffers,
+																							shadowMapFramebuffers
+																											.length -
+																									1)),
+									   "Failed to create directional light shadow map framebuffer!");
+
+				shadowMapImageInfos[cascade].image = *image;
+			}
+			shadowMapDescriptorWrite.descriptorSet = descriptorSet;
+			shadowMapDescriptorWrite.descriptorArrayElement = 0;
+			shadowMapDescriptorWrite.descriptorCount = 4;
+			shadowMapImageInfos->sampler = textureSamplers.spotLightShadowMaps;
 		} else if (light->type == LIGHT_TYPE_POINT)
 		{
 			VulkanTestReturnResult(lunaCreateImageCube(device, commandBuffer, &pointLightShadowMapCreationInfo, image),
@@ -470,10 +538,10 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 			}
 			shadowMapDescriptorWrite.descriptorSet = pointLightShadowMapsDescriptorSet;
 			shadowMapDescriptorWrite.descriptorArrayElement = pointLightCount++;
-			shadowMapImageInfo.sampler = textureSamplers.pointLightShadowMaps;
+			shadowMapDescriptorWrite.descriptorCount = 1;
+			shadowMapImageInfos->sampler = textureSamplers.pointLightShadowMaps;
+			shadowMapImageInfos->image = *image;
 		}
-		shadowMapImageInfo.image = *image;
-		shadowMapDescriptorWrite.imageInfo = &shadowMapImageInfo;
 		lunaWriteDescriptorSets(device, 1, &shadowMapDescriptorWrite);
 	}
 
@@ -485,9 +553,9 @@ VkResult UpdateCameraUniform(const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(camera->fov),
-						  (float)swapChainExtent.width / (float)swapChainExtent.height,
-						  camera->nearZ,
-						  camera->farZ,
+						  (float)swapchainExtent.width / (float)swapchainExtent.height,
+						  camera->farPlane,
+						  camera->nearPlane,
 						  perspectiveMatrix);
 
 	versor rotationQuat;
@@ -497,10 +565,9 @@ VkResult UpdateCameraUniform(const Camera *camera)
 	glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
 
 	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
-	glm_quat_look(cameraPosition, rotationQuat, cameraViewMatrix);
+	glm_quat_look(cameraPosition, rotationQuat, uniform.view);
 
-	CameraUniform uniform;
-	glm_mat4_mul(perspectiveMatrix, cameraViewMatrix, uniform.transform);
+	glm_mat4_mul(perspectiveMatrix, uniform.view, uniform.transform);
 	uniform.position = camera->transform.position;
 	const LunaBufferWriteInfo bufferWriteInfo = {
 		.bytes = sizeof(CameraUniform),
@@ -530,7 +597,7 @@ VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 
 	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	mat4 viewmodelMatrix;
-	glm_mat4_inv(cameraViewMatrix, viewmodelMatrix);
+	glm_mat4_inv(uniform.view, viewmodelMatrix);
 	glm_mat4_mul(viewmodelMatrix, translationMatrix, viewmodelMatrix);
 
 	const size_t instanceCount = lunaGetBufferSize(buffers.viewmodel.instanceData) / sizeof(ModelInstanceData);
@@ -545,6 +612,110 @@ VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 		VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.instanceData, &writeInfo),
 							   "Failed to write viewmodel transform matrix to instance data buffer!");
 	}
+
+	return VK_SUCCESS;
+}
+
+// TODO: Optimize this function
+VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
+{
+	static const float LAMBDA = 0.95f; // Adjusts the range of each split. Tweak to find optimal values
+
+	const float nearPlane = camera->nearPlane;
+	const float farPlane = camera->farPlane;
+
+	const float range = farPlane - nearPlane;
+	const float ratio = farPlane / nearPlane;
+
+	float depths[4];
+	mat4 matrices[4];
+	float previousDistance = 0.0f;
+	for (uint32_t i = 0; i < 4; i++)
+	{
+		const float p = (float)(i + 1) / 4.0f;
+		const float v = nearPlane + range * p;
+		const float d = LAMBDA * (nearPlane * powf(ratio, p) - v) + v;
+		const float distance = (d - nearPlane) / range;
+
+		vec4 frustumCorners[8] = {
+			{-1.0f, 1.0f, 1.0f, 1.0f},
+			{1.0f, 1.0f, 1.0f, 1.0f},
+			{1.0f, -1.0f, 1.0f, 1.0f},
+			{-1.0f, -1.0f, 1.0f, 1.0f},
+			{-1.0f, 1.0f, 0.0f, 1.0f},
+			{1.0f, 1.0f, 0.0f, 1.0f},
+			{1.0f, -1.0f, 0.0f, 1.0f},
+			{-1.0f, -1.0f, 0.0f, 1.0f},
+		};
+
+		// Project frustum corners into world space
+		mat4 cameraInverseTransform;
+		glm_mat4_inv(uniform.transform, cameraInverseTransform);
+		for (uint32_t j = 0; j < 8; j++)
+		{
+			vec4 inverseCorner;
+			glm_mat4_mulv(cameraInverseTransform, frustumCorners[j], inverseCorner);
+			glm_vec4_divs(inverseCorner, inverseCorner[3], frustumCorners[j]);
+		}
+
+		for (uint32_t j = 0; j < 4; j++)
+		{
+			vec3 frustumDistance;
+			glm_vec3_sub(frustumCorners[j + 4], frustumCorners[j], frustumDistance);
+			vec4 scaledFrustumDistance;
+			scaledFrustumDistance[3] = 0;
+			glm_vec3_scale(frustumDistance, distance, scaledFrustumDistance);
+			glm_vec4_add(frustumCorners[j], scaledFrustumDistance, frustumCorners[j + 4]);
+			glm_vec3_scale(frustumDistance, previousDistance, scaledFrustumDistance);
+			glm_vec4_add(frustumCorners[j], scaledFrustumDistance, frustumCorners[j]);
+		}
+
+		vec3 frustumCenter = GLM_VEC3_ZERO_INIT;
+		for (uint32_t j = 0; j < 8; j++)
+		{
+			glm_vec3_add(frustumCenter, frustumCorners[j], frustumCenter);
+		}
+		glm_vec3_divs(frustumCenter, 8.0f, frustumCenter);
+
+		float radius = 0.0f;
+		for (uint32_t j = 0; j < 8; j++)
+		{
+			radius = max(radius, glm_vec3_distance(frustumCorners[j], frustumCenter));
+		}
+		radius = ceilf(radius * 16.0f) / 16.0f;
+
+		vec3 eye;
+		glm_vec3_scale(VECTOR3_TO_VEC3(light->negativeForwardDirection), radius, eye);
+		glm_vec3_add(frustumCenter, eye, eye);
+		mat4 viewMatrix;
+		const bool yAligned = fabsf(light->negativeForwardDirection.x) < FLT_EPSILON &&
+							  fabsf(light->negativeForwardDirection.z) < FLT_EPSILON;
+		glm_lookat_lh_zo(eye, frustumCenter, yAligned ? GLM_XUP : GLM_YUP, viewMatrix);
+		mat4 perspectiveMatrix;
+		glm_ortho_lh_zo(radius, -radius, radius, -radius, radius * 2, 0, perspectiveMatrix);
+
+		depths[i] = nearPlane + distance * range;
+		glm_mat4_mul(perspectiveMatrix, viewMatrix, matrices[i]);
+
+		previousDistance = distance;
+	}
+
+	const LunaBufferWriteInfo depthsWriteInfo = {
+		.bytes = sizeof(float) * 4,
+		.data = depths,
+		.offset = sizeof(uint32_t),
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &depthsWriteInfo),
+						   "Failed to write directional light cascade depths to buffer!");
+	const LunaBufferWriteInfo matricesWriteInfo = {
+		.bytes = sizeof(mat4) * 4,
+		.data = matrices,
+		.offset = sizeof(uint32_t) + sizeof(float) * 4,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),
+						   "Failed to write directional light cascade transform matrices to buffer!");
 
 	return VK_SUCCESS;
 }

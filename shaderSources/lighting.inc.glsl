@@ -16,10 +16,12 @@ layout(set = 0, binding = 4, scalar) readonly restrict uniform FogBuffer {
 } fog;
 layout(set = 0, binding = 5, scalar) readonly restrict buffer LightsData {
     uint lightCount;
-	mat4 cascades[4];
+    float cascadeDepths[4];
+	mat4 cascadeMatrices[4];
     Light lights[];
 } lightsData;
 
+layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMaps[];
 layout(set = 1, binding = 0) uniform sampler2DShadow spotLightShadowMaps[];
 layout(set = 2, binding = 0) uniform samplerCubeShadow pointLightShadowMaps[];
 
@@ -49,7 +51,7 @@ vec3 getLightColor(const Light light, const float distance, const float theta) {
     return light.color * brightness;
 }
 
-vec3 getLightingColor(const vec3 position, const vec3 normal) {
+vec3 getLightingColor(const vec3 position, const vec3 normal, const float distance) {
     if (lightsData.lightCount == 0) {
         return vec3(1);
     }
@@ -70,26 +72,29 @@ vec3 getLightingColor(const vec3 position, const vec3 normal) {
                 if (theta > light.fadingAngle) {
                     continue;
                 }
-                const float factor = texture(spotLightShadowMaps[light.shadowMapIndex], vec3(coord.xy * 0.5 + 0.5, coord.z)); 
+                const float factor = texture(spotLightShadowMaps[nonuniformEXT(light.shadowMapIndex)], vec3(coord.xy * 0.5 + 0.5, coord.z)); 
                 lightingColor += factor * getLightColor(light, length(lightToWorld), theta) * max(dot(lightToWorldNormalized, normal), 0);
             }
         } else if (light.type == LIGHT_TYPE_DIRECTIONAL) {
-            const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
+            uint cascadeIndex;
+            for (cascadeIndex = 0; cascadeIndex < 4; ++cascadeIndex) {
+                if (distance < lightsData.cascadeDepths[cascadeIndex]) {
+                    break;
+                }
+            }
+            const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
             const vec4 coord = worldPosition / worldPosition.w;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                const float factor = texture(spotLightShadowMaps[light.shadowMapIndex], vec3(coord.xy * 0.5 + 0.5, coord.z));
+                const float factor = texture(directionalLightShadowMaps[nonuniformEXT(cascadeIndex)], vec3(coord.xy * 0.5 + 0.5, coord.z));
                 if (factor < 1e-6) {
                     continue;
                 }
                 lightingColor += factor * light.color * light.brightness * max(dot(light.negativeForwardDirection, normal), 0);
-            } else {
-                // TODO: Remove once CSM is implemented
-                lightingColor += light.color * light.brightness * max(dot(light.negativeForwardDirection, normal), 0);
             }
         } else {
             const vec3 lightToWorld = light.position - position;
             const float depth = length(lightToWorld);
-            const float factor = texture(pointLightShadowMaps[light.shadowMapIndex], vec4(lightToWorld, depth));
+            const float factor = texture(pointLightShadowMaps[nonuniformEXT(light.shadowMapIndex)], vec4(lightToWorld, depth));
             if (factor < 1e-6) {
                 continue;
             }

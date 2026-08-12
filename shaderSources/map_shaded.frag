@@ -9,7 +9,8 @@ layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inUV;
 layout(location = 2) in vec2 inLightmapUV;
 layout(location = 3) in vec3 inNormal;
-layout(location = 4) flat in uint inTextureIndex;
+layout(location = 4) in float inDistance;
+layout(location = 5) flat in uint inTextureIndex;
 
 layout(location = 0) out vec4 outColor;
 
@@ -80,7 +81,7 @@ void main() {
         discard;
     }
 	outColor.a = 1.0;
-    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal)) + sampleLightmap(lightmap, inLightmapUV).rgb;
+    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), inDistance);// + sampleLightmap(lightmap, inLightmapUV).rgb;
 	float fogFactor = clamp((gl_FragCoord.z / gl_FragCoord.w - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);

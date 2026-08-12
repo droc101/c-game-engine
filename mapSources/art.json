@@ -2454,11 +2454,11 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 },
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 16384.0
                 }

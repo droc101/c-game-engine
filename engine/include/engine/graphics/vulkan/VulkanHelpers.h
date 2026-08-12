@@ -94,6 +94,7 @@ enum PendingTasksBitFlags
 typedef struct CameraUniform
 {
 	mat4 transform;
+	mat4 view;
 	Vector3 position;
 } CameraUniform;
 
@@ -272,11 +273,18 @@ typedef struct Buffers
 
 typedef struct ShadowMapPipelines
 {
+	LunaGraphicsPipeline map;
+	LunaGraphicsPipeline modelActors;
+	LunaGraphicsPipeline wallActors;
+} ShadowMapPipelines;
+
+typedef struct DirectionalShadowMapPipelines
+{
 	LunaGraphicsPipeline mapFrontFaces;
 	LunaGraphicsPipeline mapBackFaces;
 	LunaGraphicsPipeline modelActors;
 	LunaGraphicsPipeline wallActors;
-} ShadowMapPipelines;
+} DirectionalShadowMapPipelines;
 
 typedef struct Pipelines
 {
@@ -292,6 +300,7 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorWall;
 	ShadowMapPipelines spotLightShadowMaps;
 	ShadowMapPipelines pointLightShadowMaps;
+	DirectionalShadowMapPipelines directionalLightShadowMaps;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
 	LunaGraphicsPipeline debugDrawTriangles;
@@ -376,6 +385,8 @@ VkResult CreateShadowMapGraphicsPipelines();
 VkResult UpdateCameraUniform(const Camera *camera);
 
 VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel);
+
+VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light);
 
 void EnsureSpaceForUiElements(size_t quadCount);
 

@@ -364,7 +364,8 @@ static inline VkResult CreateLightsBuffer()
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &creationInfo, &buffers.uniforms.lights), "Failed to create lights buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(device, &creationInfo, &buffers.uniforms.lights),
+						   "Failed to create lights buffer!");
 
 	return VK_SUCCESS;
 }
@@ -650,7 +651,7 @@ bool LoadTexture(const Image *image)
 		.bindingName = "Textures",
 		.descriptorArrayElement = index,
 		.descriptorCount = 1,
-		.imageInfo = &imageInfo,
+		.imageInfos = &imageInfo,
 	};
 	lunaWriteDescriptorSets(device, 1, &writeDescriptor);
 

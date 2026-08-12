@@ -28,9 +28,9 @@ static void CameraInit(Actor *this, const KvList params, Transform *transform)
 	CameraData *data = this->extraData;
 	memcpy(&data->camera.transform, transform, sizeof(Transform));
 	data->camera.fov = (float)KvGetInt(params, "fov", 90);
+	data->camera.nearPlane = KvGetFloat(params, "near_plane", DEFAULT_NEAR_PLANE);
+	data->camera.farPlane = KvGetFloat(params, "far_plane", DEFAULT_FAR_PLANE);
 	data->camera.showPlayerModel = KvGetBool(params, "show_player_model", true);
-	data->camera.nearZ = KvGetFloat(params, "near_z", DEFAULT_NEAR_Z);
-	data->camera.farZ = KvGetFloat(params, "far_z", DEFAULT_FAR_Z);
 	ActorCreateEmptyBody(this, transform);
 }
 

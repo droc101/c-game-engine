@@ -15,8 +15,8 @@ void CreatePlayer(Map *map)
 {
 	map->player.transform.rotation = JPH_Quat_Identity;
 	map->player.playerCamera.fov = GetState()->options.fov;
-	map->player.playerCamera.nearZ = DEFAULT_NEAR_Z;
-	map->player.playerCamera.farZ = DEFAULT_FAR_Z;
+	map->player.playerCamera.nearPlane = DEFAULT_NEAR_PLANE;
+	map->player.playerCamera.farPlane = DEFAULT_FAR_PLANE;
 	map->player.playerCamera.transform.rotation = JPH_Quat_Identity;
 
 	CreatePlayerPhysics(map);

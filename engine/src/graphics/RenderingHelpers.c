@@ -241,7 +241,7 @@ Vector2 ProjectPosition(vec3 position, Camera *camera)
 	const Vector2 windowSize = ActualWindowSize();
 	const float aspect = windowSize.x / windowSize.y;
 	mat4 perspectiveMatrix;
-	glm_perspective_lh_zo(glm_rad(camera->fov), aspect, camera->nearZ, camera->farZ, perspectiveMatrix);
+	glm_perspective_lh_zo(glm_rad(camera->fov), aspect, camera->nearPlane, camera->farPlane, perspectiveMatrix);
 
 	versor rotationQuat;
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
