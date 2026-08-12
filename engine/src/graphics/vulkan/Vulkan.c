@@ -30,7 +30,6 @@
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <float.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
@@ -1386,7 +1385,7 @@ bool VK_FrameStart()
 		return false;
 	}
 
-	VulkanTestResizeSwapchain(lunaBeginFrame(device, commandBuffer, false), "Failed to begin frame!");
+	VulkanTestResizeSwapchain(lunaBeginFrame(device, commandBuffer), "Failed to begin frame!");
 
 	renderPassStarted = false;
 	buffers.ui.freeQuads = buffers.ui.allocatedQuads;
@@ -1414,8 +1413,9 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 
 	VulkanTest(UpdateShadowMaps(map), "Failed to update shadow maps!");
 
+	const VkExtent2D extent = lunaGetSwapchainExtent();
 	const LunaRenderPassBeginInfo beginInfo = {
-		.renderArea.extent = swapchainExtent,
+		.renderArea.extent = extent,
 		.depthAttachmentClearValue.depthStencil.depth = 0,
 	};
 	VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
@@ -1424,8 +1424,8 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 	VulkanTest(UpdateViewModelMatrix(&map->viewmodel), "Failed to update viewmodel transform matrix!");
 
 	const VkViewport viewport = {
-		.width = (float)swapchainExtent.width,
-		.height = (float)swapchainExtent.height,
+		.width = (float)extent.width,
+		.height = (float)extent.height,
 		.maxDepth = 1,
 	};
 	const LunaViewportBindInfo viewportBindInfo = {
@@ -1433,7 +1433,7 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 		.viewports = &viewport,
 	};
 	const VkRect2D scissor = {
-		.extent = swapchainExtent,
+		.extent = extent,
 	};
 	const LunaScissorBindInfo scissorBindInfo = {
 		.scissorCount = 1,
@@ -1517,10 +1517,12 @@ bool VK_FrameEnd()
 				   "Failed to write UI index buffer!");
 	}
 
+	const VkExtent2D extent = lunaGetSwapchainExtent();
+
 	if (!renderPassStarted)
 	{
 		const LunaRenderPassBeginInfo beginInfo = {
-			.renderArea.extent = swapchainExtent,
+			.renderArea.extent = extent,
 			.depthAttachmentClearValue.depthStencil.depth = 1,
 		};
 		VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
@@ -1529,8 +1531,8 @@ bool VK_FrameEnd()
 	if (buffers.ui.freeQuads != buffers.ui.allocatedQuads)
 	{
 		const VkViewport viewport = {
-			.width = (float)swapchainExtent.width,
-			.height = (float)swapchainExtent.height,
+			.width = (float)extent.width,
+			.height = (float)extent.height,
 			.maxDepth = 1,
 		};
 		const LunaViewportBindInfo viewportBindInfo = {
@@ -1538,7 +1540,7 @@ bool VK_FrameEnd()
 			.viewports = &viewport,
 		};
 		const VkRect2D scissor = {
-			.extent = swapchainExtent,
+			.extent = extent,
 		};
 		const LunaScissorBindInfo scissorBindInfo = {
 			.scissorCount = 1,
@@ -1582,15 +1584,8 @@ bool VK_FrameEnd()
 
 	lunaEndRenderPass(commandBuffer);
 
-	const VkSwapchainKHR swapchain = lunaGetVkSwapchain();
-	uint32_t imageIndex = lunaGetSwapchainImageIndex();
-	const VkPresentInfoKHR presentInfo = {
-		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-		.swapchainCount = 1,
-		.pSwapchains = &swapchain,
-		.pImageIndices = &imageIndex,
-	};
-	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+	const LunaPresentInfo presentInfo = {};
+	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT;
 	const LunaCommandBufferSubmitInfo submitInfo = {
 		.queue = queue,
 		.waitSemaphoreCount = 1,
@@ -1669,11 +1664,11 @@ bool VK_LoadMap(const Map *map)
 
 bool VK_UpdateViewportSize()
 {
+	VulkanTest(lunaDeviceWaitIdle(device), "Failed to wait for device to become idle!");
 	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
-	swapchainExtent.width = (uint32_t)windowSize.x;
-	swapchainExtent.height = (uint32_t)windowSize.y;
 	const LunaSwapchainResizeInfo swapchainResizeInfo = {
-		.newSize = swapchainExtent,
+		.newSize.width = (uint32_t)windowSize.x,
+		.newSize.height = (uint32_t)windowSize.y,
 		.renderPassCount = 1,
 		.renderPasses = &renderPass,
 		.queueFamilyIndexCount = 1,

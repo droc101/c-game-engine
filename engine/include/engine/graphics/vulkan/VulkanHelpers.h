@@ -30,7 +30,6 @@
 #define SizeofMember(Type, member) (sizeof(((Type *)0)->member))
 
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
-// TODO Use LogInternal
 #define VulkanTestInternal(function, returnValue, ...) \
 	{ \
 		const VkResult result = function; \
@@ -50,15 +49,14 @@
 #define VulkanTestResizeSwapchain(function, ...) \
 	{ \
 		const VkResult resizeCheckResult = function; \
-		if (resizeCheckResult != VK_SUCCESS) \
+		if (resizeCheckResult != VK_SUCCESS && resizeCheckResult != VK_SUBOPTIMAL_KHR) \
 		{ \
-			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR || resizeCheckResult == VK_SUBOPTIMAL_KHR) \
+			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR) \
 			{ \
 				const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
-				swapchainExtent.width = windowSize.x; \
-				swapchainExtent.height = windowSize.y; \
 				const LunaSwapchainResizeInfo swapchainResizeInfo = { \
-					.newSize = swapchainExtent, \
+					.newSize.width = windowSize.x, \
+					.newSize.height = windowSize.y, \
 					.renderPassCount = 1, \
 					.renderPasses = &renderPass, \
 					.queueFamilyIndexCount = 1, \
@@ -328,8 +326,6 @@ typedef struct ShadowMapPushConstants
 #pragma endregion typedefs
 
 #pragma region variables
-// TODO: Make sure these are all needed and are all as they should be
-
 extern bool minimized;
 extern LunaDevice device;
 extern VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -340,7 +336,6 @@ extern LunaCommandBuffer commandBuffer;
 extern LunaCommandBuffer secondaryCommandBuffer;
 extern LunaSemaphore semaphore;
 extern VkSurfaceKHR surface;
-extern VkExtent2D swapchainExtent;
 extern VkSampleCountFlagBits msaaSamples;
 extern LunaRenderPass renderPass;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];

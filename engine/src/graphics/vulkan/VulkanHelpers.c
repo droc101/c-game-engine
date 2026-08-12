@@ -22,6 +22,7 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <float.h>
@@ -52,7 +53,6 @@ LunaCommandBuffer commandBuffer = LUNA_NULL_HANDLE;
 LunaCommandBuffer secondaryCommandBuffer = LUNA_NULL_HANDLE;
 LunaSemaphore semaphore = LUNA_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
-VkExtent2D swapchainExtent = {0};
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 LunaRenderPass renderPass = LUNA_NULL_HANDLE;
 uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
@@ -548,12 +548,12 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	return VK_SUCCESS;
 }
 
-// TODO: Make sure this doesn't need changes
 VkResult UpdateCameraUniform(const Camera *camera)
 {
 	mat4 perspectiveMatrix;
+	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
 	glm_perspective_lh_zo(glm_rad(camera->fov),
-						  (float)swapchainExtent.width / (float)swapchainExtent.height,
+						  windowSize.x / windowSize.y,
 						  camera->farPlane,
 						  camera->nearPlane,
 						  perspectiveMatrix);

@@ -4,6 +4,7 @@
 
 #include <engine/assets/KvlFile.h>
 #include <engine/debug/DebugEntryManager.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Options.h>
@@ -11,8 +12,6 @@
 #include <engine/subsystem/Logging.h>
 #include <stdbool.h>
 #include <stddef.h>
-
-#include "engine/helpers/Arguments.h"
 
 #define OPTIONS_FILE "options.kvl"
 

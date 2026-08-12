@@ -161,8 +161,8 @@ bool CreateSwapchain()
 		return true;
 	}
 
-	swapchainExtent = capabilities.currentExtent;
-	if (swapchainExtent.width == UINT32_MAX || swapchainExtent.height == UINT32_MAX)
+	VkExtent2D extent = capabilities.currentExtent;
+	if (extent.width == UINT32_MAX || extent.height == UINT32_MAX)
 	{
 		int32_t width = 0;
 		int32_t height = 0;
@@ -171,12 +171,8 @@ bool CreateSwapchain()
 			LogError("Failed to get window size with error: %s", SDL_GetError());
 			return false;
 		}
-		swapchainExtent.width = clamp((uint32_t)width,
-									  capabilities.minImageExtent.width,
-									  capabilities.maxImageExtent.width);
-		swapchainExtent.height = clamp((uint32_t)height,
-									   capabilities.minImageExtent.height,
-									   capabilities.maxImageExtent.height);
+		extent.width = clamp((uint32_t)width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+		extent.height = clamp((uint32_t)height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 	}
 
 	const bool vsync = GetState()->options.vsync;
@@ -193,8 +189,8 @@ bool CreateSwapchain()
 
 	const LunaSwapchainCreationInfo swapChainCreationInfo = {
 		.surface = surface,
-		.width = swapchainExtent.width,
-		.height = swapchainExtent.height,
+		.width = extent.width,
+		.height = extent.height,
 		.formatCount = 2,
 		.formatPriorityList = (VkSurfaceFormatKHR[]){{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
 													 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}},
@@ -276,6 +272,7 @@ bool CreateRenderPass()
 		LogError("Failed to get display bounds with error: %s", SDL_GetError());
 		return false;
 	}
+	const VkExtent2D extent = lunaGetSwapchainExtent();
 	const LunaRenderPassCreationInfo renderPassCreationInfo = {
 		.samples = msaaSamples,
 		.createColorAttachment = true,
@@ -286,7 +283,7 @@ bool CreateRenderPass()
 		.subpasses = &subpassCreationInfo,
 		.dependencyCount = 1,
 		.dependencies = &dependency,
-		.extent = (VkExtent3D){.width = swapchainExtent.width, .height = swapchainExtent.height, .depth = 1},
+		.extent = (VkExtent3D){.width = extent.width, .height = extent.height, .depth = 1},
 		.maxExtent = (VkExtent3D){.width = bounds.w, .height = bounds.h, .depth = 1},
 
 		.queueFamilyIndexCount = 1,
