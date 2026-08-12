@@ -272,7 +272,8 @@ typedef struct Buffers
 
 typedef struct ShadowMapPipelines
 {
-	LunaGraphicsPipeline map;
+	LunaGraphicsPipeline mapFrontFaces;
+	LunaGraphicsPipeline mapBackFaces;
 	LunaGraphicsPipeline modelActors;
 	LunaGraphicsPipeline wallActors;
 } ShadowMapPipelines;
@@ -313,6 +314,7 @@ typedef struct ShadowMapPushConstants
 {
 	uint32_t lightIndex;
 	uint32_t faceIndex;
+	uint32_t cascadeIndex;
 } ShadowMapPushConstants;
 #pragma endregion typedefs
 
@@ -365,7 +367,7 @@ uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
 
-uint32_t ShadowMapResolution();
+uint32_t ShadowMapResolution(LightType type);
 
 VkResult CreateShadowMapRenderPass(const Map *map);
 

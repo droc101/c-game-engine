@@ -27,7 +27,6 @@ struct Light {
 	mat4 transformMatrix;
 };
 
-const float MIN_BRIGHTNESS = 1.0 / 256.0;
 const vec2 MAGIC_XY = vec2(0.06711056, 0.00583715);
 const float MAGIC_Z = 52.9829189;
 

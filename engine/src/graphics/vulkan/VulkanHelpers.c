@@ -147,7 +147,7 @@ inline uint32_t ImageIndex(const Image *image)
 	return index;
 }
 
-inline uint32_t ShadowMapResolution()
+inline uint32_t ShadowMapResolution(const LightType type)
 {
 	switch (GetState()->options.shadowMapQuality)
 	{
@@ -164,8 +164,20 @@ inline uint32_t ShadowMapResolution()
 		case SHADOW_MAP_RESOLUTION_4096:
 			return 4096;
 		case SHADOW_MAP_RESOLUTION_8192:
+			if (type == LIGHT_TYPE_POINT)
+			{
+				return 4096;
+			}
 			return 8192;
 		case SHADOW_MAP_RESOLUTION_16384:
+			if (type == LIGHT_TYPE_POINT)
+			{
+				return 4096;
+			}
+			// if (type == LIGHT_TYPE_DIRECTIONAL)
+			// {
+			// 	return 8192;
+			// }
 			return 16384;
 		default:
 			return 0;
@@ -311,7 +323,9 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	ListInit(pointLightShadowMapImageViews, LIST_POINTER);
 	uint32_t spotLightCount = 0;
 	uint32_t pointLightCount = 0;
-	const uint32_t size = ShadowMapResolution();
+	const uint32_t spotLightSize = ShadowMapResolution(LIGHT_TYPE_SPOT);
+	const uint32_t pointLightSize = ShadowMapResolution(LIGHT_TYPE_POINT);
+	const uint32_t directionalLightSize = ShadowMapResolution(LIGHT_TYPE_DIRECTIONAL);
 	const LunaImageWriteInfo depthAttachmentWriteInfo = {
 		.destinationStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
 								VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
@@ -324,8 +338,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 
 	const LunaImageCreationInfo pointLightShadowMapDepthAttachmentCreationInfo = {
 		.format = VK_FORMAT_D32_SFLOAT,
-		.width = min(size, 4096),
-		.height = min(size, 4096),
+		.width = pointLightSize,
+		.height = pointLightSize,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 		.queueFamilyIndexCount = 1,
@@ -346,8 +360,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 
 	const LunaImageCreationInfo spotLightShadowMapCreationInfo = {
 		.format = VK_FORMAT_D32_SFLOAT,
-		.width = size,
-		.height = size,
+		.width = spotLightSize,
+		.height = spotLightSize,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
@@ -359,8 +373,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	const LunaImageCreationInfo pointLightShadowMapCreationInfo = {
 		.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
 		.format = VK_FORMAT_R32_SFLOAT,
-		.width = min(size, 4096),
-		.height = min(size, 4096),
+		.width = pointLightSize,
+		.height = pointLightSize,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
@@ -372,10 +386,6 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
 		Light *light = &map->lights[i];
-		if (light->type == LIGHT_TYPE_DIRECTIONAL)
-		{
-			continue;
-		}
 
 		ListAdd(shadowMaps, LUNA_NULL_HANDLE);
 		LunaImage *image = (LunaImage *)&ListGetPointer(shadowMaps, shadowMaps.length - 1);
@@ -386,7 +396,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		LunaDescriptorImageInfo shadowMapImageInfo = {
 			.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
 		};
-		if (light->type == LIGHT_TYPE_SPOT)
+		if (light->type == LIGHT_TYPE_SPOT || light->type == LIGHT_TYPE_DIRECTIONAL)
 		{
 			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &spotLightShadowMapCreationInfo, image),
 								   "Failed to create spot light shadow map image!");
@@ -398,8 +408,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 				.renderPass = spotLightShadowMapRenderPass,
 				.attachmentCount = 1,
 				.pAttachments = &imageView,
-				.width = size,
-				.height = size,
+				.width = spotLightSize,
+				.height = spotLightSize,
 				.layers = 1,
 			};
 			VulkanTestReturnResult(vkCreateFramebuffer(vkDevice,
@@ -445,8 +455,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 					.renderPass = pointLightShadowMapRenderPass,
 					.attachmentCount = 2,
 					.pAttachments = pointLightFramebufferAttachments,
-					.width = min(size, 4096),
-					.height = min(size, 4096),
+					.width = pointLightSize,
+					.height = pointLightSize,
 					.layers = 1,
 				};
 				VulkanTestReturnResult(vkCreateFramebuffer(vkDevice,

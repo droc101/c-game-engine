@@ -36,6 +36,4 @@ void main() {
 	} else {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * vec4(outPosition, 1);
 	}
-    const float normalMultiplier = gl_VertexIndex < 6 ? 1 : -1;
-    // outPosition -= rotateVec3ByQuat(normalMultiplier * vec3(-inAxis.y, 0, inAxis.x), inRotationQuat);
 }

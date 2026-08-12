@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <cglm/cglm.h>
+#include <cglm/clipspace/ortho_lh_zo.h>
 #include <cglm/clipspace/persp_lh_zo.h>
 #include <cglm/clipspace/view_lh_zo.h>
 #include <cglm/types.h>
@@ -17,7 +18,6 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
-#include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -30,6 +30,7 @@
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <float.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
@@ -511,18 +512,17 @@ static inline float GetMaxLightDistance(const Light *light)
 
 static inline VkResult LoadLights(const Map *map)
 {
+	uint32_t directionalLightIndex = -1u;
 	uint32_t spotLightIndex = 0;
 	uint32_t pointLightIndex = 0;
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
-		Light *light = &map->lights[i];
-
-		const float farPlaneDistance = GetMaxLightDistance(light);
 		mat4 transformMatrix;
-
+		Light *light = &map->lights[i];
 		switch (light->type)
 		{
 			case LIGHT_TYPE_SPOT:
+			{
 				light->shadowMapIndex = spotLightIndex++;
 				versor rotationQuat;
 				QUAT_TO_VERSOR(light->transform.rotation, rotationQuat);
@@ -533,20 +533,38 @@ static inline VkResult LoadLights(const Map *map)
 				glm_quat_look(VECTOR3_TO_VEC3(light->transform.position), rotationQuat, viewMatrix);
 				mat4 perspectiveMatrix;
 				// TODO: Figure out why this only works with this fov???
-				glm_perspective_lh_zo(glm_rad(235), 1, farPlaneDistance, NEAR_Z, perspectiveMatrix);
+				glm_perspective_lh_zo(glm_rad(235), 1, GetMaxLightDistance(light), NEAR_Z, perspectiveMatrix);
 				glm_mat4_mul(perspectiveMatrix, viewMatrix, transformMatrix);
-				break;
+			}
+			break;
 			case LIGHT_TYPE_POINT:
 				light->shadowMapIndex = pointLightIndex++;
-				glm_perspective_lh_zo(glm_rad(90), 1, farPlaneDistance, NEAR_Z, transformMatrix);
+				glm_perspective_lh_zo(glm_rad(90), 1, GetMaxLightDistance(light), NEAR_Z, transformMatrix);
+				break;
+			case LIGHT_TYPE_DIRECTIONAL:
+				directionalLightIndex = i;
+				light->shadowMapIndex = spotLightIndex++;
+				{
+					const float size = 4096;
+					vec3 eye;
+					glm_vec3_scale(VECTOR3_TO_VEC3(light->negativeForwardDirection), size, eye);
+					mat4 viewMatrix;
+					const bool yAligned = fabsf(light->negativeForwardDirection.x) < FLT_EPSILON &&
+										  fabsf(light->negativeForwardDirection.z) < FLT_EPSILON;
+					glm_lookat_lh_zo(eye, GLM_VEC3_ZERO, yAligned ? GLM_XUP : GLM_YUP, viewMatrix);
+					mat4 perspectiveMatrix;
+					glm_ortho_lh_zo(-size, size, -size, size, size * 2, 0, perspectiveMatrix);
+					glm_mat4_mul(perspectiveMatrix, viewMatrix, transformMatrix);
+				}
 				break;
 			default:
+				continue;
 		}
 
 		memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
 	}
 
-	const size_t lightsBufferSize = map->lightCount * sizeof(Light) + sizeof(uint32_t);
+	const size_t lightsBufferSize = sizeof(uint32_t) + sizeof(mat4) * 4 + sizeof(Light) * map->lightCount;
 	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, lightsBufferSize),
 						   "Failed to resize lights buffer!");
 
@@ -559,12 +577,31 @@ static inline VkResult LoadLights(const Map *map)
 												 commandBuffer,
 												 buffers.uniforms.lights,
 												 &lightCountBufferWriteInfo),
-						   "Failed to write lights data to buffer!");
+						   "Failed to write light count to buffer!");
+
+	// if (directionalLightIndex == -1u)
+	// {
+	// 	for (uint32_t i = 0; i < 4; i++)
+	// 	{
+	// 		mat4 matrix;
+	// 		const LunaBufferWriteInfo bufferWriteInfo = {
+	// 			.bytes = sizeof(mat4),
+	// 			.data = matrix,
+	// 			.offset = sizeof(uint32_t) + sizeof(mat4) * i,
+	// 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	// 		};
+	// 		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+	// 													 commandBuffer,
+	// 													 buffers.uniforms.lights,
+	// 													 &bufferWriteInfo),
+	// 							   "Failed to write directional light transform matrices to buffer!");
+	// 	}
+	// }
 
 	const LunaBufferWriteInfo bufferWriteInfo = {
 		.bytes = map->lightCount * sizeof(Light),
 		.data = map->lights,
-		.offset = sizeof(uint32_t),
+		.offset = sizeof(uint32_t) + sizeof(mat4) * 4,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
@@ -953,8 +990,7 @@ static inline VkResult DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pip
 
 static inline VkResult UpdateShadowMaps(const Map *map)
 {
-	const uint32_t size = ShadowMapResolution();
-	if (size == 0)
+	if (GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
 	{
 		return VK_SUCCESS;
 	}
@@ -980,14 +1016,11 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		 shadowMapPushConstants.lightIndex++)
 	{
 		const Light *light = &map->lights[shadowMapPushConstants.lightIndex];
-		if (light->type == LIGHT_TYPE_DIRECTIONAL)
-		{
-			continue;
-		}
 
+		const uint32_t size = ShadowMapResolution(light->type);
 		const VkExtent2D extent = {
-			.width = light->type == LIGHT_TYPE_POINT ? min(size, 4096) : size,
-			.height = light->type == LIGHT_TYPE_POINT ? min(size, 4096) : size,
+			.width = size,
+			.height = size,
 		};
 		const VkClearValue depthClearValue = {
 			.depthStencil.depth = 0,
@@ -1025,7 +1058,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			.dynamicStates = dynamicStateBindInfos,
 		};
 
-		if (light->type == LIGHT_TYPE_SPOT)
+		if (light->type == LIGHT_TYPE_SPOT || light->type == LIGHT_TYPE_DIRECTIONAL)
 		{
 			const VkRenderPassBeginInfo beginInfo = {
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -1037,8 +1070,13 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			};
 			vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.spotLightShadowMaps.map),
-								   "Failed to draw map!");
+			VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.spotLightShadowMaps.mapFrontFaces),
+								   "Failed to draw map front faces!");
+			if (light->type == LIGHT_TYPE_DIRECTIONAL)
+			{
+				VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.spotLightShadowMaps.mapBackFaces),
+									   "Failed to draw map back faces!");
+			}
 			VulkanTestReturnResult(DrawActors(&pipelineBindInfo,
 											  pipelines.spotLightShadowMaps.modelActors,
 											  pipelines.spotLightShadowMaps.wallActors),
@@ -1064,7 +1102,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 				};
 				vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-				VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.pointLightShadowMaps.map),
+				VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.pointLightShadowMaps.mapFrontFaces),
 									   "Failed to draw map!");
 				VulkanTestReturnResult(DrawActors(&pipelineBindInfo,
 												  pipelines.pointLightShadowMaps.modelActors,

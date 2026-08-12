@@ -25,5 +25,4 @@ void main() {
 	} else {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * inTransformMatrix * vec4(inPosition, 1);
 	}
-    // outPosition -= inNormal;
 }

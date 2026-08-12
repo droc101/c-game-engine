@@ -1241,13 +1241,17 @@ static inline bool CreateDebugDrawPipeline()
 
 static inline VkResult CreateMapShadowMapPipeline()
 {
-	if (pipelines.spotLightShadowMaps.map != LUNA_NULL_HANDLE)
+	if (pipelines.spotLightShadowMaps.mapFrontFaces != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.map);
+		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.mapFrontFaces);
 	}
-	if (pipelines.pointLightShadowMaps.map != LUNA_NULL_HANDLE)
+	if (pipelines.spotLightShadowMaps.mapBackFaces != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.map);
+		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.mapBackFaces);
+	}
+	if (pipelines.pointLightShadowMaps.mapFrontFaces != LUNA_NULL_HANDLE)
+	{
+		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.mapFrontFaces);
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
@@ -1316,7 +1320,6 @@ static inline VkResult CreateMapShadowMapPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
 		.viewportState = &VIEWPORT_STATE,
-		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
 		.depthStencilState = &SHADOW_MAP_DEPTH_STENCIL_STATE,
 		.dynamicState = &DYNAMIC_STATE,
@@ -1326,22 +1329,42 @@ static inline VkResult CreateMapShadowMapPipeline()
 	{
 		shaderStages[1].module = spotLightShadowMapsFragShaderModule;
 		pipelineInfo.colorBlendState = &SHADOW_MAP_COLOR_BLENDING;
+		pipelineInfo.rasterizationState = &SHADOW_MAP_RASTERIZER;
 		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
 																		  &pipelineInfo,
 																		  spotLightShadowMapRenderPass,
 																		  0,
-																		  &pipelines.spotLightShadowMaps.map),
-							   "Failed to create map spot light shadow map graphics pipeline!");
+																		  &pipelines.spotLightShadowMaps.mapFrontFaces),
+							   "Failed to create map front faces spot light shadow map graphics pipeline!");
+		static const VkPipelineRasterizationStateCreateInfo BACK_FACES_RASTERIZER = {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+			.polygonMode = VK_POLYGON_MODE_FILL,
+			.cullMode = VK_CULL_MODE_FRONT_BIT,
+			.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+			.depthBiasEnable = VK_TRUE,
+			.depthBiasConstantFactor = 1.0f,
+			.depthBiasSlopeFactor = 2.5f,
+			.lineWidth = 1,
+		};
+		pipelineInfo.rasterizationState = &BACK_FACES_RASTERIZER;
+		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																		  &pipelineInfo,
+																		  spotLightShadowMapRenderPass,
+																		  0,
+																		  &pipelines.spotLightShadowMaps.mapBackFaces),
+							   "Failed to create map back faces spot light shadow map graphics pipeline!");
 	}
 	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
 	{
 		shaderStages[1].module = pointLightShadowMapsFragShaderModule;
 		pipelineInfo.colorBlendState = &COLOR_BLENDING;
+		pipelineInfo.rasterizationState = &SHADOW_MAP_RASTERIZER;
 		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
 																		  &pipelineInfo,
 																		  pointLightShadowMapRenderPass,
 																		  0,
-																		  &pipelines.pointLightShadowMaps.map),
+																		  &pipelines.pointLightShadowMaps
+																				   .mapFrontFaces),
 							   "Failed to create map point light shadow map graphics pipeline!");
 	}
 
