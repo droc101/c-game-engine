@@ -461,7 +461,7 @@ static inline VkResult LoadLightmap(const Map *map)
 		.descriptorSet = descriptorSet,
 		.bindingName = "Lightmap",
 		.descriptorCount = 1,
-		.imageInfo = &imageInfo,
+		.imageInfos = &imageInfo,
 	};
 	lunaWriteDescriptorSets(device, 1, &writeDescriptor);
 

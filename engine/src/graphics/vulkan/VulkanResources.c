@@ -636,7 +636,7 @@ bool LoadTexture(const Image *image)
 		.bindingName = "Textures",
 		.descriptorArrayElement = index,
 		.descriptorCount = 1,
-		.imageInfo = &imageInfo,
+		.imageInfos = &imageInfo,
 	};
 	lunaWriteDescriptorSets(device, 1, &writeDescriptor);
 

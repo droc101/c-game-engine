@@ -504,7 +504,7 @@ void WriteDescriptorSet()
 		.descriptorSet = descriptorSet,
 		.bindingName = "Camera",
 		.descriptorCount = 1,
-		.bufferInfo = &transformMatrixBufferInfo,
+		.bufferInfos = &transformMatrixBufferInfo,
 	};
 	const LunaDescriptorBufferInfo lightingBufferInfo = {
 		.buffer = buffers.uniforms.lighting,
@@ -513,7 +513,7 @@ void WriteDescriptorSet()
 		.descriptorSet = descriptorSet,
 		.bindingName = "Global Lighting",
 		.descriptorCount = 1,
-		.bufferInfo = &lightingBufferInfo,
+		.bufferInfos = &lightingBufferInfo,
 	};
 	const LunaDescriptorBufferInfo fogBufferInfo = {
 		.buffer = buffers.uniforms.fog,
@@ -522,7 +522,7 @@ void WriteDescriptorSet()
 		.descriptorSet = descriptorSet,
 		.bindingName = "Fog",
 		.descriptorCount = 1,
-		.bufferInfo = &fogBufferInfo,
+		.bufferInfos = &fogBufferInfo,
 	};
 	lunaWriteDescriptorSets(device, 3, (LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite});
 }
