@@ -16,10 +16,10 @@
 
 /// Field of view used for viewmodels
 #define VIEWMODEL_FOV 70
-/// Near clipping plane
-#define NEAR_Z 0.01
-/// Far clipping plane
-#define FAR_Z 16384
+
+// default near & far planes also defined in camera.json and player.json actor definitions
+#define DEFAULT_NEAR_Z 0.01
+#define DEFAULT_FAR_Z 4096
 
 // TODO: use viewmodel near and far planes
 #define VIEWMODEL_NEAR_Z 0.01

@@ -2445,7 +2445,7 @@
             "position": {
                 "x": 0.0,
                 "y": 8128.0,
-                "z": -0.0
+                "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -2453,7 +2453,16 @@
                 "z": 0.0
             },
             "connections": [],
-            "params": {}
+            "params": {
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 16384.0
+                }
+            }
         },
         {
             "class": "prop_sprite",
@@ -2469,31 +2478,16 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": false
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.02500000037252903,
-                        "y": 0.02500000037252903
-                    }
-                },
-                "texture": {
+                "name": {
                     "type": "string",
-                    "value": "texture/actor/BLOB2.gtex"
+                    "value": ""
                 },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 640.0,
+                        "y": 640.0
+                    }
                 },
                 "color": {
                     "type": "color",
@@ -2504,16 +2498,31 @@
                         "a": 1.0
                     }
                 },
-                "size": {
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/BLOB2.gtex"
+                },
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
-                        "x": 640.0,
-                        "y": 640.0
+                        "x": 0.02500000037252903,
+                        "y": 0.02500000037252903
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "solid": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
                 }
             }
         }

@@ -31,6 +31,16 @@
       "type": "int",
       "minimum": 0,
       "description": "The field of view of this camera"
+    },
+    "near_z": {
+      "default": 0.01,
+      "type": "float",
+      "minimum": 0
+    },
+    "far_z": {
+      "default": 4096,
+      "type": "float",
+      "minimum": 0
     }
   }
 }

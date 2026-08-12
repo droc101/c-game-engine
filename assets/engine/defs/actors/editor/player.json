@@ -11,5 +11,17 @@
       "type": "model",
       "model": "model/player.gmdl"
     }
-  ]
+  ],
+  "params": {
+    "near_z": {
+      "default": 0.01,
+      "type": "float",
+      "minimum": 0
+    },
+    "far_z": {
+      "default": 4096,
+      "type": "float",
+      "minimum": 0
+    }
+  }
 }
