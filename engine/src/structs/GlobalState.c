@@ -4,6 +4,7 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/MapLoader.h>
+#include <engine/gameState/LoadingState.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
@@ -235,17 +236,27 @@ bool ChangeMapByName(const char *name)
 		LogError("Failed to load map due to map name %s being too long\n", name);
 		return false;
 	}
-	GetState()->saveData->blueCoins = 0;
+	state.saveData->blueCoins = 0;
 	Map *map = CreateMap();
 	ChangeMap(map);
 	if (!LoadMap(map, LoadAsset(mapPath, false, false)))
 	{
-		state.map =
-				NULL; // This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
+		// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
+		state.map = NULL;
 		ChangeMap(NULL);
 		return false;
 	}
 	map->mapName = strdup(name);
 	DiscordUpdateRPC();
 	return true;
+}
+
+void ReloadMap()
+{
+	if (state.map)
+	{
+		free(loadStateLevelname); // For some reason we *sometimes* leave a value in here so this is a saftey free
+		loadStateLevelname = strdup(state.map->mapName);
+		SetGameState(&LoadingState);
+	}
 }

@@ -1192,6 +1192,19 @@ static inline bool HandleRendererQueuedActions()
 		return true;
 	}
 	VulkanTest(lunaDeviceWaitIdle(device), "Failed to wait for device idle!");
+	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_MODELS)
+	{
+		if (!ClearModelCache())
+		{
+			return false;
+		}
+		buffers.player.modelDefinition = LoadModel(MODEL("player"));
+		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
+		if (GetMap() != NULL)
+		{
+			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
+		}
+	}
 	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_TEXTURES)
 	{
 		if (!ClearTextureCache())
@@ -1208,19 +1221,6 @@ static inline bool HandleRendererQueuedActions()
 			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
-	}
-	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_MODELS)
-	{
-		if (!ClearModelCache())
-		{
-			return false;
-		}
-		buffers.player.modelDefinition = LoadModel(MODEL("player"));
-		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_MODELS;
-		if (GetMap() != NULL)
-		{
-			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
-		}
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{

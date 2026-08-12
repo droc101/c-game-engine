@@ -150,4 +150,9 @@ void DestroyGlobalState();
  */
 bool ChangeMapByName(const char *name);
 
+/**
+ * Reload the current map
+ */
+void ReloadMap();
+
 #endif //GLOBALSTATE_H

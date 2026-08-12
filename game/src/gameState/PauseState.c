@@ -5,11 +5,13 @@
 #include "gameState/PauseState.h"
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
+#include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Image.h>
@@ -59,6 +61,13 @@ static void BtnPauseExit(Control *, void *)
 	SetGameState(&LevelSelectState);
 }
 
+static void BtnHotReloadAssets(Control *, void *)
+{
+	LogInfo("Reloading all assets\n");
+	ReloadMap();
+	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+}
+
 static void PauseStateSet()
 {
 	GetState()->rpcState = PAUSED;
@@ -75,6 +84,13 @@ static void PauseStateSet()
 					CreateButtonControl(v2(0, 70), v2(300, 40), "Options", BtnOptions, MIDDLE_CENTER, NULL));
 		UiStackPush(pauseStack,
 					CreateButtonControl(v2(0, 120), v2(300, 40), "Exit Level", BtnPauseExit, MIDDLE_CENTER, NULL));
+		UiStackPush(pauseStack,
+					CreateButtonControl(v2(0, 195),
+										v2(300, 40),
+										"Hot Reload Assets",
+										BtnHotReloadAssets,
+										MIDDLE_CENTER,
+										"top 9 ways to kill the engine"));
 	}
 	UiStackResetFocus(pauseStack);
 }

@@ -353,7 +353,6 @@ void RemoveAssetFromCache(const char *relPath)
 
 void HotReloadAssets()
 {
-	assert(GetState()->map == NULL);
 	StopAllSounds();
 
 	DestroyAssetCache();

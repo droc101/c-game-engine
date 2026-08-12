@@ -146,17 +146,17 @@ void RenderDestroy()
 
 bool FrameStart()
 {
-	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
-	{
-		HotReloadAssets();
-		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
-	}
 	return VK_FrameStart();
 }
 
 void FrameEnd()
 {
 	VK_FrameEnd();
+	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
+	{
+		HotReloadAssets();
+		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	}
 }
 
 inline float GetAutoUiScale()

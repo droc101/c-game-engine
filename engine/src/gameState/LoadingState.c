@@ -13,6 +13,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/Timing.h>
@@ -120,11 +121,14 @@ static void LoadingStateSet()
 	levelLoadStartTime = GetTimeMs();
 	assert(loadStateLevelname);
 	stage = LSS_WAITING_FOR_FRAME;
+	ChangeMap(NULL);
+	GetState()->rpcState = UNKNOWN;
 }
 
 static void LoadingStateDestroy()
 {
 	free(loadStateLevelname);
+	loadStateLevelname = NULL;
 	if (loadStateTransition)
 	{
 		free(loadStateTransition->entranceName);

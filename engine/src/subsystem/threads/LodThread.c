@@ -43,11 +43,17 @@ static int LodThreadMain(void * /*data*/)
 		assert(oldValue == 1);
 
 		const GlobalState *state = GetState();
+		if (state->map == NULL)
+		{
+			// This will be hit if a map change is started after a physics tick starts but before the lod thread starts
+			// Notably, this can happen when pressing the hot reload assets button
+			SDL_UnlockMutex(mutex);
+			continue;
+		}
 		const LockingList *actors = &state->map->actors;
 		ListLock(*actors);
 		const size_t actorCount = actors->length;
 		const float lodMultiplier = state->options.lodMultiplier;
-		bool shouldReloadActors = false; // TODO only written to, never read back?
 		Vector3 actorPosition = {};
 		Vector3 offsetFromCamera = {};
 		for (size_t i = 0; i < actorCount; i++)
@@ -64,20 +70,14 @@ static int LodThreadMain(void * /*data*/)
 				   actor->model->lods[actor->currentLod].distanceSquared * lodMultiplier > distanceSquared)
 			{
 				actor->currentLod--;
-				shouldReloadActors = true;
 			}
 			while (actor->model->lodCount > actor->currentLod + 1 &&
 				   actor->model->lods[actor->currentLod + 1].distanceSquared * lodMultiplier <= distanceSquared)
 			{
 				actor->currentLod++;
-				shouldReloadActors = true;
 			}
 		}
 		ListUnlock(*actors);
-		// if (currentRenderer == RENDERER_VULKAN && !VK_UpdateActors(actors, shouldReloadActors))
-		// {
-		// 	Error("Failed to load actors!");
-		// }
 
 		SDL_UnlockMutex(mutex);
 	}
