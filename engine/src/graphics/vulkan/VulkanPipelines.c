@@ -75,7 +75,7 @@ static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 	.depthTestEnable = VK_TRUE,
 	.depthWriteEnable = VK_TRUE,
-	.depthCompareOp = VK_COMPARE_OP_LESS,
+	.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL,
 	.maxDepthBounds = 1,
 };
 

@@ -354,8 +354,9 @@ bool CreateDescriptorSetLayouts()
 
 
 	const uint32_t shadowMapDescriptorSlots = freeResourceCount < textureCount ? 0 : freeResourceCount - textureCount;
-	shadowMapSlotsAvailable = min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
-								  shadowMapDescriptorSlots / 2);
+	shadowMapSlotsAvailable = min(min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
+									  shadowMapDescriptorSlots / 2),
+								  16384);
 	const LunaDescriptorSetLayoutBinding spotLightShadowMapsBinding = {
 		.bindingName = "Shadow Maps",
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -544,9 +545,8 @@ bool CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			// TODO: This is allocating 1GiB
-			.descriptorCount = min((uint64_t)UINT32_MAX,
-								   (uint64_t)min(MAX_TEXTURES, sampledImageCount) + 2 * (uint64_t)sampledImageCount),
+			.descriptorCount = min(UINT32_MAX,
+								   min(MAX_TEXTURES, sampledImageCount) + 2 * min(sampledImageCount, 16384) + 1),
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

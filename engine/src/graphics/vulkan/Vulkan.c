@@ -545,7 +545,7 @@ static inline VkResult LoadLights(const Map *map)
 				directionalLightIndex = i;
 				light->shadowMapIndex = spotLightIndex++;
 				{
-					const float size = 4096;
+					const float size = 2048;
 					vec3 eye;
 					glm_vec3_scale(VECTOR3_TO_VEC3(light->negativeForwardDirection), size, eye);
 					mat4 viewMatrix;
@@ -1418,7 +1418,7 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = swapchainExtent,
-		.depthAttachmentClearValue.depthStencil.depth = 1,
+		.depthAttachmentClearValue.depthStencil.depth = 0,
 	};
 	VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
 	renderPassStarted = true;
