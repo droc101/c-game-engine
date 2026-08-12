@@ -18,6 +18,10 @@ struct Camera
 	float fov;
 	/// Whether the 3rd person player model should be rendered
 	bool showPlayerModel;
+	/// Z near plane distance
+	float nearZ;
+	/// Z far plane distance
+	float farZ;
 };
 
 #endif //GAME_CAMERA_H

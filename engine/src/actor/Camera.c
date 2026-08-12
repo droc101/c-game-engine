@@ -3,6 +3,7 @@
 //
 
 #include <engine/actor/Camera.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Camera.h>
@@ -28,6 +29,8 @@ static void CameraInit(Actor *this, const KvList params, Transform *transform)
 	memcpy(&data->camera.transform, transform, sizeof(Transform));
 	data->camera.fov = (float)KvGetInt(params, "fov", 90);
 	data->camera.showPlayerModel = KvGetBool(params, "show_player_model", true);
+	data->camera.nearZ = KvGetFloat(params, "near_z", DEFAULT_NEAR_Z);
+	data->camera.farZ = KvGetFloat(params, "far_z", DEFAULT_FAR_Z);
 	ActorCreateEmptyBody(this, transform);
 }
 

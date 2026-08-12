@@ -485,9 +485,9 @@ VkResult UpdateCameraUniform(const Camera *camera)
 {
 	mat4 perspectiveMatrix;
 	glm_perspective_lh_zo(glm_rad(camera->fov),
-						  (float)swapchainExtent.width / (float)swapchainExtent.height,
-						  FAR_Z,
-						  NEAR_Z,
+						  (float)swapChainExtent.width / (float)swapChainExtent.height,
+						  camera->nearZ,
+						  camera->farZ,
 						  perspectiveMatrix);
 
 	versor rotationQuat;
