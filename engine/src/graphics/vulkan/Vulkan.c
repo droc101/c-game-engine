@@ -681,8 +681,6 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 								  const LunaGraphicsPipeline modelShadowMapsPipeline,
 								  const LunaGraphicsPipeline wallShadowMapsPipeline)
 {
-	VulkanTestReturnResult(UpdateActors(), "Failed to update actors!");
-
 	const size_t shadedDrawCount = lunaGetBufferSize(buffers.actorModels.shadedDrawInfo) /
 								   sizeof(VkDrawIndexedIndirectCommand);
 	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.actorModels.unshadedDrawInfo) /
@@ -978,52 +976,65 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 						   "Failed to begin command buffer for updating shadow maps!");
 	const VkCommandBuffer vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
 
+	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSet,
+	};
+	VulkanTestReturnResult(lunaBindDescriptorSets(device,
+												  commandBuffer,
+												  pipelines.spotLightShadowMaps.map,
+												  &descriptorSetBindInfo),
+						   "Failed to bind descriptor sets!");
+	LunaGraphicsPipelineBindInfo pipelineBindInfo = {};
+	VkViewport viewport = {.maxDepth = 1};
+	const LunaViewportBindInfo viewportBindInfo = {
+		.viewportCount = 1,
+		.viewports = &viewport,
+	};
+	VkRect2D scissor = {};
+	const LunaScissorBindInfo scissorBindInfo = {
+		.scissorCount = 1,
+		.scissors = &scissor,
+	};
+	const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+			.bindInfo.viewportBindInfo = &viewportBindInfo,
+		},
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+			.bindInfo.scissorBindInfo = &scissorBindInfo,
+		},
+	};
+	const VkClearValue depthClearValue = {
+		.depthStencil.depth = 0,
+	};
+
+	uint32_t previousSize = 0;
 	uint32_t framebufferIndex = 0;
 	for (shadowMapPushConstants.lightIndex = 0; shadowMapPushConstants.lightIndex < map->lightCount;
 		 shadowMapPushConstants.lightIndex++)
 	{
 		const Light *light = &map->lights[shadowMapPushConstants.lightIndex];
-
 		const uint32_t size = ShadowMapResolution(light->type);
+
 		const VkExtent2D extent = {
 			.width = size,
 			.height = size,
 		};
-		const VkClearValue depthClearValue = {
-			.depthStencil.depth = 0,
-		};
-		const VkViewport viewport = {
-			.width = (float)extent.width,
-			.height = (float)extent.height,
-			.maxDepth = 1,
-		};
-		const LunaViewportBindInfo viewportBindInfo = {
-			.viewportCount = 1,
-			.viewports = &viewport,
-		};
-		const VkRect2D scissor = {
-			.extent = extent,
-		};
-		const LunaScissorBindInfo scissorBindInfo = {
-			.scissorCount = 1,
-			.scissors = &scissor,
-		};
-		const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
-			{
-				.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
-				.bindInfo.viewportBindInfo = &viewportBindInfo,
-			},
-			{
-				.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
-				.bindInfo.scissorBindInfo = &scissorBindInfo,
-			},
-		};
-		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetBindInfo.descriptorSetCount = 1,
-			.descriptorSetBindInfo.descriptorSets = &descriptorSet,
-			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
-			.dynamicStates = dynamicStateBindInfos,
-		};
+
+		if (size != previousSize)
+		{
+			viewport.width = (float)extent.width;
+			viewport.height = (float)extent.height;
+			scissor.extent = extent;
+			pipelineBindInfo.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos);
+			pipelineBindInfo.dynamicStates = dynamicStateBindInfos;
+		} else
+		{
+			pipelineBindInfo.dynamicStateCount = 0;
+		}
+		previousSize = size;
 
 		if (light->type == LIGHT_TYPE_SPOT)
 		{
@@ -1410,6 +1421,8 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 	VulkanTest(HandleMapChangeFlags(map), "Failed to handle map change flags!");
 
 	VulkanTest(UpdateCameraUniform(camera), "Failed to update transform matrix!");
+
+	VulkanTest(UpdateActors(), "Failed to update actors!");
 
 	VulkanTest(UpdateShadowMaps(map), "Failed to update shadow maps!");
 

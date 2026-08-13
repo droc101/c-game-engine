@@ -459,6 +459,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		{
 			for (uint32_t cascade = 0; cascade < 4; cascade++)
 			{
+				ListAdd(shadowMaps, LUNA_NULL_HANDLE);
+				image = (LunaImage *)&ListGetPointer(shadowMaps, shadowMaps.length - 1);
 				VulkanTestReturnResult(lunaCreateImage(device,
 													   commandBuffer,
 													   &directionalLightShadowMapCreationInfo,
