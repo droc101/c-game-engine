@@ -24,5 +24,6 @@ void main() {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * vec4(inPosition, 1);
 	} else {
 	    gl_Position = lightsData.cascadeMatrices[pushConstants.cascadeIndex] * vec4(inPosition, 1);
+		gl_Position.z = min(gl_Position.z, 1);
 	}
 }
