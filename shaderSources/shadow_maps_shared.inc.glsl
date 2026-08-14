@@ -15,7 +15,7 @@ layout(scalar, set = 0, binding = 5) readonly restrict buffer LightsData {
     Light lights[];
 } lightsData;
 
-const mat4 transforms[6] = {
+const mat4 pointLightViewMatrices[6] = {
 	mat4(
          0,  0,  1,  0,
          0, -1,  0,  0,

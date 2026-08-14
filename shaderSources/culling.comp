@@ -33,6 +33,9 @@ bool IsVisible(const ModelCullInfo cullInfo) {
                center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -cullInfo.radius;
     }
 
+    if (cullInfo.castsShadows == 0) {
+        return false;
+    }
     const Frustum frustum = frustums.frustums[pushConstants.frustumIndex];
     const vec3 center = (frustum.viewMatrix * vec4(cullInfo.position, 1)).xyz;
     return center.z + cullInfo.radius > frustum.nearPlane && center.z - cullInfo.radius < frustum.farPlane &&

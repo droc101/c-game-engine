@@ -3,7 +3,6 @@
 
 #include <assert.h>
 #include <engine/assets/TextureLoader.h>
-#include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/helpers/MathEx.h>

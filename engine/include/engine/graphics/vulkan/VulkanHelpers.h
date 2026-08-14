@@ -359,7 +359,8 @@ typedef struct ModelCullingInfo
 	uint32_t castsShadows;
 } ModelCullingInfo;
 
-typedef struct Frustum {
+typedef struct Frustum
+{
 	mat4 viewMatrix;
 	float nearPlane;
 	float farPlane;

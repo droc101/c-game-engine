@@ -19,7 +19,7 @@ void main() {
     outTextureIndex = inTextureIndex;
 	if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_POINT) {
         const vec3 lightToWorld = inPosition - lightsData.lights[pushConstants.lightIndex].transform.position;
-	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (transforms[pushConstants.faceIndex] * vec4(-lightToWorld.xy, lightToWorld.z, 1));
+	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (pointLightViewMatrices[pushConstants.faceIndex] * vec4(-lightToWorld.xy, lightToWorld.z, 1));
 	} else if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_SPOT) {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * vec4(inPosition, 1);
 	} else {
