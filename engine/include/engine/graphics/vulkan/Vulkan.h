@@ -47,7 +47,7 @@ bool VK_FrameStart();
  * @param camera The camera from which the map should be rendered
  * @return @c VK_SUCCESS if the map was rendered successfully, or a meaningful result code otherwise
  */
-bool VK_RenderMap(Map *map, const Camera *camera);
+bool VK_RenderMap(Map *map, Camera *camera);
 
 bool VK_FrameEnd();
 

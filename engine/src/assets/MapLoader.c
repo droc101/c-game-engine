@@ -174,6 +174,14 @@ bool LoadMap(Map *map, Asset *mapData)
 		assert(model->material);
 		free(materialName);
 
+		EXPECT_BYTES_BOOL(sizeof(vec3) * 2, bytesRemaining);
+		model->center.x = ReadFloat(reader);
+		model->center.y = ReadFloat(reader);
+		model->center.z = ReadFloat(reader);
+		model->halfExtent.x = ReadFloat(reader);
+		model->halfExtent.y = ReadFloat(reader);
+		model->halfExtent.z = ReadFloat(reader);
+
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->vertexCount = ReadUint32(reader);
 		model->vertices = malloc(sizeof(MapVertex) * model->vertexCount);

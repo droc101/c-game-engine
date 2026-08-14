@@ -26,9 +26,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "engine/helpers/PlatformHelpers.h"
+
 Map *CreateMap(void)
 {
-	Map *map = calloc(1, sizeof(Map));
+	Map *map = AvxAlignedCalloc(sizeof(Map));
 	CheckAlloc(map);
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
@@ -125,7 +127,7 @@ void DestroyMap(Map *map)
 	ListAndContentsFree(map->namedActorNames);
 	ListFree(map->namedActorPointers);
 	ListFree(map->actors);
-	free(map);
+	AvxAlignedFree(map);
 }
 
 void AddActor(Actor *actor)
@@ -200,7 +202,7 @@ void GetActorsByName(const char *name, const Map *map, List *actors)
 	ListUnlock(map->namedActorNames);
 }
 
-void RenderMap(Map *map, const Camera *camera)
+void RenderMap(Map *map, Camera *camera)
 {
 	JoltDebugRendererDrawBodies(map->physicsSystem);
 	RenderMap3D(map, camera);

@@ -55,6 +55,7 @@ extern InputAction debugMenu;
 extern InputAction noclip;
 extern InputAction freecam;
 extern InputAction benchmark;
+extern InputAction reloadShaders;
 
 extern InputAction fullscreen;
 

@@ -194,9 +194,9 @@ void RenderHUD();
 /**
  * Render the 3D portion of a map
  * @param map The map to render
- * @param cam The camera to render with
+ * @param camera The camera to render with
  * @note - This destroys the contents of the depth buffer in the OpenGL renderer
  */
-void RenderMap3D(Map *map, const Camera *cam);
+void RenderMap3D(Map *map, Camera *camera);
 
 #endif //GAME_DRAWING_H

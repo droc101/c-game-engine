@@ -198,6 +198,14 @@ static const InputAction DEFAULT_BENCHMARK = {
 				.keyBind = SDL_SCANCODE_F10,
 			},
 };
+static const InputAction DEFAULT_RELOAD_SHADERS = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_UNBOUND,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F5,
+			},
+};
 static const InputAction DEFAULT_TOGGLE_FULLSCREEN = {
 	.keyboardMouseBindType = IA_KEY,
 	.keyboardMouseBind =
@@ -234,6 +242,7 @@ InputAction debugMenu;
 InputAction noclip;
 InputAction freecam;
 InputAction benchmark;
+InputAction reloadShaders;
 
 InputAction fullscreen;
 
@@ -326,6 +335,7 @@ void RegisterControls(const ControlRegisterFunction RegisterGameControls)
 	RegisterControl("toggle_noclip", "Toggle Noclip", &noclip, false, &DEFAULT_NOCLIP, debugCat);
 	RegisterControl("toggle_freecam", "Toggle Freecam", &freecam, false, &DEFAULT_FREECAM, debugCat);
 	RegisterControl("toggle_benchmark", "Start/Stop Benchmark", &benchmark, false, &DEFAULT_BENCHMARK, debugCat);
+	RegisterControl("reload_shaders", "Reload Shaders", &reloadShaders, false, &DEFAULT_RELOAD_SHADERS, debugCat);
 
 	if (RegisterGameControls)
 	{

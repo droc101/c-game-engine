@@ -1,16 +1,15 @@
 #version 460
 
-#extension GL_EXT_scalar_block_layout : require
-#extension GL_EXT_nonuniform_qualifier : require
+#include "shared.inc.glsl"
 
-layout (binding = 1) uniform sampler2D textureSampler[];
+layout(binding = 1) uniform sampler2D textureSampler[];
 
-layout(binding = 3, scalar) uniform GlobalLightingBuffer {
+layout(binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
 } globalLighting;
 
-layout (push_constant, scalar) uniform PushConstants {
+layout(push_constant, scalar) uniform PushConstants {
 	uint textureIndex;
 } pushConstants;
 

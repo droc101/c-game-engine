@@ -1,10 +1,6 @@
 #version 460
 
-#extension GL_EXT_scalar_block_layout : require
-
-layout(binding = 2, scalar) uniform TransformMatrixBuffer {
-	mat4 matrix;
-} transform;
+#include "shared.inc.glsl"
 
 layout(location = 0) in vec2 inVertexPosition;
 layout(location = 1) in vec2 inUV;
@@ -34,5 +30,5 @@ void main() {
     outColor = inModColor;
     outUV = inUV * inUvScale * (inScale / vec2(16.0)) + inUvOffset;
     outTextureIndex = inTextureIndex;
-    gl_Position = transform.matrix * vec4(rotateVec3ByQuat(getVec3FromVec2(inVertexPosition * inScale + inCenterOffset), inRotationQuat) + inActorPosition, 1);
+    gl_Position = camera.transformMatrix * vec4(rotateVec3ByQuat(getVec3FromVec2(inVertexPosition * inScale + inCenterOffset), inRotationQuat) + inActorPosition, 1);
 }

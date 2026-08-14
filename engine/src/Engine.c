@@ -355,6 +355,11 @@ void EngineIteration()
 		GetState()->options.fullscreen = !GetState()->options.fullscreen;
 		SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
 	}
+	if (IsInputActionJustPressed(mainThreadInput, &reloadShaders))
+	{
+		LogInfo("Reloading shaders...\n");
+		rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_SHADERS;
+	}
 
 	if (state->gameState->enableRelativeMouseMode)
 	{

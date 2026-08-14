@@ -1,6 +1,6 @@
 #version 460
 
-#extension GL_EXT_nonuniform_qualifier : require
+#include "shared.inc.glsl"
 
 layout(binding = 1) uniform sampler2D textureSampler[];
 

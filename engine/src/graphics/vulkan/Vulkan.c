@@ -303,31 +303,56 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 	const size_t shadedDrawInfoBufferSize = shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
 	VulkanTestReturnResult(lunaResizeBuffer(device,
 											commandBuffer,
-											&buffers.map.shadedDrawInfo,
+											&buffers.map.unculledShadedDrawInfo,
 											shadedDrawInfoBufferSize),
+						   "Failed to resize unculled map shaded draw info buffer!");
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.map.shadedDrawInfo,
+											shadedDrawInfoBufferSize + sizeof(uint32_t)),
 						   "Failed to resize map shaded draw info buffer!");
 	const size_t unshadedDrawInfoBufferSize = unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
 	VulkanTestReturnResult(lunaResizeBuffer(device,
 											commandBuffer,
-											&buffers.map.unshadedDrawInfo,
+											&buffers.map.unculledUnshadedDrawInfo,
 											unshadedDrawInfoBufferSize),
+						   "Failed to resize unculled map unshaded draw info buffer!");
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.map.unshadedDrawInfo,
+											unshadedDrawInfoBufferSize + sizeof(uint32_t)),
 						   "Failed to resize map unshaded draw info buffer!");
+	const size_t shadedCullingInfoBufferSize = sizeof(uint32_t) + shadedMaterialCount * sizeof(ModelCullingInfo);
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.map.shadedCullingInfo,
+											shadedCullingInfoBufferSize),
+						   "Failed to resize map shaded culling info buffer!");
+	const size_t unshadedCullingInfoBufferSize = sizeof(uint32_t) + unshadedMaterialCount * sizeof(ModelCullingInfo);
+	VulkanTestReturnResult(lunaResizeBuffer(device,
+											commandBuffer,
+											&buffers.map.unshadedCullingInfo,
+											unshadedCullingInfoBufferSize),
+						   "Failed to resize map unshaded culling info buffer!");
 
 	VkDeviceSize vertexOffset = 0;
 	VkDeviceSize indexOffset = 0;
 	size_t shadedMaterialIndex = 0;
 	size_t unshadedMaterialIndex = 0;
-	MapVertex *vertices = malloc(sizeof(MapVertex) * totalVertexCount);
+	MapVertex *vertices = malloc(vertexBufferSize);
 	CheckAlloc(vertices);
-	uint32_t *indices = malloc(sizeof(uint32_t) * totalIndexCount);
+	uint32_t *indices = malloc(indexBufferSize);
 	CheckAlloc(indices);
-	uint32_t *textureIndices = malloc(sizeof(uint32_t) * totalMaterialCount);
+	uint32_t *textureIndices = malloc(instanceDataBufferSize);
 	CheckAlloc(textureIndices);
-	VkDrawIndexedIndirectCommand *shadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) * shadedMaterialCount);
+	VkDrawIndexedIndirectCommand *shadedDrawInfo = malloc(shadedDrawInfoBufferSize);
 	CheckAlloc(shadedDrawInfo);
-	VkDrawIndexedIndirectCommand *unshadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) *
-															unshadedMaterialCount);
+	VkDrawIndexedIndirectCommand *unshadedDrawInfo = malloc(unshadedDrawInfoBufferSize);
 	CheckAlloc(unshadedDrawInfo);
+	ModelCullingInfo *shadedCullingInfo = malloc(shadedCullingInfoBufferSize);
+	CheckAlloc(shadedCullingInfo);
+	ModelCullingInfo *unshadedCullingInfo = malloc(unshadedCullingInfoBufferSize);
+	CheckAlloc(unshadedCullingInfo);
 	for (size_t i = 0; i < modelCount; i++)
 	{
 		const MapModel *model = models + i;
@@ -342,6 +367,8 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 				shadedDrawInfo[shadedMaterialIndex].firstIndex = indexOffset;
 				shadedDrawInfo[shadedMaterialIndex].vertexOffset = (int32_t)vertexOffset;
 				shadedDrawInfo[shadedMaterialIndex].firstInstance = i;
+				shadedCullingInfo[shadedMaterialIndex].position = model->center;
+				shadedCullingInfo[shadedMaterialIndex].radius = Vector3_Length(&model->halfExtent);
 				shadedMaterialIndex++;
 				break;
 			case SHADER_UNSHADED:
@@ -350,6 +377,8 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 				unshadedDrawInfo[unshadedMaterialIndex].firstIndex = indexOffset;
 				unshadedDrawInfo[unshadedMaterialIndex].vertexOffset = (int32_t)vertexOffset;
 				unshadedDrawInfo[unshadedMaterialIndex].firstInstance = i;
+				unshadedCullingInfo[unshadedMaterialIndex].position = model->center;
+				unshadedCullingInfo[unshadedMaterialIndex].radius = Vector3_Length(&model->halfExtent);
 				unshadedMaterialIndex++;
 				break;
 			default:
@@ -359,6 +388,8 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 				free(textureIndices);
 				free(shadedDrawInfo);
 				free(unshadedDrawInfo);
+				free(shadedCullingInfo);
+				free(unshadedCullingInfo);
 				return VK_ERROR_UNKNOWN;
 		}
 
@@ -397,9 +428,9 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
 												 commandBuffer,
-												 buffers.map.shadedDrawInfo,
+												 buffers.map.unculledShadedDrawInfo,
 												 &shadedDrawInfoBufferWriteInfo),
-						   "Failed to write data to map shaded draw info buffer!");
+						   "Failed to write data to unculled map shaded draw info buffer!");
 	const LunaBufferWriteInfo unshadedDrawInfoBufferWriteInfo = {
 		.bytes = unshadedDrawInfoBufferSize,
 		.data = unshadedDrawInfo,
@@ -407,15 +438,125 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
 												 commandBuffer,
-												 buffers.map.unshadedDrawInfo,
+												 buffers.map.unculledUnshadedDrawInfo,
 												 &unshadedDrawInfoBufferWriteInfo),
-						   "Failed to write data to map unshaded draw info buffer!");
+						   "Failed to write data to unculled map unshaded draw info buffer!");
+	VulkanTestReturnResult(lunaWriteUintToBuffer(device,
+												 commandBuffer,
+												 buffers.map.shadedCullingInfo,
+												 0,
+												 shadedMaterialCount,
+												 NULL),
+						   "Failed to write map shaded culling info count to buffer!");
+	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
+		.bytes = shadedMaterialCount * sizeof(ModelCullingInfo),
+		.data = shadedCullingInfo,
+		.offset = sizeof(uint32_t),
+		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.map.shadedCullingInfo,
+												 &shadedCullingInfoBufferWriteInfo),
+						   "Failed to write data to map shaded culling info buffer!");
+	VulkanTestReturnResult(lunaWriteUintToBuffer(device,
+												 commandBuffer,
+												 buffers.map.unshadedCullingInfo,
+												 0,
+												 unshadedMaterialCount,
+												 NULL),
+						   "Failed to write map unshaded culling info count to buffer!");
+	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
+		.bytes = unshadedMaterialCount * sizeof(ModelCullingInfo),
+		.data = unshadedCullingInfo,
+		.offset = sizeof(uint32_t),
+		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.map.unshadedCullingInfo,
+												 &unshadedCullingInfoBufferWriteInfo),
+						   "Failed to write data to map unshaded culling info buffer!");
 
 	free(vertices);
 	free(indices);
 	free(textureIndices);
 	free(shadedDrawInfo);
 	free(unshadedDrawInfo);
+	free(shadedCullingInfo);
+	free(unshadedCullingInfo);
+
+	const LunaDescriptorBufferInfo cullingInfoBuffers[] = {
+		{
+			.buffer = buffers.map.shadedCullingInfo,
+		},
+		{
+			.buffer = buffers.map.unshadedCullingInfo,
+		},
+	};
+	const LunaWriteDescriptorSet cullingInfoWrite = {
+		.descriptorSet = descriptorSets.culling.set,
+		.bindingName = "Cull Info",
+		.descriptorArrayElement = 0,
+		.descriptorCount = 2,
+		.bufferInfos = cullingInfoBuffers,
+	};
+	const LunaDescriptorBufferInfo unculledDrawInfoBuffers[] = {
+		{
+			.buffer = buffers.map.unculledShadedDrawInfo,
+		},
+		{
+			.buffer = buffers.map.unculledUnshadedDrawInfo,
+		},
+	};
+	const LunaWriteDescriptorSet unculledDrawInfoWrite = {
+		.descriptorSet = descriptorSets.culling.set,
+		.bindingName = "Unculled Draw Info",
+		.descriptorArrayElement = 0,
+		.descriptorCount = 2,
+		.bufferInfos = unculledDrawInfoBuffers,
+	};
+	const LunaDescriptorBufferInfo drawInfoBuffers[] = {
+		{
+			.buffer = buffers.map.shadedDrawInfo,
+		},
+		{
+			.buffer = buffers.map.unshadedDrawInfo,
+		},
+	};
+	const LunaWriteDescriptorSet drawInfoWrite = {
+		.descriptorSet = descriptorSets.culling.set,
+		.bindingName = "Output Draw Info",
+		.descriptorArrayElement = 0,
+		.descriptorCount = 2,
+		.bufferInfos = drawInfoBuffers,
+	};
+	lunaWriteDescriptorSets(device,
+							3,
+							(LunaWriteDescriptorSet[]){cullingInfoWrite, unculledDrawInfoWrite, drawInfoWrite});
+
+	const LunaBufferMemoryBarrier memoryBarriers[] = {
+		{
+			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
+			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+			.buffer = buffers.map.shadedCullingInfo,
+		},
+		{
+			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
+			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+			.buffer = buffers.map.unshadedCullingInfo,
+		},
+	};
+	const LunaDependencyInfo dependencyInfo = {
+		.bufferMemoryBarrierCount = sizeof(memoryBarriers) / sizeof(*memoryBarriers),
+		.bufferMemoryBarriers = memoryBarriers,
+	};
+	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &dependencyInfo),
+						   "Failed to insert pipeline barrier after writing map data!");
 
 	return VK_SUCCESS;
 }
@@ -484,7 +625,7 @@ static inline VkResult LoadLightmap(const Map *map)
 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 	};
 	const LunaWriteDescriptorSet writeDescriptor = {
-		.descriptorSet = descriptorSet,
+		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Lightmap",
 		.descriptorCount = 1,
 		.imageInfos = &imageInfo,
@@ -544,6 +685,7 @@ static inline VkResult LoadLights(const Map *map)
 				continue;
 		}
 
+		// The allocation for lights is not aligned so we just memcpy
 		memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
 	}
 
@@ -578,7 +720,7 @@ static inline VkResult LoadLights(const Map *map)
 		.buffer = buffers.uniforms.lights,
 	};
 	const LunaWriteDescriptorSet descriptorSetWrite = {
-		.descriptorSet = descriptorSet,
+		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Lights",
 		.descriptorCount = 1,
 		.bufferInfos = &bufferInfo,
@@ -629,11 +771,12 @@ static inline VkResult DrawSky(const LunaGraphicsPipelineBindInfo *pipelineBindI
 static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
 							   const LunaGraphicsPipeline shadowMapsPipeline)
 {
-	const size_t shadedDrawCount = lunaGetBufferSize(buffers.map.shadedDrawInfo) / sizeof(VkDrawIndexedIndirectCommand);
-	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.map.unshadedDrawInfo) /
-									 sizeof(VkDrawIndexedIndirectCommand);
+	const size_t maxShadedDrawCount = lunaGetBufferSize(buffers.map.unculledShadedDrawInfo) /
+									  sizeof(VkDrawIndexedIndirectCommand);
+	const size_t maxUnshadedDrawCount = lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo) /
+										sizeof(VkDrawIndexedIndirectCommand);
 
-	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
+	if (maxShadedDrawCount != 0 || maxUnshadedDrawCount != 0)
 	{
 		VulkanTestReturnResult(lunaBindVertexBuffers(device,
 													 commandBuffer,
@@ -651,27 +794,54 @@ static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindI
 		}
 	}
 
-	if (shadedDrawCount != 0)
+	if (maxShadedDrawCount != 0)
 	{
-		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.shadedMap,
-			.pipelineBindInfo = pipelineBindInfo,
-			.buffer = buffers.map.shadedDrawInfo,
-			.drawCount = shadedDrawCount,
-		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo), "Failed to draw shaded map!");
+		if (shadowMapsPipeline)
+		{
+			const LunaDrawIndexedIndirectInfo drawInfo = {
+				.pipeline = shadowMapsPipeline,
+				.pipelineBindInfo = pipelineBindInfo,
+				.buffer = buffers.map.unculledShadedDrawInfo,
+				.drawCount = maxShadedDrawCount,
+			};
+			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+								   "Failed to draw shaded map!");
+		} else
+		{
+			const LunaDrawIndexedIndirectCountInfo drawInfo = {
+				.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.shadedMap,
+				.pipelineBindInfo = pipelineBindInfo,
+				.buffer = buffers.map.shadedDrawInfo,
+				.maxDrawCount = maxShadedDrawCount,
+			};
+			VulkanTestReturnResult(lunaDrawIndexedIndirectCount(device, commandBuffer, &drawInfo),
+								   "Failed to draw shaded map!");
+		}
 	}
 
-	if (unshadedDrawCount != 0)
+	if (maxUnshadedDrawCount != 0)
 	{
-		const LunaDrawIndexedIndirectInfo drawInfo = {
-			.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.unshadedMap,
-			.pipelineBindInfo = pipelineBindInfo,
-			.buffer = buffers.map.unshadedDrawInfo,
-			.drawCount = unshadedDrawCount,
-		};
-		VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-							   "Failed to draw unshaded map!");
+		if (shadowMapsPipeline)
+		{
+			const LunaDrawIndexedIndirectInfo drawInfo = {
+				.pipeline = shadowMapsPipeline,
+				.pipelineBindInfo = pipelineBindInfo,
+				.buffer = buffers.map.unculledUnshadedDrawInfo,
+				.drawCount = maxUnshadedDrawCount,
+			};
+			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
+								   "Failed to draw unshaded map!");
+		} else
+		{
+			const LunaDrawIndexedIndirectCountInfo drawInfo = {
+				.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.unshadedMap,
+				.pipelineBindInfo = pipelineBindInfo,
+				.buffer = buffers.map.unshadedDrawInfo,
+				.maxDrawCount = maxUnshadedDrawCount,
+			};
+			VulkanTestReturnResult(lunaDrawIndexedIndirectCount(device, commandBuffer, &drawInfo),
+								   "Failed to draw unshaded map!");
+		}
 	}
 
 	return VK_SUCCESS;
@@ -978,7 +1148,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
 		.descriptorSetCount = 1,
-		.descriptorSets = &descriptorSet,
+		.descriptorSets = &descriptorSets.common.set,
 	};
 	VulkanTestReturnResult(lunaBindDescriptorSets(device,
 												  commandBuffer,
@@ -1258,6 +1428,33 @@ static inline bool HandleRendererQueuedActions()
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 	}
+	if (rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_SHADERS)
+	{
+		lunaDestroyComputePipeline(device, pipelines.culling);
+		lunaDestroyGraphicsPipeline(device, pipelines.ui);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadedMap);
+		lunaDestroyGraphicsPipeline(device, pipelines.unshadedMap);
+		lunaDestroyGraphicsPipeline(device, pipelines.sky);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadedModel);
+		lunaDestroyGraphicsPipeline(device, pipelines.unshadedModel);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadedActorModel);
+		lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorModel);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
+		lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
+		lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
+
+		if (!CreateCullingPipeline())
+		{
+			return false;
+		}
+		if (!CreateGraphicsPipelines())
+		{
+			return false;
+		}
+		VulkanTest(CreateShadowMapGraphicsPipelines(), "Failed to create shadow map graphics pipelines");
+
+		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_SHADERS;
+	}
 
 	return true;
 }
@@ -1280,7 +1477,7 @@ bool VK_Init(SDL_Window *window)
 	LogDebug("Initializing Vulkan renderer...\n");
 	// clang-format off
 	if (CreateSurface(window) && CreateLogicalDevice() && CreateCommandBuffers() && CreateSwapchain() &&
-		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
+		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateCullingPipeline() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
 		CreateDescriptorSet() && CreateBuffers())
 	{
 		WriteDescriptorSet();
@@ -1408,7 +1605,7 @@ bool VK_FrameStart()
 	return true;
 }
 
-bool VK_RenderMap(Map *map, const Camera *camera)
+bool VK_RenderMap(Map *map, Camera *camera)
 {
 	if (map != loadedMap)
 	{
@@ -1426,6 +1623,10 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 
 	VulkanTest(UpdateShadowMaps(map), "Failed to update shadow maps!");
 
+	VulkanTest(UpdateViewModelMatrix(&map->viewmodel), "Failed to update viewmodel transform matrix!");
+
+	VulkanTest(CullModels(), "Failed to cull models!");
+
 	const VkExtent2D extent = lunaGetSwapchainExtent();
 	const LunaRenderPassBeginInfo beginInfo = {
 		.renderArea.extent = extent,
@@ -1433,8 +1634,6 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 	};
 	VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
 	renderPassStarted = true;
-
-	VulkanTest(UpdateViewModelMatrix(&map->viewmodel), "Failed to update viewmodel transform matrix!");
 
 	const VkViewport viewport = {
 		.width = (float)extent.width,
@@ -1462,14 +1661,14 @@ bool VK_RenderMap(Map *map, const Camera *camera)
 			.bindInfo.scissorBindInfo = &scissorBindInfo,
 		},
 	};
-	const LunaDescriptorSet descriptorSets[] = {
-		descriptorSet,
-		spotLightShadowMapsDescriptorSet,
-		pointLightShadowMapsDescriptorSet,
+	const LunaDescriptorSet descriptorSetHandles[] = {
+		descriptorSets.common.set,
+		descriptorSets.spotLightShadowMaps.set,
+		descriptorSets.pointLightShadowMaps.set,
 	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
 		.descriptorSetBindInfo.descriptorSetCount = 3,
-		.descriptorSetBindInfo.descriptorSets = descriptorSets,
+		.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
 		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
@@ -1569,14 +1768,14 @@ bool VK_FrameEnd()
 				.bindInfo.scissorBindInfo = &scissorBindInfo,
 			},
 		};
-		const LunaDescriptorSet descriptorSets[] = {
-			descriptorSet,
-			spotLightShadowMapsDescriptorSet,
-			pointLightShadowMapsDescriptorSet,
+		const LunaDescriptorSet descriptorSetHandles[] = {
+			descriptorSets.common.set,
+			descriptorSets.spotLightShadowMaps.set,
+			descriptorSets.pointLightShadowMaps.set,
 		};
 		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
 			.descriptorSetBindInfo.descriptorSetCount = 3,
-			.descriptorSetBindInfo.descriptorSets = descriptorSets,
+			.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
 			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 			.dynamicStates = dynamicStateBindInfos,
 		};

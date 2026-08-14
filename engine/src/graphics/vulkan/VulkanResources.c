@@ -24,6 +24,58 @@
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
+static inline VkResult CreateModelBuffer(ModelBuffer *buffer, const char *usage)
+{
+	static const LunaBufferCreationInfo VERTEX_BUFFER_CREATION_INFO = {
+		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	static const LunaBufferCreationInfo INDEX_BUFFER_CREATION_INFO = {
+		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	static const LunaBufferCreationInfo DRAW_INFO_BUFFER_CREATION_INFO = {
+		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	static const LunaBufferCreationInfo CULLING_INFO_BUFFER_CREATION_INFO = {
+		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &VERTEX_BUFFER_CREATION_INFO, &buffer->vertices),
+						   "Failed to create shaded %s vertex buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &INDEX_BUFFER_CREATION_INFO, &buffer->indices),
+						   "Failed to create shaded %s index buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &VERTEX_BUFFER_CREATION_INFO, &buffer->instanceData),
+						   "Failed to create shaded %s instance data buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &DRAW_INFO_BUFFER_CREATION_INFO, &buffer->unculledShadedDrawInfo),
+						   "Failed to create shaded %s unculled draw info buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &DRAW_INFO_BUFFER_CREATION_INFO, &buffer->unculledUnshadedDrawInfo),
+						   "Failed to create unshaded %s unculled draw info buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &DRAW_INFO_BUFFER_CREATION_INFO, &buffer->shadedDrawInfo),
+						   "Failed to create shaded %s draw info buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &DRAW_INFO_BUFFER_CREATION_INFO, &buffer->unshadedDrawInfo),
+						   "Failed to create unshaded %s draw info buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &CULLING_INFO_BUFFER_CREATION_INFO, &buffer->shadedCullingInfo),
+						   "Failed to create %s shaded materials culling info buffer!",
+						   usage);
+	VulkanTestReturnResult(lunaCreateBuffer(device, &CULLING_INFO_BUFFER_CREATION_INFO, &buffer->unshadedCullingInfo),
+						   "Failed to create %s unshaded materials culling info buffer!",
+						   usage);
+	return VK_SUCCESS;
+}
+
 static inline VkResult CreateUiBuffers()
 {
 	static const uint32_t MAX_UI_QUADS_INIT = 8192;
@@ -88,47 +140,14 @@ static inline VkResult CreateUniformBuffers()
 	};
 	VulkanTestReturnResult(lunaCreateBuffer(device, &fogBufferCreationInfo, &buffers.uniforms.fog),
 						   "Failed to create fog uniform buffer!");
-
-	return VK_SUCCESS;
-}
-
-static inline VkResult CreateMapBuffers()
-{
-	const LunaBufferCreationInfo verticesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	const LunaBufferCreationInfo lightsBufferCreationInfo = {
+		.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment,
+		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.map.vertices),
-						   "Failed to create shaded map vertex buffer!");
-	const LunaBufferCreationInfo indicesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.map.indices),
-						   "Failed to create shaded map index buffer!");
-	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.map.instanceData),
-						   "Failed to create shaded map instance data buffer!");
-	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &shadedDrawInfoBufferCreationInfo, &buffers.map.shadedDrawInfo),
-						   "Failed to create shaded map draw info buffer!");
-	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &unshadedDrawInfoBufferCreationInfo, &buffers.map.unshadedDrawInfo),
-						   "Failed to create unshaded map draw info buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(device, &lightsBufferCreationInfo, &buffers.uniforms.lights),
+						   "Failed to create lights buffer!");
 
 	return VK_SUCCESS;
 }
@@ -154,96 +173,6 @@ static inline VkResult CreateSkyBuffers()
 	};
 	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.sky.indices),
 						   "Failed to create sky index buffer!");
-
-	return VK_SUCCESS;
-}
-
-static inline VkResult CreateViewmodelBuffers()
-{
-	const LunaBufferCreationInfo verticesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.viewmodel.vertices),
-						   "Failed to create shaded viewmodel vertex buffer!");
-	const LunaBufferCreationInfo indicesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.viewmodel.indices),
-						   "Failed to create shaded viewmodel index buffer!");
-	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.viewmodel.instanceData),
-						   "Failed to create shaded viewmodel instance data buffer!");
-	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device,
-											&shadedDrawInfoBufferCreationInfo,
-											&buffers.viewmodel.shadedDrawInfo),
-						   "Failed to create shaded viewmodel draw info buffer!");
-	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device,
-											&unshadedDrawInfoBufferCreationInfo,
-											&buffers.viewmodel.unshadedDrawInfo),
-						   "Failed to create unshaded viewmodel draw info buffer!");
-
-	return VK_SUCCESS;
-}
-
-static inline VkResult CreateActorModelBuffers()
-{
-	const LunaBufferCreationInfo verticesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &verticesBufferCreationInfo, &buffers.actorModels.vertices),
-						   "Failed to create shaded actor models vertex buffer!");
-	const LunaBufferCreationInfo indicesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.actorModels.indices),
-						   "Failed to create shaded actor models index buffer!");
-	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.actorModels.instanceData),
-						   "Failed to create shaded actor models instance data buffer!");
-	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device,
-											&shadedDrawInfoBufferCreationInfo,
-											&buffers.actorModels.shadedDrawInfo),
-						   "Failed to create shaded actor models draw info buffer!");
-	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device,
-											&unshadedDrawInfoBufferCreationInfo,
-											&buffers.actorModels.unshadedDrawInfo),
-						   "Failed to create unshaded actor models draw info buffer!");
 
 	return VK_SUCCESS;
 }
@@ -352,20 +281,6 @@ static inline VkResult CreateActorWallBuffers()
 											&unshadedInstanceDataBufferCreationInfo,
 											&buffers.actorWalls.unshadedInstanceData),
 						   "Failed to create unshaded actor walls instance data buffer!");
-
-	return VK_SUCCESS;
-}
-
-static inline VkResult CreateLightsBuffer()
-{
-	const LunaBufferCreationInfo creationInfo = {
-		.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment,
-		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTestReturnResult(lunaCreateBuffer(device, &creationInfo, &buffers.uniforms.lights),
-						   "Failed to create lights buffer!");
 
 	return VK_SUCCESS;
 }
@@ -549,12 +464,11 @@ bool CreateBuffers()
 {
 	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
 	VulkanTest(CreateUniformBuffers(), "Failed to create uniform buffers!");
-	VulkanTest(CreateMapBuffers(), "Failed to create map buffers!");
-	VulkanTest(CreateSkyBuffers(), "Failed to create sky buffers!");
-	VulkanTest(CreateViewmodelBuffers(), "Failed to create viewmodel buffers!");
-	VulkanTest(CreateActorModelBuffers(), "Failed to create actor models buffers!");
+	VulkanTest(CreateModelBuffer(&buffers.actorModels, "actor models"), "Failed to create actor models buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create actor wall buffers!");
-	VulkanTest(CreateLightsBuffer(), "Failed to create lights buffer!");
+	VulkanTest(CreateModelBuffer(&buffers.map, "map"), "Failed to create map buffers!");
+	VulkanTest(CreateModelBuffer(&buffers.viewmodel, "viewmodel"), "Failed to create viewmodel buffers!");
+	VulkanTest(CreateSkyBuffers(), "Failed to create sky buffers!");
 	VulkanTest(CreatePlayerBuffers(), "Failed to create player buffers!");
 	VulkanTest(CreateDebugDrawBuffers(), "Failed to create debug draw buffers!");
 
@@ -647,7 +561,7 @@ bool LoadTexture(const Image *image)
 		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 	};
 	const LunaWriteDescriptorSet writeDescriptor = {
-		.descriptorSet = descriptorSet,
+		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Textures",
 		.descriptorArrayElement = index,
 		.descriptorCount = 1,

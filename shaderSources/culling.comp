@@ -1,0 +1,45 @@
+#version 460
+
+#include "shared.inc.glsl"
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(push_constant) uniform PushConstants {
+    uint lightIndex;
+    uint faceIndex;
+    uint cascadeIndex;
+} pushConstants;
+
+layout(set = 1, binding = 0, scalar) readonly restrict buffer CullInfos {
+    uint count;
+    ModelCullInfo model[];
+} cullInfos[6];
+
+layout(set = 1, binding = 1, scalar) readonly restrict buffer UnculledDrawInfo {
+    VkDrawIndexedIndirectCommand drawInfos[];
+} unculledDrawInfo[6];
+
+layout(set = 1, binding = 2, scalar) restrict buffer DrawInfo {
+    uint drawCount;
+    VkDrawIndexedIndirectCommand drawInfos[];
+} drawInfo[6];
+
+bool IsVisible(const ModelCullInfo cullInfo) {
+    const vec3 center = (camera.viewMatrix * vec4(cullInfo.position, 1)).xyz;
+    return center.z + cullInfo.radius > camera.nearPlane && center.z - cullInfo.radius < camera.farPlane &&
+           center.z * camera.frustumPlanes[1] - abs(center.x) * camera.frustumPlanes[0] > -cullInfo.radius &&
+           center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -cullInfo.radius;
+}
+
+void main() {
+    const uint bufferIndex = gl_GlobalInvocationID.y;
+    const uint index = gl_GlobalInvocationID.x;
+    if (index >= cullInfos[nonuniformEXT(bufferIndex)].count) {
+        return;
+    }
+
+    if (IsVisible(cullInfos[nonuniformEXT(bufferIndex)].model[index])) {
+        const uint drawIndex = atomicAdd(drawInfo[nonuniformEXT(bufferIndex)].drawCount, 1);
+        drawInfo[nonuniformEXT(bufferIndex)].drawInfos[drawIndex] = unculledDrawInfo[nonuniformEXT(bufferIndex)].drawInfos[index];
+    }
+}

@@ -51,6 +51,10 @@ struct MapModel
 {
 	/// The material this model uses
 	MapMaterial *material;
+	/// The center of the bounding box of the model
+	Vector3 center;
+	/// The distance from the center of the bounding box to each side of the model
+	Vector3 halfExtent;
 	/// The number of vertices in this model
 	uint32_t vertexCount;
 	/// The vertices in this model
@@ -200,6 +204,6 @@ void GetActorsByName(const char *name, const Map *map, List *actors);
  * @param map The map to render
  * @param camera The camera to view from
  */
-void RenderMap(Map *map, const Camera *camera);
+void RenderMap(Map *map, Camera *camera);
 
 #endif //GAME_MAP_H

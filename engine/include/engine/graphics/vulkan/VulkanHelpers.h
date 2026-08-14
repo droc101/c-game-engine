@@ -94,6 +94,9 @@ typedef struct CameraUniform
 	mat4 transform;
 	mat4 view;
 	Vector3 position;
+	float nearPlane;
+	float farPlane;
+	float frustumPlanes[4];
 } CameraUniform;
 
 typedef struct GlobalLightingUniform
@@ -208,11 +211,19 @@ typedef struct ModelBuffer
 	/// A buffer containing the index data to use along-side the per-vertex data
 	LunaBuffer indices;
 	/// A buffer containing the instance data for each instance of each model section
-	LunaBuffer instanceData; //[FRAMES_IN_FLIGHT];
+	LunaBuffer instanceData;
 	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
-	LunaBuffer shadedDrawInfo; //[FRAMES_IN_FLIGHT];
+	LunaBuffer unculledShadedDrawInfo;
 	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
-	LunaBuffer unshadedDrawInfo; //[FRAMES_IN_FLIGHT];
+	LunaBuffer unculledUnshadedDrawInfo;
+	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
+	LunaBuffer shadedDrawInfo;
+	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
+	LunaBuffer unshadedDrawInfo;
+	/// A buffer containing information about each shaded material instance that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded material instance that is used for culling
+	LunaBuffer unshadedCullingInfo;
 } ModelBuffer;
 
 typedef struct SkyBuffer
@@ -255,13 +266,13 @@ typedef struct DebugDrawBuffer
 
 typedef struct Buffers
 {
-	UiBuffer ui; //[FRAMES_IN_FLIGHT];
-	UniformBuffers uniforms; //[FRAMES_IN_FLIGHT];
-	ModelBuffer viewmodel;
+	UiBuffer ui;
+	UniformBuffers uniforms;
 	ModelBuffer actorModels;
-	ModelBuffer map;
-	SkyBuffer sky;
 	ActorWallBuffer actorWalls;
+	ModelBuffer map;
+	ModelBuffer viewmodel;
+	SkyBuffer sky;
 	PlayerModelBuffer player;
 #ifdef JPH_DEBUG_RENDERER
 	DebugDrawBuffer debugDrawLines;
@@ -286,6 +297,8 @@ typedef struct DirectionalShadowMapPipelines
 
 typedef struct Pipelines
 {
+	LunaComputePipeline culling;
+
 	LunaGraphicsPipeline ui;
 	LunaGraphicsPipeline shadedMap;
 	LunaGraphicsPipeline unshadedMap;
@@ -323,6 +336,27 @@ typedef struct ShadowMapPushConstants
 	uint32_t faceIndex;
 	uint32_t cascadeIndex;
 } ShadowMapPushConstants;
+
+typedef struct DescriptorSet
+{
+	LunaDescriptorSetLayout layout;
+	LunaDescriptorSet set;
+} DescriptorSet;
+
+typedef struct DescriptorSets
+{
+	DescriptorSet common;
+	DescriptorSet culling;
+	DescriptorSet spotLightShadowMaps;
+	DescriptorSet pointLightShadowMaps;
+} DescriptorSets;
+
+typedef struct ModelCullingInfo
+{
+	Vector3 position;
+	float radius;
+	uint32_t castsShadows;
+} ModelCullingInfo;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -341,12 +375,7 @@ extern LunaRenderPass renderPass;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 extern TextureSamplers textureSamplers;
 extern LockingList textures;
-extern LunaDescriptorSetLayout descriptorSetLayout;
-extern LunaDescriptorSetLayout spotLightShadowMapsDescriptorSetLayout;
-extern LunaDescriptorSetLayout pointLightShadowMapsDescriptorSetLayout;
-extern LunaDescriptorSet descriptorSet;
-extern LunaDescriptorSet spotLightShadowMapsDescriptorSet;
-extern LunaDescriptorSet pointLightShadowMapsDescriptorSet;
+extern DescriptorSets descriptorSets;
 extern Buffers buffers;
 extern Pipelines pipelines;
 extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
@@ -377,11 +406,13 @@ VkResult CreateShadowMapRenderPass(const Map *map);
 
 VkResult CreateShadowMapGraphicsPipelines();
 
-VkResult UpdateCameraUniform(const Camera *camera);
+VkResult UpdateCameraUniform(Camera *camera);
 
 VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
 VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light);
+
+VkResult CullModels();
 
 void EnsureSpaceForUiElements(size_t quadCount);
 

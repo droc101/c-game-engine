@@ -50,6 +50,7 @@ enum RendererQueuedAction
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
 	QUEUED_ACTION_TOGGLE_VSYNC = 1 << 4,
 	QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION = 1 << 5,
+	QUEUED_ACTION_RELOAD_ALL_SHADERS = 1 << 6,
 };
 
 extern RendererQueuedAction rendererQueuedActions;

@@ -88,17 +88,24 @@ bool CreateLogicalDevice()
 	const LunaPhysicalDevicePreferenceDefinition devicePreferenceDefinition = {
 		.preferredDeviceType = preferred,
 	};
+	VkPhysicalDeviceSynchronization2Features synchronization2Features = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES,
+		.synchronization2 = VK_TRUE,
+	};
+	VkPhysicalDeviceVulkan12Features vulkan12Features = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+		.pNext = &synchronization2Features,
+		.drawIndirectCount = VK_TRUE,
+		.scalarBlockLayout = VK_TRUE,
+		.runtimeDescriptorArray = VK_TRUE,
+		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+		.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE,
+		.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
+	};
 	const VkPhysicalDeviceFeatures vulkan10Features = {
 		.samplerAnisotropy = VK_TRUE,
 		.multiDrawIndirect = VK_TRUE,
 		.drawIndirectFirstInstance = VK_TRUE,
-	};
-	VkPhysicalDeviceVulkan12Features vulkan12Features = {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-		.scalarBlockLayout = VK_TRUE,
-		.runtimeDescriptorArray = VK_TRUE,
-		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
-		.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
 	};
 	const VkPhysicalDeviceFeatures2 requiredFeatures = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
@@ -106,8 +113,9 @@ bool CreateLogicalDevice()
 		.features = vulkan10Features,
 	};
 	const LunaDeviceCreationInfo2 deviceCreationInfo = {
-		.extensionCount = 1,
-		.extensionNames = (const char *const[]){VK_KHR_SWAPCHAIN_EXTENSION_NAME},
+		.extensionCount = 2,
+		.extensionNames = (const char *const[]){VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+												VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME},
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
 		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
@@ -293,16 +301,16 @@ bool CreateRenderPass()
 	return true;
 }
 
-// TODO: Look into using alternative methods to remove the dependency on non-uniform indexing
 bool CreateDescriptorSetLayouts()
 {
+	// TODO: The hardcoded -5 is bug prone
 	const uint32_t freeResourceCount = physicalDeviceProperties.limits.maxPerStageResources - 5;
 	const uint32_t sampledImageCount = min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
 										   freeResourceCount);
 	const uint32_t textureCount = min(MAX_TEXTURES, sampledImageCount);
 	// TODO: This assert can actually be hit. We should account for the device limits when loading textures
 	assert(MAX_TEXTURES < sampledImageCount);
-	const LunaDescriptorSetLayoutBinding bindings[] = {
+	const LunaDescriptorSetLayoutBinding commonBindings[] = {
 		{
 			.bindingName = "Lightmap",
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -320,7 +328,7 @@ bool CreateDescriptorSetLayouts()
 			.bindingName = "Camera",
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
 			.bindingName = "Global Lighting",
@@ -338,7 +346,7 @@ bool CreateDescriptorSetLayouts()
 			.bindingName = "Lights",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
 			// Directional light shadow maps
@@ -349,14 +357,44 @@ bool CreateDescriptorSetLayouts()
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
 	};
-	const LunaDescriptorSetLayoutCreationInfo descriptorSetLayoutCreationInfo = {
+	const LunaDescriptorSetLayoutCreationInfo commonDescriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
-		.bindingCount = sizeof(bindings) / sizeof(*bindings),
-		.bindings = bindings,
+		.bindingCount = sizeof(commonBindings) / sizeof(*commonBindings),
+		.bindings = commonBindings,
 	};
-	VulkanTest(lunaCreateDescriptorSetLayout(device, &descriptorSetLayoutCreationInfo, &descriptorSetLayout),
-			   "Failed to create descriptor set layout!");
+	VulkanTest(lunaCreateDescriptorSetLayout(device,
+											 &commonDescriptorSetLayoutCreationInfo,
+											 &descriptorSets.common.layout),
+			   "Failed to create common descriptor set layout!");
 
+	const LunaDescriptorSetLayoutBinding cullingBindings[] = {
+		{
+			.bindingName = "Cull Info",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 6,
+			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		},
+		{
+			.bindingName = "Unculled Draw Info",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 6,
+			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		},
+		{
+			.bindingName = "Output Draw Info",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 6,
+			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		},
+	};
+	const LunaDescriptorSetLayoutCreationInfo cullingDescriptorSetLayoutCreationInfo = {
+		.bindingCount = sizeof(cullingBindings) / sizeof(*cullingBindings),
+		.bindings = cullingBindings,
+	};
+	VulkanTest(lunaCreateDescriptorSetLayout(device,
+											 &cullingDescriptorSetLayoutCreationInfo,
+											 &descriptorSets.culling.layout),
+			   "Failed to create culling descriptor set layout!");
 
 	const uint32_t shadowMapDescriptorSlots = freeResourceCount < textureCount ? 0 : freeResourceCount - textureCount;
 	shadowMapSlotsAvailable = min(min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
@@ -374,7 +412,7 @@ bool CreateDescriptorSetLayouts()
 	};
 	VulkanTest(lunaCreateDescriptorSetLayout(device,
 											 &spotLightShadowMapsDescriptorSetLayoutCreationInfo,
-											 &spotLightShadowMapsDescriptorSetLayout),
+											 &descriptorSets.spotLightShadowMaps.layout),
 			   "Failed to create spot light shadow maps descriptor set layout!");
 
 	const LunaDescriptorSetLayoutBinding pointLightShadowMapsBinding = {
@@ -389,7 +427,7 @@ bool CreateDescriptorSetLayouts()
 	};
 	VulkanTest(lunaCreateDescriptorSetLayout(device,
 											 &pointLightShadowMapsDescriptorSetLayoutCreationInfo,
-											 &pointLightShadowMapsDescriptorSetLayout),
+											 &descriptorSets.pointLightShadowMaps.layout),
 			   "Failed to create point light shadow maps descriptor set layout!");
 
 	return true;
@@ -559,12 +597,12 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 1,
+			.descriptorCount = 19,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
 		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
-		.maxSets = 3,
+		.maxSets = 4,
 		.poolSizeCount = sizeof(poolSizes) / sizeof(*poolSizes),
 		.poolSizes = poolSizes,
 	};
@@ -572,25 +610,24 @@ bool CreateDescriptorSet()
 			   "Failed to create descriptor pool!");
 
 	const LunaDescriptorSetLayout layouts[] = {
-		descriptorSetLayout,
-		spotLightShadowMapsDescriptorSetLayout,
-		pointLightShadowMapsDescriptorSetLayout,
+		descriptorSets.common.layout,
+		descriptorSets.culling.layout,
+		descriptorSets.spotLightShadowMaps.layout,
+		descriptorSets.pointLightShadowMaps.layout,
 	};
-	LunaDescriptorSet descriptorSets[] = {
-		descriptorSet,
-		spotLightShadowMapsDescriptorSet,
-		pointLightShadowMapsDescriptorSet,
+	LunaDescriptorSet *descriptorSetHandles[] = {
+		&descriptorSets.common.set,
+		&descriptorSets.culling.set,
+		&descriptorSets.spotLightShadowMaps.set,
+		&descriptorSets.pointLightShadowMaps.set,
 	};
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,
 		.setLayoutCount = sizeof(layouts) / sizeof(*layouts),
 		.setLayouts = layouts,
 	};
-	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, descriptorSets),
+	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, descriptorSetHandles),
 			   "Failed to allocate descriptor sets!");
-	descriptorSet = descriptorSets[0];
-	spotLightShadowMapsDescriptorSet = descriptorSets[1];
-	pointLightShadowMapsDescriptorSet = descriptorSets[2];
 
 	return true;
 }
@@ -601,7 +638,7 @@ void WriteDescriptorSet()
 		.buffer = buffers.uniforms.camera,
 	};
 	const LunaWriteDescriptorSet transformMatrixWrite = {
-		.descriptorSet = descriptorSet,
+		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Camera",
 		.descriptorCount = 1,
 		.bufferInfos = &transformMatrixBufferInfo,
@@ -610,7 +647,7 @@ void WriteDescriptorSet()
 		.buffer = buffers.uniforms.lighting,
 	};
 	const LunaWriteDescriptorSet lightingWrite = {
-		.descriptorSet = descriptorSet,
+		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Global Lighting",
 		.descriptorCount = 1,
 		.bufferInfos = &lightingBufferInfo,
@@ -619,7 +656,7 @@ void WriteDescriptorSet()
 		.buffer = buffers.uniforms.fog,
 	};
 	const LunaWriteDescriptorSet fogWrite = {
-		.descriptorSet = descriptorSet,
+		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Fog",
 		.descriptorCount = 1,
 		.bufferInfos = &fogBufferInfo,

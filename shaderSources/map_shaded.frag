@@ -81,7 +81,7 @@ void main() {
         discard;
     }
 	outColor.a = 1.0;
-    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), inDistance) + sampleLightmap(lightmap, inLightmapUV).rgb;
+    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), inDistance);// + sampleLightmap(lightmap, inLightmapUV).rgb;
 	float fogFactor = clamp((gl_FragCoord.z / gl_FragCoord.w - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);

@@ -194,3 +194,26 @@ void RestoreFd(const int modifiedFd, int *pipeFds, const int originalFd)
 	close(pipeFds[0]);
 #endif
 }
+
+void *AvxAlignedCalloc(const size_t size)
+{
+#ifdef __AVX__
+#ifdef WIN32
+	void *data = _aligned_malloc(32, size);
+#else
+	void *data = aligned_alloc(32, size);
+#endif
+	return memset(data, 0, size);
+#else
+	return calloc(1, size);
+#endif
+}
+
+void AvxAlignedFree(void *data)
+{
+#if defined(__AVX__) && defined(WIN32)
+	_aligned_free(data);
+#else
+	free(data);
+#endif
+}

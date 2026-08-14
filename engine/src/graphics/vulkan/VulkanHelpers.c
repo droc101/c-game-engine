@@ -55,30 +55,12 @@ LunaSemaphore semaphore = LUNA_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
 VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 LunaRenderPass renderPass = LUNA_NULL_HANDLE;
-uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
-TextureSamplers textureSamplers = {
-	.linearRepeatAnisotropy = LUNA_NULL_HANDLE,
-	.linearNoRepeatAnisotropy = LUNA_NULL_HANDLE,
-	.linearRepeatNoAnisotropy = LUNA_NULL_HANDLE,
-	.nearestRepeatNoAnisotropy = LUNA_NULL_HANDLE,
-	.linearNoRepeatNoAnisotropy = LUNA_NULL_HANDLE,
-	.nearestNoRepeatNoAnisotropy = LUNA_NULL_HANDLE,
-};
+uint32_t imageAssetIdToIndexMap[MAX_TEXTURES]; // Gets memset
+TextureSamplers textureSamplers = {0};
 LockingList textures = {0};
-LunaDescriptorSetLayout descriptorSetLayout = LUNA_NULL_HANDLE;
-LunaDescriptorSetLayout spotLightShadowMapsDescriptorSetLayout = LUNA_NULL_HANDLE;
-LunaDescriptorSetLayout pointLightShadowMapsDescriptorSetLayout = LUNA_NULL_HANDLE;
-LunaDescriptorSet descriptorSet = LUNA_NULL_HANDLE;
-LunaDescriptorSet spotLightShadowMapsDescriptorSet = LUNA_NULL_HANDLE;
-LunaDescriptorSet pointLightShadowMapsDescriptorSet = LUNA_NULL_HANDLE;
+DescriptorSets descriptorSets = {0};
 Buffers buffers = {0};
-Pipelines pipelines = {
-	.ui = LUNA_NULL_HANDLE,
-#ifdef JPH_DEBUG_RENDERER
-	.debugDrawLines = LUNA_NULL_HANDLE,
-	.debugDrawTriangles = LUNA_NULL_HANDLE,
-#endif
-};
+Pipelines pipelines = {0};
 uint32_t pendingTasks = 0;
 uint32_t skyTextureIndex = 0;
 uint32_t shadowMapSlotsAvailable = 0;
@@ -450,7 +432,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 																								1)),
 								   "Failed to create spot light shadow map framebuffer!");
 
-			shadowMapDescriptorWrite.descriptorSet = spotLightShadowMapsDescriptorSet;
+			shadowMapDescriptorWrite.descriptorSet = descriptorSets.spotLightShadowMaps.set;
 			shadowMapDescriptorWrite.descriptorArrayElement = spotLightCount++;
 			shadowMapDescriptorWrite.descriptorCount = 1;
 			shadowMapImageInfos->sampler = textureSamplers.spotLightShadowMaps;
@@ -489,7 +471,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 
 				shadowMapImageInfos[cascade].image = *image;
 			}
-			shadowMapDescriptorWrite.descriptorSet = descriptorSet;
+			shadowMapDescriptorWrite.descriptorSet = descriptorSets.common.set;
 			shadowMapDescriptorWrite.descriptorArrayElement = 0;
 			shadowMapDescriptorWrite.descriptorCount = 4;
 			shadowMapImageInfos->sampler = textureSamplers.spotLightShadowMaps;
@@ -538,7 +520,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 																									1)),
 									   "Failed to create point light shadow map framebuffer!");
 			}
-			shadowMapDescriptorWrite.descriptorSet = pointLightShadowMapsDescriptorSet;
+			shadowMapDescriptorWrite.descriptorSet = descriptorSets.pointLightShadowMaps.set;
 			shadowMapDescriptorWrite.descriptorArrayElement = pointLightCount++;
 			shadowMapDescriptorWrite.descriptorCount = 1;
 			shadowMapImageInfos->sampler = textureSamplers.pointLightShadowMaps;
@@ -550,15 +532,37 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	return VK_SUCCESS;
 }
 
-VkResult UpdateCameraUniform(const Camera *camera)
+VkResult UpdateCameraUniform(Camera *camera)
 {
-	mat4 perspectiveMatrix;
-	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
-	glm_perspective_lh_zo(glm_rad(camera->fov),
-						  windowSize.x / windowSize.y,
-						  camera->farPlane,
-						  camera->nearPlane,
-						  perspectiveMatrix);
+	if (camera->recomputeCachedData)
+	{
+		const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
+		glm_perspective_lh_zo(glm_rad(camera->fov),
+							  windowSize.x / windowSize.y,
+							  camera->farPlane,
+							  camera->nearPlane,
+							  camera->projectionMatrix);
+
+		mat4 transposed;
+		glm_mat4_transpose_to(camera->projectionMatrix, transposed);
+		vec4 frustumX;
+		vec4 frustumY;
+		glm_vec4_add(transposed[3], transposed[0], frustumX);
+		glm_vec4_add(transposed[3], transposed[1], frustumY);
+		glm_plane_normalize(frustumX);
+		glm_plane_normalize(frustumY);
+		camera->frustumPlanes[0] = frustumX[0];
+		camera->frustumPlanes[1] = frustumX[2];
+		camera->frustumPlanes[2] = frustumY[1];
+		camera->frustumPlanes[3] = frustumY[2];
+
+		uniform.nearPlane = camera->nearPlane;
+		uniform.farPlane = camera->farPlane;
+		uniform.frustumPlanes[0] = camera->frustumPlanes[0];
+		uniform.frustumPlanes[1] = camera->frustumPlanes[1];
+		uniform.frustumPlanes[2] = camera->frustumPlanes[2];
+		uniform.frustumPlanes[3] = camera->frustumPlanes[3];
+	}
 
 	versor rotationQuat;
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
@@ -569,7 +573,7 @@ VkResult UpdateCameraUniform(const Camera *camera)
 	vec3 cameraPosition = {camera->transform.position.x, camera->transform.position.y, camera->transform.position.z};
 	glm_quat_look(cameraPosition, rotationQuat, uniform.view);
 
-	glm_mat4_mul(perspectiveMatrix, uniform.view, uniform.transform);
+	glm_mat4_mul(camera->projectionMatrix, uniform.view, uniform.transform);
 	uniform.position = camera->transform.position;
 	const LunaBufferWriteInfo bufferWriteInfo = {
 		.bytes = sizeof(CameraUniform),
@@ -718,6 +722,90 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),
 						   "Failed to write directional light cascade transform matrices to buffer!");
+
+	return VK_SUCCESS;
+}
+
+VkResult CullModels()
+{
+	VulkanTestReturnResult(lunaWriteUintToBuffer(device, commandBuffer, buffers.map.shadedDrawInfo, 0, 0, NULL),
+						   "Failed to zero draw count in map shaded draw info buffer!");
+	VulkanTestReturnResult(lunaWriteUintToBuffer(device, commandBuffer, buffers.map.unshadedDrawInfo, 0, 0, NULL),
+						   "Failed to zero draw count in map unshaded draw info buffer!");
+
+	const LunaBufferMemoryBarrier preDispatchMemoryBarriers[] = {
+		{
+			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
+			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+			.buffer = buffers.map.shadedCullingInfo,
+		},
+		{
+			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
+			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+			.buffer = buffers.map.unshadedCullingInfo,
+		},
+	};
+	const LunaDependencyInfo preDispatchDependencyInfo = {
+		.bufferMemoryBarrierCount = sizeof(preDispatchMemoryBarriers) / sizeof(*preDispatchMemoryBarriers),
+		.bufferMemoryBarriers = preDispatchMemoryBarriers,
+	};
+	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
+						   "Failed to insert pipeline barrier before culling shader!");
+
+	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.culling.set};
+	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
+		.descriptorSetCount = 2,
+		.descriptorSets = descriptorSetHandles,
+	};
+	const LunaDispatchInfo dispatchInfo = {
+		.pipeline = pipelines.culling,
+		.descriptorSetBindInfo = &descriptorSetBindInfo,
+		.groupCountX = 16,
+		.groupCountY = 2,
+	};
+	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
+
+	const LunaBufferMemoryBarrier postDispatchMemoryBarriers[] = {
+		{
+			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+			.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
+			.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+			.buffer = buffers.map.shadedDrawInfo,
+		},
+		{
+			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+			.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
+			.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+			.buffer = buffers.map.unshadedDrawInfo,
+		},
+		// {
+		// 	.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		// 	.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
+		// 	.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
+		// 	.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+		// 	.buffer = buffers.actorModels.shadedDrawInfo,
+		// },
+		// {
+		// 	.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		// 	.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
+		// 	.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
+		// 	.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+		// 	.buffer = buffers.actorModels.unshadedDrawInfo,
+		// },
+		// // Actor walls barriers
+	};
+	const LunaDependencyInfo postDispatchDependencyInfo = {
+		.bufferMemoryBarrierCount = sizeof(postDispatchMemoryBarriers) / sizeof(*postDispatchMemoryBarriers),
+		.bufferMemoryBarriers = postDispatchMemoryBarriers,
+	};
+	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &postDispatchDependencyInfo),
+						   "Failed to insert pipeline barrier after culling shader!");
 
 	return VK_SUCCESS;
 }

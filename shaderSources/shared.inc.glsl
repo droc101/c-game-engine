@@ -4,6 +4,11 @@
 #extension GL_EXT_scalar_block_layout : require
 #extension GL_EXT_nonuniform_qualifier : require
 
+struct Transform {
+    vec3 position;
+    vec4 rotation;
+};
+
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;
 const uint LIGHT_TYPE_AREA = 2u;
@@ -11,8 +16,7 @@ const uint LIGHT_TYPE_DIRECTIONAL = 3u;
 
 struct Light {
     uint type; // Maps to an enum in C
-    vec3 position;
-    vec4 rotation;
+    Transform transform;
     vec3 negativeForwardDirection;
     vec3 color;
     float brightness;
@@ -23,48 +27,35 @@ struct Light {
     float brightAngle; // 0-90 degrees
     float fadingAngle;
     uint shadowMapIndex;
-    float _padding[2];
+	float nearPlane;
+	float farPlane;
 	mat4 transformMatrix;
+    float frustumPlanes[4];
+    float _padding[4];
+};
+
+struct ModelCullInfo {
+    vec3 position;
+    float radius;
+    uint castsShadows;
+};
+
+struct VkDrawIndexedIndirectCommand {
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int vertexOffset;
+    uint firstInstance; // TODO: If I can avoid writing this for map it will improve performance
 };
 
 const vec2 MAGIC_XY = vec2(0.06711056, 0.00583715);
 const float MAGIC_Z = 52.9829189;
 
-const mat4 transforms[6] = {
-	mat4(
-         0,  0,  1,  0,
-         0, -1,  0,  0,
-         1,  0,  0,  0,
-         0,  0,  0,  1
-	),
-    mat4(
-         0,  0, -1,  0,
-         0, -1,  0,  0,
-        -1,  0,  0,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-         1,  0,  0,  0,
-         0,  0,  1,  0,
-         0, -1,  0,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-         1,  0,  0,  0,
-         0,  0, -1,  0,
-         0,  1,  0,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-         1,  0,  0,  0,
-         0, -1,  0,  0,
-         0,  0, -1,  0,
-         0,  0,  0,  1
-	),
-	mat4(
-        -1,  0,  0,  0,
-         0, -1,  0,  0,
-         0,  0,  1,  0,
-         0,  0,  0,  1
-	),
-};
+layout(binding = 2, scalar) readonly restrict uniform CameraBuffer {
+	mat4 transformMatrix;
+	mat4 viewMatrix;
+	vec3 position;
+    float nearPlane;
+    float farPlane;
+    float frustumPlanes[4];
+} camera;

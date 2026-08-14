@@ -282,9 +282,9 @@ void RenderHUD()
 	}
 }
 
-void RenderMap3D(Map *map, const Camera *cam)
+void RenderMap3D(Map *map, Camera *camera)
 {
 	PhysicsThreadLockTickMutex();
-	VK_RenderMap(map, cam);
+	VK_RenderMap(map, camera);
 	PhysicsThreadUnlockTickMutex();
 }

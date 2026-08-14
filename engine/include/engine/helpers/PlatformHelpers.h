@@ -7,6 +7,7 @@
 
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 /**
  * Attempt to set Win32 DWM window attributes (dark mode, square corners)
@@ -47,5 +48,9 @@ bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
  * @note the read-side of the pipe will be closed by this function
  */
 void RestoreFd(int modifiedFd, int *pipeFds, int originalFd);
+
+void *AvxAlignedCalloc(size_t size);
+
+void AvxAlignedFree(void *data);
 
 #endif //PLATFORMHELPERS_H

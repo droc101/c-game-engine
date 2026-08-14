@@ -1699,12 +1699,43 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 	return VK_SUCCESS;
 }
 
+bool CreateCullingPipeline()
+{
+	shadowMapPushConstantRange.dataPointer = &shadowMapPushConstants;
+
+	const LunaDescriptorSetLayout layouts[] = {
+		descriptorSets.common.layout,
+		descriptorSets.culling.layout,
+	};
+	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
+		.descriptorSetLayoutCount = 2,
+		.descriptorSetLayouts = layouts,
+		.pushConstantRangeCount = 1,
+		.pushConstantsRanges = &shadowMapPushConstantRange,
+	};
+	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
+	VulkanTestReturnResult(CreateShaderModule(SHADER("culling_c"), SHADER_TYPE_COMP, &shaderModule),
+						   "Failed to load culling shader!");
+	const LunaPipelineShaderStageCreationInfo shaderStageCreationInfo = {
+		.stage = VK_SHADER_STAGE_COMPUTE_BIT,
+		.module = shaderModule,
+	};
+	const LunaComputePipelineCreationInfo creationInfo = {
+		.shaderStageCreationInfo = shaderStageCreationInfo,
+		.layoutCreationInfo = layoutCreationInfo,
+	};
+	VulkanTest(lunaCreateComputePipeline(device, &creationInfo, &pipelines.culling),
+			   "Failed to create culling pipeline!");
+
+	return true;
+}
+
 bool CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
-	descriptorSetLayouts[0] = descriptorSetLayout;
-	descriptorSetLayouts[1] = spotLightShadowMapsDescriptorSetLayout;
-	descriptorSetLayouts[2] = pointLightShadowMapsDescriptorSetLayout;
+	descriptorSetLayouts[0] = descriptorSets.common.layout;
+	descriptorSetLayouts[1] = descriptorSets.spotLightShadowMaps.layout;
+	descriptorSetLayouts[2] = descriptorSets.pointLightShadowMaps.layout;
 
 	VulkanTest(CreateShaderModule(SHADER("model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
 			   "Failed to load shaded model fragment shader!");
@@ -1725,10 +1756,13 @@ bool CreateGraphicsPipelines()
 
 VkResult CreateShadowMapGraphicsPipelines()
 {
-	assert(spotLightShadowMapRenderPass != VK_NULL_HANDLE || pointLightShadowMapRenderPass != VK_NULL_HANDLE);
+	if (spotLightShadowMapRenderPass == VK_NULL_HANDLE && pointLightShadowMapRenderPass == VK_NULL_HANDLE)
+	{
+		return VK_SUCCESS;
+	}
 
 	shadowMapPushConstantRange.dataPointer = &shadowMapPushConstants;
-	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSetLayout;
+	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
 
 	VulkanTestReturnResult(CreateShaderModule(SHADER("spot_light_shadow_maps_f"),
 											  SHADER_TYPE_FRAG,

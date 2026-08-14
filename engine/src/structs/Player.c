@@ -18,6 +18,7 @@ void CreatePlayer(Map *map)
 	map->player.playerCamera.nearPlane = DEFAULT_NEAR_PLANE;
 	map->player.playerCamera.farPlane = DEFAULT_FAR_PLANE;
 	map->player.playerCamera.transform.rotation = JPH_Quat_Identity;
+	map->player.playerCamera.recomputeCachedData = true;
 
 	CreatePlayerPhysics(map);
 }
