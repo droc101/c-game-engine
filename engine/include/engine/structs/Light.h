@@ -37,11 +37,8 @@ struct Light
 	float brightAngle;
 	float fadingAngle;
 	uint32_t shadowMapIndex;
-	float nearPlane;
-	float farPlane;
+	float _padding[2];
 	CGLM_ALIGN_MAT mat4 transformMatrix;
-	float frustumPlanes[4];
-	float _padding[4];
 };
 
 #endif //GAME_LIGHT_H

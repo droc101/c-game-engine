@@ -1701,17 +1701,20 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 
 bool CreateCullingPipeline()
 {
-	shadowMapPushConstantRange.dataPointer = &shadowMapPushConstants;
-
 	const LunaDescriptorSetLayout layouts[] = {
 		descriptorSets.common.layout,
 		descriptorSets.culling.layout,
+	};
+	LunaPushConstantsRange pushConstantRange = {
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.size = sizeof(uint32_t),
+		.dataPointer = &frustumIndex,
 	};
 	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
 		.descriptorSetLayoutCount = 2,
 		.descriptorSetLayouts = layouts,
 		.pushConstantRangeCount = 1,
-		.pushConstantsRanges = &shadowMapPushConstantRange,
+		.pushConstantsRanges = &pushConstantRange,
 	};
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
 	VulkanTestReturnResult(CreateShaderModule(SHADER("culling_c"), SHADER_TYPE_COMP, &shaderModule),

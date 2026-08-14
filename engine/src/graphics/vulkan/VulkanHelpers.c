@@ -31,6 +31,7 @@
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaDevice.h>
+#include <luna/lunaDrawing.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaTypes.h>
 #include <math.h>
@@ -71,6 +72,7 @@ LunaImage pointLightShadowMapDepthAttachment = LUNA_NULL_HANDLE;
 List shadowMaps = {0};
 List shadowMapFramebuffers = {0};
 List pointLightShadowMapImageViews = {0};
+uint32_t frustumIndex = 0;
 
 static CameraUniform uniform;
 #pragma endregion variables
@@ -635,6 +637,7 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 
 	float depths[4];
 	mat4 matrices[4];
+	Frustum frustums[4];
 	float previousDistance = 0.0f;
 	for (uint32_t i = 0; i < 4; i++)
 	{
@@ -697,11 +700,28 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 		const bool yAligned = fabsf(light->negativeForwardDirection.x) < FLT_EPSILON &&
 							  fabsf(light->negativeForwardDirection.z) < FLT_EPSILON;
 		glm_lookat_lh_zo(eye, frustumCenter, yAligned ? GLM_XUP : GLM_YUP, viewMatrix);
-		mat4 perspectiveMatrix;
-		glm_ortho_lh_zo(radius, -radius, radius, -radius, radius * 2, 0, perspectiveMatrix);
+		mat4 projectionMatrix;
+		glm_ortho_lh_zo(radius, -radius, radius, -radius, radius * 2, 0, projectionMatrix);
 
 		depths[i] = nearPlane + distance * range;
-		glm_mat4_mul(perspectiveMatrix, viewMatrix, matrices[i]);
+		glm_mat4_mul(projectionMatrix, viewMatrix, matrices[i]);
+
+		mat4 transposed;
+		glm_mat4_transpose_to(projectionMatrix, transposed);
+		vec4 frustumX;
+		vec4 frustumY;
+		glm_vec4_add(transposed[3], transposed[0], frustumX);
+		glm_vec4_add(transposed[3], transposed[1], frustumY);
+		glm_plane_normalize(frustumX);
+		glm_plane_normalize(frustumY);
+
+		glm_mat4_copy(viewMatrix, frustums[i].viewMatrix);
+		frustums[i].nearPlane = 0;
+		frustums[i].farPlane = radius * 2;
+		frustums[i].frustumPlanes[0] = frustumX[0];
+		frustums[i].frustumPlanes[1] = frustumX[2];
+		frustums[i].frustumPlanes[2] = frustumY[1];
+		frustums[i].frustumPlanes[3] = frustumY[2];
 
 		previousDistance = distance;
 	}
@@ -722,6 +742,14 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),
 						   "Failed to write directional light cascade transform matrices to buffer!");
+	const LunaBufferWriteInfo frustumsWriteInfo = {
+		.bytes = sizeof(frustums),
+		.data = frustums,
+		.offset = sizeof(Frustum) * frustumIndex,
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumsWriteInfo),
+						   "Failed to write directional light frustums to buffer!");
 
 	return VK_SUCCESS;
 }
@@ -756,6 +784,8 @@ VkResult CullModels()
 	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
 						   "Failed to insert pipeline barrier before culling shader!");
 
+	VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, pipelines.culling),
+						   "Failed to push constants for culling pipeline!");
 	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.culling.set};
 	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
 		.descriptorSetCount = 2,

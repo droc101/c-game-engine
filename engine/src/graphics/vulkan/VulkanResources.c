@@ -152,6 +152,19 @@ static inline VkResult CreateUniformBuffers()
 	return VK_SUCCESS;
 }
 
+static inline VkResult CreateFrustumsBuffer()
+{
+	const LunaBufferCreationInfo creationInfo = {
+		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTestReturnResult(lunaCreateBuffer(device, &creationInfo, &buffers.frustums),
+						   "Failed to create frustums buffer!");
+
+	return VK_SUCCESS;
+}
+
 static inline VkResult CreateSkyBuffers()
 {
 	static const size_t SKY_MAX_VERTICES_INIT = 559;
@@ -464,6 +477,7 @@ bool CreateBuffers()
 {
 	VulkanTest(CreateUiBuffers(), "Failed to create UI buffers!");
 	VulkanTest(CreateUniformBuffers(), "Failed to create uniform buffers!");
+	VulkanTest(CreateFrustumsBuffer(), "Failed to create frustums buffer!");
 	VulkanTest(CreateModelBuffer(&buffers.actorModels, "actor models"), "Failed to create actor models buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create actor wall buffers!");
 	VulkanTest(CreateModelBuffer(&buffers.map, "map"), "Failed to create map buffers!");

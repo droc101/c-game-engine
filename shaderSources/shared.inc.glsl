@@ -27,11 +27,15 @@ struct Light {
     float brightAngle; // 0-90 degrees
     float fadingAngle;
     uint shadowMapIndex;
-	float nearPlane;
-	float farPlane;
+    float _padding[2];
 	mat4 transformMatrix;
+};
+
+struct Frustum {
+	mat4 viewMatrix;
+    float nearPlane;
+    float farPlane;
     float frustumPlanes[4];
-    float _padding[4];
 };
 
 struct ModelCullInfo {

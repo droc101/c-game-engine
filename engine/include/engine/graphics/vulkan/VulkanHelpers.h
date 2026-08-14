@@ -268,6 +268,7 @@ typedef struct Buffers
 {
 	UiBuffer ui;
 	UniformBuffers uniforms;
+	LunaBuffer frustums;
 	ModelBuffer actorModels;
 	ActorWallBuffer actorWalls;
 	ModelBuffer map;
@@ -357,6 +358,13 @@ typedef struct ModelCullingInfo
 	float radius;
 	uint32_t castsShadows;
 } ModelCullingInfo;
+
+typedef struct Frustum {
+	mat4 viewMatrix;
+	float nearPlane;
+	float farPlane;
+	float frustumPlanes[4];
+} Frustum;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -388,6 +396,7 @@ extern LunaImage pointLightShadowMapDepthAttachment;
 extern List shadowMaps;
 extern List shadowMapFramebuffers;
 extern List pointLightShadowMapImageViews;
+extern uint32_t frustumIndex;
 #pragma endregion variables
 
 bool ClearTextureCache();

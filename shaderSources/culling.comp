@@ -5,30 +5,39 @@
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 layout(push_constant) uniform PushConstants {
-    uint lightIndex;
-    uint faceIndex;
-    uint cascadeIndex;
+    uint frustumIndex;
 } pushConstants;
 
-layout(set = 1, binding = 0, scalar) readonly restrict buffer CullInfos {
+layout(set = 1, binding = 0, scalar) readonly restrict buffer Frustums {
+    Frustum frustums[];
+} frustums;
+layout(set = 1, binding = 1, scalar) readonly restrict buffer CullInfos {
     uint count;
     ModelCullInfo model[];
 } cullInfos[6];
 
-layout(set = 1, binding = 1, scalar) readonly restrict buffer UnculledDrawInfo {
+layout(set = 1, binding = 2, scalar) readonly restrict buffer UnculledDrawInfo {
     VkDrawIndexedIndirectCommand drawInfos[];
 } unculledDrawInfo[6];
 
-layout(set = 1, binding = 2, scalar) restrict buffer DrawInfo {
+layout(set = 1, binding = 3, scalar) restrict buffer DrawInfo {
     uint drawCount;
     VkDrawIndexedIndirectCommand drawInfos[];
 } drawInfo[6];
 
 bool IsVisible(const ModelCullInfo cullInfo) {
-    const vec3 center = (camera.viewMatrix * vec4(cullInfo.position, 1)).xyz;
-    return center.z + cullInfo.radius > camera.nearPlane && center.z - cullInfo.radius < camera.farPlane &&
-           center.z * camera.frustumPlanes[1] - abs(center.x) * camera.frustumPlanes[0] > -cullInfo.radius &&
-           center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -cullInfo.radius;
+    if (pushConstants.frustumIndex == -1) {
+        const vec3 center = (camera.viewMatrix * vec4(cullInfo.position, 1)).xyz;
+        return center.z + cullInfo.radius > camera.nearPlane && center.z - cullInfo.radius < camera.farPlane &&
+               center.z * camera.frustumPlanes[1] - abs(center.x) * camera.frustumPlanes[0] > -cullInfo.radius &&
+               center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -cullInfo.radius;
+    }
+
+    const Frustum frustum = frustums.frustums[pushConstants.frustumIndex];
+    const vec3 center = (frustum.viewMatrix * vec4(cullInfo.position, 1)).xyz;
+    return center.z + cullInfo.radius > frustum.nearPlane && center.z - cullInfo.radius < frustum.farPlane &&
+           center.z * frustum.frustumPlanes[1] - abs(center.x) * frustum.frustumPlanes[0] > -cullInfo.radius &&
+           center.z * frustum.frustumPlanes[3] - abs(center.y) * frustum.frustumPlanes[2] > -cullInfo.radius;
 }
 
 void main() {

@@ -369,6 +369,12 @@ bool CreateDescriptorSetLayouts()
 
 	const LunaDescriptorSetLayoutBinding cullingBindings[] = {
 		{
+			.bindingName = "Frustums",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		},
+		{
 			.bindingName = "Cull Info",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 6,
@@ -597,7 +603,7 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 19,
+			.descriptorCount = 20,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {

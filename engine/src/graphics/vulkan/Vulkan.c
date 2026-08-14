@@ -18,6 +18,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -637,6 +638,10 @@ static inline VkResult LoadLightmap(const Map *map)
 
 static inline float GetMaxLightDistance(const Light *light)
 {
+	if (light->type == LIGHT_TYPE_DIRECTIONAL)
+	{
+		return 0;
+	}
 	const float linearSquared = light->linearAttenuation * light->linearAttenuation;
 	const float val = 4.0f *
 					  light->quadraticAttenuation *
@@ -653,12 +658,17 @@ static inline float GetMaxLightDistance(const Light *light)
 static inline VkResult LoadLights(const Map *map)
 {
 	static const float LIGHT_NEAR_PLANE = 0.01f;
+
+	Frustum *frustums = AvxAlignedCalloc(sizeof(Frustum) * (map->lightCount * 6));
+	CheckAlloc(frustums);
+	frustumIndex = 0;
 	uint32_t spotLightIndex = 0;
 	uint32_t pointLightIndex = 0;
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
 		mat4 transformMatrix;
 		Light *light = &map->lights[i];
+		const float farPlane = GetMaxLightDistance(light);
 		switch (light->type)
 		{
 			case LIGHT_TYPE_SPOT:
@@ -671,16 +681,67 @@ static inline VkResult LoadLights(const Map *map)
 				glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
 				mat4 viewMatrix;
 				glm_quat_look(VECTOR3_TO_VEC3(light->transform.position), rotationQuat, viewMatrix);
-				mat4 perspectiveMatrix;
+				mat4 projectionMatrix;
 				// TODO: Figure out why this only works with this fov???
-				glm_perspective_lh_zo(glm_rad(235), 1, GetMaxLightDistance(light), LIGHT_NEAR_PLANE, perspectiveMatrix);
-				glm_mat4_mul(perspectiveMatrix, viewMatrix, transformMatrix);
+				glm_perspective_lh_zo(glm_rad(235), 1, farPlane, LIGHT_NEAR_PLANE, projectionMatrix);
+				glm_mat4_mul(projectionMatrix, viewMatrix, transformMatrix);
+
+				mat4 transposed;
+				glm_mat4_transpose_to(projectionMatrix, transposed);
+				vec4 frustumX;
+				vec4 frustumY;
+				glm_vec4_add(transposed[3], transposed[0], frustumX);
+				glm_vec4_add(transposed[3], transposed[1], frustumY);
+				glm_plane_normalize(frustumX);
+				glm_plane_normalize(frustumY);
+
+				glm_mat4_copy(viewMatrix, frustums[frustumIndex].viewMatrix);
+				frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
+				frustums[frustumIndex].farPlane = farPlane;
+				frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
+				frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
+				frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
+				frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
+				frustumIndex++;
 			}
 			break;
 			case LIGHT_TYPE_POINT:
+			{
 				light->shadowMapIndex = pointLightIndex++;
-				glm_perspective_lh_zo(glm_rad(90), 1, GetMaxLightDistance(light), LIGHT_NEAR_PLANE, transformMatrix);
-				break;
+				glm_perspective_lh_zo(glm_rad(90), 1, farPlane, LIGHT_NEAR_PLANE, transformMatrix);
+
+				mat4 transposed;
+				glm_mat4_transpose_to(transformMatrix, transposed);
+				vec4 frustumX;
+				vec4 frustumY;
+				glm_vec4_add(transposed[3], transposed[0], frustumX);
+				glm_vec4_add(transposed[3], transposed[1], frustumY);
+				glm_plane_normalize(frustumX);
+				glm_plane_normalize(frustumY);
+
+				mat3 transforms[6] = {
+					{{0, 0, 1}, {0, -1, 0}, {1, 0, 0}},
+					{{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}},
+					{{1, 0, 0}, {0, 0, 1}, {0, -1, 0}},
+					{{1, 0, 0}, {0, 0, -1}, {0, 1, 0}},
+					{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}},
+					{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}},
+				};
+				for (uint32_t j = 0; j < 6; j++)
+				{
+					glm_mat4_ins3(transforms[j], frustums[frustumIndex].viewMatrix);
+					frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
+					frustums[frustumIndex].farPlane = farPlane;
+					frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
+					frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
+					frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
+					frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
+					frustumIndex++;
+				}
+			}
+			break;
+			case LIGHT_TYPE_DIRECTIONAL:
+				frustumIndex += 4;
 			default:
 				continue;
 		}
@@ -688,6 +749,19 @@ static inline VkResult LoadLights(const Map *map)
 		// The allocation for lights is not aligned so we just memcpy
 		memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
 	}
+
+	const size_t frustumBufferSize = sizeof(Frustum) * (frustumIndex - 1);
+	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.frustums, frustumBufferSize),
+						   "Failed to frustums buffer!");
+	const LunaBufferWriteInfo frustumBufferWriteInfo = {
+		.bytes = frustumBufferSize,
+		.data = frustums,
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
+						   "Failed to write frustums buffer!");
+
+	AvxAlignedFree(frustums);
 
 	const size_t lightsBufferSize = sizeof(uint32_t) +
 									sizeof(float) * 4 +
@@ -796,52 +870,26 @@ static inline VkResult DrawMap(const LunaGraphicsPipelineBindInfo *pipelineBindI
 
 	if (maxShadedDrawCount != 0)
 	{
-		if (shadowMapsPipeline)
-		{
-			const LunaDrawIndexedIndirectInfo drawInfo = {
-				.pipeline = shadowMapsPipeline,
-				.pipelineBindInfo = pipelineBindInfo,
-				.buffer = buffers.map.unculledShadedDrawInfo,
-				.drawCount = maxShadedDrawCount,
-			};
-			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-								   "Failed to draw shaded map!");
-		} else
-		{
-			const LunaDrawIndexedIndirectCountInfo drawInfo = {
-				.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.shadedMap,
-				.pipelineBindInfo = pipelineBindInfo,
-				.buffer = buffers.map.shadedDrawInfo,
-				.maxDrawCount = maxShadedDrawCount,
-			};
-			VulkanTestReturnResult(lunaDrawIndexedIndirectCount(device, commandBuffer, &drawInfo),
-								   "Failed to draw shaded map!");
-		}
+		const LunaDrawIndexedIndirectCountInfo drawInfo = {
+			.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.shadedMap,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.map.shadedDrawInfo,
+			.maxDrawCount = maxShadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirectCount(device, commandBuffer, &drawInfo),
+							   "Failed to draw shaded map!");
 	}
 
 	if (maxUnshadedDrawCount != 0)
 	{
-		if (shadowMapsPipeline)
-		{
-			const LunaDrawIndexedIndirectInfo drawInfo = {
-				.pipeline = shadowMapsPipeline,
-				.pipelineBindInfo = pipelineBindInfo,
-				.buffer = buffers.map.unculledUnshadedDrawInfo,
-				.drawCount = maxUnshadedDrawCount,
-			};
-			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
-								   "Failed to draw unshaded map!");
-		} else
-		{
-			const LunaDrawIndexedIndirectCountInfo drawInfo = {
-				.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.unshadedMap,
-				.pipelineBindInfo = pipelineBindInfo,
-				.buffer = buffers.map.unshadedDrawInfo,
-				.maxDrawCount = maxUnshadedDrawCount,
-			};
-			VulkanTestReturnResult(lunaDrawIndexedIndirectCount(device, commandBuffer, &drawInfo),
-								   "Failed to draw unshaded map!");
-		}
+		const LunaDrawIndexedIndirectCountInfo drawInfo = {
+			.pipeline = shadowMapsPipeline != LUNA_NULL_HANDLE ? shadowMapsPipeline : pipelines.unshadedMap,
+			.pipelineBindInfo = pipelineBindInfo,
+			.buffer = buffers.map.unshadedDrawInfo,
+			.maxDrawCount = maxUnshadedDrawCount,
+		};
+		VulkanTestReturnResult(lunaDrawIndexedIndirectCount(device, commandBuffer, &drawInfo),
+							   "Failed to draw unshaded map!");
 	}
 
 	return VK_SUCCESS;
@@ -1180,6 +1228,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		.depthStencil.depth = 0,
 	};
 
+	frustumIndex = 0;
 	uint32_t previousSize = 0;
 	uint32_t framebufferIndex = 0;
 	for (shadowMapPushConstants.lightIndex = 0; shadowMapPushConstants.lightIndex < map->lightCount;
@@ -1208,6 +1257,8 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 		if (light->type == LIGHT_TYPE_SPOT)
 		{
+			VulkanTest(CullModels(), "Failed to cull models!");
+
 			const VkRenderPassBeginInfo beginInfo = {
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 				.renderPass = spotLightShadowMapRenderPass,
@@ -1228,6 +1279,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			vkCmdEndRenderPass(vkCommandBuffer);
 
 			framebufferIndex++;
+			frustumIndex++;
 			continue;
 		}
 		if (light->type == LIGHT_TYPE_DIRECTIONAL)
@@ -1238,6 +1290,8 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			for (shadowMapPushConstants.cascadeIndex = 0; shadowMapPushConstants.cascadeIndex < 4;
 				 shadowMapPushConstants.cascadeIndex++)
 			{
+				VulkanTest(CullModels(), "Failed to cull models!");
+
 				const VkRenderPassBeginInfo beginInfo = {
 					.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 					.renderPass = spotLightShadowMapRenderPass,
@@ -1260,6 +1314,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 				vkCmdEndRenderPass(vkCommandBuffer);
 
 				framebufferIndex++;
+				frustumIndex++;
 			}
 			continue;
 		}
@@ -1268,6 +1323,8 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			for (shadowMapPushConstants.faceIndex = 0; shadowMapPushConstants.faceIndex < 6;
 				 shadowMapPushConstants.faceIndex++)
 			{
+				VulkanTest(CullModels(), "Failed to cull models!");
+
 				const VkRenderPassBeginInfo beginInfo = {
 					.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 					.renderPass = pointLightShadowMapRenderPass,
@@ -1288,6 +1345,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 				vkCmdEndRenderPass(vkCommandBuffer);
 
 				framebufferIndex++;
+				frustumIndex++;
 			}
 		}
 	}
@@ -1625,6 +1683,7 @@ bool VK_RenderMap(Map *map, Camera *camera)
 
 	VulkanTest(UpdateViewModelMatrix(&map->viewmodel), "Failed to update viewmodel transform matrix!");
 
+	frustumIndex = -1u;
 	VulkanTest(CullModels(), "Failed to cull models!");
 
 	const VkExtent2D extent = lunaGetSwapchainExtent();
