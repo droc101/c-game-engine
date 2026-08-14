@@ -11,14 +11,18 @@ layout(push_constant) uniform PushConstants {
 layout(set = 1, binding = 0, scalar) readonly restrict buffer Frustums {
     Frustum frustums[];
 } frustums;
+
 layout(set = 1, binding = 1, scalar) readonly restrict buffer CullInfos {
     uint count;
     ModelCullInfo model[];
 } cullInfos[6];
 
-layout(set = 1, binding = 2, scalar) readonly restrict buffer UnculledDrawInfo {
+layout(set = 1, binding = 2, scalar) readonly buffer UnculledDrawInfo {
     VkDrawIndexedIndirectCommand drawInfos[];
 } unculledDrawInfo[6];
+layout(set = 1, binding = 2, scalar) readonly buffer UnculledActorWallInstanceInfo {
+    ActorWallInstanceData instanceInfos[];
+} unculledActorWallInstanceInfo[6];
 
 layout(set = 1, binding = 3, scalar) restrict buffer DrawInfo {
     uint drawCount;
@@ -33,9 +37,9 @@ bool IsVisible(const ModelCullInfo cullInfo) {
                center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -cullInfo.radius;
     }
 
-    if (cullInfo.castsShadows == 0) {
-        return false;
-    }
+    // if (cullInfo.castsShadows == 0) {
+    //     return false;
+    // }
     const Frustum frustum = frustums.frustums[pushConstants.frustumIndex];
     const vec3 center = (frustum.viewMatrix * vec4(cullInfo.position, 1)).xyz;
     return center.z + cullInfo.radius > frustum.nearPlane && center.z - cullInfo.radius < frustum.farPlane &&
