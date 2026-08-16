@@ -46,6 +46,16 @@ static inline int ImagesNameCompare(const void *img1, const void *img2)
 	return strcmp(imageOne->name, imageTwo->name);
 }
 
+static Image *GetCachedImage(const char *name)
+{
+	Image **foundImage = bsearch(name, images, textureId, sizeof(Image *), ImageNameMatch);
+	if (foundImage != NULL && *foundImage != NULL)
+	{
+		return *foundImage;
+	}
+	return NULL;
+}
+
 void GenFallbackImage(Image *src)
 {
 	src->width = MISSING_TEX_SIZE;
@@ -76,15 +86,15 @@ void GenFallbackImage(Image *src)
 
 Image *LoadImage(const char *asset)
 {
-	Image **foundImage = bsearch(asset, images, textureId, sizeof(Image *), ImageNameMatch);
-	if (foundImage != NULL && *foundImage != NULL)
+	Image *existingImage = GetCachedImage(asset);
+	if (existingImage)
 	{
-		return *foundImage;
+		return existingImage;
 	}
 
 	if (textureId >= MAX_TEXTURES)
 	{
-		Error("Texture ID heap exhausted. Please increase MAX_TEXTURES\n");
+		return GetMissingTexture();
 	}
 
 	Image *img = malloc(sizeof(Image));
@@ -142,22 +152,14 @@ Image *LoadImage(const char *asset)
 		DestroyDataReader(reader);
 	}
 
-	img->id = textureId;
-
 	const size_t nameLength = strlen(asset) + 1;
 	img->name = malloc(nameLength);
 	CheckAlloc(img->name);
 	strncpy(img->name, asset, nameLength);
 
-	images[textureId] = img;
-
-	textureId++;
-
-	qsort(images, textureId, sizeof(Image *), ImagesNameCompare);
-
-	if (textureId >= MAX_TEXTURES - 10)
+	if (!RegisterImage(img))
 	{
-		LogWarning("Texture ID heap is nearly exhausted! Only %zu slots remain.\n", MAX_TEXTURES - textureId);
+		return GetMissingTexture();
 	}
 
 	if (textureAsset)
@@ -168,48 +170,61 @@ Image *LoadImage(const char *asset)
 	return img;
 }
 
-Image *RegisterFallbackImage()
+bool RegisterImage(Image *image)
 {
-	const char *asset = "_generic_fallback";
-	for (int i = 0; i < MAX_TEXTURES; i++)
+	if (GetCachedImage(image->name))
 	{
-		Image *img = images[i];
-		if (img == NULL)
-		{
-			break;
-		}
-		if (strcmp(asset, img->name) == 0)
-		{
-			return img;
-		}
+		return false;
 	}
 
 	if (textureId >= MAX_TEXTURES)
 	{
-		Error("Texture ID heap exhausted. Please increase MAX_TEXTURES\n");
+		return false;
 	}
 
-	Image *img = malloc(sizeof(Image));
-	CheckAlloc(img);
-	GenFallbackImage(img);
-
-	img->id = textureId;
-
-	const size_t nameLength = strlen(asset) + 1;
-	img->name = malloc(nameLength);
-	CheckAlloc(img->name);
-	strncpy(img->name, asset, nameLength);
-
-	images[textureId] = img;
+	image->id = textureId;
+	images[textureId] = image;
 
 	textureId++;
 
-	if (textureId >= MAX_TEXTURES - 10)
+	qsort(images, textureId, sizeof(Image *), ImagesNameCompare);
+
+	if (textureId == MAX_TEXTURES)
+	{
+		LogError("Texture ID heap exhausted. Please increase MAX_TEXTURES\n");
+	} else if (textureId >= MAX_TEXTURES - 10)
 	{
 		LogWarning("Texture ID heap is nearly exhausted! Only %zu slots remain.\n", MAX_TEXTURES - textureId);
 	}
 
+	return true;
+}
+
+Image *GetMissingTexture()
+{
+	Image *existing = GetCachedImage(MISSING_TEXTURE_NAME);
+	if (existing)
+	{
+		return existing;
+	}
+
+	Image *img = malloc(sizeof(Image));
+	img->name = strdup(MISSING_TEXTURE_NAME);
+	CheckAlloc(img);
+	GenFallbackImage(img);
+
+	if (!RegisterImage(img))
+	{
+		Error("Failed to register missing texture!");
+	}
+
 	return img;
+}
+
+void InitTextureLoader()
+{
+	// ensures the missing texture is available as a fallback
+	(void)GetMissingTexture();
 }
 
 void DestroyTextureLoader()

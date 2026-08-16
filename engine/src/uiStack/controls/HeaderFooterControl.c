@@ -57,17 +57,11 @@ void DrawHeaderFooterControl(const Control *c, ControlState state, Vector2 posit
 {
 	HeaderFooterControlData *data = c->controlData;
 
-	DrawRect(position.x, position.y, c->size.x, c->size.y, COLOR(0x80000000));
-	if (data->isHeader)
-	{
-		DrawLine(v2(position.x, position.y + c->size.y - 1),
-				 v2(position.x + c->size.x, position.y + c->size.y - 1),
-				 2,
-				 COLOR_WHITE);
-	} else
-	{
-		DrawLine(v2(position.x, position.y + 1), v2(position.x + c->size.x, position.y + 1), 2, COLOR_WHITE);
-	}
+	DrawNinePatchTexture(position,
+						 c->size,
+						 4,
+						 4,
+						 data->isHeader ? TEXTURE("interface/header") : TEXTURE("interface/footer"));
 
 	if (data->label)
 	{

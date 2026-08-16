@@ -28,8 +28,9 @@ void UpdateMenuBackground(GlobalState *state, double delta);
 /**
  * Render the menu background map
  * @param state GlobalState pointer
+ * @param drawBackgroundTexture
  */
-void RenderMenuBackground(GlobalState *state);
+void RenderMenuBackground(GlobalState *state, bool drawBackgroundTexture);
 
 /**
  * Perform a physics tick update of the background map

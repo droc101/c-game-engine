@@ -122,6 +122,8 @@ void DrawTextureRegionMod(Vector2 pos,
 						  Vector2 regionEnd,
 						  Color color);
 
+void DrawTextureTiled(Vector2 pos, Vector2 size, const char *texture);
+
 /**
  * Draw a nine patch image to the screen
  * @param pos The position to draw at

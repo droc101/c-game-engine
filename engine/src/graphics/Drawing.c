@@ -106,6 +106,14 @@ inline void DrawTextureRegionMod(const Vector2 pos,
 								 color);
 }
 
+void DrawTextureTiled(const Vector2 pos, const Vector2 size, const char *texture)
+{
+	const Vector2 imageSize = GetTextureSize(texture);
+	const Vector2 tilesOnScreen = v2(size.x / imageSize.x, size.y / imageSize.y);
+	const Vector2 tileRegion = v2(tilesOnScreen.x * imageSize.x, tilesOnScreen.y * imageSize.y);
+	DrawTextureRegion(pos, size, texture, v2(0, 0), tileRegion);
+}
+
 inline void DrawRect(const int x, const int y, const int w, const int h, const Color color)
 {
 	VK_DrawColoredQuad(x, y, w, h, color);
@@ -241,7 +249,9 @@ void RenderInGameMenuBackground()
 	const GlobalState *state = GetState();
 	RenderMap(state->map, state->camera);
 	RenderHUD();
-	DrawRect(0, 0, ScaledWindowWidth(), ScaledWindowHeight(), COLOR(0xA0000000));
+	DrawTextureTiled(v2s(0),
+					 v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
+					 TEXTURE("interface/ingame_menu_background"));
 }
 
 void RenderHUD()

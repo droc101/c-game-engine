@@ -67,7 +67,7 @@ static void LevelSelectStateUpdate(GlobalState *state, const double delta)
 
 static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 {
-	RenderMenuBackground(state);
+	RenderMenuBackground(state, true);
 	if (!IsBackgroundMapLoaded())
 	{
 		return;
