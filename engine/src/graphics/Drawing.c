@@ -251,7 +251,7 @@ void RenderInGameMenuBackground()
 	RenderHUD();
 	DrawTextureTiled(v2s(0),
 					 v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
-					 TEXTURE("interface/menu_background"));
+					 TEXTURE("interface/ingame_menu_background"));
 }
 
 void RenderHUD()

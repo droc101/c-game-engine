@@ -197,7 +197,7 @@ static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground(state);
+		RenderMenuBackground(state, true);
 	}
 
 	ProcessOptionsMenu(videoOptionsMenu);
