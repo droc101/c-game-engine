@@ -6,6 +6,7 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -23,7 +24,7 @@ static MapMaterial fallbackMaterial = {
 	.name = "_fallback",
 	.shader = SHADER_UNSHADED,
 	.soundClass = SOUND_CLASS_DEFAULT,
-	.texture = "_generic_fallback",
+	.texture = MISSING_TEXTURE_NAME,
 };
 
 MapMaterial *LoadMapMaterial(const char *path)

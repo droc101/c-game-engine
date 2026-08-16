@@ -18,6 +18,8 @@
 #error "The required minimum for the maxPerStageDescriptorUpdateAfterBindSamplers limit is 500000, which should not be exceeded."
 #endif
 
+#define MISSING_TEXTURE_NAME "dynamic/missingtex"
+
 typedef struct Image Image;
 typedef enum ImagePixelFormat ImagePixelFormat;
 
@@ -67,9 +69,22 @@ void GenFallbackImage(Image *src);
 Image *LoadImage(const char *asset);
 
 /**
- * Create an image that is *always* missing
+ * Get the missing texture
  */
-Image *RegisterFallbackImage();
+Image *GetMissingTexture();
+
+/**
+ * Register an image
+ * @param image The image to register
+ * @return Whether the registration was expected
+ * @note The image should already have its name set, but it will be given an ID by this function
+ */
+bool RegisterImage(Image *image);
+
+/**
+ * Initialize the texture loader
+ */
+void InitTextureLoader();
 
 /**
  * Destroy the texture loader and clean up all loaded textures

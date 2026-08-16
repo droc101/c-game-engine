@@ -34,10 +34,10 @@ static Font *GenerateFallbackFont(const char *asset)
 	font->spaceWidth = 8;
 	font->defaultSize = 16;
 	font->uppercaseOnly = false;
-	font->texture = calloc(strlen("_generic_fallback") + 1, sizeof(char));
+	font->texture = calloc(strlen(MISSING_TEXTURE_NAME) + 1, sizeof(char));
 	CheckAlloc(font->texture);
-	strcpy(font->texture, "_generic_fallback");
-	const Image *img = RegisterFallbackImage();
+	strcpy(font->texture, MISSING_TEXTURE_NAME);
+	const Image *img = GetMissingTexture();
 	static_assert(sizeof(font->charWidths) / sizeof(*font->charWidths) ==
 								  sizeof(font->charStartUVs) / sizeof(*font->charStartUVs) &&
 						  sizeof(font->charWidths) / sizeof(*font->charWidths) ==

@@ -177,6 +177,7 @@ void AssetCacheInit()
 	LogDebug("Initializing asset cache...\n");
 	AssetCache_init(assetCache);
 	InitModelLoader();
+	InitTextureLoader();
 }
 
 void DestroyAssetCache()
