@@ -32,6 +32,7 @@ void DestroyVScrollBar(const Control *) {}
 
 void UpdateVScrollBar(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t ctlIndex)
 {
+	return;
 	VScrollBarData *data = (VScrollBarData *)c->controlData;
 	if (stack->activeControl == ctlIndex)
 	{
@@ -57,6 +58,7 @@ void UpdateVScrollBar(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uin
 
 void AlwaysUpdateVScrollBar(UiStack * /*stack*/, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
+	return;
 	VScrollBarData *data = (VScrollBarData *)c->controlData;
 	c->allowFocus = !UseController(mainThreadInput) && data->contentHeight > c->size.y;
 	if (data->contentHeight > c->size.y)
