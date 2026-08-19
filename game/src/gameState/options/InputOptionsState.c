@@ -82,7 +82,7 @@ static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground(state);
+		RenderMenuBackground(state, true);
 	}
 
 	ProcessOptionsMenu(inputOptionsMenu);

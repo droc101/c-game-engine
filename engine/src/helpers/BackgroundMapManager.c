@@ -83,7 +83,7 @@ void UpdateMenuBackground(GlobalState *state, const double delta)
 	}
 }
 
-void RenderMenuBackground(GlobalState *state)
+void RenderMenuBackground(GlobalState *state, const bool drawBackgroundTexture)
 {
 	if (IsBackgroundMapLoaded() && !dontLoadBackgroundMap)
 	{
@@ -93,9 +93,21 @@ void RenderMenuBackground(GlobalState *state)
 					   v2(ScaledWindowWidth(), ScaledWindowHeight()),
 					   TEXTURE("interface/background_placeholder"),
 					   &COLOR(0x00FFFFFF | alpha));
+		if (drawBackgroundTexture)
+		{
+			DrawTextureTiled(v2s(0),
+							 v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
+							 TEXTURE("interface/menu_background"));
+		}
 	} else
 	{
 		DrawTexture(v2s(0), v2(ScaledWindowWidth(), ScaledWindowHeight()), TEXTURE("interface/background_placeholder"));
+		if (drawBackgroundTexture)
+		{
+			DrawTextureTiled(v2s(0),
+							 v2(ScaledWindowWidthFloat(), ScaledWindowHeightFloat()),
+							 TEXTURE("interface/menu_background"));
+		}
 		if (!dontLoadBackgroundMap)
 		{
 			DrawTextAligned("LOADING",

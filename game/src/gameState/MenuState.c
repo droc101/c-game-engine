@@ -58,7 +58,7 @@ static void ReloadAssets(Control *, void *)
 
 static void MenuStateRender(GlobalState *state, const double /*delta*/)
 {
-	RenderMenuBackground(state);
+	RenderMenuBackground(state, false);
 	if (!IsBackgroundMapLoaded())
 	{
 		return;
