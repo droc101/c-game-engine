@@ -199,11 +199,15 @@ void *AvxAlignedCalloc(const size_t size)
 {
 #ifdef __AVX__
 #ifdef WIN32
-	void *data = _aligned_malloc(32, size);
+	void *data = _aligned_malloc(size, 32);
 #else
 	void *data = aligned_alloc(32, size);
 #endif
-	return memset(data, 0, size);
+	if (data)
+	{
+		return memset(data, 0, size);
+	}
+	return NULL;
 #else
 	return calloc(1, size);
 #endif
