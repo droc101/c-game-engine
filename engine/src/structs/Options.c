@@ -105,7 +105,7 @@ void LoadOptions(Options *options)
 {
 	if (HasCliArg("--reset-options"))
 	{
-		LogInfo("Resetting options...");
+		LogInfo("Resetting options...\n");
 		DefaultOptions(options);
 		return;
 	}
