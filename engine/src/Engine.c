@@ -27,6 +27,7 @@
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <engine/subsystem/SteamworksManager.h>
 #include <engine/subsystem/TextInputSystem.h>
 #include <engine/subsystem/threads/LodThread.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
@@ -244,6 +245,16 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	InitArguments(initInfo.argc, initInfo.argv);
 
+	if (!HasCliArg("--nosteam"))
+	{
+		if (!InitSteamworks())
+		{
+			FriendlyError("Error",
+						  "Fatal Error: Failed to start Steam integration.\nIs the Steam client running and up to "
+						  "date?");
+		}
+	}
+
 	if (HasCliArg("--game"))
 	{
 		const char *game = GetCliArgStr("--game", "assets/game");
@@ -374,6 +385,9 @@ void EngineIteration()
 	ProcessStateChangeQueue();
 
 	DiscordUpdate();
+
+	ProcessSteamworks();
+
 	if (state->requestExit)
 	{
 		shouldQuit = true;
@@ -407,6 +421,7 @@ void DestroyEngine()
 {
 	SDL_HideWindow(GetGameWindow());
 	DestroyDPrintConsole();
+	ShutdownSteamworks();
 	DiscordDestroy();
 	PhysicsThreadTerminate();
 	LodThreadDestroy();

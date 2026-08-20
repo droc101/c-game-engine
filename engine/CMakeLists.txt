@@ -52,6 +52,10 @@ endif ()
 message(STATUS "Fetching JoltC/Jolt...")
 fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14ecd27 joltc)
 
+if (ENABLE_STEAMWORKS)
+    import_steamworks_sdk()
+endif ()
+
 #endregion
 
 add_library(engine INTERFACE)
@@ -226,6 +230,8 @@ target_sources(engine INTERFACE
         include/engine/subsystem/threads/PhysicsThread.h
         src/subsystem/Timing.c
         include/engine/subsystem/Timing.h
+        src/subsystem/SteamworksManager.cpp
+        include/engine/subsystem/SteamworksManager.h
 
         src/uiStack/controls/Button.c
         include/engine/uiStack/controls/Button.h
@@ -263,6 +269,12 @@ if (x86_64 AND USE_DISCORD_SDK)
     target_compile_definitions(engine INTERFACE ENABLE_DISCORD_SDK)
     target_include_directories(engine INTERFACE ${DISCORD_GAME_SDK_DIR}/c/)
     target_link_libraries(engine INTERFACE discord_game_sdk)
+endif ()
+
+if (ENABLE_STEAMWORKS)
+    target_link_libraries(engine INTERFACE steamworks)
+    target_compile_definitions(engine INTERFACE ENABLE_STEAMWORKS STEAMWORKS_APP_ID=${STEAMWORKS_APP_ID})
+    file(WRITE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/steam_appid.txt" ${STEAMWORKS_APP_ID})
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")

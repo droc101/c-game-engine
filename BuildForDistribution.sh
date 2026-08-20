@@ -22,7 +22,7 @@ export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
 clean_build_dir() {
   if [ -d "$BUILD_DIR" ]; then
     cd "$BUILD_DIR" # Make sure we don't break things by being in the wrong directory :)
-    rm -rf !(out|_deps|discord_game_sdk.@(so|dll)) _deps/!(sdl3*|*-src)/
+    rm -rf !(libsteam_api.so|steam_api64.dll|out|_deps|discord_game_sdk.@(so|dll)) _deps/!(sdl3*|*-src)/
   fi
   cd "$SRC_DIR"
 }

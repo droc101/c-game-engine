@@ -16,6 +16,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/SteamworksManager.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
@@ -54,6 +55,11 @@ static void ReloadAssets(Control *, void *)
 	ChangeMap(NULL);
 	EnterMenuBackgroundState();
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+}
+
+static void SteamButton(Control *, void *)
+{
+	SteamworksTest();
 }
 
 static void MenuStateRender(GlobalState *state, const double /*delta*/)
@@ -127,6 +133,14 @@ static void MenuStateSet()
 										MIDDLE_CENTER,
 										"top 10 ways to kill the engine"));
 		opY += opSpacing;
+#ifdef ENABLE_STEAMWORKS
+		if (IsSteamworksRunning())
+		{
+			UiStackPush(menuStack,
+						CreateButtonControl(v2(0, opY), v2(480, 40), "steam button", SteamButton, MIDDLE_CENTER, NULL));
+			opY += opSpacing;
+		}
+#endif
 	}
 	UiStackResetFocus(menuStack);
 	EnterMenuBackgroundState();
