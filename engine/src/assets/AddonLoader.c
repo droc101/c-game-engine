@@ -86,7 +86,7 @@ static void RescanAddons()
 	const struct dirent *ent = readdir(dir);
 	while (ent != NULL)
 	{
-		if (ent->d_name[0] != '.' && ent->d_type == DT_DIR)
+		if (ent->d_name[0] != '.')
 		{
 			const size_t path_length = strlen(ADDONS_PATH) + 1 + strlen(ent->d_name) + 1;
 			char *path = malloc(path_length);
