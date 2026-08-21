@@ -321,8 +321,7 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorModel;
 	LunaGraphicsPipeline shadedActorWall;
 	LunaGraphicsPipeline unshadedActorWall;
-	ShadowMapPipelines spotLightShadowMaps;
-	ShadowMapPipelines pointLightShadowMaps;
+	ShadowMapPipelines shadowMaps;
 	DirectionalShadowMapPipelines directionalLightShadowMaps;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
@@ -338,8 +337,7 @@ typedef struct TextureSamplers
 	LunaSampler nearestRepeatNoAnisotropy;
 	LunaSampler linearNoRepeatNoAnisotropy;
 	LunaSampler nearestNoRepeatNoAnisotropy;
-	LunaSampler spotLightShadowMaps;
-	LunaSampler pointLightShadowMaps;
+	LunaSampler shadowMaps;
 } TextureSamplers;
 
 typedef struct ShadowMapPushConstants
@@ -402,9 +400,7 @@ extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
 extern uint32_t skyTextureIndex;
 extern uint32_t shadowMapSlotsAvailable;
 extern ShadowMapPushConstants shadowMapPushConstants;
-extern VkRenderPass spotLightShadowMapRenderPass;
-extern VkRenderPass pointLightShadowMapRenderPass;
-extern LunaImage pointLightShadowMapDepthAttachment;
+extern VkRenderPass shadowMapRenderPass;
 extern List shadowMaps;
 extern List shadowMapFramebuffers;
 extern List pointLightShadowMapImageViews;

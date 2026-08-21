@@ -808,7 +808,7 @@ static inline VkResult LoadLights(const Map *map)
 static inline VkResult CreateShadowMaps(const Map *map)
 {
 	VulkanTestReturnResult(CreateShadowMapRenderPass(map), "Failed to create shadow map render pass!");
-	if (spotLightShadowMapRenderPass == VK_NULL_HANDLE && pointLightShadowMapRenderPass == VK_NULL_HANDLE)
+	if (shadowMapRenderPass == VK_NULL_HANDLE)
 	{
 		return VK_SUCCESS;
 	}
@@ -1203,7 +1203,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 	};
 	VulkanTestReturnResult(lunaBindDescriptorSets(device,
 												  commandBuffer,
-												  pipelines.spotLightShadowMaps.map,
+												  pipelines.shadowMaps.map,
 												  &descriptorSetBindInfo),
 						   "Failed to bind descriptor sets!");
 	LunaGraphicsPipelineBindInfo pipelineBindInfo = {};
@@ -1264,7 +1264,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 			const VkRenderPassBeginInfo beginInfo = {
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-				.renderPass = spotLightShadowMapRenderPass,
+				.renderPass = shadowMapRenderPass,
 				.framebuffer = ListGetPointer(shadowMapFramebuffers, framebufferIndex),
 				.renderArea.extent = extent,
 				.clearValueCount = 1,
@@ -1272,11 +1272,10 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			};
 			vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.spotLightShadowMaps.map),
-								   "Failed to draw map!");
+			VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.shadowMaps.map), "Failed to draw map!");
 			VulkanTestReturnResult(DrawActors(&pipelineBindInfo,
-											  pipelines.spotLightShadowMaps.modelActors,
-											  pipelines.spotLightShadowMaps.wallActors),
+											  pipelines.shadowMaps.modelActors,
+											  pipelines.shadowMaps.wallActors),
 								   "Failed to draw actors!");
 
 			vkCmdEndRenderPass(vkCommandBuffer);
@@ -1297,7 +1296,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 				const VkRenderPassBeginInfo beginInfo = {
 					.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-					.renderPass = spotLightShadowMapRenderPass,
+					.renderPass = shadowMapRenderPass,
 					.framebuffer = ListGetPointer(shadowMapFramebuffers, framebufferIndex),
 					.renderArea.extent = extent,
 					.clearValueCount = 1,
@@ -1330,19 +1329,18 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 				const VkRenderPassBeginInfo beginInfo = {
 					.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-					.renderPass = pointLightShadowMapRenderPass,
+					.renderPass = shadowMapRenderPass,
 					.framebuffer = ListGetPointer(shadowMapFramebuffers, framebufferIndex),
 					.renderArea.extent = extent,
-					.clearValueCount = 2,
-					.pClearValues = (VkClearValue[]){depthClearValue, {.color = 0}},
+					.clearValueCount = 1,
+					.pClearValues = &depthClearValue,
 				};
 				vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-				VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.pointLightShadowMaps.map),
-									   "Failed to draw map!");
+				VulkanTestReturnResult(DrawMap(&pipelineBindInfo, pipelines.shadowMaps.map), "Failed to draw map!");
 				VulkanTestReturnResult(DrawActors(&pipelineBindInfo,
-												  pipelines.pointLightShadowMaps.modelActors,
-												  pipelines.pointLightShadowMaps.wallActors),
+												  pipelines.shadowMaps.modelActors,
+												  pipelines.shadowMaps.wallActors),
 									   "Failed to draw actors!");
 
 				vkCmdEndRenderPass(vkCommandBuffer);
@@ -1353,6 +1351,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		}
 	}
 
+	// TODO: Pipeline dependency instead of command buffer submission
 	VulkanTestReturnResult(lunaEndAndSubmitCommandBuffer(device, commandBuffer, &submitInfo),
 						   "Failed to submit command buffer after updating shadow maps!");
 
@@ -1468,7 +1467,7 @@ static inline bool HandleRendererQueuedActions()
 	{
 		if (GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED && GetMap() != NULL)
 		{
-			if (spotLightShadowMapRenderPass == VK_NULL_HANDLE)
+			if (shadowMapRenderPass == VK_NULL_HANDLE)
 			{
 				VulkanTest(LoadLights(loadedMap), "Failed to load lights into buffer!");
 			}
@@ -1482,7 +1481,7 @@ static inline bool HandleRendererQueuedActions()
 				VulkanTest(lunaFillBuffer(device, commandBuffer, buffers.uniforms.lights, 0, NULL),
 						   "Failed to clear lights buffer!");
 			}
-			if (spotLightShadowMapRenderPass != VK_NULL_HANDLE)
+			if (shadowMapRenderPass != VK_NULL_HANDLE)
 			{
 				VulkanTest(CreateShadowMapRenderPass(NULL), "Failed to clean up shadow maps!");
 			}

@@ -127,8 +127,7 @@ static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
 
 static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
-static LunaShaderModule spotLightShadowMapsFragShaderModule = LUNA_NULL_HANDLE;
-static LunaShaderModule pointLightShadowMapsFragShaderModule = LUNA_NULL_HANDLE;
+static LunaShaderModule shadowMapsFragShaderModule = LUNA_NULL_HANDLE;
 #pragma endregion shared
 
 static inline bool CreateUIPipeline()
@@ -1184,13 +1183,9 @@ static inline bool CreateDebugDrawPipeline()
 
 static inline VkResult CreateMapShadowMapPipeline()
 {
-	if (pipelines.spotLightShadowMaps.map != LUNA_NULL_HANDLE)
+	if (pipelines.shadowMaps.map != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.map);
-	}
-	if (pipelines.pointLightShadowMaps.map != LUNA_NULL_HANDLE)
-	{
-		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.map);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadowMaps.map);
 	}
 	if (pipelines.directionalLightShadowMaps.mapFrontFaces != LUNA_NULL_HANDLE)
 	{
@@ -1205,13 +1200,14 @@ static inline VkResult CreateMapShadowMapPipeline()
 	VulkanTestReturnResult(CreateShaderModule(SHADER("map_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
 						   "Failed to load map shadow maps vertex shader!");
 
-	LunaPipelineShaderStageCreationInfo shaderStages[] = {
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = shadowMapsFragShaderModule,
 		},
 	};
 
@@ -1267,74 +1263,54 @@ static inline VkResult CreateMapShadowMapPipeline()
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
 		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &SHADOW_MAP_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
 	};
-	if (spotLightShadowMapRenderPass != VK_NULL_HANDLE)
-	{
-		shaderStages[1].module = spotLightShadowMapsFragShaderModule;
-		pipelineInfo.colorBlendState = &SHADOW_MAP_COLOR_BLENDING;
-		pipelineInfo.rasterizationState = &SHADOW_MAP_RASTERIZER;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.spotLightShadowMaps.map),
-							   "Failed to create map spot light shadow map graphics pipeline!");
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.directionalLightShadowMaps
-																				   .mapFrontFaces),
-							   "Failed to create map directional light front faces shadow map graphics pipeline!");
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.shadowMaps.map),
+						   "Failed to create map shadow map graphics pipeline!");
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.directionalLightShadowMaps
+																			   .mapFrontFaces),
+						   "Failed to create map directional light front faces shadow map graphics pipeline!");
 
-		static const VkPipelineRasterizationStateCreateInfo BACK_FACES_RASTERIZER = {
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-			.polygonMode = VK_POLYGON_MODE_FILL,
-			.cullMode = VK_CULL_MODE_FRONT_BIT,
-			.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
-			.depthBiasEnable = VK_TRUE,
-			.depthBiasConstantFactor = 1.0f,
-			.depthBiasSlopeFactor = 2.5f,
-			.lineWidth = 1,
-		};
-		pipelineInfo.rasterizationState = &BACK_FACES_RASTERIZER;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.directionalLightShadowMaps
-																				   .mapBackFaces),
-							   "Failed to create map directional light back faces shadow map graphics pipeline!");
-	}
-	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
-	{
-		shaderStages[1].module = pointLightShadowMapsFragShaderModule;
-		pipelineInfo.colorBlendState = &COLOR_BLENDING;
-		pipelineInfo.rasterizationState = &SHADOW_MAP_RASTERIZER;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  pointLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.pointLightShadowMaps.map),
-							   "Failed to create map point light shadow map graphics pipeline!");
-	}
+	static const VkPipelineRasterizationStateCreateInfo BACK_FACES_RASTERIZER = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+		.polygonMode = VK_POLYGON_MODE_FILL,
+		.cullMode = VK_CULL_MODE_FRONT_BIT,
+		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		.depthBiasEnable = VK_TRUE,
+		.depthBiasConstantFactor = 1.0f,
+		.depthBiasSlopeFactor = 2.5f,
+		.lineWidth = 1,
+	};
+	pipelineInfo.rasterizationState = &BACK_FACES_RASTERIZER;
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.directionalLightShadowMaps
+																			   .mapBackFaces),
+						   "Failed to create map directional light back faces shadow map graphics pipeline!");
 
 	return VK_SUCCESS;
 }
 
 static inline VkResult CreateModelActorShadowMapPipeline()
 {
-	if (pipelines.spotLightShadowMaps.modelActors != LUNA_NULL_HANDLE)
+	if (pipelines.shadowMaps.modelActors != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.modelActors);
-	}
-	if (pipelines.pointLightShadowMaps.modelActors != LUNA_NULL_HANDLE)
-	{
-		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.modelActors);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadowMaps.modelActors);
 	}
 	if (pipelines.directionalLightShadowMaps.modelActors != LUNA_NULL_HANDLE)
 	{
@@ -1345,13 +1321,14 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 	VulkanTestReturnResult(CreateShaderModule(SHADER("actor_model_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
 						   "Failed to load model actor shadow maps vertex shader!");
 
-	LunaPipelineShaderStageCreationInfo shaderStages[] = {
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = shadowMapsFragShaderModule,
 		},
 	};
 
@@ -1443,7 +1420,7 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
-	LunaGraphicsPipelineCreationInfo pipelineInfo = {
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
@@ -1452,51 +1429,32 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &SHADOW_MAP_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
 	};
-	if (spotLightShadowMapRenderPass != VK_NULL_HANDLE)
-	{
-		shaderStages[1].module = spotLightShadowMapsFragShaderModule;
-		pipelineInfo.colorBlendState = &SHADOW_MAP_COLOR_BLENDING;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.spotLightShadowMaps.modelActors),
-							   "Failed to create model actor spot light shadow map graphics pipeline!");
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.directionalLightShadowMaps
-																				   .modelActors),
-							   "Failed to create model actor directional light shadow map graphics pipeline!");
-	}
-	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
-	{
-		shaderStages[1].module = pointLightShadowMapsFragShaderModule;
-		pipelineInfo.colorBlendState = &COLOR_BLENDING;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  pointLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.pointLightShadowMaps.modelActors),
-							   "Failed to create model actor point light shadow map graphics pipeline!");
-	}
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.shadowMaps.modelActors),
+						   "Failed to create model actor shadow map graphics pipeline!");
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.directionalLightShadowMaps
+																			   .modelActors),
+						   "Failed to create model actor directional light shadow map graphics pipeline!");
 
 	return VK_SUCCESS;
 }
 
 static inline VkResult CreateWallActorShadowMapPipeline()
 {
-	if (pipelines.spotLightShadowMaps.wallActors != LUNA_NULL_HANDLE)
+	if (pipelines.shadowMaps.wallActors != LUNA_NULL_HANDLE)
 	{
-		lunaDestroyGraphicsPipeline(device, pipelines.spotLightShadowMaps.wallActors);
-	}
-	if (pipelines.pointLightShadowMaps.wallActors != LUNA_NULL_HANDLE)
-	{
-		lunaDestroyGraphicsPipeline(device, pipelines.pointLightShadowMaps.wallActors);
+		lunaDestroyGraphicsPipeline(device, pipelines.shadowMaps.wallActors);
 	}
 	if (pipelines.directionalLightShadowMaps.wallActors != LUNA_NULL_HANDLE)
 	{
@@ -1507,13 +1465,14 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 	VulkanTestReturnResult(CreateShaderModule(SHADER("actor_wall_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
 						   "Failed to load wall actor shadow maps vertex shader!");
 
-	LunaPipelineShaderStageCreationInfo shaderStages[] = {
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = shadowMapsFragShaderModule,
 		},
 	};
 
@@ -1556,7 +1515,7 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
-	LunaGraphicsPipelineCreationInfo pipelineInfo = {
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
 		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
@@ -1565,38 +1524,22 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		.rasterizationState = &SHADOW_MAP_RASTERIZER,
 		.multisampleState = &MULTISAMPLING_DISABLED,
 		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &SHADOW_MAP_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
 	};
-	if (spotLightShadowMapRenderPass != VK_NULL_HANDLE)
-	{
-		shaderStages[1].module = spotLightShadowMapsFragShaderModule;
-		pipelineInfo.colorBlendState = &SHADOW_MAP_COLOR_BLENDING;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.spotLightShadowMaps.wallActors),
-							   "Failed to create wall actor spot light shadow map graphics pipeline!");
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  spotLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.directionalLightShadowMaps
-																				   .wallActors),
-							   "Failed to create wall actor directional light shadow map graphics pipeline!");
-	}
-	if (pointLightShadowMapRenderPass != VK_NULL_HANDLE)
-	{
-		shaderStages[1].module = pointLightShadowMapsFragShaderModule;
-		pipelineInfo.colorBlendState = &COLOR_BLENDING;
-		VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
-																		  &pipelineInfo,
-																		  pointLightShadowMapRenderPass,
-																		  0,
-																		  &pipelines.pointLightShadowMaps.wallActors),
-							   "Failed to create wall actor point light shadow map graphics pipeline!");
-	}
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.shadowMaps.wallActors),
+						   "Failed to create wall actor shadow map graphics pipeline!");
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.directionalLightShadowMaps.wallActors),
+						   "Failed to create wall actor directional light shadow map graphics pipeline!");
 
 	return VK_SUCCESS;
 }
@@ -1684,7 +1627,7 @@ bool CreateGraphicsPipelines()
 
 VkResult CreateShadowMapGraphicsPipelines()
 {
-	if (spotLightShadowMapRenderPass == VK_NULL_HANDLE && pointLightShadowMapRenderPass == VK_NULL_HANDLE)
+	if (shadowMapRenderPass == VK_NULL_HANDLE)
 	{
 		return VK_SUCCESS;
 	}
@@ -1692,14 +1635,8 @@ VkResult CreateShadowMapGraphicsPipelines()
 	shadowMapPushConstantRange.dataPointer = &shadowMapPushConstants;
 	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
 
-	VulkanTestReturnResult(CreateShaderModule(SHADER("spot_light_shadow_maps_f"),
-											  SHADER_TYPE_FRAG,
-											  &spotLightShadowMapsFragShaderModule),
+	VulkanTestReturnResult(CreateShaderModule(SHADER("shadow_maps_f"), SHADER_TYPE_FRAG, &shadowMapsFragShaderModule),
 						   "Failed to load spot light shadow maps fragment shader!");
-	VulkanTestReturnResult(CreateShaderModule(SHADER("point_light_shadow_maps_f"),
-											  SHADER_TYPE_FRAG,
-											  &pointLightShadowMapsFragShaderModule),
-						   "Failed to load point light shadow maps fragment shader!");
 
 	VulkanTestReturnResult(CreateMapShadowMapPipeline(), "Failed to create map shadow maps pipeline!");
 	VulkanTestReturnResult(CreateModelActorShadowMapPipeline(), "Failed to create model actor shadow maps pipeline!");
