@@ -2,6 +2,7 @@
 // Created by droc101 on 10/7/2025.
 //
 
+#include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/Commit.h>
@@ -269,6 +270,8 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	InitOptions();
 
+	InitAddonLoader();
+
 	InitTimers();
 
 	PhysicsInitGlobal(GetState());
@@ -437,6 +440,7 @@ void DestroyEngine()
 	LogDebug("Cleaning up icon...\n");
 	SDL_DestroySurface(windowIcon);
 	DestroyAssetCache(); // Free all assets
+	DestroyAddonLoader();
 	DestroyGameConfig();
 	// Need to clean up logging system before cleaning SDL as logging uses and SDL thread
 	// Logs beyond this point will not be written to the log file, but will still print to stdout

@@ -117,6 +117,8 @@ target_sources(engine INTERFACE
         include/engine/assets/DataWriter.h
         src/assets/KvlFile.c
         include/engine/assets/KvlFile.h
+        src/assets/AddonLoader.c
+        include/engine/assets/AddonLoader.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h
