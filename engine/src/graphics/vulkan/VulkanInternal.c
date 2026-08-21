@@ -382,19 +382,19 @@ bool CreateDescriptorSetLayouts()
 		{
 			.bindingName = "Cull Info",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 6,
+			.descriptorCount = 8,
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
 			.bindingName = "Unculled Draw Info",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 6,
+			.descriptorCount = 8,
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
 			.bindingName = "Output Draw Info",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 6,
+			.descriptorCount = 8,
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 	};
@@ -592,7 +592,7 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 21,
+			.descriptorCount = 27,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {

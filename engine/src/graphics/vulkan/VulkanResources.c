@@ -297,7 +297,7 @@ static inline VkResult CreateActorWallBuffers()
 	const LunaWriteDescriptorSet drawInfoWrite = {
 		.descriptorSet = descriptorSets.culling.set,
 		.bindingName = "Output Draw Info",
-		.descriptorArrayElement = 2,
+		.descriptorArrayElement = 4,
 		.descriptorCount = 2,
 		.bufferInfos = drawInfoBuffers,
 	};
@@ -508,6 +508,7 @@ bool CreateBuffers()
 	VulkanTest(CreateFrustumsBuffer(), "Failed to create frustums buffer!");
 	VulkanTest(CreateModelBuffer(&buffers.actorModels, "actor models"), "Failed to create actor models buffers!");
 	VulkanTest(CreateActorWallBuffers(), "Failed to create actor wall buffers!");
+	VulkanTest(CreateModelBuffer(&buffers.opaqueMap, "opaque map"), "Failed to create opaque map buffers!");
 	VulkanTest(CreateModelBuffer(&buffers.map, "map"), "Failed to create map buffers!");
 	VulkanTest(CreateModelBuffer(&buffers.viewmodel, "viewmodel"), "Failed to create viewmodel buffers!");
 	VulkanTest(CreateSkyBuffers(), "Failed to create sky buffers!");

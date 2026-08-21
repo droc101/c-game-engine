@@ -1306,6 +1306,69 @@ static inline VkResult CreateMapShadowMapPipeline()
 	return VK_SUCCESS;
 }
 
+static inline VkResult CreateOpaqueMapShadowMapPipeline()
+{
+	if (pipelines.shadowMaps.opaqueMap != LUNA_NULL_HANDLE)
+	{
+		lunaDestroyGraphicsPipeline(device, pipelines.shadowMaps.opaqueMap);
+	}
+
+	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
+	VulkanTestReturnResult(CreateShaderModule(SHADER("opaque_map_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
+						   "Failed to load opaque map shadow maps vertex shader!");
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = shaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescriptions[] = {
+		{
+			.binding = 0,
+			.stride = sizeof(MapVertex),
+			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+		},
+	};
+	const VkVertexInputAttributeDescription attributeDescriptions[] = {
+		{
+			.location = 0,
+			.binding = 0,
+			.format = VK_FORMAT_R32G32B32_SFLOAT,
+			.offset = offsetof(MapVertex, position),
+		},
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.pVertexBindingDescriptions = bindingDescriptions,
+		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.pVertexAttributeDescriptions = attributeDescriptions,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &SHADOW_MAP_RASTERIZER,
+		.multisampleState = &MULTISAMPLING_DISABLED,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.dynamicState = &DYNAMIC_STATE,
+		.layoutCreationInfo = shadowMapPipelineLayoutCreationInfo,
+	};
+	VulkanTestReturnResult(lunaCreateGraphicsPipelineWithVkRenderPass(device,
+																	  &pipelineInfo,
+																	  shadowMapRenderPass,
+																	  0,
+																	  &pipelines.shadowMaps.opaqueMap),
+						   "Failed to create opaque map shadow map graphics pipeline!");
+
+	return VK_SUCCESS;
+}
+
 static inline VkResult CreateModelActorShadowMapPipeline()
 {
 	if (pipelines.shadowMaps.modelActors != LUNA_NULL_HANDLE)
@@ -1638,6 +1701,7 @@ VkResult CreateShadowMapGraphicsPipelines()
 	VulkanTestReturnResult(CreateShaderModule(SHADER("shadow_maps_f"), SHADER_TYPE_FRAG, &shadowMapsFragShaderModule),
 						   "Failed to load spot light shadow maps fragment shader!");
 
+	VulkanTestReturnResult(CreateOpaqueMapShadowMapPipeline(), "Failed to create map shadow maps pipeline!");
 	VulkanTestReturnResult(CreateMapShadowMapPipeline(), "Failed to create map shadow maps pipeline!");
 	VulkanTestReturnResult(CreateModelActorShadowMapPipeline(), "Failed to create model actor shadow maps pipeline!");
 	VulkanTestReturnResult(CreateWallActorShadowMapPipeline(), "Failed to create wall actor shadow maps pipeline!");

@@ -15,25 +15,25 @@ layout(set = 1, binding = 0, scalar) readonly restrict buffer Frustums {
 layout(set = 1, binding = 1, scalar) readonly restrict buffer CullInfos {
     uint count;
     ModelCullInfo model[];
-} cullInfos[6];
+} cullInfos[8];
 
 layout(set = 1, binding = 2, scalar) buffer UnculledDrawInfo {
     VkDrawIndexedIndirectCommand drawInfos[];
-} unculledDrawInfo[6];
+} unculledDrawInfo[8];
 layout(set = 1, binding = 2, scalar) buffer InstanceIndices {
     uint instanceIndex[];
-} instanceIndices[6];
+} instanceIndices[8];
 
 layout(set = 1, binding = 3, scalar) buffer ModelsDrawInfo {
     uint drawCount;
     VkDrawIndexedIndirectCommand drawInfos[];
-} modelsDrawInfo[6];
+} modelsDrawInfo[8];
 layout(set = 1, binding = 3, scalar) buffer VkDrawIndirectCommand {
     uint vertexCount;
     uint instanceCount;
     uint firstVertex;
     uint firstInstance;
-} actorWallsDrawInfo[6];
+} actorWallsDrawInfo[8];
 
 bool IsVisible(const ModelCullInfo cullInfo) {
     if (pushConstants.frustumIndex == -1) {
@@ -63,10 +63,10 @@ void CullMapModel(const uint bufferIndex, const uint index) {
 void CullWallActor(const uint bufferIndex, const uint index) {
     if (IsVisible(cullInfos[bufferIndex].model[index])) {
         const uint drawIndex = atomicAdd(actorWallsDrawInfo[bufferIndex].instanceCount, 1);
-        if (bufferIndex == 2) {
-            instanceIndices[2].instanceIndex[drawIndex] = index;
+        if (bufferIndex == 4) {
+            instanceIndices[4].instanceIndex[drawIndex] = index;
         } else {
-            instanceIndices[3].instanceIndex[drawIndex] = index + cullInfos[2].count;
+            instanceIndices[5].instanceIndex[drawIndex] = index + cullInfos[4].count;
         }
     }
 }
@@ -78,9 +78,9 @@ void main() {
         return;
     }
 
-    if (bufferIndex < 2) {
+    if (bufferIndex < 4) {
         CullMapModel(bufferIndex, index);
-    } else if (bufferIndex < 4) {
+    } else if (bufferIndex < 6) {
         CullWallActor(bufferIndex, index);
     } else {
         // TODO: Actor models

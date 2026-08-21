@@ -7,30 +7,33 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 layout(set = 0, binding = 1, scalar) readonly restrict buffer CullInfos {
     uint count;
     ModelCullInfo model[];
-} cullInfos[6];
+} cullInfos[8];
 
 layout(set = 0, binding = 3, scalar) buffer ModelsDrawInfo {
     uint drawCount;
     VkDrawIndexedIndirectCommand drawInfos[];
-} modelsDrawInfo[6];
+} modelsDrawInfo[8];
 layout(set = 0, binding = 3, scalar) buffer VkDrawIndirectCommand {
     uint vertexCount;
     uint instanceCount;
     uint firstVertex;
     uint firstInstance;
-} actorWallsDrawInfo[6];
+} actorWallsDrawInfo[8];
 
 void main() {
     modelsDrawInfo[0].drawCount = 0;
     modelsDrawInfo[1].drawCount = 0;
+    modelsDrawInfo[2].drawCount = 0;
+    modelsDrawInfo[3].drawCount = 0;
 
-    actorWallsDrawInfo[2].vertexCount = 12;
-    actorWallsDrawInfo[2].instanceCount = 0;
-    actorWallsDrawInfo[2].firstVertex = 0;
-    actorWallsDrawInfo[2].firstInstance = 0;
+    // TODO: Initialize actor wall draw infos so that only the instance count needs to be reset
+    actorWallsDrawInfo[4].vertexCount = 12;
+    actorWallsDrawInfo[4].instanceCount = 0;
+    actorWallsDrawInfo[4].firstVertex = 0;
+    actorWallsDrawInfo[4].firstInstance = 0;
 
-    actorWallsDrawInfo[3].vertexCount = 12;
-    actorWallsDrawInfo[3].instanceCount = 0;
-    actorWallsDrawInfo[3].firstVertex = 0;
-    actorWallsDrawInfo[3].firstInstance = 0;
+    actorWallsDrawInfo[5].vertexCount = 12;
+    actorWallsDrawInfo[5].instanceCount = 0;
+    actorWallsDrawInfo[5].firstVertex = 0;
+    actorWallsDrawInfo[5].firstInstance = 0;
 }

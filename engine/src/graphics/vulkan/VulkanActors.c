@@ -409,7 +409,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		const LunaWriteDescriptorSet instanceIndicesWrite = {
 			.descriptorSet = descriptorSets.culling.set,
 			.bindingName = "Unculled Draw Info",
-			.descriptorArrayElement = 2,
+			.descriptorArrayElement = 4,
 			.descriptorCount = 1,
 			.bufferInfos = &instanceIndicesBufferInfo,
 		};
@@ -437,7 +437,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		const LunaWriteDescriptorSet cullingInfoWrite = {
 			.descriptorSet = descriptorSets.culling.set,
 			.bindingName = "Cull Info",
-			.descriptorArrayElement = 2,
+			.descriptorArrayElement = 4,
 			.descriptorCount = 1,
 			.bufferInfos = &cullingInfoBufferInfo,
 		};
@@ -466,7 +466,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		const LunaWriteDescriptorSet instanceIndicesWrite = {
 			.descriptorSet = descriptorSets.culling.set,
 			.bindingName = "Unculled Draw Info",
-			.descriptorArrayElement = 3,
+			.descriptorArrayElement = 5,
 			.descriptorCount = 1,
 			.bufferInfos = &instanceIndicesBufferInfo,
 		};
@@ -494,7 +494,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		const LunaWriteDescriptorSet cullingInfoWrite = {
 			.descriptorSet = descriptorSets.culling.set,
 			.bindingName = "Cull Info",
-			.descriptorArrayElement = 3,
+			.descriptorArrayElement = 5,
 			.descriptorCount = 1,
 			.bufferInfos = &cullingInfoBufferInfo,
 		};

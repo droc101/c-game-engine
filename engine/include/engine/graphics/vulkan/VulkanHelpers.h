@@ -281,6 +281,7 @@ typedef struct Buffers
 	LunaBuffer frustums;
 	ModelBuffer actorModels;
 	ActorWallBuffer actorWalls;
+	ModelBuffer opaqueMap;
 	ModelBuffer map;
 	ModelBuffer viewmodel;
 	SkyBuffer sky;
@@ -293,6 +294,9 @@ typedef struct Buffers
 
 typedef struct ShadowMapPipelines
 {
+	LunaGraphicsPipeline opaqueMap;
+	LunaGraphicsPipeline opaqueModelActors;
+	LunaGraphicsPipeline opaqueWallActors;
 	LunaGraphicsPipeline map;
 	LunaGraphicsPipeline modelActors;
 	LunaGraphicsPipeline wallActors;

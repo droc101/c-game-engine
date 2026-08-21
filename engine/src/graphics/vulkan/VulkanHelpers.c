@@ -658,6 +658,8 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 VkResult CullModels()
 {
 	const LunaBuffer bufferHandles[] = {
+		buffers.opaqueMap.shadedDrawInfo,
+		buffers.opaqueMap.unshadedDrawInfo,
 		buffers.map.shadedDrawInfo,
 		buffers.map.unshadedDrawInfo,
 		buffers.actorWalls.shadedDrawInfo,
@@ -717,7 +719,7 @@ VkResult CullModels()
 		.pipeline = pipelines.culling,
 		.descriptorSetBindInfo = &descriptorSetBindInfo,
 		.groupCountX = 16,
-		.groupCountY = 4,
+		.groupCountY = 6,
 	};
 	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
 
