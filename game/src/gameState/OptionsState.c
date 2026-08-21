@@ -73,7 +73,7 @@ static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 		RenderInGameMenuBackground();
 	} else
 	{
-		RenderMenuBackground(state, true);
+		RenderMenuBackground(state, false);
 	}
 
 	ProcessUiStack(optionsStack);

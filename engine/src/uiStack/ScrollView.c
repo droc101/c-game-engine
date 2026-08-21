@@ -47,11 +47,29 @@ void FreeScrollView(ScrollView *view)
 	free(view);
 }
 
+static void ScrollViewControlFocused(const Control *c)
+{
+	ScrollView *view = c->positioningData;
+	const float top = c->position.y;
+	const float bottom = top + c->size.y;
+
+	const float scrollViewHeight = view->size.y - 32.0f;
+
+	if (bottom + (float)view->scrollBarData.scrollPos > scrollViewHeight)
+	{
+		view->scrollBarData.scrollPos = (int)(scrollViewHeight - bottom);
+	} else if (top + view->scrollBarData.scrollPos < 16.0f)
+	{
+		view->scrollBarData.scrollPos = -top;
+	}
+}
+
 void ScrollViewAddChild(ScrollView *view, Control *control)
 {
 	assert(control->anchor == TOP_LEFT || control->anchor == TOP_CENTER || control->anchor == TOP_RIGHT);
 	control->CalculatePosition = CalculateScrollViewChildPosition;
 	control->positioningData = view;
+	control->FocusCallback = ScrollViewControlFocused;
 	ListAdd(view->children, control);
 	UiStackPush(view->stack, control);
 }

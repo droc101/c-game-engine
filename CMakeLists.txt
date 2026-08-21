@@ -4,6 +4,7 @@ project(game C)
 include(engine/cmake/Helpers.cmake)
 
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin)
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -25,6 +26,10 @@ option(STANDALONE_LAUNCHER "Whether or not to build only the launcher" OFF)
 set(X86_64_VERSION "3" CACHE STRING "The x86_64 microarchitecture level to target, 1 to 4. Using lower levels has a performance penalty.") # See https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels for details
 
 option(USE_DISCORD_SDK "Whether or not to enable the Discord Game SDK" ON)
+
+option(ENABLE_STEAMWORKS "Whether or not to enable Steamworks integration. You must also set the STEAMWORKS_SDK_PATH and STEAMWORKS_APP_ID variables when using this." OFF)
+set(STEAMWORKS_SDK_PATH "/path/to/steamworks/sdk" CACHE STRING "The absolute path to the Steamworks SDK. Do not add a trailing slash.")
+set(STEAMWORKS_APP_ID "480" CACHE STRING "The Steam AppID to use with Steamworks")
 
 #endregion
 

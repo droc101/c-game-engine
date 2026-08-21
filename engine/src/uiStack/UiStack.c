@@ -34,12 +34,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
-typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
-typedef void (*ControlDestroyFunc)(const Control *);
-typedef void (*ControlFocusFunc)(const Control *);
-typedef void (*ControlUnfocusFunc)(const Control *);
-
 /**
  * Destroy functions for each control type
  */
@@ -179,23 +173,27 @@ bool ProcessUiStack(UiStack *stack)
 		if (!c->allowFocus)
 		{
 			stack->focusedControl = -1u;
-		} else if (CONTROL_UPDATE_FUNCTIONS[c->type])
+		} else
 		{
-			CONTROL_UPDATE_FUNCTIONS[c->type](stack,
-											  c,
-											  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-											  stack->focusedControl);
+			const Vector2 localMousePos = v2(mousePos.x - c->position.x, mousePos.y - c->position.y);
+			if (c->UpdateCallback)
+			{
+				c->UpdateCallback(stack, c, localMousePos, stack->focusedControl);
+			}
+			CONTROL_UPDATE_FUNCTIONS[c->type](stack, c, localMousePos, stack->focusedControl);
 		}
 	}
 	if (stack->activeControl != -1u)
 	{
 		Control *c = ListGetPointer(stack->controls, stack->activeControl);
+		const Vector2 localMousePos = v2(mousePos.x - c->position.x, mousePos.y - c->position.y);
+		if (c->UpdateCallback)
+		{
+			c->UpdateCallback(stack, c, localMousePos, stack->activeControl);
+		}
 		if (CONTROL_UPDATE_FUNCTIONS[c->type])
 		{
-			CONTROL_UPDATE_FUNCTIONS[c->type](stack,
-											  c,
-											  v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-											  stack->activeControl);
+			CONTROL_UPDATE_FUNCTIONS[c->type](stack, c, localMousePos, stack->activeControl);
 		}
 	}
 
@@ -204,12 +202,14 @@ bool ProcessUiStack(UiStack *stack)
 	{
 		Control *c = ListGetPointer(stack->controls, i);
 
+		const Vector2 localMousePos = v2(mousePos.x - c->position.x, mousePos.y - c->position.y);
+		if (c->AlwaysUpdateCallback)
+		{
+			c->AlwaysUpdateCallback(stack, c, localMousePos, stack->activeControl);
+		}
 		if (CONTROL_ALWAYS_UPDATE_FUNCTIONS[c->type])
 		{
-			CONTROL_ALWAYS_UPDATE_FUNCTIONS[c->type](stack,
-													 c,
-													 v2(mousePos.x - c->position.x, mousePos.y - c->position.y),
-													 stack->activeControl);
+			CONTROL_ALWAYS_UPDATE_FUNCTIONS[c->type](stack, c, localMousePos, stack->activeControl);
 		}
 
 		c->anchoredPosition = c->CalculatePosition(c, c->positioningData);
@@ -297,6 +297,10 @@ void SetFocusedControl(UiStack *stack, const uint32_t index)
 	if (stack->focusedControl != -1u)
 	{
 		const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
+		if (c->UnfocusCallback)
+		{
+			c->UnfocusCallback(c);
+		}
 		if (CONTROL_UNFOCUS_FUNCTIONS[c->type] != NULL)
 		{
 			CONTROL_UNFOCUS_FUNCTIONS[c->type](c);
@@ -308,6 +312,10 @@ void SetFocusedControl(UiStack *stack, const uint32_t index)
 	if (stack->focusedControl != -1u)
 	{
 		const Control *c = ListGetPointer(stack->controls, stack->focusedControl);
+		if (c->FocusCallback)
+		{
+			c->FocusCallback(c);
+		}
 		if (CONTROL_FOCUS_FUNCTIONS[c->type] != NULL)
 		{
 			CONTROL_FOCUS_FUNCTIONS[c->type](c);
@@ -340,6 +348,10 @@ void DrawUiStack(const UiStack *stack)
 		CONTROL_DRAW_FUNCTIONS[c->type](c,
 										i == stack->activeControl ? stack->activeControlState : NORMAL,
 										c->anchoredPosition);
+		if (c->DrawCallback)
+		{
+			c->DrawCallback(c, i == stack->activeControl ? stack->activeControlState : NORMAL, c->anchoredPosition);
+		}
 
 		// if this is the focused control, draw a border around it
 		if (i == stack->focusedControl)
@@ -429,12 +441,9 @@ Vector2 CalculateControlPosition(const Control *control, const void *positioning
 
 Control *CreateEmptyControl()
 {
-	Control *c = malloc(sizeof(Control));
+	Control *c = calloc(1, sizeof(Control));
 	CheckAlloc(c);
-	c->tooltip = NULL;
-	c->controlData = NULL;
 	c->CalculatePosition = CalculateControlPosition;
-	c->positioningData = NULL;
 	c->allowFocus = true;
 	return c;
 }
@@ -446,6 +455,10 @@ void UiStackPush(UiStack *stack, Control *control)
 
 void UiStackRemove(UiStack *stack, const Control *control)
 {
+	if (control->DestroyCallback)
+	{
+		control->DestroyCallback(control);
+	}
 	CONTROL_DESTROY_FUNCTIONS[control->type](control);
 
 	ListRemoveAt(stack->controls, ListFind(stack->controls, control));

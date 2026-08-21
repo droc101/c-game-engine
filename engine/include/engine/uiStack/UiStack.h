@@ -20,6 +20,12 @@ typedef struct LiteralControlValue LiteralControlValue;
 typedef struct Control Control;
 typedef struct UiStack UiStack;
 
+typedef void (*ControlDrawFunc)(const Control *, ControlState state, Vector2 position);
+typedef void (*ControlUpdateFunc)(UiStack *stack, Control *, Vector2 localMousePos, uint32_t ctlIndex);
+typedef void (*ControlDestroyFunc)(const Control *);
+typedef void (*ControlFocusFunc)(const Control *);
+typedef void (*ControlUnfocusFunc)(const Control *);
+
 typedef Vector2 (*CalculateControlPositionFunc)(const Control *, const void *positioningData);
 
 enum ControlType
@@ -116,6 +122,13 @@ struct Control
 
 	/// Extra data for the control
 	void *controlData;
+
+	ControlDestroyFunc DestroyCallback;
+	ControlDrawFunc DrawCallback;
+	ControlUpdateFunc UpdateCallback;
+	ControlUpdateFunc AlwaysUpdateCallback;
+	ControlFocusFunc FocusCallback;
+	ControlUnfocusFunc UnfocusCallback;
 };
 
 struct UiStack

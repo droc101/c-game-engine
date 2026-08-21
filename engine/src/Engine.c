@@ -2,6 +2,7 @@
 // Created by droc101 on 10/7/2025.
 //
 
+#include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/Commit.h>
@@ -27,6 +28,7 @@
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <engine/subsystem/SteamworksManager.h>
 #include <engine/subsystem/TextInputSystem.h>
 #include <engine/subsystem/threads/LodThread.h>
 #include <engine/subsystem/threads/PhysicsThread.h>
@@ -247,6 +249,16 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	InitArguments(initInfo.argc, initInfo.argv);
 
+	if (!HasCliArg("--nosteam"))
+	{
+		if (!InitSteamworks())
+		{
+			FriendlyError("Error",
+						  "Fatal Error: Failed to start Steam integration.\nIs the Steam client running and up to "
+						  "date?");
+		}
+	}
+
 	if (HasCliArg("--game"))
 	{
 		const char *game = GetCliArgStr("--game", "assets/game");
@@ -260,6 +272,8 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	InitDebugEntryManager();
 
 	InitOptions();
+
+	InitAddonLoader();
 
 	InitTimers();
 
@@ -382,6 +396,9 @@ void EngineIteration()
 	ProcessStateChangeQueue();
 
 	DiscordUpdate();
+
+	ProcessSteamworks();
+
 	if (state->requestExit)
 	{
 		shouldQuit = true;
@@ -415,6 +432,7 @@ void DestroyEngine()
 {
 	SDL_HideWindow(GetGameWindow());
 	DestroyDPrintConsole();
+	ShutdownSteamworks();
 	DiscordDestroy();
 	PhysicsThreadTerminate();
 	LodThreadDestroy();
@@ -430,6 +448,7 @@ void DestroyEngine()
 	LogDebug("Cleaning up icon...\n");
 	SDL_DestroySurface(windowIcon);
 	DestroyAssetCache(); // Free all assets
+	DestroyAddonLoader();
 	DestroyGameConfig();
 	// Need to clean up logging system before cleaning SDL as logging uses and SDL thread
 	// Logs beyond this point will not be written to the log file, but will still print to stdout
