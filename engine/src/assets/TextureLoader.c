@@ -63,6 +63,7 @@ void GenFallbackImage(Image *src)
 	src->filter = false;
 	src->repeat = true;
 	src->mipmaps = false;
+	src->opaque = true;
 	src->pixelFormat = PIXEL_FORMAT_RGBA8;
 	const size_t pixelDataSize = MISSING_TEX_SIZE * MISSING_TEX_SIZE * sizeof(uint32_t);
 	uint32_t *pixelData = malloc(pixelDataSize);
@@ -128,6 +129,7 @@ Image *LoadImage(const char *asset)
 				img->filter = ReadUint8(reader) != 0;
 				img->repeat = ReadUint8(reader) != 0;
 				img->mipmaps = ReadUint8(reader) != 0;
+				img->opaque = ReadUint8(reader) != 0;
 				img->pixelFormat = ReadUint8(reader);
 				size_t pixelDataSize = img->width * img->height;
 				if (img->pixelFormat == PIXEL_FORMAT_RGBA8)

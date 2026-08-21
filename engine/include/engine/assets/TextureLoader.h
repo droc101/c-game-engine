@@ -48,6 +48,8 @@ struct Image
 	bool repeat;
 	/// Whether to generate mipmaps for this texture
 	bool mipmaps;
+	/// Whether the image is fully opaque
+	bool opaque;
 
 	/// The name of the image
 	char *name;
