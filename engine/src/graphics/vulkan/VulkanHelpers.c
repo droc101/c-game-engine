@@ -756,35 +756,56 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 
 VkResult CullModels()
 {
-	VulkanTestReturnResult(lunaWriteUintToBuffer(device, commandBuffer, buffers.map.shadedDrawInfo, 0, 0, NULL),
-						   "Failed to zero draw count in map shaded draw info buffer!");
-	VulkanTestReturnResult(lunaWriteUintToBuffer(device, commandBuffer, buffers.map.unshadedDrawInfo, 0, 0, NULL),
-						   "Failed to zero draw count in map unshaded draw info buffer!");
+	const LunaBuffer bufferHandles[] = {
+		buffers.map.shadedDrawInfo,
+		buffers.map.unshadedDrawInfo,
+		buffers.actorWalls.shadedDrawInfo,
+		buffers.actorWalls.unshadedDrawInfo,
+	};
+	const LunaMultiBufferMemoryBarrier preClearMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
+		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
+		.bufferCount = sizeof(bufferHandles) / sizeof(*bufferHandles),
+		.buffers = bufferHandles,
+		.size = sizeof(uint32_t),
+	};
+	const LunaDependencyInfo preClearDependencyInfo = {
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &preClearMemoryBarrier,
+	};
+	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preClearDependencyInfo),
+						   "Failed to insert pipeline barrier before clearing culling data!");
 
-	const LunaBufferMemoryBarrier preDispatchMemoryBarriers[] = {
-		{
-			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
-			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
-			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-			.buffer = buffers.map.shadedCullingInfo,
-		},
-		{
-			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
-			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
-			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-			.buffer = buffers.map.unshadedCullingInfo,
-		},
+	const LunaDescriptorSetBindInfo clearDescriptorSetBindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSets.culling.set,
+	};
+	const LunaDispatchInfo clearDispatchInfo = {
+		.pipeline = pipelines.clearCullingData,
+		.descriptorSetBindInfo = &clearDescriptorSetBindInfo,
+	};
+	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &clearDispatchInfo),
+						   "Failed to dispatch culling data clear shader!");
+
+	const LunaMultiBufferMemoryBarrier preDispatchMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+		.bufferCount = sizeof(bufferHandles) / sizeof(*bufferHandles),
+		.buffers = bufferHandles,
+		.size = sizeof(uint32_t),
 	};
 	const LunaDependencyInfo preDispatchDependencyInfo = {
-		.bufferMemoryBarrierCount = sizeof(preDispatchMemoryBarriers) / sizeof(*preDispatchMemoryBarriers),
-		.bufferMemoryBarriers = preDispatchMemoryBarriers,
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &preDispatchMemoryBarrier,
 	};
 	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
 						   "Failed to insert pipeline barrier before culling shader!");
 
-	VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, pipelines.culling),
+	VulkanTestReturnResult(lunaPushConstantsCompute(device, commandBuffer, pipelines.culling),
 						   "Failed to push constants for culling pipeline!");
 	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.culling.set};
 	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
@@ -795,44 +816,21 @@ VkResult CullModels()
 		.pipeline = pipelines.culling,
 		.descriptorSetBindInfo = &descriptorSetBindInfo,
 		.groupCountX = 16,
-		.groupCountY = 2,
+		.groupCountY = 4,
 	};
 	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
 
-	const LunaBufferMemoryBarrier postDispatchMemoryBarriers[] = {
-		{
-			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
-			.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
-			.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
-			.buffer = buffers.map.shadedDrawInfo,
-		},
-		{
-			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
-			.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
-			.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
-			.buffer = buffers.map.unshadedDrawInfo,
-		},
-		// {
-		// 	.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-		// 	.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
-		// 	.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
-		// 	.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
-		// 	.buffer = buffers.actorModels.shadedDrawInfo,
-		// },
-		// {
-		// 	.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-		// 	.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
-		// 	.destinationStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
-		// 	.destinationAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
-		// 	.buffer = buffers.actorModels.unshadedDrawInfo,
-		// },
-		// // Actor walls barriers
+	const LunaMultiBufferMemoryBarrier postDispatchMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
+		.destinationAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+		.bufferCount = sizeof(bufferHandles) / sizeof(*bufferHandles),
+		.buffers = bufferHandles,
 	};
 	const LunaDependencyInfo postDispatchDependencyInfo = {
-		.bufferMemoryBarrierCount = sizeof(postDispatchMemoryBarriers) / sizeof(*postDispatchMemoryBarriers),
-		.bufferMemoryBarriers = postDispatchMemoryBarriers,
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &postDispatchMemoryBarrier,
 	};
 	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &postDispatchDependencyInfo),
 						   "Failed to insert pipeline barrier after culling shader!");

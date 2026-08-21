@@ -44,6 +44,34 @@ struct ModelCullInfo {
     uint castsShadows;
 };
 
+struct ModelInstanceData
+{
+	mat4 transformMatrix;
+	vec4 materialColor;
+	uint textureIndex;
+};
+
+struct ActorModelInstanceData
+{
+	mat4 transformMatrix;
+	vec4 modColor;
+	vec4 materialColor;
+	uint textureIndex;
+};
+
+struct ActorWallInstanceData
+{
+	vec3 position;
+	vec2 scale;
+	vec2 axis;
+	vec2 centerOffset;
+	vec4 rotationQuat;
+	uint textureIndex;
+	vec2 uvScale;
+	vec2 uvOffset;
+	vec4 modColor;
+};
+
 struct VkDrawIndexedIndirectCommand {
     uint indexCount;
     uint instanceCount;

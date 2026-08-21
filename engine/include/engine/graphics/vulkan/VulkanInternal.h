@@ -24,6 +24,8 @@ bool CreateRenderPass();
 
 bool CreateDescriptorSetLayouts();
 
+bool CreateCullingDataClearPipeline();
+
 bool CreateCullingPipeline();
 
 bool CreateGraphicsPipelines();

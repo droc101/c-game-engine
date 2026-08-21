@@ -32,7 +32,7 @@ message(STATUS "Fetching Luna...")
 FetchContent_Declare(
         Luna
         GIT_REPOSITORY https://github.com/NBT22/Luna
-        GIT_TAG cc661950bdb88c263f4b84d88a74bc0b52ebcb0e
+        GIT_TAG f9a162bc094cb6c9668d67ced5a8f31ebf2bb6a2
         GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(Luna)

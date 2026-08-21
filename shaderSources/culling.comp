@@ -17,17 +17,23 @@ layout(set = 1, binding = 1, scalar) readonly restrict buffer CullInfos {
     ModelCullInfo model[];
 } cullInfos[6];
 
-layout(set = 1, binding = 2, scalar) readonly buffer UnculledDrawInfo {
+layout(set = 1, binding = 2, scalar) buffer UnculledDrawInfo {
     VkDrawIndexedIndirectCommand drawInfos[];
 } unculledDrawInfo[6];
-layout(set = 1, binding = 2, scalar) readonly buffer UnculledActorWallInstanceInfo {
-    ActorWallInstanceData instanceInfos[];
-} unculledActorWallInstanceInfo[6];
+layout(set = 1, binding = 2, scalar) buffer InstanceIndices {
+    uint instanceIndex[];
+} instanceIndices[6];
 
-layout(set = 1, binding = 3, scalar) restrict buffer DrawInfo {
+layout(set = 1, binding = 3, scalar) buffer ModelsDrawInfo {
     uint drawCount;
     VkDrawIndexedIndirectCommand drawInfos[];
-} drawInfo[6];
+} modelsDrawInfo[6];
+layout(set = 1, binding = 3, scalar) buffer VkDrawIndirectCommand {
+    uint vertexCount;
+    uint instanceCount;
+    uint firstVertex;
+    uint firstInstance;
+} actorWallsDrawInfo[6];
 
 bool IsVisible(const ModelCullInfo cullInfo) {
     if (pushConstants.frustumIndex == -1) {
@@ -47,15 +53,36 @@ bool IsVisible(const ModelCullInfo cullInfo) {
            center.z * frustum.frustumPlanes[3] - abs(center.y) * frustum.frustumPlanes[2] > -cullInfo.radius;
 }
 
+void CullMapModel(const uint bufferIndex, const uint index) {
+    if (IsVisible(cullInfos[bufferIndex].model[index])) {
+        const uint drawIndex = atomicAdd(modelsDrawInfo[bufferIndex].drawCount, 1);
+        modelsDrawInfo[bufferIndex].drawInfos[drawIndex] = unculledDrawInfo[bufferIndex].drawInfos[index];
+    }
+}
+
+void CullWallActor(const uint bufferIndex, const uint index) {
+    if (IsVisible(cullInfos[bufferIndex].model[index])) {
+        const uint drawIndex = atomicAdd(actorWallsDrawInfo[bufferIndex].instanceCount, 1);
+        if (bufferIndex == 2) {
+            instanceIndices[2].instanceIndex[drawIndex] = index;
+        } else {
+            instanceIndices[3].instanceIndex[drawIndex] = index + cullInfos[2].count;
+        }
+    }
+}
+
 void main() {
     const uint bufferIndex = gl_GlobalInvocationID.y;
     const uint index = gl_GlobalInvocationID.x;
-    if (index >= cullInfos[nonuniformEXT(bufferIndex)].count) {
+    if (index >= cullInfos[bufferIndex].count) {
         return;
     }
 
-    if (IsVisible(cullInfos[nonuniformEXT(bufferIndex)].model[index])) {
-        const uint drawIndex = atomicAdd(drawInfo[nonuniformEXT(bufferIndex)].drawCount, 1);
-        drawInfo[nonuniformEXT(bufferIndex)].drawInfos[drawIndex] = unculledDrawInfo[nonuniformEXT(bufferIndex)].drawInfos[index];
+    if (bufferIndex < 2) {
+        CullMapModel(bufferIndex, index);
+    } else if (bufferIndex < 4) {
+        CullWallActor(bufferIndex, index);
+    } else {
+        // TODO: Actor models
     }
 }

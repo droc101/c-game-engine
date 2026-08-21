@@ -355,6 +355,12 @@ bool CreateDescriptorSetLayouts()
 			.descriptorCount = 4,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
+		{
+			.bindingName = "Wall Actor Instance Data",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		},
 	};
 	const LunaDescriptorSetLayoutCreationInfo commonDescriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
@@ -602,7 +608,7 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 20,
+			.descriptorCount = 21,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {

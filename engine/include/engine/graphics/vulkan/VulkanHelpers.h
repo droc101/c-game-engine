@@ -158,10 +158,10 @@ typedef struct ModelInstanceData
 typedef struct ActorModelInstanceData
 {
 	mat4 transformMatrix;
-	vec4 modColor;
-	vec4 materialColor;
+	Color modColor;
+	Color materialColor;
 	uint32_t textureIndex;
-} __attribute__((aligned(32))) ActorModelInstanceData;
+} ActorModelInstanceData;
 
 typedef struct ActorWallInstanceData
 {
@@ -236,14 +236,24 @@ typedef struct ActorWallBuffer
 {
 	/// A buffer of the 12 ActorWallVertex values corresponding to the two faces of the quad
 	LunaBuffer vertices;
-	/// A buffer containing the ActorWallInstanceData for each shaded actor wall
-	LunaBuffer shadedInstanceData;
 	/// The number of shaded actor walls in the map
 	uint32_t shadedInstanceCount;
-	/// A buffer containing the ActorWallInstanceData for each unshaded actor wall
-	LunaBuffer unshadedInstanceData;
 	/// The number of unshaded actor walls in the map
 	uint32_t unshadedInstanceCount;
+	/// A buffer containing the VkDrawIndirectCommand for each shaded actor wall
+	LunaBuffer shadedDrawInfo;
+	/// A buffer containing the VkDrawIndirectCommand for each unshaded actor wall
+	LunaBuffer unshadedDrawInfo;
+	/// A buffer containing uint32_t instance indices emitted by culling for each shaded actor wall
+	LunaBuffer shadedInstanceIndices;
+	/// A buffer containing uint32_t instance indices emitted by culling for each unshaded actor wall
+	LunaBuffer unshadedInstanceIndices;
+	/// A buffer containing the ActorWallInstanceData for each actor wall
+	LunaBuffer instanceData;
+	/// A buffer containing information about each shaded actor wall that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded actor wall that is used for culling
+	LunaBuffer unshadedCullingInfo;
 } ActorWallBuffer;
 
 typedef struct PlayerModelBuffer
@@ -299,6 +309,7 @@ typedef struct DirectionalShadowMapPipelines
 typedef struct Pipelines
 {
 	LunaComputePipeline culling;
+	LunaComputePipeline clearCullingData;
 
 	LunaGraphicsPipeline ui;
 	LunaGraphicsPipeline shadedMap;

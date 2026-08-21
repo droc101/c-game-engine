@@ -1013,7 +1013,7 @@ static inline bool CreateActorWallPipelines()
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorWallInstanceData),
+			.stride = sizeof(uint32_t),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -1033,56 +1033,7 @@ static inline bool CreateActorWallPipelines()
 		{
 			.location = 2,
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, position),
-		},
-		{
-			.location = 3,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, scale),
-		},
-		{
-			.location = 4,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, axis),
-		},
-		{
-			.location = 5,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, centerOffset),
-		},
-		{
-			.location = 6,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, rotationQuat),
-		},
-		{
-			.location = 7,
-			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorWallInstanceData, textureIndex),
-		},
-		{
-			.location = 8,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, uvScale),
-		},
-		{
-			.location = 9,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, uvOffset),
-		},
-		{
-			.location = 10,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, modColor),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -1574,7 +1525,7 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorWallInstanceData),
+			.stride = sizeof(uint32_t),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -1594,56 +1545,7 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		{
 			.location = 2,
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, position),
-		},
-		{
-			.location = 3,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, scale),
-		},
-		{
-			.location = 4,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, axis),
-		},
-		{
-			.location = 5,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, centerOffset),
-		},
-		{
-			.location = 6,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, rotationQuat),
-		},
-		{
-			.location = 7,
-			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorWallInstanceData, textureIndex),
-		},
-		{
-			.location = 8,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, uvScale),
-		},
-		{
-			.location = 9,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, uvOffset),
-		},
-		{
-			.location = 10,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorWallInstanceData, modColor),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -1699,6 +1601,29 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 	return VK_SUCCESS;
 }
 
+bool CreateCullingDataClearPipeline()
+{
+	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
+		.descriptorSetLayoutCount = 1,
+		.descriptorSetLayouts = &descriptorSets.culling.layout,
+	};
+	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
+	VulkanTest(CreateShaderModule(SHADER("clear_culling_data_c"), SHADER_TYPE_COMP, &shaderModule),
+			   "Failed to load culling data clear shader!");
+	const LunaPipelineShaderStageCreationInfo shaderStageCreationInfo = {
+		.stage = VK_SHADER_STAGE_COMPUTE_BIT,
+		.module = shaderModule,
+	};
+	const LunaComputePipelineCreationInfo creationInfo = {
+		.shaderStageCreationInfo = shaderStageCreationInfo,
+		.layoutCreationInfo = layoutCreationInfo,
+	};
+	VulkanTest(lunaCreateComputePipeline(device, &creationInfo, &pipelines.clearCullingData),
+			   "Failed to create culling pipeline!");
+
+	return true;
+}
+
 bool CreateCullingPipeline()
 {
 	const LunaDescriptorSetLayout layouts[] = {
@@ -1717,8 +1642,8 @@ bool CreateCullingPipeline()
 		.pushConstantsRanges = &pushConstantRange,
 	};
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
-	VulkanTestReturnResult(CreateShaderModule(SHADER("culling_c"), SHADER_TYPE_COMP, &shaderModule),
-						   "Failed to load culling shader!");
+	VulkanTest(CreateShaderModule(SHADER("culling_c"), SHADER_TYPE_COMP, &shaderModule),
+			   "Failed to load culling shader!");
 	const LunaPipelineShaderStageCreationInfo shaderStageCreationInfo = {
 		.stage = VK_SHADER_STAGE_COMPUTE_BIT,
 		.module = shaderModule,

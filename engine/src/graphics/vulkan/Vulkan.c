@@ -18,6 +18,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
@@ -536,25 +537,25 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount, const MapM
 							3,
 							(LunaWriteDescriptorSet[]){cullingInfoWrite, unculledDrawInfoWrite, drawInfoWrite});
 
-	const LunaBufferMemoryBarrier memoryBarriers[] = {
-		{
-			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
-			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
-			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-			.buffer = buffers.map.shadedCullingInfo,
-		},
-		{
-			.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
-			.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
-			.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-			.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-			.buffer = buffers.map.unshadedCullingInfo,
-		},
+	const LunaBuffer bufferHandles[] = {
+		buffers.map.shadedDrawInfo,
+		buffers.map.unshadedDrawInfo,
+		buffers.map.shadedCullingInfo,
+		buffers.map.unshadedCullingInfo,
+		buffers.map.unculledShadedDrawInfo,
+		buffers.map.unculledUnshadedDrawInfo,
+	};
+	const LunaMultiBufferMemoryBarrier memoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+		.bufferCount = sizeof(bufferHandles) / sizeof(*bufferHandles),
+		.buffers = bufferHandles,
 	};
 	const LunaDependencyInfo dependencyInfo = {
-		.bufferMemoryBarrierCount = sizeof(memoryBarriers) / sizeof(*memoryBarriers),
-		.bufferMemoryBarriers = memoryBarriers,
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &memoryBarrier,
 	};
 	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &dependencyInfo),
 						   "Failed to insert pipeline barrier after writing map data!");
@@ -750,9 +751,9 @@ static inline VkResult LoadLights(const Map *map)
 		memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
 	}
 
-	const size_t frustumBufferSize = sizeof(Frustum) * (frustumIndex - 1);
+	const size_t frustumBufferSize = sizeof(Frustum) * (max(frustumIndex, 1) - 1);
 	VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.frustums, frustumBufferSize),
-						   "Failed to frustums buffer!");
+						   "Failed to resize frustums buffer!");
 	const LunaBufferWriteInfo frustumBufferWriteInfo = {
 		.bytes = frustumBufferSize,
 		.data = frustums,
@@ -967,36 +968,38 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 		{
 			VulkanTestReturnResult(lunaBindVertexBuffers(device,
 														 commandBuffer,
-														 &buffers.actorWalls.shadedInstanceData,
+														 &buffers.actorWalls.shadedInstanceIndices,
 														 1,
 														 1),
 								   "Failed to bind shaded actor wall instance data buffer!");
-			const LunaDrawInfo drawInfo = {
+			const LunaDrawIndirectInfo drawInfo = {
 				.pipeline = wallShadowMapsPipeline != LUNA_NULL_HANDLE ? wallShadowMapsPipeline
 																	   : pipelines.shadedActorWall,
 				.pipelineBindInfo = pipelineBindInfo,
-				.vertexCount = 12,
-				.instanceCount = buffers.actorWalls.shadedInstanceCount,
+				.buffer = buffers.actorWalls.shadedDrawInfo,
+				.drawCount = 1,
 			};
-			VulkanTestReturnResult(lunaDraw(device, commandBuffer, &drawInfo), "Failed to draw shaded actor walls!");
+			VulkanTestReturnResult(lunaDrawIndirect(device, commandBuffer, &drawInfo),
+								   "Failed to draw shaded actor walls!");
 		}
 
 		if (buffers.actorWalls.unshadedInstanceCount != 0)
 		{
 			VulkanTestReturnResult(lunaBindVertexBuffers(device,
 														 commandBuffer,
-														 &buffers.actorWalls.unshadedInstanceData,
+														 &buffers.actorWalls.unshadedInstanceIndices,
 														 1,
 														 1),
 								   "Failed to bind unshaded actor wall instance data buffer!");
-			const LunaDrawInfo drawInfo = {
+			const LunaDrawIndirectInfo drawInfo = {
 				.pipeline = wallShadowMapsPipeline != LUNA_NULL_HANDLE ? wallShadowMapsPipeline
 																	   : pipelines.unshadedActorWall,
 				.pipelineBindInfo = pipelineBindInfo,
-				.vertexCount = 12,
-				.instanceCount = buffers.actorWalls.unshadedInstanceCount,
+				.buffer = buffers.actorWalls.unshadedDrawInfo,
+				.drawCount = 1,
 			};
-			VulkanTestReturnResult(lunaDraw(device, commandBuffer, &drawInfo), "Failed to draw unshaded actor walls!");
+			VulkanTestReturnResult(lunaDrawIndirect(device, commandBuffer, &drawInfo),
+								   "Failed to draw unshaded actor walls!");
 		}
 	}
 
@@ -1535,8 +1538,8 @@ bool VK_Init(SDL_Window *window)
 	LogDebug("Initializing Vulkan renderer...\n");
 	// clang-format off
 	if (CreateSurface(window) && CreateLogicalDevice() && CreateCommandBuffers() && CreateSwapchain() &&
-		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateCullingPipeline() && CreateGraphicsPipelines() && CreateTextureSamplers() &&
-		CreateDescriptorSet() && CreateBuffers())
+		CreateRenderPass() && CreateDescriptorSetLayouts() && CreateCullingPipeline() && CreateGraphicsPipelines() &&
+		CreateCullingDataClearPipeline() && CreateTextureSamplers() && CreateDescriptorSet() && CreateBuffers())
 	{
 		WriteDescriptorSet();
 
