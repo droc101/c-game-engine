@@ -4,10 +4,12 @@
 
 #include <dirent.h>
 #include <engine/assets/AddonLoader.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/KvlFile.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/helpers/PlatformHelpers.h>
+#include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Logging.h>
@@ -19,9 +21,61 @@
 
 #define ADDONS_PATH "addons"
 #define ADDON_CONFIG_FILENAME "addon.kvl"
+#define ADDON_ICON_FILENAME "icon.gtex"
 #define ADDON_ASSETS_FOLDER "assets"
+#define ADDON_ICON_PREFIX "dynamic/addon_"
 
 List addons;
+
+void ClearAddonIcons()
+{
+	for (size_t i = 0; i < addons.length; i++)
+	{
+		Addon *a = ListGetPointer(addons, i);
+		free(a->icon);
+		a->icon = NULL;
+	}
+}
+
+char *GetAddonIcon(Addon *addon)
+{
+	if (addon->icon)
+	{
+		return addon->icon;
+	}
+
+	const size_t iconRegisteredNameLength = strlen(ADDON_ICON_PREFIX) + strlen(addon->id) + 1;
+	char *iconRegisteredName = malloc(iconRegisteredNameLength);
+	snprintf(iconRegisteredName, iconRegisteredNameLength, ADDON_ICON_PREFIX "%s", addon->id);
+
+	const size_t iconFilenameLength = strlen(addon->rootPath) + 1 + strlen(ADDON_ICON_FILENAME) + 1;
+	char *iconFilename = malloc(iconFilenameLength);
+	snprintf(iconFilename, iconFilenameLength, "%s/" ADDON_ICON_FILENAME, addon->rootPath);
+
+	Image *icon = malloc(sizeof(Image));
+
+	FILE *file = fopen(iconFilename, "r");
+	if (file)
+	{
+		Asset *iconAsset = LoadAssetFromFile(file);
+		if (!LoadImageFromAsset(iconAsset, icon))
+		{
+			GenFallbackImage(icon);
+		}
+		if (iconAsset)
+		{
+			FreeAsset(iconAsset);
+		}
+	} else
+	{
+		GenFallbackImage(icon);
+	}
+
+	icon->name = iconRegisteredName;
+	RegisterImage(icon);
+	addon->icon = strdup(iconRegisteredName);
+	return addon->icon;
+}
 
 static Addon *LoadAddon(const char *path, const char *id)
 {
@@ -41,7 +95,7 @@ static Addon *LoadAddon(const char *path, const char *id)
 	addon->displayName = strdup(KvGetString(config, "display_name", "Unknown Addon"));
 	addon->description = strdup(KvGetString(config, "description", ""));
 	addon->type = KvGetByte(config, "type", ADDON_TYPE_ASSET_PACK);
-	addon->icon = strdup(MISSING_TEXTURE_NAME); // TODO load icon
+	addon->icon = NULL;
 
 	KvListDestroy(config);
 

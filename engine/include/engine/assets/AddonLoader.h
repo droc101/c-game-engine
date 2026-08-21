@@ -33,4 +33,8 @@ void DestroyAddonLoader();
 
 void ApplyAddonAssetPaths();
 
+void ClearAddonIcons();
+
+char *GetAddonIcon(Addon *addon);
+
 #endif //GAME_ADDONLOADER_H

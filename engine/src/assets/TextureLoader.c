@@ -84,6 +84,55 @@ void GenFallbackImage(Image *src)
 	}
 }
 
+bool LoadImageFromAsset(const Asset *asset, Image *image)
+{
+	if (asset == NULL || asset->type != ASSET_TYPE_TEXTURE)
+	{
+		return false;
+	}
+	DataReader *reader = CreateDataReaderFromAsset(asset);
+	if (asset->typeVersion != TEXTURE_ASSET_VERSION)
+	{
+		LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)\n",
+				 asset->typeVersion,
+				 TEXTURE_ASSET_VERSION);
+		return false;
+	}
+	const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 4);
+	if (asset->size < headerSize)
+	{
+		LogError("Failed to load texture asset as it was the wrong size.\n");
+		return false;
+	}
+	image->width = ReadSizeT(reader);
+	image->height = ReadSizeT(reader);
+	image->filter = ReadUint8(reader) != 0;
+	image->repeat = ReadUint8(reader) != 0;
+	image->mipmaps = ReadUint8(reader) != 0;
+	image->pixelFormat = ReadUint8(reader);
+	size_t pixelDataSize = image->width * image->height;
+	if (image->pixelFormat == PIXEL_FORMAT_RGBA8)
+	{
+		pixelDataSize *= sizeof(uint32_t);
+	} else
+	{
+		pixelDataSize *= sizeof(_Float16) * 4;
+	}
+	if (asset->size < headerSize + pixelDataSize)
+	{
+		LogError("Failed to load texture asset as it was the wrong size.\n");
+		return false;
+	}
+
+	image->pixelData = malloc(pixelDataSize);
+	CheckAlloc(image->pixelData);
+	ReadBuffer(reader, pixelDataSize, image->pixelData);
+
+	DestroyDataReader(reader);
+
+	return true;
+}
+
 Image *LoadImage(const char *asset)
 {
 	Image *existingImage = GetCachedImage(asset);
@@ -101,55 +150,9 @@ Image *LoadImage(const char *asset)
 	CheckAlloc(img);
 
 	Asset *textureAsset = LoadAsset(asset, false, false);
-
-	if (textureAsset == NULL || textureAsset->type != ASSET_TYPE_TEXTURE)
+	if (!LoadImageFromAsset(textureAsset, img))
 	{
 		GenFallbackImage(img);
-	} else
-	{
-		DataReader *reader = CreateDataReaderFromAsset(textureAsset);
-		if (textureAsset->typeVersion != TEXTURE_ASSET_VERSION)
-		{
-			LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)\n",
-					 textureAsset->typeVersion,
-					 TEXTURE_ASSET_VERSION);
-			GenFallbackImage(img);
-		} else
-		{
-			const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 4);
-			if (textureAsset->size < headerSize)
-			{
-				LogError("Failed to load texture asset as it was the wrong size.\n");
-				GenFallbackImage(img);
-			} else
-			{
-				img->width = ReadSizeT(reader);
-				img->height = ReadSizeT(reader);
-				img->filter = ReadUint8(reader) != 0;
-				img->repeat = ReadUint8(reader) != 0;
-				img->mipmaps = ReadUint8(reader) != 0;
-				img->pixelFormat = ReadUint8(reader);
-				size_t pixelDataSize = img->width * img->height;
-				if (img->pixelFormat == PIXEL_FORMAT_RGBA8)
-				{
-					pixelDataSize *= sizeof(uint32_t);
-				} else
-				{
-					pixelDataSize *= sizeof(_Float16) * 4;
-				}
-				if (textureAsset->size < headerSize + pixelDataSize)
-				{
-					LogError("Failed to load texture asset as it was the wrong size.\n");
-					GenFallbackImage(img);
-				} else
-				{
-					img->pixelData = malloc(pixelDataSize);
-					CheckAlloc(img->pixelData);
-					ReadBuffer(reader, pixelDataSize, img->pixelData);
-				}
-			}
-		}
-		DestroyDataReader(reader);
 	}
 
 	const size_t nameLength = strlen(asset) + 1;

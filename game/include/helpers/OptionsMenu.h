@@ -17,6 +17,7 @@ typedef struct OptionsMenu
 	int yPos;
 	bool smallOptionRightSide;
 	bool locked;
+	int rowMaxY;
 } OptionsMenu;
 
 OptionsMenu *CreateOptionsMenu();
@@ -33,6 +34,8 @@ void OptionsMenuAddControl(OptionsMenu *menu, Control *control);
 
 void OptionsMenuNextRow(OptionsMenu *menu);
 
+
+void OptionsMenuAddNoButtonHeaderFooter(OptionsMenu *menu, char *title);
 
 void OptionsMenuAddSimpleHeaderFooter(OptionsMenu *menu, char *title, ButtonCallback doneButtonCallback);
 

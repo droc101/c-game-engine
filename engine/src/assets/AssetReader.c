@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <dirent.h>
+#include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
@@ -13,6 +14,7 @@
 #include <engine/debug/DPrint.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
@@ -32,7 +34,6 @@
 #include <unistd.h>
 #include <zconf.h>
 #include <zlib.h>
-#include <engine/helpers/PlatformHelpers.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -184,6 +185,7 @@ void DestroyAssetCache()
 {
 	LogDebug("Cleaning up asset cache...\n");
 	AssetCache_clear(assetCache);
+	ClearAddonIcons();
 	DestroyTextureLoader();
 	DestroyModelLoader();
 	DestroyMapMaterialLoader();
