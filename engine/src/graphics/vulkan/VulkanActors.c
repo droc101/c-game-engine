@@ -120,12 +120,12 @@ static inline VkResult LoadModelLods(const ModelDefinition *model)
 		{
 			MaterialSlotVertexData *materialSlotVertexData = malloc(sizeof(MaterialSlotVertexData));
 			CheckAlloc(materialSlotVertexData);
-			materialSlotVertexData->indexCount = model->lods[i].indexCount[j];
+			materialSlotVertexData->indexCount = model->lods[i].components[j].indexCount;
 			materialSlotVertexData->firstIndex = bufferIndexCount + indexCount;
 			materialSlotVertexData->vertexOffset = (int32_t)(bufferVertexCount + vertexCount);
 			ListAdd(*materialSlotsVertexData, materialSlotVertexData);
 
-			indexCount += model->lods[i].indexCount[j];
+			indexCount += materialSlotVertexData->indexCount;
 		}
 
 		vertexCount += (int32_t)model->lods[i].vertexCount;
@@ -162,10 +162,9 @@ static inline VkResult LoadModelLods(const ModelDefinition *model)
 		vertexOffset += lod->vertexCount;
 		for (uint32_t materialSlotIndex = 0; materialSlotIndex < model->materialSlotCount; materialSlotIndex++)
 		{
-			memcpy(indexData + indexOffset,
-				   lod->indexData[materialSlotIndex],
-				   lod->indexCount[materialSlotIndex] * sizeof(uint32_t));
-			indexOffset += lod->indexCount[materialSlotIndex];
+			const ModelComponent *component = &lod->components[materialSlotIndex];
+			memcpy(indexData + indexOffset, component->indices, component->indexCount * sizeof(uint32_t));
+			indexOffset += component->indexCount;
 		}
 	}
 

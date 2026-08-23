@@ -114,11 +114,11 @@ static inline VkResult LoadSky(const ModelDefinition *model)
 
 	free(vertices);
 
-	skyModelIndexCount = lod->indexCount[0];
+	skyModelIndexCount = lod->components->indexCount;
 	assert(lunaGetBufferSize(buffers.sky.indices) == sizeof(uint32_t) * skyModelIndexCount);
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
 		.bytes = sizeof(uint32_t) * skyModelIndexCount,
-		.data = lod->indexData[0],
+		.data = lod->components->indices,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.sky.indices, &indexBufferWriteInfo),
@@ -152,8 +152,9 @@ static inline VkResult UpdateViewmodel(const Viewmodel *viewmodel)
 													 &instanceDataBufferWriteInfo),
 							   "Failed to write viewmodel instance data to buffer!");
 
+		const uint32_t componentIndexCount = model->lods->components[i].indexCount;
 		VkDrawIndexedIndirectCommand drawInfo = {
-			.indexCount = model->lods->indexCount[i],
+			.indexCount = componentIndexCount,
 			.instanceCount = 1,
 			.firstIndex = indexCount,
 			.firstInstance = i,
@@ -174,7 +175,7 @@ static inline VkResult UpdateViewmodel(const Viewmodel *viewmodel)
 							   "Failed to write viewmodel draw info to buffer!");
 
 		shadedCount += material->shader == SHADER_SHADED ? 1 : 0;
-		indexCount += model->lods->indexCount[i];
+		indexCount += componentIndexCount;
 	}
 
 	return VK_SUCCESS;
@@ -206,8 +207,9 @@ static inline VkResult LoadViewmodel(const Viewmodel *viewmodel)
 	size_t unshadedMaterialCount = 0;
 	for (size_t i = 0; i < model->materialSlotCount; i++)
 	{
-		memcpy(indices + indexCount, lod->indexData[i], lod->indexCount[i] * sizeof(uint32_t));
-		indexCount += lod->indexCount[i];
+		const ModelComponent *component = &lod->components[i];
+		memcpy(indices + indexCount, component->indices, component->indexCount * sizeof(uint32_t));
+		indexCount += component->indexCount;
 		if (model->materials[materialIndices[i]].shader == SHADER_SHADED)
 		{
 			shadedMaterialCount++;

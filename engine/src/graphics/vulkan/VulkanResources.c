@@ -387,16 +387,17 @@ static inline VkResult CreatePlayerBuffers()
 	for (uint32_t slotIndex = 0; slotIndex < model->materialSlotCount; slotIndex++)
 	{
 		const Material *material = &model->materials[model->skinMaterialIndices[0][slotIndex]];
+		const ModelComponent *component = &lod->components[slotIndex];
 
-		memcpy(indices + indexOffset, lod->indexData[slotIndex], lod->indexCount[slotIndex] * sizeof(uint32_t));
-		indexOffset += lod->indexCount[slotIndex];
+		memcpy(indices + indexOffset, component->indices, component->indexCount * sizeof(uint32_t));
+		indexOffset += component->indexCount;
 
 		buffers.player.instanceData[slotIndex].materialColor = material->color;
 		buffers.player.instanceData[slotIndex].textureIndex = TextureIndex(material->texture);
 
 		if (material->shader == SHADER_SHADED)
 		{
-			shadedDrawInfo[shadedDrawCount].indexCount = lod->indexCount[slotIndex];
+			shadedDrawInfo[shadedDrawCount].indexCount = component->indexCount;
 			shadedDrawInfo[shadedDrawCount].instanceCount = 1;
 			shadedDrawInfo[shadedDrawCount].firstIndex = 0;
 			shadedDrawInfo[shadedDrawCount].vertexOffset = 0;
@@ -404,7 +405,7 @@ static inline VkResult CreatePlayerBuffers()
 			shadedDrawCount++;
 		} else if (material->shader == SHADER_UNSHADED)
 		{
-			unshadedDrawInfo[unshadedDrawCount].indexCount = lod->indexCount[slotIndex];
+			unshadedDrawInfo[unshadedDrawCount].indexCount = component->indexCount;
 			unshadedDrawInfo[unshadedDrawCount].instanceCount = 1;
 			unshadedDrawInfo[unshadedDrawCount].firstIndex = 0;
 			unshadedDrawInfo[unshadedDrawCount].vertexOffset = 0;
