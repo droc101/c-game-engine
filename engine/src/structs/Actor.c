@@ -115,8 +115,8 @@ void ActorFireOutput(Actor *sender, const char *output, const Param defaultParam
 					}
 					ActorTriggerInput(sender, actor, connection->targetActorInput, param);
 				}
-				ListFree(actors);
 			}
+			ListFree(actors);
 
 			// connections that have 0 refires at this point have infinite refires
 			if (connection->numRefires > 0)

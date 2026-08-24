@@ -333,13 +333,13 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 											&buffer->unshadedDrawInfo,
 											unshadedDrawInfoBufferSize + sizeof(uint32_t)),
 						   "Failed to resize map unshaded draw info buffer!");
-	const size_t shadedCullingInfoBufferSize = sizeof(uint32_t) + shadedMaterialCount * sizeof(ModelCullingInfo);
+	const size_t shadedCullingInfoBufferSize = sizeof(uint32_t) + shadedMaterialCount * sizeof(CullingInfo);
 	VulkanTestReturnResult(lunaResizeBuffer(device,
 											commandBuffer,
 											&buffer->shadedCullingInfo,
 											shadedCullingInfoBufferSize),
 						   "Failed to resize map shaded culling info buffer!");
-	const size_t unshadedCullingInfoBufferSize = sizeof(uint32_t) + unshadedMaterialCount * sizeof(ModelCullingInfo);
+	const size_t unshadedCullingInfoBufferSize = sizeof(uint32_t) + unshadedMaterialCount * sizeof(CullingInfo);
 	VulkanTestReturnResult(lunaResizeBuffer(device,
 											commandBuffer,
 											&buffer->unshadedCullingInfo,
@@ -361,9 +361,9 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 	CheckAlloc(shadedDrawInfo);
 	VkDrawIndexedIndirectCommand *unshadedDrawInfo = malloc(unshadedDrawInfoBufferSize);
 	CheckAlloc(unshadedDrawInfo);
-	ModelCullingInfo *shadedCullingInfo = malloc(shadedCullingInfoBufferSize);
+	CullingInfo *shadedCullingInfo = malloc(shadedCullingInfoBufferSize);
 	CheckAlloc(shadedCullingInfo);
-	ModelCullingInfo *unshadedCullingInfo = malloc(unshadedCullingInfoBufferSize);
+	CullingInfo *unshadedCullingInfo = malloc(unshadedCullingInfoBufferSize);
 	CheckAlloc(unshadedCullingInfo);
 	for (size_t i = 0; i < modelCount; i++)
 	{
@@ -466,7 +466,7 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 												 NULL),
 						   "Failed to write map shaded culling info count to buffer!");
 	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
-		.bytes = shadedMaterialCount * sizeof(ModelCullingInfo),
+		.bytes = shadedMaterialCount * sizeof(CullingInfo),
 		.data = shadedCullingInfo,
 		.offset = sizeof(uint32_t),
 		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
@@ -484,7 +484,7 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 												 NULL),
 						   "Failed to write map unshaded culling info count to buffer!");
 	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
-		.bytes = unshadedMaterialCount * sizeof(ModelCullingInfo),
+		.bytes = unshadedMaterialCount * sizeof(CullingInfo),
 		.data = unshadedCullingInfo,
 		.offset = sizeof(uint32_t),
 		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
@@ -528,7 +528,7 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 	};
 	const LunaWriteDescriptorSet unculledDrawInfoWrite = {
 		.descriptorSet = descriptorSets.culling.set,
-		.bindingName = "Unculled Draw Info",
+		.bindingName = "Additional Culling Info",
 		.descriptorArrayElement = opaque ? 0 : 2,
 		.descriptorCount = 2,
 		.bufferInfos = unculledDrawInfoBuffers,
@@ -782,6 +782,15 @@ static inline VkResult LoadLights(const Map *map)
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
 						   "Failed to write frustums buffer!");
+	const LunaDescriptorBufferInfo frustumsBufferInfo = {
+		.buffer = buffers.frustums,
+	};
+	const LunaWriteDescriptorSet frustumsDescriptorWrite = {
+		.descriptorSet = descriptorSets.culling.set,
+		.bindingName = "Frustums",
+		.descriptorCount = 1,
+		.bufferInfos = &frustumsBufferInfo,
+	};
 
 	AvxAlignedFree(frustums);
 
@@ -812,16 +821,16 @@ static inline VkResult LoadLights(const Map *map)
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
 						   "Failed to write lights data to buffer!");
 
-	const LunaDescriptorBufferInfo bufferInfo = {
+	const LunaDescriptorBufferInfo lightsBufferInfo = {
 		.buffer = buffers.uniforms.lights,
 	};
-	const LunaWriteDescriptorSet descriptorSetWrite = {
+	const LunaWriteDescriptorSet lightsDescriptorWrite = {
 		.descriptorSet = descriptorSets.common.set,
 		.bindingName = "Lights",
 		.descriptorCount = 1,
-		.bufferInfos = &bufferInfo,
+		.bufferInfos = &lightsBufferInfo,
 	};
-	lunaWriteDescriptorSets(device, 1, &descriptorSetWrite);
+	lunaWriteDescriptorSets(device, 2, (LunaWriteDescriptorSet[]){frustumsDescriptorWrite, lightsDescriptorWrite});
 
 	return VK_SUCCESS;
 }
@@ -1024,18 +1033,13 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 								  const LunaGraphicsPipeline wallShadowMapsPipeline)
 {
 	const size_t shadedDrawCount = lunaGetBufferSize(buffers.actorModels.shadedDrawInfo) /
-								   sizeof(VkDrawIndexedIndirectCommand);
+								   sizeof(DrawActorModelIndexedIndirectCommand);
 	const size_t unshadedDrawCount = lunaGetBufferSize(buffers.actorModels.unshadedDrawInfo) /
-									 sizeof(VkDrawIndexedIndirectCommand);
+									 sizeof(DrawActorModelIndexedIndirectCommand);
 
 	if (shadedDrawCount != 0 || unshadedDrawCount != 0)
 	{
-		VulkanTestReturnResult(lunaBindVertexBuffers(device,
-													 commandBuffer,
-													 (LunaBuffer[]){buffers.actorModels.vertices,
-																	buffers.actorModels.instanceData},
-													 0,
-													 2),
+		VulkanTestReturnResult(lunaBindVertexBuffers(device, commandBuffer, &buffers.actorModels.vertices, 0, 1),
 							   "Failed to bind actor models vertex buffers!");
 		VulkanTestReturnResult(lunaBindIndexBuffer(device,
 												   commandBuffer,
@@ -1051,12 +1055,19 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 
 		if (shadedDrawCount != 0)
 		{
+			VulkanTestReturnResult(lunaBindVertexBuffers(device,
+														 commandBuffer,
+														 &buffers.actorModels.shadedInstanceIndices,
+														 1,
+														 1),
+								   "Failed to bind shaded actor model instance indices buffer!");
 			const LunaDrawIndexedIndirectInfo drawInfo = {
 				.pipeline = modelShadowMapsPipeline != LUNA_NULL_HANDLE ? modelShadowMapsPipeline
 																		: pipelines.shadedActorModel,
 				.pipelineBindInfo = pipelineBindInfo,
 				.buffer = buffers.actorModels.shadedDrawInfo,
 				.drawCount = shadedDrawCount,
+				.stride = sizeof(DrawActorModelIndexedIndirectCommand),
 			};
 			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
 								   "Failed to draw shaded actor models!");
@@ -1064,12 +1075,19 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 
 		if (unshadedDrawCount != 0)
 		{
+			VulkanTestReturnResult(lunaBindVertexBuffers(device,
+														 commandBuffer,
+														 &buffers.actorModels.unshadedInstanceIndices,
+														 1,
+														 1),
+								   "Failed to bind unshaded actor model instance indices buffer!");
 			const LunaDrawIndexedIndirectInfo drawInfo = {
 				.pipeline = modelShadowMapsPipeline != LUNA_NULL_HANDLE ? modelShadowMapsPipeline
 																		: pipelines.unshadedActorModel,
 				.pipelineBindInfo = pipelineBindInfo,
 				.buffer = buffers.actorModels.unshadedDrawInfo,
 				.drawCount = unshadedDrawCount,
+				.stride = sizeof(DrawActorModelIndexedIndirectCommand),
 			};
 			VulkanTestReturnResult(lunaDrawIndexedIndirect(device, commandBuffer, &drawInfo),
 								   "Failed to draw unshaded actor models!");
@@ -1094,7 +1112,7 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 														 &buffers.actorWalls.shadedInstanceIndices,
 														 1,
 														 1),
-								   "Failed to bind shaded actor wall instance data buffer!");
+								   "Failed to bind shaded actor wall instance indices buffer!");
 			const LunaDrawIndirectInfo drawInfo = {
 				.pipeline = wallShadowMapsPipeline != LUNA_NULL_HANDLE ? wallShadowMapsPipeline
 																	   : pipelines.shadedActorWall,
@@ -1113,7 +1131,7 @@ static inline VkResult DrawActors(const LunaGraphicsPipelineBindInfo *pipelineBi
 														 &buffers.actorWalls.unshadedInstanceIndices,
 														 1,
 														 1),
-								   "Failed to bind unshaded actor wall instance data buffer!");
+								   "Failed to bind unshaded actor wall instance indices buffer!");
 			const LunaDrawIndirectInfo drawInfo = {
 				.pipeline = wallShadowMapsPipeline != LUNA_NULL_HANDLE ? wallShadowMapsPipeline
 																	   : pipelines.unshadedActorWall,

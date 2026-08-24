@@ -10,6 +10,7 @@
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -657,6 +658,8 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 
 VkResult CullModels()
 {
+	SetActorInstanceIndices();
+
 	const LunaBuffer bufferHandles[] = {
 		buffers.opaqueMap.shadedDrawInfo,
 		buffers.opaqueMap.unshadedDrawInfo,
@@ -664,10 +667,16 @@ VkResult CullModels()
 		buffers.map.unshadedDrawInfo,
 		buffers.actorWalls.shadedDrawInfo,
 		buffers.actorWalls.unshadedDrawInfo,
+		buffers.actorWalls.shadedInstanceIndices,
+		buffers.actorWalls.unshadedInstanceIndices,
+		buffers.actorModels.shadedDrawInfo,
+		buffers.actorModels.unshadedDrawInfo,
+		buffers.actorModels.shadedInstanceIndices,
+		buffers.actorModels.unshadedInstanceIndices,
 	};
 	const LunaMultiBufferMemoryBarrier preClearMemoryBarrier = {
-		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
-		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
 		.bufferCount = sizeof(bufferHandles) / sizeof(*bufferHandles),
@@ -719,15 +728,19 @@ VkResult CullModels()
 		.pipeline = pipelines.culling,
 		.descriptorSetBindInfo = &descriptorSetBindInfo,
 		.groupCountX = 16,
-		.groupCountY = 6,
+		.groupCountY = 8,
 	};
 	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
 
 	const LunaMultiBufferMemoryBarrier postDispatchMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
 		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
-		.destinationStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT,
-		.destinationAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT |
+								VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT |
+								VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT |
+								 VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT |
+								 VK_ACCESS_2_SHADER_READ_BIT,
 		.bufferCount = sizeof(bufferHandles) / sizeof(*bufferHandles),
 		.buffers = bufferHandles,
 	};

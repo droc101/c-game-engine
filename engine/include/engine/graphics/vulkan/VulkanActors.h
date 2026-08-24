@@ -14,4 +14,6 @@ VkResult LoadActors(const LockingList *actors);
 
 VkResult UpdateActors();
 
+VkResult SetActorInstanceIndices();
+
 #endif //GAME_VULKANACTORS_H

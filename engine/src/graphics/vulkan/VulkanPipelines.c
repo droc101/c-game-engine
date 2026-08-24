@@ -54,8 +54,8 @@ static const VkPipelineRasterizationStateCreateInfo SHADOW_MAP_RASTERIZER = {
 	.cullMode = VK_CULL_MODE_BACK_BIT,
 	.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 	.depthBiasEnable = VK_TRUE,
-	.depthBiasConstantFactor = -1.0f,
-	.depthBiasSlopeFactor = -2.5f,
+	.depthBiasConstantFactor = -3.5f,
+	.depthBiasSlopeFactor = -6.5f,
 	.lineWidth = 1,
 };
 
@@ -751,7 +751,7 @@ static inline bool CreateShadedActorModelPipeline()
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorModelInstanceData),
+			.stride = sizeof(uint32_t),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -783,44 +783,7 @@ static inline bool CreateShadedActorModelPipeline()
 		{
 			.location = 4,
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
-		},
-		{
-			.location = 5,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
-		},
-		{
-			.location = 6,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
-		},
-		{
-			.location = 7,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
-		},
-		{
-			.location = 8,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, modColor),
-		},
-		{
-			.location = 9,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, materialColor),
-		},
-		{
-			.location = 10,
-			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorModelInstanceData, textureIndex),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -878,7 +841,7 @@ static inline bool CreateUnshadedActorModelPipeline()
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorModelInstanceData),
+			.stride = sizeof(uint32_t),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -904,44 +867,7 @@ static inline bool CreateUnshadedActorModelPipeline()
 		{
 			.location = 3,
 			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
-		},
-		{
-			.location = 4,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
-		},
-		{
-			.location = 5,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
-		},
-		{
-			.location = 6,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
-		},
-		{
-			.location = 7,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, modColor),
-		},
-		{
-			.location = 8,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, materialColor),
-		},
-		{
-			.location = 9,
-			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorModelInstanceData, textureIndex),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
@@ -1403,7 +1329,7 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		},
 		{
 			.binding = 1,
-			.stride = sizeof(ActorModelInstanceData),
+			.stride = sizeof(uint32_t),
 			.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE,
 		},
 	};
@@ -1423,56 +1349,13 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		{
 			.location = 2,
 			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(ModelVertex, normal),
-		},
-		{
-			.location = 3,
-			.binding = 0,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 			.offset = offsetof(ModelVertex, color),
 		},
 		{
-			.location = 4,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 0,
-		},
-		{
-			.location = 5,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 1,
-		},
-		{
-			.location = 6,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 2,
-		},
-		{
-			.location = 7,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, transformMatrix) + sizeof(vec4) * 3,
-		},
-		{
-			.location = 8,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, modColor),
-		},
-		{
-			.location = 9,
-			.binding = 1,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.offset = offsetof(ActorModelInstanceData, materialColor),
-		},
-		{
-			.location = 10,
+			.location = 3,
 			.binding = 1,
 			.format = VK_FORMAT_R32_UINT,
-			.offset = offsetof(ActorModelInstanceData, textureIndex),
 		},
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {

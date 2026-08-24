@@ -4,6 +4,7 @@
 
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
@@ -25,8 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "engine/helpers/PlatformHelpers.h"
 
 Map *CreateMap(void)
 {

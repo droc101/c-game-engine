@@ -38,10 +38,17 @@ struct Frustum {
     float frustumPlanes[4];
 };
 
-struct ModelCullInfo {
+struct CullingInfo {
     vec3 position;
     float radius;
     uint castsShadows;
+};
+
+struct ModelActorCullingInfo {
+    vec3 position;
+    float radius;
+    uint castsShadows;
+    uint drawInfoIndex;
 };
 
 struct ModelInstanceData
@@ -57,6 +64,7 @@ struct ActorModelInstanceData
 	vec4 modColor;
 	vec4 materialColor;
 	uint textureIndex;
+    float _padding[7];
 };
 
 struct ActorWallInstanceData
@@ -77,7 +85,17 @@ struct VkDrawIndexedIndirectCommand {
     uint instanceCount;
     uint firstIndex;
     int vertexOffset;
-    uint firstInstance; // TODO: If I can avoid writing this for map it will improve performance
+    uint firstInstance;
+};
+
+struct DrawActorModelIndexedIndirectCommand {
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int vertexOffset;
+    uint firstInstance;
+
+    uint instanceIndex;
 };
 
 const vec2 MAGIC_XY = vec2(0.06711056, 0.00583715);

@@ -12,62 +12,79 @@ layout(set = 1, binding = 0, scalar) readonly restrict buffer Frustums {
     Frustum frustums[];
 } frustums;
 
-layout(set = 1, binding = 1, scalar) readonly restrict buffer CullInfos {
+layout(set = 1, binding = 1, scalar) readonly buffer CullInfos {
     uint count;
-    ModelCullInfo model[];
+    CullingInfo cullInfo[];
 } cullInfos[8];
+layout(set = 1, binding = 1, scalar) readonly buffer ModelActorCullInfos {
+    uint count;
+    ModelActorCullingInfo cullInfo[];
+} modelActorCullInfos[8];
 
-layout(set = 1, binding = 2, scalar) buffer UnculledDrawInfo {
+layout(set = 1, binding = 2, scalar) readonly buffer UnculledDrawInfo {
     VkDrawIndexedIndirectCommand drawInfos[];
 } unculledDrawInfo[8];
-layout(set = 1, binding = 2, scalar) buffer InstanceIndices {
+layout(set = 1, binding = 2, scalar) writeonly buffer InstanceIndices {
     uint instanceIndex[];
 } instanceIndices[8];
 
-layout(set = 1, binding = 3, scalar) buffer ModelsDrawInfo {
+layout(set = 1, binding = 3, scalar) buffer MapModelsDrawInfo {
     uint drawCount;
     VkDrawIndexedIndirectCommand drawInfos[];
-} modelsDrawInfo[8];
+} mapModelsDrawInfo[8];
 layout(set = 1, binding = 3, scalar) buffer VkDrawIndirectCommand {
     uint vertexCount;
     uint instanceCount;
     uint firstVertex;
     uint firstInstance;
 } actorWallsDrawInfo[8];
+layout(set = 1, binding = 3, scalar) buffer ModelActorsDrawInfo {
+    DrawActorModelIndexedIndirectCommand drawInfos[];
+} modelActorsDrawInfo[8];
 
-bool IsVisible(const ModelCullInfo cullInfo) {
+bool IsVisible(const vec3 position, const float radius) {
     if (pushConstants.frustumIndex == -1) {
-        const vec3 center = (camera.viewMatrix * vec4(cullInfo.position, 1)).xyz;
-        return center.z + cullInfo.radius > camera.nearPlane && center.z - cullInfo.radius < camera.farPlane &&
-               center.z * camera.frustumPlanes[1] - abs(center.x) * camera.frustumPlanes[0] > -cullInfo.radius &&
-               center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -cullInfo.radius;
+        const vec3 center = (camera.viewMatrix * vec4(position, 1)).xyz;
+        return center.z + radius > camera.nearPlane && center.z - radius < camera.farPlane &&
+               center.z * camera.frustumPlanes[1] - abs(center.x) * camera.frustumPlanes[0] > -radius &&
+               center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -radius;
     }
 
-    // if (cullInfo.castsShadows == 0) {
-    //     return false;
-    // }
+    // TODO: light frustums are broken
+    return true;
+
     const Frustum frustum = frustums.frustums[pushConstants.frustumIndex];
-    const vec3 center = (frustum.viewMatrix * vec4(cullInfo.position, 1)).xyz;
-    return center.z + cullInfo.radius > frustum.nearPlane && center.z - cullInfo.radius < frustum.farPlane &&
-           center.z * frustum.frustumPlanes[1] - abs(center.x) * frustum.frustumPlanes[0] > -cullInfo.radius &&
-           center.z * frustum.frustumPlanes[3] - abs(center.y) * frustum.frustumPlanes[2] > -cullInfo.radius;
+    const vec3 center = (frustum.viewMatrix * vec4(position, 1)).xyz;
+    return center.z + radius > frustum.nearPlane && center.z - radius < frustum.farPlane &&
+           center.z * frustum.frustumPlanes[1] - abs(center.x) * frustum.frustumPlanes[0] > -radius &&
+           center.z * frustum.frustumPlanes[3] - abs(center.y) * frustum.frustumPlanes[2] > -radius;
 }
 
 void CullMapModel(const uint bufferIndex, const uint index) {
-    if (IsVisible(cullInfos[bufferIndex].model[index])) {
-        const uint drawIndex = atomicAdd(modelsDrawInfo[bufferIndex].drawCount, 1);
-        modelsDrawInfo[bufferIndex].drawInfos[drawIndex] = unculledDrawInfo[bufferIndex].drawInfos[index];
+    if (IsVisible(cullInfos[bufferIndex].cullInfo[index].position, cullInfos[bufferIndex].cullInfo[index].radius)) {
+        const uint drawIndex = atomicAdd(mapModelsDrawInfo[bufferIndex].drawCount, 1);
+        mapModelsDrawInfo[bufferIndex].drawInfos[drawIndex] = unculledDrawInfo[bufferIndex].drawInfos[index];
     }
 }
 
 void CullWallActor(const uint bufferIndex, const uint index) {
-    if (IsVisible(cullInfos[bufferIndex].model[index])) {
+    if (IsVisible(cullInfos[bufferIndex].cullInfo[index].position, cullInfos[bufferIndex].cullInfo[index].radius)) {
         const uint drawIndex = atomicAdd(actorWallsDrawInfo[bufferIndex].instanceCount, 1);
         if (bufferIndex == 4) {
             instanceIndices[4].instanceIndex[drawIndex] = index;
         } else {
             instanceIndices[5].instanceIndex[drawIndex] = index + cullInfos[4].count;
         }
+    }
+}
+
+void CullModelActor(const uint bufferIndex, const uint index) {
+    const uint drawInfoIndex = modelActorCullInfos[bufferIndex].cullInfo[index].drawInfoIndex;
+    const uint instanceIndex = atomicAdd(modelActorsDrawInfo[bufferIndex].drawInfos[drawInfoIndex].instanceIndex, bufferIndex == 7 ? -1 : 1);
+    if (IsVisible(modelActorCullInfos[bufferIndex].cullInfo[index].position, modelActorCullInfos[bufferIndex].cullInfo[index].radius)) {
+        const uint drawIndex = atomicAdd(modelActorsDrawInfo[bufferIndex].drawInfos[drawInfoIndex].instanceCount, 1);
+        const uint firstInstance = modelActorsDrawInfo[bufferIndex].drawInfos[drawInfoIndex].firstInstance;
+        instanceIndices[bufferIndex].instanceIndex[drawIndex + firstInstance] = instanceIndex + firstInstance;
     }
 }
 
@@ -83,6 +100,6 @@ void main() {
     } else if (bufferIndex < 6) {
         CullWallActor(bufferIndex, index);
     } else {
-        // TODO: Actor models
+        CullModelActor(bufferIndex, index);
     }
 }

@@ -161,6 +161,7 @@ typedef struct ActorModelInstanceData
 	Color modColor;
 	Color materialColor;
 	uint32_t textureIndex;
+	float _padding[7]; // I hate alignment
 } ActorModelInstanceData;
 
 typedef struct ActorWallInstanceData
@@ -212,13 +213,23 @@ typedef struct ModelBuffer
 	LunaBuffer indices;
 	/// A buffer containing the instance data for each instance of each model section
 	LunaBuffer instanceData;
-	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
-	LunaBuffer unculledShadedDrawInfo;
-	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
-	LunaBuffer unculledUnshadedDrawInfo;
-	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
+	union
+	{
+		/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
+		LunaBuffer unculledShadedDrawInfo;
+		/// A buffer containing the uint32_t indices used to get the instance data for each instance to draw
+		LunaBuffer shadedInstanceIndices;
+	};
+	union
+	{
+		/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
+		LunaBuffer unculledUnshadedDrawInfo;
+		/// A buffer containing the uint32_t indices used to get the instance data for each instance to draw
+		LunaBuffer unshadedInstanceIndices;
+	};
+	/// A buffer containing the structures required for the shaded materials indirect draw call
 	LunaBuffer shadedDrawInfo;
-	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
+	/// A buffer containing the structures required for the unshaded materials indirect draw call
 	LunaBuffer unshadedDrawInfo;
 	/// A buffer containing information about each shaded material instance that is used for culling
 	LunaBuffer shadedCullingInfo;
@@ -365,12 +376,20 @@ typedef struct DescriptorSets
 	DescriptorSet pointLightShadowMaps;
 } DescriptorSets;
 
-typedef struct ModelCullingInfo
+typedef struct CullingInfo
 {
 	Vector3 position;
 	float radius;
 	uint32_t castsShadows;
-} ModelCullingInfo;
+} CullingInfo;
+
+typedef struct ModelActorCullingInfo
+{
+	Vector3 position;
+	float radius;
+	uint32_t castsShadows;
+	uint32_t drawInfoIndex;
+} ModelActorCullingInfo;
 
 typedef struct Frustum
 {
@@ -379,6 +398,17 @@ typedef struct Frustum
 	float farPlane;
 	float frustumPlanes[4];
 } Frustum;
+
+typedef struct DrawActorModelIndexedIndirectCommand
+{
+	uint32_t indexCount;
+	uint32_t instanceCount;
+	uint32_t firstIndex;
+	int vertexOffset;
+	uint32_t firstInstance;
+
+	uint32_t instanceIndex;
+} DrawActorModelIndexedIndirectCommand;
 #pragma endregion typedefs
 
 #pragma region variables

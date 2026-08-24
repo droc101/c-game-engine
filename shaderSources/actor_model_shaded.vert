@@ -2,14 +2,15 @@
 
 #include "shared.inc.glsl"
 
+layout(binding = 7, scalar) readonly restrict buffer InstanceData {
+    ActorModelInstanceData instanceDatas[];
+} instanceDatas[2];
+
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inUV;
 layout(location = 2) in vec4 inColor;
 layout(location = 3) in vec3 inNormal;
-layout(location = 4) in mat4 inTransformMatrix;
-layout(location = 8) in vec4 inModColor;
-layout(location = 9) in vec4 inMaterialColor;
-layout(location = 10) in uint inTextureIndex;
+layout(location = 4) in uint inInstanceIndex;
 
 layout(location = 0) out vec4 outPosition;
 layout(location = 1) out vec4 outColor;
@@ -19,11 +20,12 @@ layout(location = 4) out float outDistance;
 layout(location = 5) flat out uint outTextureIndex;
 
 void main() {
-	outPosition = inTransformMatrix * vec4(inPosition, 1);
-    outColor = inColor * inMaterialColor * inModColor;
+    const ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
+	outPosition = instanceData.transformMatrix * vec4(inPosition, 1);
+    outColor = inColor * instanceData.materialColor * instanceData.modColor;
     outUV = inUV;
-    outNormal = (inTransformMatrix * vec4(inNormal, 0)).xyz;
+    outNormal = (instanceData.transformMatrix * vec4(inNormal, 0)).xyz;
     outDistance = (camera.viewMatrix * outPosition).z;
-    outTextureIndex = inTextureIndex;
+    outTextureIndex = instanceData.textureIndex;
     gl_Position = camera.transformMatrix * outPosition;
 }

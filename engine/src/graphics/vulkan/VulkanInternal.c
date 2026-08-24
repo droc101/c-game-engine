@@ -356,9 +356,9 @@ bool CreateDescriptorSetLayouts()
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
 		{
-			.bindingName = "Wall Actor Instance Data",
+			.bindingName = "Actor Instance Data",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 1,
+			.descriptorCount = 2,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 		},
 	};
@@ -386,7 +386,7 @@ bool CreateDescriptorSetLayouts()
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
-			.bindingName = "Unculled Draw Info",
+			.bindingName = "Additional Culling Info",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 8,
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -583,7 +583,6 @@ bool CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			// I'm not sure why I need the +1 but for some reason it breaks without it
 			.descriptorCount = min(MAX_TEXTURES, sampledImageCount) + 2 * min(sampledImageCount, 16384) + 4 + 1,
 		},
 		{
@@ -592,7 +591,7 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 27,
+			.descriptorCount = 28,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
