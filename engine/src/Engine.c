@@ -423,6 +423,7 @@ void EngineIteration()
 void DestroyEngine()
 {
 	SDL_HideWindow(GetGameWindow());
+	SaveOptions(&GetState()->options);
 	DestroyDPrintConsole();
 	ShutdownSteamworks();
 	DiscordDestroy();

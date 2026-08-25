@@ -27,6 +27,7 @@
 #include "helpers/OptionsMenu.h"
 
 static OptionsMenu *addonsOptionsMenu = NULL;
+static bool shouldRebuildUiStack = false;
 
 static void ApplyAddons()
 {
@@ -38,57 +39,83 @@ static void ApplyAddons()
 
 static void DoneButton(Control *, void *)
 {
+	SaveOptions(&GetState()->options);
 	ApplyAddons();
 	SetGameState(&MenuState);
 }
 
-static void AddonsStateUpdate(GlobalState *state, const double delta)
+static void EnableAddonBtn(Control *, void *pAddon)
 {
-	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
-		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
-	{
-		DoneButton(NULL, NULL);
-	}
-	UpdateMenuBackground(state, delta);
+	SetAddonEnabled(pAddon, true);
+	shouldRebuildUiStack = true;
 }
 
-static void AddonsStateRender(GlobalState *state, const double /*delta*/)
+static void DisableAddonBtn(Control *, void *pAddon)
 {
-	RenderMenuBackground(state, true);
-	if (!IsBackgroundMapLoaded())
-	{
-		return;
-	}
-
-	ProcessOptionsMenu(addonsOptionsMenu);
+	SetAddonEnabled(pAddon, false);
+	shouldRebuildUiStack = true;
 }
 
-static void AddonsStateSet()
+static void ReconstructUiStack()
 {
-	GetState()->rpcState = IN_MENUS;
-	if (addonsOptionsMenu == NULL)
+	shouldRebuildUiStack = false;
+	if (addonsOptionsMenu != NULL)
 	{
-		addonsOptionsMenu = CreateOptionsMenu();
+		DestroyOptionsMenu(addonsOptionsMenu);
+	}
+	addonsOptionsMenu = CreateOptionsMenu();
 
-		if (addons.length == 0)
-		{
-			OptionsMenuAddControl(addonsOptionsMenu,
-								  CreateLabelControl("No Addons Found",
-													 16,
-													 COLOR_WHITE,
-													 v2(0, 0),
-													 v2(750, 32),
-													 TOP_CENTER,
-													 FONT_HALIGN_CENTER,
-													 FONT_VALIGN_MIDDLE,
-													 FONT("small_font"),
-													 false));
-		}
+	if (addons.length == 0)
+	{
+		OptionsMenuAddControl(addonsOptionsMenu,
+							  CreateLabelControl("No Addons Found",
+												 16,
+												 COLOR_WHITE,
+												 v2(0, 0),
+												 v2(750, 32),
+												 TOP_CENTER,
+												 FONT_HALIGN_CENTER,
+												 FONT_VALIGN_MIDDLE,
+												 FONT("small_font"),
+												 false));
+	} else
+	{
+		List enabledAddons;
+		List disabledAddons;
+		ListInit(enabledAddons, LIST_POINTER);
+		ListInit(disabledAddons, LIST_POINTER);
 
 		for (size_t i = 0; i < addons.length; i++)
 		{
 			Addon *a = ListGetPointer(addons, i);
-			char *iconName = GetAddonIcon(a);
+			if (IsAddonEnabled(a))
+			{
+				ListAdd(enabledAddons, a);
+			} else
+			{
+				ListAdd(disabledAddons, a);
+			}
+		}
+
+		OptionsMenuAddSection(addonsOptionsMenu, "Enabled Addons");
+		if (enabledAddons.length == 0)
+		{
+			OptionsMenuAddControl(addonsOptionsMenu,
+								  CreateLabelControl("(none)",
+													 16,
+													 COLOR(0xFF808080),
+													 v2(0, 0),
+													 v2(750, 16),
+													 TOP_CENTER,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+		}
+		for (size_t i = 0; i < enabledAddons.length; i++)
+		{
+			Addon *a = ListGetPointer(enabledAddons, i);
+			const char *iconName = GetAddonIcon(a);
 			Control *icon = CreateImageControl(v2(0, 0), v2s(96), iconName, TOP_LEFT, NULL);
 			OptionsMenuAddControl(addonsOptionsMenu, icon);
 			OptionsMenuAddControl(addonsOptionsMenu,
@@ -113,15 +140,103 @@ static void AddonsStateSet()
 													 FONT_VALIGN_TOP,
 													 FONT("small_font"),
 													 false));
+			Control *disableBtn = CreateButtonControl(v2s(0), v2(100, 40), "Disable", DisableAddonBtn, TOP_RIGHT, NULL);
+			((ButtonData *)disableBtn->controlData)->extraData = a;
+			OptionsMenuAddControl(addonsOptionsMenu, disableBtn);
 
 			OptionsMenuNextRow(addonsOptionsMenu);
 		}
 
-		OptionsMenuAddNoButtonHeaderFooter(addonsOptionsMenu, "Addons");
-		UiStackPush(addonsOptionsMenu->stack,
-					CreateButtonControl(v2(0, -40), v2(480, 40), "Done", DoneButton, BOTTOM_CENTER, NULL));
+		OptionsMenuAddSection(addonsOptionsMenu, "Disabled Addons");
+		if (disabledAddons.length == 0)
+		{
+			OptionsMenuAddControl(addonsOptionsMenu,
+								  CreateLabelControl("(none)",
+													 16,
+													 COLOR(0xFF808080),
+													 v2(0, 0),
+													 v2(750, 16),
+													 TOP_CENTER,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+		}
+		for (size_t i = 0; i < disabledAddons.length; i++)
+		{
+			Addon *a = ListGetPointer(disabledAddons, i);
+			const char *iconName = GetAddonIcon(a);
+			Control *icon = CreateImageControl(v2(0, 0), v2s(96), iconName, TOP_LEFT, NULL);
+			OptionsMenuAddControl(addonsOptionsMenu, icon);
+			OptionsMenuAddControl(addonsOptionsMenu,
+								  CreateLabelControl(a->displayName,
+													 16,
+													 COLOR_WHITE,
+													 v2(104, 0),
+													 v2(750 - 104, 32),
+													 TOP_LEFT,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 false));
+			OptionsMenuAddControl(addonsOptionsMenu,
+								  CreateLabelControl(a->description,
+													 16,
+													 COLOR(0xFFEEEEEE),
+													 v2(104, 40),
+													 v2(750 - 104, 96 - 40),
+													 TOP_LEFT,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_TOP,
+													 FONT("small_font"),
+													 false));
+			Control *enableBtn = CreateButtonControl(v2s(0), v2(100, 40), "Enable", EnableAddonBtn, TOP_RIGHT, NULL);
+			((ButtonData *)enableBtn->controlData)->extraData = a;
+			OptionsMenuAddControl(addonsOptionsMenu, enableBtn);
+
+			OptionsMenuNextRow(addonsOptionsMenu);
+		}
+
+		ListFree(enabledAddons);
+		ListFree(disabledAddons);
 	}
+
+	OptionsMenuAddNoButtonHeaderFooter(addonsOptionsMenu, "Addons");
+	UiStackPush(addonsOptionsMenu->stack,
+				CreateButtonControl(v2(0, -40), v2(480, 40), "Done", DoneButton, BOTTOM_CENTER, NULL));
 	UiStackResetFocus(addonsOptionsMenu->stack);
+}
+
+static void AddonsStateUpdate(GlobalState *state, const double delta)
+{
+	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
+		IsButtonJustPressed(mainThreadInput, CONTROLLER_CANCEL))
+	{
+		DoneButton(NULL, NULL);
+	}
+	UpdateMenuBackground(state, delta);
+}
+
+static void AddonsStateRender(GlobalState *state, const double /*delta*/)
+{
+	if (shouldRebuildUiStack)
+	{
+		ReconstructUiStack();
+	}
+
+	RenderMenuBackground(state, true);
+	if (!IsBackgroundMapLoaded())
+	{
+		return;
+	}
+
+	ProcessOptionsMenu(addonsOptionsMenu);
+}
+
+static void AddonsStateSet()
+{
+	GetState()->rpcState = IN_MENUS;
+	ReconstructUiStack();
 	EnterMenuBackgroundState();
 }
 

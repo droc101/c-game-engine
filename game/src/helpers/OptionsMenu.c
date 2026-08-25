@@ -43,7 +43,11 @@ void OptionsMenuAddSection(OptionsMenu *menu, char *label)
 		menu->yPos += OPTION_VERTICAL_SPACING;
 		menu->smallOptionRightSide = false;
 	}
-	menu->yPos += OPTION_SECTION_SPACING;
+	if (menu->yPos != 0)
+	{
+		menu->yPos += OPTION_SECTION_SPACING;
+	}
+
 	if (label)
 	{
 		Control *labelControl = CreateLabelControl(label,

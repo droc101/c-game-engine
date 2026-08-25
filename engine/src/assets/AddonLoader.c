@@ -14,6 +14,7 @@
 #include <engine/structs/List.h>
 #include <engine/subsystem/Logging.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +27,9 @@
 #define ADDON_ICON_PREFIX "dynamic/addon_"
 
 List addons;
+
+static bool enabledListCreated = false;
+static List enabledAddons;
 
 void ClearAddonIcons()
 {
@@ -55,6 +59,7 @@ char *GetAddonIcon(Addon *addon)
 	Image *icon = malloc(sizeof(Image));
 
 	FILE *file = fopen(iconFilename, "r");
+	free(iconFilename);
 	if (file)
 	{
 		Asset *iconAsset = LoadAssetFromFile(file);
@@ -161,6 +166,11 @@ static void RescanAddons()
 void InitAddonLoader()
 {
 	ListInit(addons, LIST_POINTER);
+	if (!enabledListCreated)
+	{
+		ListInit(enabledAddons, LIST_POINTER);
+		enabledListCreated = true;
+	}
 	RescanAddons();
 	ApplyAddonAssetPaths();
 }
@@ -185,6 +195,7 @@ void DestroyAddonLoader()
 		FreeAddon(ListGetPointer(addons, i));
 	}
 	ListAndContentsFree(addons);
+	ListAndContentsFree(enabledAddons);
 }
 
 void ApplyAddonAssetPaths()
@@ -194,6 +205,85 @@ void ApplyAddonAssetPaths()
 	for (size_t i = 0; i < addons.length; i++)
 	{
 		Addon *addon = ListGetPointer(addons, i);
-		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
+		if (IsAddonEnabled(addon))
+		{
+			ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
+		}
+	}
+}
+
+void DefaultAddonSettings()
+{
+	if (!enabledListCreated)
+	{
+		ListInit(enabledAddons, LIST_POINTER);
+		enabledListCreated = true;
+	}
+	ListClear(enabledAddons);
+}
+
+void LoadAddonSettings(ParamArray *from)
+{
+	if (!enabledListCreated)
+	{
+		ListInit(enabledAddons, LIST_POINTER);
+		enabledListCreated = true;
+	}
+	for (size_t i = 0; i < from->length; i++)
+	{
+		const Param *p = &from->data[i];
+		if (p->type == PARAM_TYPE_STRING)
+		{
+			ListAdd(enabledAddons, strdup(p->stringValue));
+		}
+	}
+}
+
+ParamArray SaveAddonSettings()
+{
+	ParamArray arr;
+	arr.length = enabledAddons.length;
+	arr.data = calloc(arr.length, sizeof(Param)); // TODO this allocation is not properly freed, likely KvList bug
+	for (size_t i = 0; i < arr.length; i++)
+	{
+		Param *p = &arr.data[i];
+		p->type = PARAM_TYPE_STRING;
+		p->stringValue = strdup(ListGetPointer(enabledAddons,
+											   i)); // TODO this allocation is not properly freed, likely KvList bug
+	}
+	return arr;
+}
+
+bool IsAddonEnabled(Addon *addon)
+{
+	for (size_t i = 0; i < enabledAddons.length; i++)
+	{
+		if (strcmp(ListGetPointer(enabledAddons, i), addon->id) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void SetAddonEnabled(Addon *addon, const bool enabled)
+{
+	if (enabled)
+	{
+		if (!IsAddonEnabled(addon))
+		{
+			ListAdd(enabledAddons, strdup(addon->id));
+		}
+	} else
+	{
+		for (size_t i = 0; i < enabledAddons.length; i++)
+		{
+			char *enabledId = ListGetPointer(enabledAddons, i);
+			if (strcmp(enabledId, addon->id) == 0)
+			{
+				free(enabledId);
+				ListRemoveAt(enabledAddons, i);
+			}
+		}
 	}
 }

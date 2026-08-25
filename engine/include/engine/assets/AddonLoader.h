@@ -6,7 +6,9 @@
 #define GAME_ADDONLOADER_H
 
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
+#include <stdbool.h>
 
 typedef enum AddonType
 {
@@ -36,5 +38,15 @@ void ApplyAddonAssetPaths();
 void ClearAddonIcons();
 
 char *GetAddonIcon(Addon *addon);
+
+void DefaultAddonSettings();
+
+void LoadAddonSettings(ParamArray *from);
+
+ParamArray SaveAddonSettings();
+
+bool IsAddonEnabled(Addon *addon);
+
+void SetAddonEnabled(Addon *addon, bool enabled);
 
 #endif //GAME_ADDONLOADER_H

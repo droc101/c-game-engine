@@ -40,6 +40,7 @@ DebugGraph *CreateDebugGraph(const size_t numDataPoints,
 
 	DebugGraph *graph = malloc(sizeof(DebugGraph));
 	CheckAlloc(graph);
+	graph->lastUpdateTimeMsec = 0;
 	graph->goodThreshold = goodThreshold;
 	graph->maxShownValue = maxShownValue;
 	graph->badThreshold = badThreshold;
