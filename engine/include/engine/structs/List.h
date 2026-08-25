@@ -61,8 +61,8 @@ void _LockingListInit(LockingList *list, enum _ListType listType);
 void _ListCopy(const List *restrict oldList, List *restrict newList);
 void _LockingListCopy(const LockingList *restrict oldList, LockingList *restrict newList);
 
-void _ListAdd(List *list, void *data);
-void _LockingListAdd(LockingList *list, void *data);
+void **_ListAdd(List *list, void *data);
+void **_LockingListAdd(LockingList *list, void *data);
 
 void _ListSet(const List *list, size_t index, void *data);
 void _LockingListSet(const LockingList *list, size_t index, void *data);
@@ -121,7 +121,7 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param data Data to append
  */
 #define ListAdd(list, data) \
-	_Generic((list), List: _ListAdd, LockingList: _LockingListAdd)(&(list), (void *)(uintptr_t)(data))
+	(void *)_Generic((list), List: _ListAdd, LockingList: _LockingListAdd)(&(list), (void *)(uintptr_t)(data))
 
 /**
  * Remove an item from the list by index
