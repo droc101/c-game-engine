@@ -78,7 +78,7 @@ char *GetAddonIcon(Addon *addon)
 	}
 
 	icon->name = iconRegisteredName;
-	RegisterImage(icon);
+	(void)RegisterImage(icon);
 	addon->icon = strdup(iconRegisteredName);
 	return addon->icon;
 }
@@ -167,12 +167,19 @@ static void RescanAddons()
 			const size_t path_length = strlen(ADDONS_PATH) + 1 + strlen(ent->d_name) + 1;
 			char *path = malloc(path_length);
 			snprintf(path, path_length, "%s/%s", ADDONS_PATH, ent->d_name);
-			Addon *addon = LoadAddon(path, ent->d_name);
-			LogInfo("Loaded addon \"%s\"\n", addon->id);
-			if (addon)
+
+			struct stat path_stat;
+			stat(path, &path_stat);
+			if (S_ISDIR(path_stat.st_mode))
 			{
-				ListAdd(addons, addon);
+				Addon *addon = LoadAddon(path, ent->d_name);
+				if (addon)
+				{
+					LogInfo("Loaded addon \"%s\"\n", addon->id);
+					ListAdd(addons, addon);
+				}
 			}
+
 			free(path);
 		}
 		ent = readdir(dir);
