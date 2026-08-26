@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define ADDONS_PATH "addons"
@@ -138,8 +139,20 @@ static void RescanAddons()
 	DIR *dir = opendir(ADDONS_PATH);
 	if (dir == NULL)
 	{
-		LogError("Failed to open addons directory: %s\n", strerror(errno));
-		return;
+		if (errno == ENOENT)
+		{
+			if (mkdir(ADDONS_PATH, 0660) != 0)
+			{
+				LogError("Failed to create addons directory: %s\n", strerror(errno));
+			} else
+			{
+				LogInfo("Created addons directory\n");
+			}
+		} else
+		{
+			LogError("Failed to open addons directory: %s\n", strerror(errno));
+		}
+		return; // new directory won't have any addons, no need to process it
 	}
 
 	const struct dirent *ent = readdir(dir);
@@ -296,4 +309,3 @@ Addon *GetAddonById(const char *id)
 	}
 	return NULL;
 }
-
