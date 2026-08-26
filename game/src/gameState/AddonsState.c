@@ -13,8 +13,8 @@
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
-#include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Image.h>
@@ -127,17 +127,17 @@ static void ReconstructUiStack()
 		OptionsMenuAddSection(addonsOptionsMenu, "Enabled Addons");
 		if (enabledAddons.length == 0)
 		{
-			OptionsMenuAddControl(addonsOptionsMenu,
-								  CreateLabelControl("(none)",
-													 16,
-													 COLOR(0xFF808080),
-													 v2(0, 0),
-													 v2(750, 16),
-													 TOP_CENTER,
-													 FONT_HALIGN_LEFT,
-													 FONT_VALIGN_MIDDLE,
-													 FONT("small_font"),
-													 true));
+			OptionsMenuAddLargeControl(addonsOptionsMenu,
+									   CreateLabelControl("(none)",
+														  16,
+														  COLOR(0xFF808080),
+														  v2(0, 0),
+														  v2(750, 16),
+														  TOP_CENTER,
+														  FONT_HALIGN_LEFT,
+														  FONT_VALIGN_MIDDLE,
+														  FONT("small_font"),
+														  true));
 		}
 		for (size_t i = 0; i < enabledAddons.length; i++)
 		{
@@ -150,7 +150,7 @@ static void ReconstructUiStack()
 													 16,
 													 COLOR_WHITE,
 													 v2(104, 0),
-													 v2(750 - 104, 32),
+													 v2(750 - 104 - 128, 32),
 													 TOP_LEFT,
 													 FONT_HALIGN_LEFT,
 													 FONT_VALIGN_MIDDLE,
@@ -161,7 +161,7 @@ static void ReconstructUiStack()
 													 16,
 													 COLOR(0xFFEEEEEE),
 													 v2(104, 40),
-													 v2(750 - 104, 96 - 40),
+													 v2(750 - 104 - 128, 96 - 40),
 													 TOP_LEFT,
 													 FONT_HALIGN_LEFT,
 													 FONT_VALIGN_TOP,
@@ -200,17 +200,17 @@ static void ReconstructUiStack()
 		OptionsMenuAddSection(addonsOptionsMenu, "Disabled Addons");
 		if (disabledAddons.length == 0)
 		{
-			OptionsMenuAddControl(addonsOptionsMenu,
-								  CreateLabelControl("(none)",
-													 16,
-													 COLOR(0xFF808080),
-													 v2(0, 0),
-													 v2(750, 16),
-													 TOP_CENTER,
-													 FONT_HALIGN_LEFT,
-													 FONT_VALIGN_MIDDLE,
-													 FONT("small_font"),
-													 true));
+			OptionsMenuAddLargeControl(addonsOptionsMenu,
+									   CreateLabelControl("(none)",
+														  16,
+														  COLOR(0xFF808080),
+														  v2(0, 0),
+														  v2(750, 16),
+														  TOP_CENTER,
+														  FONT_HALIGN_LEFT,
+														  FONT_VALIGN_MIDDLE,
+														  FONT("small_font"),
+														  true));
 		}
 		for (size_t i = 0; i < disabledAddons.length; i++)
 		{
@@ -223,7 +223,7 @@ static void ReconstructUiStack()
 													 16,
 													 COLOR_WHITE,
 													 v2(104, 0),
-													 v2(750 - 104, 32),
+													 v2(750 - 104 - 128, 32),
 													 TOP_LEFT,
 													 FONT_HALIGN_LEFT,
 													 FONT_VALIGN_MIDDLE,
@@ -234,7 +234,7 @@ static void ReconstructUiStack()
 													 16,
 													 COLOR(0xFFEEEEEE),
 													 v2(104, 40),
-													 v2(750 - 104, 96 - 40),
+													 v2(750 - 104 - 128, 96 - 40),
 													 TOP_LEFT,
 													 FONT_HALIGN_LEFT,
 													 FONT_VALIGN_TOP,
