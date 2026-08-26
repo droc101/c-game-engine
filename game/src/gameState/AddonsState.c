@@ -3,6 +3,7 @@
 //
 
 #include "gameState/AddonsState.h"
+#include <assert.h>
 #include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Font.h>
@@ -56,6 +57,29 @@ static void DisableAddonBtn(Control *, void *pAddon)
 	shouldRebuildUiStack = true;
 }
 
+static void Swap(List *list, const size_t a, const size_t b)
+{
+	void *first = ListGetPointer(*list, a);
+	ListSet(*list, a, ListGetPointer(*list, b));
+	ListSet(*list, b, first);
+}
+
+static void BtnAddonPriUp(Control *, void *addonIndexInAddress)
+{
+	const size_t index = (size_t)addonIndexInAddress;
+	assert(index != 0);
+	Swap(&enabledAddons, index, index - 1);
+	shouldRebuildUiStack = true;
+}
+
+static void BtnAddonPriDown(Control *, void *addonIndexInAddress)
+{
+	const size_t index = (size_t)addonIndexInAddress;
+	assert(index != enabledAddons.length - 1);
+	Swap(&enabledAddons, index, index + 1);
+	shouldRebuildUiStack = true;
+}
+
 static void ReconstructUiStack()
 {
 	shouldRebuildUiStack = false;
@@ -80,18 +104,13 @@ static void ReconstructUiStack()
 												 false));
 	} else
 	{
-		List enabledAddons;
 		List disabledAddons;
-		ListInit(enabledAddons, LIST_POINTER);
 		ListInit(disabledAddons, LIST_POINTER);
 
 		for (size_t i = 0; i < addons.length; i++)
 		{
 			Addon *a = ListGetPointer(addons, i);
-			if (IsAddonEnabled(a))
-			{
-				ListAdd(enabledAddons, a);
-			} else
+			if (!IsAddonEnabled(a))
 			{
 				ListAdd(disabledAddons, a);
 			}
@@ -114,7 +133,7 @@ static void ReconstructUiStack()
 		}
 		for (size_t i = 0; i < enabledAddons.length; i++)
 		{
-			Addon *a = ListGetPointer(enabledAddons, i);
+			Addon *a = GetAddonById(ListGetPointer(enabledAddons, i));
 			const char *iconName = GetAddonIcon(a);
 			Control *icon = CreateImageControl(v2(0, 0), v2s(96), iconName, TOP_LEFT, NULL);
 			OptionsMenuAddControl(addonsOptionsMenu, icon);
@@ -140,9 +159,32 @@ static void ReconstructUiStack()
 													 FONT_VALIGN_TOP,
 													 FONT("small_font"),
 													 false));
-			Control *disableBtn = CreateButtonControl(v2s(0), v2(100, 40), "Disable", DisableAddonBtn, TOP_RIGHT, NULL);
+			Control *disableBtn = CreateButtonControl(v2(0, 28),
+													  v2(120, 40),
+													  "Disable",
+													  DisableAddonBtn,
+													  TOP_RIGHT,
+													  NULL);
 			((ButtonData *)disableBtn->controlData)->extraData = a;
 			OptionsMenuAddControl(addonsOptionsMenu, disableBtn);
+
+			if (i != 0)
+			{
+				Control *priUpBtn = CreateButtonControl(v2(-40, 0), v2(40, 28), "/\\", BtnAddonPriUp, TOP_RIGHT, NULL);
+				((ButtonData *)priUpBtn->controlData)->extraData = (void *)i;
+				OptionsMenuAddControl(addonsOptionsMenu, priUpBtn);
+			}
+			if (i != enabledAddons.length - 1)
+			{
+				Control *priDownBtn = CreateButtonControl(v2(-40, 68),
+														  v2(40, 28),
+														  "\\/",
+														  BtnAddonPriDown,
+														  TOP_RIGHT,
+														  NULL);
+				((ButtonData *)priDownBtn->controlData)->extraData = (void *)i;
+				OptionsMenuAddControl(addonsOptionsMenu, priDownBtn);
+			}
 
 			OptionsMenuNextRow(addonsOptionsMenu);
 		}
@@ -190,14 +232,12 @@ static void ReconstructUiStack()
 													 FONT_VALIGN_TOP,
 													 FONT("small_font"),
 													 false));
-			Control *enableBtn = CreateButtonControl(v2s(0), v2(100, 40), "Enable", EnableAddonBtn, TOP_RIGHT, NULL);
+			Control *enableBtn = CreateButtonControl(v2(0, 28), v2(120, 40), "Enable", EnableAddonBtn, TOP_RIGHT, NULL);
 			((ButtonData *)enableBtn->controlData)->extraData = a;
 			OptionsMenuAddControl(addonsOptionsMenu, enableBtn);
 
 			OptionsMenuNextRow(addonsOptionsMenu);
 		}
-
-		ListFree(enabledAddons);
 		ListFree(disabledAddons);
 	}
 

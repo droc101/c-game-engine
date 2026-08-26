@@ -59,7 +59,10 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_
 		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
 		ConsumeKey(mainThreadInput, SDL_SCANCODE_SPACE);
 		ConsumeButton(mainThreadInput, CONTROLLER_OK);
-		data->callback(c, data->extraData);
+		if (data->callback)
+		{
+			data->callback(c, data->extraData);
+		}
 	}
 }
 

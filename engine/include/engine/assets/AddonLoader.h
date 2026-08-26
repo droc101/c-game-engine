@@ -28,6 +28,7 @@ typedef struct Addon
 } Addon;
 
 extern List addons;
+extern List enabledAddons;
 
 void InitAddonLoader();
 
@@ -48,5 +49,7 @@ ParamArray SaveAddonSettings();
 bool IsAddonEnabled(Addon *addon);
 
 void SetAddonEnabled(Addon *addon, bool enabled);
+
+Addon *GetAddonById(const char *id);
 
 #endif //GAME_ADDONLOADER_H

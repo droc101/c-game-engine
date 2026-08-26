@@ -29,7 +29,7 @@
 List addons;
 
 static bool enabledListCreated = false;
-static List enabledAddons;
+List enabledAddons;
 
 void ClearAddonIcons()
 {
@@ -202,13 +202,10 @@ void ApplyAddonAssetPaths()
 {
 	RemoveAddonAssetPaths();
 
-	for (size_t i = 0; i < addons.length; i++)
+	for (size_t i = enabledAddons.length - 1; i != SIZE_MAX; i--)
 	{
-		Addon *addon = ListGetPointer(addons, i);
-		if (IsAddonEnabled(addon))
-		{
-			ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
-		}
+		Addon *addon = GetAddonById(ListGetPointer(enabledAddons, i));
+		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
 	}
 }
 
@@ -286,3 +283,17 @@ void SetAddonEnabled(Addon *addon, const bool enabled)
 		}
 	}
 }
+
+Addon *GetAddonById(const char *id)
+{
+	for (size_t i = 0; i < addons.length; i++)
+	{
+		Addon *a = ListGetPointer(addons, i);
+		if (strcmp(a->id, id) == 0)
+		{
+			return a;
+		}
+	}
+	return NULL;
+}
+
