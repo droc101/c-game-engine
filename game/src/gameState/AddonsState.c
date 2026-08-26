@@ -29,13 +29,17 @@
 
 static OptionsMenu *addonsOptionsMenu = NULL;
 static bool shouldRebuildUiStack = false;
+static bool hasMadeChanges = false;
 
 static void ApplyAddons()
 {
 	ApplyAddonAssetPaths();
-	ChangeMap(NULL);
-	EnterMenuBackgroundState();
-	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	if (hasMadeChanges)
+	{
+		ChangeMap(NULL);
+		EnterMenuBackgroundState();
+		rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	}
 }
 
 static void DoneButton(Control *, void *)
@@ -47,12 +51,14 @@ static void DoneButton(Control *, void *)
 
 static void EnableAddonBtn(Control *, void *pAddon)
 {
+	hasMadeChanges = true;
 	SetAddonEnabled(pAddon, true);
 	shouldRebuildUiStack = true;
 }
 
 static void DisableAddonBtn(Control *, void *pAddon)
 {
+	hasMadeChanges = true;
 	SetAddonEnabled(pAddon, false);
 	shouldRebuildUiStack = true;
 }
@@ -66,6 +72,7 @@ static void Swap(List *list, const size_t a, const size_t b)
 
 static void BtnAddonPriUp(Control *, void *addonIndexInAddress)
 {
+	hasMadeChanges = true;
 	const size_t index = (size_t)addonIndexInAddress;
 	assert(index != 0);
 	Swap(&enabledAddons, index, index - 1);
@@ -74,6 +81,7 @@ static void BtnAddonPriUp(Control *, void *addonIndexInAddress)
 
 static void BtnAddonPriDown(Control *, void *addonIndexInAddress)
 {
+	hasMadeChanges = true;
 	const size_t index = (size_t)addonIndexInAddress;
 	assert(index != enabledAddons.length - 1);
 	Swap(&enabledAddons, index, index + 1);
@@ -275,7 +283,7 @@ static void AddonsStateRender(GlobalState *state, const double /*delta*/)
 
 static void AddonsStateSet()
 {
-	GetState()->rpcState = IN_MENUS;
+	hasMadeChanges = false;
 	ReconstructUiStack();
 	EnterMenuBackgroundState();
 }
