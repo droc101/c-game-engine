@@ -136,6 +136,8 @@ struct Map
 	uint32_t lightCount;
 	/// The lights in this level
 	Light *lights;
+	/// The directional light, or NULL if there is not one
+	Light *directionalLight;
 
 	MapTransition *transition;
 };

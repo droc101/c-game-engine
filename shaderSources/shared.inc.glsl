@@ -1,6 +1,7 @@
 // Include only. This file will not compile as a standalone module.
 
 #extension GL_EXT_debug_printf : require
+#extension GL_EXT_buffer_reference : require
 #extension GL_EXT_scalar_block_layout : require
 #extension GL_EXT_nonuniform_qualifier : require
 
@@ -44,7 +45,7 @@ struct CullingInfo {
     uint castsShadows;
 };
 
-struct ModelActorCullingInfo {
+struct ActorModelCullingInfo {
     vec3 position;
     float radius;
     uint castsShadows;
@@ -97,6 +98,83 @@ struct DrawActorModelIndexedIndirectCommand {
 
     uint instanceIndex;
 };
+
+
+layout(scalar, buffer_reference) readonly buffer CullingInfoBuffer {
+    uint count;
+    CullingInfo cullingInfos[];
+};
+
+layout(scalar, buffer_reference) readonly buffer ActorModelCullingInfoBuffer {
+    uint count;
+    ActorModelCullingInfo cullingInfos[];
+};
+
+layout(scalar, buffer_reference) readonly buffer MapModelsUnculledDrawInfoBuffer {
+    VkDrawIndexedIndirectCommand drawInfos[];
+};
+
+layout(scalar, buffer_reference) writeonly buffer InstanceIndicesBuffer {
+    uint indices[];
+};
+
+layout(scalar, buffer_reference) buffer MapModelsOutputDrawInfoBuffer {
+    uint count;
+    VkDrawIndexedIndirectCommand drawInfos[];
+};
+
+layout(scalar, buffer_reference) buffer ActorWallsDrawInfoBuffer {
+    uint vertexCount;
+    uint instanceCount;
+    uint firstVertex;
+    uint firstInstance;
+};
+
+layout(scalar, buffer_reference) buffer ActorModelsDrawInfoBuffer {
+    DrawActorModelIndexedIndirectCommand drawInfos[];
+};
+
+struct FrustumCullingData
+{
+    Frustum frustum;
+
+
+    CullingInfoBuffer shadedOpaqueMapModelsCullingInfo;
+    MapModelsUnculledDrawInfoBuffer shadedOpaqueMapModelsUnculledDrawInfo;
+    MapModelsOutputDrawInfoBuffer shadedOpaqueMapModelsOutputDrawInfo;
+
+    CullingInfoBuffer unshadedOpaqueMapModelsCullingInfo;
+    MapModelsUnculledDrawInfoBuffer unshadedOpaqueMapModelsUnculledDrawInfo;
+    MapModelsOutputDrawInfoBuffer unshadedOpaqueMapModelsOutputDrawInfo;
+
+    CullingInfoBuffer shadedMapModelsCullingInfo;
+    MapModelsUnculledDrawInfoBuffer shadedMapModelsUnculledDrawInfo;
+    MapModelsOutputDrawInfoBuffer shadedMapModelsOutputDrawInfo;
+
+    CullingInfoBuffer unshadedMapModelsCullingInfo;
+    MapModelsUnculledDrawInfoBuffer unshadedMapModelsUnculledDrawInfo;
+    MapModelsOutputDrawInfoBuffer unshadedMapModelsOutputDrawInfo;
+
+    CullingInfoBuffer shadedActorWallsCullingInfo;
+    InstanceIndicesBuffer shadedActorWallsInstanceIndices;
+    ActorWallsDrawInfoBuffer shadedActorWallsDrawInfo;
+
+    CullingInfoBuffer unshadedActorWallsCullingInfo;
+    InstanceIndicesBuffer unshadedActorWallsInstanceIndices;
+    ActorWallsDrawInfoBuffer unshadedActorWallsDrawInfo;
+
+    ActorModelCullingInfoBuffer shadedActorModelsCullingInfo;
+    InstanceIndicesBuffer shadedActorModelsInstanceIndices;
+    ActorModelsDrawInfoBuffer shadedActorModelsDrawInfo;
+
+    ActorModelCullingInfoBuffer unshadedActorModelsCullingInfo;
+    InstanceIndicesBuffer unshadedActorModelsInstanceIndices;
+    ActorModelsDrawInfoBuffer unshadedActorModelsDrawInfo;
+
+
+    float _padding[2];
+};
+
 
 const vec2 MAGIC_XY = vec2(0.06711056, 0.00583715);
 const float MAGIC_Z = 52.9829189;

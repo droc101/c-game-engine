@@ -177,6 +177,50 @@ typedef struct ActorWallInstanceData
 	Color modColor;
 } ActorWallInstanceData;
 
+typedef struct FrustumCullingData
+{
+	mat4 viewMatrix;
+	float nearPlane;
+	float farPlane;
+	float frustumPlanes[4];
+
+
+	VkDeviceAddress shadedOpaqueMapModelsCullingInfo;
+	VkDeviceAddress shadedOpaqueMapModelsUnculledDrawInfo;
+	VkDeviceAddress shadedOpaqueMapModelsOutputDrawInfo;
+
+	VkDeviceAddress unshadedOpaqueMapModelsCullingInfo;
+	VkDeviceAddress unshadedOpaqueMapModelsUnculledDrawInfo;
+	VkDeviceAddress unshadedOpaqueMapModelsOutputDrawInfo;
+
+	VkDeviceAddress shadedMapModelsCullingInfo;
+	VkDeviceAddress shadedMapModelsUnculledDrawInfo;
+	VkDeviceAddress shadedMapModelsOutputDrawInfo;
+
+	VkDeviceAddress unshadedMapModelsCullingInfo;
+	VkDeviceAddress unshadedMapModelsUnculledDrawInfo;
+	VkDeviceAddress unshadedMapModelsOutputDrawInfo;
+
+	VkDeviceAddress shadedActorWallsCullingInfo;
+	VkDeviceAddress shadedActorWallsInstanceIndices;
+	VkDeviceAddress shadedActorWallsDrawInfo;
+
+	VkDeviceAddress unshadedActorWallsCullingInfo;
+	VkDeviceAddress unshadedActorWallsInstanceIndices;
+	VkDeviceAddress unshadedActorWallsDrawInfo;
+
+	VkDeviceAddress shadedActorModelsCullingInfo;
+	VkDeviceAddress shadedActorModelsInstanceIndices;
+	VkDeviceAddress shadedActorModelsDrawInfo;
+
+	VkDeviceAddress unshadedActorModelsCullingInfo;
+	VkDeviceAddress unshadedActorModelsInstanceIndices;
+	VkDeviceAddress unshadedActorModelsDrawInfo;
+
+
+	float _padding[2];
+} FrustumCullingData;
+
 typedef struct UiBuffer
 {
 	LunaBuffer vertexBuffer;
@@ -195,16 +239,74 @@ typedef struct UniformBuffers
 	LunaBuffer lights;
 } UniformBuffers;
 
-/**
- * Contains the required buffers for a model that can have multiple materials
- *
- * Models with multiple materials are always drawn using lunaDrawIndexedIndirect regardless of if they are instanced.
- * This is done due to the fact that each different material becomes a driver-dispatched draw call, and would have to be
- * individually dispatched draw calls if it were not using indirect draw.
- *
- * Vertex and index data does not need to be duplicated for each frame in flight due to the fact that it is in local
- * space and only the instance data should be changing on a frame-to-frame basis.
- */
+typedef struct ActorModelsBuffer
+{
+	/// A buffer containing per-vertex data
+	LunaBuffer vertices;
+	/// A buffer containing the index data to use along-side the per-vertex data
+	LunaBuffer indices;
+	/// A buffer containing the instance data for each instance of each model section
+	LunaBuffer instanceData;
+	/// A list of LunaBuffer handles containing the uint32_t indices used to get the instance data for each instance to draw
+	List shadedInstanceIndices;
+	/// A list of LunaBuffer handles containing the uint32_t indices used to get the instance data for each instance to draw
+	List unshadedInstanceIndices;
+	/// A list of LunaBuffer handles containing the structures required for the shaded materials indirect draw calls
+	List shadedDrawInfo;
+	/// A list of LunaBuffer handles containing the structures required for the unshaded materials indirect draw calls
+	List unshadedDrawInfo;
+	/// A buffer containing information about each shaded material instance that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded material instance that is used for culling
+	LunaBuffer unshadedCullingInfo;
+} ActorModelsBuffer;
+
+typedef struct ActorWallsBuffer
+{
+	/// The number of shaded actor walls in the map
+	uint32_t shadedInstanceCount;
+	/// The number of unshaded actor walls in the map
+	uint32_t unshadedInstanceCount;
+	/// A buffer of the 12 ActorWallVertex values corresponding to the two faces of the quad
+	LunaBuffer vertices;
+	/// A buffer containing the ActorWallInstanceData for each actor wall
+	LunaBuffer instanceData;
+	/// A list of LunaBuffer handles containing uint32_t instance indices emitted by culling for each shaded actor wall
+	List shadedInstanceIndices;
+	/// A list of LunaBuffer handles containing uint32_t instance indices emitted by culling for each unshaded actor wall
+	List unshadedInstanceIndices;
+	/// A list of LunaBuffer handles containing the VkDrawIndirectCommand for each shaded actor wall
+	List shadedDrawInfo;
+	/// A list of LunaBuffer handles containing the VkDrawIndirectCommand for each unshaded actor wall
+	List unshadedDrawInfo;
+	/// A buffer containing information about each shaded actor wall that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded actor wall that is used for culling
+	LunaBuffer unshadedCullingInfo;
+} ActorWallsBuffer;
+
+typedef struct MapModelsBuffer
+{
+	/// A buffer containing per-vertex data
+	LunaBuffer vertices;
+	/// A buffer containing the index data to use along-side the per-vertex data
+	LunaBuffer indices;
+	/// A buffer containing the instance data for each instance of each model section
+	LunaBuffer instanceData;
+	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
+	LunaBuffer unculledShadedDrawInfo;
+	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
+	LunaBuffer unculledUnshadedDrawInfo;
+	/// A list of LunaBuffer handles containing the structures required for the shaded materials indirect draw calls
+	List shadedDrawInfo;
+	/// A list of LunaBuffer handles containing the structures required for the unshaded materials indirect draw calls
+	List unshadedDrawInfo;
+	/// A buffer containing information about each shaded material instance that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded material instance that is used for culling
+	LunaBuffer unshadedCullingInfo;
+} MapModelsBuffer;
+
 typedef struct ModelBuffer
 {
 	/// A buffer containing per-vertex data
@@ -213,28 +315,10 @@ typedef struct ModelBuffer
 	LunaBuffer indices;
 	/// A buffer containing the instance data for each instance of each model section
 	LunaBuffer instanceData;
-	union
-	{
-		/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
-		LunaBuffer unculledShadedDrawInfo;
-		/// A buffer containing the uint32_t indices used to get the instance data for each instance to draw
-		LunaBuffer shadedInstanceIndices;
-	};
-	union
-	{
-		/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
-		LunaBuffer unculledUnshadedDrawInfo;
-		/// A buffer containing the uint32_t indices used to get the instance data for each instance to draw
-		LunaBuffer unshadedInstanceIndices;
-	};
 	/// A buffer containing the structures required for the shaded materials indirect draw call
 	LunaBuffer shadedDrawInfo;
 	/// A buffer containing the structures required for the unshaded materials indirect draw call
 	LunaBuffer unshadedDrawInfo;
-	/// A buffer containing information about each shaded material instance that is used for culling
-	LunaBuffer shadedCullingInfo;
-	/// A buffer containing information about each unshaded material instance that is used for culling
-	LunaBuffer unshadedCullingInfo;
 } ModelBuffer;
 
 typedef struct SkyBuffer
@@ -242,30 +326,6 @@ typedef struct SkyBuffer
 	LunaBuffer vertices;
 	LunaBuffer indices;
 } SkyBuffer;
-
-typedef struct ActorWallBuffer
-{
-	/// A buffer of the 12 ActorWallVertex values corresponding to the two faces of the quad
-	LunaBuffer vertices;
-	/// The number of shaded actor walls in the map
-	uint32_t shadedInstanceCount;
-	/// The number of unshaded actor walls in the map
-	uint32_t unshadedInstanceCount;
-	/// A buffer containing the VkDrawIndirectCommand for each shaded actor wall
-	LunaBuffer shadedDrawInfo;
-	/// A buffer containing the VkDrawIndirectCommand for each unshaded actor wall
-	LunaBuffer unshadedDrawInfo;
-	/// A buffer containing uint32_t instance indices emitted by culling for each shaded actor wall
-	LunaBuffer shadedInstanceIndices;
-	/// A buffer containing uint32_t instance indices emitted by culling for each unshaded actor wall
-	LunaBuffer unshadedInstanceIndices;
-	/// A buffer containing the ActorWallInstanceData for each actor wall
-	LunaBuffer instanceData;
-	/// A buffer containing information about each shaded actor wall that is used for culling
-	LunaBuffer shadedCullingInfo;
-	/// A buffer containing information about each unshaded actor wall that is used for culling
-	LunaBuffer unshadedCullingInfo;
-} ActorWallBuffer;
 
 typedef struct PlayerModelBuffer
 {
@@ -289,11 +349,12 @@ typedef struct Buffers
 {
 	UiBuffer ui;
 	UniformBuffers uniforms;
+	/// A buffer containing one FrustumCullingData structure per frustum
 	LunaBuffer frustums;
-	ModelBuffer actorModels;
-	ActorWallBuffer actorWalls;
-	ModelBuffer opaqueMap;
-	ModelBuffer map;
+	ActorModelsBuffer actorModels;
+	ActorWallsBuffer actorWalls;
+	MapModelsBuffer opaqueMap;
+	MapModelsBuffer map;
 	ModelBuffer viewmodel;
 	SkyBuffer sky;
 	PlayerModelBuffer player;
@@ -391,14 +452,6 @@ typedef struct ModelActorCullingInfo
 	uint32_t drawInfoIndex;
 } ModelActorCullingInfo;
 
-typedef struct Frustum
-{
-	mat4 viewMatrix;
-	float nearPlane;
-	float farPlane;
-	float frustumPlanes[4];
-} Frustum;
-
 typedef struct DrawActorModelIndexedIndirectCommand
 {
 	uint32_t indexCount;
@@ -438,7 +491,21 @@ extern VkRenderPass shadowMapRenderPass;
 extern List shadowMaps;
 extern List shadowMapFramebuffers;
 extern List pointLightShadowMapImageViews;
-extern uint32_t frustumIndex;
+extern List perFrustumBuffersHandles;
+extern uint32_t frustumCount;
+extern FrustumCullingData *frustums;
+
+/// Simply a collection of constants that are used to prevent significant usage of magic numbers
+enum PerFrustumBufferMagicConstants : uint32_t
+{
+	PER_FRUSTUM_BUFFER_MODEL_ACTOR_DRAW_INFO_OFFSET = 0,
+	PER_FRUSTUM_BUFFER_WALL_ACTOR_DRAW_INFO_OFFSET = 2,
+	PER_FRUSTUM_BUFFER_OPAQUE_MAP_DRAW_INFO_OFFSET = 4,
+	PER_FRUSTUM_BUFFER_MAP_DRAW_INFO_OFFSET = 6,
+	PER_FRUSTUM_BUFFER_MODEL_ACTOR_INSTANCE_INDICES_OFFSET = 8,
+	PER_FRUSTUM_BUFFER_WALL_ACTOR_INSTANCE_INDICES_OFFSET = 10,
+	PER_FRUSTUM_BUFFER_COUNT = 12,
+};
 #pragma endregion variables
 
 bool ClearTextureCache();
@@ -462,6 +529,8 @@ VkResult UpdateCameraUniform(Camera *camera);
 VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
 VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light);
+
+VkResult WriteFrustumsBuffer();
 
 VkResult CullModels();
 

@@ -1519,16 +1519,9 @@ bool CreateCullingPipeline()
 		descriptorSets.common.layout,
 		descriptorSets.culling.layout,
 	};
-	LunaPushConstantsRange pushConstantRange = {
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-		.size = sizeof(uint32_t),
-		.dataPointer = &frustumIndex,
-	};
 	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
 		.descriptorSetLayoutCount = 2,
 		.descriptorSetLayouts = layouts,
-		.pushConstantRangeCount = 1,
-		.pushConstantsRanges = &pushConstantRange,
 	};
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("culling_c"), SHADER_TYPE_COMP, &shaderModule),

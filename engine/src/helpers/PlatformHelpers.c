@@ -215,6 +215,10 @@ void *AvxAlignedCalloc(const size_t size)
 
 void AvxAlignedFree(void *data)
 {
+	if (!data)
+	{
+		return;
+	}
 #if defined(__AVX__) && defined(WIN32)
 	_aligned_free(data);
 #else

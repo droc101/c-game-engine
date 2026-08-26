@@ -329,6 +329,11 @@ bool LoadMap(Map *map, Asset *mapData)
 		light->attenuationMultiplier = ReadFloat(reader);
 		light->brightAngle = ReadFloat(reader);
 		light->fadingAngle = ReadFloat(reader);
+
+		if (light->type == LIGHT_TYPE_DIRECTIONAL)
+		{
+			map->directionalLight = light;
+		}
 	}
 
 	DestroyDataReader(reader);

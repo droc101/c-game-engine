@@ -2,48 +2,48 @@
 
 #include "shared.inc.glsl"
 
+const uint SHADED_OPAQUE_MAP_MODELS_INDEX = 0;
+const uint UNSHADED_OPAQUE_MAP_MODELS_INDEX = 1;
+const uint SHADED_MAP_MODELS_INDEX = 2;
+const uint UNSHADED_MAP_MODELS_INDEX = 3;
+const uint SHADED_ACTOR_WALLS_INDEX = 4;
+const uint UNSHADED_ACTOR_WALLS_INDEX = 5;
+const uint SHADED_ACTOR_MODELS_INDEX = 6;
+const uint UNSHADED_ACTOR_MODELS_INDEX = 7;
+
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
-layout(push_constant) uniform PushConstants {
-    uint frustumIndex;
-} pushConstants;
+layout(set = 1, binding = 0, scalar) buffer CullingData {
+    FrustumCullingData frustums[];
+} cullingData;
 
-layout(set = 1, binding = 0, scalar) readonly restrict buffer Frustums {
-    Frustum frustums[];
-} frustums;
+uint GetCount() {
+    switch (gl_GlobalInvocationID.y) {
+        case SHADED_OPAQUE_MAP_MODELS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].shadedOpaqueMapModelsCullingInfo.count;
+        case UNSHADED_OPAQUE_MAP_MODELS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].unshadedOpaqueMapModelsCullingInfo.count;
+        case SHADED_MAP_MODELS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].shadedMapModelsCullingInfo.count;
+        case UNSHADED_MAP_MODELS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].unshadedMapModelsCullingInfo.count;
+        case SHADED_ACTOR_WALLS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].shadedActorWallsCullingInfo.count;
+        case UNSHADED_ACTOR_WALLS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].unshadedActorWallsCullingInfo.count;
+        case SHADED_ACTOR_MODELS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].shadedActorModelsCullingInfo.count;
+        case UNSHADED_ACTOR_MODELS_INDEX:
+            return cullingData.frustums[gl_GlobalInvocationID.z].unshadedActorModelsCullingInfo.count;
+        default:
+            return 0;
+    }
+}
 
-layout(set = 1, binding = 1, scalar) readonly buffer CullInfos {
-    uint count;
-    CullingInfo cullInfo[];
-} cullInfos[8];
-layout(set = 1, binding = 1, scalar) readonly buffer ModelActorCullInfos {
-    uint count;
-    ModelActorCullingInfo cullInfo[];
-} modelActorCullInfos[8];
-
-layout(set = 1, binding = 2, scalar) readonly buffer UnculledDrawInfo {
-    VkDrawIndexedIndirectCommand drawInfos[];
-} unculledDrawInfo[8];
-layout(set = 1, binding = 2, scalar) writeonly buffer InstanceIndices {
-    uint instanceIndex[];
-} instanceIndices[8];
-
-layout(set = 1, binding = 3, scalar) buffer MapModelsDrawInfo {
-    uint drawCount;
-    VkDrawIndexedIndirectCommand drawInfos[];
-} mapModelsDrawInfo[8];
-layout(set = 1, binding = 3, scalar) buffer VkDrawIndirectCommand {
-    uint vertexCount;
-    uint instanceCount;
-    uint firstVertex;
-    uint firstInstance;
-} actorWallsDrawInfo[8];
-layout(set = 1, binding = 3, scalar) buffer ModelActorsDrawInfo {
-    DrawActorModelIndexedIndirectCommand drawInfos[];
-} modelActorsDrawInfo[8];
-
-bool IsVisible(const vec3 position, const float radius) {
-    if (pushConstants.frustumIndex == -1) {
+bool IsVisible(const vec3 position, const float radius, const uint frustumIndex) {
+    return false;
+    // TODO: Use the frustum information from index 0 and remove the frustum information from the camera
+    if (frustumIndex == 0) {
         const vec3 center = (camera.viewMatrix * vec4(position, 1)).xyz;
         return center.z + radius > camera.nearPlane && center.z - radius < camera.farPlane &&
                center.z * camera.frustumPlanes[1] - abs(center.x) * camera.frustumPlanes[0] > -radius &&
@@ -53,53 +53,113 @@ bool IsVisible(const vec3 position, const float radius) {
     // TODO: light frustums are broken
     return true;
 
-    const Frustum frustum = frustums.frustums[pushConstants.frustumIndex];
+    const Frustum frustum = cullingData.frustums[frustumIndex].frustum;
     const vec3 center = (frustum.viewMatrix * vec4(position, 1)).xyz;
     return center.z + radius > frustum.nearPlane && center.z - radius < frustum.farPlane &&
            center.z * frustum.frustumPlanes[1] - abs(center.x) * frustum.frustumPlanes[0] > -radius &&
            center.z * frustum.frustumPlanes[3] - abs(center.y) * frustum.frustumPlanes[2] > -radius;
 }
 
-void CullMapModel(const uint bufferIndex, const uint index) {
-    if (IsVisible(cullInfos[bufferIndex].cullInfo[index].position, cullInfos[bufferIndex].cullInfo[index].radius)) {
-        const uint drawIndex = atomicAdd(mapModelsDrawInfo[bufferIndex].drawCount, 1);
-        mapModelsDrawInfo[bufferIndex].drawInfos[drawIndex] = unculledDrawInfo[bufferIndex].drawInfos[index];
+void CullMapModel(const uint index, const uint bufferIndex, const uint frustumIndex) {
+    CullingInfo cullingInfo;
+    switch (bufferIndex) {
+        case SHADED_OPAQUE_MAP_MODELS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].shadedOpaqueMapModelsCullingInfo.cullingInfos[index];
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                MapModelsOutputDrawInfoBuffer drawInfo = cullingData.frustums[frustumIndex].shadedOpaqueMapModelsOutputDrawInfo;
+                const uint drawIndex = atomicAdd(drawInfo.count, 1);
+                drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].shadedOpaqueMapModelsUnculledDrawInfo.drawInfos[index];
+            }
+        case UNSHADED_OPAQUE_MAP_MODELS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsCullingInfo.cullingInfos[index];
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                MapModelsOutputDrawInfoBuffer drawInfo = cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsOutputDrawInfo;
+                const uint drawIndex = atomicAdd(drawInfo.count, 1);
+                drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsUnculledDrawInfo.drawInfos[index];
+            }
+        case SHADED_MAP_MODELS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].shadedMapModelsCullingInfo.cullingInfos[index];
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                MapModelsOutputDrawInfoBuffer drawInfo = cullingData.frustums[frustumIndex].shadedMapModelsOutputDrawInfo;
+                const uint drawIndex = atomicAdd(drawInfo.count, 1);
+                drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].shadedMapModelsUnculledDrawInfo.drawInfos[index];
+            }
+        case UNSHADED_MAP_MODELS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].unshadedMapModelsCullingInfo.cullingInfos[index];
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                MapModelsOutputDrawInfoBuffer drawInfo = cullingData.frustums[frustumIndex].unshadedMapModelsOutputDrawInfo;
+                const uint drawIndex = atomicAdd(drawInfo.count, 1);
+                drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].unshadedMapModelsUnculledDrawInfo.drawInfos[index];
+            }
+        default:
+            break;
     }
 }
 
-void CullWallActor(const uint bufferIndex, const uint index) {
-    if (IsVisible(cullInfos[bufferIndex].cullInfo[index].position, cullInfos[bufferIndex].cullInfo[index].radius)) {
-        const uint drawIndex = atomicAdd(actorWallsDrawInfo[bufferIndex].instanceCount, 1);
-        if (bufferIndex == 4) {
-            instanceIndices[4].instanceIndex[drawIndex] = index;
-        } else {
-            instanceIndices[5].instanceIndex[drawIndex] = index + cullInfos[4].count;
-        }
+void CullWallActor(const uint index, const uint bufferIndex, const uint frustumIndex) {
+    CullingInfo cullingInfo;
+    switch (bufferIndex) {
+        case SHADED_ACTOR_WALLS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].shadedActorWallsCullingInfo.cullingInfos[index];
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                const uint drawIndex = atomicAdd(cullingData.frustums[frustumIndex].shadedActorWallsDrawInfo.instanceCount, 1);
+                cullingData.frustums[frustumIndex].shadedActorWallsInstanceIndices.indices[drawIndex] = index;
+            }
+        case UNSHADED_ACTOR_WALLS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].unshadedActorWallsCullingInfo.cullingInfos[index];
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                const uint drawIndex = atomicAdd(cullingData.frustums[frustumIndex].unshadedActorWallsDrawInfo.instanceCount, 1);
+                const uint shadedInstanceCount = cullingData.frustums[frustumIndex].shadedActorWallsCullingInfo.count;
+                cullingData.frustums[frustumIndex].unshadedActorWallsInstanceIndices.indices[drawIndex] = index + shadedInstanceCount;
+            }
+        default:
+            break;
     }
 }
 
-void CullModelActor(const uint bufferIndex, const uint index) {
-    const uint drawInfoIndex = modelActorCullInfos[bufferIndex].cullInfo[index].drawInfoIndex;
-    const uint instanceIndex = atomicAdd(modelActorsDrawInfo[bufferIndex].drawInfos[drawInfoIndex].instanceIndex, bufferIndex == 7 ? -1 : 1);
-    if (IsVisible(modelActorCullInfos[bufferIndex].cullInfo[index].position, modelActorCullInfos[bufferIndex].cullInfo[index].radius)) {
-        const uint drawIndex = atomicAdd(modelActorsDrawInfo[bufferIndex].drawInfos[drawInfoIndex].instanceCount, 1);
-        const uint firstInstance = modelActorsDrawInfo[bufferIndex].drawInfos[drawInfoIndex].firstInstance;
-        instanceIndices[bufferIndex].instanceIndex[drawIndex + firstInstance] = instanceIndex + firstInstance;
+void CullModelActor(const uint index, const uint bufferIndex, const uint frustumIndex) {
+    ActorModelCullingInfo cullingInfo;
+    ActorModelsDrawInfoBuffer drawInfoBuffer;
+    uint instanceIndex;
+    switch (bufferIndex) {
+        case SHADED_ACTOR_MODELS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].shadedActorModelsCullingInfo.cullingInfos[index];
+            drawInfoBuffer = cullingData.frustums[frustumIndex].shadedActorModelsDrawInfo;
+            instanceIndex = atomicAdd(drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].instanceIndex, 1);
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                const uint drawIndex = atomicAdd(drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].instanceCount, 1);
+                const uint firstInstance = drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].firstInstance;
+                cullingData.frustums[frustumIndex].shadedActorModelsInstanceIndices.indices[drawIndex + firstInstance] = instanceIndex + firstInstance;
+            }
+        case UNSHADED_ACTOR_MODELS_INDEX:
+            cullingInfo = cullingData.frustums[frustumIndex].unshadedActorModelsCullingInfo.cullingInfos[index];
+            drawInfoBuffer = cullingData.frustums[frustumIndex].unshadedActorModelsDrawInfo;
+            instanceIndex = atomicAdd(drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].instanceIndex, -1);
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+                const uint drawIndex = atomicAdd(drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].instanceCount, 1);
+                const uint firstInstance = drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].firstInstance;
+                cullingData.frustums[frustumIndex].unshadedActorModelsInstanceIndices.indices[drawIndex + firstInstance] = instanceIndex + firstInstance;
+            }
+        default:
+            break;
     }
 }
 
 void main() {
-    const uint bufferIndex = gl_GlobalInvocationID.y;
     const uint index = gl_GlobalInvocationID.x;
-    if (index >= cullInfos[bufferIndex].count) {
+    if (index >= GetCount()) {
         return;
     }
 
-    if (bufferIndex < 4) {
-        CullMapModel(bufferIndex, index);
-    } else if (bufferIndex < 6) {
-        CullWallActor(bufferIndex, index);
-    } else {
-        CullModelActor(bufferIndex, index);
-    }
+    // const uint bufferIndex = gl_GlobalInvocationID.y;
+    // const uint frustumIndex = gl_GlobalInvocationID.z;
+
+
+    // if (bufferIndex < 4) {
+    //     CullMapModel(index, bufferIndex, frustumIndex);
+    // } else if (bufferIndex < 6) {
+    //     CullWallActor(index, bufferIndex, frustumIndex);
+    // } else {
+    //     CullModelActor(index, bufferIndex, frustumIndex);
+    // }
 }

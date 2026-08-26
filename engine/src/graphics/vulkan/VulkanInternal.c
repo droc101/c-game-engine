@@ -96,6 +96,7 @@ bool CreateLogicalDevice()
 		.pNext = &synchronization2Features,
 		.drawIndirectCount = VK_TRUE,
 		.scalarBlockLayout = VK_TRUE,
+		.bufferDeviceAddress = VK_TRUE,
 		.runtimeDescriptorArray = VK_TRUE,
 		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
 		.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE,
@@ -118,6 +119,8 @@ bool CreateLogicalDevice()
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
 		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
+		.allocatorCreateFlags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT |
+								VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
 	};
 	VulkanTest(lunaCreateDevice2(&deviceCreationInfo, &device), "Failed to create logical device!");
 	lunaGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
@@ -374,27 +377,9 @@ bool CreateDescriptorSetLayouts()
 
 	const LunaDescriptorSetLayoutBinding cullingBindings[] = {
 		{
-			.bindingName = "Frustums",
+			.bindingName = "Frustum Culling Data",
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-		},
-		{
-			.bindingName = "Cull Info",
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 8,
-			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-		},
-		{
-			.bindingName = "Additional Culling Info",
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 8,
-			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-		},
-		{
-			.bindingName = "Output Draw Info",
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 8,
 			.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 	};
@@ -591,7 +576,7 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 28,
+			.descriptorCount = 4,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {

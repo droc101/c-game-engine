@@ -4,36 +4,26 @@
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-layout(set = 0, binding = 1, scalar) readonly buffer ModelActorCullInfos {
-    uint count;
-    ModelActorCullingInfo cullInfo[];
-} modelActorCullInfos[8];
-
-layout(set = 0, binding = 3, scalar) buffer ModelsDrawInfo {
-    uint drawCount;
-    VkDrawIndexedIndirectCommand drawInfos[];
-} modelsDrawInfo[8];
-layout(set = 0, binding = 3, scalar) buffer VkDrawIndirectCommand {
-    uint vertexCount;
-    uint instanceCount;
-    uint firstVertex;
-    uint firstInstance;
-} actorWallsDrawInfo[8];
+layout(set = 0, binding = 0, scalar) buffer CullingData {
+    FrustumCullingData frustums[];
+} cullingData;
 
 void main() {
-    modelsDrawInfo[0].drawCount = 0;
-    modelsDrawInfo[1].drawCount = 0;
-    modelsDrawInfo[2].drawCount = 0;
-    modelsDrawInfo[3].drawCount = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].shadedOpaqueMapModelsOutputDrawInfo.count = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedOpaqueMapModelsOutputDrawInfo.count = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].shadedMapModelsOutputDrawInfo.count = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedMapModelsOutputDrawInfo.count = 0;
 
-    // TODO: Initialize actor wall draw infos so that only the instance count needs to be reset
-    actorWallsDrawInfo[4].vertexCount = 12;
-    actorWallsDrawInfo[4].instanceCount = 0;
-    actorWallsDrawInfo[4].firstVertex = 0;
-    actorWallsDrawInfo[4].firstInstance = 0;
+    // // TODO: Initialize actor wall draw infos so that only the instance count needs to be reset
+    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.vertexCount = 12;
+    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.instanceCount = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.firstVertex = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.firstInstance = 0;
 
-    actorWallsDrawInfo[5].vertexCount = 12;
-    actorWallsDrawInfo[5].instanceCount = 0;
-    actorWallsDrawInfo[5].firstVertex = 0;
-    actorWallsDrawInfo[5].firstInstance = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.vertexCount = 12;
+    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.instanceCount = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.firstVertex = 0;
+    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.firstInstance = 0;
+
+    // TODO: Move actor wall buffer clearing to here instead of on the CPU
 }
