@@ -243,13 +243,12 @@ ParamArray SaveAddonSettings()
 {
 	ParamArray arr;
 	arr.length = enabledAddons.length;
-	arr.data = calloc(arr.length, sizeof(Param)); // TODO this allocation is not properly freed, likely KvList bug
+	arr.data = calloc(arr.length, sizeof(Param));
 	for (size_t i = 0; i < arr.length; i++)
 	{
 		Param *p = &arr.data[i];
 		p->type = PARAM_TYPE_STRING;
-		p->stringValue = strdup(ListGetPointer(enabledAddons,
-											   i)); // TODO this allocation is not properly freed, likely KvList bug
+		p->stringValue = strdup(ListGetPointer(enabledAddons, i));
 	}
 	return arr;
 }
