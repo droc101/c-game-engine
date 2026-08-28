@@ -31,7 +31,7 @@ void main() {
 	outTextureIndex = instanceData.textureIndex;
 	if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_POINT) {
         const vec3 lightToWorld = outPosition - lightsData.lights[pushConstants.lightIndex].transform.position;
-	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (pointLightViewMatrices[pushConstants.faceIndex] * vec4(-lightToWorld.xy, lightToWorld.z, 1));
+	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (pointLightViewMatrices[pushConstants.faceIndex] * vec4(lightToWorld, 1));
 	} else if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_SPOT) {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * vec4(outPosition, 1);
 	} else {

@@ -873,16 +873,22 @@ static inline VkResult LoadLights(const Map *map)
 				glm_plane_normalize(frustumY);
 
 				mat3 transforms[6] = {
-					{{0, 0, 1}, {0, -1, 0}, {1, 0, 0}},
-					{{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}},
-					{{1, 0, 0}, {0, 0, 1}, {0, -1, 0}},
-					{{1, 0, 0}, {0, 0, -1}, {0, 1, 0}},
-					{{1, 0, 0}, {0, -1, 0}, {0, 0, -1}},
-					{{-1, 0, 0}, {0, -1, 0}, {0, 0, 1}},
+					{{0, 0, -1}, {0, 1, 0}, {1, 0, 0}},
+					{{0, 0, 1}, {0, 1, 0}, {-1, 0, 0}},
+					{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}},
+					{{-1, 0, 0}, {0, 0, 1}, {0, 1, 0}},
+					{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}},
+					{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
+				};
+				vec3 negativeLightPosition = {
+					-light->transform.position.x,
+					-light->transform.position.y,
+					-light->transform.position.z,
 				};
 				for (uint32_t j = 0; j < 6; j++)
 				{
 					glm_mat4_ins3(transforms[j], frustums[frustumIndex].viewMatrix);
+					glm_translate(frustums[frustumIndex].viewMatrix, negativeLightPosition);
 					frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
 					frustums[frustumIndex].farPlane = farPlane;
 					frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
