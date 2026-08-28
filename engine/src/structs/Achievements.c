@@ -283,7 +283,25 @@ void SaveAchievements()
 void DestroyAchievementSystem()
 {
 	SaveAchievements();
+
+	StatDict_iterator stat_it;
+	StatDict_it(stat_it, statistics);
+	while (!StatDict_end_p(stat_it))
+	{
+		const StatDict_pair *pair = StatDict_ref(stat_it);
+		free(pair->value);
+		StatDict_next(stat_it);
+	}
 	StatDict_clear(statistics);
+
+	AchievementDict_iterator ach_it;
+	AchievementDict_it(ach_it, achievements);
+	while (!AchievementDict_end_p(ach_it))
+	{
+		const AchievementDict_pair *pair = AchievementDict_ref(ach_it);
+		free(pair->value);
+		AchievementDict_next(ach_it);
+	}
 	AchievementDict_clear(achievements);
 }
 
