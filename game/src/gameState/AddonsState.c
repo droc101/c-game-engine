@@ -127,17 +127,18 @@ static void ReconstructUiStack()
 		OptionsMenuAddSection(addonsOptionsMenu, "Enabled Addons");
 		if (enabledAddons.length == 0)
 		{
-			OptionsMenuAddLargeControl(addonsOptionsMenu,
-									   CreateLabelControl("(none)",
-														  16,
-														  COLOR(0xFF808080),
-														  v2(0, 0),
-														  v2(750, 16),
-														  TOP_CENTER,
-														  FONT_HALIGN_LEFT,
-														  FONT_VALIGN_MIDDLE,
-														  FONT("small_font"),
-														  true));
+			OptionsMenuAddControl(addonsOptionsMenu,
+								  CreateLabelControl("(none)",
+													 16,
+													 COLOR(0xFF808080),
+													 v2(0, 0),
+													 v2(750, 16),
+													 TOP_CENTER,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+			OptionsMenuNextRow(addonsOptionsMenu);
 		}
 		for (size_t i = 0; i < enabledAddons.length; i++)
 		{
@@ -200,17 +201,18 @@ static void ReconstructUiStack()
 		OptionsMenuAddSection(addonsOptionsMenu, "Disabled Addons");
 		if (disabledAddons.length == 0)
 		{
-			OptionsMenuAddLargeControl(addonsOptionsMenu,
-									   CreateLabelControl("(none)",
-														  16,
-														  COLOR(0xFF808080),
-														  v2(0, 0),
-														  v2(750, 16),
-														  TOP_CENTER,
-														  FONT_HALIGN_LEFT,
-														  FONT_VALIGN_MIDDLE,
-														  FONT("small_font"),
-														  true));
+			OptionsMenuAddControl(addonsOptionsMenu,
+								  CreateLabelControl("(none)",
+													 16,
+													 COLOR(0xFF808080),
+													 v2(0, 0),
+													 v2(750, 16),
+													 TOP_CENTER,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+			OptionsMenuNextRow(addonsOptionsMenu);
 		}
 		for (size_t i = 0; i < disabledAddons.length; i++)
 		{

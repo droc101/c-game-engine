@@ -89,17 +89,18 @@ static void AchievementsStateSet()
 		OptionsMenuAddSection(achievementsOptionsMenu, "Unlocked Achievements");
 		if (unlockedAchievements.length == 0)
 		{
-			OptionsMenuAddLargeControl(achievementsOptionsMenu,
-									   CreateLabelControl("(none)",
-														  16,
-														  COLOR(0xFF808080),
-														  v2(0, 0),
-														  v2(750, 16),
-														  TOP_CENTER,
-														  FONT_HALIGN_LEFT,
-														  FONT_VALIGN_MIDDLE,
-														  FONT("small_font"),
-														  true));
+			OptionsMenuAddControl(achievementsOptionsMenu,
+								  CreateLabelControl("(none)",
+													 16,
+													 COLOR(0xFF808080),
+													 v2(0, 0),
+													 v2(750, 16),
+													 TOP_CENTER,
+													 FONT_HALIGN_LEFT,
+													 FONT_VALIGN_MIDDLE,
+													 FONT("small_font"),
+													 true));
+			OptionsMenuNextRow(achievementsOptionsMenu);
 		} else
 		{
 			for (size_t i = 0; i < unlockedAchievements.length; i++)
@@ -143,31 +144,32 @@ static void AchievementsStateSet()
 		{
 			if (hiddenAchievements == 0)
 			{
-				OptionsMenuAddLargeControl(achievementsOptionsMenu,
-										   CreateLabelControl("(none)",
-															  16,
-															  COLOR(0xFF808080),
-															  v2(0, 0),
-															  v2(750, 16),
-															  TOP_CENTER,
-															  FONT_HALIGN_LEFT,
-															  FONT_VALIGN_MIDDLE,
-															  FONT("small_font"),
-															  true));
+				OptionsMenuAddControl(achievementsOptionsMenu,
+									  CreateLabelControl("(none)",
+														 16,
+														 COLOR(0xFF808080),
+														 v2(0, 0),
+														 v2(750, 16),
+														 TOP_CENTER,
+														 FONT_HALIGN_LEFT,
+														 FONT_VALIGN_MIDDLE,
+														 FONT("small_font"),
+														 true));
 			} else
 			{
-				OptionsMenuAddLargeControl(achievementsOptionsMenu,
-										   CreateLabelControl("Some hidden achievements...",
-															  16,
-															  COLOR(0xFF808080),
-															  v2(0, 0),
-															  v2(750, 16),
-															  TOP_CENTER,
-															  FONT_HALIGN_LEFT,
-															  FONT_VALIGN_MIDDLE,
-															  FONT("small_font"),
-															  true));
+				OptionsMenuAddControl(achievementsOptionsMenu,
+									  CreateLabelControl("Some hidden achievements...",
+														 16,
+														 COLOR(0xFF808080),
+														 v2(0, 0),
+														 v2(750, 16),
+														 TOP_CENTER,
+														 FONT_HALIGN_LEFT,
+														 FONT_VALIGN_MIDDLE,
+														 FONT("small_font"),
+														 true));
 			}
+			OptionsMenuNextRow(achievementsOptionsMenu);
 		} else
 		{
 			for (size_t i = 0; i < lockedAchievements.length; i++)
@@ -204,17 +206,18 @@ static void AchievementsStateSet()
 			}
 			if (hiddenAchievements != 0)
 			{
-				OptionsMenuAddLargeControl(achievementsOptionsMenu,
-										   CreateLabelControl("...and some hidden achievements",
-															  16,
-															  COLOR(0xFF808080),
-															  v2(0, 0),
-															  v2(750, 16),
-															  TOP_CENTER,
-															  FONT_HALIGN_LEFT,
-															  FONT_VALIGN_MIDDLE,
-															  FONT("small_font"),
-															  true));
+				OptionsMenuAddControl(achievementsOptionsMenu,
+									  CreateLabelControl("...and some hidden achievements",
+														 16,
+														 COLOR(0xFF808080),
+														 v2(0, 0),
+														 v2(750, 16),
+														 TOP_CENTER,
+														 FONT_HALIGN_LEFT,
+														 FONT_VALIGN_MIDDLE,
+														 FONT("small_font"),
+														 true));
+				OptionsMenuNextRow(achievementsOptionsMenu);
 			}
 		}
 		ListFree(lockedAchievements);
