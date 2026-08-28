@@ -15,7 +15,6 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
-#include <engine/subsystem/SteamworksManager.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
@@ -57,11 +56,6 @@ static void OpenAddons(Control *, void *)
 static void OpenAchievements(Control *, void *)
 {
 	SetGameState(&AchievementsState);
-}
-
-static void SteamButton(Control *, void *)
-{
-	SteamworksTest();
 }
 
 static void MenuStateRender(GlobalState *state, const double /*delta*/)
@@ -137,14 +131,6 @@ static void MenuStateSet()
 		opY += opSpacing * 1.5;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
 		opY += opSpacing;
-#ifdef ENABLE_STEAMWORKS
-		if (IsSteamworksRunning())
-		{
-			UiStackPush(menuStack,
-						CreateButtonControl(v2(0, opY), v2(480, 40), "steam button", SteamButton, MIDDLE_CENTER, NULL));
-			opY += opSpacing;
-		}
-#endif
 	}
 	UiStackResetFocus(menuStack);
 	EnterMenuBackgroundState();
