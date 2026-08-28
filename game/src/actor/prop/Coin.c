@@ -6,6 +6,7 @@
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>
+#include <engine/structs/Achievements.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ActorWall.h>
@@ -29,6 +30,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "helpers/GameAchievements.h"
 
 static const float SIZE = 4.0f;
 
@@ -72,14 +74,13 @@ static void CoinUpdate(Actor *this, double /*delta*/)
 static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 {
 	const CoinData *data = this->extraData;
-	if (!data->isBlue)
-	{
-		GetState()->saveData->coins++;
-	} else
+	const int coins = data->isBlue ? 5 : 1;
+	if (data->isBlue)
 	{
 		GetState()->saveData->blueCoins++;
-		GetState()->saveData->coins += 5;
 	}
+	GetState()->saveData->coins += coins;
+	IncrementIntegerStatistic(GAME_STAT_COINS_COLLECTED, coins);
 	(void)PlaySound(SOUND("sfx/coincling"), SOUND_CATEGORY_SFX);
 	ActorFireOutput(this, COIN_OUTPUT_COLLECTED, PARAM_NONE);
 	RemoveActor(this);

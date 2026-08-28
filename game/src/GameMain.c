@@ -8,6 +8,7 @@
 #include "gameState/LogoSplashState.h"
 #include "gameState/MainState.h"
 #include "gameState/MenuState.h"
+#include "helpers/GameAchievements.h"
 #include "helpers/GameActorRegistration.h"
 #include "helpers/GameControls.h"
 
@@ -63,6 +64,7 @@ EXPORT_SYM int GameMain(const int argc, const char *argv[])
 		.argv = argv,
 		.RegisterGameActors = RegisterGameActors,
 		.RegisterGameControls = RegisterGameControls,
+		.RegisterGameAchievements = RegisterGameAchievements,
 	};
 
 	InitEngine(initInfo);

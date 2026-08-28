@@ -22,8 +22,8 @@
 #include <engine/uiStack/UiStack.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <time.h>
+#include "gameState/AchievementsState.h"
 #include "gameState/AddonsState.h"
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
@@ -52,6 +52,11 @@ static void OpenOptions(Control *, void *)
 static void OpenAddons(Control *, void *)
 {
 	SetGameState(&AddonsState);
+}
+
+static void OpenAchievements(Control *, void *)
+{
+	SetGameState(&AchievementsState);
 }
 
 static void SteamButton(Control *, void *)
@@ -120,10 +125,18 @@ static void MenuStateSet()
 		UiStackPush(menuStack,
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Options", OpenOptions, MIDDLE_CENTER, NULL));
 		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Addons", OpenAddons, MIDDLE_CENTER, NULL));
-		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(-122.5, opY), v2(235, 40), "Addons", OpenAddons, MIDDLE_CENTER, NULL));
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(122.5, opY),
+										v2(235, 40),
+										"Achievements",
+										OpenAchievements,
+										MIDDLE_CENTER,
+										NULL));
 		opY += opSpacing * 1.5;
+		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
+		opY += opSpacing;
 #ifdef ENABLE_STEAMWORKS
 		if (IsSteamworksRunning())
 		{

@@ -18,6 +18,7 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
+#include <engine/structs/Achievements.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
@@ -270,6 +271,8 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	InitOptions();
 
+	InitAchievementSystem(initInfo.RegisterGameAchievements);
+
 	InitAddonLoader();
 
 	InitTimers();
@@ -425,6 +428,7 @@ void DestroyEngine()
 	SDL_HideWindow(GetGameWindow());
 	SaveOptions(&GetState()->options);
 	DestroyDPrintConsole();
+	DestroyAchievementSystem();
 	ShutdownSteamworks();
 	DiscordDestroy();
 	PhysicsThreadTerminate();
