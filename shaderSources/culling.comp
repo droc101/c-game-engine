@@ -68,8 +68,6 @@ bool IsVisible(const vec3 position, const float radius, const uint frustumIndex)
                center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -radius;
     }
 
-    return true;
-
     const Frustum frustum = cullingData.frustums[frustumIndex].frustum;
     const vec3 center = (frustum.viewMatrix * vec4(position, 1)).xyz;
     return center.z + radius > frustum.nearPlane && center.z - radius < frustum.farPlane &&
