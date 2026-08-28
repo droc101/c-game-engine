@@ -184,7 +184,7 @@ typedef struct FrustumCullingData
 	float farPlane;
 	float frustumPlanes[4];
 
-	float _padding[2];
+	float _padding[6];
 
 
 	VkDeviceAddress shadedOpaqueMapModelsCullingInfo;

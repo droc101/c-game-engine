@@ -39,7 +39,7 @@ struct Frustum {
     float farPlane;
     float frustumPlanes[4];
 
-    float _padding[2];
+    float _padding[6];
 };
 
 struct CullingInfo {

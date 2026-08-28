@@ -634,7 +634,7 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 						   "Failed to write directional light cascade transform matrices to buffer!");
 	const LunaBufferWriteInfo frustumsWriteInfo = {
 		.bytes = sizeof(FrustumCullingData) * 4,
-		.data = frustums,
+		.data = &frustums[1],
 		.offset = sizeof(FrustumCullingData),
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 	};
