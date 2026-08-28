@@ -74,6 +74,8 @@ List pointLightShadowMapImageViews = {0};
 List perFrustumBuffersHandles = {0};
 uint32_t frustumCount = 0;
 FrustumCullingData *frustums = NULL;
+uint32_t actorModelsDrawInfoCount = 0;
+uint32_t maximumCulledInstanceCount = 0;
 
 static CameraUniform uniform;
 #pragma endregion variables
@@ -198,7 +200,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		shadowMapRenderPass = VK_NULL_HANDLE;
 	}
 
-	if (map == NULL)
+	if (map == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
 	{
 		return VK_SUCCESS;
 	}
@@ -510,6 +512,11 @@ VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 // TODO: Optimize this function
 VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
 {
+	if (light == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
+	{
+		return VK_SUCCESS;
+	}
+
 	static const float LAMBDA = 0.95f; // Adjusts the range of each split. Tweak to find optimal values
 
 	const float nearPlane = camera->nearPlane;
@@ -652,6 +659,9 @@ VkResult WriteFrustumsBuffer()
 
 VkResult CullModels()
 {
+	VulkanTestReturnResult(UpdateDirectionalLightCascades(GetState()->camera, GetState()->map->directionalLight),
+						   "Failed to update directional light cascades!");
+
 	const LunaMultiBufferMemoryBarrier preClearMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,
 		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT,
@@ -667,6 +677,8 @@ VkResult CullModels()
 	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preClearDependencyInfo),
 						   "Failed to insert pipeline barrier before clearing culling data!");
 
+	VulkanTestReturnResult(lunaPushConstantsCompute(device, commandBuffer, pipelines.clearCullingData),
+						   "Failed to push constants for clearing culling data!");
 	const LunaDescriptorSetBindInfo clearDescriptorSetBindInfo = {
 		.descriptorSetCount = 1,
 		.descriptorSets = &descriptorSets.culling.set,
@@ -674,6 +686,8 @@ VkResult CullModels()
 	const LunaDispatchInfo clearDispatchInfo = {
 		.pipeline = pipelines.clearCullingData,
 		.descriptorSetBindInfo = &clearDescriptorSetBindInfo,
+		.groupCountX = ((actorModelsDrawInfoCount + 63) / 64),
+		.groupCountY = frustumCount,
 	};
 	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &clearDispatchInfo),
 						   "Failed to dispatch culling data clear shader!");
@@ -703,9 +717,9 @@ VkResult CullModels()
 	const LunaDispatchInfo dispatchInfo = {
 		.pipeline = pipelines.culling,
 		.descriptorSetBindInfo = &descriptorSetBindInfo,
-		.groupCountX = 16,
+		.groupCountX = ((maximumCulledInstanceCount + 63) / 64),
 		.groupCountY = 8,
-		// .groupCountZ = frustumCount,
+		.groupCountZ = frustumCount,
 	};
 	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
 

@@ -6,6 +6,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/GlobalState.h>
@@ -35,14 +36,10 @@ typedef struct
 
 typedef struct
 {
-	uint32_t shadedInstanceCount;
-	uint32_t unshadedInstanceCount;
-	/// A pointer to the DrawActorModelIndexedIndirectCommand structure used for drawing this material as shaded
-	DrawActorModelIndexedIndirectCommand *shadedDrawInfo;
-	/// A pointer to the DrawActorModelIndexedIndirectCommand structure used for drawing this material as unshaded
-	DrawActorModelIndexedIndirectCommand *unshadedDrawInfo;
-	/// A pointer to the instance data for the first instance
-	ActorModelInstanceData *instanceData;
+	/// A pointer to the VkDrawIndexedIndirectCommand structure used for drawing this material as shaded
+	VkDrawIndexedIndirectCommand *shadedDrawInfo;
+	/// A pointer to the VkDrawIndexedIndirectCommand structure used for drawing this material as unshaded
+	VkDrawIndexedIndirectCommand *unshadedDrawInfo;
 } MaterialSlotData;
 
 typedef struct
@@ -67,11 +64,14 @@ typedef struct
 	bool shouldReallocUnshadedWalls;
 } InstanceDataReallocInfo;
 
+static uint32_t allocatedBufferCount;
 static size_t bufferVertexCount;
 static size_t bufferIndexCount;
+static uint32_t *shadedModelsInstanceIndices;
+static uint32_t *unshadedModelsInstanceIndices;
 static ActorModelInstanceData *modelsInstanceData;
-static DrawActorModelIndexedIndirectCommand *shadedModelsDrawInfo;
-static DrawActorModelIndexedIndirectCommand *unshadedModelsDrawInfo;
+static VkDrawIndexedIndirectCommand *shadedModelsDrawInfo;
+static VkDrawIndexedIndirectCommand *unshadedModelsDrawInfo;
 static ModelActorCullingInfo *shadedModelsCullingInfo;
 static ModelActorCullingInfo *unshadedModelsCullingInfo;
 static ActorWallInstanceData *wallsInstanceData;
@@ -252,9 +252,7 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 					const LodMaterialSlotsData *materialSlotDatas = ListGetPointer(lodMaterialSlotsData, lodId);
 					for (uint32_t j = 0; j < materialSlotDatas->materialSlots.length; j++)
 					{
-						MaterialSlotData *materialSlotData = ListGetPointer(materialSlotDatas->materialSlots, j);
-						materialSlotData->shadedInstanceCount = 0;
-						materialSlotData->unshadedInstanceCount = 0;
+						const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotDatas->materialSlots, j);
 						materialSlotData->shadedDrawInfo->instanceCount = 0;
 						materialSlotData->unshadedDrawInfo->instanceCount = 0;
 						materialSlotData->unshadedDrawInfo->firstInstance = materialSlotData->shadedDrawInfo
@@ -280,6 +278,14 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 	reallocInfo->shouldReallocUnshadedWalls = reallocInfo->unshadedWallsInstanceCount !=
 											  buffers.actorWalls.unshadedInstanceCount;
 
+	if (frustumCount != allocatedBufferCount)
+	{
+		reallocInfo->shouldReallocModels = true;
+		reallocInfo->shouldReallocShadedWalls = true;
+		reallocInfo->shouldReallocUnshadedWalls = true;
+		return true;
+	}
+
 	if (reallocInfo->lodInstanceCounts->length != lodMaterialSlotsData.length)
 	{
 		reallocInfo->shouldReallocModels = true;
@@ -302,18 +308,25 @@ static inline bool ShouldReallocInstanceData(const LockingList *actors, Instance
 
 static inline VkResult ReallocateInstanceData(const LockingList *actors, const InstanceDataReallocInfo *reallocInfo)
 {
-	const uint32_t drawInfoBytes = reallocInfo->modelDrawCount * sizeof(DrawActorModelIndexedIndirectCommand);
+	const uint32_t instanceIndicesBytes = reallocInfo->modelInstanceCount * sizeof(uint32_t);
+	const uint32_t drawInfoBytes = reallocInfo->modelDrawCount * sizeof(VkDrawIndexedIndirectCommand);
 	const uint32_t cullingInfoBytes = sizeof(uint32_t) +
 									  reallocInfo->modelInstanceCount * sizeof(ModelActorCullingInfo);
 
 	if (reallocInfo->shouldReallocModels)
 	{
+		free(shadedModelsInstanceIndices);
+		free(unshadedModelsInstanceIndices);
 		free(modelsInstanceData);
 		free(shadedModelsDrawInfo);
 		free(unshadedModelsDrawInfo);
 		free(shadedModelsCullingInfo);
 		free(unshadedModelsCullingInfo);
 
+		shadedModelsInstanceIndices = malloc(instanceIndicesBytes);
+		CheckAlloc(shadedModelsInstanceIndices);
+		unshadedModelsInstanceIndices = malloc(instanceIndicesBytes);
+		CheckAlloc(unshadedModelsInstanceIndices);
 		modelsInstanceData = malloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
 		CheckAlloc(modelsInstanceData);
 		shadedModelsDrawInfo = calloc(1, drawInfoBytes);
@@ -360,8 +373,6 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 				{
 					const MaterialSlotVertexData *materialSlotVertexData = ListGetPointer(*materialSlotsVertexData, j);
 					MaterialSlotData *materialSlotData = malloc(sizeof(MaterialSlotData));
-					materialSlotData->shadedInstanceCount = 0;
-					materialSlotData->unshadedInstanceCount = 0;
 					materialSlotData->shadedDrawInfo = shadedModelsDrawInfo + drawInfoOffset;
 					materialSlotData->shadedDrawInfo->indexCount = materialSlotVertexData->indexCount;
 					materialSlotData->shadedDrawInfo->instanceCount = 0;
@@ -370,7 +381,6 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 					materialSlotData->shadedDrawInfo->firstInstance = instanceDataOffset;
 					materialSlotData->unshadedDrawInfo = unshadedModelsDrawInfo + drawInfoOffset;
 					*materialSlotData->unshadedDrawInfo = *materialSlotData->shadedDrawInfo;
-					materialSlotData->instanceData = modelsInstanceData + instanceDataOffset;
 					ListAdd(materialSlotsData->materialSlots, materialSlotData);
 					drawInfoOffset++;
 					instanceDataOffset += materialSlotsData->instanceCount;
@@ -380,8 +390,6 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 				for (uint32_t j = 0; j < actor->model->materialSlotCount; j++)
 				{
 					MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
-					materialSlotData->shadedInstanceCount = 0;
-					materialSlotData->unshadedInstanceCount = 0;
 					materialSlotData->shadedDrawInfo->instanceCount = 0;
 					materialSlotData->unshadedDrawInfo->instanceCount = 0;
 					materialSlotData->unshadedDrawInfo->firstInstance = materialSlotData->shadedDrawInfo->firstInstance;
@@ -402,6 +410,16 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 												&buffers.actorModels.unshadedCullingInfo,
 												cullingInfoBytes),
 							   "Failed to resize actor models unshaded culling info buffer!");
+		VulkanTestReturnResult(lunaResizeBuffer(device,
+												commandBuffer,
+												&buffers.actorModels.shadedUnculledInstanceIndices,
+												instanceIndicesBytes),
+							   "Failed to resize actor models unculled shaded instance indices buffer!");
+		VulkanTestReturnResult(lunaResizeBuffer(device,
+												commandBuffer,
+												&buffers.actorModels.unshadedUnculledInstanceIndices,
+												instanceIndicesBytes),
+							   "Failed to resize actor models unculled unshaded instance indices buffer!");
 		for (uint32_t i = 0; i < frustumCount; i++)
 		{
 			LunaBuffer *shadedInstanceIndices = (LunaBuffer *)&ListGetPointer(buffers.actorModels.shadedInstanceIndices,
@@ -412,15 +430,12 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 			LunaBuffer *shadedDrawInfo = (LunaBuffer *)&ListGetPointer(buffers.actorModels.shadedDrawInfo, i);
 			LunaBuffer *unshadedDrawInfo = (LunaBuffer *)&ListGetPointer(buffers.actorModels.unshadedDrawInfo, i);
 
-			VulkanTestReturnResult(lunaResizeBuffer(device,
-													commandBuffer,
-													shadedInstanceIndices,
-													reallocInfo->modelInstanceCount * sizeof(uint32_t)),
+			VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, shadedInstanceIndices, instanceIndicesBytes),
 								   "Failed to resize actor models shaded instance indices buffer!");
 			VulkanTestReturnResult(lunaResizeBuffer(device,
 													commandBuffer,
 													unshadedInstanceIndices,
-													reallocInfo->modelInstanceCount * sizeof(uint32_t)),
+													instanceIndicesBytes),
 								   "Failed to resize actor models unshaded instance indices buffer!");
 			VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, shadedDrawInfo, drawInfoBytes),
 								   "Failed to resize actor models shaded draw info buffer!");
@@ -436,17 +451,23 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 			ListSet(perFrustumBuffersHandles, drawInfoShadedIndex, *shadedDrawInfo);
 			ListSet(perFrustumBuffersHandles, drawInfoShadedIndex + 1, *unshadedDrawInfo);
 
-			frustums[i].shadedActorModelsInstanceIndices = lunaGetBufferDeviceAddress(device, *shadedInstanceIndices);
-			frustums[i].unshadedActorModelsInstanceIndices = lunaGetBufferDeviceAddress(device,
-																						*unshadedInstanceIndices);
-			frustums[i].shadedActorModelsDrawInfo = lunaGetBufferDeviceAddress(device, *shadedDrawInfo);
-			frustums[i].unshadedActorModelsDrawInfo = lunaGetBufferDeviceAddress(device, *unshadedDrawInfo);
-			frustums[i]
-					.shadedActorModelsCullingInfo = lunaGetBufferDeviceAddress(device,
+			FrustumCullingData *frustum = &frustums[i];
+			frustum->shadedActorModelsCullingInfo = lunaGetBufferDeviceAddress(device,
 																			   buffers.actorModels.shadedCullingInfo);
-			frustums[i].unshadedActorModelsCullingInfo = lunaGetBufferDeviceAddress(device,
-																					buffers.actorModels
-																							.unshadedCullingInfo);
+			frustum->shadedActorModelsUnculledInstanceIndices = lunaGetBufferDeviceAddress(
+					device,
+					buffers.actorModels.shadedUnculledInstanceIndices);
+			frustum->shadedActorModelsInstanceIndices = lunaGetBufferDeviceAddress(device, *shadedInstanceIndices);
+			frustum->shadedActorModelsDrawInfo = lunaGetBufferDeviceAddress(device, *shadedDrawInfo);
+
+			frustum->unshadedActorModelsCullingInfo = lunaGetBufferDeviceAddress(device,
+																				 buffers.actorModels
+																						 .unshadedCullingInfo);
+			frustum->unshadedActorModelsUnculledInstanceIndices = lunaGetBufferDeviceAddress(
+					device,
+					buffers.actorModels.unshadedUnculledInstanceIndices);
+			frustum->unshadedActorModelsInstanceIndices = lunaGetBufferDeviceAddress(device, *unshadedInstanceIndices);
+			frustum->unshadedActorModelsDrawInfo = lunaGetBufferDeviceAddress(device, *unshadedDrawInfo);
 		}
 
 		VulkanTestReturnResult(lunaResizeBuffer(device,
@@ -501,6 +522,9 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 
 			frustums[i].shadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
 																				 buffers.actorWalls.shadedCullingInfo);
+			frustums[i].shadedActorWallsDrawInfo = lunaGetBufferDeviceAddress(
+					device,
+					(LunaBuffer)ListGetPointer(buffers.actorWalls.shadedDrawInfo, i));
 			frustums[i].shadedActorWallsInstanceIndices = lunaGetBufferDeviceAddress(device, *buffer);
 		}
 	}
@@ -540,6 +564,9 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 			frustums[i]
 					.unshadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
 																				buffers.actorWalls.unshadedCullingInfo);
+			frustums[i].unshadedActorWallsDrawInfo = lunaGetBufferDeviceAddress(
+					device,
+					(LunaBuffer)ListGetPointer(buffers.actorWalls.unshadedDrawInfo, i));
 			frustums[i].unshadedActorWallsInstanceIndices = lunaGetBufferDeviceAddress(device, *buffer);
 		}
 	}
@@ -568,48 +595,7 @@ static inline VkResult ReallocateInstanceData(const LockingList *actors, const I
 		lunaWriteDescriptorSets(device, 1, &instanceDataWrite);
 	}
 
-	if (lunaGetBufferSize(buffers.actorWalls.shadedCullingInfo) == 0)
-	{
-		VulkanTestReturnResult(lunaResizeBuffer(device,
-												commandBuffer,
-												&buffers.actorWalls.shadedCullingInfo,
-												sizeof(uint32_t)),
-							   "Failed to resize shaded actor walls culling info buffer!");
-		VulkanTestReturnResult(lunaWriteUintToBuffer(device,
-													 commandBuffer,
-													 buffers.actorWalls.shadedCullingInfo,
-													 0,
-													 buffers.actorWalls.shadedInstanceCount,
-													 NULL),
-							   "Failed to write shaded actor walls culling info to buffer!");
-		for (uint32_t i = 0; i < frustumCount; i++)
-		{
-			frustums[i].shadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
-																				 buffers.actorWalls.shadedCullingInfo);
-		}
-	}
-	if (lunaGetBufferSize(buffers.actorWalls.unshadedCullingInfo) == 0)
-	{
-		VulkanTestReturnResult(lunaResizeBuffer(device,
-												commandBuffer,
-												&buffers.actorWalls.unshadedCullingInfo,
-												sizeof(uint32_t)),
-							   "Failed to resize unshaded actor walls culling info buffer!");
-		VulkanTestReturnResult(lunaWriteUintToBuffer(device,
-													 commandBuffer,
-													 buffers.actorWalls.unshadedCullingInfo,
-													 0,
-													 buffers.actorWalls.unshadedInstanceCount,
-													 NULL),
-							   "Failed to write unshaded actor walls culling info to buffer!");
-		for (uint32_t i = 0; i < frustumCount; i++)
-		{
-			frustums[i]
-					.unshadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
-																				buffers.actorWalls.unshadedCullingInfo);
-		}
-	}
-
+	allocatedBufferCount = frustumCount;
 	VulkanTestReturnResult(WriteFrustumsBuffer(), "Failed to write data to frustums buffer!");
 
 	return VK_SUCCESS;
@@ -633,33 +619,30 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 	{
 		const uint32_t materialIndex = actor->model->skinMaterialIndices[actor->currentSkinIndex][j];
 		const Material *material = &actor->model->materials[materialIndex];
-		MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
+		const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
 
-		ActorModelInstanceData *instanceData = NULL;
+		const uint32_t instanceIndex = reallocInfo->shadedModelInstanceCount + reallocInfo->unshadedModelInstanceCount;
 		ModelActorCullingInfo *cullingInfo = NULL;
 		switch (material->shader)
 		{
 			case SHADER_SHADED:
 				cullingInfo = &shadedModelsCullingInfo[reallocInfo->shadedModelInstanceCount];
 				cullingInfo->drawInfoIndex = materialSlotData->shadedDrawInfo - shadedModelsDrawInfo;
-				instanceData = &materialSlotData->instanceData[materialSlotData->shadedInstanceCount];
-				materialSlotData->shadedInstanceCount++;
+				shadedModelsInstanceIndices[reallocInfo->shadedModelInstanceCount] = instanceIndex;
 				materialSlotData->unshadedDrawInfo->firstInstance++;
 				reallocInfo->shadedModelInstanceCount++;
 				break;
 			case SHADER_UNSHADED:
 				cullingInfo = &unshadedModelsCullingInfo[reallocInfo->unshadedModelInstanceCount];
 				cullingInfo->drawInfoIndex = materialSlotData->unshadedDrawInfo - unshadedModelsDrawInfo;
-				instanceData = &materialSlotData->instanceData[materialSlotsData->instanceCount -
-															   materialSlotData->unshadedInstanceCount -
-															   1];
-				materialSlotData->unshadedInstanceCount++;
+				unshadedModelsInstanceIndices[reallocInfo->unshadedModelInstanceCount] = instanceIndex;
 				reallocInfo->unshadedModelInstanceCount++;
 				break;
 			default:
 				assert(material->shader != SHADER_SKY);
 				continue;
 		}
+		ActorModelInstanceData *instanceData = &modelsInstanceData[instanceIndex];
 		memcpy(instanceData->transformMatrix, transformMatrix, sizeof(transformMatrix));
 		instanceData->modColor = actor->modColor;
 		instanceData->materialColor = material->color;
@@ -694,6 +677,110 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 	// TODO: This does not take centerOffset into account
 	cullingInfo->position = position;
 	cullingInfo->radius = Vector2Length(actorInstanceData->scale);
+}
+
+static inline VkResult WriteActorModelBuffers(const InstanceDataReallocInfo *reallocInfo)
+{
+	assert(reallocInfo->modelInstanceCount ==
+		   reallocInfo->shadedModelInstanceCount + reallocInfo->unshadedModelInstanceCount);
+
+	const LunaBufferWriteInfo instanceDataWriteInfo = {
+		.bytes = reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData),
+		.data = modelsInstanceData,
+		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.instanceData,
+												 &instanceDataWriteInfo),
+						   "Failed to write actor models instance data to buffer!");
+
+	const LunaBufferWriteInfo shadedUnculledInstanceIndicesWriteInfo = {
+		.bytes = reallocInfo->shadedModelInstanceCount * sizeof(uint32_t),
+		.data = shadedModelsInstanceIndices,
+		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.shadedUnculledInstanceIndices,
+												 &shadedUnculledInstanceIndicesWriteInfo),
+						   "Failed to write shaded actor models unculled instance indices to buffer!");
+	const LunaBufferWriteInfo unshadedUnculledInstanceIndicesWriteInfo = {
+		.bytes = reallocInfo->unshadedModelInstanceCount * sizeof(uint32_t),
+		.data = unshadedModelsInstanceIndices,
+		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.unshadedUnculledInstanceIndices,
+												 &unshadedUnculledInstanceIndicesWriteInfo),
+						   "Failed to write unshaded actor models unculled instance indices to buffer!");
+
+	VulkanTestReturnResult(lunaWriteUintToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.shadedCullingInfo,
+												 0,
+												 reallocInfo->shadedModelInstanceCount,
+												 NULL),
+						   "Failed to write actor model shaded culling info count to buffer!");
+	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
+		.bytes = reallocInfo->shadedModelInstanceCount * sizeof(ModelActorCullingInfo),
+		.data = shadedModelsCullingInfo,
+		.offset = sizeof(uint32_t),
+		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.shadedCullingInfo,
+												 &shadedCullingInfoBufferWriteInfo),
+						   "Failed to write data to actor model shaded culling info buffer!");
+	VulkanTestReturnResult(lunaWriteUintToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.unshadedCullingInfo,
+												 0,
+												 reallocInfo->unshadedModelInstanceCount,
+												 NULL),
+						   "Failed to write actor model unshaded culling info count to buffer!");
+	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
+		.bytes = reallocInfo->unshadedModelInstanceCount * sizeof(ModelActorCullingInfo),
+		.data = unshadedModelsCullingInfo,
+		.offset = sizeof(uint32_t),
+		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	};
+	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+												 commandBuffer,
+												 buffers.actorModels.unshadedCullingInfo,
+												 &unshadedCullingInfoBufferWriteInfo),
+						   "Failed to write data to actor model unshaded culling info buffer!");
+
+	const uint32_t drawInfoBytes = reallocInfo->modelDrawCount * sizeof(VkDrawIndexedIndirectCommand);
+	const LunaBufferWriteInfo shadedDrawInfoBufferWriteInfo = {
+		.bytes = drawInfoBytes,
+		.data = shadedModelsDrawInfo,
+		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+	};
+	const LunaBufferWriteInfo unshadedDrawInfoBufferWriteInfo = {
+		.bytes = drawInfoBytes,
+		.data = unshadedModelsDrawInfo,
+		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+	};
+	for (uint32_t i = 0; i < frustumCount; i++)
+	{
+		const LunaBuffer shadedDrawInfo = (LunaBuffer)ListGetPointer(buffers.actorModels.shadedDrawInfo, i);
+		const LunaBuffer unshadedDrawInfo = (LunaBuffer)ListGetPointer(buffers.actorModels.unshadedDrawInfo, i);
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+													 commandBuffer,
+													 shadedDrawInfo,
+													 &shadedDrawInfoBufferWriteInfo),
+							   "Failed to write actor models shaded draw info to buffer!");
+		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
+													 commandBuffer,
+													 unshadedDrawInfo,
+													 &unshadedDrawInfoBufferWriteInfo),
+							   "Failed to write actor models unshaded draw info to buffer!");
+	}
+
+	return VK_SUCCESS;
 }
 
 static inline VkResult WriteActorWallBuffers()
@@ -771,86 +858,14 @@ static inline VkResult UpdateInstanceData(const LockingList *actors,
 			}
 		}
 	}
+	maximumCulledInstanceCount = max(maximumCulledInstanceCount, reallocInfo->shadedWallsInstanceCount);
+	maximumCulledInstanceCount = max(maximumCulledInstanceCount, reallocInfo->unshadedWallsInstanceCount);
+	maximumCulledInstanceCount = max(maximumCulledInstanceCount, reallocInfo->shadedModelInstanceCount);
+	maximumCulledInstanceCount = max(maximumCulledInstanceCount, reallocInfo->unshadedModelInstanceCount);
 
-	assert(reallocInfo->modelInstanceCount ==
-		   reallocInfo->shadedModelInstanceCount + reallocInfo->unshadedModelInstanceCount);
+	VulkanTestReturnResult(WriteActorModelBuffers(reallocInfo), "Failed to write actor model buffers!");
 
-	const LunaBufferWriteInfo modelsInstanceDataWriteInfo = {
-		.bytes = reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData),
-		.data = modelsInstanceData,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
-	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-												 commandBuffer,
-												 buffers.actorModels.instanceData,
-												 &modelsInstanceDataWriteInfo),
-						   "Failed to write actor models instance data to buffer!");
-
-	VulkanTestReturnResult(lunaWriteUintToBuffer(device,
-												 commandBuffer,
-												 buffers.actorModels.shadedCullingInfo,
-												 0,
-												 reallocInfo->shadedModelInstanceCount,
-												 NULL),
-						   "Failed to write actor model shaded culling info count to buffer!");
-	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
-		.bytes = reallocInfo->shadedModelInstanceCount * sizeof(ModelActorCullingInfo),
-		.data = shadedModelsCullingInfo,
-		.offset = sizeof(uint32_t),
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-												 commandBuffer,
-												 buffers.actorModels.shadedCullingInfo,
-												 &shadedCullingInfoBufferWriteInfo),
-						   "Failed to write data to actor model shaded culling info buffer!");
-	VulkanTestReturnResult(lunaWriteUintToBuffer(device,
-												 commandBuffer,
-												 buffers.actorModels.unshadedCullingInfo,
-												 0,
-												 reallocInfo->unshadedModelInstanceCount,
-												 NULL),
-						   "Failed to write actor model unshaded culling info count to buffer!");
-	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
-		.bytes = reallocInfo->unshadedModelInstanceCount * sizeof(ModelActorCullingInfo),
-		.data = unshadedModelsCullingInfo,
-		.offset = sizeof(uint32_t),
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-												 commandBuffer,
-												 buffers.actorModels.unshadedCullingInfo,
-												 &unshadedCullingInfoBufferWriteInfo),
-						   "Failed to write data to actor model unshaded culling info buffer!");
-
-	const uint32_t drawInfoBytes = reallocInfo->modelDrawCount * sizeof(DrawActorModelIndexedIndirectCommand);
-	const LunaBufferWriteInfo shadedDrawInfoBufferWriteInfo = {
-		.bytes = drawInfoBytes,
-		.data = shadedModelsDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
-	};
-	const LunaBufferWriteInfo unshadedDrawInfoBufferWriteInfo = {
-		.bytes = drawInfoBytes,
-		.data = unshadedModelsDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
-	};
-	for (uint32_t i = 0; i < frustumCount; i++)
-	{
-		const LunaBuffer shadedDrawInfo = (LunaBuffer)ListGetPointer(buffers.actorModels.shadedDrawInfo, i);
-		const LunaBuffer unshadedDrawInfo = (LunaBuffer)ListGetPointer(buffers.actorModels.unshadedDrawInfo, i);
-		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-													 commandBuffer,
-													 shadedDrawInfo,
-													 &shadedDrawInfoBufferWriteInfo),
-							   "Failed to write actor models shaded draw info to buffer!");
-		VulkanTestReturnResult(lunaWriteDataToBuffer(device,
-													 commandBuffer,
-													 unshadedDrawInfo,
-													 &unshadedDrawInfoBufferWriteInfo),
-							   "Failed to write actor models unshaded draw info to buffer!");
-	}
-
-	VulkanTestReturnResult(WriteActorWallBuffers(), "Failed to write actor walls instance data!");
+	VulkanTestReturnResult(WriteActorWallBuffers(), "Failed to write actor wall buffers!");
 
 	const LunaMultiBufferMemoryBarrier memoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT,

@@ -1492,9 +1492,16 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 
 bool CreateCullingDataClearPipeline()
 {
+	const LunaPushConstantsRange pushConstantsRange = {
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.size = sizeof(actorModelsDrawInfoCount),
+		.dataPointer = &actorModelsDrawInfoCount,
+	};
 	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
 		.descriptorSetLayoutCount = 1,
 		.descriptorSetLayouts = &descriptorSets.culling.layout,
+		.pushConstantRangeCount = 1,
+		.pushConstantsRanges = &pushConstantsRange,
 	};
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
 	VulkanTest(CreateShaderModule(SHADER("clear_culling_data_c"), SHADER_TYPE_COMP, &shaderModule),

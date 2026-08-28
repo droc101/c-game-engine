@@ -1,29 +1,43 @@
 #version 460
 
-#include "shared.inc.glsl"
+#include "types.inc.glsl"
 
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(push_constant, scalar) uniform PushConstants {
+	uint actorModelsDrawInfoCount;
+} pushConstants;
 
 layout(set = 0, binding = 0, scalar) buffer CullingData {
     FrustumCullingData frustums[];
 } cullingData;
 
+#define SetSafe(ref, field, value) if (uvec2(ref) != uvec2(0)) (ref).field = (value);
+
 void main() {
-    // cullingData.frustums[gl_GlobalInvocationID.x].shadedOpaqueMapModelsOutputDrawInfo.count = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedOpaqueMapModelsOutputDrawInfo.count = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].shadedMapModelsOutputDrawInfo.count = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedMapModelsOutputDrawInfo.count = 0;
+    const uint index = gl_GlobalInvocationID.x;
+    const uint frustumIndex = gl_GlobalInvocationID.y;
+    // TODO: This branch will cause threads to require masking the majority of the time!
+    if (index == 0) {
+        SetSafe(cullingData.frustums[frustumIndex].shadedOpaqueMapModelsOutputDrawInfo, count, 0);
+        SetSafe(cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsOutputDrawInfo, count, 0);
+        SetSafe(cullingData.frustums[frustumIndex].shadedMapModelsOutputDrawInfo, count, 0);
+        SetSafe(cullingData.frustums[frustumIndex].unshadedMapModelsOutputDrawInfo, count, 0);
 
-    // // TODO: Initialize actor wall draw infos so that only the instance count needs to be reset
-    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.vertexCount = 12;
-    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.instanceCount = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.firstVertex = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].shadedActorWallsDrawInfo.firstInstance = 0;
+        // TODO: Initialize actor wall draw infos so that only the instance count needs to be reset
+        SetSafe(cullingData.frustums[frustumIndex].shadedActorWallsDrawInfo, vertexCount, 12);
+        SetSafe(cullingData.frustums[frustumIndex].shadedActorWallsDrawInfo, instanceCount, 0);
+        SetSafe(cullingData.frustums[frustumIndex].shadedActorWallsDrawInfo, firstVertex, 0);
+        SetSafe(cullingData.frustums[frustumIndex].shadedActorWallsDrawInfo, firstInstance, 0);
 
-    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.vertexCount = 12;
-    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.instanceCount = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.firstVertex = 0;
-    // cullingData.frustums[gl_GlobalInvocationID.x].unshadedActorWallsDrawInfo.firstInstance = 0;
-
-    // TODO: Move actor wall buffer clearing to here instead of on the CPU
+        SetSafe(cullingData.frustums[frustumIndex].unshadedActorWallsDrawInfo, vertexCount, 12);
+        SetSafe(cullingData.frustums[frustumIndex].unshadedActorWallsDrawInfo, instanceCount, 0);
+        SetSafe(cullingData.frustums[frustumIndex].unshadedActorWallsDrawInfo, firstVertex, 0);
+        SetSafe(cullingData.frustums[frustumIndex].unshadedActorWallsDrawInfo, firstInstance, 0);
+    }
+    if (index >= pushConstants.actorModelsDrawInfoCount) {
+        return;
+    }
+    SetSafe(cullingData.frustums[frustumIndex].shadedActorModelsDrawInfo, drawInfos[index].instanceCount, 0);
+    SetSafe(cullingData.frustums[frustumIndex].unshadedActorModelsDrawInfo, drawInfos[index].instanceCount, 0);
 }

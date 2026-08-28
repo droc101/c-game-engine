@@ -184,6 +184,8 @@ typedef struct FrustumCullingData
 	float farPlane;
 	float frustumPlanes[4];
 
+	float _padding[2];
+
 
 	VkDeviceAddress shadedOpaqueMapModelsCullingInfo;
 	VkDeviceAddress shadedOpaqueMapModelsUnculledDrawInfo;
@@ -210,15 +212,14 @@ typedef struct FrustumCullingData
 	VkDeviceAddress unshadedActorWallsDrawInfo;
 
 	VkDeviceAddress shadedActorModelsCullingInfo;
+	VkDeviceAddress shadedActorModelsUnculledInstanceIndices;
 	VkDeviceAddress shadedActorModelsInstanceIndices;
 	VkDeviceAddress shadedActorModelsDrawInfo;
 
 	VkDeviceAddress unshadedActorModelsCullingInfo;
+	VkDeviceAddress unshadedActorModelsUnculledInstanceIndices;
 	VkDeviceAddress unshadedActorModelsInstanceIndices;
 	VkDeviceAddress unshadedActorModelsDrawInfo;
-
-
-	float _padding[2];
 } FrustumCullingData;
 
 typedef struct UiBuffer
@@ -245,8 +246,12 @@ typedef struct ActorModelsBuffer
 	LunaBuffer vertices;
 	/// A buffer containing the index data to use along-side the per-vertex data
 	LunaBuffer indices;
-	/// A buffer containing the instance data for each instance of each model section
+	/// A buffer containing the instance data for all instances of all lod components. Should be treated as unsorted
 	LunaBuffer instanceData;
+	/// A buffer containing the instance data index for each instance of each shaded lod component
+	LunaBuffer shadedUnculledInstanceIndices;
+	/// A buffer containing the instance data index for each instance of each unshaded lod component
+	LunaBuffer unshadedUnculledInstanceIndices;
 	/// A list of LunaBuffer handles containing the uint32_t indices used to get the instance data for each instance to draw
 	List shadedInstanceIndices;
 	/// A list of LunaBuffer handles containing the uint32_t indices used to get the instance data for each instance to draw
@@ -451,17 +456,6 @@ typedef struct ModelActorCullingInfo
 	uint32_t castsShadows;
 	uint32_t drawInfoIndex;
 } ModelActorCullingInfo;
-
-typedef struct DrawActorModelIndexedIndirectCommand
-{
-	uint32_t indexCount;
-	uint32_t instanceCount;
-	uint32_t firstIndex;
-	int vertexOffset;
-	uint32_t firstInstance;
-
-	uint32_t instanceIndex;
-} DrawActorModelIndexedIndirectCommand;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -494,6 +488,8 @@ extern List pointLightShadowMapImageViews;
 extern List perFrustumBuffersHandles;
 extern uint32_t frustumCount;
 extern FrustumCullingData *frustums;
+extern uint32_t actorModelsDrawInfoCount;
+extern uint32_t maximumCulledInstanceCount;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t

@@ -177,6 +177,14 @@ static inline VkResult CreateActorModelsBuffers()
 						   "Failed to create shaded actor models index buffer!");
 	VulkanTestReturnResult(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.actorModels.instanceData),
 						   "Failed to create shaded actor models instance data buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&cullingInfoBufferCreationInfo,
+											&buffers.actorModels.shadedUnculledInstanceIndices),
+						   "Failed to create shaded actor models unculled instance indices buffer!");
+	VulkanTestReturnResult(lunaCreateBuffer(device,
+											&cullingInfoBufferCreationInfo,
+											&buffers.actorModels.unshadedUnculledInstanceIndices),
+						   "Failed to create unshaded actor models unculled instance indices buffer!");
 	ListInit(buffers.actorModels.shadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorModels.unshadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorModels.shadedDrawInfo, LIST_POINTER);
