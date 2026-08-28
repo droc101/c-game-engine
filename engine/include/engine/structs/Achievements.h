@@ -97,4 +97,6 @@ void GetAchievementKeys(List *dest);
 const char *GetAchievementIcon(const char *key);
 const Achievement *GetAchievement(const char *key);
 
+void ResetAchievements();
+
 #endif //GAME_ACHIEVEMENTS_H

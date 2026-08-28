@@ -31,6 +31,12 @@ static void DoneButton(Control *, void *)
 	SetGameState(&MenuState);
 }
 
+static void ResetButton(Control *, void *)
+{
+	ResetAchievements();
+	SetGameState(&AchievementsState);
+}
+
 static void AchievementsStateUpdate(GlobalState *state, const double delta)
 {
 	if (IsKeyJustPressed(mainThreadInput, SDL_SCANCODE_ESCAPE) ||
@@ -223,7 +229,12 @@ static void AchievementsStateSet()
 		ListFree(lockedAchievements);
 
 
-		OptionsMenuAddSimpleHeaderFooter(achievementsOptionsMenu, "Achievements", DoneButton);
+		OptionsMenuAddTwoButtonHeaderFooter(achievementsOptionsMenu,
+											"Achievements",
+											"Reset Achievements",
+											ResetButton,
+											"Done",
+											DoneButton);
 	}
 	EnterMenuBackgroundState();
 }

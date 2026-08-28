@@ -2,11 +2,9 @@
 // Created by droc101 on 8/27/26.
 //
 
-#include <engine/assets/KvlFile.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Achievements.h>
 #include <engine/structs/Dict.h>
-#include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
@@ -15,7 +13,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
+
+#ifdef ENABLE_STEAMWORKS
+#include <engine/subsystem/SteamworksManager.h>
+#else
+#include <engine/assets/KvlFile.h>
+#include <engine/structs/KVList.h>
+#endif
 
 #define ACHIEVEMENTS_FILE "achievements.kvl"
 
@@ -172,6 +176,7 @@ void InitAchievementSystem(const RegisterGameAchievementsFunction RegisterGameAc
 
 	RegisterGameAchievements();
 
+#ifndef ENABLE_STEAMWORKS
 	KvList list;
 	if (ReadKvlFile(ACHIEVEMENTS_FILE, list))
 	{
@@ -224,10 +229,45 @@ void InitAchievementSystem(const RegisterGameAchievementsFunction RegisterGameAc
 
 		KvListDestroy(list);
 	}
+#else
+	StatDict_iterator stat_it;
+	StatDict_it(stat_it, statistics);
+	while (!StatDict_end_p(stat_it))
+	{
+		const StatDict_pair *pair = StatDict_ref(stat_it);
+
+		if (!pair->value->persist)
+		{
+			StatDict_next(stat_it);
+			continue;
+		}
+
+		switch (pair->value->type)
+		{
+			case STAT_TYPE_INT:
+				pair->value->value.intValue = GetSteamIntegerStatistic(pair->key);
+				break;
+			case STAT_TYPE_FLOAT:
+				pair->value->value.floatValue = GetSteamFloatStatistic(pair->key);
+				break;
+		}
+		StatDict_next(stat_it);
+	}
+
+	AchievementDict_iterator ach_it;
+	AchievementDict_it(ach_it, achievements);
+	while (!AchievementDict_end_p(ach_it))
+	{
+		const AchievementDict_pair *pair = AchievementDict_ref(ach_it);
+		pair->value->unlocked = IsSteamAchievementUnlocked(pair->key);
+		AchievementDict_next(ach_it);
+	}
+#endif
 }
 
 void SaveAchievements()
 {
+#ifndef ENABLE_STEAMWORKS
 	KvList list;
 	KvListCreate(list);
 
@@ -278,6 +318,9 @@ void SaveAchievements()
 
 	KvListDestroy(savedStats);
 	KvListDestroy(savedAchievements);
+#else
+	SaveSteamAchievementsAndStats();
+#endif
 }
 
 void DestroyAchievementSystem()
@@ -332,7 +375,11 @@ static void UnlockAchievementsBasedOnStat(const char *statKey, const Stat *stat)
 			}
 			if (unlock)
 			{
+#ifndef ENABLE_STEAMWORKS
 				UnlockAchievement(pair->key);
+#else
+				pair->value->unlocked = true;
+#endif
 			}
 		}
 		AchievementDict_next(ach_it);
@@ -345,6 +392,10 @@ void IncrementIntegerStatistic(const char *stat, const int32_t change)
 	statistic->value.intValue = clamp(statistic->value.intValue + change,
 									  statistic->minValue.intValue,
 									  statistic->maxValue.intValue);
+#ifdef ENABLE_STEAMWORKS
+	SetSteamIntegerStatistic(stat, statistic->value.intValue);
+	SaveAchievements();
+#endif
 	UnlockAchievementsBasedOnStat(stat, statistic);
 }
 void IncrementFloatStatistic(const char *stat, const float change)
@@ -353,6 +404,10 @@ void IncrementFloatStatistic(const char *stat, const float change)
 	statistic->value.floatValue = clamp(statistic->value.floatValue + change,
 										statistic->minValue.floatValue,
 										statistic->maxValue.floatValue);
+#ifdef ENABLE_STEAMWORKS
+	SetSteamFloatStatistic(stat, statistic->value.floatValue);
+	SaveAchievements();
+#endif
 	UnlockAchievementsBasedOnStat(stat, statistic);
 }
 
@@ -360,12 +415,20 @@ void SetIntegerStatistic(const char *stat, const int32_t newValue)
 {
 	Stat *statistic = *StatDict_get(statistics, stat);
 	statistic->value.intValue = clamp(newValue, statistic->minValue.intValue, statistic->maxValue.intValue);
+#ifdef ENABLE_STEAMWORKS
+	SetSteamIntegerStatistic(stat, statistic->value.intValue);
+	SaveAchievements();
+#endif
 	UnlockAchievementsBasedOnStat(stat, statistic);
 }
 void SetFloatStatistic(const char *stat, const float newValue)
 {
 	Stat *statistic = *StatDict_get(statistics, stat);
 	statistic->value.floatValue = clamp(newValue, statistic->minValue.floatValue, statistic->maxValue.floatValue);
+#ifdef ENABLE_STEAMWORKS
+	SetSteamFloatStatistic(stat, statistic->value.floatValue);
+	SaveAchievements();
+#endif
 	UnlockAchievementsBasedOnStat(stat, statistic);
 }
 
@@ -385,6 +448,9 @@ void UnlockAchievement(const char *ach)
 	{
 		LogInfo("Unlocked \"%s\"!", a->name); // TODO some sort of callback so there can be a UI
 		a->unlocked = true;
+#ifdef ENABLE_STEAMWORKS
+		SetSteamAchievementUnlocked(ach, true);
+#endif
 		SaveAchievements();
 	}
 }
@@ -394,6 +460,9 @@ void LockAchievement(const char *ach)
 	if (a->unlocked)
 	{
 		a->unlocked = false;
+#ifdef ENABLE_STEAMWORKS
+		SetSteamAchievementUnlocked(ach, false);
+#endif
 		SaveAchievements();
 	}
 }
@@ -425,4 +494,38 @@ const char *GetAchievementIcon(const char *key)
 const Achievement *GetAchievement(const char *key)
 {
 	return *AchievementDict_get(achievements, key);
+}
+
+void ResetAchievements()
+{
+#ifdef ENABLE_STEAMWORKS
+	ResetSteamAchievementsAndStats();
+#endif
+
+	StatDict_iterator stat_it;
+	StatDict_it(stat_it, statistics);
+	while (!StatDict_end_p(stat_it))
+	{
+		const StatDict_pair *pair = StatDict_ref(stat_it);
+
+		switch (pair->value->type)
+		{
+			case STAT_TYPE_INT:
+				SetIntegerStatistic(pair->key, pair->value->defaultValue.intValue);
+				break;
+			case STAT_TYPE_FLOAT:
+				SetFloatStatistic(pair->key, pair->value->defaultValue.floatValue);
+				break;
+		}
+		StatDict_next(stat_it);
+	}
+
+	AchievementDict_iterator ach_it;
+	AchievementDict_it(ach_it, achievements);
+	while (!AchievementDict_end_p(ach_it))
+	{
+		const AchievementDict_pair *pair = AchievementDict_ref(ach_it);
+		LockAchievement(pair->key);
+		AchievementDict_next(ach_it);
+	}
 }
