@@ -21,7 +21,7 @@ extern "C" {
 	void ShutdownSteamworks();
 //endregion
 
-	//region Achievements & Stats
+//region Achievements & Stats
 	bool IsSteamAchievementUnlocked(const char *achievement);
 	int32_t GetSteamIntegerStatistic(const char *statistic);
 	float GetSteamFloatStatistic(const char *statistic);
@@ -33,7 +33,7 @@ extern "C" {
 	void SaveSteamAchievementsAndStats();
 
 	void ResetSteamAchievementsAndStats();
-	//endregion
+//endregion
 
 #ifdef __cplusplus
 }

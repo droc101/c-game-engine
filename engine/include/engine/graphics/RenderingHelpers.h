@@ -7,6 +7,7 @@
 
 #include <cglm/types.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
@@ -210,6 +211,12 @@ void GetColor(uint32_t argb, Color *color);
 
 void DPrintGPUInfo();
 
+/**
+ * Project a 3D position into screen space
+ * @param position The 3D position
+ * @param camera The camera to view from
+ * @return Screen-space position, or {FLT_MAX, FLT_MAX} if off screen
+ */
 Vector2 ProjectPosition(vec3 position, Camera *camera);
 
 #endif //GAME_RENDERINGHELPERS_H

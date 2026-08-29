@@ -5,7 +5,7 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
-#include <engine/assets/AssetReader.h>
+#include <engine/structs/Asset.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -62,6 +62,12 @@ struct Image
  */
 void GenFallbackImage(Image *src);
 
+/**
+ * Load an image from an asset, without registering it
+ * @param asset The asset to load from
+ * @param image The image to load into
+ * @return Success/failure
+ */
 bool LoadImageFromAsset(const Asset *asset, Image *image);
 
 /**
