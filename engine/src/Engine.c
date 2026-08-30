@@ -332,24 +332,6 @@ void EngineIteration()
 
 	const double delta = lastFrameTime / TARGET_FPS_NS_D;
 
-	if (!FrameStart())
-	{
-		if (state->gameState->UpdateGame)
-		{
-			state->gameState->UpdateGame(state, delta);
-		}
-		UpdateSoundSystem();
-		if (state->requestExit)
-		{
-			shouldQuit = true;
-		}
-		if (IsLowFPSModeEnabled())
-		{
-			SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
-		}
-		return;
-	}
-
 	ResetDPrintYPos();
 
 	if (state->gameState->UpdateGame)
@@ -382,12 +364,30 @@ void EngineIteration()
 		SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
 	}
 
+	if (!FrameStart())
+	{
+		if (state->gameState->UpdateGame)
+		{
+			state->gameState->UpdateGame(state, delta);
+		}
+		UpdateSoundSystem();
+		if (state->requestExit)
+		{
+			shouldQuit = true;
+		}
+		if (IsLowFPSModeEnabled())
+		{
+			SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
+		}
+		return;
+	}
+
 	state->gameState->RenderGame(state, delta);
 	RenderDebugEntries();
 
-	ProcessDPrintConsole();
-
 	FrameEnd();
+
+	ProcessDPrintConsole();
 
 	UpdateSoundSystem();
 
