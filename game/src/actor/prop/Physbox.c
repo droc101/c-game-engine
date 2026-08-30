@@ -46,13 +46,6 @@ static void PhysboxInit(Actor *this, const KvList /*params*/, Transform *transfo
 }
 
 ActorDefinition physboxActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = PhysboxInit,
 };
 

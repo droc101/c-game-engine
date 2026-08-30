@@ -74,12 +74,6 @@ static void JohnInit(Actor *this, const KvList /*params*/, Transform *transform)
 
 ActorDefinition npcJohnActorDefinition = {
 	.Update = JohnUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = JohnInit,
 };
 

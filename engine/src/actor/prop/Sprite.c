@@ -66,13 +66,6 @@ static void SpriteInit(Actor *this, const KvList params, Transform *transform)
 }
 
 ActorDefinition spriteActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = SpriteInit,
 };
 

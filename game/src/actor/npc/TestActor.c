@@ -105,12 +105,7 @@ static void TestActorInit(Actor *this, const KvList /*params*/, Transform *trans
 
 ActorDefinition testActorDefinition = {
 	.Update = TestActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = TestActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = TestActorInit,
 };
 

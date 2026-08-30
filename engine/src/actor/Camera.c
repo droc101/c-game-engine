@@ -71,11 +71,6 @@ static void CameraDisableHandler(Actor *this, const Actor * /*sender*/, const Pa
 
 ActorDefinition cameraActorDefinition = {
 	.Update = CameraUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = CameraDestroy,
 	.Init = CameraInit,
 };

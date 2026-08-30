@@ -100,11 +100,6 @@ static void GlobalLightDestroy(Actor *this)
 
 ActorDefinition globalLightActorDefinition = {
 	.Update = GlobalLightUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = GlobalLightDestroy,
 	.Init = GlobalLightInit,
 };

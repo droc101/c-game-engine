@@ -88,7 +88,10 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 	for (size_t i = 0; i < state->map->actors.length; i++)
 	{
 		Actor *a = ListGetPointer(state->map->actors, i);
-		a->definition->Update(a, delta);
+		if (a->definition->Update)
+		{
+			a->definition->Update(a, delta);
+		}
 	}
 
 	// TODO proper UI for switching items

@@ -113,13 +113,6 @@ static void PhysicsModelSetSkinHandler(Actor *this, const Actor * /*sender*/, co
 }
 
 ActorDefinition physicsModelActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = PhysicsModelInit,
 };
 

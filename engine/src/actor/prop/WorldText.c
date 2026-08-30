@@ -80,12 +80,7 @@ static void WorldTextDestroy(Actor *this)
 }
 
 ActorDefinition worldTextActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
 	.RenderUi = WorldTextRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = WorldTextDestroy,
 	.Init = WorldTextInit,
 };

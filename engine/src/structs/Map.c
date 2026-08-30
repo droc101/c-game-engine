@@ -210,7 +210,10 @@ void RenderMap(Map *map, Camera *camera)
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		Actor *actor = ListGetPointer(map->actors, i);
-		actor->definition->RenderUi(actor);
+		if (actor->definition->RenderUi)
+		{
+			actor->definition->RenderUi(actor);
+		}
 	}
 	ListUnlock(map->actors);
 }

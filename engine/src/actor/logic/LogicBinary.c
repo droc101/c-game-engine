@@ -84,13 +84,6 @@ static void LogicBinaryInit(Actor *this, const KvList params, Transform * /*tran
 }
 
 ActorDefinition logicBinaryActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = LogicBinaryInit,
 };
 

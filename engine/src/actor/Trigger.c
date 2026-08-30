@@ -111,13 +111,9 @@ static void TriggerInit(Actor *this, const KvList params, Transform *transform)
 }
 
 ActorDefinition triggerActorDefinition = {
-	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = TriggerOnPlayerContactAdded,
 	.OnPlayerContactPersisted = TriggerOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = TriggerOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = TriggerInit,
 };
 

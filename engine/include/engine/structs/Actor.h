@@ -141,45 +141,9 @@ void DestroyActorConnection(ActorConnection *connection);
 void ActorCreateEmptyBody(Actor *this, const Transform *transform);
 
 /**
- * Default actor update function
- */
-void DefaultActorUpdate(Actor * /*this*/, double /*delta*/);
-
-/**
  * Actor kill signal handler
  * @param this The actor this signal was sent to
  */
 void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/);
-
-/**
- * Default actor on player contact added function
- */
-void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyID /*bodyId*/);
-
-/**
- * Default actor on player contact persisted function
- */
-void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyID /*bodyId*/);
-
-/**
- * Default actor on player contact removed function
- */
-void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/);
-
-/**
- * Default actor render ui function
- */
-void DefaultActorRenderUi(Actor * /*this*/);
-
-/**
- * Default actor interact function
- */
-void DefaultActorInteract(Actor * /*this*/);
-
-/**
- * Default actor destroy function
- */
-void DefaultActorDestroy(Actor * /*this*/);
-
 
 #endif //GAME_ACTOR_H

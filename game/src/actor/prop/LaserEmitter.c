@@ -116,12 +116,6 @@ static void LaserEmitterInit(Actor *this, const KvList params, Transform *transf
 
 ActorDefinition laserEmitterActorDefinition = {
 	.Update = LaserEmitterUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = LaserEmitterInit,
 };
 

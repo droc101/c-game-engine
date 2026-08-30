@@ -105,11 +105,6 @@ static void GoalInit(Actor *this, const KvList params, Transform *transform)
 ActorDefinition goalActorDefinition = {
 	.Update = GoalUpdate,
 	.OnPlayerContactAdded = GoalOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = GoalInit,
 };
 

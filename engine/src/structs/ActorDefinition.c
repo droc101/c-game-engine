@@ -34,14 +34,7 @@ void RegisterActor(const char *actorTypeName, ActorDefinition *definition)
 	assert(ActorDefinitionDict_get(actorDefinitions, actorTypeName) == NULL); // Actor name already registered
 	assert(actorTypeName != NULL);
 	assert(definition != NULL);
-	assert(definition->Update != NULL);
-	assert(definition->OnPlayerContactAdded != NULL);
-	assert(definition->OnPlayerContactPersisted != NULL);
-	assert(definition->OnPlayerContactRemoved != NULL);
-	assert(definition->RenderUi != NULL);
-	assert(definition->Interact != NULL);
 	assert(definition->Init != NULL);
-	assert(definition->Destroy != NULL);
 #ifdef BUILDSTYLE_DEBUG
 	ActorInputHandlerFunctionDict_iterator it;
 	ActorInputHandlerFunctionDict_it(it, definition->inputHandlers);

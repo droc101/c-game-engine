@@ -54,7 +54,10 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 
 void FreeActor(Actor *actor)
 {
-	actor->definition->Destroy(actor);
+	if (actor->definition->Destroy)
+	{
+		actor->definition->Destroy(actor);
+	}
 	if (!actor->hasModel && actor->wall != NULL)
 	{
 		free(actor->wall->texture);
@@ -142,24 +145,11 @@ void DestroyActorConnection(ActorConnection *connection)
 	FreeParam(&connection->outParamOverride);
 	free(connection);
 }
-void DefaultActorUpdate(Actor * /*this*/, double /*delta*/) {}
 
 void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	RemoveActor(this);
 }
-
-void DefaultActorOnPlayerContactAdded(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
-
-void DefaultActorOnPlayerContactPersisted(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
-
-void DefaultActorOnPlayerContactRemoved(Actor * /*this*/, JPH_BodyID /*bodyId*/) {}
-
-void DefaultActorRenderUi(Actor * /*this*/) {}
-
-void DefaultActorInteract(Actor * /*this*/) {}
-
-void DefaultActorDestroy(Actor * /*this*/) {}
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 {

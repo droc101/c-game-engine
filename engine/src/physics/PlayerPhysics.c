@@ -112,7 +112,10 @@ static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 	if (actor)
 	{
 		ioSettings->canPushCharacter = (actor->flags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
-		actor->definition->OnPlayerContactAdded(actor, bodyId);
+		if (actor->definition->OnPlayerContactAdded)
+		{
+			actor->definition->OnPlayerContactAdded(actor, bodyId);
+		}
 	}
 }
 
@@ -128,7 +131,10 @@ static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
 	if (actor)
 	{
 		ioSettings->canPushCharacter = (actor->flags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
-		actor->definition->OnPlayerContactPersisted(actor, bodyId);
+		if (actor->definition->OnPlayerContactPersisted)
+		{
+			actor->definition->OnPlayerContactPersisted(actor, bodyId);
+		}
 	}
 }
 
@@ -138,7 +144,7 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
-	if (actor)
+	if (actor && actor->definition->OnPlayerContactRemoved)
 	{
 		actor->definition->OnPlayerContactRemoved(actor, bodyId);
 	}
@@ -394,7 +400,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 16.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
-						if (IsInputActionJustPressed(physicsThreadInput, &interact))
+						if (IsInputActionJustPressed(physicsThreadInput, &interact) &&
+							player->targetedActor->definition->Interact)
 						{
 							player->targetedActor->definition->Interact(player->targetedActor);
 						}

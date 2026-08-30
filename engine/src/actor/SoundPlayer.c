@@ -101,12 +101,6 @@ static void SoundPlayerInit(Actor *this, const KvList params, Transform *transfo
 }
 
 ActorDefinition soundPlayerActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = SoundPlayerDestroy,
 	.Init = SoundPlayerInit,
 };

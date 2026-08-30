@@ -116,11 +116,6 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 ActorDefinition coinActorDefinition = {
 	.Update = CoinUpdate,
 	.OnPlayerContactAdded = CoinOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = CoinInit,
 };
 

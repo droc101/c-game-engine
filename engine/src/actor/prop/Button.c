@@ -100,12 +100,7 @@ static void ButtonInteract(Actor *this)
 
 ActorDefinition buttonActorDefinition = {
 	.Update = ButtonUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
 	.Interact = ButtonInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = ButtonInit,
 };
 

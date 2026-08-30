@@ -32,12 +32,6 @@ static void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*tran
 
 ActorDefinition ioProxyActorDefinition = {
 	.Update = IoProxyUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = IoProxyInit,
 };
 
