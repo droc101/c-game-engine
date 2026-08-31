@@ -616,7 +616,7 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 
 		FrustumCullingData *frustum = &frustums[i + 1];
 		glm_mat4_copy(viewMatrix, frustum->viewMatrix);
-		frustum->nearPlane = 0;
+		frustum->nearPlane = -FLT_MAX;
 		frustum->farPlane = radius * 2;
 		frustum->frustumPlanes[0] = frustumX[0];
 		frustum->frustumPlanes[1] = frustumX[2];
