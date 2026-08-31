@@ -212,15 +212,15 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
-		.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 	};
-	const VkAttachmentReference spotLightDepthAttachmentReference = {
-		.layout = VK_IMAGE_LAYOUT_GENERAL,
+	const VkAttachmentReference depthAttachmentReference = {
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
 	};
-	const VkSubpassDescription spotLightSubpassDescription = {
+	const VkSubpassDescription subpassDescription = {
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-		.pDepthStencilAttachment = &spotLightDepthAttachmentReference,
+		.pDepthStencilAttachment = &depthAttachmentReference,
 	};
 	const VkSubpassDependency spotLightDependency = {
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
@@ -234,7 +234,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.attachmentCount = 1,
 		.pAttachments = &depthAttachmentDescription,
 		.subpassCount = 1,
-		.pSubpasses = &spotLightSubpassDescription,
+		.pSubpasses = &subpassDescription,
 		.dependencyCount = 1,
 		.pDependencies = &spotLightDependency,
 	};
@@ -263,7 +263,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
-		.layout = VK_IMAGE_LAYOUT_GENERAL,
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
 		.writeInfo = depthAttachmentWriteInfo,
 	};
@@ -276,7 +276,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
-		.layout = VK_IMAGE_LAYOUT_GENERAL,
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
 		.writeInfo = depthAttachmentWriteInfo,
 	};
@@ -288,7 +288,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
-		.layout = VK_IMAGE_LAYOUT_GENERAL,
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
 		.writeInfo = depthAttachmentWriteInfo,
 	};
@@ -300,19 +300,19 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		LunaDescriptorImageInfo shadowMapImageInfos[4] = {
 			{
 				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 			},
 			{
 				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 			},
 			{
 				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 			},
 			{
 				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 			},
 		};
 		LunaWriteDescriptorSet shadowMapDescriptorWrite = {
