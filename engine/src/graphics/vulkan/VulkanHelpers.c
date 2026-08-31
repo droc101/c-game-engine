@@ -76,6 +76,7 @@ uint32_t frustumCount = 0;
 FrustumCullingData *frustums = NULL;
 uint32_t actorModelsDrawInfoCount = 0;
 uint32_t maximumCulledInstanceCount = 0;
+uint32_t lightCount = 0;
 
 static CameraUniform uniform;
 #pragma endregion variables
@@ -619,7 +620,6 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	const LunaBufferWriteInfo depthsWriteInfo = {
 		.bytes = sizeof(float) * 4,
 		.data = depths,
-		.offset = sizeof(uint32_t),
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &depthsWriteInfo),
@@ -627,7 +627,7 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	const LunaBufferWriteInfo matricesWriteInfo = {
 		.bytes = sizeof(mat4) * 4,
 		.data = matrices,
-		.offset = sizeof(uint32_t) + sizeof(float) * 4,
+		.offset = sizeof(float) * 4,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	};
 	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),

@@ -30,6 +30,8 @@ bool CreateCullingPipeline();
 
 bool CreateGraphicsPipelines();
 
+bool UpdateLightCount();
+
 bool CreateTextureSamplers();
 
 bool CreateBuffers();

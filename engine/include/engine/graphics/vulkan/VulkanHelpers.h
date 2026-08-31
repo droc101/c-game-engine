@@ -490,6 +490,7 @@ extern uint32_t frustumCount;
 extern FrustumCullingData *frustums;
 extern uint32_t actorModelsDrawInfoCount;
 extern uint32_t maximumCulledInstanceCount;
+extern uint32_t lightCount;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t

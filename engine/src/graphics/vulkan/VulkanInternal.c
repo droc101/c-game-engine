@@ -346,7 +346,7 @@ bool CreateDescriptorSetLayouts()
 		},
 		{
 			.bindingName = "Lights",
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
 		},
@@ -572,11 +572,11 @@ bool CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 3,
+			.descriptorCount = 4,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 4,
+			.descriptorCount = 3,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {

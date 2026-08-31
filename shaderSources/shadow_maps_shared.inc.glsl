@@ -2,17 +2,18 @@
 
 #include "shared.inc.glsl"
 
+layout(constant_id = 0) const uint LIGHT_COUNT = 1;
+
 layout(push_constant) uniform PushConstants {
     uint lightIndex;
     uint faceIndex;
     uint cascadeIndex;
 } pushConstants;
 
-layout(scalar, set = 0, binding = 5) readonly restrict buffer LightsData {
-	uint lightCount;
+layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
-    Light lights[];
+    Light lights[LIGHT_COUNT];
 } lightsData;
 
 const mat4 pointLightViewMatrices[6] = {

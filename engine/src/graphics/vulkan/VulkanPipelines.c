@@ -128,6 +128,16 @@ static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
 static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule shadowMapsFragShaderModule = LUNA_NULL_HANDLE;
+
+static const VkSpecializationMapEntry SPECIALIZATION_MAP_ENTRY = {
+	.size = sizeof(uint32_t),
+};
+static const VkSpecializationInfo SPECIALIZATION_INFO = {
+	.mapEntryCount = 1,
+	.pMapEntries = &SPECIALIZATION_MAP_ENTRY,
+	.dataSize = sizeof(uint32_t),
+	.pData = &lightCount,
+};
 #pragma endregion shared
 
 static inline bool CreateUIPipeline()
@@ -247,6 +257,7 @@ static inline bool CreateShadedMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = fragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -504,6 +515,7 @@ static inline bool CreateShadedModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -740,6 +752,7 @@ static inline bool CreateShadedActorModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -917,6 +930,7 @@ static inline bool CreateActorWallPipelines()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 	const LunaPipelineShaderStageCreationInfo unshadedShaderStages[] = {
@@ -1130,10 +1144,12 @@ static inline VkResult CreateMapShadowMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -1247,6 +1263,7 @@ static inline VkResult CreateOpaqueMapShadowMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -1314,10 +1331,12 @@ static inline VkResult CreateModelActorShadowMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -1415,10 +1434,12 @@ static inline VkResult CreateWallActorShadowMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
+			.specializationInfo = &SPECIALIZATION_INFO,
 		},
 	};
 
@@ -1590,4 +1611,20 @@ VkResult CreateShadowMapGraphicsPipelines()
 	VulkanTestReturnResult(CreateWallActorShadowMapPipeline(), "Failed to create wall actor shadow maps pipeline!");
 
 	return VK_SUCCESS;
+}
+
+bool UpdateLightCount()
+{
+	VulkanTest(CreateShadowMapGraphicsPipelines(), "Failed to create shadow map graphics pipelines");
+
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedMap);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
+
+	return CreateShadedMapPipeline() &&
+		   CreateShadedModelPipeline() &&
+		   CreateShadedActorModelPipeline() &&
+		   CreateActorWallPipelines();
 }
