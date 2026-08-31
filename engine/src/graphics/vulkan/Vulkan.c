@@ -796,6 +796,11 @@ static inline VkResult LoadLights(const Map *map)
 		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
 							   "Failed to resize lights buffer!");
 
+		if (!UpdateLightCount())
+		{
+			return VK_ERROR_UNKNOWN;
+		}
+
 		return VK_SUCCESS;
 	}
 
@@ -811,7 +816,7 @@ static inline VkResult LoadLights(const Map *map)
 	{
 		mat4 transformMatrix;
 		Light *light = &map->lights[lightCount];
-		const float farPlane = GetMaxLightDistance(light);
+		light->maxDistance = GetMaxLightDistance(light);
 		switch (light->type)
 		{
 			case LIGHT_TYPE_SPOT:
@@ -825,8 +830,11 @@ static inline VkResult LoadLights(const Map *map)
 				mat4 viewMatrix;
 				glm_quat_look(VECTOR3_TO_VEC3(light->transform.position), rotationQuat, viewMatrix);
 				mat4 projectionMatrix;
-				// TODO: Figure out why this only works with this fov???
-				glm_perspective_lh_zo(glm_rad(235), 1, farPlane, LIGHT_NEAR_PLANE, projectionMatrix);
+				glm_perspective_lh_zo(glm_rad(2 * light->fadingAngle),
+									  1,
+									  light->maxDistance,
+									  LIGHT_NEAR_PLANE,
+									  projectionMatrix);
 				glm_mat4_mul(projectionMatrix, viewMatrix, transformMatrix);
 
 				mat4 transposed;
@@ -840,7 +848,7 @@ static inline VkResult LoadLights(const Map *map)
 
 				glm_mat4_copy(viewMatrix, frustums[frustumIndex].viewMatrix);
 				frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
-				frustums[frustumIndex].farPlane = farPlane;
+				frustums[frustumIndex].farPlane = light->maxDistance;
 				frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
 				frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
 				frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
@@ -851,7 +859,7 @@ static inline VkResult LoadLights(const Map *map)
 			case LIGHT_TYPE_POINT:
 			{
 				light->shadowMapIndex = pointLightIndex++;
-				glm_perspective_lh_zo(glm_rad(90), 1, farPlane, LIGHT_NEAR_PLANE, transformMatrix);
+				glm_perspective_lh_zo(glm_rad(90), 1, light->maxDistance, LIGHT_NEAR_PLANE, transformMatrix);
 
 				mat4 transposed;
 				glm_mat4_transpose_to(transformMatrix, transposed);
@@ -880,7 +888,7 @@ static inline VkResult LoadLights(const Map *map)
 					glm_mat4_ins3(transforms[j], frustums[frustumIndex].viewMatrix);
 					glm_translate(frustums[frustumIndex].viewMatrix, negativeLightPosition);
 					frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
-					frustums[frustumIndex].farPlane = farPlane;
+					frustums[frustumIndex].farPlane = light->maxDistance;
 					frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
 					frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
 					frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
@@ -1394,20 +1402,6 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		return VK_SUCCESS;
 	}
 
-	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
-	const LunaCommandBufferSubmitInfo submitInfo = {
-		.queue = queue,
-		.waitSemaphoreCount = 1,
-		.waitSemaphores = &semaphore,
-		.waitDstStageMasks = &waitStage,
-		.signalSemaphoreCount = 1,
-		.signalSemaphores = &semaphore,
-	};
-	VulkanTestReturnResult(lunaEndAndSubmitCommandBuffer(device, commandBuffer, &submitInfo),
-						   "Failed to submit command buffer before updating shadow maps!");
-
-	VulkanTestReturnResult(lunaBeginSingleUseCommandBuffer(device, commandBuffer),
-						   "Failed to begin command buffer for updating shadow maps!");
 	const VkCommandBuffer vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
 
 	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
@@ -1571,13 +1565,6 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		}
 	}
 
-	// TODO: Pipeline dependency instead of command buffer submission
-	VulkanTestReturnResult(lunaEndAndSubmitCommandBuffer(device, commandBuffer, &submitInfo),
-						   "Failed to submit command buffer after updating shadow maps!");
-
-	VulkanTestReturnResult(lunaBeginSingleUseCommandBuffer(device, commandBuffer),
-						   "Failed to begin command buffer after updating shadow maps!");
-
 	return VK_SUCCESS;
 }
 
@@ -1621,10 +1608,6 @@ static inline VkResult UpdateFogUniform(const Map *map)
 
 static inline VkResult HandleMapChangeFlags(Map *map)
 {
-	if (map->changeFlags != 0)
-	{
-		asm("nop");
-	}
 	static_assert(MAP_LIGHT_CHANGED == MAP_EXPOSURE_CHANGED);
 	if ((map->changeFlags & MAP_LIGHT_CHANGED) == MAP_LIGHT_CHANGED)
 	{
@@ -1708,10 +1691,19 @@ static inline bool HandleRendererQueuedActions()
 			VulkanTest(CreateShadowMaps(loadedMap), "Failed to create shadow maps!");
 		} else
 		{
-			if (lunaGetBufferSize(buffers.uniforms.lights) != 0)
+			if (lunaGetBufferSize(buffers.uniforms.lights) != 0 || frustumCount != 1)
 			{
-				VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
-						   "Failed to empty lights buffer!");
+				VulkanTest(LoadLights(NULL), "Failed to load lights into buffer!");
+				VulkanTest(CreateMapModelDrawInfos(true,
+												   &buffers.opaqueMap,
+												   lunaGetBufferSize(buffers.opaqueMap.unculledShadedDrawInfo),
+												   lunaGetBufferSize(buffers.opaqueMap.unculledUnshadedDrawInfo)),
+						   "Failed to create opaque map model draw infos!");
+				VulkanTest(CreateMapModelDrawInfos(false,
+												   &buffers.map,
+												   lunaGetBufferSize(buffers.map.unculledShadedDrawInfo),
+												   lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo)),
+						   "Failed to create map model draw infos!");
 			}
 			if (shadowMapRenderPass != VK_NULL_HANDLE)
 			{

@@ -526,6 +526,25 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	const float range = farPlane - nearPlane;
 	const float ratio = farPlane / nearPlane;
 
+	mat4 cameraInverseTransform;
+	glm_mat4_inv(uniform.transform, cameraInverseTransform);
+	vec4 projectedCorners[8] = {
+		{-1.0f, 1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f, 1.0f},
+		{1.0f, -1.0f, 1.0f, 1.0f},
+		{-1.0f, -1.0f, 1.0f, 1.0f},
+		{-1.0f, 1.0f, 0.0f, 1.0f},
+		{1.0f, 1.0f, 0.0f, 1.0f},
+		{1.0f, -1.0f, 0.0f, 1.0f},
+		{-1.0f, -1.0f, 0.0f, 1.0f},
+	};
+	for (uint32_t j = 0; j < 8; j++)
+	{
+		vec4 inverseCorner;
+		glm_mat4_mulv(cameraInverseTransform, projectedCorners[j], inverseCorner);
+		glm_vec4_divs(inverseCorner, inverseCorner[3], projectedCorners[j]);
+	}
+
 	float depths[4];
 	mat4 matrices[4];
 	float previousDistance = 0.0f;
@@ -537,25 +556,15 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 		const float distance = (d - nearPlane) / range;
 
 		vec4 frustumCorners[8] = {
-			{-1.0f, 1.0f, 1.0f, 1.0f},
-			{1.0f, 1.0f, 1.0f, 1.0f},
-			{1.0f, -1.0f, 1.0f, 1.0f},
-			{-1.0f, -1.0f, 1.0f, 1.0f},
-			{-1.0f, 1.0f, 0.0f, 1.0f},
-			{1.0f, 1.0f, 0.0f, 1.0f},
-			{1.0f, -1.0f, 0.0f, 1.0f},
-			{-1.0f, -1.0f, 0.0f, 1.0f},
+			{projectedCorners[0][0], projectedCorners[0][1], projectedCorners[0][2], projectedCorners[0][3]},
+			{projectedCorners[1][0], projectedCorners[1][1], projectedCorners[1][2], projectedCorners[1][3]},
+			{projectedCorners[2][0], projectedCorners[2][1], projectedCorners[2][2], projectedCorners[2][3]},
+			{projectedCorners[3][0], projectedCorners[3][1], projectedCorners[3][2], projectedCorners[3][3]},
+			{projectedCorners[4][0], projectedCorners[4][1], projectedCorners[4][2], projectedCorners[4][3]},
+			{projectedCorners[5][0], projectedCorners[5][1], projectedCorners[5][2], projectedCorners[5][3]},
+			{projectedCorners[6][0], projectedCorners[6][1], projectedCorners[6][2], projectedCorners[6][3]},
+			{projectedCorners[7][0], projectedCorners[7][1], projectedCorners[7][2], projectedCorners[7][3]},
 		};
-
-		// Project frustum corners into world space
-		mat4 cameraInverseTransform;
-		glm_mat4_inv(uniform.transform, cameraInverseTransform);
-		for (uint32_t j = 0; j < 8; j++)
-		{
-			vec4 inverseCorner;
-			glm_mat4_mulv(cameraInverseTransform, frustumCorners[j], inverseCorner);
-			glm_vec4_divs(inverseCorner, inverseCorner[3], frustumCorners[j]);
-		}
 
 		for (uint32_t j = 0; j < 4; j++)
 		{

@@ -29,7 +29,8 @@ struct Light {
     float brightAngle; // 0-90 degrees
     float fadingAngle;
     uint shadowMapIndex;
-    float _padding[2];
+    float maxDistance;
+    float _padding;
 	mat4 transformMatrix;
 };
 

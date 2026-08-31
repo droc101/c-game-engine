@@ -37,7 +37,8 @@ struct Light
 	float brightAngle;
 	float fadingAngle;
 	uint32_t shadowMapIndex;
-	float _padding[2];
+	float maxDistance;
+	float _padding;
 	CGLM_ALIGN_MAT mat4 transformMatrix;
 };
 

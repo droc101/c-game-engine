@@ -26,6 +26,15 @@ layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMaps[
 layout(set = 1, binding = 0) uniform sampler2DShadow spotLightShadowMaps[];
 layout(set = 2, binding = 0) uniform samplerCubeShadow pointLightShadowMaps[];
 
+uint getCascadeIndex(const float distance) {
+    for (uint cascadeIndex = 0; cascadeIndex < 4; ++cascadeIndex) {
+        if (distance < lightsData.cascadeDepths[cascadeIndex]) {
+            return cascadeIndex;
+        }
+    }
+    return 4;
+}
+
 float getLightBrightness(const Light light, const float distance, const float theta) {
     float multiplierSquared;
     float brightness;
@@ -49,39 +58,15 @@ float getLightBrightness(const Light light, const float distance, const float th
     return brightness;
 }
 
-vec3 getLightingColor(const vec3 position, const vec3 normal, const float distance) {
+vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
     if (LIGHT_COUNT == 0) {
         return vec3(1);
     }
     vec3 lightingColor = vec3(0);
     for (uint i = 0; i < LIGHT_COUNT; i++) {
-        const Light light = lightsData.lights[i];
-        if (light.type == LIGHT_TYPE_SPOT) {
-            const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
-            const vec4 coord = worldPosition / worldPosition.w;
-            if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                const vec3 lightToWorld = light.transform.position - position;
-                const vec3 lightToWorldNormalized = normalize(lightToWorld);
-                const float dottedDirection = dot(lightToWorldNormalized, light.negativeForwardDirection);
-                if (dottedDirection < 0) {
-                    continue;
-                }
-                const float theta = degrees(acos(dottedDirection));
-                if (theta > light.fadingAngle) {
-                    continue;
-                }
-                const float factor = texture(spotLightShadowMaps[nonuniformEXT(light.shadowMapIndex)], vec3(coord.xy * 0.5 + 0.5, coord.z)); 
-                lightingColor += factor * getLightBrightness(light, length(lightToWorld), theta) * max(dot(lightToWorldNormalized, normal), 0) * light.color;
-            }
-        } else if (light.type == LIGHT_TYPE_DIRECTIONAL) {
-            uint cascadeIndex;
-            for (cascadeIndex = 0; cascadeIndex < 4; ++cascadeIndex) {
-                if (distance < lightsData.cascadeDepths[cascadeIndex]) {
-                    break;
-                }
-            }
+        if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL) {
             if (cascadeIndex == 4) {
-                lightingColor += 1;
+                lightingColor += lightsData.lights[i].brightness * max(dot(lightsData.lights[i].negativeForwardDirection, normal), 0) * lightsData.lights[i].color;
                 continue;
             }
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
@@ -91,25 +76,47 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const float distan
                 if (factor < 1e-6) {
                     continue;
                 }
-                lightingColor += factor * light.brightness * max(dot(light.negativeForwardDirection, normal), 0) * light.color;
+                lightingColor += factor * lightsData.lights[i].brightness * max(dot(lightsData.lights[i].negativeForwardDirection, normal), 0) * lightsData.lights[i].color;
             }
         } else {
-            const vec3 lightToWorld = light.transform.position - position;
-            const float normalFactor = max(dot(normalize(lightToWorld), normal), 0);
-            if (normalFactor < 1e-6) {
+            const vec3 lightToWorld = lightsData.lights[i].transform.position - position;
+            const float distance = length(lightToWorld);
+            if (distance > lightsData.lights[i].maxDistance) {
                 continue;
             }
-            const float brightness = getLightBrightness(light, length(lightToWorld), 0);
-            if (brightness < MIN_BRIGHTNESS) {
-                continue;
+            const vec3 lightToWorldNormalized = normalize(lightToWorld);
+            if (lightsData.lights[i].type == LIGHT_TYPE_SPOT) {
+                const float dottedDirection = dot(lightToWorldNormalized, lightsData.lights[i].negativeForwardDirection);
+                if (dottedDirection < 0) {
+                    continue;
+                }
+                const float theta = degrees(acos(dottedDirection));
+                if (theta > lightsData.lights[i].fadingAngle) {
+                    continue;
+                }
+                const vec4 worldPosition = lightsData.lights[i].transformMatrix * vec4(position, 1);
+                const vec4 coord = worldPosition / worldPosition.w;
+                if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
+                    const float factor = texture(spotLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], vec3(coord.xy * 0.5 + 0.5, coord.z)); 
+                    lightingColor += factor * getLightBrightness(lightsData.lights[i], distance, theta) * max(dot(lightToWorldNormalized, normal), 0) * lightsData.lights[i].color;
+                }
+            } else {
+                const float normalFactor = dot(lightToWorldNormalized, normal);
+                if (normalFactor < 1e-6) {
+                    continue;
+                }
+                const float brightness = getLightBrightness(lightsData.lights[i], distance, 0);
+                if (brightness < MIN_BRIGHTNESS) {
+                    continue;
+                }
+                const float scale = max(max(abs(lightToWorld.x), abs(lightToWorld.y)), abs(lightToWorld.z));
+                const float comparisonDepth = lightsData.lights[i].transformMatrix[2][2] + lightsData.lights[i].transformMatrix[3][2] / scale;
+                const float factor = texture(pointLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], vec4(lightToWorld, comparisonDepth));
+                if (factor < 1e-6) {
+                    continue;
+                }
+                lightingColor += factor * brightness * max(normalFactor, 0) * lightsData.lights[i].color;
             }
-            const float scale = max(max(abs(lightToWorld.x), abs(lightToWorld.y)), abs(lightToWorld.z));
-            const float comparisonDepth = light.transformMatrix[2][2] + light.transformMatrix[3][2] / scale;
-            const float factor = texture(pointLightShadowMaps[nonuniformEXT(light.shadowMapIndex)], vec4(lightToWorld, comparisonDepth));
-            if (factor < 1e-6) {
-                continue;
-            }
-            lightingColor += factor * brightness * normalFactor * light.color;
         }
     }
     return lightingColor;
