@@ -43,6 +43,10 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         include/gameState/options/ControlsOptionsState.h
         src/gameState/options/RestartPromptState.c
         include/gameState/options/RestartPromptState.h
+        src/gameState/AddonsState.c
+        include/gameState/AddonsState.h
+        src/gameState/AchievementsState.c
+        include/gameState/AchievementsState.h
 
         src/helpers/GameActorRegistration.c
         include/helpers/GameActorRegistration.h
@@ -50,6 +54,8 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         include/helpers/GameControls.h
         src/helpers/OptionsMenu.c
         include/helpers/OptionsMenu.h
+        src/helpers/GameAchievements.c
+        include/helpers/GameAchievements.h
 
         src/GameMain.c
 

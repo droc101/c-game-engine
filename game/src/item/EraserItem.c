@@ -5,6 +5,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/helpers/MathEx.h>
+#include <engine/structs/Achievements.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>
@@ -20,6 +21,7 @@
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "helpers/GameAchievements.h"
 
 static void EraserItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 {
@@ -43,6 +45,7 @@ static bool EraserItemCanTargetFunction(Item * /*this*/,
 		if (IsInputActionJustPressed(physicsThreadInput, &primaryAttack))
 		{
 			const GlobalState *state = GetState();
+			IncrementIntegerStatistic(GAME_STAT_ENEMIES_KILLED, 1);
 			RemoveActor(state->map->player.targetedActor);
 		}
 

@@ -20,9 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-Font *smallFont;
-Font *largeFont;
-
 inline void FontDrawString(const Vector2 pos, const char *str, const uint32_t size, const Color color, const char *font)
 {
 	DrawTextAligned(str, size, color, pos, v2s(FLT_MAX), FONT_HALIGN_LEFT, FONT_VALIGN_TOP, font);

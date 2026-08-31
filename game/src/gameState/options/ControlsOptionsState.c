@@ -369,8 +369,6 @@ static void ControlsOptionsStateSet()
 		ListInit(controlRows, LIST_POINTER);
 
 		controlOptionsMenu = CreateOptionsMenu();
-
-		int entryY = 0;
 		for (size_t ci = 0; ci < controlCategories.length; ci++)
 		{
 			ControlCategory *cat = ListGetPointer(controlCategories, ci);
@@ -378,7 +376,7 @@ static void ControlsOptionsStateSet()
 								  CreateLabelControl(cat->categoryName,
 													 16,
 													 COLOR_WHITE,
-													 v2(0, entryY),
+													 v2s(0),
 													 v2(750, 40),
 													 TOP_LEFT,
 													 FONT_HALIGN_CENTER,
@@ -389,14 +387,12 @@ static void ControlsOptionsStateSet()
 
 			for (size_t i = 0; i < cat->controlOptions.length; i++)
 			{
-				entryY += ENTRY_HEIGHT;
-
 				ControlOption *entry = ListGetPointer(cat->controlOptions, i);
 				OptionsMenuAddControl(controlOptionsMenu,
 									  CreateLabelControl(entry->displayName,
 														 16,
 														 COLOR_WHITE,
-														 v2(0, entryY),
+														 v2s(0),
 														 v2(750 - 40 - 6 - 190 - 6 - 190 - 6, 40),
 														 TOP_LEFT,
 														 FONT_HALIGN_LEFT,
@@ -404,19 +400,19 @@ static void ControlsOptionsStateSet()
 														 FONT("small_font"),
 														 true));
 
-				Control *kbmButton = CreateButtonControl(v2(0 - 40 - 6 - 190 - 6, entryY),
+				Control *kbmButton = CreateButtonControl(v2(0 - 40 - 6 - 190 - 6, 0),
 														 v2(190, 40),
 														 "KBM",
 														 BtnEditKbmBinding,
 														 TOP_RIGHT,
 														 NULL);
-				Control *ctlrButton = CreateButtonControl(v2(0 - 40 - 6, entryY),
+				Control *ctlrButton = CreateButtonControl(v2(0 - 40 - 6, 0),
 														  v2(190, 40),
 														  "CTLR",
 														  BtnEditCtlrBinding,
 														  TOP_RIGHT,
 														  NULL);
-				Control *resetButton = CreateIconButtonControl(v2(0, entryY),
+				Control *resetButton = CreateIconButtonControl(v2s(0),
 															   TEXTURE("interface/reset"),
 															   BtnResetBinding,
 															   TOP_RIGHT,
@@ -437,7 +433,7 @@ static void ControlsOptionsStateSet()
 				OptionsMenuAddControl(controlOptionsMenu, resetButton);
 				OptionsMenuNextRow(controlOptionsMenu);
 			}
-			entryY += ENTRY_HEIGHT * 1.5f;
+			controlOptionsMenu->yPos += 20;
 		}
 
 		OptionsMenuAddSimpleHeaderFooter(controlOptionsMenu, "Controls", BtnControlsOptionsBack);

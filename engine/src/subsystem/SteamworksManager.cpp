@@ -7,14 +7,14 @@
 #include <engine/subsystem/SteamworksManager.h>
 
 #ifdef ENABLE_STEAMWORKS
-#include <steam/isteamfriends.h>
-#include <steam/isteamuser.h>
+#include <steam/isteamuserstats.h>
 #include <steam/steam_api.h>
 #include <steam/steam_api_common.h>
 #endif
 
 extern "C" {
 #include <engine/subsystem/Logging.h>
+#include <stdint.h>
 #include <stdlib.h>
 }
 
@@ -81,13 +81,130 @@ void ShutdownSteamworks()
 #endif
 }
 
-void SteamworksTest()
+bool IsSteamAchievementUnlocked(const char *achievement)
 {
 #ifdef ENABLE_STEAMWORKS
 	if (steamworksRunning)
 	{
-		SteamFriends()->ActivateGameOverlay("friends");
-		LogDebug("You are %s, Steam level %d\n", SteamFriends()->GetPersonaName(), SteamUser()->GetPlayerSteamLevel());
+		bool unlocked = false;
+		if (SteamUserStats()->GetAchievement(achievement, &unlocked))
+		{
+			return unlocked;
+		} else
+		{
+			LogError("Failed to get achievement \"%s\" from Steam, does it exist?\n", achievement);
+		}
+	}
+#endif
+	return false;
+}
+
+int32_t GetSteamIntegerStatistic(const char *statistic)
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		int32_t value = 0;
+		if (SteamUserStats()->GetStat(statistic, &value))
+		{
+			return value;
+		} else
+		{
+			LogError("Failed to get stat \"%s\" from Steam, does it exist?\n", statistic);
+		}
+	}
+#endif
+	return 0;
+}
+
+float GetSteamFloatStatistic(const char *statistic)
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		float value = 0;
+		if (SteamUserStats()->GetStat(statistic, &value))
+		{
+			return value;
+		} else
+		{
+			LogError("Failed to get stat \"%s\" from Steam, does it exist?\n", statistic);
+		}
+	}
+#endif
+	return 0.0f;
+}
+
+void SetSteamAchievementUnlocked(const char *achievement, bool unlocked)
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		if (unlocked)
+		{
+			if (!SteamUserStats()->SetAchievement(achievement))
+			{
+				LogError("Failed to unlock Steam achievement \"%s\", does it exist?\n", achievement);
+			}
+		} else
+		{
+			if (!SteamUserStats()->ClearAchievement(achievement))
+			{
+				LogError("Failed to lock Steam achievement \"%s\", does it exist?\n", achievement);
+			}
+		}
+	}
+#endif
+}
+
+void SetSteamIntegerStatistic(const char *statistic, const int32_t value)
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		if (!SteamUserStats()->SetStat(statistic, value))
+		{
+			LogError("Failed to set Steam stat \"%s\", does it exist?\n", statistic);
+		}
+	}
+#endif
+}
+
+void SetSteamFloatStatistic(const char *statistic, const float value)
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		if (!SteamUserStats()->SetStat(statistic, value))
+		{
+			LogError("Failed to set Steam stat \"%s\", does it exist?\n", statistic);
+		}
+	}
+#endif
+}
+
+void SaveSteamAchievementsAndStats()
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		if (!SteamUserStats()->StoreStats())
+		{
+			LogError("failed to store Steam achievements & stats\n");
+		}
+	}
+#endif
+}
+
+void ResetSteamAchievementsAndStats()
+{
+#ifdef ENABLE_STEAMWORKS
+	if (steamworksRunning)
+	{
+		if (!SteamUserStats()->ResetAllStats(true))
+		{
+			LogError("failed to reset Steam achievements & stats\n");
+		}
 	}
 #endif
 }

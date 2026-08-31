@@ -195,7 +195,6 @@ void ChangeMap(Map *map)
 void DestroyGlobalState()
 {
 	LogDebug("Cleaning up GlobalState...\n");
-	SaveOptions(&state.options);
 	if (state.gameState->Destroy)
 	{
 		state.gameState->Destroy();

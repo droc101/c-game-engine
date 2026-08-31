@@ -2,6 +2,7 @@
 // Created by droc101 on 10/27/24.
 //
 
+#include <engine/assets/AddonLoader.h>
 #include <engine/assets/KvlFile.h>
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/helpers/Arguments.h>
@@ -43,6 +44,7 @@ static void DefaultOptions(Options *options)
 	ApplyVideoPreset(options, VIDEO_PRESET_MEDIUM);
 	DefaultControls();
 	DefaultDebugEntrySettings();
+	DefaultAddonSettings();
 }
 
 static bool ValidateOptions(const Options *options)
@@ -139,6 +141,15 @@ void LoadOptions(Options *options)
 			DefaultDebugEntrySettings();
 		}
 
+		ParamArray *enabledAddons = KvGetArray(list, "enabled_addons");
+		if (enabledAddons)
+		{
+			LoadAddonSettings(enabledAddons);
+		} else
+		{
+			DefaultAddonSettings();
+		}
+
 		options->fullscreen = KvGetBool(list, "fullscreen", false);
 		options->vsync = KvGetBool(list, "vsync", true);
 		options->preferWayland = KvGetBool(list, "prefer_wayland", true);
@@ -200,6 +211,8 @@ void SaveOptions(Options *options)
 	KvListCreate(debugEntries);
 	SaveDebugEntrySettings(debugEntries);
 	KvSetList(list, "debug_options", debugEntries);
+
+	KvSetParamArray(list, "enabled_addons", SaveAddonSettings());
 
 	KvSetBool(list, "fullscreen", options->fullscreen);
 	KvSetBool(list, "vsync", options->vsync);

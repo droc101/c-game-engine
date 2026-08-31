@@ -6,6 +6,7 @@
 #include <cglm/types.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/physics/Physics.h>
+#include <engine/structs/Achievements.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ActorWall.h>
@@ -26,6 +27,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "helpers/GameAchievements.h"
 
 typedef struct GoalData
 {
@@ -71,6 +73,8 @@ static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 	if (data->enabled)
 	{
 		GetState()->saveData->coins += 10;
+		IncrementIntegerStatistic(GAME_STAT_COINS_COLLECTED, 10);
+		UnlockAchievement(GAME_ACHIEVEMENT_GET_GOAL);
 		ActorFireOutput(this, GOAL_OUTPUT_COLLECTED, PARAM_NONE);
 		RemoveActor(this);
 	}

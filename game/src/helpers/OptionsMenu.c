@@ -31,6 +31,7 @@ OptionsMenu *CreateOptionsMenu()
 	builder->smallOptionRightSide = false;
 	builder->yPos = 0;
 	builder->locked = false;
+	builder->rowMaxY = 0;
 	return builder;
 }
 
@@ -42,7 +43,11 @@ void OptionsMenuAddSection(OptionsMenu *menu, char *label)
 		menu->yPos += OPTION_VERTICAL_SPACING;
 		menu->smallOptionRightSide = false;
 	}
-	menu->yPos += OPTION_SECTION_SPACING;
+	if (menu->yPos != 0)
+	{
+		menu->yPos += OPTION_SECTION_SPACING;
+	}
+
 	if (label)
 	{
 		Control *labelControl = CreateLabelControl(label,
@@ -93,15 +98,19 @@ void OptionsMenuAddSmallControl(OptionsMenu *menu, Control *control)
 void OptionsMenuAddControl(OptionsMenu *menu, Control *control)
 {
 	assert(!menu->locked);
-	control->size.y = 40;
-	control->position.y = menu->yPos;
+	if (control->position.y + control->size.y > menu->rowMaxY)
+	{
+		menu->rowMaxY = control->position.y + control->size.y;
+	}
+	control->position.y += menu->yPos;
 	ScrollViewAddChild(menu->scrollView, control);
 }
 
 void OptionsMenuNextRow(OptionsMenu *menu)
 {
 	assert(!menu->locked);
-	menu->yPos += OPTION_VERTICAL_SPACING;
+	menu->yPos += menu->rowMaxY + 5;
+	menu->rowMaxY = 0;
 	menu->smallOptionRightSide = false;
 }
 
@@ -120,6 +129,13 @@ void OptionsMenuAddOneButtonHeaderFooter(OptionsMenu *menu,
 	UiStackPush(menu->stack, CreateHeaderFooterControl(100, false, NULL));
 	UiStackPush(menu->stack,
 				CreateButtonControl(v2(0, -40), v2(480, 40), buttonText, buttonCallback, BOTTOM_CENTER, NULL));
+	menu->locked = true;
+}
+
+void OptionsMenuAddNoButtonHeaderFooter(OptionsMenu *menu, char *title)
+{
+	UiStackPush(menu->stack, CreateHeaderFooterControl(100, true, title));
+	UiStackPush(menu->stack, CreateHeaderFooterControl(100, false, NULL));
 	menu->locked = true;
 }
 

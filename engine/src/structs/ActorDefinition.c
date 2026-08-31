@@ -38,7 +38,7 @@ void RegisterActor(const char *actorTypeName, ActorDefinition *definition)
 #ifdef BUILDSTYLE_DEBUG
 	ActorInputHandlerFunctionDict_iterator it;
 	ActorInputHandlerFunctionDict_it(it, definition->inputHandlers);
-	while (!ActorInputHandlerFunctionDict_last_p(it))
+	while (!ActorInputHandlerFunctionDict_end_p(it))
 	{
 		const ActorInputHandlerFunctionDict_pair *pair = ActorInputHandlerFunctionDict_ref(it);
 		assert(pair->value != NULL);
@@ -122,7 +122,7 @@ void DestroyActorDefinitions()
 {
 	ActorDefinitionDict_iterator it;
 	ActorDefinitionDict_it(it, actorDefinitions);
-	while (!ActorDefinitionDict_last_p(it))
+	while (!ActorDefinitionDict_end_p(it))
 	{
 		const ActorDefinitionDict_pair *pair = ActorDefinitionDict_ref(it);
 		ActorInputHandlerFunctionDict_clear(pair->value->inputHandlers);

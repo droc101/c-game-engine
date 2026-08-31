@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <dirent.h>
+#include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
@@ -184,6 +185,7 @@ void DestroyAssetCache()
 {
 	LogDebug("Cleaning up asset cache...\n");
 	AssetCache_clear(assetCache);
+	ClearAddonIcons();
 	DestroyTextureLoader();
 	DestroyModelLoader();
 	DestroyMapMaterialLoader();

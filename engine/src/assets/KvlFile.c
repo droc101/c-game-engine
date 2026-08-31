@@ -89,9 +89,11 @@ bool WriteKvlFile(const char *path, KvList input)
 	WriteKvList(input, writer);
 	KvListDestroy(input);
 
-	const KvlFileHeader header = {.magic = KVL_MAGIC,
-								  .version = KVL_VERSION,
-								  .checksum = Checksum(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer))};
+	const KvlFileHeader header = {
+		.magic = KVL_MAGIC,
+		.version = KVL_VERSION,
+		.checksum = Checksum(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer)),
+	};
 
 	FILE *file = fopen(path, "wb");
 	if (file == NULL)

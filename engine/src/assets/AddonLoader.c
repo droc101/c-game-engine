@@ -4,24 +4,84 @@
 
 #include <dirent.h>
 #include <engine/assets/AddonLoader.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/KvlFile.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/helpers/PlatformHelpers.h>
+#include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Logging.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define ADDONS_PATH "addons"
 #define ADDON_CONFIG_FILENAME "addon.kvl"
+#define ADDON_ICON_FILENAME "icon.gtex"
 #define ADDON_ASSETS_FOLDER "assets"
+#define ADDON_ICON_PREFIX "dynamic/addon_"
 
 List addons;
+
+static bool enabledListCreated = false;
+List enabledAddons;
+
+void ClearAddonIcons()
+{
+	for (size_t i = 0; i < addons.length; i++)
+	{
+		Addon *a = ListGetPointer(addons, i);
+		free(a->icon);
+		a->icon = NULL;
+	}
+}
+
+char *GetAddonIcon(Addon *addon)
+{
+	if (addon->icon)
+	{
+		return addon->icon;
+	}
+
+	const size_t iconRegisteredNameLength = strlen(ADDON_ICON_PREFIX) + strlen(addon->id) + 1;
+	char *iconRegisteredName = malloc(iconRegisteredNameLength);
+	snprintf(iconRegisteredName, iconRegisteredNameLength, ADDON_ICON_PREFIX "%s", addon->id);
+
+	const size_t iconFilenameLength = strlen(addon->rootPath) + 1 + strlen(ADDON_ICON_FILENAME) + 1;
+	char *iconFilename = malloc(iconFilenameLength);
+	snprintf(iconFilename, iconFilenameLength, "%s/" ADDON_ICON_FILENAME, addon->rootPath);
+
+	Image *icon = malloc(sizeof(Image));
+
+	FILE *file = fopen(iconFilename, "r");
+	free(iconFilename);
+	if (file)
+	{
+		Asset *iconAsset = LoadAssetFromFile(file);
+		if (!LoadImageFromAsset(iconAsset, icon))
+		{
+			GenFallbackImage(icon);
+		}
+		if (iconAsset)
+		{
+			FreeAsset(iconAsset);
+		}
+	} else
+	{
+		GenFallbackImage(icon);
+	}
+
+	icon->name = iconRegisteredName;
+	(void)RegisterImage(icon);
+	addon->icon = strdup(iconRegisteredName);
+	return addon->icon;
+}
 
 static Addon *LoadAddon(const char *path, const char *id)
 {
@@ -41,7 +101,7 @@ static Addon *LoadAddon(const char *path, const char *id)
 	addon->displayName = strdup(KvGetString(config, "display_name", "Unknown Addon"));
 	addon->description = strdup(KvGetString(config, "description", ""));
 	addon->type = KvGetByte(config, "type", ADDON_TYPE_ASSET_PACK);
-	addon->icon = strdup(MISSING_TEXTURE_NAME); // TODO load icon
+	addon->icon = NULL;
 
 	KvListDestroy(config);
 
@@ -79,8 +139,24 @@ static void RescanAddons()
 	DIR *dir = opendir(ADDONS_PATH);
 	if (dir == NULL)
 	{
-		LogError("Failed to open addons directory: %s\n", strerror(errno));
-		return;
+		if (errno == ENOENT)
+		{
+#ifdef WIN32
+			if (mkdir(ADDONS_PATH) != 0)
+#else
+			if (mkdir(ADDONS_PATH, 0660) != 0)
+#endif
+			{
+				LogError("Failed to create addons directory: %s\n", strerror(errno));
+			} else
+			{
+				LogInfo("Created addons directory\n");
+			}
+		} else
+		{
+			LogError("Failed to open addons directory: %s\n", strerror(errno));
+		}
+		return; // new directory won't have any addons, no need to process it
 	}
 
 	const struct dirent *ent = readdir(dir);
@@ -91,12 +167,19 @@ static void RescanAddons()
 			const size_t path_length = strlen(ADDONS_PATH) + 1 + strlen(ent->d_name) + 1;
 			char *path = malloc(path_length);
 			snprintf(path, path_length, "%s/%s", ADDONS_PATH, ent->d_name);
-			Addon *addon = LoadAddon(path, ent->d_name);
-			LogInfo("Loaded addon \"%s\"\n", addon->id);
-			if (addon)
+
+			struct stat path_stat;
+			stat(path, &path_stat);
+			if (S_ISDIR(path_stat.st_mode))
 			{
-				ListAdd(addons, addon);
+				Addon *addon = LoadAddon(path, ent->d_name);
+				if (addon)
+				{
+					LogInfo("Loaded addon \"%s\"\n", addon->id);
+					ListAdd(addons, addon);
+				}
 			}
+
 			free(path);
 		}
 		ent = readdir(dir);
@@ -107,6 +190,11 @@ static void RescanAddons()
 void InitAddonLoader()
 {
 	ListInit(addons, LIST_POINTER);
+	if (!enabledListCreated)
+	{
+		ListInit(enabledAddons, LIST_POINTER);
+		enabledListCreated = true;
+	}
 	RescanAddons();
 	ApplyAddonAssetPaths();
 }
@@ -131,15 +219,104 @@ void DestroyAddonLoader()
 		FreeAddon(ListGetPointer(addons, i));
 	}
 	ListAndContentsFree(addons);
+	ListAndContentsFree(enabledAddons);
 }
 
 void ApplyAddonAssetPaths()
 {
 	RemoveAddonAssetPaths();
 
-	for (size_t i = 0; i < addons.length; i++)
+	for (size_t i = enabledAddons.length - 1; i != SIZE_MAX; i--)
 	{
-		Addon *addon = ListGetPointer(addons, i);
+		Addon *addon = GetAddonById(ListGetPointer(enabledAddons, i));
 		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
 	}
+}
+
+void DefaultAddonSettings()
+{
+	if (!enabledListCreated)
+	{
+		ListInit(enabledAddons, LIST_POINTER);
+		enabledListCreated = true;
+	}
+	ListClear(enabledAddons);
+}
+
+void LoadAddonSettings(ParamArray *from)
+{
+	if (!enabledListCreated)
+	{
+		ListInit(enabledAddons, LIST_POINTER);
+		enabledListCreated = true;
+	}
+	for (size_t i = 0; i < from->length; i++)
+	{
+		const Param *p = &from->data[i];
+		if (p->type == PARAM_TYPE_STRING)
+		{
+			ListAdd(enabledAddons, strdup(p->stringValue));
+		}
+	}
+}
+
+ParamArray SaveAddonSettings()
+{
+	ParamArray arr;
+	arr.length = enabledAddons.length;
+	arr.data = calloc(arr.length, sizeof(Param));
+	for (size_t i = 0; i < arr.length; i++)
+	{
+		Param *p = &arr.data[i];
+		p->type = PARAM_TYPE_STRING;
+		p->stringValue = strdup(ListGetPointer(enabledAddons, i));
+	}
+	return arr;
+}
+
+bool IsAddonEnabled(Addon *addon)
+{
+	for (size_t i = 0; i < enabledAddons.length; i++)
+	{
+		if (strcmp(ListGetPointer(enabledAddons, i), addon->id) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void SetAddonEnabled(Addon *addon, const bool enabled)
+{
+	if (enabled)
+	{
+		if (!IsAddonEnabled(addon))
+		{
+			ListAdd(enabledAddons, strdup(addon->id));
+		}
+	} else
+	{
+		for (size_t i = 0; i < enabledAddons.length; i++)
+		{
+			char *enabledId = ListGetPointer(enabledAddons, i);
+			if (strcmp(enabledId, addon->id) == 0)
+			{
+				free(enabledId);
+				ListRemoveAt(enabledAddons, i);
+			}
+		}
+	}
+}
+
+Addon *GetAddonById(const char *id)
+{
+	for (size_t i = 0; i < addons.length; i++)
+	{
+		Addon *a = ListGetPointer(addons, i);
+		if (strcmp(a->id, id) == 0)
+		{
+			return a;
+		}
+	}
+	return NULL;
 }

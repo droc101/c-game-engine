@@ -18,8 +18,14 @@ typedef enum VideoPreset
 	VIDEO_PRESET_CUSTOM,
 } VideoPreset;
 
+/**
+ * Get the current video preset
+ */
 VideoPreset GetCurrentVideoPreset(const Options *options);
 
+/**
+ * Apply a video preset
+ */
 void ApplyVideoPreset(Options *options, VideoPreset preset);
 
 #endif //GAME_VIDEOPRESET_H

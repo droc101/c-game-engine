@@ -30,18 +30,41 @@ typedef struct DebugEntry
 
 extern List debugEntries;
 
+/**
+ * Check if a debug entry is visible
+ * @param key The entry to check for
+ * @note This function is expensive
+ */
 bool IsDebugEntryVisible(const char *key);
 
+/**
+ * Initialize the debug entry manager
+ */
 void InitDebugEntryManager();
 
+/**
+ * Render visible debug entries
+ */
 void RenderDebugEntries();
 
+/**
+ * Load the default debug entry settings
+ */
 void DefaultDebugEntrySettings();
 
+/**
+ * Load debug entry settings
+ */
 void LoadDebugEntrySettings(KvList from);
 
+/**
+ * Save debug entry settings
+ */
 void SaveDebugEntrySettings(KvList to);
 
+/**
+ * Destroy the debug entry manager
+ */
 void DestroyDebugEntryManager();
 
 #endif //GAME_DEBUGENTRYMANAGER_H

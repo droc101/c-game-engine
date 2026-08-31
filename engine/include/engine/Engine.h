@@ -6,6 +6,7 @@
 #define GAME_ENGINE_H
 
 #include <engine/Commit.h>
+#include <engine/structs/Achievements.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ControlOptions.h>
 #include <stdbool.h>
@@ -39,6 +40,7 @@ typedef struct EngineInitializationInfo
 	const char **argv;
 	const RegisterGameActorsFunction RegisterGameActors;
 	const ControlRegisterFunction RegisterGameControls;
+	const RegisterGameAchievementsFunction RegisterGameAchievements;
 } EngineInitializationInfo;
 
 /**

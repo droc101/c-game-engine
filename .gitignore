@@ -48,3 +48,5 @@ cmake-build-*/
 
 # Local GitHub actions testing
 .artifacts
+
+*.spv

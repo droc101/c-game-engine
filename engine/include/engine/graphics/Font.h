@@ -29,9 +29,6 @@ enum FontVerticalAlign
 	FONT_VALIGN_BOTTOM
 };
 
-extern Font *smallFont;
-extern Font *largeFont;
-
 /**
  * Draw a string of text to the screen
  * @param pos Top left position of the text

@@ -457,6 +457,11 @@ inline void KvSetUint64(KvList list, const char *key, const uint64_t value)
 void KvSetParamArray(KvList list, const char *key, const ParamArray array)
 {
 	KvSet(list, key, (Param){PARAM_TYPE_ARRAY, .arrayValue = array});
+	for (size_t i = 0; i < array.length; i++)
+	{
+		FreeParam(&array.data[i]);
+	}
+	free(array.data);
 }
 
 void KvSetList(KvList list, const char *key, KvList value)

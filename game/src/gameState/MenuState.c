@@ -15,16 +15,15 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
-#include <engine/subsystem/Logging.h>
-#include <engine/subsystem/SteamworksManager.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <time.h>
+#include "gameState/AchievementsState.h"
+#include "gameState/AddonsState.h"
 #include "gameState/LevelSelectState.h"
 #include "gameState/OptionsState.h"
 
@@ -49,17 +48,14 @@ static void OpenOptions(Control *, void *)
 	SetGameState(&OptionsState);
 }
 
-static void ReloadAssets(Control *, void *)
+static void OpenAddons(Control *, void *)
 {
-	LogInfo("Reloading all assets\n");
-	ChangeMap(NULL);
-	EnterMenuBackgroundState();
-	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	SetGameState(&AddonsState);
 }
 
-static void SteamButton(Control *, void *)
+static void OpenAchievements(Control *, void *)
 {
-	SteamworksTest();
+	SetGameState(&AchievementsState);
 }
 
 static void MenuStateRender(GlobalState *state, const double /*delta*/)
@@ -123,24 +119,18 @@ static void MenuStateSet()
 		UiStackPush(menuStack,
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Options", OpenOptions, MIDDLE_CENTER, NULL));
 		opY += opSpacing;
-		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
-		opY += opSpacing * 1.5;
 		UiStackPush(menuStack,
-					CreateButtonControl(v2(0, opY),
-										v2(480, 40),
-										"Hot Reload Assets",
-										ReloadAssets,
+					CreateButtonControl(v2(-122.5, opY), v2(235, 40), "Addons", OpenAddons, MIDDLE_CENTER, NULL));
+		UiStackPush(menuStack,
+					CreateButtonControl(v2(122.5, opY),
+										v2(235, 40),
+										"Achievements",
+										OpenAchievements,
 										MIDDLE_CENTER,
-										"top 10 ways to kill the engine"));
+										NULL));
+		opY += opSpacing * 1.5;
+		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
 		opY += opSpacing;
-#ifdef ENABLE_STEAMWORKS
-		if (IsSteamworksRunning())
-		{
-			UiStackPush(menuStack,
-						CreateButtonControl(v2(0, opY), v2(480, 40), "steam button", SteamButton, MIDDLE_CENTER, NULL));
-			opY += opSpacing;
-		}
-#endif
 	}
 	UiStackResetFocus(menuStack);
 	EnterMenuBackgroundState();

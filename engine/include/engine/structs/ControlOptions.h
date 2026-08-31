@@ -61,10 +61,28 @@ extern InputAction fullscreen;
 
 #pragma endregion
 
+/**
+ * Get an existing control category, or NULL if it doesn't exist
+ * @param key The key to get
+ */
 ControlCategory *GetControlCategory(const char *key);
 
+/**
+ * Register a control category, or get an existing one if the key already exists
+ * @param displayName The display name to register
+ * @param key The key to register
+ */
 ControlCategory *RegisterControlCategory(char *displayName, char *key);
 
+/**
+ * Register a control binding
+ * @param key The key to register
+ * @param displayName The display name of this control
+ * @param action The input action this control is associated with
+ * @param allowAxisBind Whether to allow analog bindings
+ * @param defaultAction The default binding
+ * @param category The category this control is in
+ */
 void RegisterControl(char *key,
 					 char *displayName,
 					 InputAction *action,
@@ -72,14 +90,30 @@ void RegisterControl(char *key,
 					 const InputAction *defaultAction,
 					 ControlCategory *category);
 
+/**
+ * Register control bindings
+ * @param RegisterGameControls Function to call to register game control bindings
+ */
 void RegisterControls(ControlRegisterFunction RegisterGameControls);
 
+/**
+ * Reset all control bindings to the default
+ */
 void DefaultControls();
 
+/**
+ * Load control options
+ */
 void LoadControls(KvList from);
 
+/**
+ * Save control options
+ */
 void SaveControls(KvList to);
 
+/**
+ * Destroy controls system
+ */
 void DestroyControls();
 
 #endif //GAME_CONTROLOPTIONS_H

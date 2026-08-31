@@ -11,7 +11,7 @@
             "floorHeight": -8.0,
             "ceilingHeight": 128.0,
             "floorMaterial": {
-                "material": "material/floor.gmtl",
+                "material": "material/dev/floor_test.gmtl",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -23,7 +23,7 @@
                 "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
-                "material": "material/tools/skip.gmtl",
+                "material": "material/dev/ceiling_test.gmtl",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -36,7 +36,7 @@
             },
             "wallMaterials": [
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -48,7 +48,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -60,7 +60,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -72,7 +72,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/tools/skip.gmtl",
+                    "material": "material/dev/wall_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -87,14 +87,14 @@
             "points": [
                 {
                     "x": -192.0,
-                    "z": -128.0
+                    "z": 16.0
                 },
                 {
-                    "x": 320.0,
-                    "z": -128.0
+                    "x": 448.0,
+                    "z": 16.0
                 },
                 {
-                    "x": 320.0,
+                    "x": 448.0,
                     "z": 128.0
                 },
                 {
@@ -595,7 +595,7 @@
             "floorMaterial": {
                 "material": "material/dev/uv_test.gmtl",
                 "uvOffset": {
-                    "x": 0.0,
+                    "x": 0.5,
                     "y": 0.0
                 },
                 "uvScale": {
@@ -633,7 +633,7 @@
                     "material": "material/dev/uv_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
-                        "y": 0.0
+                        "y": 0.5
                     },
                     "uvScale": {
                         "x": 1.0,
@@ -645,7 +645,7 @@
                     "material": "material/dev/uv_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
-                        "y": 0.0
+                        "y": 0.5
                     },
                     "uvScale": {
                         "x": 1.0,
@@ -657,7 +657,7 @@
                     "material": "material/dev/uv_test.gmtl",
                     "uvOffset": {
                         "x": 0.0,
-                        "y": 0.0
+                        "y": 0.5
                     },
                     "uvScale": {
                         "x": 1.0,
@@ -715,7 +715,7 @@
             },
             "wallMaterials": [
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -727,7 +727,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -739,7 +739,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -751,7 +751,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -812,7 +812,7 @@
             },
             "wallMaterials": [
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -824,7 +824,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -836,7 +836,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -848,7 +848,7 @@
                     "units_per_luxel": 1.0
                 },
                 {
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/white_light.gmtl",
                     "uvOffset": {
                         "x": 0.0,
                         "y": 0.0
@@ -876,6 +876,1461 @@
                 {
                     "x": 216.0,
                     "z": 112.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -8.0,
+            "ceilingHeight": 128.0,
+            "floorMaterial": {
+                "material": "material/dev/floor_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/ceiling_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -192.0,
+                    "z": -128.0
+                },
+                {
+                    "x": 448.0,
+                    "z": -128.0
+                },
+                {
+                    "x": 448.0,
+                    "z": -16.0
+                },
+                {
+                    "x": -192.0,
+                    "z": -16.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -8.0,
+            "ceilingHeight": 128.0,
+            "floorMaterial": {
+                "material": "material/floor.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/ceiling_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -192.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 448.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 448.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -192.0,
+                    "z": 16.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -176.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -144.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -144.0,
+                    "z": 32.0
+                },
+                {
+                    "x": -176.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -112.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -80.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -80.0,
+                    "z": 32.0
+                },
+                {
+                    "x": -112.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": -48.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -16.0,
+                    "z": -32.0
+                },
+                {
+                    "x": -16.0,
+                    "z": 32.0
+                },
+                {
+                    "x": -48.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 16.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 48.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 48.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 16.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 80.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 112.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 112.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 80.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 144.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 176.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 176.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 144.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 208.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 240.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 240.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 208.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 272.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 304.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 304.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 272.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 336.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 368.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 368.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 336.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 400.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 432.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 432.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 400.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -10.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/missing_texture.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 408.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 440.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 440.0,
+                    "z": -48.0
+                },
+                {
+                    "x": 408.0,
+                    "z": -48.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -10.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/alpha.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 1.0
+                },
+                "uvScale": {
+                    "x": 0.5,
+                    "y": 0.5
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 328.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 360.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 360.0,
+                    "z": -48.0
+                },
+                {
+                    "x": 328.0,
+                    "z": -48.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": -10.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "fake",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/white_light.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 368.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 400.0,
+                    "z": -80.0
+                },
+                {
+                    "x": 400.0,
+                    "z": -48.0
+                },
+                {
+                    "x": 368.0,
+                    "z": -48.0
                 }
             ]
         }
@@ -894,7 +2349,16 @@
                 "z": 0.0
             },
             "connections": [],
-            "params": {}
+            "params": {
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                }
+            }
         },
         {
             "class": "prop_door",
@@ -1702,6 +3166,14 @@
             },
             "connections": [],
             "params": {
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                },
                 "name": {
                     "type": "string",
                     "value": "hide_player_camera"
@@ -1730,6 +3202,14 @@
             },
             "connections": [],
             "params": {
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                },
                 "name": {
                     "type": "string",
                     "value": "fov_camera"
@@ -4171,6 +5651,1095 @@
                         "a": 1.0
                     }
                 },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "light_directional",
+            "position": {
+                "x": -256.0,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 292.5,
+                "y": 202.5,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.8270041942596436,
+                        "g": 0.9408748745918274,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 0.5
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": -96.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 32.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 128.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 256.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": -96.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 32.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 128.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 256.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 146.0,
+                "y": -12.0,
+                "z": 118.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 134.0,
+                "y": -16.0,
+                "z": 118.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 122.0,
+                "y": -20.0,
+                "z": 118.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 110.0,
+                "y": -12.0,
+                "z": 118.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.9113922119140625,
+                        "g": 0.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 110.0,
+                "y": -16.0,
+                "z": 118.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.9113922119140625,
+                        "g": 0.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": 110.0,
+                "y": -20.0,
+                "z": 118.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.9113922119140625,
+                        "g": 0.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 384.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 384.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 384.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "materials"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 344.0,
+                "y": -8.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "translucent"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 424.0,
+                "y": -8.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "valid material, missing texture"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 384.0,
+                "y": -8.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "missing material"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_physbox",
+            "position": {
+                "x": 384.0,
+                "y": 0.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_physbox",
+            "position": {
+                "x": 384.0,
+                "y": 8.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_physbox",
+            "position": {
+                "x": 384.0,
+                "y": 16.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
                 "name": {
                     "type": "string",
                     "value": ""
