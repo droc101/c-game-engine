@@ -126,7 +126,7 @@ static inline VkResult CreateUniformBuffers()
 						   "Failed to create fog uniform buffer!");
 	const LunaBufferCreationInfo lightsBufferCreationInfo = {
 		.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment,
-		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
