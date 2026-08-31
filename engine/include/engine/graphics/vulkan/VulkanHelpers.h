@@ -423,6 +423,7 @@ typedef struct TextureSamplers
 
 typedef struct ShadowMapPushConstants
 {
+	LightType lightType;
 	uint32_t lightIndex;
 	uint32_t faceIndex;
 	uint32_t cascadeIndex;

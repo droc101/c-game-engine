@@ -17,10 +17,10 @@ void main() {
 	outAlpha = 1;
 	outPosition = inPosition;
     outTextureIndex = inTextureIndex;
-	if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_POINT) {
+	if (pushConstants.lightType == LIGHT_TYPE_POINT) {
         const vec3 lightToWorld = inPosition - lightsData.lights[pushConstants.lightIndex].transform.position;
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (pointLightViewMatrices[pushConstants.faceIndex] * vec4(lightToWorld, 1));
-	} else if (lightsData.lights[pushConstants.lightIndex].type == LIGHT_TYPE_SPOT) {
+	} else if (pushConstants.lightType == LIGHT_TYPE_SPOT) {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * vec4(inPosition, 1);
 	} else {
 	    gl_Position = lightsData.cascadeMatrices[pushConstants.cascadeIndex] * vec4(inPosition, 1);

@@ -5,6 +5,7 @@
 layout(constant_id = 0) const uint LIGHT_COUNT = 1;
 
 layout(push_constant) uniform PushConstants {
+    uint lightType;
     uint lightIndex;
     uint faceIndex;
     uint cascadeIndex;

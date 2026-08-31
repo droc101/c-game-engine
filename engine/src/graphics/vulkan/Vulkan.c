@@ -1446,6 +1446,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 	{
 		const Light *light = &map->lights[shadowMapPushConstants.lightIndex];
 		const uint32_t size = ShadowMapResolution(light->type);
+		shadowMapPushConstants.lightType = light->type;
 
 		const VkExtent2D extent = {
 			.width = size,
