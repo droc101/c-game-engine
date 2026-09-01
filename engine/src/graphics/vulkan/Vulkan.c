@@ -441,6 +441,7 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 				shadedDrawInfo[shadedMaterialIndex].firstInstance = index;
 				shadedCullingInfo[shadedMaterialIndex].position = model->center;
 				shadedCullingInfo[shadedMaterialIndex].radius = Vector3_Length(&model->halfExtent);
+				shadedCullingInfo[shadedMaterialIndex].castsShadows = model->material->castsShadows;
 				shadedMaterialIndex++;
 				break;
 			case SHADER_UNSHADED:
@@ -451,6 +452,7 @@ static inline VkResult LoadMapModelsToBuffer(const size_t modelCount,
 				unshadedDrawInfo[unshadedMaterialIndex].firstInstance = index;
 				unshadedCullingInfo[unshadedMaterialIndex].position = model->center;
 				unshadedCullingInfo[unshadedMaterialIndex].radius = Vector3_Length(&model->halfExtent);
+				unshadedCullingInfo[unshadedMaterialIndex].castsShadows = model->material->castsShadows;
 				unshadedMaterialIndex++;
 				break;
 			default:

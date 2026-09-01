@@ -652,6 +652,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &position);
 		Vector3_Add(&position, &lod->components[j].centerOffset, &cullingInfo->position);
 		cullingInfo->radius = lod->components[j].radius;
+		cullingInfo->castsShadows = material->castsShadows;
 	}
 }
 
@@ -677,6 +678,7 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 	// TODO: This does not take centerOffset into account
 	cullingInfo->position = position;
 	cullingInfo->radius = Vector2Length(actorInstanceData->scale);
+	cullingInfo->castsShadows = true;
 }
 
 static inline VkResult WriteActorModelBuffers(const InstanceDataReallocInfo *reallocInfo)

@@ -76,6 +76,7 @@ MapMaterial *LoadMapMaterial(const char *path)
 	EXPECT_BYTES(2, bytesRemaining);
 	material->shader = ReadUint8(reader);
 	material->soundClass = ReadUint8(reader);
+	material->castsShadows = ReadUint8(reader) != 0;
 
 	material->id = mapMaterialId;
 

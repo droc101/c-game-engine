@@ -83,6 +83,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		mat->color.b = ReadFloat(reader);
 		mat->color.a = ReadFloat(reader);
 		mat->shader = ReadUint32(reader);
+		mat->castsShadows = ReadUint8(reader) != 0;
 	}
 
 	model->skinMaterialIndices = malloc(sizeof(uint32_t *) * model->skinCount);

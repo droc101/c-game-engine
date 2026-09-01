@@ -59,7 +59,7 @@ uint GetCount() {
     return 0;
 }
 
-bool IsVisible(const vec3 position, const float radius, const uint frustumIndex) {
+bool IsVisible(const vec3 position, const float radius, const uint castsShadows, const uint frustumIndex) {
     // TODO: Use the frustum information from index 0 and remove the frustum information from the camera
     if (frustumIndex == 0) {
         const vec3 center = (camera.viewMatrix * vec4(position, 1)).xyz;
@@ -68,6 +68,9 @@ bool IsVisible(const vec3 position, const float radius, const uint frustumIndex)
                center.z * camera.frustumPlanes[3] - abs(center.y) * camera.frustumPlanes[2] > -radius;
     }
 
+    if (castsShadows == 0) {
+        return false;
+    }
     const Frustum frustum = cullingData.frustums[frustumIndex].frustum;
     const vec3 center = (frustum.viewMatrix * vec4(position, 1)).xyz;
     return center.z + radius > frustum.nearPlane && center.z - radius < frustum.farPlane &&
@@ -84,7 +87,7 @@ void CullMapModel(const uint index, const uint bufferIndex, const uint frustumIn
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].shadedOpaqueMapModelsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 DrawIndexedIndirectCountBuffer drawInfo = cullingData.frustums[frustumIndex].shadedOpaqueMapModelsOutputDrawInfo;
                 const uint drawIndex = atomicAdd(drawInfo.count, 1);
                 drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].shadedOpaqueMapModelsUnculledDrawInfo.drawInfos[index];
@@ -96,7 +99,7 @@ void CullMapModel(const uint index, const uint bufferIndex, const uint frustumIn
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 DrawIndexedIndirectCountBuffer drawInfo = cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsOutputDrawInfo;
                 const uint drawIndex = atomicAdd(drawInfo.count, 1);
                 drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsUnculledDrawInfo.drawInfos[index];
@@ -108,7 +111,7 @@ void CullMapModel(const uint index, const uint bufferIndex, const uint frustumIn
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].shadedMapModelsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 DrawIndexedIndirectCountBuffer drawInfo = cullingData.frustums[frustumIndex].shadedMapModelsOutputDrawInfo;
                 const uint drawIndex = atomicAdd(drawInfo.count, 1);
                 drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].shadedMapModelsUnculledDrawInfo.drawInfos[index];
@@ -120,7 +123,7 @@ void CullMapModel(const uint index, const uint bufferIndex, const uint frustumIn
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].unshadedMapModelsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 DrawIndexedIndirectCountBuffer drawInfo = cullingData.frustums[frustumIndex].unshadedMapModelsOutputDrawInfo;
                 const uint drawIndex = atomicAdd(drawInfo.count, 1);
                 drawInfo.drawInfos[drawIndex] = cullingData.frustums[frustumIndex].unshadedMapModelsUnculledDrawInfo.drawInfos[index];
@@ -140,7 +143,7 @@ void CullWallActor(const uint index, const uint bufferIndex, const uint frustumI
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].shadedActorWallsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 const uint drawIndex = atomicAdd(cullingData.frustums[frustumIndex].shadedActorWallsDrawInfo.instanceCount, 1);
                 cullingData.frustums[frustumIndex].shadedActorWallsInstanceIndices.indices[drawIndex] = index;
             }
@@ -151,7 +154,7 @@ void CullWallActor(const uint index, const uint bufferIndex, const uint frustumI
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].unshadedActorWallsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 const uint drawIndex = atomicAdd(cullingData.frustums[frustumIndex].unshadedActorWallsDrawInfo.instanceCount, 1);
                 const uint shadedInstanceCount = cullingData.frustums[frustumIndex].shadedActorWallsCullingInfo.count;
                 cullingData.frustums[frustumIndex].unshadedActorWallsInstanceIndices.indices[drawIndex] = index + shadedInstanceCount;
@@ -171,7 +174,7 @@ void CullModelActor(const uint index, const uint bufferIndex, const uint frustum
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].shadedActorModelsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 DrawIndexedIndirectBuffer drawInfoBuffer = cullingData.frustums[frustumIndex].shadedActorModelsDrawInfo;
                 const uint drawIndex = atomicAdd(drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].instanceCount, 1);
                 const uint firstInstance = drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].firstInstance;
@@ -185,7 +188,7 @@ void CullModelActor(const uint index, const uint bufferIndex, const uint frustum
                 return;
             }
             cullingInfo = cullingData.frustums[frustumIndex].unshadedActorModelsCullingInfo.cullingInfos[index];
-            if (IsVisible(cullingInfo.position, cullingInfo.radius, frustumIndex)) {
+            if (IsVisible(cullingInfo.position, cullingInfo.radius, cullingInfo.castsShadows, frustumIndex)) {
                 DrawIndexedIndirectBuffer drawInfoBuffer = cullingData.frustums[frustumIndex].unshadedActorModelsDrawInfo;
                 const uint drawIndex = atomicAdd(drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].instanceCount, 1);
                 const uint firstInstance = drawInfoBuffer.drawInfos[cullingInfo.drawInfoIndex].firstInstance;

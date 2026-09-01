@@ -60,6 +60,8 @@ struct Material
 	Color color;
 	/// The shader to use for this material
 	ModelShader shader;
+	/// If this material should cast shadows or not
+	bool castsShadows;
 };
 
 struct ModelVertex
