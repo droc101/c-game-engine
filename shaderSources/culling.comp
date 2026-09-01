@@ -1,6 +1,6 @@
 #version 460
 
-#include "shared.inc.glsl"
+#include "include/shared.inc.glsl"
 
 const uint SHADED_OPAQUE_MAP_MODELS_INDEX = 0;
 const uint UNSHADED_OPAQUE_MAP_MODELS_INDEX = 1;

@@ -1,6 +1,6 @@
 #version 460
 
-#include "shadow_maps_shared.inc.glsl"
+#include "../../include/shadow_maps_shared.inc.glsl"
 
 layout(binding = 7, scalar) readonly restrict buffer InstanceData {
     ActorModelInstanceData instanceDatas[];
@@ -13,23 +13,23 @@ layout(location = 3) in uint inInstanceIndex;
 
 layout(location = 0, component = 0) out vec2 outUv;
 layout(location = 0, component = 3) out float outAlpha;
-layout(location = 1) out vec3 outPosition;
-layout(location = 2) flat out uint outTextureIndex;
+layout(location = 1) flat out uint outTextureIndex;
 
 void main() {
     const ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
-	const vec4 transformedPosition = instanceData.transformMatrix * vec4(inPosition, 1);
     outUv = inUV;
 	outAlpha = inColor.a * instanceData.materialColor.a * instanceData.modColor.a;
-	outPosition = transformedPosition.xyz;
     outTextureIndex = instanceData.textureIndex;
+	const vec4 transformedPosition = instanceData.transformMatrix * vec4(inPosition, 1);
 	if (pushConstants.lightType == LIGHT_TYPE_POINT) {
-        const vec3 lightToWorld = outPosition - lightsData.lights[pushConstants.lightIndex].transform.position;
+        const vec3 lightToWorld = transformedPosition.xyz - lightsData.lights[pushConstants.lightIndex].transform.position;
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (pointLightViewMatrices[pushConstants.faceIndex] * vec4(lightToWorld, 1));
 	} else if (pushConstants.lightType == LIGHT_TYPE_SPOT) {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * transformedPosition;
-	} else {
+	} else if (pushConstants.lightType == LIGHT_TYPE_DIRECTIONAL) {
         gl_Position = lightsData.cascadeMatrices[pushConstants.cascadeIndex] * transformedPosition;
 		gl_Position.z = min(gl_Position.z, 1);
-    }
+    } else {
+		gl_Position = camera.transformMatrix * transformedPosition;
+	}
 }

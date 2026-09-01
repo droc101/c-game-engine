@@ -1,6 +1,6 @@
 #version 460
 
-#include "shared.inc.glsl"
+#include "../../include/shared.inc.glsl"
 
 layout(binding = 7, scalar) readonly restrict buffer InstanceData {
     ActorModelInstanceData instanceDatas[];

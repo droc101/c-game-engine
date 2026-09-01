@@ -369,15 +369,13 @@ typedef struct Buffers
 #endif
 } Buffers;
 
-typedef struct ShadowMapPipelines
+typedef struct DepthPipelines
 {
 	LunaGraphicsPipeline opaqueMap;
-	LunaGraphicsPipeline opaqueModelActors;
-	LunaGraphicsPipeline opaqueWallActors;
 	LunaGraphicsPipeline map;
 	LunaGraphicsPipeline modelActors;
 	LunaGraphicsPipeline wallActors;
-} ShadowMapPipelines;
+} DepthPipelines;
 
 typedef struct DirectionalShadowMapPipelines
 {
@@ -393,6 +391,8 @@ typedef struct Pipelines
 	LunaComputePipeline clearCullingData;
 
 	LunaGraphicsPipeline ui;
+	DepthPipelines depthPrepass;
+	LunaGraphicsPipeline opaqueShadedMap;
 	LunaGraphicsPipeline shadedMap;
 	LunaGraphicsPipeline unshadedMap;
 	LunaGraphicsPipeline sky;
@@ -402,7 +402,7 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorModel;
 	LunaGraphicsPipeline shadedActorWall;
 	LunaGraphicsPipeline unshadedActorWall;
-	ShadowMapPipelines shadowMaps;
+	DepthPipelines shadowMaps;
 	DirectionalShadowMapPipelines directionalLightShadowMaps;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
@@ -423,7 +423,7 @@ typedef struct TextureSamplers
 
 typedef struct ShadowMapPushConstants
 {
-	LightType lightType;
+	uint32_t lightType;
 	uint32_t lightIndex;
 	uint32_t faceIndex;
 	uint32_t cascadeIndex;
@@ -520,7 +520,7 @@ uint32_t ShadowMapResolution(LightType type);
 
 VkResult CreateShadowMapRenderPass(const Map *map);
 
-VkResult CreateShadowMapGraphicsPipelines();
+VkResult CreateDepthGraphicsPipelines(void);
 
 VkResult UpdateCameraUniform(Camera *camera);
 

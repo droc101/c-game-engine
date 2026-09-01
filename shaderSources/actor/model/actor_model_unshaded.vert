@@ -1,6 +1,6 @@
 #version 460
 
-#include "shared.inc.glsl"
+#include "../../include/shared.inc.glsl"
 
 layout(binding = 7, scalar) readonly restrict buffer InstanceData {
     ActorModelInstanceData instanceDatas[];
@@ -20,5 +20,5 @@ void main() {
     outColor = inColor * instanceData.materialColor * instanceData.modColor;
     outUV = inUV;
     outTextureIndex = instanceData.textureIndex;
-    gl_Position = camera.transformMatrix * instanceData.transformMatrix * vec4(inPosition, 1);
+    gl_Position = camera.transformMatrix * (instanceData.transformMatrix * vec4(inPosition, 1));
 }

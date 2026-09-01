@@ -13,7 +13,6 @@ struct Transform {
 
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;
-const uint LIGHT_TYPE_AREA = 2u;
 const uint LIGHT_TYPE_DIRECTIONAL = 3u;
 
 struct Light {

@@ -264,17 +264,44 @@ bool CreateRenderPass()
 					"A fallback has been set to avoid issues.");
 	}
 
-	const LunaSubpassCreationInfo subpassCreationInfo = {
-		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-		.useColorAttachment = true,
-		.useDepthAttachment = true,
+	const LunaSubpassCreationInfo subpasses[] = {
+		{
+			.name = "Depth Prepass",
+			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+			.useDepthAttachment = true,
+		},
+		{
+			.name = "Main Pass",
+			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+			.useColorAttachment = true,
+			.useDepthAttachment = true,
+		},
 	};
-	VkSubpassDependency dependency = {
-		.srcSubpass = VK_SUBPASS_EXTERNAL,
-		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-		.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	VkSubpassDependency dependencies[] = {
+		{
+			.srcSubpass = VK_SUBPASS_EXTERNAL,
+			.dstSubpass = 0,
+			.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+			.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		},
+		{
+			.srcSubpass = 0,
+			.dstSubpass = 1,
+			.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+			.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		},
+		{
+			.srcSubpass = VK_SUBPASS_EXTERNAL,
+			.dstSubpass = 1,
+			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		},
 	};
 	SDL_Rect bounds;
 	if (!SDL_GetDisplayBounds(SDL_GetDisplayForWindow(vulkanWindow), &bounds))
@@ -289,10 +316,10 @@ bool CreateRenderPass()
 		.colorAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_MODE_CLEAR,
 		.createDepthAttachment = true,
 		.depthAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_MODE_CLEAR,
-		.subpassCount = 1,
-		.subpasses = &subpassCreationInfo,
-		.dependencyCount = 1,
-		.dependencies = &dependency,
+		.subpassCount = sizeof(subpasses) / sizeof(*subpasses),
+		.subpasses = subpasses,
+		.dependencyCount = sizeof(dependencies) / sizeof(*dependencies),
+		.dependencies = dependencies,
 		.extent = (VkExtent3D){.width = extent.width, .height = extent.height, .depth = 1},
 		.maxExtent = (VkExtent3D){.width = bounds.w, .height = bounds.h, .depth = 1},
 

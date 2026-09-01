@@ -1,6 +1,6 @@
 #version 460
 
-#include "lighting.inc.glsl"
+#include "../include/lighting.inc.glsl"
 
 layout(set = 0, binding = 0) uniform sampler2D lightmap;
 layout(set = 0, binding = 1) uniform sampler2D textureSampler[];
@@ -76,10 +76,6 @@ vec4 sampleLightmap(const sampler2D lightmap, const vec2 original_uv){
 
 void main() {
     outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
-    float fade = clamp(outColor.a, 0.0, 1.0);
-    if (fade < 0.001 || fade < fract(MAGIC_Z * fract(dot(gl_FragCoord.xy, MAGIC_XY)))) {
-        discard;
-    }
 	outColor.a = 1.0;
     vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));// + sampleLightmap(lightmap, inLightmapUV).rgb;
 	float fogFactor = clamp((gl_FragCoord.z / gl_FragCoord.w - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;

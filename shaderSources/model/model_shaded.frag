@@ -1,6 +1,6 @@
 #version 460
 
-#include "lighting.inc.glsl"
+#include "../include/lighting.inc.glsl"
 
 layout(set = 0, binding = 1) uniform sampler2D textureSampler[];
 

@@ -957,11 +957,7 @@ static inline VkResult LoadLights(const Map *map)
 static inline VkResult CreateShadowMaps(const Map *map)
 {
 	VulkanTestReturnResult(CreateShadowMapRenderPass(map), "Failed to create shadow map render pass!");
-	if (shadowMapRenderPass == VK_NULL_HANDLE)
-	{
-		return VK_SUCCESS;
-	}
-	VulkanTestReturnResult(CreateShadowMapGraphicsPipelines(), "Failed to create shadow map graphics pipelines!");
+	VulkanTestReturnResult(CreateDepthGraphicsPipelines(), "Failed to create shadow map graphics pipelines!");
 
 	return VK_SUCCESS;
 }
@@ -1109,10 +1105,30 @@ static inline VkResult DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 
 static inline VkResult DrawMap(const uint32_t frustumIndex,
 							   const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
+							   const bool depthPrepass,
 							   const LunaGraphicsPipeline opaqueShadowMapsPipeline,
 							   const LunaGraphicsPipeline shadowMapsPipeline)
 {
-	if (shadowMapsPipeline != LUNA_NULL_HANDLE)
+	if (depthPrepass)
+	{
+		shadowMapPushConstants.lightType = -1u;
+		VulkanTestReturnResult(DrawMapModelsBuffer(&buffers.opaqueMap,
+												   0,
+												   pipelines.depthPrepass.opaqueMap,
+												   pipelines.depthPrepass.opaqueMap,
+												   pipelineBindInfo,
+												   true,
+												   "opaque map"),
+							   "Failed to draw opaque map!");
+		VulkanTestReturnResult(DrawMapModelsBuffer(&buffers.map,
+												   0,
+												   pipelines.depthPrepass.map,
+												   pipelines.depthPrepass.map,
+												   pipelineBindInfo,
+												   true,
+												   "map"),
+							   "Failed to draw map!");
+	} else if (shadowMapsPipeline != LUNA_NULL_HANDLE)
 	{
 		VulkanTestReturnResult(DrawMapModelsBuffer(&buffers.opaqueMap,
 												   frustumIndex,
@@ -1480,6 +1496,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 			VulkanTestReturnResult(DrawMap(frustumIndex,
 										   &pipelineBindInfo,
+										   false,
 										   pipelines.shadowMaps.opaqueMap,
 										   pipelines.shadowMaps.map),
 								   "Failed to draw map!");
@@ -1512,11 +1529,13 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 				VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
 											   &pipelineBindInfo,
+											   false,
 											   pipelines.directionalLightShadowMaps.mapFrontFaces,
 											   pipelines.directionalLightShadowMaps.mapFrontFaces),
 									   "Failed to draw map front faces!");
 				VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
 											   &pipelineBindInfo,
+											   false,
 											   pipelines.directionalLightShadowMaps.mapBackFaces,
 											   pipelines.directionalLightShadowMaps.mapBackFaces),
 									   "Failed to draw map back faces!");
@@ -1549,6 +1568,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 
 				VulkanTestReturnResult(DrawMap(frustumIndex,
 											   &pipelineBindInfo,
+											   false,
 											   pipelines.shadowMaps.opaqueMap,
 											   pipelines.shadowMaps.map),
 									   "Failed to draw map!");
@@ -1735,7 +1755,7 @@ static inline bool HandleRendererQueuedActions()
 		{
 			return false;
 		}
-		VulkanTest(CreateShadowMapGraphicsPipelines(), "Failed to create shadow map graphics pipelines");
+		VulkanTest(CreateDepthGraphicsPipelines(), "Failed to create shadow map graphics pipelines");
 
 		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_SHADERS;
 	}
@@ -1957,11 +1977,26 @@ bool VK_RenderMap(Map *map, Camera *camera)
 		.dynamicStates = dynamicStateBindInfos,
 	};
 
+	const LunaGraphicsPipelineBindInfo prepassPipelineBindInfo = {
+		.descriptorSetBindInfo.descriptorSetCount = 1,
+		.descriptorSetBindInfo.descriptorSets = &descriptorSets.common.set,
+		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+		.dynamicStates = dynamicStateBindInfos,
+	};
+	VulkanTest(DrawMap(0, &prepassPipelineBindInfo, true, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE),
+			   "Failed to draw map depth prepass!");
+	VulkanTest(DrawActors(0,
+						  &prepassPipelineBindInfo,
+						  pipelines.depthPrepass.modelActors,
+						  pipelines.depthPrepass.wallActors),
+			   "Failed to draw actors depth prepass!");
+	lunaNextSubpass(commandBuffer);
+
 	if (map->renderSky)
 	{
 		VulkanTest(DrawSky(&pipelineBindInfo), "Failed to draw sky!");
 	}
-	VulkanTest(DrawMap(0, &pipelineBindInfo, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE), "Failed to draw map!");
+	VulkanTest(DrawMap(0, &pipelineBindInfo, false, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE), "Failed to draw map!");
 	VulkanTest(DrawActors(0, &pipelineBindInfo, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE), "Failed to draw actors!");
 	VulkanTest(DrawDebugRenderer(&pipelineBindInfo), "Failed to draw Jolt debug renderer!");
 	if (camera->showPlayerModel)
@@ -2022,6 +2057,7 @@ bool VK_FrameEnd()
 			.depthAttachmentClearValue.depthStencil.depth = 1,
 		};
 		VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
+		lunaNextSubpass(commandBuffer); // Skip the depth prepass since we aren't using depth anyway
 	}
 
 	if (buffers.ui.freeQuads != buffers.ui.allocatedQuads)

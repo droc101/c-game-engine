@@ -1,6 +1,6 @@
 #version 460
 
-#include "shared.inc.glsl"
+#include "include/shared.inc.glsl"
 
 layout(location = 0) in vec3 inVertex;
 layout(location = 1) in vec4 inColor;
