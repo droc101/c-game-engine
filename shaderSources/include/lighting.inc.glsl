@@ -109,7 +109,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
-                const float scale = max(max(abs(lightToWorld.x), abs(lightToWorld.y)), abs(lightToWorld.z));
+                const float scale = max(max(abs(lightToWorld.x), abs(lightToWorld.y)), abs(lightToWorld.z)) - 0.01;
                 const float comparisonDepth = lightsData.lights[i].transformMatrix[2][2] + lightsData.lights[i].transformMatrix[3][2] / scale;
                 const float factor = texture(pointLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], vec4(lightToWorld, comparisonDepth));
                 if (factor < 1e-6) {

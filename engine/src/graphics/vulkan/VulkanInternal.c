@@ -219,11 +219,7 @@ bool CreateSwapchain()
 
 bool CreateRenderPass()
 {
-	// TODO: Once Luna supports it, prefer using VK_FORMAT_D32_SFLOAT
-	//  Also ensure that that is the best format for all drivers, not just for NVIDIA
-	VulkanTest(lunaSetDepthImageFormat(device,
-									   2,
-									   (VkFormat[]){VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT_S8_UINT}),
+	VulkanTest(lunaSetDepthImageFormat(device, 2, (VkFormat[]){VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT}),
 			   "Failed to set depth image format!");
 
 	switch (GetState()->options.msaa)

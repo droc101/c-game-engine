@@ -1679,7 +1679,8 @@ VkResult CreateDepthGraphicsPipelines(void)
 
 	VulkanTestReturnResult(CreateOpaqueMapDepthPipelines(shadowMapRenderPass != VK_NULL_HANDLE),
 						   "Failed to create map shadow maps pipeline!");
-	VulkanTestReturnResult(CreateMapShadowMapPipeline(shadowMapRenderPass != VK_NULL_HANDLE), "Failed to create map shadow maps pipeline!");
+	VulkanTestReturnResult(CreateMapShadowMapPipeline(shadowMapRenderPass != VK_NULL_HANDLE),
+						   "Failed to create map shadow maps pipeline!");
 	VulkanTestReturnResult(CreateModelActorDepthPipelines(shadowMapRenderPass != VK_NULL_HANDLE),
 						   "Failed to create model actor shadow maps pipeline!");
 	VulkanTestReturnResult(CreateWallActorDepthPipelines(shadowMapRenderPass != VK_NULL_HANDLE),
