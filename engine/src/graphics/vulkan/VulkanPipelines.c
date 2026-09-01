@@ -251,9 +251,9 @@ static inline bool CreateShadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
 	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("map_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("map/shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded map vertex shader!");
-	VulkanTest(CreateShaderModule(SHADER("map_shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("map/shaded_f"), SHADER_TYPE_FRAG, &fragShaderModule),
 			   "Failed to load shaded map fragment shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -345,7 +345,7 @@ static inline bool CreateShadedMapPipeline()
 static inline bool CreateUnshadedMapPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("map_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("map/unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load unshaded map vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -511,7 +511,7 @@ static inline bool CreateShadedModelPipeline()
 				  offsetof(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, materialColor));
 
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("model/shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -633,7 +633,7 @@ static inline bool CreateShadedModelPipeline()
 static inline bool CreateUnshadedModelPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("model/unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load unshaded model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -748,7 +748,7 @@ static inline bool CreateUnshadedModelPipeline()
 static inline bool CreateShadedActorModelPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("actor_model_shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("actor/model/shaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load shaded actor model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -839,7 +839,7 @@ static inline bool CreateShadedActorModelPipeline()
 static inline bool CreateUnshadedActorModelPipeline()
 {
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("actor_model_unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("actor/model/unshaded_v"), SHADER_TYPE_VERT, &vertShaderModule),
 			   "Failed to load unshaded actor model vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -923,10 +923,10 @@ static inline bool CreateUnshadedActorModelPipeline()
 static inline bool CreateActorWallPipelines()
 {
 	LunaShaderModule shadedVertModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("actor_wall_shaded_v"), SHADER_TYPE_VERT, &shadedVertModule),
+	VulkanTest(CreateShaderModule(SHADER("actor/wall/shaded_v"), SHADER_TYPE_VERT, &shadedVertModule),
 			   "Failed to load shaded actor wall vertex shader!");
 	LunaShaderModule unshadedVertModule = LUNA_NULL_HANDLE;
-	VulkanTest(CreateShaderModule(SHADER("actor_wall_unshaded_v"), SHADER_TYPE_VERT, &unshadedVertModule),
+	VulkanTest(CreateShaderModule(SHADER("actor/wall/unshaded_v"), SHADER_TYPE_VERT, &unshadedVertModule),
 			   "Failed to load unshaded actor wall vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shadedShaderStages[] = {
@@ -1140,7 +1140,9 @@ static inline VkResult CreateOpaqueMapDepthPipelines(const bool shadowMaps)
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
-	VulkanTestReturnResult(CreateShaderModule(SHADER("map_opaque_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
+	VulkanTestReturnResult(CreateShaderModule(SHADER("map/opaque_materials_depth_only_v"),
+											  SHADER_TYPE_VERT,
+											  &shaderModule),
 						   "Failed to load opaque map shadow maps vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -1230,7 +1232,7 @@ static inline VkResult CreateMapShadowMapPipeline(const bool shadowMaps)
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
-	VulkanTestReturnResult(CreateShaderModule(SHADER("map_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
+	VulkanTestReturnResult(CreateShaderModule(SHADER("map/depth_only_v"), SHADER_TYPE_VERT, &shaderModule),
 						   "Failed to load map shadow maps vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -1371,7 +1373,7 @@ static inline VkResult CreateModelActorDepthPipelines(const bool shadowMaps)
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
-	VulkanTestReturnResult(CreateShaderModule(SHADER("actor_model_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
+	VulkanTestReturnResult(CreateShaderModule(SHADER("actor/model/depth_only_v"), SHADER_TYPE_VERT, &shaderModule),
 						   "Failed to load model actor shadow maps vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -1492,7 +1494,7 @@ static inline VkResult CreateWallActorDepthPipelines(const bool shadowMaps)
 	}
 
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
-	VulkanTestReturnResult(CreateShaderModule(SHADER("actor_wall_shadow_maps_v"), SHADER_TYPE_VERT, &shaderModule),
+	VulkanTestReturnResult(CreateShaderModule(SHADER("actor/wall/depth_only_v"), SHADER_TYPE_VERT, &shaderModule),
 						   "Failed to load wall actor shadow maps vertex shader!");
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
@@ -1652,9 +1654,9 @@ bool CreateGraphicsPipelines()
 	descriptorSetLayouts[1] = descriptorSets.spotLightShadowMaps.layout;
 	descriptorSetLayouts[2] = descriptorSets.pointLightShadowMaps.layout;
 
-	VulkanTest(CreateShaderModule(SHADER("model_shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("model/shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
 			   "Failed to load shaded model fragment shader!");
-	VulkanTest(CreateShaderModule(SHADER("model_unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule),
+	VulkanTest(CreateShaderModule(SHADER("model/unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule),
 			   "Failed to load unshaded model fragment shader!");
 
 	return CreateUIPipeline() &&
@@ -1674,7 +1676,7 @@ VkResult CreateDepthGraphicsPipelines(void)
 	shadowMapPushConstantRange.dataPointer = &shadowMapPushConstants;
 	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
 
-	VulkanTestReturnResult(CreateShaderModule(SHADER("shadow_maps_f"), SHADER_TYPE_FRAG, &shadowMapsFragShaderModule),
+	VulkanTestReturnResult(CreateShaderModule(SHADER("depth_only_f"), SHADER_TYPE_FRAG, &shadowMapsFragShaderModule),
 						   "Failed to load spot light shadow maps fragment shader!");
 
 	VulkanTestReturnResult(CreateOpaqueMapDepthPipelines(shadowMapRenderPass != VK_NULL_HANDLE),
