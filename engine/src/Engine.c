@@ -49,11 +49,6 @@
 #include <stdint.h>
 #include <string.h>
 
-// Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems
-// I do not know if these do anything on Linux, but they are here just in case.
-EXPORT_SYM uint32_t NvOptimusEnablement = 0x00000001;
-EXPORT_SYM int AmdPowerXpressRequestHighPerformance = 1;
-
 static SDL_Surface *windowIcon;
 static SDL_Event event;
 static bool shouldQuit = false;
