@@ -99,7 +99,7 @@ bool LoadImageFromAsset(const Asset *asset, Image *image)
 				 TEXTURE_ASSET_VERSION);
 		return false;
 	}
-	const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 4);
+	const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 5);
 	if (asset->size < headerSize)
 	{
 		LogError("Failed to load texture asset as it was the wrong size.\n");
