@@ -2342,39 +2342,34 @@ void VK_DrawTexturedQuadsBatched(const float *vertices, const int32_t quadCount,
 	}
 }
 
-void VK_DrawLine(const int32_t startX,
-				 const int32_t startY,
-				 const int32_t endX,
-				 const int32_t endY,
-				 const int32_t thickness,
-				 const Color color)
+void VK_DrawLine(const Vector2 start, const Vector2 end, const float thickness, const Color color)
 {
-	const float dx = (float)endX - (float)startX;
-	const float dy = (float)endY - (float)startY;
+	const float dx = end.x - start.x;
+	const float dy = end.y - start.y;
 	const float distance = 2.0f * sqrtf(dx * dx + dy * dy);
 
 	const mat4 matrix = {
 		{
-			VK_X_TO_NDC(-thickness * dy / distance + (float)startX),
-			VK_Y_TO_NDC(thickness * dx / distance + (float)startY),
+			VK_X_TO_NDC(-thickness * dy / distance + start.x),
+			VK_Y_TO_NDC(thickness * dx / distance + start.y),
 			0,
 			0,
 		},
 		{
-			VK_X_TO_NDC(-thickness * dy / distance + (float)endX),
-			VK_Y_TO_NDC(thickness * dx / distance + (float)endY),
+			VK_X_TO_NDC(-thickness * dy / distance + end.x),
+			VK_Y_TO_NDC(thickness * dx / distance + end.y),
 			0,
 			0,
 		},
 		{
-			VK_X_TO_NDC(thickness * dy / distance + (float)endX),
-			VK_Y_TO_NDC(-thickness * dx / distance + (float)endY),
+			VK_X_TO_NDC(thickness * dy / distance + end.x),
+			VK_Y_TO_NDC(-thickness * dx / distance + end.y),
 			0,
 			0,
 		},
 		{
-			VK_X_TO_NDC(thickness * dy / distance + (float)startX),
-			VK_Y_TO_NDC(-thickness * dx / distance + (float)startY),
+			VK_X_TO_NDC(thickness * dy / distance + start.x),
+			VK_Y_TO_NDC(-thickness * dx / distance + start.y),
 			0,
 			0,
 		},
@@ -2382,17 +2377,19 @@ void VK_DrawLine(const int32_t startX,
 	DrawQuadInternal(matrix, &color, -1);
 }
 
-void VK_DrawRectOutline(const int32_t x,
-						const int32_t y,
-						const int32_t w,
-						const int32_t h,
-						const int32_t thickness,
-						const Color color)
+void VK_DrawRectOutline(const Vector2 position, const Vector2 size, const float thickness, const Color color)
 {
-	VK_DrawLine(x, y, x + w, y, thickness, color);
-	VK_DrawLine(x + w, y, x + w, y + h, thickness, color);
-	VK_DrawLine(x + w, y + h, x, y + h, thickness, color);
-	VK_DrawLine(x, y + h, x, y, thickness, color);
+	const float halfThickness = thickness / 2.0f;
+	const float left = position.x + halfThickness;
+	const float right = position.x + size.x;
+	const float top = position.y - halfThickness;
+	const float bottom = position.y + size.y;
+	const float horizontalRight = right - halfThickness;
+	const float verticalBottom = position.y + size.y + halfThickness;
+	VK_DrawLine(v2(left, position.y), v2(horizontalRight, position.y), thickness, color);
+	VK_DrawLine(v2(left, bottom), v2(horizontalRight, bottom), thickness, color);
+	VK_DrawLine(v2(position.x, top), v2(position.x, verticalBottom), thickness, color);
+	VK_DrawLine(v2(right, top), v2(right, verticalBottom), thickness, color);
 }
 
 void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, const Color color)

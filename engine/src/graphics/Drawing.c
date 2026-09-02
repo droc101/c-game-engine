@@ -52,12 +52,12 @@ SDL_Surface *ToSDLSurface(const char *texture)
 
 inline void DrawLine(const Vector2 start, const Vector2 end, const float thickness, const Color color)
 {
-	VK_DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, (int)(thickness * GetState()->uiScale), color);
+	VK_DrawLine(start, end, thickness * (float)GetState()->uiScale, color);
 }
 
 inline void DrawOutlineRect(const Vector2 pos, const Vector2 size, const float thickness, const Color color)
 {
-	VK_DrawRectOutline((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, (int)(thickness * GetState()->uiScale), color);
+	VK_DrawRectOutline(pos, size, thickness * (float)GetState()->uiScale, color);
 }
 
 inline void DrawTexture(const Vector2 pos, const Vector2 size, const char *texture)

@@ -93,9 +93,9 @@ void VK_DrawTexturedQuadRegionMod(int x,
 
 void VK_DrawTexturedQuadsBatched(const float *vertices, int quadCount, const char *texture, Color color);
 
-void VK_DrawLine(int startX, int startY, int endX, int endY, int thickness, Color color);
+void VK_DrawLine(Vector2 start, Vector2 end, float thickness, Color color);
 
-void VK_DrawRectOutline(int x, int y, int w, int h, int thickness, Color color);
+void VK_DrawRectOutline(Vector2 position, Vector2 size, float thickness, Color color);
 
 void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, Color color);
 
