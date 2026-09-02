@@ -2333,6 +2333,103 @@
                     "z": -48.0
                 }
             ]
+        },
+        {
+            "name": "",
+            "floorHeight": -16.0,
+            "ceilingHeight": -8.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/uv_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 344.0,
+                    "z": 88.0
+                },
+                {
+                    "x": 360.0,
+                    "z": 88.0
+                },
+                {
+                    "x": 360.0,
+                    "z": 104.0
+                },
+                {
+                    "x": 344.0,
+                    "z": 104.0
+                }
+            ]
         }
     ],
     "actors": [
@@ -2350,13 +2447,21 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
+                },
+                "far_plane": {
+                    "type": "float",
+                    "value": 4096.0
                 },
                 "far_z": {
                     "type": "float",
                     "value": 4096.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -2374,14 +2479,43 @@
             },
             "connections": [],
             "params": {
-                "color": {
-                    "type": "color",
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "uv_offset": {
+                    "type": "vec2",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "x": 0.0,
+                        "y": 0.0
                     }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "size": {
                     "type": "vec2",
@@ -2390,43 +2524,14 @@
                         "y": 32.0
                     }
                 },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
-                    "type": "vec2",
+                "color": {
+                    "type": "color",
                     "value": {
-                        "x": 1.0,
-                        "y": 1.0
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
                 }
             }
         },
@@ -2444,59 +2549,59 @@
             },
             "connections": [],
             "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
-                "size": {
+                "uv_offset": {
                     "type": "vec2",
                     "value": {
-                        "x": 16.0,
-                        "y": 16.0
+                        "x": 0.0,
+                        "y": 0.0
                     }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
                 },
                 "delay_until_close": {
                     "type": "float",
                     "value": 5.0
                 },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "uv_scale": {
+                "size": {
                     "type": "vec2",
                     "value": {
-                        "x": 1.0,
-                        "y": 1.0
+                        "x": 16.0,
+                        "y": 16.0
                     }
                 },
-                "uv_offset": {
-                    "type": "vec2",
+                "color": {
+                    "type": "color",
                     "value": {
-                        "x": 0.0,
-                        "y": 0.0
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
                 }
             }
         },
@@ -2514,48 +2619,9 @@
             },
             "connections": [],
             "params": {
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 16.0,
-                        "y": 16.0
-                    }
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "texture": {
+                "name": {
                     "type": "string",
-                    "value": "texture/actor/monster2.gtex"
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
+                    "value": ""
                 },
                 "uv_offset": {
                     "type": "vec2",
@@ -2564,9 +2630,48 @@
                         "y": 0.0
                     }
                 },
-                "name": {
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "texture": {
                     "type": "string",
-                    "value": ""
+                    "value": "texture/actor/monster2.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
                 }
             }
         },
@@ -2584,39 +2689,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "prop_door"
                 },
-                "text_color": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -2634,26 +2739,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "size"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -2664,9 +2752,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "size"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -2684,26 +2789,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "close delay"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -2714,9 +2802,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "close delay"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -2734,26 +2839,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "texture"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -2764,9 +2852,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "texture"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -2784,39 +2889,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "text_color": {
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "prop_button"
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -2834,33 +2939,33 @@
             },
             "connections": [],
             "params": {
-                "name": {
+                "model": {
                     "type": "string",
-                    "value": ""
+                    "value": "model/wall_button.gmdl"
                 },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
-                },
-                "on_skin": {
+                "off_skin": {
                     "type": "int",
-                    "value": 1
+                    "value": 0
                 },
                 "reset_delay_ms": {
                     "type": "int",
                     "value": 3000
                 },
-                "off_skin": {
+                "on_skin": {
                     "type": "int",
-                    "value": 0
+                    "value": 1
                 },
-                "model": {
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
+                    "value": ""
                 }
             }
         },
@@ -2878,33 +2983,33 @@
             },
             "connections": [],
             "params": {
-                "name": {
+                "model": {
                     "type": "string",
-                    "value": ""
-                },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": true
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": -1
+                    "value": "model/wall_button.gmdl"
                 },
                 "off_skin": {
                     "type": "int",
                     "value": 0
                 },
-                "model": {
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": -1
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": true
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
+                    "value": ""
                 }
             }
         },
@@ -2922,33 +3027,33 @@
             },
             "connections": [],
             "params": {
-                "name": {
+                "model": {
                     "type": "string",
-                    "value": ""
-                },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": -1
+                    "value": "model/wall_button.gmdl"
                 },
                 "off_skin": {
                     "type": "int",
                     "value": 0
                 },
-                "model": {
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": -1
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
+                    "value": ""
                 }
             }
         },
@@ -2966,13 +3071,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "toggle"
                 },
                 "text_color": {
                     "type": "color",
@@ -2983,22 +3097,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "toggle"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3016,13 +3121,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "normal"
                 },
                 "text_color": {
                     "type": "color",
@@ -3033,22 +3147,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "normal"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3066,13 +3171,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "stay pressed"
                 },
                 "text_color": {
                     "type": "color",
@@ -3083,22 +3197,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "stay pressed"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3116,39 +3221,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "text_color": {
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "camera"
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3166,25 +3271,33 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 },
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
+                },
+                "fov": {
+                    "type": "int",
+                    "value": 90
+                },
+                "show_player_model": {
+                    "type": "bool",
+                    "value": false
                 },
                 "name": {
                     "type": "string",
                     "value": "hide_player_camera"
                 },
-                "show_player_model": {
-                    "type": "bool",
-                    "value": false
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
                 },
-                "fov": {
-                    "type": "int",
-                    "value": 90
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -3202,25 +3315,33 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 },
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
                 },
-                "name": {
-                    "type": "string",
-                    "value": "fov_camera"
+                "fov": {
+                    "type": "int",
+                    "value": 30
                 },
                 "show_player_model": {
                     "type": "bool",
                     "value": true
                 },
-                "fov": {
-                    "type": "int",
-                    "value": 30
+                "name": {
+                    "type": "string",
+                    "value": "fov_camera"
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -3259,33 +3380,33 @@
                 }
             ],
             "params": {
-                "name": {
+                "model": {
                     "type": "string",
-                    "value": ""
-                },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": 3000
+                    "value": "model/wall_button.gmdl"
                 },
                 "off_skin": {
                     "type": "int",
                     "value": 0
                 },
-                "model": {
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 3000
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
+                    "value": ""
                 }
             }
         },
@@ -3324,33 +3445,33 @@
                 }
             ],
             "params": {
-                "name": {
+                "model": {
                     "type": "string",
-                    "value": ""
-                },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": 3000
+                    "value": "model/wall_button.gmdl"
                 },
                 "off_skin": {
                     "type": "int",
                     "value": 0
                 },
-                "model": {
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 3000
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
+                    "value": ""
                 }
             }
         },
@@ -3368,39 +3489,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "custom fov (30)"
                 },
-                "text_color": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3418,26 +3539,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "hide player model"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -3448,9 +3552,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "hide player model"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3468,26 +3589,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "I/O # refires"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -3498,9 +3602,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "I/O # refires"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3529,33 +3650,33 @@
                 }
             ],
             "params": {
-                "model": {
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
-                },
-                "off_skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": 100
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
+                    "value": ""
                 },
                 "start_pressed": {
                     "type": "bool",
                     "value": false
                 },
-                "name": {
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
                     "type": "string",
-                    "value": ""
+                    "value": "model/wall_button.gmdl"
                 }
             }
         },
@@ -3573,33 +3694,33 @@
             },
             "connections": [],
             "params": {
-                "category": {
-                    "type": "byte",
-                    "value": 1
-                },
-                "loops": {
-                    "type": "int",
-                    "value": 0
-                },
-                "positional": {
-                    "type": "bool",
-                    "value": false
-                },
-                "preload": {
-                    "type": "bool",
-                    "value": true
-                },
-                "sound": {
+                "name": {
                     "type": "string",
-                    "value": "sound/sfx/coincling.gsnd"
+                    "value": "coin_cling"
                 },
                 "volume": {
                     "type": "float",
                     "value": 1.0
                 },
-                "name": {
+                "sound": {
                     "type": "string",
-                    "value": "coin_cling"
+                    "value": "sound/sfx/coincling.gsnd"
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "category": {
+                    "type": "byte",
+                    "value": 1
                 }
             }
         },
@@ -3628,33 +3749,33 @@
                 }
             ],
             "params": {
-                "model": {
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
-                },
-                "off_skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": 100
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
+                    "value": ""
                 },
                 "start_pressed": {
                     "type": "bool",
                     "value": false
                 },
-                "name": {
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
                     "type": "string",
-                    "value": ""
+                    "value": "model/wall_button.gmdl"
                 }
             }
         },
@@ -3672,26 +3793,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "can fire 5 times"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -3702,9 +3806,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "can fire 5 times"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3722,26 +3843,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "unlimited"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -3752,9 +3856,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "unlimited"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3772,26 +3893,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "prop_model_physics"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -3802,9 +3906,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "prop_model_physics"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -3822,9 +3943,21 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
                 },
                 "color": {
                     "type": "color",
@@ -3835,21 +3968,9 @@
                         "a": 1.0
                     }
                 },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "name": {
-                    "type": "string",
-                    "value": "orb"
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3867,9 +3988,21 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
                 },
                 "color": {
                     "type": "color",
@@ -3880,21 +4013,9 @@
                         "a": 1.0
                     }
                 },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "name": {
-                    "type": "string",
-                    "value": "orb"
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3912,9 +4033,21 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": false
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
                 },
                 "color": {
                     "type": "color",
@@ -3925,21 +4058,9 @@
                         "a": 1.0
                     }
                 },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "name": {
-                    "type": "string",
-                    "value": "orb"
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3957,26 +4078,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "mass override"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -3987,9 +4091,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "mass override"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4007,26 +4128,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "normal"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -4037,9 +4141,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "normal"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4057,39 +4178,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "disallow pickup"
                 },
-                "text_color": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4107,34 +4228,34 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
+                "skin": {
+                    "type": "int",
+                    "value": 0
                 },
                 "model": {
                     "type": "string",
                     "value": "model/player.gmdl"
                 },
-                "skin": {
-                    "type": "int",
-                    "value": 0
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -4152,26 +4273,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "no collision shape"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -4182,9 +4286,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "no collision shape"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4202,26 +4323,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "static collision"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -4232,9 +4336,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "static collision"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4252,9 +4373,21 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/laseremitter.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
                 },
                 "color": {
                     "type": "color",
@@ -4265,21 +4398,9 @@
                         "a": 1.0
                     }
                 },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/laseremitter.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -4297,9 +4418,21 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "color": {
                     "type": "color",
@@ -4310,21 +4443,9 @@
                         "a": 1.0
                     }
                 },
-                "mass_override": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "name": {
-                    "type": "string",
-                    "value": "orb"
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -4342,9 +4463,21 @@
             },
             "connections": [],
             "params": {
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": "orb"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
                 },
                 "color": {
                     "type": "color",
@@ -4355,21 +4488,9 @@
                         "a": 0.501960813999176
                     }
                 },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "name": {
-                    "type": "string",
-                    "value": "orb"
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -4387,13 +4508,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "color"
                 },
                 "text_color": {
                     "type": "color",
@@ -4404,22 +4534,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "color"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4437,13 +4558,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "skin"
                 },
                 "text_color": {
                     "type": "color",
@@ -4454,22 +4584,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "skin"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4487,17 +4608,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4515,17 +4636,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 2
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 2
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4543,17 +4664,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4571,17 +4692,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 0
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 0
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4599,13 +4720,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "prop_laser_emitter"
                 },
                 "text_color": {
                     "type": "color",
@@ -4616,22 +4746,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "prop_laser_emitter"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4649,43 +4770,6 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/level/wall_test.gtex"
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": true
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 48.0,
-                        "y": 16.0
-                    }
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -4694,6 +4778,43 @@
                         "b": 1.0,
                         "a": 0.7843137383460999
                     }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 48.0,
+                        "y": 16.0
+                    }
+                },
+                "solid": {
+                    "type": "bool",
+                    "value": true
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/wall_test.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4711,39 +4832,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "text_color": {
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "solid w/o ACTOR_FLAG_CAN_BLOCK_LASERS"
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4761,51 +4882,6 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 16.0,
-                        "y": 16.0
-                    }
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -4814,6 +4890,51 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4831,51 +4952,6 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": false
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 16.0,
-                        "y": 16.0
-                    }
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -4884,6 +4960,51 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
+                },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": false
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -4901,39 +5022,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "text_color": {
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "prevent player open"
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -4951,13 +5072,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "stay open"
                 },
                 "text_color": {
                     "type": "color",
@@ -4968,22 +5098,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "stay open"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5001,13 +5122,22 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
                 },
-                "name": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "invisible but solid"
                 },
                 "text_color": {
                     "type": "color",
@@ -5018,22 +5148,13 @@
                         "a": 1.0
                     }
                 },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "invisible but solid"
+                    "value": ""
                 },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5051,39 +5172,39 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
-                "background_color": {
+                "text_color": {
                     "type": "color",
                     "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
                 },
                 "text": {
                     "type": "string",
                     "value": "sound_player"
                 },
-                "text_color": {
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
                     "type": "color",
                     "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5101,33 +5222,33 @@
             },
             "connections": [],
             "params": {
-                "category": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": "looping_sound"
                 },
-                "loops": {
-                    "type": "int",
-                    "value": 5
-                },
-                "positional": {
-                    "type": "bool",
-                    "value": false
-                },
-                "preload": {
-                    "type": "bool",
-                    "value": true
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
                 },
                 "sound": {
                     "type": "string",
                     "value": "sound/sfx/popup.gsnd"
                 },
-                "volume": {
-                    "type": "float",
-                    "value": 1.0
+                "preload": {
+                    "type": "bool",
+                    "value": true
                 },
-                "name": {
-                    "type": "string",
-                    "value": "looping_sound"
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 5
+                },
+                "category": {
+                    "type": "byte",
+                    "value": 1
                 }
             }
         },
@@ -5145,33 +5266,33 @@
             },
             "connections": [],
             "params": {
-                "category": {
-                    "type": "byte",
-                    "value": 0
-                },
-                "loops": {
-                    "type": "int",
-                    "value": 0
-                },
-                "positional": {
-                    "type": "bool",
-                    "value": true
-                },
-                "preload": {
-                    "type": "bool",
-                    "value": false
-                },
-                "sound": {
+                "name": {
                     "type": "string",
-                    "value": "sound/music/field.gsnd"
+                    "value": "positional_music"
                 },
                 "volume": {
                     "type": "float",
                     "value": 1.0
                 },
-                "name": {
+                "sound": {
                     "type": "string",
-                    "value": "positional_music"
+                    "value": "sound/music/field.gsnd"
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": false
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": true
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "category": {
+                    "type": "byte",
+                    "value": 0
                 }
             }
         },
@@ -5189,26 +5310,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "loop 5 times"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -5219,9 +5323,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "loop 5 times"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5239,26 +5360,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "positional music"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -5269,9 +5373,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "positional music"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5300,33 +5421,33 @@
                 }
             ],
             "params": {
-                "model": {
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
-                },
-                "off_skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": 100
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
+                    "value": ""
                 },
                 "start_pressed": {
                     "type": "bool",
                     "value": false
                 },
-                "name": {
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
                     "type": "string",
-                    "value": ""
+                    "value": "model/wall_button.gmdl"
                 }
             }
         },
@@ -5365,33 +5486,33 @@
                 }
             ],
             "params": {
-                "model": {
+                "name": {
                     "type": "string",
-                    "value": "model/wall_button.gmdl"
-                },
-                "off_skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "reset_delay_ms": {
-                    "type": "int",
-                    "value": -1
-                },
-                "on_skin": {
-                    "type": "int",
-                    "value": 1
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": true
+                    "value": ""
                 },
                 "start_pressed": {
                     "type": "bool",
                     "value": false
                 },
-                "name": {
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": true
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": -1
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
                     "type": "string",
-                    "value": ""
+                    "value": "model/wall_button.gmdl"
                 }
             }
         },
@@ -5420,29 +5541,29 @@
                 }
             ],
             "params": {
-                "depth": {
-                    "type": "float",
-                    "value": 48.0
-                },
-                "height": {
-                    "type": "float",
-                    "value": 16.0
-                },
-                "one_shot": {
-                    "type": "bool",
-                    "value": true
-                },
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
                 "width": {
                     "type": "float",
                     "value": 32.0
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "one_shot": {
+                    "type": "bool",
+                    "value": true
+                },
+                "height": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "depth": {
+                    "type": "float",
+                    "value": 48.0
                 }
             }
         },
@@ -5481,29 +5602,29 @@
                 }
             ],
             "params": {
-                "depth": {
-                    "type": "float",
-                    "value": 48.0
-                },
-                "height": {
-                    "type": "float",
-                    "value": 16.0
-                },
-                "one_shot": {
-                    "type": "bool",
-                    "value": false
-                },
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
                 "width": {
                     "type": "float",
                     "value": 32.0
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "one_shot": {
+                    "type": "bool",
+                    "value": false
+                },
+                "height": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "depth": {
+                    "type": "float",
+                    "value": 48.0
                 }
             }
         },
@@ -5521,26 +5642,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "trigger"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -5551,9 +5655,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "trigger"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5571,26 +5692,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "one shot"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -5601,9 +5705,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "one shot"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5621,26 +5742,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "multi shot"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -5651,9 +5755,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "multi shot"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -5671,6 +5792,10 @@
             },
             "connections": [],
             "params": {
+                "brightness": {
+                    "type": "float",
+                    "value": 0.5
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5679,10 +5804,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 0.5
                 }
             }
         },
@@ -5700,6 +5821,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5708,34 +5857,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -5753,6 +5874,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5761,34 +5910,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -5806,6 +5927,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5814,34 +5963,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -5859,6 +5980,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5867,34 +6016,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -5912,6 +6033,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5920,34 +6069,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -5965,6 +6086,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -5973,34 +6122,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -6018,6 +6139,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6026,34 +6175,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -6071,6 +6192,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6079,34 +6228,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -6124,6 +6245,26 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6132,26 +6273,6 @@
                         "b": 0.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 8.0
                 }
             }
         },
@@ -6169,6 +6290,26 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6177,26 +6318,6 @@
                         "b": 0.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 8.0
                 }
             }
         },
@@ -6214,6 +6335,26 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6222,26 +6363,6 @@
                         "b": 0.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 8.0
                 }
             }
         },
@@ -6259,6 +6380,26 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6267,26 +6408,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 8.0
                 }
             }
         },
@@ -6304,6 +6425,26 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6312,26 +6453,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 8.0
                 }
             }
         },
@@ -6349,6 +6470,26 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6357,26 +6498,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 8.0
                 }
             }
         },
@@ -6394,6 +6515,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6402,34 +6551,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -6447,6 +6568,34 @@
             },
             "connections": [],
             "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -6455,34 +6604,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 3.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "constant_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "fading_angle": {
-                    "type": "float",
-                    "value": 60.0
-                },
-                "bright_angle": {
-                    "type": "float",
-                    "value": 45.0
                 }
             }
         },
@@ -6500,26 +6621,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "materials"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -6530,9 +6634,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "materials"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -6550,26 +6671,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "translucent"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -6580,9 +6684,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "translucent"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -6600,26 +6721,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "valid material, missing texture"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -6630,9 +6734,26 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "valid material, missing texture"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
@@ -6650,26 +6771,9 @@
             },
             "connections": [],
             "params": {
-                "visible_distance": {
-                    "type": "float",
-                    "value": 80.0
-                },
-                "background_color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.0,
-                        "g": 0.0,
-                        "b": 0.0,
-                        "a": 0.501960813999176
-                    }
-                },
-                "font_size": {
-                    "type": "int",
-                    "value": 16
-                },
-                "text": {
+                "name": {
                     "type": "string",
-                    "value": "missing material"
+                    "value": ""
                 },
                 "text_color": {
                     "type": "color",
@@ -6680,18 +6784,35 @@
                         "a": 1.0
                     }
                 },
-                "name": {
+                "text": {
                     "type": "string",
-                    "value": ""
+                    "value": "missing material"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         },
         {
             "class": "prop_physbox",
             "position": {
-                "x": 384.0,
+                "x": 416.0,
                 "y": 0.0,
-                "z": 88.0
+                "z": 96.0
             },
             "rotation": {
                 "x": 0.0,
@@ -6709,9 +6830,9 @@
         {
             "class": "prop_physbox",
             "position": {
-                "x": 384.0,
+                "x": 416.0,
                 "y": 8.0,
-                "z": 88.0
+                "z": 96.0
             },
             "rotation": {
                 "x": 0.0,
@@ -6729,9 +6850,9 @@
         {
             "class": "prop_physbox",
             "position": {
-                "x": 384.0,
+                "x": 416.0,
                 "y": 16.0,
-                "z": 88.0
+                "z": 96.0
             },
             "rotation": {
                 "x": 0.0,
@@ -6743,6 +6864,269 @@
                 "name": {
                     "type": "string",
                     "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 352.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "sphere skin counter",
+                    "targetInput": "increment",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "logic_counter",
+            "position": {
+                "x": 352.0,
+                "y": 0.0,
+                "z": 76.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "sphere skin counter",
+                    "targetInput": "subtract",
+                    "sourceOutput": "hit_max",
+                    "numRefires": 0,
+                    "overridesParam": true,
+                    "param": {
+                        "type": "int",
+                        "value": 4
+                    }
+                },
+                {
+                    "targetName": "sphere",
+                    "targetInput": "set_skin",
+                    "sourceOutput": "counter_changed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "int",
+                        "value": 0
+                    }
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "sphere skin counter"
+                },
+                "min": {
+                    "type": "int",
+                    "value": 0
+                },
+                "max": {
+                    "type": "int",
+                    "value": 4
+                },
+                "counter": {
+                    "type": "int",
+                    "value": 0
+                },
+                "clamp_to_min": {
+                    "type": "bool",
+                    "value": true
+                },
+                "clamp_to_max": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_model_physics",
+            "position": {
+                "x": 352.0,
+                "y": -8.0,
+                "z": 96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "sphere"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 352.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "Cycle skin"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 384.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "Model rendering"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         }
