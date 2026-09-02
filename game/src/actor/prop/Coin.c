@@ -112,6 +112,7 @@ static void CoinInit(Actor *this, const KvList params, Transform *transform)
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = SIZE;
 	this->wall->unshaded = false;
+	this->wall->castsShadows = true;
 }
 
 ActorDefinition coinActorDefinition = {

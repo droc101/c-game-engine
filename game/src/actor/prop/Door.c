@@ -339,6 +339,7 @@ static void DoorInit(Actor *this, const KvList params, Transform *transform)
 	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
 	this->wall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->wall->unshaded = KvGetBool(params, "unshaded", false);
+	this->wall->castsShadows = true;
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 
 	CreateDoorBodies(this, transform, KvGetBool(params, "prevent_player_open", false));

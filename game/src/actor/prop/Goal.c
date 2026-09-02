@@ -98,6 +98,7 @@ static void GoalInit(Actor *this, const KvList params, Transform *transform)
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 16.0f;
 	this->wall->unshaded = false;
+	this->wall->castsShadows = true;
 
 	const Transform adjustedTransform = {
 		.position = transform->position,

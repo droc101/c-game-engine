@@ -678,7 +678,7 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 	// TODO: This does not take centerOffset into account
 	cullingInfo->position = position;
 	cullingInfo->radius = Vector2Length(actorInstanceData->scale);
-	cullingInfo->castsShadows = true;
+	cullingInfo->castsShadows = actor->wall->castsShadows;
 }
 
 static inline VkResult WriteActorModelBuffers(const InstanceDataReallocInfo *reallocInfo)
