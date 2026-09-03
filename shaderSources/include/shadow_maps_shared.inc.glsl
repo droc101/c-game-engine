@@ -2,7 +2,7 @@
 
 #include "shared.inc.glsl"
 
-layout(constant_id = 0) const uint LIGHT_COUNT = 1;
+layout(constant_id = 0) const uint MAX_LIGHT_COUNT = 1;
 
 layout(push_constant) uniform PushConstants {
     uint lightType;
@@ -14,7 +14,8 @@ layout(push_constant) uniform PushConstants {
 layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
-    Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
+    // uint lightIndices[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
+    Light lights[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
 } lightsData;
 
 const mat4 pointLightViewMatrices[6] = {

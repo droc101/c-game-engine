@@ -2,7 +2,7 @@
 
 #include "shared.inc.glsl"
 
-layout(constant_id = 0) const uint LIGHT_COUNT = 1;
+layout(constant_id = 0) const uint MAX_LIGHT_COUNT = 1;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
@@ -19,7 +19,8 @@ layout(set = 0, binding = 4, scalar) readonly restrict uniform FogBuffer {
 layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
-    Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
+    // uint lightIndices[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
+    Light lights[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
 } lightsData;
 
 layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMaps[];
@@ -59,11 +60,11 @@ float getLightBrightness(const Light light, const float distance, const float th
 }
 
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
-    if (LIGHT_COUNT == 0) {
+    if (MAX_LIGHT_COUNT == 0) {
         return vec3(1);
     }
     vec3 lightingColor = vec3(0);
-    for (uint i = 0; i < LIGHT_COUNT; i++) {
+    for (uint i = 0; i < MAX_LIGHT_COUNT; i++) {
         if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL) {
             if (cascadeIndex == 4) {
                 lightingColor += lightsData.lights[i].brightness * max(dot(lightsData.lights[i].negativeForwardDirection, normal), 0) * lightsData.lights[i].color;

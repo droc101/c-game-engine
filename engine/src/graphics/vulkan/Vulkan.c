@@ -675,17 +675,18 @@ static inline float GetMaxLightDistance(const Light *light)
 	{
 		return 0;
 	}
-	const float linearSquared = light->linearAttenuation * light->linearAttenuation;
-	const float val = 4.0f *
-					  light->quadraticAttenuation *
-					  (light->constantAttenuation - (light->brightness * 25600.0f));
-	if (val > linearSquared)
-	{
-		return 0.0f;
-	}
 
-	return (light->attenuationMultiplier * (sqrtf(linearSquared - val) - light->linearAttenuation)) /
-		   (2.0f * light->quadraticAttenuation);
+	const float a = light->quadraticAttenuation;
+	const float b = light->attenuationMultiplier * light->linearAttenuation;
+	const float c = -light->attenuationMultiplier *
+					light->attenuationMultiplier *
+					(light->brightness * 256 - light->constantAttenuation);
+	const float val = b * b - 4 * a * c;
+	if (val <= 0)
+	{
+		return 0;
+	}
+	return (sqrtf(val) - b) / (2 * a);
 }
 
 static inline VkResult CreatePerFrustumBuffers()
@@ -829,32 +830,25 @@ static inline VkResult LoadLights(const Map *map)
 				versor rotationOffset;
 				glm_quatv(rotationOffset, GLM_PIf, GLM_XUP);
 				glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
-				mat4 viewMatrix;
-				glm_quat_look(VECTOR3_TO_VEC3(light->transform.position), rotationQuat, viewMatrix);
+				glm_quat_look(VECTOR3_TO_VEC3(light->transform.position),
+							  rotationQuat,
+							  frustums[frustumIndex].viewMatrix);
 				mat4 projectionMatrix;
 				glm_perspective_lh_zo(glm_rad(2 * light->fadingAngle),
 									  1,
 									  light->maxDistance,
 									  LIGHT_NEAR_PLANE,
 									  projectionMatrix);
-				glm_mat4_mul(projectionMatrix, viewMatrix, transformMatrix);
+				glm_mat4_mul(projectionMatrix, frustums[frustumIndex].viewMatrix, transformMatrix);
 
-				mat4 transposed;
-				glm_mat4_transpose_to(projectionMatrix, transposed);
-				vec4 frustumX;
-				vec4 frustumY;
-				glm_vec4_add(transposed[3], transposed[0], frustumX);
-				glm_vec4_add(transposed[3], transposed[1], frustumY);
-				glm_plane_normalize(frustumX);
-				glm_plane_normalize(frustumY);
-
-				glm_mat4_copy(viewMatrix, frustums[frustumIndex].viewMatrix);
 				frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
 				frustums[frustumIndex].farPlane = light->maxDistance;
-				frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
-				frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
-				frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
-				frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
+				frustums[frustumIndex].frustumPlanes[1] = 1 / Vector2Length(v2(projectionMatrix[0][0], 1));
+				frustums[frustumIndex].frustumPlanes[3] = 1 / Vector2Length(v2(projectionMatrix[1][1], 1));
+				frustums[frustumIndex].frustumPlanes[0] = projectionMatrix[0][0] *
+														  frustums[frustumIndex].frustumPlanes[1];
+				frustums[frustumIndex].frustumPlanes[2] = projectionMatrix[1][1] *
+														  frustums[frustumIndex].frustumPlanes[3];
 				frustumIndex++;
 			}
 			break;
@@ -862,15 +856,6 @@ static inline VkResult LoadLights(const Map *map)
 			{
 				light->shadowMapIndex = pointLightIndex++;
 				glm_perspective_lh_zo(glm_rad(90), 1, light->maxDistance, LIGHT_NEAR_PLANE, transformMatrix);
-
-				mat4 transposed;
-				glm_mat4_transpose_to(transformMatrix, transposed);
-				vec4 frustumX;
-				vec4 frustumY;
-				glm_vec4_add(transposed[3], transposed[0], frustumX);
-				glm_vec4_add(transposed[3], transposed[1], frustumY);
-				glm_plane_normalize(frustumX);
-				glm_plane_normalize(frustumY);
 
 				mat3 transforms[6] = {
 					{{0, 0, -1}, {0, 1, 0}, {1, 0, 0}},
@@ -889,12 +874,15 @@ static inline VkResult LoadLights(const Map *map)
 				{
 					glm_mat4_ins3(transforms[j], frustums[frustumIndex].viewMatrix);
 					glm_translate(frustums[frustumIndex].viewMatrix, negativeLightPosition);
+
 					frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
 					frustums[frustumIndex].farPlane = light->maxDistance;
-					frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
-					frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
-					frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
-					frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
+					frustums[frustumIndex].frustumPlanes[1] = 1 / Vector2Length(v2(transformMatrix[0][0], 1));
+					frustums[frustumIndex].frustumPlanes[3] = 1 / Vector2Length(v2(transformMatrix[1][1], 1));
+					frustums[frustumIndex].frustumPlanes[0] = transformMatrix[0][0] *
+															  frustums[frustumIndex].frustumPlanes[1];
+					frustums[frustumIndex].frustumPlanes[2] = transformMatrix[1][1] *
+															  frustums[frustumIndex].frustumPlanes[3];
 					frustumIndex++;
 				}
 			}

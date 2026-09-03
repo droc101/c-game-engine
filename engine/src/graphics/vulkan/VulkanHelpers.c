@@ -431,18 +431,10 @@ VkResult UpdateCameraUniform(Camera *camera)
 							  camera->nearPlane,
 							  camera->projectionMatrix);
 
-		mat4 transposed;
-		glm_mat4_transpose_to(camera->projectionMatrix, transposed);
-		vec4 frustumX;
-		vec4 frustumY;
-		glm_vec4_add(transposed[3], transposed[0], frustumX);
-		glm_vec4_add(transposed[3], transposed[1], frustumY);
-		glm_plane_normalize(frustumX);
-		glm_plane_normalize(frustumY);
-		camera->frustumPlanes[0] = frustumX[0];
-		camera->frustumPlanes[1] = frustumX[2];
-		camera->frustumPlanes[2] = frustumY[1];
-		camera->frustumPlanes[3] = frustumY[2];
+		camera->frustumPlanes[1] = 1 / Vector2Length(v2(camera->projectionMatrix[0][0], 1));
+		camera->frustumPlanes[3] = 1 / Vector2Length(v2(camera->projectionMatrix[1][1], 1));
+		camera->frustumPlanes[0] = camera->projectionMatrix[0][0] * camera->frustumPlanes[1];
+		camera->frustumPlanes[2] = camera->projectionMatrix[1][1] * camera->frustumPlanes[3];
 
 		uniform.nearPlane = camera->nearPlane;
 		uniform.farPlane = camera->farPlane;
@@ -555,16 +547,8 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 		const float d = LAMBDA * (nearPlane * powf(ratio, p) - v) + v;
 		const float distance = (d - nearPlane) / range;
 
-		vec4 frustumCorners[8] = {
-			{projectedCorners[0][0], projectedCorners[0][1], projectedCorners[0][2], projectedCorners[0][3]},
-			{projectedCorners[1][0], projectedCorners[1][1], projectedCorners[1][2], projectedCorners[1][3]},
-			{projectedCorners[2][0], projectedCorners[2][1], projectedCorners[2][2], projectedCorners[2][3]},
-			{projectedCorners[3][0], projectedCorners[3][1], projectedCorners[3][2], projectedCorners[3][3]},
-			{projectedCorners[4][0], projectedCorners[4][1], projectedCorners[4][2], projectedCorners[4][3]},
-			{projectedCorners[5][0], projectedCorners[5][1], projectedCorners[5][2], projectedCorners[5][3]},
-			{projectedCorners[6][0], projectedCorners[6][1], projectedCorners[6][2], projectedCorners[6][3]},
-			{projectedCorners[7][0], projectedCorners[7][1], projectedCorners[7][2], projectedCorners[7][3]},
-		};
+		vec4 frustumCorners[8];
+		memcpy(frustumCorners, projectedCorners, sizeof(projectedCorners));
 
 		for (uint32_t j = 0; j < 4; j++)
 		{
@@ -664,6 +648,78 @@ VkResult WriteFrustumsBuffer()
 						   "Failed to write frustums buffer!");
 
 	return VK_SUCCESS;
+}
+
+static inline bool OverlapsCameraFrustum(const Camera *camera, const FrustumCullingData *frustum) {}
+
+VkResult CullLights()
+{
+	uint32_t frustumIndex = GetState()->map->directionalLight == NULL ? 1 : 5;
+	for (uint32_t i = 0; i < GetState()->map->lightCount; i++)
+	{
+		const Light *light = &GetState()->map->lights[i];
+		// switch (light->type)
+		// {
+		// 	case LIGHT_TYPE_SPOT:
+		// 	{
+		// 		glm_mat4_copy(viewMatrix, frustums[frustumIndex].viewMatrix);
+		// 		frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
+		// 		frustums[frustumIndex].farPlane = light->maxDistance;
+		// 		frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
+		// 		frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
+		// 		frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
+		// 		frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
+		// 		frustumIndex++;
+		// 	}
+		// 	break;
+		// 	case LIGHT_TYPE_POINT:
+		// 	{
+		// 		light->shadowMapIndex = pointLightIndex++;
+		// 		glm_perspective_lh_zo(glm_rad(90), 1, light->maxDistance, LIGHT_NEAR_PLANE, transformMatrix);
+		//
+		// 		mat4 transposed;
+		// 		glm_mat4_transpose_to(transformMatrix, transposed);
+		// 		vec4 frustumX;
+		// 		vec4 frustumY;
+		// 		glm_vec4_add(transposed[3], transposed[0], frustumX);
+		// 		glm_vec4_add(transposed[3], transposed[1], frustumY);
+		// 		glm_plane_normalize(frustumX);
+		// 		glm_plane_normalize(frustumY);
+		//
+		// 		mat3 transforms[6] = {
+		// 			{{0, 0, -1}, {0, 1, 0}, {1, 0, 0}},
+		// 			{{0, 0, 1}, {0, 1, 0}, {-1, 0, 0}},
+		// 			{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}},
+		// 			{{-1, 0, 0}, {0, 0, 1}, {0, 1, 0}},
+		// 			{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}},
+		// 			{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
+		// 		};
+		// 		vec3 negativeLightPosition = {
+		// 			-light->transform.position.x,
+		// 			-light->transform.position.y,
+		// 			-light->transform.position.z,
+		// 		};
+		// 		for (uint32_t j = 0; j < 6; j++)
+		// 		{
+		// 			glm_mat4_ins3(transforms[j], frustums[frustumIndex].viewMatrix);
+		// 			glm_translate(frustums[frustumIndex].viewMatrix, negativeLightPosition);
+		// 			frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
+		// 			frustums[frustumIndex].farPlane = light->maxDistance;
+		// 			frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
+		// 			frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
+		// 			frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
+		// 			frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
+		// 			frustumIndex++;
+		// 		}
+		// 	}
+		// 	break;
+		// 	default:
+		// 		continue;
+		// }
+		//
+		// // The allocation for lights is not aligned so we just memcpy
+		// memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
+	}
 }
 
 VkResult CullModels()

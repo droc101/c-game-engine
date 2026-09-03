@@ -530,6 +530,8 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 
 VkResult WriteFrustumsBuffer();
 
+VkResult CullLights();
+
 VkResult CullModels();
 
 void EnsureSpaceForUiElements(size_t quadCount);
