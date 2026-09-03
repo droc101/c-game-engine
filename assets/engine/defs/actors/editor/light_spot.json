@@ -18,7 +18,7 @@
         "$color:b*0.5"
       ],
       "angle": "$fading_angle",
-      "length": 5,
+      "length": 80,
       "is_gizmo": true,
       "num_sides": 32
     },
@@ -26,7 +26,7 @@
       "type": "cone",
       "color": "$color",
       "angle": "$bright_angle",
-      "length": 5,
+      "length": 80,
       "is_gizmo": true,
       "num_sides": 32
     }
