@@ -77,6 +77,7 @@ FrustumCullingData *frustums = NULL;
 uint32_t actorModelsDrawInfoCount = 0;
 uint32_t maximumCulledInstanceCount = 0;
 uint32_t lightCount = 0;
+uint32_t lightmapTextureSize = 0;
 
 static CameraUniform uniform;
 #pragma endregion variables
@@ -139,41 +140,33 @@ inline uint32_t ImageIndex(const Image *image)
 	return index;
 }
 
-inline uint32_t ShadowMapResolution(const LightType type)
+inline uint32_t ShadowMapResolution(void)
 {
 	switch (GetState()->options.shadowMapQuality)
 	{
 		case SHADOW_MAP_RESOLUTION_128:
-			return 128;
+			lightmapTextureSize = 128;
+			break;
 		case SHADOW_MAP_RESOLUTION_256:
-			return 256;
+			lightmapTextureSize = 256;
+			break;
 		case SHADOW_MAP_RESOLUTION_512:
-			return 512;
+			lightmapTextureSize = 512;
+			break;
 		case SHADOW_MAP_RESOLUTION_1024:
-			return 1024;
+			lightmapTextureSize = 1024;
+			break;
 		case SHADOW_MAP_RESOLUTION_2048:
-			return 2048;
+			lightmapTextureSize = 2048;
+			break;
 		case SHADOW_MAP_RESOLUTION_4096:
-			return 4096;
-		case SHADOW_MAP_RESOLUTION_8192:
-			if (type == LIGHT_TYPE_POINT)
-			{
-				return 4096;
-			}
-			return 8192;
-		case SHADOW_MAP_RESOLUTION_16384:
-			if (type == LIGHT_TYPE_POINT)
-			{
-				return 4096;
-			}
-			if (type == LIGHT_TYPE_DIRECTIONAL)
-			{
-				return 8192;
-			}
-			return 16384;
+			lightmapTextureSize = 4096;
+			break;
 		default:
-			return 0;
+			lightmapTextureSize = 0;
+			break;
 	}
+	return lightmapTextureSize;
 }
 
 VkResult CreateShadowMapRenderPass(const Map *map)
@@ -247,44 +240,18 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	ListInit(pointLightShadowMapImageViews, LIST_POINTER);
 	uint32_t spotLightCount = 0;
 	uint32_t pointLightCount = 0;
-	const uint32_t spotLightSize = ShadowMapResolution(LIGHT_TYPE_SPOT);
-	const uint32_t pointLightSize = ShadowMapResolution(LIGHT_TYPE_POINT);
-	const uint32_t directionalLightSize = ShadowMapResolution(LIGHT_TYPE_DIRECTIONAL);
+	const uint32_t lightSize = ShadowMapResolution();
 	const LunaImageWriteInfo depthAttachmentWriteInfo = {
 		.destinationStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
 								VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
 		.destinationAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 	};
 
-	const LunaImageCreationInfo spotLightShadowMapCreationInfo = {
-		.format = VK_FORMAT_D32_SFLOAT,
-		.width = spotLightSize,
-		.height = spotLightSize,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
-		.writeInfo = depthAttachmentWriteInfo,
-	};
-	const LunaImageCreationInfo pointLightShadowMapCreationInfo = {
+	const LunaImageCreationInfo shadowMapCreationInfo = {
 		.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
 		.format = VK_FORMAT_D32_SFLOAT,
-		.width = pointLightSize,
-		.height = pointLightSize,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
-		.writeInfo = depthAttachmentWriteInfo,
-	};
-	const LunaImageCreationInfo directionalLightShadowMapCreationInfo = {
-		.format = VK_FORMAT_D32_SFLOAT,
-		.width = directionalLightSize,
-		.height = directionalLightSize,
+		.width = lightSize,
+		.height = lightSize,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
@@ -322,7 +289,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		};
 		if (light->type == LIGHT_TYPE_SPOT)
 		{
-			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &spotLightShadowMapCreationInfo, image),
+			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
 								   "Failed to create spot light shadow map image!");
 
 			VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
@@ -332,8 +299,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 				.renderPass = shadowMapRenderPass,
 				.attachmentCount = 1,
 				.pAttachments = &imageView,
-				.width = spotLightSize,
-				.height = spotLightSize,
+				.width = lightSize,
+				.height = lightSize,
 				.layers = 1,
 			};
 			VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
@@ -348,10 +315,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 			for (uint32_t cascade = 0; cascade < 4; cascade++)
 			{
 				image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-				VulkanTestReturnResult(lunaCreateImage(device,
-													   commandBuffer,
-													   &directionalLightShadowMapCreationInfo,
-													   image),
+				VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
 									   "Failed to create directional light shadow map image!");
 
 				VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
@@ -361,8 +325,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 					.renderPass = shadowMapRenderPass,
 					.attachmentCount = 1,
 					.pAttachments = &imageView,
-					.width = directionalLightSize,
-					.height = directionalLightSize,
+					.width = lightSize,
+					.height = lightSize,
 					.layers = 1,
 				};
 				VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
@@ -375,7 +339,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 			shadowMapDescriptorWrite.descriptorCount = 4;
 		} else if (light->type == LIGHT_TYPE_POINT)
 		{
-			VulkanTestReturnResult(lunaCreateImageCube(device, commandBuffer, &pointLightShadowMapCreationInfo, image),
+			VulkanTestReturnResult(lunaCreateImageCube(device, commandBuffer, &shadowMapCreationInfo, image),
 								   "Failed to create point light shadow map image!");
 			for (uint32_t layer = 0; layer < 6; layer++)
 			{
@@ -402,8 +366,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 					.renderPass = shadowMapRenderPass,
 					.attachmentCount = 1,
 					.pAttachments = imageView,
-					.width = pointLightSize,
-					.height = pointLightSize,
+					.width = lightSize,
+					.height = lightSize,
 					.layers = 1,
 				};
 				VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),

@@ -999,6 +999,10 @@ static inline VkResult DrawModelBuffer(const ModelBuffer *buffer,
 		VulkanTestReturnResult(lunaBindIndexBuffer(device, commandBuffer, buffer->indices, VK_INDEX_TYPE_UINT32),
 							   "Failed to bind %s index buffer!",
 							   name);
+
+		VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, shadedPipeline),
+							   "Failed to push constants for %s pipeline!",
+							   name);
 	}
 
 	if (shadedDrawCount != 0)
@@ -1035,7 +1039,6 @@ static inline VkResult DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 										   const LunaGraphicsPipeline shadedPipeline,
 										   const LunaGraphicsPipeline unshadedPipeline,
 										   const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
-										   const bool pushConstants,
 										   const char *name)
 {
 	const size_t shadedDrawCount = lunaGetBufferSize(buffer->unculledShadedDrawInfo) /
@@ -1056,12 +1059,9 @@ static inline VkResult DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 							   "Failed to bind %s index buffer!",
 							   name);
 
-		if (pushConstants)
-		{
-			VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, shadedPipeline),
-								   "Failed to push constants for %s pipeline!",
-								   name);
-		}
+		VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, shadedPipeline),
+							   "Failed to push constants for %s pipeline!",
+							   name);
 	}
 
 	if (shadedDrawCount != 0)
@@ -1107,7 +1107,6 @@ static inline VkResult DrawMap(const uint32_t frustumIndex,
 												   pipelines.depthPrepass.opaqueMap,
 												   pipelines.depthPrepass.opaqueMap,
 												   pipelineBindInfo,
-												   true,
 												   "opaque map"),
 							   "Failed to draw opaque map!");
 		VulkanTestReturnResult(DrawMapModelsBuffer(&buffers.map,
@@ -1115,7 +1114,6 @@ static inline VkResult DrawMap(const uint32_t frustumIndex,
 												   pipelines.depthPrepass.map,
 												   pipelines.depthPrepass.map,
 												   pipelineBindInfo,
-												   true,
 												   "map"),
 							   "Failed to draw map!");
 	} else if (shadowMapsPipeline != LUNA_NULL_HANDLE)
@@ -1125,7 +1123,6 @@ static inline VkResult DrawMap(const uint32_t frustumIndex,
 												   opaqueShadowMapsPipeline,
 												   opaqueShadowMapsPipeline,
 												   pipelineBindInfo,
-												   true,
 												   "opaque map"),
 							   "Failed to draw opaque map!");
 		VulkanTestReturnResult(DrawMapModelsBuffer(&buffers.map,
@@ -1133,7 +1130,6 @@ static inline VkResult DrawMap(const uint32_t frustumIndex,
 												   shadowMapsPipeline,
 												   shadowMapsPipeline,
 												   pipelineBindInfo,
-												   true,
 												   "map"),
 							   "Failed to draw map!");
 	} else
@@ -1143,7 +1139,6 @@ static inline VkResult DrawMap(const uint32_t frustumIndex,
 												   pipelines.shadedMap,
 												   pipelines.unshadedMap,
 												   pipelineBindInfo,
-												   false,
 												   "opaque map"),
 							   "Failed to draw opaque map!");
 		VulkanTestReturnResult(DrawMapModelsBuffer(&buffers.map,
@@ -1151,7 +1146,6 @@ static inline VkResult DrawMap(const uint32_t frustumIndex,
 												   pipelines.shadedMap,
 												   pipelines.unshadedMap,
 												   pipelineBindInfo,
-												   false,
 												   "map"),
 							   "Failed to draw map!");
 	}
@@ -1179,11 +1173,11 @@ static inline VkResult DrawActors(const uint32_t frustumIndex,
 												   VK_INDEX_TYPE_UINT32),
 							   "Failed to bind actor models index buffer!");
 
-		if (modelShadowMapsPipeline != LUNA_NULL_HANDLE)
-		{
-			VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, modelShadowMapsPipeline),
-								   "Failed to push constants for model actor shadow map pipeline!");
-		}
+		const LunaGraphicsPipeline shadedPipeline = modelShadowMapsPipeline != LUNA_NULL_HANDLE
+															? modelShadowMapsPipeline
+															: pipelines.shadedActorModel;
+		VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, shadedPipeline),
+							   "Failed to push constants for model actor pipeline!");
 
 		if (shadedDrawCount != 0)
 		{
@@ -1192,8 +1186,7 @@ static inline VkResult DrawActors(const uint32_t frustumIndex,
 			VulkanTestReturnResult(lunaBindVertexBuffers(device, commandBuffer, &instanceIndicesBuffer, 1, 1),
 								   "Failed to bind shaded actor model instance indices buffer!");
 			const LunaDrawIndexedIndirectInfo drawInfo = {
-				.pipeline = modelShadowMapsPipeline != LUNA_NULL_HANDLE ? modelShadowMapsPipeline
-																		: pipelines.shadedActorModel,
+				.pipeline = shadedPipeline,
 				.pipelineBindInfo = pipelineBindInfo,
 				.buffer = shadedDrawInfo,
 				.drawCount = shadedDrawCount,
@@ -1225,11 +1218,11 @@ static inline VkResult DrawActors(const uint32_t frustumIndex,
 		VulkanTestReturnResult(lunaBindVertexBuffers(device, commandBuffer, &buffers.actorWalls.vertices, 0, 1),
 							   "Failed to bind actor wall vertex buffer!");
 
-		if (wallShadowMapsPipeline != LUNA_NULL_HANDLE)
-		{
-			VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, wallShadowMapsPipeline),
-								   "Failed to push constants for wall actor shadow map pipeline!");
-		}
+		const LunaGraphicsPipeline shadedPipeline = wallShadowMapsPipeline != LUNA_NULL_HANDLE
+															? wallShadowMapsPipeline
+															: pipelines.shadedActorWall;
+		VulkanTestReturnResult(lunaPushConstants(device, commandBuffer, shadedPipeline),
+							   "Failed to push constants for wall actor pipeline!");
 
 		if (buffers.actorWalls.shadedInstanceCount != 0)
 		{
@@ -1240,8 +1233,7 @@ static inline VkResult DrawActors(const uint32_t frustumIndex,
 			VulkanTestReturnResult(lunaBindVertexBuffers(device, commandBuffer, &instanceIndicesBuffer, 1, 1),
 								   "Failed to bind shaded actor wall instance indices buffer!");
 			const LunaDrawIndirectInfo drawInfo = {
-				.pipeline = wallShadowMapsPipeline != LUNA_NULL_HANDLE ? wallShadowMapsPipeline
-																	   : pipelines.shadedActorWall,
+				.pipeline = shadedPipeline,
 				.pipelineBindInfo = pipelineBindInfo,
 				.buffer = drawInfoBuffer,
 				.drawCount = 1,
@@ -1451,7 +1443,7 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 		 shadowMapPushConstants.lightIndex++)
 	{
 		const Light *light = &map->lights[shadowMapPushConstants.lightIndex];
-		const uint32_t size = ShadowMapResolution(light->type);
+		const uint32_t size = ShadowMapResolution();
 		shadowMapPushConstants.lightType = light->type;
 
 		const VkExtent2D extent = {

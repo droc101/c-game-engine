@@ -107,6 +107,17 @@ static const LunaPipelineLayoutCreationInfo PIPELINE_LAYOUT_CREATION_INFO = {
 	.descriptorSetLayouts = descriptorSetLayouts,
 };
 
+static LunaPushConstantsRange lightingShadersPushConstantsRange = {
+	.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	.size = sizeof(uint32_t),
+};
+static const LunaPipelineLayoutCreationInfo LIGHTING_PIPELINE_LAYOUT_CREATION_INFO = {
+	.descriptorSetLayoutCount = 3,
+	.descriptorSetLayouts = descriptorSetLayouts,
+	.pushConstantRangeCount = 1,
+	.pushConstantsRanges = &lightingShadersPushConstantsRange,
+};
+
 static LunaPushConstantsRange shadowMapPushConstantRange = {
 	.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 	.size = sizeof(ShadowMapPushConstants),
@@ -136,11 +147,10 @@ static LunaShaderModule shadowMapsFragShaderModule = LUNA_NULL_HANDLE;
 static const VkSpecializationMapEntry SPECIALIZATION_MAP_ENTRY = {
 	.size = sizeof(uint32_t),
 };
-static const VkSpecializationInfo SPECIALIZATION_INFO = {
+static VkSpecializationInfo specializationInfo = {
 	.mapEntryCount = 1,
 	.pMapEntries = &SPECIALIZATION_MAP_ENTRY,
 	.dataSize = sizeof(uint32_t),
-	.pData = &lightCount,
 };
 #pragma endregion shared
 
@@ -261,7 +271,7 @@ static inline bool CreateShadedMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = fragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -328,7 +338,7 @@ static inline bool CreateShadedMapPipeline()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -519,7 +529,7 @@ static inline bool CreateShadedModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -616,7 +626,7 @@ static inline bool CreateShadedModelPipeline()
 		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -756,7 +766,7 @@ static inline bool CreateShadedActorModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -822,7 +832,7 @@ static inline bool CreateShadedActorModelPipeline()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -934,7 +944,7 @@ static inline bool CreateActorWallPipelines()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 	const LunaPipelineShaderStageCreationInfo unshadedShaderStages[] = {
@@ -998,7 +1008,7 @@ static inline bool CreateActorWallPipelines()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &shadedPipelineInfo,
@@ -1146,7 +1156,7 @@ static inline VkResult CreateOpaqueMapDepthPipelines(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -1236,12 +1246,12 @@ static inline VkResult CreateMapShadowMapPipeline(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -1377,12 +1387,12 @@ static inline VkResult CreateModelActorDepthPipelines(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -1498,12 +1508,12 @@ static inline VkResult CreateWallActorDepthPipelines(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
-			.specializationInfo = &SPECIALIZATION_INFO,
+			.specializationInfo = &specializationInfo,
 		},
 	};
 
@@ -1650,6 +1660,8 @@ bool CreateGraphicsPipelines()
 	descriptorSetLayouts[0] = descriptorSets.common.layout;
 	descriptorSetLayouts[1] = descriptorSets.spotLightShadowMaps.layout;
 	descriptorSetLayouts[2] = descriptorSets.pointLightShadowMaps.layout;
+	lightingShadersPushConstantsRange.dataPointer = &lightmapTextureSize;
+	specializationInfo.pData = &lightCount;
 
 	VulkanTest(CreateShaderModule(SHADER("model/shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
 			   "Failed to load shaded model fragment shader!");

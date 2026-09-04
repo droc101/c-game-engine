@@ -25,7 +25,7 @@ static const VideoPresetData VERY_LOW_PRESET = {
 };
 
 static const VideoPresetData LOW_PRESET = {
-	.msaa = MSAA_2X,
+	.msaa = MSAA_4X,
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_4X,
@@ -37,7 +37,7 @@ static const VideoPresetData MEDIUM_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_8X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_2048,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_1024,
 };
 
 static const VideoPresetData HIGH_PRESET = {
@@ -45,7 +45,7 @@ static const VideoPresetData HIGH_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.5f,
 	.anisotropy = ANISOTROPY_16X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_4096,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_2048,
 };
 
 static const VideoPresetData ULTRA_PRESET = {
@@ -53,7 +53,7 @@ static const VideoPresetData ULTRA_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 2.0f,
 	.anisotropy = ANISOTROPY_16X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_8192,
+	.shadowMapQuality = SHADOW_MAP_RESOLUTION_4096,
 };
 
 static bool IsPresetDataActive(const VideoPresetData *preset, const Options *options)

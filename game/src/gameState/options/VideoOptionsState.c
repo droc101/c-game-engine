@@ -83,7 +83,7 @@ static void BtnVideoOptionsBack(Control *, void *)
 
 static char *SliderLabelShadowMapQuality(const Control *slider)
 {
-	char *labels[] = {"Disabled", "128px", "256px", "512px", "1024px", "2048px", "4096px", "8192px", "16384px"};
+	char *labels[] = {"Disabled", "128px", "256px", "512px", "1024px", "2048px", "4096px"};
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
@@ -359,7 +359,7 @@ static void VideoOptionsStateSet()
 													   SldOptionsShadowMapQuality,
 													   TOP_CENTER,
 													   0.0,
-													   8.0,
+													   6.0,
 													   (ControlValue){
 														   .type = CONTROL_VALUE_DWORD,
 														   .dwordValue = &GetState()->options.shadowMapQuality,

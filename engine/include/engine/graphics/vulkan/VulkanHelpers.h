@@ -492,6 +492,7 @@ extern FrustumCullingData *frustums;
 extern uint32_t actorModelsDrawInfoCount;
 extern uint32_t maximumCulledInstanceCount;
 extern uint32_t lightCount;
+extern uint32_t lightmapTextureSize;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t
@@ -516,7 +517,7 @@ uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
 
-uint32_t ShadowMapResolution(LightType type);
+uint32_t ShadowMapResolution(void);
 
 VkResult CreateShadowMapRenderPass(const Map *map);
 
