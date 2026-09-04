@@ -518,8 +518,11 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	const float range = farPlane - nearPlane;
 	const float ratio = farPlane / nearPlane;
 
-	mat4 cameraInverseTransform;
-	glm_mat4_inv(uniform.transform, cameraInverseTransform);
+	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
+	mat4 transformMatrix;
+	glm_perspective_lh_zo(glm_rad(camera->fov), windowSize.x / windowSize.y, farPlane, nearPlane, transformMatrix);
+	glm_mat4_mul(transformMatrix, uniform.view, transformMatrix);
+	glm_mat4_inv(transformMatrix, transformMatrix);
 	vec4 projectedCorners[8] = {
 		{-1.0f, 1.0f, 1.0f, 1.0f},
 		{1.0f, 1.0f, 1.0f, 1.0f},
@@ -533,7 +536,7 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 	for (uint32_t j = 0; j < 8; j++)
 	{
 		vec4 inverseCorner;
-		glm_mat4_mulv(cameraInverseTransform, projectedCorners[j], inverseCorner);
+		glm_mat4_mulv(transformMatrix, projectedCorners[j], inverseCorner);
 		glm_vec4_divs(inverseCorner, inverseCorner[3], projectedCorners[j]);
 	}
 

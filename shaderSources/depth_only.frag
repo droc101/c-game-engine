@@ -2,8 +2,6 @@
 
 #include "include/shadow_maps_shared.inc.glsl"
 
-const vec2 MAGIC = vec2(0.06711056, 0.00583715) * 52.9829189;
-
 layout(binding = 1) uniform sampler2D textureSampler[];
 
 layout(location = 0, component = 0) in vec2 inUv;

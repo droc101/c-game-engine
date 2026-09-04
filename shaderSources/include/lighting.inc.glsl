@@ -6,6 +6,10 @@ layout(constant_id = 0) const uint MAX_LIGHT_COUNT = 1;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
+layout(push_constant) uniform PushConstants {
+    uint shadowMapSize;
+} pushConstants;
+
 layout(set = 0, binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
@@ -59,6 +63,32 @@ float getLightBrightness(const Light light, const float distance, const float th
     return brightness;
 }
 
+const uint SAMPLE_COUNT = 32;
+
+vec2 getSoftShadowKernel(const float sampleIndex) {
+    float r = sqrt(sampleIndex + 0.5) / sqrt(float(SAMPLE_COUNT));
+    float theta = sampleIndex * 2.4;
+    return vec2(cos(theta) * r, sin(theta) * r);
+}
+
+float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth) {
+	if (SAMPLE_COUNT == 0) {
+		return texture(shadowMap, vec3(uv, depth));
+	}
+
+    const float r = fract(dot(gl_FragCoord.xy, MAGIC)) * 6.283185307179586;
+    const float sr = sin(r);
+    const float cr = cos(r);
+	const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
+    const float size = 4.0 / float(pushConstants.shadowMapSize);
+
+	float sum = 0.0;
+    for (uint i = 0; i < SAMPLE_COUNT; i++) {
+		sum += texture(shadowMap, vec3(uv + size * (diskRotation * getSoftShadowKernel(float(i))), depth));
+	}
+    return sum / float(SAMPLE_COUNT);
+}
+
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
     if (MAX_LIGHT_COUNT == 0) {
         return vec3(1);
@@ -73,7 +103,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
             const vec4 coord = worldPosition / worldPosition.w;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                const float factor = texture(directionalLightShadowMaps[nonuniformEXT(cascadeIndex)], vec3(coord.xy * 0.5 + 0.5, coord.z));
+                const float factor = sampleShadowMap(directionalLightShadowMaps[nonuniformEXT(cascadeIndex)], coord.xy * 0.5 + 0.5, coord.z);
                 if (factor < 1e-6) {
                     continue;
                 }
@@ -91,6 +121,10 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (dottedDirection < 0) {
                     continue;
                 }
+                const float normalFactor = dot(lightToWorldNormalized, normal);
+                if (normalFactor < 1e-6) {
+                    continue;
+                }
                 const float theta = degrees(acos(dottedDirection));
                 if (theta > lightsData.lights[i].fadingAngle) {
                     continue;
@@ -98,8 +132,15 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 const vec4 worldPosition = lightsData.lights[i].transformMatrix * vec4(position, 1);
                 const vec4 coord = worldPosition / worldPosition.w;
                 if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                    const float factor = texture(spotLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], vec3(coord.xy * 0.5 + 0.5, coord.z)); 
-                    lightingColor += factor * getLightBrightness(lightsData.lights[i], distance, theta) * max(dot(lightToWorldNormalized, normal), 0) * lightsData.lights[i].color;
+                    const float brightness = getLightBrightness(lightsData.lights[i], distance, theta);
+                    if (brightness < MIN_BRIGHTNESS) {
+                        continue;
+                    }
+                    const float factor = sampleShadowMap(spotLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], coord.xy * 0.5 + 0.5, coord.z);
+                    if (factor < 1e-6) {
+                        continue;
+                    }
+                    lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color;
                 }
             } else {
                 const float normalFactor = dot(lightToWorldNormalized, normal);
@@ -116,7 +157,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (factor < 1e-6) {
                     continue;
                 }
-                lightingColor += factor * brightness * max(normalFactor, 0) * lightsData.lights[i].color;
+                lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color;
             }
         }
     }

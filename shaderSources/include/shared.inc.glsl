@@ -10,3 +10,5 @@ layout(binding = 2, scalar) readonly restrict uniform CameraBuffer {
     float farPlane;
     float frustumPlanes[4];
 } camera;
+
+const vec2 MAGIC = vec2(0.06711056, 0.00583715) * 52.9829189;

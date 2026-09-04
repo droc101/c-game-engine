@@ -23,9 +23,6 @@
 #include <engine/debug/JoltDebugRenderer.h>
 #endif
 
-// TODO: This probably won't change much since pipelines are really just a lot of boilerplate,
-//  but make sure to go through and add documentation as well as ensuring there aren't any cut corners left in.
-
 #pragma region shared
 static const VkPipelineViewportStateCreateInfo VIEWPORT_STATE = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
