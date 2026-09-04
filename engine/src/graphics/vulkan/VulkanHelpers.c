@@ -240,7 +240,6 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	};
 
 	const LunaImageCreationInfo shadowMapCreationInfo = {
-		.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
 		.format = VK_FORMAT_D32_SFLOAT,
 		.width = lightSize,
 		.height = lightSize,
