@@ -101,9 +101,9 @@ static const VkPipelineColorBlendStateCreateInfo SHADOW_MAP_COLOR_BLENDING = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 };
 
-static LunaDescriptorSetLayout descriptorSetLayouts[3];
+static LunaDescriptorSetLayout descriptorSetLayouts[2];
 static const LunaPipelineLayoutCreationInfo PIPELINE_LAYOUT_CREATION_INFO = {
-	.descriptorSetLayoutCount = 3,
+	.descriptorSetLayoutCount = 2,
 	.descriptorSetLayouts = descriptorSetLayouts,
 };
 
@@ -112,7 +112,7 @@ static LunaPushConstantsRange lightingShadersPushConstantsRange = {
 	.size = sizeof(uint32_t),
 };
 static const LunaPipelineLayoutCreationInfo LIGHTING_PIPELINE_LAYOUT_CREATION_INFO = {
-	.descriptorSetLayoutCount = 3,
+	.descriptorSetLayoutCount = 2,
 	.descriptorSetLayouts = descriptorSetLayouts,
 	.pushConstantRangeCount = 1,
 	.pushConstantsRanges = &lightingShadersPushConstantsRange,
@@ -1658,8 +1658,7 @@ bool CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
 	descriptorSetLayouts[0] = descriptorSets.common.layout;
-	descriptorSetLayouts[1] = descriptorSets.spotLightShadowMaps.layout;
-	descriptorSetLayouts[2] = descriptorSets.pointLightShadowMaps.layout;
+	descriptorSetLayouts[1] = descriptorSets.shadowMaps.layout;
 	lightingShadersPushConstantsRange.dataPointer = &lightmapTextureSize;
 	specializationInfo.pData = &lightCount;
 
@@ -1686,7 +1685,7 @@ VkResult CreateDepthGraphicsPipelines(void)
 	shadowMapPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
 
 	VulkanTestReturnResult(CreateShaderModule(SHADER("depth_only_f"), SHADER_TYPE_FRAG, &shadowMapsFragShaderModule),
-						   "Failed to load spot light shadow maps fragment shader!");
+						   "Failed to load depth only pass fragment shader!");
 
 	VulkanTestReturnResult(CreateOpaqueMapDepthPipelines(shadowMapRenderPass != VK_NULL_HANDLE),
 						   "Failed to create map shadow maps pipeline!");

@@ -813,8 +813,7 @@ static inline VkResult LoadLights(const Map *map)
 	frustums = AvxAlignedCalloc(sizeof(FrustumCullingData) * (map->lightCount * 6 + 1));
 	CheckAlloc(frustums);
 	uint32_t frustumIndex = map->directionalLight == NULL ? 1 : 5;
-	uint32_t spotLightIndex = 0;
-	uint32_t pointLightIndex = 0;
+	uint32_t shadowMapIndex = 0;
 	for (lightCount = 0; lightCount < map->lightCount; lightCount++)
 	{
 		mat4 transformMatrix;
@@ -824,7 +823,7 @@ static inline VkResult LoadLights(const Map *map)
 		{
 			case LIGHT_TYPE_SPOT:
 			{
-				light->shadowMapIndex = spotLightIndex++;
+				light->shadowMapIndex = shadowMapIndex++;
 				versor rotationQuat;
 				QUAT_TO_VERSOR(light->transform.rotation, rotationQuat);
 				versor rotationOffset;
@@ -854,7 +853,8 @@ static inline VkResult LoadLights(const Map *map)
 			break;
 			case LIGHT_TYPE_POINT:
 			{
-				light->shadowMapIndex = pointLightIndex++;
+				light->shadowMapIndex = shadowMapIndex;
+				shadowMapIndex += 6;
 				glm_perspective_lh_zo(glm_rad(90), 1, light->maxDistance, LIGHT_NEAR_PLANE, transformMatrix);
 
 				mat3 transforms[6] = {
@@ -1949,11 +1949,10 @@ bool VK_RenderMap(Map *map, Camera *camera)
 	};
 	const LunaDescriptorSet descriptorSetHandles[] = {
 		descriptorSets.common.set,
-		descriptorSets.spotLightShadowMaps.set,
-		descriptorSets.pointLightShadowMaps.set,
+		descriptorSets.shadowMaps.set,
 	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-		.descriptorSetBindInfo.descriptorSetCount = 3,
+		.descriptorSetBindInfo.descriptorSetCount = sizeof(descriptorSetHandles) / sizeof(*descriptorSetHandles),
 		.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
 		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
@@ -2072,11 +2071,10 @@ bool VK_FrameEnd()
 		};
 		const LunaDescriptorSet descriptorSetHandles[] = {
 			descriptorSets.common.set,
-			descriptorSets.spotLightShadowMaps.set,
-			descriptorSets.pointLightShadowMaps.set,
+			descriptorSets.shadowMaps.set,
 		};
 		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetBindInfo.descriptorSetCount = 3,
+			.descriptorSetBindInfo.descriptorSetCount = sizeof(descriptorSetHandles) / sizeof(*descriptorSetHandles),
 			.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
 			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 			.dynamicStates = dynamicStateBindInfos,

@@ -28,8 +28,7 @@ layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
 } lightsData;
 
 layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMaps[];
-layout(set = 1, binding = 0) uniform sampler2DShadow spotLightShadowMaps[];
-layout(set = 2, binding = 0) uniform samplerCubeShadow pointLightShadowMaps[];
+layout(set = 1, binding = 0) uniform sampler2DShadow shadowMaps[];
 
 uint getCascadeIndex(const float distance) {
     for (uint cascadeIndex = 0; cascadeIndex < 4; ++cascadeIndex) {
@@ -71,7 +70,8 @@ vec2 getSoftShadowKernel(const float sampleIndex) {
     return vec2(cos(theta) * r, sin(theta) * r);
 }
 
-float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth) {
+float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, vec2 uv, const float depth) {
+    uv = uv * 0.5 + 0.5;
 	if (SAMPLE_COUNT == 0) {
 		return texture(shadowMap, vec3(uv, depth));
 	}
@@ -103,7 +103,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
             const vec4 coord = worldPosition / worldPosition.w;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                const float factor = sampleShadowMap(directionalLightShadowMaps[nonuniformEXT(cascadeIndex)], coord.xy * 0.5 + 0.5, coord.z);
+                const float factor = sampleShadowMap(directionalLightShadowMaps[nonuniformEXT(cascadeIndex)], coord.xy, coord.z);
                 if (factor < 1e-6) {
                     continue;
                 }
@@ -136,7 +136,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     if (brightness < MIN_BRIGHTNESS) {
                         continue;
                     }
-                    const float factor = sampleShadowMap(spotLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], coord.xy * 0.5 + 0.5, coord.z);
+                    const float factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], coord.xy, coord.z);
                     if (factor < 1e-6) {
                         continue;
                     }
@@ -151,9 +151,29 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
-                const float scale = max(max(abs(lightToWorld.x), abs(lightToWorld.y)), abs(lightToWorld.z)) - 0.01;
-                const float comparisonDepth = lightsData.lights[i].transformMatrix[2][2] + lightsData.lights[i].transformMatrix[3][2] / scale;
-                const float factor = texture(pointLightShadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], vec4(lightToWorld, comparisonDepth));
+                const vec3 lightToWorldAbs = abs(lightToWorld);
+                const float scale = max(max(lightToWorldAbs.x, lightToWorldAbs.y), lightToWorldAbs.z);
+                const float comparisonDepth = lightsData.lights[i].transformMatrix[2][2] + lightsData.lights[i].transformMatrix[3][2] / (scale - 0.01);
+                float factor;
+                if (scale == lightToWorldAbs.x) {
+                    if (scale == lightToWorld.x) {
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], lightToWorld.zy / -scale, comparisonDepth);
+                    } else {
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 1], vec2(lightToWorld.z, -lightToWorld.y) / scale, comparisonDepth);
+                    }
+                } else if (scale == lightToWorldAbs.y) {
+                    if (scale == lightToWorld.y) {
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 2], lightToWorld.xz / scale, comparisonDepth);
+                    } else {
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 3], vec2(lightToWorld.x, -lightToWorld.z) / scale, comparisonDepth);
+                    }
+                } else {
+                    if (scale == lightToWorld.z) {
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 4], vec2(lightToWorld.x, -lightToWorld.y) / scale, comparisonDepth);
+                    } else {
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 5], lightToWorld.xy / -scale, comparisonDepth);
+                    }
+                }
                 if (factor < 1e-6) {
                     continue;
                 }

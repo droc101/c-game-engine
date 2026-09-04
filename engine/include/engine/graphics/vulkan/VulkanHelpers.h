@@ -439,8 +439,7 @@ typedef struct DescriptorSets
 {
 	DescriptorSet common;
 	DescriptorSet culling;
-	DescriptorSet spotLightShadowMaps;
-	DescriptorSet pointLightShadowMaps;
+	DescriptorSet shadowMaps;
 } DescriptorSets;
 
 typedef struct CullingInfo
@@ -485,7 +484,6 @@ extern ShadowMapPushConstants shadowMapPushConstants;
 extern VkRenderPass shadowMapRenderPass;
 extern List shadowMaps;
 extern List shadowMapFramebuffers;
-extern List pointLightShadowMapImageViews;
 extern List perFrustumBuffersHandles;
 extern uint32_t frustumCount;
 extern FrustumCullingData *frustums;
