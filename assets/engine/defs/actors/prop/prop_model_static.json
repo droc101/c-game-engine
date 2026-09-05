@@ -3,17 +3,21 @@
   "renderers": [
     {
       "type": "point",
-      "color": "$color"
+      "color": "$color",
+      "viewport_mode": "2d"
     },
     {
       "type": "orientation",
-      "color": "$color"
+      "color": "$color",
+      "viewport_mode": "2d"
     },
     {
       "type": "model",
       "model": "$model",
       "color": "$color",
-      "affect_lightmap": "$affect_lightmap"
+      "mod_color": "$color",
+      "affect_lightmap": "$affect_lightmap",
+      "skin": "$skin"
     }
   ],
   "params": {

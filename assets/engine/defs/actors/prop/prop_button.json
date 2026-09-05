@@ -3,14 +3,17 @@
   "description": "Button that can be pressed with the use key",
   "renderers": [
     {
-      "type": "point"
+      "type": "point",
+      "viewport_mode": "2d"
     },
     {
-      "type": "orientation"
+      "type": "orientation",
+      "viewport_mode": "2d"
     },
     {
       "type": "model",
-      "model": "$model"
+      "model": "$model",
+      "skin": "$off_skin"
     }
   ],
   "outputs": {
