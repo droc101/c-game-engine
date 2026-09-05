@@ -16,7 +16,7 @@ layout(location = 0) out vec4 outColor;
 void main() {
     outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
 	outColor.a = 1.0;
-	float fogFactor = clamp((gl_FragCoord.z / gl_FragCoord.w - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
+	float fogFactor = clamp((inDistance - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * inColor.rgb * globalLighting.color.rgb * getLightingColor(inPosition.xyz, normalize(inNormal), getCascadeIndex(inDistance)), fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);
 }
