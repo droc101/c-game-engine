@@ -1,5 +1,10 @@
 {
   "extends": "actor",
+  "renderers": [
+    {
+      "type": "point"
+    }
+  ],
   "params": {
     "text": {
       "default": "",

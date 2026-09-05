@@ -3,7 +3,8 @@
   "extends": "actor",
   "renderers": [
     {
-      "type": "point"
+      "type": "point",
+      "viewport_mode": "2d"
     },
     {
       "type": "model",

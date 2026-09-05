@@ -1,0 +1,52 @@
+{
+    "version": 1,
+    "discord_rpc_icon_id": "logo",
+    "discord_rpc_map_name": "Unnamed Map",
+    "has_sky": true,
+    "sky_texture": "texture/level/sky_test.gtex",
+    "light_cube_luxels_per_unit": 4,
+    "brushes": [],
+    "actors": [
+        {
+            "class": "prop_model_static",
+            "position": {
+                "x": -0.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/quad.gmdl"
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "collision": {
+                    "type": "byte",
+                    "value": 2
+                },
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        }
+    ]
+}

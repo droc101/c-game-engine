@@ -3,10 +3,12 @@
   "description": "Actor used for engine testing. Subject to change.",
   "renderers": [
     {
-      "type": "point"
+      "type": "point",
+      "viewport_mode": "2d"
     },
     {
-      "type": "orientation"
+      "type": "orientation",
+      "viewport_mode": "2d"
     },
     {
       "type": "model",

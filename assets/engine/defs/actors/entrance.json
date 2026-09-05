@@ -1,6 +1,19 @@
 {
   "description": "Player spawnpoint used by trigger_map actors",
   "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "orientation"
+    },
+    {
+      "type": "model",
+      "model": "model/player.gmdl"
+    }
+  ],
   "outputs": {
     "used": {}
   }
