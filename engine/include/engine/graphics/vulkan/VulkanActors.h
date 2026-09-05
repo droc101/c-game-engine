@@ -10,6 +10,8 @@
 
 void InitActorLoadingVariables();
 
+void RequireRealloc();
+
 VkResult LoadActors(const LockingList *actors);
 
 VkResult UpdateActors();

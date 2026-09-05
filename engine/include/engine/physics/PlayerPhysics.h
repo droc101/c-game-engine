@@ -10,6 +10,7 @@
 #include <engine/structs/Player.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Physics/Body/BodyID.h>
 
 /// Player movement speed (in units per second)
 extern const float MOVE_SPEED;
@@ -17,6 +18,8 @@ extern const float MOVE_SPEED;
 extern const float SLOW_MOVE_SPEED;
 /// The maximum angle that the player can walk on, in degrees
 extern const float MAX_WALKABLE_SLOPE;
+/// The body id for the player. Set to 0xfffffffe if the player has no internal body
+extern JPH_BodyID playerBodyId;
 
 /**
  * Initialize the objects used by the player that will persist for the program's lifetime

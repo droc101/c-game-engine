@@ -37,9 +37,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "engine/graphics/vulkan/Vulkan.h"
+
 const float MOVE_SPEED = 96.0f;
 const float SLOW_MOVE_SPEED = 9.6f;
 const float MAX_WALKABLE_SLOPE = 50.0f;
+JPH_BodyID playerBodyId = 0xfffffffe;
 static const float JUMP_SPEED = 68.0f;
 static const float ACTOR_RAYCAST_MAX_DISTANCE = 160.0f;
 static const float HELD_ACTOR_OFFSET = 14.0f;
@@ -302,6 +305,18 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime, const bool allowInput)
 {
+	if (allowInput && IsInputActionJustPressed(physicsThreadInput, &flashlight))
+	{
+		if (player->isFlashlightOn)
+		{
+			VK_RemoveDynamicLight(&player->flashlight);
+			player->isFlashlightOn = false;
+		} else
+		{
+			VK_AddDynamicLight(&player->flashlight);
+			player->isFlashlightOn = true;
+		}
+	}
 	if (allowInput && !player->isNoclipActive && IsInputActionJustPressed(physicsThreadInput, &freecam))
 	{
 		player->isFreecamActive = !player->isFreecamActive;

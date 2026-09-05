@@ -9,6 +9,7 @@
 #include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/Map.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_video.h>
@@ -55,6 +56,23 @@ bool VK_FrameEnd();
 void VK_Cleanup();
 
 bool VK_LoadMap(const Map *map);
+
+/**
+ * Load a dynamic light
+ * @warning The pointer passed to this function is stored!
+ *			Therefore, it must live until VK_RemoveDynamicLight is called with the same pointer
+ * @param light The light to load
+ * @return True if the light was successfully added, or false if something failed
+ */
+void VK_AddDynamicLight(const DynamicLight *light);
+
+/**
+ * Remove a dynamic light so that it is no longer rendered
+ * @note This function does not free the memory pointed to by @c light
+ * @param light The light to remove. Must exactly match a pointer previously passed to VK_AddDynamicLight
+ * @return True if the light was successfully removed, or false if something failed
+ */
+void VK_RemoveDynamicLight(const DynamicLight *light);
 
 bool VK_UpdateViewportSize();
 

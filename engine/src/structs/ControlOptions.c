@@ -214,6 +214,14 @@ static const InputAction DEFAULT_TOGGLE_FULLSCREEN = {
 			},
 	.controllerBindType = IA_UNBOUND,
 };
+static const InputAction DEFAULT_TOGGLE_FLASHLIGHT = {
+	.keyboardMouseBindType = IA_KEY,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F,
+			},
+	.controllerBindType = IA_UNBOUND,
+};
 
 #pragma endregion
 
@@ -245,6 +253,7 @@ InputAction benchmark;
 InputAction reloadShaders;
 
 InputAction fullscreen;
+InputAction flashlight;
 
 #pragma endregion
 
@@ -329,6 +338,7 @@ void RegisterControls(const ControlRegisterFunction RegisterGameControls)
 
 	ControlCategory *miscCat = RegisterControlCategory("Miscellaneous", "miscellaneous");
 	RegisterControl("toggle_fullscreen", "Toggle Fullscreen", &fullscreen, false, &DEFAULT_TOGGLE_FULLSCREEN, miscCat);
+	RegisterControl("toggle_flashlight", "Toggle Flashlight", &flashlight, false, &DEFAULT_TOGGLE_FLASHLIGHT, miscCat);
 
 	ControlCategory *debugCat = RegisterControlCategory("Debug", "debug");
 	RegisterControl("toggle_debug_menu", "Toggle Debug Menu", &debugMenu, false, &DEFAULT_DEBUG_MENU, debugCat);

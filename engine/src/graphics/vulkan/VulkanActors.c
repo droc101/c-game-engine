@@ -102,6 +102,11 @@ void InitActorLoadingVariables()
 	ListInit(lodMaterialSlotsData, LIST_POINTER);
 }
 
+void RequireRealloc()
+{
+	allocatedBufferCount = 0;
+}
+
 static inline VkResult LoadModelLods(const ModelDefinition *model)
 {
 	if (ListFind(loadedModelIds, model->id) != SIZE_MAX)

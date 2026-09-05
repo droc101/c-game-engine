@@ -12,6 +12,8 @@ typedef enum LightType LightType;
 
 typedef struct Light Light;
 
+typedef struct DynamicLight DynamicLight;
+
 enum LightType
 {
 	LIGHT_TYPE_POINT,
@@ -40,6 +42,13 @@ struct Light
 	float maxDistance;
 	uint32_t culled;
 	CGLM_ALIGN_MAT mat4 transformMatrix;
+};
+
+struct DynamicLight
+{
+	Light light;
+	JPH_BodyID parent;
+	Vector3 relativePosition;
 };
 
 #endif //GAME_LIGHT_H

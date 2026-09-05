@@ -72,11 +72,15 @@ List shadowMaps = {0};
 List shadowMapFramebuffers = {0};
 List perFrustumBuffersHandles = {0};
 uint32_t frustumCount = 0;
+uint32_t staticLightFrustumCount = 0;
 FrustumCullingData *frustums = NULL;
 uint32_t actorModelsDrawInfoCount = 0;
 uint32_t maximumCulledInstanceCount = 0;
 uint32_t lightCount = 0;
 uint32_t lightmapTextureSize = 0;
+LockingList dynamicLightsToAdd = {0};
+LockingList dynamicLightsToRemove = {0};
+List dynamicLights = {0};
 
 static CameraUniform uniform;
 #pragma endregion variables
@@ -168,6 +172,98 @@ inline uint32_t ShadowMapResolution(void)
 	return lightmapTextureSize;
 }
 
+static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint32_t *const shadowMapCount)
+{
+	const VkDevice vkDevice = lunaGetVkDevice(device);
+	const uint32_t lightSize = ShadowMapResolution();
+	const LunaImageWriteInfo depthAttachmentWriteInfo = {
+		.destinationStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
+								VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
+		.destinationAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	};
+	const LunaImageCreationInfo shadowMapCreationInfo = {
+		.format = VK_FORMAT_D32_SFLOAT,
+		.width = lightSize,
+		.height = lightSize,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+		.writeInfo = depthAttachmentWriteInfo,
+	};
+
+	LunaImage *image = LUNA_NULL_HANDLE;
+	VkImageView imageView = VK_NULL_HANDLE;
+	const VkFramebufferCreateInfo framebufferCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+		.renderPass = shadowMapRenderPass,
+		.attachmentCount = 1,
+		.pAttachments = &imageView,
+		.width = lightSize,
+		.height = lightSize,
+		.layers = 1,
+	};
+	LunaDescriptorImageInfo shadowMapImageInfos[6] = {
+		{
+			.sampler = textureSamplers.shadowMaps,
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		},
+		{
+			.sampler = textureSamplers.shadowMaps,
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		},
+		{
+			.sampler = textureSamplers.shadowMaps,
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		},
+		{
+			.sampler = textureSamplers.shadowMaps,
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		},
+		{
+			.sampler = textureSamplers.shadowMaps,
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		},
+		{
+			.sampler = textureSamplers.shadowMaps,
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		},
+	};
+	uint32_t lightFrustumCount = 4;
+	if (light->type != LIGHT_TYPE_DIRECTIONAL)
+	{
+		lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
+		*shadowMapCount += lightFrustumCount;
+	}
+	const LunaWriteDescriptorSet shadowMapDescriptorWrite = {
+		.bindingName = "Shadow Maps",
+		.descriptorSet = light->type == LIGHT_TYPE_DIRECTIONAL ? descriptorSets.common.set
+															   : descriptorSets.shadowMaps.set,
+		.descriptorArrayElement = light->type == LIGHT_TYPE_DIRECTIONAL ? 0 : *shadowMapCount - lightFrustumCount,
+		.descriptorCount = lightFrustumCount,
+		.imageInfos = shadowMapImageInfos,
+	};
+	for (uint32_t i = 0; i < lightFrustumCount; i++)
+	{
+		image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
+		VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
+							   "Failed to create spot light shadow map image!");
+
+		imageView = lunaGetVkImageView(*image);
+		VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
+		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
+							   "Failed to create spot light shadow map framebuffer!");
+
+		shadowMapImageInfos[i].image = *image;
+	}
+
+	lunaWriteDescriptorSets(device, 1, &shadowMapDescriptorWrite);
+
+	return VK_SUCCESS;
+}
+
 VkResult CreateShadowMapRenderPass(const Map *map)
 {
 	const VkDevice vkDevice = lunaGetVkDevice(device);
@@ -232,140 +328,17 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	ListInit(shadowMaps, LIST_POINTER);
 	ListInit(shadowMapFramebuffers, LIST_POINTER);
 	uint32_t shadowMapCount = 0;
-	const uint32_t lightSize = ShadowMapResolution();
-	const LunaImageWriteInfo depthAttachmentWriteInfo = {
-		.destinationStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
-								VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
-		.destinationAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	};
-
-	const LunaImageCreationInfo shadowMapCreationInfo = {
-		.format = VK_FORMAT_D32_SFLOAT,
-		.width = lightSize,
-		.height = lightSize,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
-		.writeInfo = depthAttachmentWriteInfo,
-	};
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
-		Light *light = &map->lights[i];
-
-		LunaImage *image = LUNA_NULL_HANDLE;
-		LunaDescriptorImageInfo shadowMapImageInfos[6] = {
-			{
-				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			},
-			{
-				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			},
-			{
-				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			},
-			{
-				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			},
-			{
-				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			},
-			{
-				.sampler = textureSamplers.shadowMaps,
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			},
-		};
-		LunaWriteDescriptorSet shadowMapDescriptorWrite = {
-			.bindingName = "Shadow Maps",
-			.imageInfos = shadowMapImageInfos,
-		};
-		if (light->type == LIGHT_TYPE_SPOT)
-		{
-			image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
-								   "Failed to create spot light shadow map image!");
-
-			VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-			const VkImageView imageView = lunaGetVkImageView(*image);
-			const VkFramebufferCreateInfo framebufferCreateInfo = {
-				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-				.renderPass = shadowMapRenderPass,
-				.attachmentCount = 1,
-				.pAttachments = &imageView,
-				.width = lightSize,
-				.height = lightSize,
-				.layers = 1,
-			};
-			VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
-								   "Failed to create spot light shadow map framebuffer!");
-
-			shadowMapDescriptorWrite.descriptorSet = descriptorSets.shadowMaps.set;
-			shadowMapDescriptorWrite.descriptorArrayElement = shadowMapCount++;
-			shadowMapDescriptorWrite.descriptorCount = 1;
-			shadowMapImageInfos->image = *image;
-		} else if (light->type == LIGHT_TYPE_DIRECTIONAL)
-		{
-			for (uint32_t cascade = 0; cascade < 4; cascade++)
-			{
-				image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-				VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
-									   "Failed to create directional light shadow map image!");
-
-				VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-				const VkImageView imageView = lunaGetVkImageView(*image);
-				const VkFramebufferCreateInfo framebufferCreateInfo = {
-					.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-					.renderPass = shadowMapRenderPass,
-					.attachmentCount = 1,
-					.pAttachments = &imageView,
-					.width = lightSize,
-					.height = lightSize,
-					.layers = 1,
-				};
-				VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
-									   "Failed to create directional light shadow map framebuffer!");
-
-				shadowMapImageInfos[cascade].image = *image;
-			}
-			shadowMapDescriptorWrite.descriptorSet = descriptorSets.common.set;
-			shadowMapDescriptorWrite.descriptorArrayElement = 0;
-			shadowMapDescriptorWrite.descriptorCount = 4;
-		} else if (light->type == LIGHT_TYPE_POINT)
-		{
-			for (uint32_t layer = 0; layer < 6; layer++)
-			{
-				image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-				VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
-									   "Failed to create point light shadow map image!");
-
-				VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-				const VkImageView imageView = lunaGetVkImageView(*image);
-				const VkFramebufferCreateInfo framebufferCreateInfo = {
-					.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-					.renderPass = shadowMapRenderPass,
-					.attachmentCount = 1,
-					.pAttachments = &imageView,
-					.width = lightSize,
-					.height = lightSize,
-					.layers = 1,
-				};
-				VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
-									   "Failed to create point light shadow map framebuffer!");
-				shadowMapImageInfos[layer].image = *image;
-			}
-			shadowMapDescriptorWrite.descriptorSet = descriptorSets.shadowMaps.set;
-			shadowMapDescriptorWrite.descriptorArrayElement = shadowMapCount;
-			shadowMapDescriptorWrite.descriptorCount = 6;
-			shadowMapCount += 6;
-		}
-		lunaWriteDescriptorSets(device, 1, &shadowMapDescriptorWrite);
+		const Light *light = &map->lights[i];
+		VulkanTestReturnResult(CreateLightFrustumShadowMapImage(light, &shadowMapCount),
+							   "Failed to create light frustum!");
+	}
+	for (uint32_t i = 0; i < dynamicLights.length; i++)
+	{
+		const DynamicLight *light = ListGetPointer(dynamicLights, i);
+		VulkanTestReturnResult(CreateLightFrustumShadowMapImage(&light->light, &shadowMapCount),
+							   "Failed to create dynamic light frustum!");
 	}
 
 	return VK_SUCCESS;

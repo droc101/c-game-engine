@@ -87,6 +87,7 @@ enum VendorIDs
 enum PendingTasksBitFlags
 {
 	PENDING_TASK_UI_BUFFERS_RESIZE_BIT = 1 << 0,
+	PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS = 1 << 1,
 };
 
 typedef struct CameraUniform
@@ -486,11 +487,15 @@ extern List shadowMaps;
 extern List shadowMapFramebuffers;
 extern List perFrustumBuffersHandles;
 extern uint32_t frustumCount;
+extern uint32_t staticLightFrustumCount;
 extern FrustumCullingData *frustums;
 extern uint32_t actorModelsDrawInfoCount;
 extern uint32_t maximumCulledInstanceCount;
 extern uint32_t lightCount;
 extern uint32_t lightmapTextureSize;
+extern LockingList dynamicLightsToAdd;
+extern LockingList dynamicLightsToRemove;
+extern List dynamicLights;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t

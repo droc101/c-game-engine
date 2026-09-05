@@ -58,6 +58,7 @@ extern InputAction benchmark;
 extern InputAction reloadShaders;
 
 extern InputAction fullscreen;
+extern InputAction flashlight;
 
 #pragma endregion
 
