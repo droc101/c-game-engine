@@ -36,7 +36,9 @@ struct Light
 	float linearAttenuation;
 	float quadraticAttenuation;
 	float attenuationMultiplier;
+	/// The angle at which the spotlight will retain up to 75% brightness
 	float brightAngle;
+	/// The angle at which the spotlight will reach 0% brightness
 	float fadingAngle;
 	uint32_t shadowMapIndex;
 	float maxDistance;

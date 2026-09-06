@@ -26,9 +26,11 @@ void CreatePlayer(Map *map)
 	map->player.flashlight.light.color[0] = 1;
 	map->player.flashlight.light.color[1] = 1;
 	map->player.flashlight.light.color[2] = 1;
-	map->player.flashlight.light.brightness = 1;
+	map->player.flashlight.light.brightness = 5;
+	map->player.flashlight.light.constantAttenuation = 2.5f;
+	map->player.flashlight.light.linearAttenuation = 1;
 	map->player.flashlight.light.quadraticAttenuation = 1;
-	map->player.flashlight.light.attenuationMultiplier = 100;
+	map->player.flashlight.light.attenuationMultiplier = 25;
 	map->player.flashlight.light.brightAngle = 15;
 	map->player.flashlight.light.fadingAngle = 25;
 

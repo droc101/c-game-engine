@@ -33,6 +33,7 @@
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <float.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
@@ -684,6 +685,10 @@ static inline float GetMaxLightDistance(const Light *light)
 	const float c = -light->attenuationMultiplier *
 					light->attenuationMultiplier *
 					(light->brightness * 256 - light->constantAttenuation);
+	if (a == 0)
+	{
+		return b == 0 ? FLT_MAX : -c / b;
+	}
 	const float val = b * b - 4 * a * c;
 	if (val <= 0)
 	{
@@ -1373,7 +1378,7 @@ static inline VkResult DrawViewmodel(const LunaGraphicsPipelineBindInfo *pipelin
 {
 	return DrawModelBuffer(&buffers.viewmodel,
 						   pipelines.shadedModel,
-						   pipelines.unshadedMap,
+						   pipelines.unshadedModel,
 						   pipelineBindInfo,
 						   "viewmodel");
 }
