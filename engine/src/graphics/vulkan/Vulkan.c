@@ -1435,120 +1435,15 @@ static inline VkResult DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pip
 }
 
 static inline VkResult UpdateLightShadowMaps(const Light *light,
-											 LunaGraphicsPipelineBindInfo *pipelineBindInfo,
 											 uint32_t *const frustumIndex,
 											 uint32_t *const framebufferIndex)
 {
 	const VkCommandBuffer vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
 	const uint32_t size = ShadowMapResolution();
-	shadowMapPushConstants.lightType = light->type;
-
 	const VkExtent2D extent = {
 		.width = size,
 		.height = size,
 	};
-	const VkClearValue depthClearValue = {
-		.depthStencil.depth = 0,
-	};
-	VkRenderPassBeginInfo beginInfo = {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-		.renderPass = shadowMapRenderPass,
-		.renderArea.extent = extent,
-		.clearValueCount = 1,
-		.pClearValues = &depthClearValue,
-	};
-
-	if (light->type == LIGHT_TYPE_DIRECTIONAL)
-	{
-		for (shadowMapPushConstants.cascadeIndex = 0; shadowMapPushConstants.cascadeIndex < 4;
-			 shadowMapPushConstants.cascadeIndex++)
-		{
-			if (pipelineBindInfo->dynamicStateCount != 0 && shadowMapPushConstants.cascadeIndex != 0)
-			{
-				pipelineBindInfo->dynamicStateCount = 0;
-			}
-			beginInfo.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex);
-			vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-			VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
-										   pipelineBindInfo,
-										   false,
-										   pipelines.directionalLightShadowMaps.mapFrontFaces,
-										   pipelines.directionalLightShadowMaps.mapFrontFaces),
-								   "Failed to draw map front faces!");
-			VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
-										   pipelineBindInfo,
-										   false,
-										   pipelines.directionalLightShadowMaps.mapBackFaces,
-										   pipelines.directionalLightShadowMaps.mapBackFaces),
-								   "Failed to draw map back faces!");
-			VulkanTestReturnResult(DrawActors(shadowMapPushConstants.cascadeIndex + 1,
-											  pipelineBindInfo,
-											  pipelines.directionalLightShadowMaps.modelActors,
-											  pipelines.directionalLightShadowMaps.wallActors),
-								   "Failed to draw actors!");
-
-			vkCmdEndRenderPass(vkCommandBuffer);
-
-			(*framebufferIndex)++;
-		}
-		return VK_SUCCESS;
-	}
-
-	const uint32_t lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
-	for (shadowMapPushConstants.faceIndex = 0; shadowMapPushConstants.faceIndex < lightFrustumCount;
-		 shadowMapPushConstants.faceIndex++)
-	{
-		if (pipelineBindInfo->dynamicStateCount != 0 && shadowMapPushConstants.faceIndex != 0)
-		{
-			pipelineBindInfo->dynamicStateCount = 0;
-		}
-		beginInfo.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex);
-		vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		VulkanTestReturnResult(DrawMap(*frustumIndex,
-									   pipelineBindInfo,
-									   false,
-									   pipelines.shadowMaps.opaqueMap,
-									   pipelines.shadowMaps.map),
-							   "Failed to draw map!");
-		VulkanTestReturnResult(DrawActors(*frustumIndex,
-										  pipelineBindInfo,
-										  pipelines.shadowMaps.modelActors,
-										  pipelines.shadowMaps.wallActors),
-							   "Failed to draw actors!");
-
-		vkCmdEndRenderPass(vkCommandBuffer);
-
-		(*framebufferIndex)++;
-		(*frustumIndex)++;
-	}
-
-	return VK_SUCCESS;
-}
-
-static inline VkResult UpdateShadowMaps(const Map *map)
-{
-	if (GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED || lightCount == 0)
-	{
-		return VK_SUCCESS;
-	}
-
-	const uint32_t size = ShadowMapResolution();
-	const VkExtent2D extent = {
-		.width = size,
-		.height = size,
-	};
-
-	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
-		.descriptorSetCount = 1,
-		.descriptorSets = &descriptorSets.common.set,
-	};
-	VulkanTestReturnResult(lunaBindDescriptorSets(device,
-												  commandBuffer,
-												  pipelines.shadowMaps.map,
-												  &descriptorSetBindInfo),
-						   "Failed to bind descriptor sets!");
 	VkViewport viewport = {
 		.width = (float)extent.width,
 		.height = (float)extent.height,
@@ -1575,35 +1470,128 @@ static inline VkResult UpdateShadowMaps(const Map *map)
 			.bindInfo.scissorBindInfo = &scissorBindInfo,
 		},
 	};
-	LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
 		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
+	shadowMapPushConstants.lightType = light->type;
+
+	const VkClearValue depthClearValue = {
+		.depthStencil.depth = 0,
+	};
+	VkRenderPassBeginInfo beginInfo = {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+		.renderPass = shadowMapRenderPass,
+		.renderArea.extent = extent,
+		.clearValueCount = 1,
+		.pClearValues = &depthClearValue,
+	};
+
+	if (light->type == LIGHT_TYPE_DIRECTIONAL)
+	{
+		for (shadowMapPushConstants.cascadeIndex = 0; shadowMapPushConstants.cascadeIndex < 4;
+			 shadowMapPushConstants.cascadeIndex++)
+		{
+			const VkOffset2D offset = {
+				.x = (int)(size * (shadowMapPushConstants.cascadeIndex % 2)),
+				.y = (int)(size * (shadowMapPushConstants.cascadeIndex / 2)),
+			};
+			viewport.x = (float)offset.x;
+			viewport.y = (float)offset.y;
+			scissor.offset = offset;
+			const VkRenderPassBeginInfo directionalLightRenderPassBeginInfo = {
+				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+				.renderPass = shadowMapRenderPass,
+				.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex),
+				.renderArea.extent = extent,
+				.renderArea.offset = offset,
+				.clearValueCount = 1,
+				.pClearValues = &depthClearValue,
+			};
+			vkCmdBeginRenderPass(vkCommandBuffer, &directionalLightRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
+										   &pipelineBindInfo,
+										   false,
+										   pipelines.directionalLightShadowMaps.mapFrontFaces,
+										   pipelines.directionalLightShadowMaps.mapFrontFaces),
+								   "Failed to draw map front faces!");
+			VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
+										   &pipelineBindInfo,
+										   false,
+										   pipelines.directionalLightShadowMaps.mapBackFaces,
+										   pipelines.directionalLightShadowMaps.mapBackFaces),
+								   "Failed to draw map back faces!");
+			VulkanTestReturnResult(DrawActors(shadowMapPushConstants.cascadeIndex + 1,
+											  &pipelineBindInfo,
+											  pipelines.directionalLightShadowMaps.modelActors,
+											  pipelines.directionalLightShadowMaps.wallActors),
+								   "Failed to draw actors!");
+
+			vkCmdEndRenderPass(vkCommandBuffer);
+		}
+		(*framebufferIndex)++;
+		return VK_SUCCESS;
+	}
+
+	const uint32_t lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
+	for (shadowMapPushConstants.faceIndex = 0; shadowMapPushConstants.faceIndex < lightFrustumCount;
+		 shadowMapPushConstants.faceIndex++)
+	{
+		beginInfo.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex);
+		vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		VulkanTestReturnResult(DrawMap(*frustumIndex,
+									   &pipelineBindInfo,
+									   false,
+									   pipelines.shadowMaps.opaqueMap,
+									   pipelines.shadowMaps.map),
+							   "Failed to draw map!");
+		VulkanTestReturnResult(DrawActors(*frustumIndex,
+										  &pipelineBindInfo,
+										  pipelines.shadowMaps.modelActors,
+										  pipelines.shadowMaps.wallActors),
+							   "Failed to draw actors!");
+
+		vkCmdEndRenderPass(vkCommandBuffer);
+
+		(*framebufferIndex)++;
+		(*frustumIndex)++;
+	}
+
+	return VK_SUCCESS;
+}
+
+static inline VkResult UpdateShadowMaps(const Map *map)
+{
+	if (GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED || lightCount == 0)
+	{
+		return VK_SUCCESS;
+	}
+
+	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSets.common.set,
+	};
+	VulkanTestReturnResult(lunaBindDescriptorSets(device,
+												  commandBuffer,
+												  pipelines.shadowMaps.map,
+												  &descriptorSetBindInfo),
+						   "Failed to bind descriptor sets!");
 
 	uint32_t frustumIndex = map->directionalLight == NULL ? 1 : 5;
 	uint32_t framebufferIndex = 0;
 	for (shadowMapPushConstants.lightIndex = 0; shadowMapPushConstants.lightIndex < map->lightCount;
 		 shadowMapPushConstants.lightIndex++)
 	{
-		if (pipelineBindInfo.dynamicStateCount != 0 && shadowMapPushConstants.lightIndex != 0)
-		{
-			pipelineBindInfo.dynamicStateCount = 0;
-		}
 		const Light *light = &map->lights[shadowMapPushConstants.lightIndex];
-		VulkanTestReturnResult(UpdateLightShadowMaps(light, &pipelineBindInfo, &frustumIndex, &framebufferIndex),
+		VulkanTestReturnResult(UpdateLightShadowMaps(light, &frustumIndex, &framebufferIndex),
 							   "Failed to update light shadow maps!");
 	}
 	for (uint32_t i = 0; i < dynamicLights.length; shadowMapPushConstants.lightIndex++, i++)
 	{
-		if (pipelineBindInfo.dynamicStateCount != 0 && shadowMapPushConstants.lightIndex != 0)
-		{
-			pipelineBindInfo.dynamicStateCount = 0;
-		}
 		const DynamicLight *light = ListGetPointer(dynamicLights, i);
-		VulkanTestReturnResult(UpdateLightShadowMaps(&light->light,
-													 &pipelineBindInfo,
-													 &frustumIndex,
-													 &framebufferIndex),
+		VulkanTestReturnResult(UpdateLightShadowMaps(&light->light, &frustumIndex, &framebufferIndex),
 							   "Failed to update light shadow maps!");
 	}
 

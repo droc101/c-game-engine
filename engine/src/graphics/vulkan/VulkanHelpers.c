@@ -231,12 +231,58 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		},
 	};
-	uint32_t lightFrustumCount = 4;
-	if (light->type != LIGHT_TYPE_DIRECTIONAL)
+	const uint32_t lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
+	if (light->type == LIGHT_TYPE_DIRECTIONAL)
 	{
-		lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
+		image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
+		const LunaImageCreationInfo directionalShadowMapAtlasCreationInfo = {
+			.format = VK_FORMAT_D32_SFLOAT,
+			.width = lightSize * 2,
+			.height = lightSize * 2,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+			.queueFamilyIndexCount = 1,
+			.queueFamilyIndices = &queueFamilyIndex,
+			.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+			.writeInfo = depthAttachmentWriteInfo,
+		};
+		VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &directionalShadowMapAtlasCreationInfo, image),
+							   "Failed to create spot light shadow map image!");
+		imageView = lunaGetVkImageView(*image);
+
+		const VkFramebufferCreateInfo directionalLightShadowMapAtlasFramebufferCreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+			.renderPass = shadowMapRenderPass,
+			.attachmentCount = 1,
+			.pAttachments = &imageView,
+			.width = 2 * lightSize,
+			.height = 2 * lightSize,
+			.layers = 1,
+		};
+		VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
+		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &directionalLightShadowMapAtlasFramebufferCreateInfo, NULL, framebuffer),
+							   "Failed to create spot light shadow map framebuffer!");
+
+		shadowMapImageInfos->image = *image;
+	} else
+	{
 		*shadowMapCount += lightFrustumCount;
+		for (uint32_t i = 0; i < lightFrustumCount; i++)
+		{
+			image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
+			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
+								   "Failed to create spot light shadow map image!");
+
+			imageView = lunaGetVkImageView(*image);
+			VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
+			VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
+								   "Failed to create spot light shadow map framebuffer!");
+
+			shadowMapImageInfos[i].image = *image;
+		}
 	}
+
 	const LunaWriteDescriptorSet shadowMapDescriptorWrite = {
 		.bindingName = "Shadow Maps",
 		.descriptorSet = light->type == LIGHT_TYPE_DIRECTIONAL ? descriptorSets.common.set
@@ -245,20 +291,6 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 		.descriptorCount = lightFrustumCount,
 		.imageInfos = shadowMapImageInfos,
 	};
-	for (uint32_t i = 0; i < lightFrustumCount; i++)
-	{
-		image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-		VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
-							   "Failed to create spot light shadow map image!");
-
-		imageView = lunaGetVkImageView(*image);
-		VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
-							   "Failed to create spot light shadow map framebuffer!");
-
-		shadowMapImageInfos[i].image = *image;
-	}
-
 	lunaWriteDescriptorSets(device, 1, &shadowMapDescriptorWrite);
 
 	return VK_SUCCESS;
@@ -296,7 +328,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 	};
 	const VkAttachmentReference depthAttachmentReference = {
@@ -308,8 +340,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	};
 	const VkSubpassDependency dependency = {
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
-		.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-		.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
 		.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 		.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 	};

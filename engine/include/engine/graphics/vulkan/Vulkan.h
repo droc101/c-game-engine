@@ -16,17 +16,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef BUILDSTYLE_DEBUG
-/**
- * Additional validation for Vulkan code
- * This will only work if the Vulkan SDK is installed on the device running the program.
- * @warning NOT FOR RELEASE BUILDS
- * @see https://docs.vulkan.org/guide/latest/validation_overview.html
- * @see https://vulkan.lunarg.com/doc/sdk/latest/windows/khronos_validation_layer.html
- */
-#define VK_ENABLE_VALIDATION_LAYER
-#endif
-
 #define VK_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
 #define VK_Y_TO_NDC(y) ((float)(y) / ScaledWindowHeightFloat() * 2.0f - 1.0f)
 

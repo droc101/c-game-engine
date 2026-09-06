@@ -47,7 +47,7 @@ bool CreateInstance()
 		.extensionCount = extensionCount,
 		.extensionNames = extensionNames,
 
-#ifdef VK_ENABLE_VALIDATION_LAYER
+#ifdef BUILDSTYLE_DEBUG
 		.enableValidation = true,
 #endif
 	};
@@ -374,12 +374,10 @@ bool CreateDescriptorSetLayouts()
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
-			// Directional light shadow maps
 			.bindingName = "Shadow Maps",
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			// TODO: This is count is unchecked and not used when checking how many other shadow maps to make
-			.descriptorCount = 4,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
 		{
 			.bindingName = "Actor Instance Data",
@@ -576,7 +574,7 @@ bool CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = min(MAX_TEXTURES, sampledImageCount) + min(sampledImageCount, 16384) + 4 + 1,
+			.descriptorCount = min(MAX_TEXTURES, sampledImageCount) + min(sampledImageCount, 16384) + 1 + 1,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

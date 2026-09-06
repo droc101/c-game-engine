@@ -27,7 +27,7 @@ layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     Light lights[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
 } lightsData;
 
-layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMaps[];
+layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMapAtlas;
 layout(set = 1, binding = 0) uniform sampler2DShadow shadowMaps[];
 
 uint getCascadeIndex(const float distance) {
@@ -70,23 +70,29 @@ vec2 getSoftShadowKernel(const float sampleIndex) {
     return vec2(cos(theta) * r, sin(theta) * r);
 }
 
-float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, vec2 uv, const float depth) {
-    uv = uv * 0.5 + 0.5;
-	if (SAMPLE_COUNT == 0) {
-		return texture(shadowMap, vec3(uv, depth));
-	}
+float sampleShadowMapInternal(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth, const float size) {
+    if (SAMPLE_COUNT == 0) {
+        return texture(shadowMap, vec3(uv, depth));
+    }
 
     const float r = fract(dot(gl_FragCoord.xy, MAGIC)) * 6.283185307179586;
     const float sr = sin(r);
     const float cr = cos(r);
-	const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
-    const float size = 4.0 / float(pushConstants.shadowMapSize);
+    const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
 
-	float sum = 0.0;
+    float sum = 0.0;
     for (uint i = 0; i < SAMPLE_COUNT; i++) {
-		sum += texture(shadowMap, vec3(uv + size * (diskRotation * getSoftShadowKernel(float(i))), depth));
-	}
+        sum += texture(shadowMap, vec3(uv + size * (diskRotation * getSoftShadowKernel(float(i))), depth));
+    }
     return sum / float(SAMPLE_COUNT);
+}
+
+float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth) {
+    return sampleShadowMapInternal(shadowMap, uv * 0.5 + 0.5, depth, 4.0 / float(pushConstants.shadowMapSize));
+}
+
+float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord) {
+    return sampleShadowMapInternal(directionalLightShadowMapAtlas, (coord.xy * 0.5 + 0.5 + vec2(cascadeIndex % 2, cascadeIndex / 2)) * 0.5, coord.z, 4.0 / float(2 * pushConstants.shadowMapSize));
 }
 
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
@@ -103,7 +109,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
             const vec4 coord = worldPosition / worldPosition.w;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                const float factor = sampleShadowMap(directionalLightShadowMaps[nonuniformEXT(cascadeIndex)], coord.xy, coord.z);
+                const float factor = sampleDirectionalShadowMap(cascadeIndex, coord.xyz);
                 if (factor < 1e-6) {
                     continue;
                 }
