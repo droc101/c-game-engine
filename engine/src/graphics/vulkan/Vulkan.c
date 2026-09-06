@@ -1489,26 +1489,23 @@ static inline VkResult UpdateLightShadowMaps(const Light *light,
 
 	if (light->type == LIGHT_TYPE_DIRECTIONAL)
 	{
+		const VkRenderPassBeginInfo directionalLightRenderPassBeginInfo = {
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+			.renderPass = shadowMapRenderPass,
+			.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex),
+			.renderArea.extent.width = 2 * size,
+			.renderArea.extent.height = 2 * size,
+			.clearValueCount = 1,
+			.pClearValues = &depthClearValue,
+		};
+		vkCmdBeginRenderPass(vkCommandBuffer, &directionalLightRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 		for (shadowMapPushConstants.cascadeIndex = 0; shadowMapPushConstants.cascadeIndex < 4;
 			 shadowMapPushConstants.cascadeIndex++)
 		{
-			const VkOffset2D offset = {
-				.x = (int)(size * (shadowMapPushConstants.cascadeIndex % 2)),
-				.y = (int)(size * (shadowMapPushConstants.cascadeIndex / 2)),
-			};
-			viewport.x = (float)offset.x;
-			viewport.y = (float)offset.y;
-			scissor.offset = offset;
-			const VkRenderPassBeginInfo directionalLightRenderPassBeginInfo = {
-				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-				.renderPass = shadowMapRenderPass,
-				.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex),
-				.renderArea.extent = extent,
-				.renderArea.offset = offset,
-				.clearValueCount = 1,
-				.pClearValues = &depthClearValue,
-			};
-			vkCmdBeginRenderPass(vkCommandBuffer, &directionalLightRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			scissor.offset.x = (int)(size * (shadowMapPushConstants.cascadeIndex % 2));
+			scissor.offset.y = (int)(size * (shadowMapPushConstants.cascadeIndex / 2));
+			viewport.x = (float)scissor.offset.x;
+			viewport.y = (float)scissor.offset.y;
 
 			VulkanTestReturnResult(DrawMap(shadowMapPushConstants.cascadeIndex + 1,
 										   &pipelineBindInfo,
@@ -1527,9 +1524,8 @@ static inline VkResult UpdateLightShadowMaps(const Light *light,
 											  pipelines.directionalLightShadowMaps.modelActors,
 											  pipelines.directionalLightShadowMaps.wallActors),
 								   "Failed to draw actors!");
-
-			vkCmdEndRenderPass(vkCommandBuffer);
 		}
+		vkCmdEndRenderPass(vkCommandBuffer);
 		(*framebufferIndex)++;
 		return VK_SUCCESS;
 	}
