@@ -25,12 +25,15 @@ int main(const int argc, const char *argv[])
 
 #ifndef NDEBUG
 	// Create a terminal window if not already attached to a terminal
-	if (AllocConsole())
+	if (GetStdHandle(STD_OUTPUT_HANDLE) == NULL)
 	{
-		// Reopen stdio handles to point to newly created terminal
-		freopen("CONOUT$", "w", stdout);
-		freopen("CONOUT$", "w", stderr);
-		freopen("CONIN$", "r", stdin);
+		if (AllocConsole())
+		{
+			// Reopen stdio handles to point to newly created terminal
+			freopen("CONOUT$", "w", stdout);
+			freopen("CONOUT$", "w", stderr);
+			freopen("CONIN$", "r", stdin);
+		}
 	}
 #endif
 
