@@ -42,21 +42,21 @@ static void ApplyAddons()
 	}
 }
 
-static void DoneButton(Control *, void *)
+static void DoneButton(Control */*control*/, void */*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	ApplyAddons();
 	SetGameState(&MenuState);
 }
 
-static void EnableAddonBtn(Control *, void *pAddon)
+static void EnableAddonBtn(Control */*control*/, void *pAddon)
 {
 	hasMadeChanges = true;
 	SetAddonEnabled(pAddon, true);
 	shouldRebuildUiStack = true;
 }
 
-static void DisableAddonBtn(Control *, void *pAddon)
+static void DisableAddonBtn(Control */*control*/, void *pAddon)
 {
 	hasMadeChanges = true;
 	SetAddonEnabled(pAddon, false);
@@ -70,7 +70,7 @@ static void Swap(List *list, const size_t a, const size_t b)
 	ListSet(*list, b, first);
 }
 
-static void BtnAddonPriUp(Control *, void *addonIndexInAddress)
+static void BtnAddonPriUp(Control */*control*/, void *addonIndexInAddress)
 {
 	hasMadeChanges = true;
 	const size_t index = (size_t)addonIndexInAddress;
@@ -79,7 +79,7 @@ static void BtnAddonPriUp(Control *, void *addonIndexInAddress)
 	shouldRebuildUiStack = true;
 }
 
-static void BtnAddonPriDown(Control *, void *addonIndexInAddress)
+static void BtnAddonPriDown(Control */*control*/, void *addonIndexInAddress)
 {
 	hasMadeChanges = true;
 	const size_t index = (size_t)addonIndexInAddress;

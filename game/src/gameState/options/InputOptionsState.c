@@ -51,7 +51,7 @@ static OptionsButtonValue invertCameraButtonValues[2] = {
 	},
 };
 
-static void BtnInputOptionsBack(Control *, void *)
+static void BtnInputOptionsBack(Control */*control*/, void */*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
@@ -70,7 +70,7 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-static void BtnControlsOptions(Control *, void *)
+static void BtnControlsOptions(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&ControlsOptionsState);
 }

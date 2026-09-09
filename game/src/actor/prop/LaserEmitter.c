@@ -30,7 +30,7 @@ enum LaserEmitterSkin
 	EMITTER_SKIN_FLOOR,
 	EMITTER_SKIN_MIDDLE,
 	EMITTER_SKIN_CEILING,
-	EMITTER_SKIN_ALL
+	EMITTER_SKIN_ALL,
 };
 
 typedef struct LaserEmitterData

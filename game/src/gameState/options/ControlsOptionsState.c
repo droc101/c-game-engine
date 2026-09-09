@@ -50,14 +50,12 @@ typedef struct ControlRowData
 static OptionsMenu *controlOptionsMenu;
 static char *filter = NULL;
 
-static const int ENTRY_HEIGHT = 44;
-
 static ListenMode listenMode;
 static ControlRowData *listenRow;
 
 static List controlRows;
 
-static void BtnControlsOptionsBack(Control *, void *)
+static void BtnControlsOptionsBack(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&InputOptionsState);
 }
@@ -89,7 +87,7 @@ static void UpdateControlRow(ControlRowData *row)
 	resetButtonData->extraData = row;
 }
 
-static void BtnResetBinding(Control *, void *extraData)
+static void BtnResetBinding(Control */*control*/, void *extraData)
 {
 	ControlRowData *row = extraData;
 	listenMode = NOT_LISTNENING;
@@ -97,7 +95,7 @@ static void BtnResetBinding(Control *, void *extraData)
 	UpdateControlRow(row);
 }
 
-static void BtnEditKbmBinding(Control *, void *extraData)
+static void BtnEditKbmBinding(Control */*control*/, void *extraData)
 {
 	if (listenMode != NOT_LISTNENING)
 	{
@@ -109,7 +107,7 @@ static void BtnEditKbmBinding(Control *, void *extraData)
 	UpdateControlRow(row);
 }
 
-static void BtnEditCtlrBinding(Control *, void *extraData)
+static void BtnEditCtlrBinding(Control */*control*/, void *extraData)
 {
 	if (listenMode != NOT_LISTNENING)
 	{

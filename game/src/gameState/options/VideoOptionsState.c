@@ -29,7 +29,7 @@
 static OptionsMenu *videoOptionsMenu = NULL;
 static bool hasChangedVideoOptions = false;
 
-VideoPreset currentVideoPreset;
+static VideoPreset currentVideoPreset;
 
 static OptionsButtonValue gpuTypeButtonValues[3] = {
 	{
@@ -70,7 +70,7 @@ static OptionsButtonValue preferWaylandButtonValues[2] = {
 	},
 };
 
-static void BtnVideoOptionsBack(Control *, void *)
+static void BtnVideoOptionsBack(Control */*control*/, void */*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	if (hasChangedVideoOptions)
@@ -127,18 +127,18 @@ static char *SliderLabelMaxFps(const Control *slider)
 	return buf;
 }
 
-static void OptBtnFullscreenChanged(const OptionsButtonValue *value, void *)
+static void OptBtnFullscreenChanged(const OptionsButtonValue */*value*/, void */*extraData*/)
 {
 	SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
 }
 
-static void ToggleVsyncCallback(const OptionsButtonValue *value, void *)
+static void ToggleVsyncCallback(const OptionsButtonValue */*value*/, void */*extraData*/)
 {
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
-static void ClearTexturesOptBtnCallback(const OptionsButtonValue *value, void * /*extraData*/)
+static void ClearTexturesOptBtnCallback(const OptionsButtonValue */*value*/, void * /*extraData*/)
 {
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
@@ -148,7 +148,7 @@ static void ClearTexturesSliderCallback(const ControlValue * /*value*/)
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
-static void RequireRestartCallback(const OptionsButtonValue *value, void *)
+static void RequireRestartCallback(const OptionsButtonValue */*value*/, void */*extraData*/)
 {
 	hasChangedVideoOptions = true;
 	// Change will happen next restart

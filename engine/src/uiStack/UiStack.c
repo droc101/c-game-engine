@@ -393,7 +393,7 @@ void DrawUiStack(const UiStack *stack)
 	}
 }
 
-Vector2 CalculateControlPosition(const Control *control, const void *positioningData)
+Vector2 CalculateControlPosition(const Control *control, const void */*positioningData*/)
 {
 	Vector2 pos = control->position;
 	const ControlAnchor anchor = control->anchor;

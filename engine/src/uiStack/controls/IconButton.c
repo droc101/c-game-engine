@@ -46,7 +46,7 @@ void DestroyIconButton(const Control *c)
 	free(c->controlData);
 }
 
-void UpdateIconButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex)
+void UpdateIconButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	const IconButtonData *data = (IconButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))

@@ -16,7 +16,7 @@ typedef struct LabelControlData LabelControlData;
 
 struct LabelControlData
 {
-	char *str;
+	const char *str;
 	uint32_t size;
 	Color color;
 	FontHorizontalAlign hAlign;
@@ -25,7 +25,7 @@ struct LabelControlData
 	bool shadow;
 };
 
-Control *CreateLabelControl(char *str,
+Control *CreateLabelControl(const char *str,
 							uint32_t size,
 							Color color,
 							Vector2 rectPos,

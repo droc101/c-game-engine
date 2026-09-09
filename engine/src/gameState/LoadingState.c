@@ -31,7 +31,7 @@ typedef enum LoadingStateStage
 	/// Performing the first physics tick
 	LSS_WAITING_FOR_TICK,
 	/// Done, will call LoadingStateDoneCallback once LEVEL_LOAD_MIN_TIME_MS check passes
-	LSS_DONE
+	LSS_DONE,
 } LoadingStateStage;
 
 /// The minimum time the loading screen should be visible for, to prevent quick flashes

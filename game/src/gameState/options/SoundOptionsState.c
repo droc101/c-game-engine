@@ -26,7 +26,7 @@
 
 static OptionsMenu *soundOptionsMenu = NULL;
 
-static void BtnSoundOptionsBack(Control *, void *)
+static void BtnSoundOptionsBack(Control */*control*/, void */*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);

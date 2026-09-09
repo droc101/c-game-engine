@@ -25,12 +25,12 @@
 
 static UiStack *menuStack = NULL;
 
-static void BtnDontRelaunch(Control *, void *)
+static void BtnDontRelaunch(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&OptionsState);
 }
 
-static void BtnRelaunch(Control *, void *)
+static void BtnRelaunch(Control */*control*/, void */*extraData*/)
 {
 	RestartProgram();
 }

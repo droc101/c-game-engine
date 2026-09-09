@@ -43,19 +43,19 @@ Control *CreateHeaderFooterControl(const float height, const bool isHeader, char
 
 void DestroyHeaderFooterControl(const Control *c)
 {
-	const HeaderFooterControlData *data = c->controlData;
+	HeaderFooterControlData *data = c->controlData;
 	free(data->label);
 	free(data);
 }
 
-void AlwaysUpdateHeaderFooterControl(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex)
+void AlwaysUpdateHeaderFooterControl(UiStack */*stack*/, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	c->size.x = ScaledWindowWidthFloat();
 }
 
-void DrawHeaderFooterControl(const Control *c, ControlState state, Vector2 position)
+void DrawHeaderFooterControl(const Control *c, ControlState /*state*/, Vector2 position)
 {
-	HeaderFooterControlData *data = c->controlData;
+	const HeaderFooterControlData *data = c->controlData;
 
 	DrawNinePatchTexture(position,
 						 c->size,

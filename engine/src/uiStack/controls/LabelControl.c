@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-Control *CreateLabelControl(char *str,
+Control *CreateLabelControl(const char *str,
 							const uint32_t size,
 							const Color color,
 							const Vector2 rectPos,

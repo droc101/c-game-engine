@@ -28,7 +28,7 @@ Control *CreateVScrollBarControl(Vector2 position, float height, ControlAnchor a
 	return scrollbar;
 }
 
-void DestroyVScrollBar(const Control *) {}
+void DestroyVScrollBar(const Control */*control*/) {}
 
 void UpdateVScrollBar(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t ctlIndex)
 {

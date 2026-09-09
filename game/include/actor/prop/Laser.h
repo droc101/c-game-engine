@@ -19,7 +19,7 @@ typedef enum LaserHeight
 	LASER_HEIGHT_FLOOR,
 	LASER_HEIGHT_MIDDLE,
 	LASER_HEIGHT_CEILING,
-	LASER_HEIGHT_TRIPLE
+	LASER_HEIGHT_TRIPLE,
 } LaserHeight;
 
 void LaserRaycastFiltersInit();

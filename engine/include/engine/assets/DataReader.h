@@ -18,14 +18,14 @@ typedef struct DataReader DataReader;
  * @param offset The initial offset into the buffer
  * @return The DataReader
  */
-DataReader *CreateDataReader(void *data, size_t bufferSize, size_t offset);
+DataReader *CreateDataReader(const void *data, size_t bufferSize, size_t offset);
 
 /**
  * Create a DataReader from an Asset
  * @param asset The Asset to read from
  * @return The DataReader
  */
-DataReader *CreateDataReaderFromAsset(Asset *asset);
+DataReader *CreateDataReaderFromAsset(const Asset *asset);
 
 /**
  * Destroy a DataReader
