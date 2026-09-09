@@ -1,20 +1,4 @@
 cmake_minimum_required(VERSION 3.18) # TODO: Figure out the real number for all of these (and test with that version)
-project(game C)
-
-include(engine/cmake/Helpers.cmake)
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin)
-file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-
-set(CMAKE_PLATFORM_NO_VERSIONED_SONAME ON)
-
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
-endif()
 
 #region Options
 
@@ -23,6 +7,7 @@ option(JOLT_BUILD_ENABLE_ASSERTS "Whether or not to enable the Jolt's assert mac
 option(JOLT_BUILD_TYPE_RELWITHDEBINFO "Whether or not to compile Jolt using a RelWithDebInfo build even when compiling a debug build of GAME." ON)
 
 option(STANDALONE_LAUNCHER "Whether or not to build only the launcher" OFF)
+
 set(X86_64_VERSION "3" CACHE STRING "The x86_64 microarchitecture level to target, 1 to 4. Using lower levels has a performance penalty.") # See https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels for details
 
 option(USE_DISCORD_SDK "Whether or not to enable the Discord Game SDK" ON)
@@ -35,6 +20,22 @@ set(STEAMWORKS_APP_ID "480" CACHE STRING "The Steam AppID to use with Steamworks
 
 #region Compile flags
 
+include(engine/cmake/Helpers.cmake)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin)
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+
+set(CMAKE_SKIP_RPATH ON)
+set(CMAKE_PLATFORM_NO_VERSIONED_SONAME ON)
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
+endif()
+
 set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=default -Wundef -fPIC ${CMAKE_C_FLAGS}")
 
 if (WIN32)
@@ -42,8 +43,8 @@ if (WIN32)
 endif ()
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -Wl,--gc-sections -fdata-sections -ffunction-sections")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wl,--gc-sections -fdata-sections -ffunction-sections")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -fdata-sections -ffunction-sections")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -fdata-sections -ffunction-sections")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
