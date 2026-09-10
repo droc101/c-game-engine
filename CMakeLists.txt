@@ -47,8 +47,8 @@ if (WIN32)
 endif ()
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -fdata-sections -ffunction-sections")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -fdata-sections -ffunction-sections")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -fdata-sections -ffunction-sections -Wl,--gc-sections")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -fdata-sections -ffunction-sections -Wl,--gc-sections")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
