@@ -194,7 +194,7 @@ void DrawNinePatchTexture(const Vector2 pos,
 		.vertices = vertices,
 		.vertexCount = ArrayLength(vertices),
 		.indices = indices,
-		.indexCount = ArrayLength(indices),
+		.indexCount = ArrayLength(indices) * ArrayLength(*indices),
 	};
 
 	DrawUiTriangles(&tris, texture, COLOR_WHITE);
