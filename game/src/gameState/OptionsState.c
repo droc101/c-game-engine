@@ -27,11 +27,12 @@
 #include "gameState/options/SoundOptionsState.h"
 #include "gameState/options/VideoOptionsState.h"
 #include "gameState/PauseState.h"
+#include "gameState/RenderingTogglesState.h"
 
 static UiStack *optionsStack = NULL;
 bool optionsStateInGame = false;
 
-static void BtnOptionsBack(Control */*control*/, void */*extraData*/)
+static void BtnOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	if (optionsStateInGame)
@@ -80,27 +81,32 @@ static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(optionsStack);
 }
 
-static void BtnVideoOptions(Control */*control*/, void */*extraData*/)
+static void BtnVideoOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&VideoOptionsState);
 }
 
-static void BtnSoundOptions(Control */*control*/, void */*extraData*/)
+static void BtnSoundOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&SoundOptionsState);
 }
 
-static void BtnInputOptions(Control */*control*/, void */*extraData*/)
+static void BtnInputOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&InputOptionsState);
 }
 
-static void BtnDebugOptions(Control */*control*/, void */*extraData*/)
+static void BtnDebugOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&DebugOptionsState);
 }
 
-static void CbOptionsEnableDiscordRpc(const OptionsButtonValue */*value*/, void */*extraData*/)
+static void BtnRenderingToggles(Control * /*control*/, void * /*extraData*/)
+{
+	SetGameState(&RenderingTogglesState);
+}
+
+static void CbOptionsEnableDiscordRpc(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	if (!GetState()->options.enableDiscordRpc)
 	{
@@ -143,6 +149,14 @@ static void OptionsStateSet()
 		opY += opSpacing;
 		UiStackPush(optionsStack,
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Debug Options", BtnDebugOptions, TOP_CENTER, NULL));
+		opY += opSpacing;
+		UiStackPush(optionsStack,
+					CreateButtonControl(v2(0, opY),
+										v2(480, 40),
+										"Rendering Toggles",
+										BtnRenderingToggles,
+										TOP_CENTER,
+										NULL));
 #ifdef ENABLE_DISCORD_SDK
 		opY += opSpacing * 1.5f;
 		const ControlValue discordRpcValue = {

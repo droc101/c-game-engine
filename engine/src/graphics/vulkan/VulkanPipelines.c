@@ -145,12 +145,14 @@ static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule shadowMapsFragShaderModule = LUNA_NULL_HANDLE;
 
-static const VkSpecializationMapEntry SPECIALIZATION_MAP_ENTRY = {
-	.size = sizeof(uint32_t),
+static const VkSpecializationMapEntry SPECIALIZATION_MAP_ENTRIES[] = {
+	{
+		.size = sizeof(uint32_t),
+	},
 };
 static VkSpecializationInfo specializationInfo = {
-	.mapEntryCount = 1,
-	.pMapEntries = &SPECIALIZATION_MAP_ENTRY,
+	.mapEntryCount = ArrayLength(SPECIALIZATION_MAP_ENTRIES),
+	.pMapEntries = SPECIALIZATION_MAP_ENTRIES,
 	.dataSize = sizeof(uint32_t),
 };
 #pragma endregion shared

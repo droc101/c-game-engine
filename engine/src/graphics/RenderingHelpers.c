@@ -12,6 +12,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>

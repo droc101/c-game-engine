@@ -86,6 +86,7 @@ enum PendingTasksBitFlags
 {
 	PENDING_TASK_UI_BUFFERS_RESIZE_BIT = 1 << 0,
 	PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS = 1 << 1,
+	PENDING_TASK_RELOAD_LIGHTING_SHADERS = 1 << 2,
 };
 
 typedef struct CameraUniform
@@ -455,6 +456,11 @@ typedef struct ModelActorCullingInfo
 	uint32_t castsShadows;
 	uint32_t drawInfoIndex;
 } ModelActorCullingInfo;
+
+typedef struct RenderingToggles
+{
+	VkBool32 indirectLighting;
+} RenderingToggles;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -494,6 +500,7 @@ extern uint32_t lightmapTextureSize;
 extern LockingList dynamicLightsToAdd;
 extern LockingList dynamicLightsToRemove;
 extern List dynamicLights;
+extern RenderingToggles renderingToggles;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t

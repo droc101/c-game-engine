@@ -15,6 +15,7 @@
 #include <engine/Engine.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>

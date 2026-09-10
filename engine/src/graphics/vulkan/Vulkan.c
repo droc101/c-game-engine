@@ -11,7 +11,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
-#include <engine/debug/DPrint.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
@@ -1960,52 +1959,6 @@ bool VK_Init(SDL_Window *window)
 	VK_Cleanup();
 
 	return false;
-}
-
-void VK_DPrintDevice()
-{
-	const char *gpuType = "Unknown";
-	switch (physicalDeviceProperties.deviceType)
-	{
-		case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-			gpuType = "Integrated";
-			break;
-		case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-			gpuType = "Discrete";
-			break;
-		case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-			gpuType = "Virtual";
-			break;
-		case VK_PHYSICAL_DEVICE_TYPE_CPU:
-			gpuType = "CPU";
-			break;
-		default:
-			break;
-	}
-
-	DPrintF("GPU: %s (%s)", COLOR_WHITE, physicalDeviceProperties.deviceName, gpuType);
-	DPrintF("Vulkan: %u.%u.%u",
-			COLOR_WHITE,
-			VK_API_VERSION_MAJOR(physicalDeviceProperties.apiVersion),
-			VK_API_VERSION_MINOR(physicalDeviceProperties.apiVersion),
-			VK_API_VERSION_PATCH(physicalDeviceProperties.apiVersion));
-}
-
-void VK_DPrintSceneStatistics()
-{
-	DPrintF("Vulkan scene statistics:", COLOR_WHITE);
-	DPrintF("Map vertex/index count: %u/%u",
-			COLOR_WHITE,
-			lunaGetBufferSize(buffers.map.vertices) / sizeof(ModelVertex),
-			lunaGetBufferSize(buffers.map.indices) / sizeof(uint32_t));
-	DPrintF("Actor model vertex/index count: %u/%u",
-			COLOR_WHITE,
-			lunaGetBufferSize(buffers.actorModels.vertices) / sizeof(ModelVertex),
-			lunaGetBufferSize(buffers.actorModels.indices) / sizeof(uint32_t));
-	DPrintF("Actor wall shaded/unshaded count: %u/%u",
-			COLOR_WHITE,
-			buffers.actorWalls.shadedInstanceCount,
-			buffers.actorWalls.unshadedInstanceCount);
 }
 
 bool VK_FrameStart()

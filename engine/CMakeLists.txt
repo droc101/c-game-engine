@@ -157,6 +157,8 @@ target_sources(engine INTERFACE
         src/graphics/vulkan/VulkanPipelines.c
         src/graphics/vulkan/VulkanResources.c
         include/engine/graphics/vulkan/VulkanResources.h
+        src/graphics/vulkan/VulkanDebug.c
+        include/engine/graphics/vulkan/VulkanDebug.h
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h

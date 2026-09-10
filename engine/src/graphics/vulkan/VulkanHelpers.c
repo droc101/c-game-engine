@@ -81,6 +81,9 @@ uint32_t lightmapTextureSize = 0;
 LockingList dynamicLightsToAdd = {0};
 LockingList dynamicLightsToRemove = {0};
 List dynamicLights = {0};
+RenderingToggles renderingToggles = {
+	.indirectLighting = VK_TRUE,
+};
 
 static CameraUniform uniform;
 #pragma endregion variables
@@ -134,6 +137,7 @@ inline uint32_t ImageIndex(const Image *image)
 	const uint32_t index = imageAssetIdToIndexMap[image->id];
 	if (index == -1u)
 	{
+		// TODO: Only error if the missing texture fails to load
 		if (!LoadTexture(image))
 		{
 			Error("Failed to load texture into VkImage!");
@@ -261,7 +265,10 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 			.layers = 1,
 		};
 		VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &directionalLightShadowMapAtlasFramebufferCreateInfo, NULL, framebuffer),
+		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice,
+												   &directionalLightShadowMapAtlasFramebufferCreateInfo,
+												   NULL,
+												   framebuffer),
 							   "Failed to create spot light shadow map framebuffer!");
 
 		shadowMapImageInfos->image = *image;
