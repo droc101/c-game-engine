@@ -3,6 +3,8 @@
 #include "shared.inc.glsl"
 
 layout(constant_id = 0) const uint MAX_LIGHT_COUNT = 1;
+layout(constant_id = 1) const uint SAMPLE_COUNT = 32;
+layout(constant_id = 2) const float SAMPLE_RADIUS = 4.0;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
@@ -62,8 +64,6 @@ float getLightBrightness(const Light light, const float distance, const float th
     return brightness;
 }
 
-const uint SAMPLE_COUNT = 32;
-
 vec2 getSoftShadowKernel(const float sampleIndex) {
     float r = sqrt(sampleIndex + 0.5) / sqrt(float(SAMPLE_COUNT));
     float theta = sampleIndex * 2.4;
@@ -81,18 +81,21 @@ float sampleShadowMapInternal(nonuniformEXT sampler2DShadow shadowMap, const vec
     const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
 
     float sum = 0.0;
+    vec2 sampleUv = uv + size * (diskRotation * getSoftShadowKernel(0));
     for (uint i = 0; i < SAMPLE_COUNT; i++) {
-        sum += texture(shadowMap, vec3(uv + size * (diskRotation * getSoftShadowKernel(float(i))), depth));
+        float factor = texture(shadowMap, vec3(sampleUv, depth));
+        sampleUv = uv + size * (diskRotation * getSoftShadowKernel(i + 1));
+        sum += factor;
     }
     return sum / float(SAMPLE_COUNT);
 }
 
 float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth) {
-    return sampleShadowMapInternal(shadowMap, uv * 0.5 + 0.5, depth, 4.0 / float(pushConstants.shadowMapSize));
+    return sampleShadowMapInternal(shadowMap, uv * 0.5 + 0.5, depth, SAMPLE_RADIUS / float(pushConstants.shadowMapSize));
 }
 
 float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord) {
-    return sampleShadowMapInternal(directionalLightShadowMapAtlas, (coord.xy * 0.5 + 0.5 + vec2(cascadeIndex % 2, cascadeIndex / 2)) * 0.5, coord.z, 4.0 / float(2 * pushConstants.shadowMapSize));
+    return sampleShadowMapInternal(directionalLightShadowMapAtlas, (coord.xy * 0.25 + 0.25 + vec2(cascadeIndex % 2, cascadeIndex / 2) * 0.5) , coord.z, SAMPLE_RADIUS / float(2 * pushConstants.shadowMapSize));
 }
 
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
