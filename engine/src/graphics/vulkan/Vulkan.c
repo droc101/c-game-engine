@@ -18,6 +18,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
@@ -739,19 +740,19 @@ static inline VkResult CreatePerFrustumBuffers()
 		&buffers.actorWalls.shadedInstanceIndices,
 		&buffers.actorWalls.unshadedInstanceIndices,
 	};
-	for (size_t j = 0; j < sizeof(drawInfoBufferLists) / sizeof(*drawInfoBufferLists); j++)
+	for (size_t j = 0; j < ArrayLength(drawInfoBufferLists); j++)
 	{
 		ListFree(*drawInfoBufferLists[j]);
 		ListInit(*drawInfoBufferLists[j], LIST_POINTER);
 	}
-	for (size_t j = 0; j < sizeof(instanceIndicesLists) / sizeof(*instanceIndicesLists); j++)
+	for (size_t j = 0; j < ArrayLength(instanceIndicesLists); j++)
 	{
 		ListFree(*instanceIndicesLists[j]);
 		ListInit(*instanceIndicesLists[j], LIST_POINTER);
 	}
 	for (uint32_t i = 0; i < frustumCount; i++)
 	{
-		for (size_t j = 0; j < sizeof(drawInfoBufferLists) / sizeof(*drawInfoBufferLists); j++)
+		for (size_t j = 0; j < ArrayLength(drawInfoBufferLists); j++)
 		{
 			List *list = drawInfoBufferLists[j];
 			LunaBuffer *buffer = ListAdd(*list, LUNA_NULL_HANDLE);
@@ -767,7 +768,7 @@ static inline VkResult CreatePerFrustumBuffers()
 			}
 			ListAdd(perFrustumBuffersHandles, *buffer);
 		}
-		for (size_t j = 0; j < sizeof(instanceIndicesLists) / sizeof(*instanceIndicesLists); j++)
+		for (size_t j = 0; j < ArrayLength(instanceIndicesLists); j++)
 		{
 			LunaBuffer *buffer = ListAdd(*(instanceIndicesLists[j]), LUNA_NULL_HANDLE);
 			VulkanTestReturnResult(lunaCreateBuffer(device, &instanceIndicesBufferCreationInfo, buffer),
@@ -1471,7 +1472,7 @@ static inline VkResult UpdateLightShadowMaps(const Light *light,
 		},
 	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
 	shadowMapPushConstants.lightType = light->type;
@@ -2094,16 +2095,16 @@ bool VK_RenderMap(Map *map, Camera *camera)
 		descriptorSets.shadowMaps.set,
 	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-		.descriptorSetBindInfo.descriptorSetCount = sizeof(descriptorSetHandles) / sizeof(*descriptorSetHandles),
+		.descriptorSetBindInfo.descriptorSetCount = ArrayLength(descriptorSetHandles),
 		.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
-		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
 
 	const LunaGraphicsPipelineBindInfo prepassPipelineBindInfo = {
 		.descriptorSetBindInfo.descriptorSetCount = 1,
 		.descriptorSetBindInfo.descriptorSets = &descriptorSets.common.set,
-		.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
 	VulkanTest(DrawMap(0, &prepassPipelineBindInfo, true, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE),
@@ -2216,9 +2217,9 @@ bool VK_FrameEnd()
 			descriptorSets.shadowMaps.set,
 		};
 		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetBindInfo.descriptorSetCount = sizeof(descriptorSetHandles) / sizeof(*descriptorSetHandles),
+			.descriptorSetBindInfo.descriptorSetCount = ArrayLength(descriptorSetHandles),
 			.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
-			.dynamicStateCount = sizeof(dynamicStateBindInfos) / sizeof(*dynamicStateBindInfos),
+			.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 			.dynamicStates = dynamicStateBindInfos,
 		};
 		const LunaDrawIndexedInfo drawInfo = {

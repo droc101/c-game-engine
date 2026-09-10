@@ -8,6 +8,7 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/helpers/Macros.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -191,9 +192,9 @@ void DrawNinePatchTexture(const Vector2 pos,
 
 	const UiTriangleArray tris = {
 		.vertices = vertices,
-		.vertexCount = sizeof(vertices) / (sizeof(float) * 4),
+		.vertexCount = ArrayLength(vertices),
 		.indices = indices,
-		.indexCount = sizeof(indices) / sizeof(uint32_t),
+		.indexCount = ArrayLength(indices),
 	};
 
 	DrawUiTriangles(&tris, texture, COLOR_WHITE);

@@ -5,6 +5,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
@@ -312,9 +313,9 @@ bool CreateRenderPass()
 		.colorAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_MODE_CLEAR,
 		.createDepthAttachment = true,
 		.depthAttachmentLoadMode = LUNA_ATTACHMENT_LOAD_MODE_CLEAR,
-		.subpassCount = sizeof(subpasses) / sizeof(*subpasses),
+		.subpassCount = ArrayLength(subpasses),
 		.subpasses = subpasses,
-		.dependencyCount = sizeof(dependencies) / sizeof(*dependencies),
+		.dependencyCount = ArrayLength(dependencies),
 		.dependencies = dependencies,
 		.extent = (VkExtent3D){.width = extent.width, .height = extent.height, .depth = 1},
 		.maxExtent = (VkExtent3D){.width = bounds.w, .height = bounds.h, .depth = 1},
@@ -388,7 +389,7 @@ bool CreateDescriptorSetLayouts()
 	};
 	const LunaDescriptorSetLayoutCreationInfo commonDescriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
-		.bindingCount = sizeof(commonBindings) / sizeof(*commonBindings),
+		.bindingCount = ArrayLength(commonBindings),
 		.bindings = commonBindings,
 	};
 	VulkanTest(lunaCreateDescriptorSetLayout(device,
@@ -405,7 +406,7 @@ bool CreateDescriptorSetLayouts()
 		},
 	};
 	const LunaDescriptorSetLayoutCreationInfo cullingDescriptorSetLayoutCreationInfo = {
-		.bindingCount = sizeof(cullingBindings) / sizeof(*cullingBindings),
+		.bindingCount = ArrayLength(cullingBindings),
 		.bindings = cullingBindings,
 	};
 	VulkanTest(lunaCreateDescriptorSetLayout(device,
@@ -588,7 +589,7 @@ bool CreateDescriptorSet()
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
 		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
 		.maxSets = 3,
-		.poolSizeCount = sizeof(poolSizes) / sizeof(*poolSizes),
+		.poolSizeCount = ArrayLength(poolSizes),
 		.poolSizes = poolSizes,
 	};
 	VulkanTest(lunaCreateDescriptorPool(device, &descriptorPoolCreationInfo, &descriptorPool),
@@ -606,7 +607,7 @@ bool CreateDescriptorSet()
 	};
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,
-		.setLayoutCount = sizeof(layouts) / sizeof(*layouts),
+		.setLayoutCount = ArrayLength(layouts),
 		.setLayouts = layouts,
 	};
 	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, descriptorSetHandles),

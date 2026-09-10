@@ -8,6 +8,7 @@
 #include <engine/assets/FontLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/helpers/Macros.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/subsystem/Error.h>
@@ -38,15 +39,12 @@ static Font *GenerateFallbackFont(const char *asset)
 	CheckAlloc(font->texture);
 	strcpy(font->texture, MISSING_TEXTURE_NAME);
 	const Image *img = GetMissingTexture();
-	static_assert(sizeof(font->charWidths) / sizeof(*font->charWidths) ==
-								  sizeof(font->charStartUVs) / sizeof(*font->charStartUVs) &&
-						  sizeof(font->charWidths) / sizeof(*font->charWidths) ==
-								  sizeof(font->charEndUVs) / sizeof(*font->charEndUVs),
+	static_assert(ArrayLength(font->charWidths) == ArrayLength(font->charStartUVs) &&
+						  ArrayLength(font->charWidths) == ArrayLength(font->charEndUVs),
 				  "Array lengths must match!");
-	static_assert((uint8_t)(sizeof(font->charWidths) / sizeof(*font->charWidths)) ==
-						  (sizeof(font->charWidths) / sizeof(*font->charWidths)),
+	static_assert((uint8_t)(ArrayLength(font->charWidths)) == ArrayLength(font->charWidths),
 				  "Array must have a uint8_t element count!");
-	font->charCount = sizeof(font->charWidths) / sizeof(*font->charWidths);
+	font->charCount = ArrayLength(font->charWidths);
 	for (int i = 0; i < font->charCount; i++)
 	{
 		font->charWidths[i] = 16;
@@ -112,9 +110,9 @@ static Font *LoadFontInternal(const char *asset)
 	free(fontTexture);
 	const Image *img = LoadImage(font->texture);
 	font->charCount = ReadUint8(reader);
-	memset(font->charWidths, 0, sizeof(font->charWidths) / sizeof(*font->charWidths));
-	memset(font->charStartUVs, 0, sizeof(font->charStartUVs) / sizeof(*font->charStartUVs));
-	memset(font->charEndUVs, 0, sizeof(font->charEndUVs) / sizeof(*font->charEndUVs));
+	memset(font->charWidths, 0, ArrayLength(font->charWidths));
+	memset(font->charStartUVs, 0, ArrayLength(font->charStartUVs));
+	memset(font->charEndUVs, 0, ArrayLength(font->charEndUVs));
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{

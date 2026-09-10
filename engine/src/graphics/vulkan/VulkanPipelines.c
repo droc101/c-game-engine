@@ -9,6 +9,7 @@
 #include <engine/assets/ShaderLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/Macros.h>
 #include <engine/structs/Map.h>
 #include <luna/luna.h>
 #include <luna/lunaDrawing.h>
@@ -209,7 +210,7 @@ static inline bool CreateUIPipeline()
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &bindingDescription,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
@@ -233,7 +234,7 @@ static inline bool CreateUIPipeline()
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -321,14 +322,14 @@ static inline bool CreateShadedMapPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -400,14 +401,14 @@ static inline bool CreateUnshadedMapPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -471,9 +472,9 @@ static inline bool CreateSkyPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
@@ -490,7 +491,7 @@ static inline bool CreateSkyPipeline()
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -609,14 +610,14 @@ static inline bool CreateShadedModelPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -724,14 +725,14 @@ static inline bool CreateUnshadedModelPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -815,14 +816,14 @@ static inline bool CreateShadedActorModelPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -899,14 +900,14 @@ static inline bool CreateUnshadedActorModelPipeline()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -991,14 +992,14 @@ static inline bool CreateActorWallPipelines()
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	const LunaGraphicsPipelineCreationInfo shadedPipelineInfo = {
-		.shaderStageCount = sizeof(shadedShaderStages) / sizeof(*shadedShaderStages),
+		.shaderStageCount = ArrayLength(shadedShaderStages),
 		.shaderStages = shadedShaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -1017,7 +1018,7 @@ static inline bool CreateActorWallPipelines()
 			   "Failed to create shaded actor wall graphics pipeline!");
 
 	const LunaGraphicsPipelineCreationInfo unshadedPipelineInfo = {
-		.shaderStageCount = sizeof(unshadedShaderStages) / sizeof(*unshadedShaderStages),
+		.shaderStageCount = ArrayLength(unshadedShaderStages),
 		.shaderStages = unshadedShaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -1082,7 +1083,7 @@ static inline bool CreateDebugDrawPipeline()
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 		.vertexBindingDescriptionCount = 1,
 		.pVertexBindingDescriptions = &bindingDescription,
-		.vertexAttributeDescriptionCount = sizeof(vertexDescriptions) / sizeof(*vertexDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(vertexDescriptions),
 		.pVertexAttributeDescriptions = vertexDescriptions,
 	};
 
@@ -1098,7 +1099,7 @@ static inline bool CreateDebugDrawPipeline()
 		.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
 	};
 	const LunaGraphicsPipelineCreationInfo linesPipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &LINES_INPUT_ASSEMBLY,
@@ -1115,7 +1116,7 @@ static inline bool CreateDebugDrawPipeline()
 			   "Failed to create graphics pipeline for Jolt debug renderer lines!");
 
 	const LunaGraphicsPipelineCreationInfo trianglesPipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -1177,14 +1178,14 @@ static inline VkResult CreateOpaqueMapDepthPipelines(const bool shadowMaps)
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -1295,14 +1296,14 @@ static inline VkResult CreateMapShadowMapPipeline(const bool shadowMaps)
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -1435,14 +1436,14 @@ static inline VkResult CreateModelActorDepthPipelines(const bool shadowMaps)
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,
@@ -1550,14 +1551,14 @@ static inline VkResult CreateWallActorDepthPipelines(const bool shadowMaps)
 	};
 	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = sizeof(bindingDescriptions) / sizeof(*bindingDescriptions),
+		.vertexBindingDescriptionCount = ArrayLength(bindingDescriptions),
 		.pVertexBindingDescriptions = bindingDescriptions,
-		.vertexAttributeDescriptionCount = sizeof(attributeDescriptions) / sizeof(*attributeDescriptions),
+		.vertexAttributeDescriptionCount = ArrayLength(attributeDescriptions),
 		.pVertexAttributeDescriptions = attributeDescriptions,
 	};
 
 	LunaGraphicsPipelineCreationInfo pipelineInfo = {
-		.shaderStageCount = sizeof(shaderStages) / sizeof(*shaderStages),
+		.shaderStageCount = ArrayLength(shaderStages),
 		.shaderStages = shaderStages,
 		.vertexInputState = &vertexInputInfo,
 		.inputAssemblyState = &INPUT_ASSEMBLY,

@@ -160,14 +160,15 @@ target_sources(engine INTERFACE
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h
+        src/helpers/BackgroundMapManager.c
+        include/engine/helpers/BackgroundMapManager.h
+        include/engine/helpers/Macros.h
         src/helpers/MathEx.c
         include/engine/helpers/MathEx.h
         src/helpers/PlatformHelpers.c
         include/engine/helpers/PlatformHelpers.h
         src/helpers/Realloc.c
         include/engine/helpers/Realloc.h
-        src/helpers/BackgroundMapManager.c
-        include/engine/helpers/BackgroundMapManager.h
 
         src/physics/Navigation.c
         include/engine/physics/Navigation.h

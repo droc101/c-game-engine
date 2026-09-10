@@ -27,8 +27,6 @@
 #pragma region macros
 #define FRAMES_IN_FLIGHT 1
 
-#define SizeofMember(Type, member) (sizeof(((Type *)0)->member))
-
 #define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
 #define VulkanTestInternal(function, returnValue, ...) \
 	{ \
