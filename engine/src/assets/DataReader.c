@@ -13,12 +13,12 @@
 
 struct DataReader
 {
-	uint8_t *data;
+	const uint8_t *data;
 	size_t offset;
 	size_t totalBufferSize;
 };
 
-DataReader *CreateDataReader(void *data, const size_t bufferSize, const size_t offset)
+DataReader *CreateDataReader(const void *data, const size_t bufferSize, const size_t offset)
 {
 	DataReader *reader = malloc(sizeof(DataReader));
 	CheckAlloc(reader);
@@ -28,7 +28,7 @@ DataReader *CreateDataReader(void *data, const size_t bufferSize, const size_t o
 	return reader;
 }
 
-DataReader *CreateDataReaderFromAsset(Asset *asset)
+DataReader *CreateDataReaderFromAsset(const Asset *asset)
 {
 	return CreateDataReader(asset->data, asset->size, 0);
 }

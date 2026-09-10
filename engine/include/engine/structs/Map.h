@@ -32,7 +32,7 @@ enum MapChangeFlags
 	MAP_LIGHT_CHANGED = 1 << 1,
 	MAP_EXPOSURE_CHANGED = 1 << 1,
 	MAP_FOG_CHANGED = 1 << 2,
-	MAP_VIEWMODEL_CHANGED = 1 << 3
+	MAP_VIEWMODEL_CHANGED = 1 << 3,
 };
 
 struct MapVertex

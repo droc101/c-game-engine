@@ -29,7 +29,7 @@ struct ConsoleMessage
 	size_t time;
 };
 
-static const Color ansiColors[] = {
+static const Color ANSI_COLORS[] = {
 	// NORMAL COLORS
 	COLOR_BLACK, // BLACK
 	COLOR(0xFFD00000), // RED
@@ -85,10 +85,10 @@ void AddConsoleMessage(const char *msg, const int color)
 	cm->message = strdup(msg);
 	if (color >= 90)
 	{
-		cm->color = ansiColors[(color % 10) + 9];
+		cm->color = ANSI_COLORS[(color % 10) + 9];
 	} else
 	{
-		cm->color = ansiColors[color % 10];
+		cm->color = ANSI_COLORS[color % 10];
 	}
 	// time will be set when the message is first processed so a 2-second frame doesn't result in messages not getting shown
 	cm->time = 0;

@@ -36,14 +36,14 @@ void LogInternal(const char *type, int color, bool flush, const char *message, .
  * Log an info message
  * @param ... Format arguments
  */
-#define LogInfo(...) LogInternal("INFO", 37, FLUSH_ON_INFO, __VA_ARGS__)
+#define LogInfo(...) LogInternal("INFO", 39, FLUSH_ON_INFO, __VA_ARGS__)
 
 #ifdef BUILDSTYLE_DEBUG
 /**
  * Log an info message, but only in debug builds
  * @param ... Format arguments
  */
-#define LogDebug(...) LogInternal("DEBUG", 37, FLUSH_ON_DEBUG, __VA_ARGS__)
+#define LogDebug(...) LogInternal("DEBUG", 39, FLUSH_ON_DEBUG, __VA_ARGS__)
 #else
 #define LogDebug(...)
 #endif

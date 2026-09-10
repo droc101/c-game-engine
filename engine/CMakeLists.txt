@@ -9,6 +9,7 @@ detect_platform()
 
 #region Dependencies
 
+message(STATUS "Fetching SDL3...")
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin) # TODO SDL3 seems to put its DLLs in the RUNTIME output dir for some reason
 disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI_DEFAULT SDL_POWER_DEFAULT
@@ -17,6 +18,7 @@ disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI
 fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
 target_compile_options(SDL3-shared PRIVATE "-w")
 
+message(STATUS "Fetching SDL3_mixer...")
 disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
         SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK)
 fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git release-3.*.* SDL3_mixer)
@@ -36,6 +38,7 @@ FetchContent_Declare(
         GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(Luna)
+
 if (x86_64 AND USE_DISCORD_SDK)
     fetch_discord_sdk()
 endif ()

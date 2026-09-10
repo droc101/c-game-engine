@@ -23,6 +23,7 @@
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
+#include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
@@ -48,11 +49,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
-// Exporting these symbols tells GPU drivers to use the dedicated GPU on hybrid systems
-// I do not know if these do anything on Linux, but they are here just in case.
-EXPORT_SYM uint32_t NvOptimusEnablement = 0x00000001;
-EXPORT_SYM int AmdPowerXpressRequestHighPerformance = 1;
 
 static SDL_Surface *windowIcon;
 static SDL_Event event;

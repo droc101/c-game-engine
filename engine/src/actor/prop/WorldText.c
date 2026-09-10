@@ -18,11 +18,11 @@
 #include <joltc/Math/RVec3.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyInterface.h>
-#include <SDL3/SDL_stdinc.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct WorldTextData
 {

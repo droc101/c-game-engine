@@ -41,14 +41,14 @@ enum ControlType
 	OPTIONS_BUTTON,
 	ICON_BUTTON,
 	IMAGE,
-	CONTROL_TYPE_COUNT
+	CONTROL_TYPE_COUNT,
 };
 
 enum ControlState
 {
 	NORMAL,
 	HOVER,
-	ACTIVE
+	ACTIVE,
 };
 
 enum ControlAnchor

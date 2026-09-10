@@ -225,6 +225,10 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/,
 		return;
 	}
 	VK_DrawJoltDebugRendererLine(from, to, color);
+#else
+	(void)from;
+	(void)to;
+	(void)color;
 #endif
 }
 
@@ -241,6 +245,11 @@ void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
 		return;
 	}
 	VK_DrawJoltDebugRendererTriangle((Vector3[]){*v1, *v2, *v3}, color);
+#else
+	(void)v1;
+	(void)v2;
+	(void)v3;
+	(void)color;
 #endif
 }
 

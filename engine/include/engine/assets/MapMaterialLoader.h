@@ -18,7 +18,7 @@ typedef struct MapMaterial MapMaterial;
 
 enum SoundClass
 {
-	SOUND_CLASS_DEFAULT
+	SOUND_CLASS_DEFAULT,
 };
 
 struct MapMaterial

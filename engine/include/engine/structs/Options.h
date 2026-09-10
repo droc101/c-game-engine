@@ -23,7 +23,7 @@ enum OptionsMsaa
 	MSAA_NONE = 0,
 	MSAA_2X = 1,
 	MSAA_4X = 2,
-	MSAA_8X = 3
+	MSAA_8X = 3,
 };
 
 enum OptionsAnisotropy
@@ -32,7 +32,7 @@ enum OptionsAnisotropy
 	ANISOTROPY_2X = 1,
 	ANISOTROPY_4X = 2,
 	ANISOTROPY_8X = 3,
-	ANISOTROPY_16X = 4
+	ANISOTROPY_16X = 4,
 };
 
 enum OptionsGpuType

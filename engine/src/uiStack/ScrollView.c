@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -100,7 +101,7 @@ void ProcessScrollView(ScrollView *view)
 	}
 }
 
-Vector2 CalculateScrollViewScrollBarPosition(const Control *control, const void *positioningData)
+Vector2 CalculateScrollViewScrollBarPosition(const Control * /*control*/, const void *positioningData)
 {
 	const ScrollView *view = positioningData;
 	return v2(view->anchoredPosition.x + view->size.x + 16, view->anchoredPosition.y);

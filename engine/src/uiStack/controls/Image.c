@@ -38,7 +38,7 @@ void DestroyImage(const Control *c)
 	free(c->controlData);
 }
 
-void DrawImage(const Control *c, ControlState state, Vector2 position)
+void DrawImage(const Control *c, ControlState /*state*/, Vector2 position)
 {
 	ImageData *data = c->controlData;
 	DrawTexture(position, c->size, data->texture);

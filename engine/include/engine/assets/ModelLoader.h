@@ -39,7 +39,7 @@ enum ModelShader
 	/// A basic shader with no lighting
 	SHADER_UNSHADED,
 	/// A shader with basic lighting based on the vertex normals.
-	SHADER_SHADED
+	SHADER_SHADED,
 };
 
 enum CollisionModelType
@@ -49,7 +49,7 @@ enum CollisionModelType
 	/// This model contains a static collision mesh (@c JPH_MeshShape)
 	COLLISION_MODEL_TYPE_STATIC,
 	/// This model contains a set of convex hulls in a compound shape (@c JPH_StaticCompoundShape)
-	COLLISION_MODEL_TYPE_DYNAMIC
+	COLLISION_MODEL_TYPE_DYNAMIC,
 };
 
 struct Material
