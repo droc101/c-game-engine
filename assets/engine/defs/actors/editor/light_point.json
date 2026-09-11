@@ -31,13 +31,13 @@
     "constant_attenuation": {
       "display": "Constant Attenuation",
       "type": "float",
-      "default": 0.0,
+      "default": 0.25,
       "minimum": 0.0
     },
     "linear_attenuation": {
       "display": "Linear Attenuation",
       "type": "float",
-      "default": 0.0,
+      "default": 1.0,
       "minimum": 0.0
     },
     "quadratic_attenuation": {
@@ -49,7 +49,7 @@
     "attenuation_multiplier": {
       "display": "Attenuation Multiplier",
       "type": "float",
-      "default": 32.0,
+      "default": 25.0,
       "minimum": 0.0
     }
   }

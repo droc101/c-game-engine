@@ -1,5 +1,5 @@
 {
-  "description": "Gof",
+  "description": "Fog",
   "extends": "actor",
   "renderers": [
     {

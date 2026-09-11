@@ -1,6 +1,6 @@
 {
   "extends": "actor",
-  "description": "Button that can be pressed with the use key",
+  "description": "Button that can be pressed with the interact key",
   "renderers": [
     {
       "type": "point",
