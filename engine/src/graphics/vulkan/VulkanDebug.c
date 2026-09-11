@@ -67,7 +67,8 @@ void VK_DPrintSceneStatistics()
 			buffers.actorWalls.unshadedInstanceCount);
 }
 
-bool VK_ToggleIndirectLight()
+void VK_ToggleBakedLighting()
 {
-	pendingTasks |= PENDING_TASK_RELOAD_LIGHTING_SHADERS;
+	lightingShaderSpecializationConstants.bakedLighting = !lightingShaderSpecializationConstants.bakedLighting;
+	pendingTasks |= PENDING_TASK_TOGGLE_BAKED_LIGHTING;
 }

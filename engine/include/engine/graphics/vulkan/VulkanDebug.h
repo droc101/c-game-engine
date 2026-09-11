@@ -9,6 +9,6 @@ void VK_DPrintDevice();
 
 void VK_DPrintSceneStatistics();
 
-bool VK_ToggleIndirectLight();
+void VK_ToggleBakedLighting();
 
 #endif //GAME_VULKANDEBUG_H

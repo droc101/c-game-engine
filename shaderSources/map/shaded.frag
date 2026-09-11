@@ -77,7 +77,10 @@ vec4 sampleLightmap(const sampler2D lightmap, const vec2 original_uv){
 void main() {
     outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
 	outColor.a = 1.0;
-    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));// + sampleLightmap(lightmap, inLightmapUV).rgb;
+    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
+	if (ENABLE_BAKED_LIGHTING) {
+		lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
+	}
 	float fogFactor = clamp((inDistance - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);

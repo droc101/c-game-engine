@@ -893,6 +893,7 @@ static inline VkResult LoadLights(const Map *map)
 		lunaWriteDescriptorSets(device, 1, &frustumsDescriptorWrite);
 
 		lightCount = 0;
+		lightingShaderSpecializationConstants.maxLightCount = lightCount;
 		VulkanTestReturnResult(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
 							   "Failed to resize lights buffer!");
 
@@ -920,6 +921,7 @@ static inline VkResult LoadLights(const Map *map)
 		DynamicLight *light = ListGetPointer(dynamicLights, i);
 		LoadLight(&light->light, &frustumIndex, &shadowMapIndex);
 	}
+	lightingShaderSpecializationConstants.maxLightCount = lightCount;
 
 	frustumCount = frustumIndex;
 	VulkanTestReturnResult(CreatePerFrustumBuffers(), "Failed to create per-frustum buffers!");
@@ -1626,7 +1628,7 @@ static inline VkResult UpdateDynamicLights()
 	assert(loadedMap);
 
 	uint32_t frustumIndex = staticLightFrustumCount + 1;
-	for (uint32_t i = 0; i < dynamicLights.length; lightCount++, i++)
+	for (uint32_t i = 0; i < dynamicLights.length; i++)
 	{
 		UpdateDynamicLight(ListGetPointer(dynamicLights, i), &frustumIndex);
 	}
@@ -1722,6 +1724,22 @@ static inline VkResult HandleMapChangeFlags(Map *map)
 	return VK_SUCCESS;
 }
 
+static inline bool RecreateGraphicsPipelines()
+{
+	lunaDestroyGraphicsPipeline(device, pipelines.ui);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedMap);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedMap);
+	lunaDestroyGraphicsPipeline(device, pipelines.sky);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
+
+	return CreateGraphicsPipelines();
+}
+
 /// Handles the rendererQueuedActions and pendingTasks bit masks
 static inline bool HandleDeferredWork()
 {
@@ -1809,22 +1827,12 @@ static inline bool HandleDeferredWork()
 	if (rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_SHADERS)
 	{
 		lunaDestroyComputePipeline(device, pipelines.culling);
-		lunaDestroyGraphicsPipeline(device, pipelines.ui);
-		lunaDestroyGraphicsPipeline(device, pipelines.shadedMap);
-		lunaDestroyGraphicsPipeline(device, pipelines.unshadedMap);
-		lunaDestroyGraphicsPipeline(device, pipelines.sky);
-		lunaDestroyGraphicsPipeline(device, pipelines.shadedModel);
-		lunaDestroyGraphicsPipeline(device, pipelines.unshadedModel);
-		lunaDestroyGraphicsPipeline(device, pipelines.shadedActorModel);
-		lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorModel);
-		lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
-		lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
 
 		if (!CreateCullingPipeline())
 		{
 			return false;
 		}
-		if (!CreateGraphicsPipelines())
+		if (!RecreateGraphicsPipelines())
 		{
 			return false;
 		}
@@ -1876,6 +1884,15 @@ static inline bool HandleDeferredWork()
 		VulkanTest(CreateShadowMaps(loadedMap), "Failed to create shadow maps!");
 
 		pendingTasks &= ~PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
+	}
+	if (pendingTasks & PENDING_TASK_TOGGLE_BAKED_LIGHTING)
+	{
+		if (!RecreateGraphicsPipelines())
+		{
+			return false;
+		}
+
+		pendingTasks &= ~PENDING_TASK_TOGGLE_BAKED_LIGHTING;
 	}
 
 	return true;

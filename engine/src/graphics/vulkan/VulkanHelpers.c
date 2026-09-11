@@ -81,8 +81,8 @@ uint32_t lightmapTextureSize = 0;
 LockingList dynamicLightsToAdd = {0};
 LockingList dynamicLightsToRemove = {0};
 List dynamicLights = {0};
-RenderingToggles renderingToggles = {
-	.indirectLighting = VK_TRUE,
+LightingShaderSpecializationConstants lightingShaderSpecializationConstants = {
+	.bakedLighting = VK_TRUE,
 };
 
 static CameraUniform uniform;

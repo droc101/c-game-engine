@@ -86,7 +86,7 @@ enum PendingTasksBitFlags
 {
 	PENDING_TASK_UI_BUFFERS_RESIZE_BIT = 1 << 0,
 	PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS = 1 << 1,
-	PENDING_TASK_RELOAD_LIGHTING_SHADERS = 1 << 2,
+	PENDING_TASK_TOGGLE_BAKED_LIGHTING = 1 << 2,
 };
 
 typedef struct CameraUniform
@@ -392,7 +392,6 @@ typedef struct Pipelines
 
 	LunaGraphicsPipeline ui;
 	DepthPipelines depthPrepass;
-	LunaGraphicsPipeline opaqueShadedMap;
 	LunaGraphicsPipeline shadedMap;
 	LunaGraphicsPipeline unshadedMap;
 	LunaGraphicsPipeline sky;
@@ -457,10 +456,13 @@ typedef struct ModelActorCullingInfo
 	uint32_t drawInfoIndex;
 } ModelActorCullingInfo;
 
-typedef struct RenderingToggles
+typedef struct LightingShaderSpecializationConstants
 {
-	VkBool32 indirectLighting;
-} RenderingToggles;
+	uint32_t maxLightCount;
+	uint32_t sampleCount;
+	float sampleRadius;
+	VkBool32 bakedLighting;
+} LightingShaderSpecializationConstants;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -500,7 +502,7 @@ extern uint32_t lightmapTextureSize;
 extern LockingList dynamicLightsToAdd;
 extern LockingList dynamicLightsToRemove;
 extern List dynamicLights;
-extern RenderingToggles renderingToggles;
+extern LightingShaderSpecializationConstants lightingShaderSpecializationConstants;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t

@@ -6,6 +6,8 @@ layout(constant_id = 0) const uint MAX_LIGHT_COUNT = 1;
 layout(constant_id = 1) const uint SAMPLE_COUNT = 32;
 layout(constant_id = 2) const float SAMPLE_RADIUS = 4.0;
 
+layout(constant_id = 3) const bool ENABLE_BAKED_LIGHTING = true;
+
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
 layout(push_constant) uniform PushConstants {

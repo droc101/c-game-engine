@@ -75,8 +75,6 @@ void FreeLoadTimeMapData(Map *map)
 		model->vertices = NULL;
 		model->indices = NULL;
 	}
-	free(map->lightmapPixels);
-	map->lightmapPixels = NULL;
 }
 
 void DestroyMap(Map *map)

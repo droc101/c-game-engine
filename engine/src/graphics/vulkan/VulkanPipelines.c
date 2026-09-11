@@ -145,15 +145,30 @@ static LunaShaderModule modelShadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule modelUnshadedFragShaderModule = LUNA_NULL_HANDLE;
 static LunaShaderModule shadowMapsFragShaderModule = LUNA_NULL_HANDLE;
 
-static const VkSpecializationMapEntry SPECIALIZATION_MAP_ENTRIES[] = {
+static const VkSpecializationMapEntry DEPTH_ONLY_SPECIALIZATION_MAP_ENTRY = {
+	.size = sizeof(uint32_t),
+};
+static VkSpecializationInfo depthOnlySpecializationInfo = {
+	.mapEntryCount = 1,
+	.pMapEntries = &DEPTH_ONLY_SPECIALIZATION_MAP_ENTRY,
+	.dataSize = sizeof(uint32_t),
+};
+static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
 	{
-		.size = sizeof(uint32_t),
+		.constantID = 0,
+		.offset = offsetof(LightingShaderSpecializationConstants, maxLightCount),
+		.size = SizeofMember(LightingShaderSpecializationConstants, maxLightCount),
+	},
+	{
+		.constantID = 3,
+		.offset = offsetof(LightingShaderSpecializationConstants, bakedLighting),
+		.size = SizeofMember(LightingShaderSpecializationConstants, bakedLighting),
 	},
 };
-static VkSpecializationInfo specializationInfo = {
-	.mapEntryCount = ArrayLength(SPECIALIZATION_MAP_ENTRIES),
-	.pMapEntries = SPECIALIZATION_MAP_ENTRIES,
-	.dataSize = sizeof(uint32_t),
+static VkSpecializationInfo lightingSpecializationInfo = {
+	.mapEntryCount = ArrayLength(LIGHTING_SPECIALIZATION_MAP_ENTRIES),
+	.pMapEntries = LIGHTING_SPECIALIZATION_MAP_ENTRIES,
+	.dataSize = sizeof(LightingShaderSpecializationConstants),
 };
 #pragma endregion shared
 
@@ -274,7 +289,7 @@ static inline bool CreateShadedMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = fragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &lightingSpecializationInfo,
 		},
 	};
 
@@ -532,7 +547,7 @@ static inline bool CreateShadedModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &lightingSpecializationInfo,
 		},
 	};
 
@@ -769,7 +784,7 @@ static inline bool CreateShadedActorModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &lightingSpecializationInfo,
 		},
 	};
 
@@ -947,7 +962,7 @@ static inline bool CreateActorWallPipelines()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &lightingSpecializationInfo,
 		},
 	};
 	const LunaPipelineShaderStageCreationInfo unshadedShaderStages[] = {
@@ -1159,7 +1174,7 @@ static inline VkResult CreateOpaqueMapDepthPipelines(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 	};
 
@@ -1249,12 +1264,12 @@ static inline VkResult CreateMapShadowMapPipeline(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 	};
 
@@ -1390,12 +1405,12 @@ static inline VkResult CreateModelActorDepthPipelines(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 	};
 
@@ -1511,12 +1526,12 @@ static inline VkResult CreateWallActorDepthPipelines(const bool shadowMaps)
 		{
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = shaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = shadowMapsFragShaderModule,
-			.specializationInfo = &specializationInfo,
+			.specializationInfo = &depthOnlySpecializationInfo,
 		},
 	};
 
@@ -1663,7 +1678,8 @@ bool CreateGraphicsPipelines()
 	descriptorSetLayouts[0] = descriptorSets.common.layout;
 	descriptorSetLayouts[1] = descriptorSets.shadowMaps.layout;
 	lightingShadersPushConstantsRange.dataPointer = &lightmapTextureSize;
-	specializationInfo.pData = &lightCount;
+	depthOnlySpecializationInfo.pData = &lightCount;
+	lightingSpecializationInfo.pData = &lightingShaderSpecializationConstants;
 
 	VulkanTest(CreateShaderModule(SHADER("model/shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule),
 			   "Failed to load shaded model fragment shader!");

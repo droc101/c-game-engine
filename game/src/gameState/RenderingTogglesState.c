@@ -4,11 +4,14 @@
 
 #include "gameState/RenderingTogglesState.h"
 #include <engine/graphics/Drawing.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
+#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -17,8 +20,14 @@
 #include "helpers/OptionsMenu.h"
 
 static OptionsMenu *renderingTogglesMenu;
+static bool enableBakedLighting = true;
 
-static void BtnRenderingTogglesBack(Control *, void *)
+static void ToggleBakedLightingCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
+{
+	VK_ToggleBakedLighting();
+}
+
+static void BtnRenderingTogglesBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
@@ -55,6 +64,21 @@ static void RenderingTogglesStateSet()
 	if (renderingTogglesMenu == NULL)
 	{
 		renderingTogglesMenu = CreateOptionsMenu();
+
+		OptionsMenuAddLargeControl(renderingTogglesMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Baked lighting: %s",
+															  ToggleBakedLightingCallback,
+															  TOP_CENTER,
+															  onOffButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &enableBakedLighting,
+															  },
+															  NULL));
 
 		OptionsMenuAddSimpleHeaderFooter(renderingTogglesMenu, "Rendering Toggles", BtnRenderingTogglesBack);
 	}
