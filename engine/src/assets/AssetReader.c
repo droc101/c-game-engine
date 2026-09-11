@@ -7,12 +7,12 @@
 #include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
+#include <engine/assets/FontLoader.h>
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/debug/DPrint.h>
-#include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>

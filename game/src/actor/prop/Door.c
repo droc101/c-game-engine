@@ -34,7 +34,7 @@ typedef enum
 	DOOR_CLOSED,
 	DOOR_OPENING,
 	DOOR_OPEN,
-	DOOR_CLOSING
+	DOOR_CLOSING,
 } DoorState;
 
 typedef struct DoorData

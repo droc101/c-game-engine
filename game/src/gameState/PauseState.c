@@ -42,18 +42,18 @@ static void PauseStateRender(GlobalState * /*state*/, const double /*delta*/)
 	DrawUiStack(pauseStack);
 }
 
-static void BtnPauseResume(Control *, void *)
+static void BtnPauseResume(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&MainState);
 }
 
-static void BtnOptions(Control *, void *)
+static void BtnOptions(Control */*control*/, void */*extraData*/)
 {
 	optionsStateInGame = true;
 	SetGameState(&OptionsState);
 }
 
-static void BtnPauseExit(Control *, void *)
+static void BtnPauseExit(Control */*control*/, void */*extraData*/)
 {
 	ChangeMap(NULL);
 	SetGameState(&LevelSelectState);

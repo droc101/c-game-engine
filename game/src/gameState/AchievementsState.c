@@ -26,12 +26,12 @@
 
 static OptionsMenu *achievementsOptionsMenu = NULL;
 
-static void DoneButton(Control *, void *)
+static void DoneButton(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&MenuState);
 }
 
-static void ResetButton(Control *, void *)
+static void ResetButton(Control */*control*/, void */*extraData*/)
 {
 	ResetAchievements();
 	SetGameState(&AchievementsState);

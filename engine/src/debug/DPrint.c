@@ -39,5 +39,5 @@ void DPrintF(const char *format, const Color color, ...)
 
 void DPrintSpacing(const uint32_t spacing)
 {
-	dprintYPosition += spacing;
+	dprintYPosition += (int)spacing;
 }

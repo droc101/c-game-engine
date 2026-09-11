@@ -103,6 +103,10 @@ static void SetSliderValue(SliderData *data, float newValue, const float roundTo
 	}
 
 	newValue = clamp(newValue, data->min, data->max);
+	if (newValue == GetSliderValueAsFloat(data))
+	{
+		return;
+	}
 
 	switch (data->value.type)
 	{

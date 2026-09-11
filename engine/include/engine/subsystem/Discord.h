@@ -10,7 +10,7 @@ typedef enum RPCState
 	UNKNOWN,
 	IN_MENUS,
 	IN_GAME,
-	PAUSED
+	PAUSED,
 } RPCState;
 
 /**

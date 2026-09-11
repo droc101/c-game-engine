@@ -58,14 +58,12 @@ static OptionsButtonValue buttonValues[3] = {
 	},
 };
 
-static const int ENTRY_HEIGHT = 44;
-
-static void BtnDebugOptionsBack(Control *, void *)
+static void BtnDebugOptionsBack(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&OptionsState);
 }
 
-static void BtnDebugOptionsReset(Control *, void *)
+static void BtnDebugOptionsReset(Control */*control*/, void */*extraData*/)
 {
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{

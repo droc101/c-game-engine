@@ -772,6 +772,8 @@ static inline VkResult DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pip
 		VulkanTestReturnResult(lunaDrawBuffer(device, commandBuffer, buffers.debugDrawTriangles.buffer, &drawInfo),
 							   "Failed to draw Jolt debug renderer triangles!");
 	}
+#else
+	(void)pipelineBindInfo;
 #endif
 
 	return VK_SUCCESS;

@@ -31,7 +31,7 @@
 static UiStack *optionsStack = NULL;
 bool optionsStateInGame = false;
 
-static void BtnOptionsBack(Control *, void *)
+static void BtnOptionsBack(Control */*control*/, void */*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	if (optionsStateInGame)
@@ -80,27 +80,27 @@ static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(optionsStack);
 }
 
-static void BtnVideoOptions(Control *, void *)
+static void BtnVideoOptions(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&VideoOptionsState);
 }
 
-static void BtnSoundOptions(Control *, void *)
+static void BtnSoundOptions(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&SoundOptionsState);
 }
 
-static void BtnInputOptions(Control *, void *)
+static void BtnInputOptions(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&InputOptionsState);
 }
 
-static void BtnDebugOptions(Control *, void *)
+static void BtnDebugOptions(Control */*control*/, void */*extraData*/)
 {
 	SetGameState(&DebugOptionsState);
 }
 
-static void CbOptionsEnableDiscordRpc(const OptionsButtonValue *, void *)
+static void CbOptionsEnableDiscordRpc(const OptionsButtonValue */*value*/, void */*extraData*/)
 {
 	if (!GetState()->options.enableDiscordRpc)
 	{
