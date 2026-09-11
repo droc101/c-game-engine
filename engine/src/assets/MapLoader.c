@@ -288,16 +288,17 @@ bool LoadMap(Map *map, Asset *mapData)
 	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
 	map->lightmapWidth = ReadSizeT(reader);
 	map->lightmapHeight = ReadSizeT(reader);
-	size_t lightmapDataSize = sizeof(uint16_t) *
-							  4 *
-							  map->lightmapHeight *
-							  map->lightmapWidth; // uint16_t because float16
+	size_t lightmapDataSize = sizeof(_Float16) * 4 * map->lightmapHeight * map->lightmapWidth;
 	EXPECT_BYTES_BOOL(lightmapDataSize, bytesRemaining);
 	map->lightmapPixels = malloc(lightmapDataSize);
 	CheckAlloc(map->lightmapPixels);
 	ReadBuffer(reader, lightmapDataSize, map->lightmapPixels);
+	EXPECT_BYTES_BOOL(lightmapDataSize, bytesRemaining);
+	map->indirectLightmapPixels = malloc(lightmapDataSize);
+	CheckAlloc(map->indirectLightmapPixels);
+	ReadBuffer(reader, lightmapDataSize, map->indirectLightmapPixels);
 
-	EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
+	EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 	map->lightCount = ReadUint32(reader);
 	map->lights = malloc(sizeof(Light) * map->lightCount);
 	CheckAlloc(map->lights);

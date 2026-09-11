@@ -129,7 +129,9 @@ struct Map
 	size_t lightmapWidth;
 	/// The height of the lightmap in pixels
 	size_t lightmapHeight;
-	/// The lightmap data in RGBA16F format
+	/// The lightmap data in RGBA16F format, containing only indirect lighting
+	void *indirectLightmapPixels;
+	/// The lightmap data in RGBA16F format, containing both indirect and direct lighting
 	void *lightmapPixels;
 
 	/// The number of lights in the level

@@ -102,7 +102,7 @@ float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord) {
 
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
     if (MAX_LIGHT_COUNT == 0) {
-        return vec3(1);
+        return vec3(0);
     }
     vec3 lightingColor = vec3(0);
     for (uint i = 0; i < MAX_LIGHT_COUNT; i++) {

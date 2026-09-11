@@ -648,7 +648,9 @@ static inline VkResult LoadLightmap(const Map *map)
 		.queueFamilyIndices = &queueFamilyIndex,
 		.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		.writeInfo.bytes = map->lightmapWidth * map->lightmapHeight * sizeof(_Float16) * 4,
-		.writeInfo.pixels = map->lightmapPixels,
+		.writeInfo.pixels = GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED
+									? map->indirectLightmapPixels
+									: map->lightmapPixels,
 		.writeInfo.sourceStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 		.writeInfo.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.writeInfo.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
@@ -1799,6 +1801,7 @@ static inline bool HandleDeferredWork()
 												   lunaGetBufferSize(buffers.map.unculledShadedDrawInfo),
 												   lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo)),
 						   "Failed to create map model draw infos!");
+				VulkanTest(LoadLightmap(loadedMap), "Failed to load indirect lighting light map!");
 			}
 			VulkanTest(CreateShadowMaps(loadedMap), "Failed to create shadow maps!");
 		} else
@@ -1820,6 +1823,7 @@ static inline bool HandleDeferredWork()
 			if (shadowMapRenderPass != VK_NULL_HANDLE)
 			{
 				VulkanTest(CreateShadowMapRenderPass(NULL), "Failed to clean up shadow maps!");
+				VulkanTest(LoadLightmap(loadedMap), "Failed to load direct lighting light map!");
 			}
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
