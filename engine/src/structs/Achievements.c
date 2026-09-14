@@ -175,7 +175,10 @@ void InitAchievementSystem(const RegisterGameAchievementsFunction RegisterGameAc
 	StatDict_init(statistics);
 	AchievementDict_init(achievements);
 
-	RegisterGameAchievements();
+	if (RegisterGameAchievements)
+	{
+		RegisterGameAchievements();
+	}
 
 #ifndef ENABLE_STEAMWORKS
 	KvList list;
