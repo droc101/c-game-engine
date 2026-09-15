@@ -57,17 +57,17 @@ bool LoadMap(Map *map, Asset *mapData)
 	{
 		map->skyTexture = ReadStringSafe(reader, &strLength);
 		bytesRemaining -= strLength;
-		bytesRemaining += sizeof(size_t);
+		bytesRemaining -= sizeof(size_t);
 	} else
 	{
 		map->skyTexture = NULL;
 	}
 	map->discordRpcIcon = ReadStringSafe(reader, &strLength);
 	bytesRemaining -= strLength;
-	bytesRemaining += sizeof(size_t);
+	bytesRemaining -= sizeof(size_t);
 	map->discordRpcName = ReadStringSafe(reader, &strLength);
 	bytesRemaining -= strLength;
-	bytesRemaining += sizeof(size_t);
+	bytesRemaining -= sizeof(size_t);
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 	const size_t numActors = ReadSizeT(reader);
@@ -99,13 +99,14 @@ bool LoadMap(Map *map, Asset *mapData)
 			CheckAlloc(connection);
 			connection->sourceActorOutput = ReadStringSafe(reader, &strLength);
 			bytesRemaining -= strLength;
-			bytesRemaining += sizeof(size_t);
+			bytesRemaining -= sizeof(size_t);
 			connection->targetActorName = ReadStringSafe(reader, &strLength);
 			bytesRemaining -= strLength;
-			bytesRemaining += sizeof(size_t);
+			bytesRemaining -= sizeof(size_t);
 			connection->targetActorInput = ReadStringSafe(reader, &strLength);
 			bytesRemaining -= strLength;
-			bytesRemaining += sizeof(size_t);
+			bytesRemaining -= sizeof(size_t);
+			EXPECT_BYTES_BOOL(1, bytesRemaining);
 			uint8_t hasOverride = ReadUint8(reader);
 			// TODO data size validation for params
 			if (hasOverride)
@@ -116,6 +117,7 @@ bool LoadMap(Map *map, Asset *mapData)
 			{
 				connection->outParamOverride.type = PARAM_TYPE_NONE;
 			}
+			EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 			connection->numRefires = ReadSizeT(reader);
 			ListAdd(ioConnections, connection);
 		}
@@ -316,6 +318,8 @@ bool LoadMap(Map *map, Asset *mapData)
 		light->brightAngle = ReadFloat(reader);
 		light->fadingAngle = ReadFloat(reader);
 	}
+
+	EXPECT_EOF_BYTES(bytesRemaining);
 
 	DestroyDataReader(reader);
 	FreeAsset(mapData);

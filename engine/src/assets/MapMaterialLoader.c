@@ -76,6 +76,8 @@ MapMaterial *LoadMapMaterial(const char *path)
 	EXPECT_BYTES(2, bytesRemaining);
 	material->shader = ReadUint8(reader);
 	material->soundClass = ReadUint8(reader);
+	EXPECT_BYTES(sizeof(float) + 2, bytesRemaining);
+	Seek(reader, sizeof(float) + 2); // compileInvis, compileNoclip, emissive
 
 	material->id = mapMaterialId;
 
@@ -93,6 +95,8 @@ MapMaterial *LoadMapMaterial(const char *path)
 		LogWarning("Map Material ID heap is nearly exhausted! Only %zu slots remain.\n",
 				   MAX_MAP_MATERIALS - mapMaterialId);
 	}
+
+	EXPECT_EOF_BYTES(bytesRemaining);
 
 	DestroyDataReader(reader);
 	FreeAsset(mapMaterialAsset);
