@@ -72,11 +72,13 @@ MapMaterial *LoadMapMaterial(const char *path)
 	bytesRemaining -= sizeof(size_t);
 	bytesRemaining -= strLength;
 	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
-	Seek(reader, sizeof(float) * 2); // default scale is lvledit side only
+	Seek(reader, sizeof(float) * 3); // default scale is lvledit side only
 	EXPECT_BYTES(2, bytesRemaining);
 	material->shader = ReadUint8(reader);
 	material->soundClass = ReadUint8(reader);
 	material->castsShadows = ReadUint8(reader) != 0;
+	EXPECT_BYTES(sizeof(float) + 2, bytesRemaining);
+	Seek(reader, sizeof(float) + 2); // compileInvis, compileNoclip, emissive
 
 	material->id = mapMaterialId;
 
@@ -94,6 +96,8 @@ MapMaterial *LoadMapMaterial(const char *path)
 		LogWarning("Map Material ID heap is nearly exhausted! Only %zu slots remain.\n",
 				   MAX_MAP_MATERIALS - mapMaterialId);
 	}
+
+	EXPECT_EOF_BYTES(bytesRemaining);
 
 	DestroyDataReader(reader);
 	FreeAsset(mapMaterialAsset);

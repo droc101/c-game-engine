@@ -111,7 +111,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		lod->id = lodId;
 		lodId++;
 
-		EXPECT_BYTES(sizeof(float) * 2 + sizeof(size_t), bytesRemaining);
+		EXPECT_BYTES(sizeof(float) * 3 + sizeof(size_t) + sizeof(uint32_t) * 2, bytesRemaining);
 		Seek(reader, sizeof(float)); // skip non-squared lod distance
 		lod->distanceSquared = ReadFloat(reader);
 		Seek(reader, sizeof(float)); // Skip unitsPerLuxel
@@ -125,6 +125,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		CheckAlloc(lod->vertexData);
 		ReadBuffer(reader, vertexDataSize, lod->vertexData);
 
+		EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);
 		lod->totalIndexCount = ReadUint32(reader);
 		lod->components = malloc(model->materialSlotCount * sizeof(ModelComponent));
 		CheckAlloc(lod->components);
@@ -214,6 +215,8 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	{
 		model->collisionModelShape = NULL;
 	}
+
+	EXPECT_EOF_BYTES(bytesRemaining);
 
 	DestroyDataReader(reader);
 	FreeAsset(assetData);

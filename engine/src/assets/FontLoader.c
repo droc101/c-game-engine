@@ -102,13 +102,14 @@ static Font *LoadFontInternal(const char *asset)
 		return GenerateFallbackFont(asset);
 	}
 	bytesRemaining -= fontTextureLength;
-	bytesRemaining += sizeof(size_t);
+	bytesRemaining -= sizeof(size_t);
 	fontTextureLength += strlen(TEXTURE(""));
 	font->texture = calloc(fontTextureLength, sizeof(char));
 	CheckAlloc(font->texture);
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);
 	free(fontTexture);
 	const Image *img = LoadImage(font->texture);
+	EXPECT_BYTES(1, bytesRemaining);
 	font->charCount = ReadUint8(reader);
 	memset(font->charWidths, 0, ArrayLength(font->charWidths));
 	memset(font->charStartUVs, 0, ArrayLength(font->charStartUVs));
@@ -122,6 +123,7 @@ static Font *LoadFontInternal(const char *asset)
 		font->charStartUVs[(int)chr] = (float)((double)i / font->charCount); // Casting through double here is required
 		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)img->width); // Here too
 	}
+	EXPECT_EOF_BYTES(bytesRemaining);
 	font->name = strdup(asset);
 	DestroyDataReader(reader);
 	FreeAsset(assetData);

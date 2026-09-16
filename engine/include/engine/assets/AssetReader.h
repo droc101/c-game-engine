@@ -41,6 +41,14 @@
 		(bytesRemaining) -= (expected); \
 	}
 
+#define EXPECT_EOF_BYTES(bytesRemaining) \
+	{ \
+		if (bytesRemaining > 0) \
+		{ \
+			LogWarning("%s: Expected end of buffer, but %zu bytes remain!\n", __PRETTY_FUNCTION__, bytesRemaining); \
+		} \
+	}
+
 /**
  * Initialize the asset cache
  */

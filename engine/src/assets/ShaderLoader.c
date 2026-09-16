@@ -40,6 +40,8 @@ Shader *LoadShader(const char *asset)
 	shader->spirv = calloc(shader->spirvLength, sizeof(uint32_t));
 	CheckAlloc(shader->spirv);
 	ReadBuffer(reader, shader->spirvLength * sizeof(uint32_t), shader->spirv);
+
+	EXPECT_EOF_BYTES(bytesRemaining);
 	DestroyDataReader(reader);
 	FreeAsset(assetData);
 

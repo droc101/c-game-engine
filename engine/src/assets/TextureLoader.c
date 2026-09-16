@@ -92,6 +92,7 @@ bool LoadImageFromAsset(const Asset *asset, Image *image)
 		return false;
 	}
 	DataReader *reader = CreateDataReaderFromAsset(asset);
+	size_t bytesRemaining = asset->size;
 	if (asset->typeVersion != TEXTURE_ASSET_VERSION)
 	{
 		LogError("Failed to load texture from asset due to version mismatch (got %d, expected %d)\n",
@@ -99,14 +100,10 @@ bool LoadImageFromAsset(const Asset *asset, Image *image)
 				 TEXTURE_ASSET_VERSION);
 		return false;
 	}
-	const size_t headerSize = (sizeof(size_t) * 2) + (sizeof(uint8_t) * 5);
-	if (asset->size < headerSize)
-	{
-		LogError("Failed to load texture asset as it was the wrong size.\n");
-		return false;
-	}
+	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
 	image->width = ReadSizeT(reader);
 	image->height = ReadSizeT(reader);
+	EXPECT_BYTES(5, bytesRemaining);
 	image->filter = ReadUint8(reader) != 0;
 	image->repeat = ReadUint8(reader) != 0;
 	image->mipmaps = ReadUint8(reader) != 0;
@@ -120,16 +117,13 @@ bool LoadImageFromAsset(const Asset *asset, Image *image)
 	{
 		pixelDataSize *= sizeof(_Float16) * 4;
 	}
-	if (asset->size < headerSize + pixelDataSize)
-	{
-		LogError("Failed to load texture asset as it was the wrong size.\n");
-		return false;
-	}
+	EXPECT_BYTES_BOOL(pixelDataSize, bytesRemaining);
 
 	image->pixelData = malloc(pixelDataSize);
 	CheckAlloc(image->pixelData);
 	ReadBuffer(reader, pixelDataSize, image->pixelData);
 
+	EXPECT_EOF_BYTES(bytesRemaining);
 	DestroyDataReader(reader);
 
 	return true;

@@ -95,7 +95,10 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterEntrance();
 	RegisterWorldText();
 
-	RegisterGameActors();
+	if (RegisterGameActors)
+	{
+		RegisterGameActors();
+	}
 }
 
 const ActorDefinition *GetActorDefinition(const char *actorType)

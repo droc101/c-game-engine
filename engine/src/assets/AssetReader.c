@@ -90,6 +90,7 @@ static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 			}
 		} else
 		{
+			free(cPath);
 #ifdef WIN32
 			LogError("CanonicalFilePath failed! LastError=%d", GetLastError());
 #else
