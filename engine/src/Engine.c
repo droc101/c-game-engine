@@ -306,6 +306,9 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	LodThreadInit();
 
+	LoadingStateDoneCallback = initInfo.LoadingStateDoneCallback;
+	LoadingStateErrorCallback = initInfo.LoadingStateErrorCallback;
+
 	SDL_ShowWindow(GetGameWindow());
 }
 
