@@ -77,7 +77,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		mat->texture = ReadStringSafe(reader, &strLength);
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
-		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t), bytesRemaining);
+		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t) + 1, bytesRemaining);
 		mat->color.r = ReadFloat(reader);
 		mat->color.g = ReadFloat(reader);
 		mat->color.b = ReadFloat(reader);

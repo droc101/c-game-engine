@@ -72,8 +72,8 @@ MapMaterial *LoadMapMaterial(const char *path)
 	bytesRemaining -= sizeof(size_t);
 	bytesRemaining -= strLength;
 	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
-	Seek(reader, sizeof(float) * 3); // default scale is lvledit side only
-	EXPECT_BYTES(2, bytesRemaining);
+	Seek(reader, sizeof(float) * 2); // default scale is lvledit side only
+	EXPECT_BYTES(3, bytesRemaining);
 	material->shader = ReadUint8(reader);
 	material->soundClass = ReadUint8(reader);
 	material->castsShadows = ReadUint8(reader) != 0;

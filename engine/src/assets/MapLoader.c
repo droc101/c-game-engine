@@ -176,7 +176,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		assert(model->material);
 		free(materialName);
 
-		EXPECT_BYTES_BOOL(sizeof(vec3) * 2, bytesRemaining);
+		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
 		model->center.x = ReadFloat(reader);
 		model->center.y = ReadFloat(reader);
 		model->center.z = ReadFloat(reader);
@@ -191,7 +191,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
 			MapVertex *vertex = model->vertices + j;
-			EXPECT_BYTES_BOOL(sizeof(float) * 7, bytesRemaining);
+			EXPECT_BYTES_BOOL(sizeof(float) * 10, bytesRemaining);
 			vertex->position.x = ReadFloat(reader);
 			vertex->position.y = ReadFloat(reader);
 			vertex->position.z = ReadFloat(reader);
@@ -304,7 +304,7 @@ bool LoadMap(Map *map, Asset *mapData)
 	map->lightCount = ReadUint32(reader);
 	map->lights = malloc(sizeof(Light) * map->lightCount);
 	CheckAlloc(map->lights);
-	EXPECT_BYTES_BOOL((sizeof(float) * 16 + sizeof(uint32_t)) * map->lightCount, bytesRemaining);
+	EXPECT_BYTES_BOOL((sizeof(float) * 19 + sizeof(uint32_t)) * map->lightCount, bytesRemaining);
 	for (size_t i = 0; i < map->lightCount; i++)
 	{
 		Light *light = &map->lights[i];
