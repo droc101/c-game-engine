@@ -48,4 +48,6 @@ bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
  */
 void RestoreFd(int modifiedFd, int *pipeFds, int originalFd);
 
+void OpenFileInDefaultProgram(const char *filePath);
+
 #endif //PLATFORMHELPERS_H

@@ -30,8 +30,6 @@
 #include <execinfo.h>
 #endif
 
-static SDL_MessageBoxColorScheme mbColorScheme;
-
 _Noreturn inline void _GameAllocFailure()
 {
 	LogError("Memory Allocation Failed: %s\n", strerror(errno));
@@ -50,28 +48,33 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 		SDL_SetWindowRelativeMouseMode(GetGameWindow(), false);
 	}
 
-	char messageBuffer[256];
-	sprintf(messageBuffer, "%s\n \n%s:%d (%s)\n", error, file, line, function);
-
-	LogError("%s\n", error);
+	LogError("Fatal Error: %s\n", error);
 	LogError("At: %s:%d (%s)\n", file, line, function);
 
 	PrintStackTrace();
 
-	char messageBoxTextBuffer[768];
-	sprintf(messageBoxTextBuffer,
-			"Sorry, but the game has crashed.\n\n%s\n\nEngine Version: %s",
-			messageBuffer,
-			ENGINE_VERSION);
+	char messageBoxTextBuffer[1024];
+#ifdef BUILDSTYLE_DEBUG
+	snprintf(messageBoxTextBuffer,
+			 1024,
+			 "%s\n\nAt: %s:%d (%s)\nEngine Version: %s",
+			 error,
+			 file,
+			 line,
+			 function,
+			 ENGINE_VERSION);
+#else
+	snprintf(messageBoxTextBuffer, 1024, "%s", error);
+#endif
 
 	SDL_MessageBoxData mb;
 	mb.message = messageBoxTextBuffer;
-	mb.title = "Error";
+	mb.title = "Fatal Error";
 
 #ifdef BUILDSTYLE_RELEASE
-	const int buttonCount = 2;
-#else
 	const int buttonCount = 3;
+#else
+	const int buttonCount = 4;
 #endif
 
 	SDL_MessageBoxButtonData buttons[buttonCount];
@@ -81,16 +84,17 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	buttons[1].buttonID = 1;
 	buttons[1].text = "Restart";
 	buttons[1].flags = 0;
-#ifdef BUILDSTYLE_DEBUG
 	buttons[2].buttonID = 2;
-	buttons[2].text = "Debug";
+	buttons[2].text = "View Logs";
 	buttons[2].flags = 0;
+#ifdef BUILDSTYLE_DEBUG
+	buttons[3].buttonID = 3;
+	buttons[3].text = "Debug";
+	buttons[3].flags = 0;
 #endif
 
 	mb.buttons = buttons;
 	mb.numbuttons = buttonCount;
-
-	mb.colorScheme = &mbColorScheme;
 
 	mb.window = GetGameWindow();
 	mb.flags = SDL_MESSAGEBOX_ERROR;
@@ -103,13 +107,15 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 
 	switch (pressedButtonID)
 	{
-		case 0:
-			exit(1);
 		case 1:
 			RestartProgram();
+			break;
 		case 2:
+			LogDestroy();
+			OpenFileInDefaultProgram("game.log");
+			break;
+		case 3:
 			fflush(stdout);
-
 #ifdef WIN32
 			__debugbreak(); // SIGTRAP doesn't exist on Windows
 #else
@@ -118,10 +124,9 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 #endif
 			break;
 		default:
-			exit(1);
+			break;
 	}
-	while (true)
-	{}
+	exit(1);
 }
 
 _Noreturn void FriendlyError(const char *title, const char *description)
@@ -150,7 +155,6 @@ _Noreturn void RenderInitError()
 	buttons[0].text = "Exit";
 	buttons[0].flags = 0;
 
-	mb.colorScheme = &mbColorScheme;
 	mb.buttons = buttons;
 	mb.window = NULL;
 	mb.flags = SDL_MESSAGEBOX_ERROR;
@@ -179,32 +183,6 @@ static void SignalHandler(const int sig)
 
 void ErrorHandlerInit()
 {
-	SDL_MessageBoxColor bg;
-	bg.r = 25;
-	bg.g = 25;
-	bg.b = 25;
-
-	SDL_MessageBoxColor text;
-	text.r = 255;
-	text.g = 255;
-	text.b = 255;
-
-	SDL_MessageBoxColor buttonBorder;
-	buttonBorder.r = 40;
-	buttonBorder.g = 40;
-	buttonBorder.b = 40;
-
-	SDL_MessageBoxColor buttonBg;
-	buttonBg.r = 35;
-	buttonBg.g = 35;
-	buttonBg.b = 35;
-
-	mbColorScheme.colors[SDL_MESSAGEBOX_COLOR_BACKGROUND] = bg;
-	mbColorScheme.colors[SDL_MESSAGEBOX_COLOR_TEXT] = text;
-	mbColorScheme.colors[SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] = buttonBorder;
-	mbColorScheme.colors[SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] = buttonBg;
-	mbColorScheme.colors[SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] = text;
-
 #ifdef BUILDSTYLE_RELEASE
 	signal(SIGSEGV, SignalHandler);
 	signal(SIGFPE, SignalHandler);
