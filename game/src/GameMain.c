@@ -65,6 +65,7 @@ EXPORT_SYM int GameMain(const int argc, const char *argv[])
 		.RegisterGameActors = RegisterGameActors,
 		.RegisterGameControls = RegisterGameControls,
 		.RegisterGameAchievements = RegisterGameAchievements,
+		.defaultGamePath = "assets/game",
 	};
 
 	InitEngine(initInfo);

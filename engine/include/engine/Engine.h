@@ -41,6 +41,7 @@ typedef struct EngineInitializationInfo
 	const RegisterGameActorsFunction RegisterGameActors;
 	const ControlRegisterFunction RegisterGameControls;
 	const RegisterGameAchievementsFunction RegisterGameAchievements;
+	const char *defaultGamePath;
 } EngineInitializationInfo;
 
 /**
