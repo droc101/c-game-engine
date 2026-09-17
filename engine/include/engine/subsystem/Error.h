@@ -58,19 +58,4 @@ _Noreturn void RenderInitError();
  */
 void ErrorHandlerInit();
 
-/**
- * Check if an SDL function failed (returned nonzero) and log the error
- * @param result The result of the SDL function
- * @param message The message to log (%s: sdl error)
- */
-void TestSDLFunctionNonFatal(bool result, const char *message);
-
-/**
- * Test an SDL function for failure and log the error, terminating the program if it failed
- * @param result The result of the SDL function
- * @param message The log message
- * @param userMessage The user-facing crash message
- */
-void TestSDLFunction(bool result, const char *message, const char *userMessage);
-
 #endif //GAME_ERROR_H

@@ -176,20 +176,3 @@ void ErrorHandlerInit()
 	signal(SIGABRT, SignalHandler);
 #endif
 }
-
-inline void TestSDLFunctionNonFatal(const bool result, const char *message)
-{
-	if (!result)
-	{
-		LogError("%s: %s\n", message, SDL_GetError());
-	}
-}
-
-inline void TestSDLFunction(const bool result, const char *message, const char *userMessage)
-{
-	if (!result)
-	{
-		LogError("%s: %s\n", message, SDL_GetError());
-		Error((char *)userMessage);
-	}
-}
