@@ -40,14 +40,14 @@ endif()
 get_filename_component(DEPS_ABS_PATH "${FETCHCONTENT_BASE_DIR}" ABSOLUTE)
 get_filename_component(REPO_ABS_PATH "${CMAKE_SOURCE_DIR}" ABSOLUTE)
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -fvisibility=default -Wundef -fPIC -fcanon-prefix-map -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -Wundef -fPIC -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
 
 if (WIN32)
     set(CMAKE_C_FLAGS "-static-libgcc -static-libstdc++ ${CMAKE_C_FLAGS}")
 endif ()
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -fdata-sections -ffunction-sections -Wl,--gc-sections")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -O3 -s -DNDEBUG -fdata-sections -ffunction-sections -Wl,--gc-sections  -fvisibility=hidden")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -fdata-sections -ffunction-sections -Wl,--gc-sections")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")

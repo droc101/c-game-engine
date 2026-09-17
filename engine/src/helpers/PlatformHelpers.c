@@ -2,6 +2,7 @@
 // Created by droc101 on 11/10/2024.
 //
 
+#include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
@@ -12,8 +13,9 @@
 #include <unistd.h>
 
 #ifdef WIN32
+// clang-format off
+#include <windows.h>
 #include <ctype.h>
-#include <dwmapi.h>
 #include <handleapi.h>
 #include <minwindef.h>
 #include <processthreadsapi.h>
@@ -21,31 +23,13 @@
 #include <SDL3/SDL_video.h>
 #include <string.h>
 #include <winbase.h>
-#endif
-
-void SetDwmWindowAttribs(SDL_Window *window)
-{
-#ifdef WIN32
-
-	const HWND hWnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window),
-												   SDL_PROP_WINDOW_WIN32_HWND_POINTER,
-												   NULL);
-	const BOOL enable = true;
-	HRESULT res = DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &enable, sizeof(BOOL));
-	if (res != S_OK)
-	{
-		LogWarning("Failed to enable dark mode: %lx\n", res);
-	}
-	const DWORD cornerPreference = DWMWCP_DONOTROUND;
-	res = DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &cornerPreference, sizeof(DWORD));
-	if (res != S_OK)
-	{
-		LogWarning("Failed to set window corner preference: %lx\n", res);
-	}
+#include <dbghelp.h>
+// clang-format on
 #else
-	(void)window;
+#include <execinfo.h>
+#include <signal.h>
+#include <sys/stat.h>
 #endif
-}
 
 _Noreturn void RestartProgram()
 {
@@ -56,7 +40,7 @@ _Noreturn void RestartProgram()
 	si.cb = sizeof(si);
 	CreateProcess(
 			GetState()->executablePath,
-			NULL,
+			GetCommandLine(),
 			NULL,
 			NULL,
 			FALSE,
@@ -68,8 +52,8 @@ _Noreturn void RestartProgram()
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #else
-	char *args[] = {GetState()->executablePath, NULL}; // TODO use argv and argc now stored in Argument.c
-	execv(GetState()->executablePath, args);
+	char **argv = (char **)GetArgv();
+	execv(GetState()->executablePath, argv);
 #endif
 	exit(1);
 }
@@ -251,6 +235,101 @@ void OpenFileInDefaultProgram(const char *filePath)
 			LogError("execvp() failed: %s", strerror(errno));
 			return;
 		}
+	}
+#endif
+}
+
+void FixupPath(char *path)
+{
+#ifdef WIN32
+	for (size_t i = 0; i < strlen(path); i++)
+	{
+		if (path[i] == '\\')
+		{
+			path[i] = '/';
+		}
+	}
+#else
+	(void)path;
+#endif
+}
+
+bool MakeDirectory(const char *path)
+{
+#ifdef WIN32
+	return mkdir(path) != 0;
+#else
+	return mkdir(path, 0660) != 0;
+#endif
+}
+
+void RaiseDebugger()
+{
+#ifdef WIN32
+	__debugbreak(); // SIGTRAP doesn't exist on Windows
+#else
+	// emit sigtrap to allow debugger to catch the error
+	raise(SIGTRAP);
+#endif
+}
+
+void PrintStackTrace()
+{
+#ifdef WIN32
+	void *frames[512];
+	const HANDLE hProcess = GetCurrentProcess();
+	SymInitialize(hProcess, NULL, TRUE);
+	SYMBOL_INFO *symbol = calloc(1, sizeof(SYMBOL_INFO) + 256);
+	// not using CheckAlloc here because this may be run in memory starved conditions, nullness will be checked before use
+	if (symbol)
+	{
+		symbol->MaxNameLen = 255;
+		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+	}
+	const uint16_t num_frames = CaptureStackBackTrace(0, 512, frames, NULL);
+	if (num_frames > 0)
+	{
+		LogInfo("Stack Trace:\n");
+		for (int i = 0; i < num_frames; i++)
+		{
+			if (symbol && SymFromAddr(hProcess, (uint64_t)frames[i], 0, symbol))
+			{
+				LogInfo("    %d: %s+0x%zx [%p]\n", i, symbol->Name, frames[i] - symbol->Address, frames[i]);
+			} else
+			{
+				LogInfo("    %d: ??? [%p]\n", i, frames[i]);
+			}
+		}
+	} else
+	{
+		LogWarning("Stack trace contained no frames!\n");
+	}
+	free(symbol);
+#else
+	void *frames[512];
+	const int num_frames = backtrace(frames, 512);
+	char **symbols = backtrace_symbols(frames, num_frames);
+	if (num_frames > 0)
+	{
+		LogInfo("Stack Trace:\n");
+		if (symbols)
+		{
+			for (int i = 0; i < num_frames; i++)
+			{
+				LogInfo("    %d: %s\n", i, symbols[i]);
+			}
+			free(symbols);
+		} else
+		{
+			LogWarning("Failed to get symbols for stack trace\n");
+			for (int i = 0; i < num_frames; i++)
+			{
+				LogInfo("    %d: %p\n", i, frames[i]);
+			}
+		}
+	} else
+	{
+		LogWarning("Stack trace contained no frames!\n");
 	}
 #endif
 }

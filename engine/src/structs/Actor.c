@@ -27,14 +27,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-static uint64_t actorId;
-
 Actor *CreateActor(Transform *transform, const char *actorType, KvList params, JPH_BodyInterface *bodyInterface)
 {
 	Actor *actor = calloc(1, sizeof(Actor));
 	CheckAlloc(actor);
-	// Simply incrementing this is fine, because if one actor were loaded every nanosecond it would take ~585 years to overflow
-	actor->id = actorId++;
 	actor->definition = GetActorDefinition(actorType);
 	actor->visible = true;
 	actor->modColor = COLOR_WHITE;

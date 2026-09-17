@@ -75,15 +75,7 @@ void LoadGameConfig(const char *game)
 		sprintf(configPath, "%s%s/game.gkvl", GetState()->executableFolder, game);
 	}
 
-#ifdef WIN32
-	for (size_t i = 0; i < strlen(configPath); i++)
-	{
-		if (configPath[i] == '\\')
-		{
-			configPath[i] = '/';
-		}
-	}
-#endif
+	FixupPath(configPath);
 
 	LogDebug("Loading game.gkvl from %s\n", configPath);
 	FILE *file = fopen(configPath, "rb");

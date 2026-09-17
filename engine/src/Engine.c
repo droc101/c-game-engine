@@ -68,15 +68,7 @@ void ExecPathInit(const int argc, const char *argv[])
 		Error("Executable path too long. Please rethink your file structure.");
 	}
 	strncpy(GetState()->executablePath, argv[0], 260); // we do not mess around with user data in c.
-#ifdef WIN32
-	for (size_t i = 0; i < strlen(GetState()->executablePath); i++)
-	{
-		if (GetState()->executablePath[i] == '\\')
-		{
-			GetState()->executablePath[i] = '/';
-		}
-	}
-#endif
+	FixupPath(GetState()->executablePath);
 	LogInfo("Executable path: %s\n", GetState()->executablePath);
 
 	const char *folder = SDL_GetBasePath();
@@ -89,15 +81,7 @@ void ExecPathInit(const int argc, const char *argv[])
 		Error("Base path too long. Please rethink your file structure.");
 	}
 	strncpy(GetState()->executableFolder, folder, 260);
-#ifdef WIN32
-	for (size_t i = 0; i < strlen(GetState()->executableFolder); i++)
-	{
-		if (GetState()->executableFolder[i] == '\\')
-		{
-			GetState()->executableFolder[i] = '/';
-		}
-	}
-#endif
+	FixupPath(GetState()->executableFolder);
 	LogInfo("Executable folder: %s\n", GetState()->executableFolder);
 }
 
@@ -151,7 +135,6 @@ void WindowAndRenderInit()
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		Error("Failed to create window.");
 	}
-	SetDwmWindowAttribs(window);
 	if (HasCliArg("--fullscreen"))
 	{
 		GetState()->options.fullscreen = true;

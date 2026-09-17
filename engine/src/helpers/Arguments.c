@@ -92,3 +92,8 @@ bool HasCliArg(const char *argument)
 	}
 	return false;
 }
+
+const char **GetArgv()
+{
+	return argv;
+}

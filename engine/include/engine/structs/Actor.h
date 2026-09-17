@@ -52,9 +52,6 @@ struct ActorConnection
 
 struct Actor
 {
-	/// A unique ID used to represent this actor
-	uint64_t id;
-
 	/// The actor's definition
 	const ActorDefinition *definition;
 

@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "engine/subsystem/Logging.h"
+
 Map *CreateMap(void)
 {
 	Map *map = AvxAlignedCalloc(sizeof(Map));
@@ -129,6 +131,12 @@ void DestroyMap(Map *map)
 
 void AddActor(Actor *actor)
 {
+	if (GetState()->map->actors.length >= MAX_ACTORS)
+	{
+		LogError("Cannot add actor, map already has the maximum number of actors (%d)\n", MAX_ACTORS);
+		FreeActor(actor);
+		return;
+	}
 	ListAdd(GetState()->map->actors, actor);
 }
 
