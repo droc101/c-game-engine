@@ -142,11 +142,8 @@ static void RescanAddons()
 	{
 		if (errno == ENOENT)
 		{
-#ifdef WIN32
-			if (mkdir(ADDONS_PATH) != 0)
-#else
-			if (mkdir(ADDONS_PATH, 0660) != 0)
-#endif
+
+			if (!MakeDirectory(ADDONS_PATH))
 			{
 				LogError("Failed to create addons directory: %s\n", strerror(errno));
 			} else

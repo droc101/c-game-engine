@@ -43,4 +43,9 @@ bool GetCliArgBool(const char *argument, bool defaultValue);
  */
 bool HasCliArg(const char *argument);
 
+/**
+ * Get the raw argv array
+ */
+const char **GetArgv();
+
 #endif //ARGUMENTS_H
