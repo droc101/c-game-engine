@@ -446,9 +446,11 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 }
 
 // TODO: Optimize this function
-void UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
+void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 {
-	if (light == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
+	if (map == NULL ||
+		map->directionalLight == NULL ||
+		GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
 	{
 		return;
 	}
@@ -456,7 +458,7 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
 	static const float LAMBDA = 0.95f; // Adjusts the range of each split. Tweak to find optimal values
 
 	const float nearPlane = camera->nearPlane;
-	const float farPlane = camera->farPlane;
+	const float farPlane = min(camera->farPlane, map->maxInboundsDistance);
 
 	const float range = farPlane - nearPlane;
 	const float ratio = farPlane / nearPlane;
@@ -491,7 +493,7 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
 		const float p = (float)(i + 1) / 4.0f;
 		const float v = nearPlane + range * p;
 		const float d = LAMBDA * (nearPlane * powf(ratio, p) - v) + v;
-		const float distance = (d - nearPlane) / range;
+		const float distance = i == 0 ? 0.1f : (i == 1 ? 0.2f : (i == 2 ? 0.5f : 1));
 
 		vec4 frustumCorners[8];
 		memcpy(frustumCorners, projectedCorners, sizeof(projectedCorners));
@@ -523,11 +525,11 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
 		radius = ceilf(radius * 16.0f) / 16.0f;
 
 		vec3 eye;
-		glm_vec3_scale(VECTOR3_TO_VEC3(light->negativeForwardDirection), radius, eye);
+		glm_vec3_scale(VECTOR3_TO_VEC3(map->directionalLight->negativeForwardDirection), radius, eye);
 		glm_vec3_add(frustumCenter, eye, eye);
 		mat4 viewMatrix;
-		const bool yAligned = fabsf(light->negativeForwardDirection.x) < FLT_EPSILON &&
-							  fabsf(light->negativeForwardDirection.z) < FLT_EPSILON;
+		const bool yAligned = fabsf(map->directionalLight->negativeForwardDirection.x) < FLT_EPSILON &&
+							  fabsf(map->directionalLight->negativeForwardDirection.z) < FLT_EPSILON;
 		glm_lookat_lh_zo(eye, frustumCenter, yAligned ? GLM_XUP : GLM_YUP, viewMatrix);
 		mat4 projectionMatrix;
 		glm_ortho_lh_zo(radius, -radius, radius, -radius, radius * 2, 0, projectionMatrix);
@@ -594,7 +596,7 @@ void WriteFrustumsBuffer()
 
 void CullModels()
 {
-	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map->directionalLight);
+	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map);
 
 	const LunaMultiBufferMemoryBarrier preClearMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,

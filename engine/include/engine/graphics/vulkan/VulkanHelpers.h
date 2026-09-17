@@ -557,7 +557,7 @@ void UpdateCameraUniform(Camera *camera);
 
 void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
-void UpdateDirectionalLightCascades(const Camera *camera, const Light *light);
+void UpdateDirectionalLightCascades(const Camera *camera, const Map *map);
 
 void WriteFrustumsBuffer();
 

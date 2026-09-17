@@ -287,6 +287,9 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
 
+	EXPECT_BYTES_BOOL(sizeof(float), bytesRemaining);
+	map->maxInboundsDistance = ReadFloat(reader);
+
 	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
 	map->lightmapWidth = ReadSizeT(reader);
 	map->lightmapHeight = ReadSizeT(reader);

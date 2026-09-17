@@ -88,6 +88,8 @@ struct Map
 	/// The map models
 	MapModel *models;
 
+	float maxInboundsDistance;
+
 	List joltBodies;
 
 	bool renderSky;
