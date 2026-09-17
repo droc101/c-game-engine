@@ -834,6 +834,7 @@ static inline void LoadLights(const Map *map)
 				   "Failed to resize lights buffer!");
 
 		UpdateLightCount();
+		return;
 	}
 
 	AvxAlignedFree(frustums);

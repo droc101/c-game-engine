@@ -311,7 +311,7 @@ void CreateShadowMapRenderPass(const Map *map)
 		shadowMapRenderPass = VK_NULL_HANDLE;
 	}
 
-	if (map == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
+	if (map == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED || lightCount == 0)
 	{
 		return;
 	}
