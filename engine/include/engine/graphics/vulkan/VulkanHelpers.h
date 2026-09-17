@@ -15,57 +15,77 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
-#include <engine/subsystem/Logging.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h> // NOLINT(*-include-cleaner): Used in a macro
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
 #pragma region macros
 #define FRAMES_IN_FLIGHT 1
 
-#define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
-#define VulkanTestInternal(function, returnValue, ...) \
+#define VulkanRecoveryOption(_returnValue, _recoveryMethod) \
+	if (_result == (_returnValue)) \
 	{ \
-		const VkResult result = function; \
-		if (result != VK_SUCCESS) \
+		_recoveryMethod; \
+	} else
+#define VulkanTestRecoverable(_function, _recover, ...) \
+	{ \
+		const VkResult _result = _function; \
+		if (_result != VK_SUCCESS) \
 		{ \
-			LogInternal("VULKAN", 31, false, __VA_ARGS__); \
-			LogInternal(NULL, 31, true, "Error code: %d\n", result); \
-			if (result == VK_ERROR_DEVICE_LOST) \
+			_recover \
 			{ \
-				LogInfo("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.webp for more information\n"); \
+				LogInternal("VULKAN", 31, true, __VA_ARGS__); \
+				LogInternal(NULL, 31, true, "Error code: %d\n", _result); \
+				char _buffer[1024]; \
+				_buffer[1023] = '\0'; \
+				snprintf(_buffer, 1024, __VA_ARGS__); \
+				Error(_buffer); \
 			} \
-			return returnValue; \
 		} \
 	}
-#define VulkanTestReturnResult(function, ...) VulkanTestInternal(function, result, __VA_ARGS__)
-#define VulkanTest(function, ...) VulkanTestInternal(function, false, __VA_ARGS__)
-#define VulkanTestResizeSwapchain(function, ...) \
+#define VulkanTest(_function, ...) VulkanTestRecoverable(_function, {}, __VA_ARGS__)
+#define VulkanTestBoolRecoverable(_function, _recover, ...) \
 	{ \
-		const VkResult resizeCheckResult = function; \
-		if (resizeCheckResult != VK_SUCCESS && resizeCheckResult != VK_SUBOPTIMAL_KHR) \
+		if (!(_function)) \
 		{ \
-			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR) \
+			_recover \
 			{ \
-				const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
-				const LunaSwapchainResizeInfo swapchainResizeInfo = { \
-					.newSize.width = windowSize.x, \
-					.newSize.height = windowSize.y, \
-					.renderPassCount = 1, \
-					.renderPasses = &renderPass, \
-					.queueFamilyIndexCount = 1, \
-					.queueFamilyIndices = &queueFamilyIndex, \
-				}; \
-				VulkanTest(lunaResizeSwapchain(device, &swapchainResizeInfo), "Failed to resize swapchain!"); \
-				return false; \
+				LogInternal("VULKAN", 31, true, __VA_ARGS__); \
+				char _buffer[1024]; \
+				_buffer[1023] = '\0'; \
+				snprintf(_buffer, 1024, __VA_ARGS__); \
+				Error(_buffer); \
 			} \
-			VulkanTest(resizeCheckResult, __VA_ARGS__); \
 		} \
 	}
+#define VulkanTestBool(_function, ...) VulkanTestBoolRecoverable(_function, {}, __VA_ARGS__)
+
+#define VulkanTestResizeSwapchain(_function, ...) \
+	VulkanTestRecoverable(_function, \
+						  VulkanRecoveryOption(VK_SUBOPTIMAL_KHR, {}) \
+								  VulkanRecoveryOption(VK_ERROR_OUT_OF_DATE_KHR, ({ \
+														   const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
+														   const LunaSwapchainResizeInfo swapchainResizeInfo = { \
+															   .newSize.width = windowSize.x, \
+															   .newSize.height = windowSize.y, \
+															   .renderPassCount = 1, \
+															   .renderPasses = &renderPass, \
+															   .queueFamilyIndexCount = 1, \
+															   .queueFamilyIndices = &queueFamilyIndex, \
+														   }; \
+														   VulkanTest(lunaResizeSwapchain(device, \
+																						  &swapchainResizeInfo), \
+																	  "Failed to resize swapchain!"); \
+														   return false; \
+													   })), \
+						  __VA_ARGS__)
 #pragma endregion macros
 
 #pragma region typedefs
@@ -517,11 +537,11 @@ enum PerFrustumBufferMagicConstants : uint32_t
 };
 #pragma endregion variables
 
-bool ClearTextureCache();
+void ClearTextureCache();
 
-bool ClearModelCache();
+void ClearModelCache();
 
-VkResult CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
+void CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
 
 uint32_t TextureIndex(const char *texture);
 
@@ -529,21 +549,19 @@ uint32_t ImageIndex(const Image *image);
 
 uint32_t ShadowMapResolution(void);
 
-VkResult CreateShadowMapRenderPass(const Map *map);
+void CreateShadowMapRenderPass(const Map *map);
 
-VkResult CreateDepthGraphicsPipelines(void);
+void CreateDepthGraphicsPipelines(void);
 
-VkResult UpdateCameraUniform(Camera *camera);
+void UpdateCameraUniform(Camera *camera);
 
-VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel);
+void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
-VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light);
+void UpdateDirectionalLightCascades(const Camera *camera, const Light *light);
 
-VkResult WriteFrustumsBuffer();
+void WriteFrustumsBuffer();
 
-VkResult CullLights();
-
-VkResult CullModels();
+void CullModels();
 
 void EnsureSpaceForUiElements(size_t quadCount);
 

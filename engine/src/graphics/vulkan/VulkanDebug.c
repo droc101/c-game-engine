@@ -19,8 +19,6 @@
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
 
-#include "engine/graphics/RenderingHelpers.h"
-
 void VK_DPrintDevice()
 {
 	const char *gpuType = "Unknown";

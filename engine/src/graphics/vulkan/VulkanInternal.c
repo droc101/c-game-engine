@@ -11,7 +11,6 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <luna/luna.h>
 #include <luna/lunaCommandBuffer.h>
 #include <luna/lunaDevice.h>
@@ -32,15 +31,11 @@
 
 static SDL_Window *vulkanWindow;
 
-bool CreateInstance()
+void CreateInstance()
 {
 	uint32_t extensionCount = 0;
 	const char *const *extensionNames = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
-	if (!extensionNames)
-	{
-		VulkanLogError("Failed to acquire extensions required for SDL window!\n");
-		return false;
-	}
+	VulkanTestBool(extensionNames, "Failed to acquire extensions required for SDL window!\n");
 
 	const LunaInstanceCreationInfo instanceCreationInfo = {
 		.apiVersion = VK_API_VERSION_1_2,
@@ -53,21 +48,14 @@ bool CreateInstance()
 #endif
 	};
 	VulkanTest(lunaCreateInstance(&instanceCreationInfo), "Failed to create instance!");
-
-	return true;
 }
 
-bool CreateSurface(SDL_Window *window)
+void CreateSurface(SDL_Window *window)
 {
 	vulkanWindow = window;
 
-	if (!SDL_Vulkan_CreateSurface(vulkanWindow, lunaGetInstance(), NULL, &surface))
-	{
-		VulkanLogError("Failed to create window surface\n");
-		return false;
-	}
-
-	return true;
+	VulkanTestBool(SDL_Vulkan_CreateSurface(vulkanWindow, lunaGetInstance(), NULL, &surface),
+				   "Failed to create window surface\n");
 }
 
 bool CreateLogicalDevice()
@@ -123,13 +111,17 @@ bool CreateLogicalDevice()
 		.allocatorCreateFlags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT |
 								VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
 	};
-	VulkanTest(lunaCreateDevice2(&deviceCreationInfo, &device), "Failed to create logical device!");
+	if (lunaCreateDevice2(&deviceCreationInfo, &device) != VK_SUCCESS)
+	{
+		return false;
+	}
 	lunaGetPhysicalDeviceProperties(device, &physicalDeviceProperties);
 	// TODO: Check that no limits are being exceeded
+
 	return true;
 }
 
-bool CreateCommandBuffers()
+void CreateCommandBuffers()
 {
 	const LunaQueueFamilyProperties requiredProperties = {
 		.queueFamilyProperties.queueFlags = VK_QUEUE_GRAPHICS_BIT,
@@ -149,16 +141,14 @@ bool CreateCommandBuffers()
 
 	const LunaSemaphoreCreationInfo semaphoreCreationInfo = {};
 	VulkanTest(lunaCreateSemaphore(device, &semaphoreCreationInfo, &semaphore), "Failed to create semaphore!");
-
-	return true;
 }
 
 // TODO: In-depth review of this function, or rewrite from the ground up
-bool CreateSwapchain()
+void CreateSwapchain()
 {
 	if (minimized)
 	{
-		return true;
+		return;
 	}
 
 	VkSurfaceCapabilitiesKHR capabilities;
@@ -169,7 +159,7 @@ bool CreateSwapchain()
 		// Window is minimized, so return to prevent creating a swap chain with dimensions of 0px by 0px
 		// However, we do not want to fail or even log anything, since this is intended behavior
 		minimized = true;
-		return true;
+		return;
 	}
 
 	VkExtent2D extent = capabilities.currentExtent;
@@ -177,11 +167,9 @@ bool CreateSwapchain()
 	{
 		int32_t width = 0;
 		int32_t height = 0;
-		if (!SDL_GetWindowSizeInPixels(vulkanWindow, &width, &height))
-		{
-			LogError("Failed to get window size with error: %s", SDL_GetError());
-			return false;
-		}
+		VulkanTestBool(SDL_GetWindowSizeInPixels(vulkanWindow, &width, &height),
+					   "Failed to get window size with error: %s",
+					   SDL_GetError());
 		extent.width = clamp((uint32_t)width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
 		extent.height = clamp((uint32_t)height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 	}
@@ -214,11 +202,9 @@ bool CreateSwapchain()
 	};
 
 	VulkanTest(lunaCreateSwapchain(device, &swapChainCreationInfo), "Failed to create swap chain!");
-
-	return true;
 }
 
-bool CreateRenderPass()
+void CreateRenderPass()
 {
 	VulkanTest(lunaSetDepthImageFormat(device, 2, (VkFormat[]){VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT}),
 			   "Failed to set depth image format!");
@@ -248,12 +234,11 @@ bool CreateRenderPass()
 				 msaaSamples))
 		{
 			msaaSamples >>= 1;
-			if (msaaSamples == 0)
-			{
-				VulkanLogError("Found device does not support sampling the image even once. "
-							   "This indicates an issue with the graphics driver.");
-				return false;
-			}
+
+			// Check that msaaSamples is not zero
+			VulkanTestBool(msaaSamples,
+						   "Found device does not support sampling the images. "
+						   "This indicates an issue with the graphics driver.");
 		}
 		// TODO: This doesn't update the options and it doesn't tell the user what to change their MSAA level to
 		ShowWarning("Invalid Settings",
@@ -301,11 +286,9 @@ bool CreateRenderPass()
 		},
 	};
 	SDL_Rect bounds;
-	if (!SDL_GetDisplayBounds(SDL_GetDisplayForWindow(vulkanWindow), &bounds))
-	{
-		LogError("Failed to get display bounds with error: %s", SDL_GetError());
-		return false;
-	}
+	VulkanTestBool(SDL_GetDisplayBounds(SDL_GetDisplayForWindow(vulkanWindow), &bounds),
+				   "Failed to get display bounds with error: %s",
+				   SDL_GetError());
 	const VkExtent2D extent = lunaGetSwapchainExtent();
 	const LunaRenderPassCreationInfo renderPassCreationInfo = {
 		.samples = msaaSamples,
@@ -324,10 +307,9 @@ bool CreateRenderPass()
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
 	VulkanTest(lunaCreateRenderPass(device, &renderPassCreationInfo, &renderPass), "Failed to create render pass!");
-	return true;
 }
 
-bool CreateDescriptorSetLayouts()
+void CreateDescriptorSetLayouts()
 {
 	// TODO: The hardcoded -5 is bug prone
 	const uint32_t freeResourceCount = physicalDeviceProperties.limits.maxPerStageResources - 5;
@@ -432,11 +414,9 @@ bool CreateDescriptorSetLayouts()
 											 &shadowMapsDescriptorSetLayoutCreationInfo,
 											 &descriptorSets.shadowMaps.layout),
 			   "Failed to create shadow maps descriptor set layout!");
-
-	return true;
 }
 
-bool CreateTextureSamplers()
+void CreateTextureSamplers()
 {
 	float maxAnisotropy = 0;
 	switch (GetState()->options.anisotropy)
@@ -562,12 +542,10 @@ bool CreateTextureSamplers()
 
 	ListInit(textures, LIST_UINT64);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
-
-	return true;
 }
 
 // TODO: Revisit this to ensure it's as it should be (update after bind flag or usage of MAX_FRAMES_IN_FLIGHT, for example)
-bool CreateDescriptorSet()
+void CreateDescriptorSet()
 {
 	const uint32_t sampledImageCount = min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
 										   physicalDeviceProperties.limits.maxPerStageDescriptorSampledImages);
@@ -612,8 +590,6 @@ bool CreateDescriptorSet()
 	};
 	VulkanTest(lunaAllocateDescriptorSets(device, &allocationInfo, descriptorSetHandles),
 			   "Failed to allocate descriptor sets!");
-
-	return true;
 }
 
 void WriteDescriptorSet()

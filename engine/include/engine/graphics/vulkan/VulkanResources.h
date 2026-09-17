@@ -8,8 +8,8 @@
 #include <engine/assets/TextureLoader.h>
 #include <stdbool.h>
 
-VkResult ResizeDebugDrawBuffers();
+void ResizeDebugDrawBuffers();
 
-bool LoadTexture(const Image *image);
+void LoadTexture(const Image *image);
 
 #endif //VULKANRESOURCES_H

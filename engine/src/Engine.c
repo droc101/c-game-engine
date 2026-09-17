@@ -289,11 +289,6 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	InitState();
 	PhysicsThreadInit();
 
-	if (!RenderPreInit())
-	{
-		RenderInitError();
-	}
-
 	InitSoundSystem();
 
 	WindowAndRenderInit();

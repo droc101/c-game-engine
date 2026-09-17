@@ -10,7 +10,6 @@
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -32,7 +31,6 @@
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaDevice.h>
-#include <luna/lunaDrawing.h>
 #include <luna/lunaImage.h>
 #include <luna/lunaTypes.h>
 #include <math.h>
@@ -88,7 +86,7 @@ LightingShaderSpecializationConstants lightingShaderSpecializationConstants = {
 static CameraUniform uniform;
 #pragma endregion variables
 
-bool ClearTextureCache()
+void ClearTextureCache()
 {
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 	for (size_t i = 0; i < textures.length; i++)
@@ -102,16 +100,13 @@ bool ClearTextureCache()
 	lunaDestroySampler(device, textureSamplers.nearestRepeatNoAnisotropy);
 	lunaDestroySampler(device, textureSamplers.linearNoRepeatNoAnisotropy);
 	lunaDestroySampler(device, textureSamplers.nearestNoRepeatNoAnisotropy);
-	return CreateTextureSamplers();
+	CreateTextureSamplers();
 }
 
-VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaShaderModule *shaderModule)
+void CreateShaderModule(const char *path, const ShaderType shaderType, LunaShaderModule *shaderModule)
 {
 	Shader *shader = LoadShader(path);
-	if (!shader)
-	{
-		return VK_ERROR_UNKNOWN;
-	}
+	VulkanTestBoolRecoverable(shader, {}, "Failed to load shader %s!", path);
 	assert(shader->type == shaderType);
 	(void)shaderType;
 
@@ -120,11 +115,10 @@ VkResult CreateShaderModule(const char *path, const ShaderType shaderType, LunaS
 		.creationInfoUnion.spirv.size = sizeof(uint32_t) * shader->spirvLength,
 		.creationInfoUnion.spirv.spirv = shader->spirv,
 	};
-	VulkanTestReturnResult(lunaCreateShaderModule(device, &shaderModuleCreationInfo, shaderModule),
-						   "Failed to create shader module!");
+	VulkanTest(lunaCreateShaderModule(device, &shaderModuleCreationInfo, shaderModule),
+			   "Failed to create shader module!");
 
 	FreeShader(shader);
-	return VK_SUCCESS;
 }
 
 inline uint32_t TextureIndex(const char *texture)
@@ -137,11 +131,7 @@ inline uint32_t ImageIndex(const Image *image)
 	const uint32_t index = imageAssetIdToIndexMap[image->id];
 	if (index == -1u)
 	{
-		// TODO: Only error if the missing texture fails to load
-		if (!LoadTexture(image))
-		{
-			Error("Failed to load texture into VkImage!");
-		}
+		LoadTexture(image);
 		return imageAssetIdToIndexMap[image->id];
 	}
 	return index;
@@ -176,7 +166,7 @@ inline uint32_t ShadowMapResolution(void)
 	return lightmapTextureSize;
 }
 
-static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint32_t *const shadowMapCount)
+static inline void CreateLightFrustumShadowMapImage(const Light *light, uint32_t *const shadowMapCount)
 {
 	const VkDevice vkDevice = lunaGetVkDevice(device);
 	const uint32_t lightSize = ShadowMapResolution();
@@ -251,8 +241,8 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
 			.writeInfo = depthAttachmentWriteInfo,
 		};
-		VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &directionalShadowMapAtlasCreationInfo, image),
-							   "Failed to create spot light shadow map image!");
+		VulkanTest(lunaCreateImage(device, commandBuffer, &directionalShadowMapAtlasCreationInfo, image),
+				   "Failed to create spot light shadow map image!");
 		imageView = lunaGetVkImageView(*image);
 
 		const VkFramebufferCreateInfo directionalLightShadowMapAtlasFramebufferCreateInfo = {
@@ -265,11 +255,11 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 			.layers = 1,
 		};
 		VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-		VulkanTestReturnResult(vkCreateFramebuffer(vkDevice,
-												   &directionalLightShadowMapAtlasFramebufferCreateInfo,
-												   NULL,
-												   framebuffer),
-							   "Failed to create spot light shadow map framebuffer!");
+		VulkanTest(vkCreateFramebuffer(vkDevice,
+									   &directionalLightShadowMapAtlasFramebufferCreateInfo,
+									   NULL,
+									   framebuffer),
+				   "Failed to create spot light shadow map framebuffer!");
 
 		shadowMapImageInfos->image = *image;
 	} else
@@ -278,13 +268,13 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 		for (uint32_t i = 0; i < lightFrustumCount; i++)
 		{
 			image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-			VulkanTestReturnResult(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
-								   "Failed to create spot light shadow map image!");
+			VulkanTest(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
+					   "Failed to create spot light shadow map image!");
 
 			imageView = lunaGetVkImageView(*image);
 			VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-			VulkanTestReturnResult(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
-								   "Failed to create spot light shadow map framebuffer!");
+			VulkanTest(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
+					   "Failed to create spot light shadow map framebuffer!");
 
 			shadowMapImageInfos[i].image = *image;
 		}
@@ -299,11 +289,9 @@ static inline VkResult CreateLightFrustumShadowMapImage(const Light *light, uint
 		.imageInfos = shadowMapImageInfos,
 	};
 	lunaWriteDescriptorSets(device, 1, &shadowMapDescriptorWrite);
-
-	return VK_SUCCESS;
 }
 
-VkResult CreateShadowMapRenderPass(const Map *map)
+void CreateShadowMapRenderPass(const Map *map)
 {
 	const VkDevice vkDevice = lunaGetVkDevice(device);
 	if (shadowMapRenderPass != VK_NULL_HANDLE)
@@ -325,7 +313,7 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 
 	if (map == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
 	{
-		return VK_SUCCESS;
+		return;
 	}
 
 	const VkAttachmentDescription depthAttachmentDescription = {
@@ -361,8 +349,8 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 		.dependencyCount = 1,
 		.pDependencies = &dependency,
 	};
-	VulkanTestReturnResult(vkCreateRenderPass(vkDevice, &renderPassCreateInfo, NULL, &shadowMapRenderPass),
-						   "Failed to create shadow map render pass!");
+	VulkanTest(vkCreateRenderPass(vkDevice, &renderPassCreateInfo, NULL, &shadowMapRenderPass),
+			   "Failed to create shadow map render pass!");
 
 	ListInit(shadowMaps, LIST_POINTER);
 	ListInit(shadowMapFramebuffers, LIST_POINTER);
@@ -370,20 +358,16 @@ VkResult CreateShadowMapRenderPass(const Map *map)
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
 		const Light *light = &map->lights[i];
-		VulkanTestReturnResult(CreateLightFrustumShadowMapImage(light, &shadowMapCount),
-							   "Failed to create light frustum!");
+		CreateLightFrustumShadowMapImage(light, &shadowMapCount);
 	}
 	for (uint32_t i = 0; i < dynamicLights.length; i++)
 	{
 		const DynamicLight *light = ListGetPointer(dynamicLights, i);
-		VulkanTestReturnResult(CreateLightFrustumShadowMapImage(&light->light, &shadowMapCount),
-							   "Failed to create dynamic light frustum!");
+		CreateLightFrustumShadowMapImage(&light->light, &shadowMapCount);
 	}
-
-	return VK_SUCCESS;
 }
 
-VkResult UpdateCameraUniform(Camera *camera)
+void UpdateCameraUniform(Camera *camera)
 {
 	if (camera->recomputeCachedData)
 	{
@@ -423,13 +407,11 @@ VkResult UpdateCameraUniform(Camera *camera)
 		.data = &uniform,
 		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.camera, &bufferWriteInfo),
-						   "Failed to write camera uniform!");
-
-	return VK_SUCCESS;
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.camera, &bufferWriteInfo),
+			   "Failed to write camera uniform!");
 }
 
-VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
+void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 {
 	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
 	glm_translate(translationMatrix,
@@ -458,19 +440,17 @@ VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel)
 			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
 			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 		};
-		VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.instanceData, &writeInfo),
-							   "Failed to write viewmodel transform matrix to instance data buffer!");
+		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.instanceData, &writeInfo),
+				   "Failed to write viewmodel transform matrix to instance data buffer!");
 	}
-
-	return VK_SUCCESS;
 }
 
 // TODO: Optimize this function
-VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
+void UpdateDirectionalLightCascades(const Camera *camera, const Light *light)
 {
 	if (light == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
 	{
-		return VK_SUCCESS;
+		return;
 	}
 
 	static const float LAMBDA = 0.95f; // Adjusts the range of each split. Tweak to find optimal values
@@ -581,117 +561,40 @@ VkResult UpdateDirectionalLightCascades(const Camera *camera, const Light *light
 		.data = depths,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &depthsWriteInfo),
-						   "Failed to write directional light cascade depths to buffer!");
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &depthsWriteInfo),
+			   "Failed to write directional light cascade depths to buffer!");
 	const LunaBufferWriteInfo matricesWriteInfo = {
 		.bytes = sizeof(mat4) * 4,
 		.data = matrices,
 		.offset = sizeof(float) * 4,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),
-						   "Failed to write directional light cascade transform matrices to buffer!");
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),
+			   "Failed to write directional light cascade transform matrices to buffer!");
 	const LunaBufferWriteInfo frustumsWriteInfo = {
 		.bytes = sizeof(FrustumCullingData) * 4,
 		.data = &frustums[1],
 		.offset = sizeof(FrustumCullingData),
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumsWriteInfo),
-						   "Failed to write directional light frustums to buffer!");
-
-	return VK_SUCCESS;
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumsWriteInfo),
+			   "Failed to write directional light frustums to buffer!");
 }
 
-VkResult WriteFrustumsBuffer()
+void WriteFrustumsBuffer()
 {
 	const LunaBufferWriteInfo frustumBufferWriteInfo = {
 		.bytes = sizeof(FrustumCullingData) * frustumCount,
 		.data = frustums,
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 	};
-	VulkanTestReturnResult(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
-						   "Failed to write frustums buffer!");
-
-	return VK_SUCCESS;
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
+			   "Failed to write frustums buffer!");
 }
 
-static inline bool OverlapsCameraFrustum(const Camera *camera, const FrustumCullingData *frustum) {}
-
-VkResult CullLights()
+void CullModels()
 {
-	uint32_t frustumIndex = GetState()->map->directionalLight == NULL ? 1 : 5;
-	for (uint32_t i = 0; i < GetState()->map->lightCount; i++)
-	{
-		const Light *light = &GetState()->map->lights[i];
-		// switch (light->type)
-		// {
-		// 	case LIGHT_TYPE_SPOT:
-		// 	{
-		// 		glm_mat4_copy(viewMatrix, frustums[frustumIndex].viewMatrix);
-		// 		frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
-		// 		frustums[frustumIndex].farPlane = light->maxDistance;
-		// 		frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
-		// 		frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
-		// 		frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
-		// 		frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
-		// 		frustumIndex++;
-		// 	}
-		// 	break;
-		// 	case LIGHT_TYPE_POINT:
-		// 	{
-		// 		light->shadowMapIndex = pointLightIndex++;
-		// 		glm_perspective_lh_zo(glm_rad(90), 1, light->maxDistance, LIGHT_NEAR_PLANE, transformMatrix);
-		//
-		// 		mat4 transposed;
-		// 		glm_mat4_transpose_to(transformMatrix, transposed);
-		// 		vec4 frustumX;
-		// 		vec4 frustumY;
-		// 		glm_vec4_add(transposed[3], transposed[0], frustumX);
-		// 		glm_vec4_add(transposed[3], transposed[1], frustumY);
-		// 		glm_plane_normalize(frustumX);
-		// 		glm_plane_normalize(frustumY);
-		//
-		// 		mat3 transforms[6] = {
-		// 			{{0, 0, -1}, {0, 1, 0}, {1, 0, 0}},
-		// 			{{0, 0, 1}, {0, 1, 0}, {-1, 0, 0}},
-		// 			{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}},
-		// 			{{-1, 0, 0}, {0, 0, 1}, {0, 1, 0}},
-		// 			{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}},
-		// 			{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
-		// 		};
-		// 		vec3 negativeLightPosition = {
-		// 			-light->transform.position.x,
-		// 			-light->transform.position.y,
-		// 			-light->transform.position.z,
-		// 		};
-		// 		for (uint32_t j = 0; j < 6; j++)
-		// 		{
-		// 			glm_mat4_ins3(transforms[j], frustums[frustumIndex].viewMatrix);
-		// 			glm_translate(frustums[frustumIndex].viewMatrix, negativeLightPosition);
-		// 			frustums[frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
-		// 			frustums[frustumIndex].farPlane = light->maxDistance;
-		// 			frustums[frustumIndex].frustumPlanes[0] = frustumX[0];
-		// 			frustums[frustumIndex].frustumPlanes[1] = frustumX[2];
-		// 			frustums[frustumIndex].frustumPlanes[2] = frustumY[1];
-		// 			frustums[frustumIndex].frustumPlanes[3] = frustumY[2];
-		// 			frustumIndex++;
-		// 		}
-		// 	}
-		// 	break;
-		// 	default:
-		// 		continue;
-		// }
-		//
-		// // The allocation for lights is not aligned so we just memcpy
-		// memcpy(light->transformMatrix, transformMatrix, sizeof(mat4));
-	}
-}
-
-VkResult CullModels()
-{
-	VulkanTestReturnResult(UpdateDirectionalLightCascades(GetState()->camera, GetState()->map->directionalLight),
-						   "Failed to update directional light cascades!");
+	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map->directionalLight);
 
 	const LunaMultiBufferMemoryBarrier preClearMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,
@@ -705,11 +608,11 @@ VkResult CullModels()
 		.multiBufferMemoryBarrierCount = 1,
 		.multiBufferMemoryBarriers = &preClearMemoryBarrier,
 	};
-	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preClearDependencyInfo),
-						   "Failed to insert pipeline barrier before clearing culling data!");
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preClearDependencyInfo),
+			   "Failed to insert pipeline barrier before clearing culling data!");
 
-	VulkanTestReturnResult(lunaPushConstantsCompute(device, commandBuffer, pipelines.clearCullingData),
-						   "Failed to push constants for clearing culling data!");
+	VulkanTest(lunaPushConstantsCompute(device, commandBuffer, pipelines.clearCullingData),
+			   "Failed to push constants for clearing culling data!");
 	const LunaDescriptorSetBindInfo clearDescriptorSetBindInfo = {
 		.descriptorSetCount = 1,
 		.descriptorSets = &descriptorSets.culling.set,
@@ -720,8 +623,8 @@ VkResult CullModels()
 		.groupCountX = ((actorModelsDrawInfoCount + 63) / 64),
 		.groupCountY = frustumCount,
 	};
-	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &clearDispatchInfo),
-						   "Failed to dispatch culling data clear shader!");
+	VulkanTest(lunaDispatch(device, commandBuffer, &clearDispatchInfo),
+			   "Failed to dispatch culling data clear shader!");
 
 	const LunaMultiBufferMemoryBarrier preDispatchMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
@@ -735,11 +638,11 @@ VkResult CullModels()
 		.multiBufferMemoryBarrierCount = 1,
 		.multiBufferMemoryBarriers = &preDispatchMemoryBarrier,
 	};
-	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
-						   "Failed to insert pipeline barrier before culling shader!");
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
+			   "Failed to insert pipeline barrier before culling shader!");
 
-	VulkanTestReturnResult(lunaPushConstantsCompute(device, commandBuffer, pipelines.culling),
-						   "Failed to push constants for culling pipeline!");
+	VulkanTest(lunaPushConstantsCompute(device, commandBuffer, pipelines.culling),
+			   "Failed to push constants for culling pipeline!");
 	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.culling.set};
 	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
 		.descriptorSetCount = 2,
@@ -752,7 +655,7 @@ VkResult CullModels()
 		.groupCountY = 8,
 		.groupCountZ = frustumCount,
 	};
-	VulkanTestReturnResult(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
+	VulkanTest(lunaDispatch(device, commandBuffer, &dispatchInfo), "Failed to dispatch culling shader!");
 
 	const LunaMultiBufferMemoryBarrier postDispatchMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
@@ -770,10 +673,8 @@ VkResult CullModels()
 		.multiBufferMemoryBarrierCount = 1,
 		.multiBufferMemoryBarriers = &postDispatchMemoryBarrier,
 	};
-	VulkanTestReturnResult(lunaPipelineBarrier(device, commandBuffer, &postDispatchDependencyInfo),
-						   "Failed to insert pipeline barrier after culling shader!");
-
-	return VK_SUCCESS;
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &postDispatchDependencyInfo),
+			   "Failed to insert pipeline barrier after culling shader!");
 }
 
 void EnsureSpaceForUiElements(const size_t quadCount)

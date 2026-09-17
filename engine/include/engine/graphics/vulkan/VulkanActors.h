@@ -12,8 +12,8 @@ void InitActorLoadingVariables();
 
 void RequireRealloc();
 
-VkResult LoadActors(const LockingList *actors);
+void LoadActors(const LockingList *actors);
 
-VkResult UpdateActors();
+void UpdateActors();
 
 #endif //GAME_VULKANACTORS_H

@@ -124,12 +124,6 @@ Vector2 GetTextureSize(const char *texture);
 void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix);
 
 /**
- * Perform any pre-initialization for the rendering system
- * This is called before the window is created.
- */
-bool RenderPreInit();
-
-/**
  * Initialize the rendering system
  */
 bool RenderInit();

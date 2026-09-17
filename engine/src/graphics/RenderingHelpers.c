@@ -42,7 +42,6 @@ static int windowWidth;
 static int windowHeight;
 
 RendererQueuedAction rendererQueuedActions = 0;
-static OptionsMsaa qaNewFramebufferMsaaValue = MSAA_NONE;
 
 void SetGameWindow(SDL_Window *w)
 {
@@ -132,11 +131,6 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	}
 }
 
-bool RenderPreInit()
-{
-	return VK_PreInit();
-}
-
 bool RenderInit()
 {
 	return VK_Init(GetGameWindow());
@@ -154,7 +148,7 @@ bool FrameStart()
 
 void FrameEnd()
 {
-	VK_FrameEnd();
+	(void)VK_FrameEnd(); // The return value of this is safe to ignore, since it'll be caught at the start of next frame
 	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
 	{
 		HotReloadAssets();

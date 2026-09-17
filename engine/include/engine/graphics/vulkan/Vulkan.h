@@ -19,8 +19,6 @@
 #define VK_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
 #define VK_Y_TO_NDC(y) ((float)(y) / ScaledWindowHeightFloat() * 2.0f - 1.0f)
 
-bool VK_PreInit();
-
 bool VK_Init(SDL_Window *window);
 
 bool VK_FrameStart();
@@ -33,14 +31,14 @@ bool VK_FrameStart();
  * @param camera The camera from which the map should be rendered
  * @return @c VK_SUCCESS if the map was rendered successfully, or a meaningful result code otherwise
  */
-bool VK_RenderMap(Map *map, Camera *camera);
+void VK_RenderMap(Map *map, Camera *camera);
 
 bool VK_FrameEnd();
 
 /// A function used to destroy the Vulkan objects when they are no longer needed.
 void VK_Cleanup();
 
-bool VK_LoadMap(const Map *map);
+void VK_LoadMap(const Map *map);
 
 /**
  * Load a dynamic light
@@ -59,7 +57,7 @@ void VK_AddDynamicLight(const DynamicLight *light);
  */
 void VK_RemoveDynamicLight(const DynamicLight *light);
 
-bool VK_UpdateViewportSize();
+void VK_UpdateViewportSize();
 
 void VK_Minimize();
 
