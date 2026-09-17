@@ -258,11 +258,11 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	if (HasCliArg("--game"))
 	{
-		const char *game = GetCliArgStr("--game", "assets/game");
+		const char *game = GetCliArgStr("--game", initInfo.defaultGamePath);
 		LoadGameConfig(game);
 	} else
 	{
-		LoadGameConfig("assets/game");
+		LoadGameConfig(initInfo.defaultGamePath);
 	}
 
 	RegisterControls(initInfo.RegisterGameControls);
@@ -308,6 +308,9 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	InitDPrintConsole();
 
 	LodThreadInit();
+
+	LoadingStateDoneCallback = initInfo.LoadingStateDoneCallback;
+	LoadingStateErrorCallback = initInfo.LoadingStateErrorCallback;
 
 	SDL_ShowWindow(GetGameWindow());
 }

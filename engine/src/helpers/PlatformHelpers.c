@@ -5,6 +5,7 @@
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
+#include <errno.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -223,5 +224,33 @@ void AvxAlignedFree(void *data)
 	_aligned_free(data);
 #else
 	free(data);
+#endif
+}
+
+void OpenFileInDefaultProgram(const char *filePath)
+{
+#ifdef WIN32
+	ShellExecuteA(NULL, "open", filePath, NULL, NULL, 0);
+#else
+	const pid_t ppid = getpid();
+	const pid_t pid = fork();
+	if (pid == -1)
+	{
+		LogError("fork() failed: %s", strerror(errno));
+		return;
+	}
+	if (pid != ppid) // check if this process is the parent or child
+	{
+		char *argv[] = {
+			"xdg-open",
+			strdup(filePath),
+			NULL,
+		};
+		if (execvp("xdg-open", argv) == -1)
+		{
+			LogError("execvp() failed: %s", strerror(errno));
+			return;
+		}
+	}
 #endif
 }

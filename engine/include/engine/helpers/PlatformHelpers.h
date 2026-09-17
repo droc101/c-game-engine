@@ -53,4 +53,6 @@ void *AvxAlignedCalloc(size_t size);
 
 void AvxAlignedFree(void *data);
 
+void OpenFileInDefaultProgram(const char *filePath);
+
 #endif //PLATFORMHELPERS_H

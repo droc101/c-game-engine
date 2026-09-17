@@ -19,13 +19,13 @@ void InitArguments(const int processArgc, const char **processArgv)
 	argv = processArgv;
 }
 
-char *GetCliArgStr(const char *argument, char *defaultValue)
+const char *GetCliArgStr(const char *argument, const char *defaultValue)
 {
 	for (int i = 0; i < argc; i++)
 	{
 		if (strncmp(argv[i], argument, strlen(argument)) == 0)
 		{
-			char *value = strchr(argv[i], '=');
+			const char *value = strchr(argv[i], '=');
 			if (value != NULL)
 			{
 				return value + 1;

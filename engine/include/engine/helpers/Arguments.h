@@ -18,7 +18,7 @@ void InitArguments(int processArgc, const char **processArgv);
  * @param defaultValue The default value to use if the argument is not present
  * @return The value of the argument, or the default if needed
  */
-char *GetCliArgStr(const char *argument, char *defaultValue);
+const char *GetCliArgStr(const char *argument, const char *defaultValue);
 
 /**
 * Get a CLI argument's value as an integer

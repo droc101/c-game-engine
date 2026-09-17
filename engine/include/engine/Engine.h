@@ -11,6 +11,8 @@
 #include <engine/structs/ControlOptions.h>
 #include <stdbool.h>
 
+#include "gameState/LoadingState.h"
+
 #define TARGET_FPS 60
 #define TARGET_FPS_NS_D (1000000000.0 / TARGET_FPS)
 
@@ -41,6 +43,9 @@ typedef struct EngineInitializationInfo
 	const RegisterGameActorsFunction RegisterGameActors;
 	const ControlRegisterFunction RegisterGameControls;
 	const RegisterGameAchievementsFunction RegisterGameAchievements;
+	const char *defaultGamePath;
+	const LoadingStateDoneFunction LoadingStateDoneCallback;
+	const LoadingStateErrorFunction LoadingStateErrorCallback;
 } EngineInitializationInfo;
 
 /**

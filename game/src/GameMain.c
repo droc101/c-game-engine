@@ -65,12 +65,13 @@ EXPORT_SYM int GameMain(const int argc, const char *argv[])
 		.RegisterGameActors = RegisterGameActors,
 		.RegisterGameControls = RegisterGameControls,
 		.RegisterGameAchievements = RegisterGameAchievements,
+		.defaultGamePath = "assets/game",
+		.LoadingStateDoneCallback = LoadingStateDone,
+		.LoadingStateErrorCallback = LoadingStateError,
 	};
 
 	InitEngine(initInfo);
 	LaserRaycastFiltersInit();
-	LoadingStateDoneCallback = LoadingStateDone;
-	LoadingStateErrorCallback = LoadingStateError;
 	SetInitialGameState();
 	LogInfo("Engine initialized, entering mainloop\n");
 	while (!EngineShouldQuit())
