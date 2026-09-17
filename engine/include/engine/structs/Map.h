@@ -20,6 +20,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define MAX_ACTORS 8192
+
 typedef struct Map Map;
 typedef struct MapVertex MapVertex;
 typedef struct MapModel MapModel;
