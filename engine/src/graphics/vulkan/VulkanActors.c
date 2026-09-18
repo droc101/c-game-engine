@@ -645,7 +645,6 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 	Vector3 position;
 	Vector3_MultiplyScalar(&actor->deltaPosition, interpolationFactor, &position);
 	Vector3_Add(&actor->previousTickStartTransform.position, &position, &position);
-	JPH_BodyInterface_GetPositionAndRotation(actor->bodyInterface, actor->bodyId, &position, &rotation);
 	actorInstanceData->position = position;
 	actorInstanceData->scale.x = actor->wall->length;
 	actorInstanceData->scale.y = actor->wall->height;
