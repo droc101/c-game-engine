@@ -133,19 +133,20 @@ static int PhysicsThreadMain(void * /*data*/)
 		GetState()->physicsFrame++;
 
 		const GlobalState *state = GetState();
-		if (!state->map)
+		if (state->map)
+		{
+			const LockingList *actors = &state->map->actors;
+			const Vector3 cameraPosition = state->camera->transform.position;
+
+			ListLock(*actors);
+			SDL_UnlockMutex(physicsTickMutex);
+
+			UpdateActorLods(actors, cameraPosition);
+			ListUnlock(*actors);
+		} else
 		{
 			SDL_UnlockMutex(physicsTickMutex);
-			continue;
 		}
-		const LockingList *actors = &state->map->actors;
-		const Vector3 cameraPosition = state->camera->transform.position;
-
-		ListLock(*actors);
-		SDL_UnlockMutex(physicsTickMutex);
-
-		UpdateActorLods(actors, cameraPosition);
-		ListUnlock(*actors);
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
