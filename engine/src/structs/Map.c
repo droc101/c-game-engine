@@ -5,6 +5,7 @@
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Camera.h>
@@ -16,6 +17,7 @@
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
@@ -25,8 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "engine/subsystem/Logging.h"
 
 Map *CreateMap(void)
 {
@@ -82,10 +82,15 @@ void FreeLoadTimeMapData(Map *map)
 
 void DestroyMap(Map *map)
 {
+	PhysicsThreadLockTickMutex();
+
+	ListLock(map->actors);
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		FreeActor(ListGetPointer(map->actors, i));
 	}
+	map->actors.length = 0;
+	ListUnlock(map->actors);
 
 	if (map->models)
 	{
@@ -128,6 +133,8 @@ void DestroyMap(Map *map)
 	ListFree(map->namedActorPointers);
 	ListFree(map->actors);
 	free(map);
+
+	PhysicsThreadUnlockTickMutex();
 }
 
 void AddActor(Actor *actor)

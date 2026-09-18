@@ -2,6 +2,7 @@
 // Created by droc101 on 7/19/26.
 //
 
+#include <engine/physics/PhysicsThread.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/FontLoader.h>
 #include <engine/assets/ModelLoader.h>
@@ -27,7 +28,6 @@
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
-#include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>

@@ -22,7 +22,6 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/threads/LodThread.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
@@ -68,9 +67,6 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 
 	MovePlayer(&state->map->player, delta, allowMovement);
 
-	LockLodThreadMutex();
-	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen before this!
-
 	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
 
 	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime, allowMovement);
@@ -113,8 +109,4 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 		Error("Failed to update physics!");
 	}
 	GetState()->map->physicsTick++;
-
-	// WARNING: Any access to `state->level->actors` with ANY chance of modifying it MUST not happen after this!
-	UnlockLodThreadMutex();
-	SignalLodThreadCanStart();
 }
