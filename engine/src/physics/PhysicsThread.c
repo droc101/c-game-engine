@@ -135,6 +135,7 @@ static int PhysicsThreadMain(void * /*data*/)
 		const GlobalState *state = GetState();
 		if (!state->map)
 		{
+			SDL_UnlockMutex(physicsTickMutex);
 			continue;
 		}
 		const LockingList *actors = &state->map->actors;

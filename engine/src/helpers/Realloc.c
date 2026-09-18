@@ -2,17 +2,15 @@
 // Created by NBT22 on 9/2/25.
 //
 
-#include <engine/helpers/Realloc.h>
-
 #include <assert.h>
+#include <engine/helpers/Realloc.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 
 void *GameReallocArray(void *ptr, const size_t arrayLength, const size_t elementSize)
 {
