@@ -1153,9 +1153,11 @@ static inline bool CreateDebugDrawPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &linesPipelineInfo, &pipelines.debugDrawLines),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &linesPipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.debugDrawLines),
 			   "Failed to create graphics pipeline for Jolt debug renderer lines!");
 
 	const LunaGraphicsPipelineCreationInfo trianglesPipelineInfo = {
@@ -1170,9 +1172,11 @@ static inline bool CreateDebugDrawPipeline()
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
-		.subpass = lunaGetRenderPassSubpassByName(renderPass, NULL),
 	};
-	VulkanTest(lunaCreateGraphicsPipeline(device, &trianglesPipelineInfo, &pipelines.debugDrawTriangles),
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &trianglesPipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, NULL),
+										  &pipelines.debugDrawTriangles),
 			   "Failed to create graphics pipeline for Jolt debug renderer triangles!");
 #endif
 

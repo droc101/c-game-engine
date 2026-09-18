@@ -42,7 +42,7 @@
 #include <vulkan/vulkan_core.h>
 
 #ifdef JPH_DEBUG_RENDERER
-#include <engine/debug/JoltDebugRenderer.h>
+#include <engine/graphics/vulkan/VulkanResources.h>
 #endif
 
 static const Map *loadedMap;
