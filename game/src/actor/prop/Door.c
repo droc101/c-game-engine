@@ -13,6 +13,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <float.h>
 #include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
@@ -175,7 +176,7 @@ static void DoorUpdate(Actor *this, const double delta)
 	switch (data->state)
 	{
 		case DOOR_OPENING:
-			if (data->animationTime >= data->width / 16.0f)
+			if ((data->animationTime + FLT_EPSILON) >= data->width / 16.0f)
 			{
 				DoorSetState(this, DOOR_OPEN, 0);
 			}
@@ -188,7 +189,7 @@ static void DoorUpdate(Actor *this, const double delta)
 			}
 			break;
 		case DOOR_CLOSING:
-			if (data->animationTime >= data->width / 16.0f)
+			if ((data->animationTime + FLT_EPSILON) >= data->width / 16.0f)
 			{
 				DoorSetState(this, DOOR_CLOSED, 0);
 				data->shouldClose = false;

@@ -11,6 +11,8 @@
 #include <engine/structs/Light.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
+#include <SDL3/SDL_mutex.h>
 #include <stdbool.h>
 
 #define CROSSHAIR_COLOR_NORMAL COLOR(0xFFFFCCCC)
@@ -23,8 +25,11 @@ typedef struct Player Player;
 
 struct Player
 {
-	/// The player's 3d transform
+	/// The player's 3d transform.
+	/// Position is the position as of the start of the last physics tick, rotation is updated on the render thread
 	Transform transform;
+	/// The change in player position during the last physics tick
+	Vector3 deltaPosition;
 	/// The Jolt character. Includes the rigid body as well as other useful abstractions
 	JPH_CharacterVirtual *joltCharacter;
 	/// Aliasing for targeted vs held actor to improve code clarity by differentiating between targeted and held actor
@@ -47,8 +52,13 @@ struct Player
 	float viewBobbingHeight;
 	/// The player's flashlight
 	DynamicLight flashlight;
+
+	/// Mutex used for synchronizing player position for interpolation
+	SDL_Mutex *mutex;
 };
 
-void CreatePlayer(Map *map);
+void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem);
+
+void DestroyPlayer(Player *player);
 
 #endif //PLAYER_H

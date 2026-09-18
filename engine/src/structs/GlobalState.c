@@ -2,13 +2,13 @@
 // Created by droc101 on 4/22/2024.
 //
 
-#include <engine/physics/PhysicsThread.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/MapLoader.h>
 #include <engine/gameState/LoadingState.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>

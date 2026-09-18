@@ -12,6 +12,7 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <stdbool.h>
@@ -59,6 +60,10 @@ struct Actor
 
 	/// Whether the actor has a model or not
 	bool hasModel;
+
+	/// Flags used to provide more information about the actor
+	uint32_t flags;
+
 	union
 	{
 		struct
@@ -77,17 +82,22 @@ struct Actor
 	/// The color modifier of the actor's model
 	Color modColor;
 
-	/// Flags used to provide more information about the actor
-	uint32_t flags;
+	/// The change in the actor's position over the last tick
+	Vector3 deltaPosition;
 
 	JPH_BodyID bodyId;
 	JPH_BodyInterface *bodyInterface;
 
+	/// Extra data for the actor
+	void *extraData;
+
 	/// List of I/O connections
 	LockingList ioConnections;
 
-	/// Extra data for the actor
-	void *extraData;
+	/// The actor's transform as of the start of the last tick
+	Transform previousTickStartTransform;
+	/// The actor's transform as of the end of the last tick
+	Transform previousTickEndTransform;
 };
 
 /**

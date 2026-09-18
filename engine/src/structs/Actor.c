@@ -15,6 +15,7 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
@@ -36,6 +37,8 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->modColor = COLOR_WHITE;
 	actor->bodyInterface = bodyInterface;
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
+	actor->previousTickStartTransform.rotation = JPH_Quat_Identity;
+	actor->previousTickEndTransform.rotation = JPH_Quat_Identity;
 	ListInit(actor->ioConnections, LIST_POINTER);
 
 	actor->definition->Init(actor, params, transform); // kindly allow the Actor to initialize itself

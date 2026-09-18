@@ -15,6 +15,7 @@
 #include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -25,7 +26,10 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <float.h>
+#include <joltc/Math/Mat44.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
+#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <math.h>
@@ -103,7 +107,7 @@ Vector2 GetTextureSize(const char *texture)
 	return v2((float)img->width, (float)img->height);
 }
 
-void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
+void ActorTransformMatrix(const Actor *actor, JPH_Mat44 *transformMatrix)
 {
 	if (!transformMatrix)
 	{
@@ -111,13 +115,20 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 	}
 	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
 	{
-		JPH_RMat44 matrix;
-		JPH_BodyInterface_GetWorldTransform(actor->bodyInterface, actor->bodyId, &matrix);
-		memcpy(*transformMatrix, &matrix, sizeof(mat4));
+		const float interpolationFactor = PhysicsInterpolationFactor();
+		JPH_Quat rotation;
+		JPH_Quat_Slerp(&actor->previousTickStartTransform.rotation,
+					   &actor->previousTickEndTransform.rotation,
+					   interpolationFactor,
+					   &rotation);
+		Vector3 interpolatedPosition;
+		Vector3_MultiplyScalar(&actor->deltaPosition, interpolationFactor, &interpolatedPosition);
+		Vector3_Add(&actor->previousTickStartTransform.position, &interpolatedPosition, &interpolatedPosition);
+		JPH_Mat44_RotationTranslation(&rotation, &interpolatedPosition, transformMatrix);
 	} else
 	{
 		LogWarning("ActorTransformMatrix called on actor which has no body!\n");
-		glm_mat4_identity(*transformMatrix);
+		*transformMatrix = JPH_Mat44_Identity;
 	}
 }
 

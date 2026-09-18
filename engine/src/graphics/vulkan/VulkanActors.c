@@ -7,14 +7,15 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/helpers/MathEx.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
+#include <joltc/Math/Mat44.h>
 #include <joltc/Math/Quat.h>
-#include <joltc/Math/RVec3.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <luna/luna.h>
@@ -588,7 +589,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 	assert(actor->model->materialSlotCount == materialSlotsData->materialSlots.length);
 	const uint32_t remainingInstances = ListGetUint32(*lodInstanceCounts, lodId) - 1;
 	ListSet(*lodInstanceCounts, lodId, remainingInstances);
-	mat4 transformMatrix;
+	JPH_Mat44 transformMatrix;
 	ActorTransformMatrix(actor, &transformMatrix);
 	for (uint32_t j = 0; j < materialSlotsData->materialSlots.length; j++)
 	{
@@ -618,7 +619,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 				continue;
 		}
 		ActorModelInstanceData *instanceData = &modelsInstanceData[instanceIndex];
-		memcpy(instanceData->transformMatrix, transformMatrix, sizeof(transformMatrix));
+		memcpy(instanceData->transformMatrix, &transformMatrix, sizeof(transformMatrix));
 		instanceData->modColor = actor->modColor;
 		instanceData->materialColor = material->color;
 		instanceData->textureIndex = TextureIndex(material->texture);
@@ -635,8 +636,15 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 											   ActorWallInstanceData *actorInstanceData,
 											   CullingInfo *cullingInfo)
 {
-	JPH_RVec3 position;
+	const float interpolationFactor = PhysicsInterpolationFactor();
 	JPH_Quat rotation;
+	JPH_Quat_Slerp(&actor->previousTickStartTransform.rotation,
+				   &actor->previousTickEndTransform.rotation,
+				   interpolationFactor,
+				   &rotation);
+	Vector3 position;
+	Vector3_MultiplyScalar(&actor->deltaPosition, interpolationFactor, &position);
+	Vector3_Add(&actor->previousTickStartTransform.position, &position, &position);
 	JPH_BodyInterface_GetPositionAndRotation(actor->bodyInterface, actor->bodyId, &position, &rotation);
 	actorInstanceData->position = position;
 	actorInstanceData->scale.x = actor->wall->length;

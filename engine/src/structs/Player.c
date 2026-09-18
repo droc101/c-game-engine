@@ -3,36 +3,45 @@
 //
 
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Light.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
+#include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
+#include <SDL3/SDL_mutex.h>
 #include <stddef.h>
 
-void CreatePlayer(Map *map)
+void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
-	map->player.transform.rotation = JPH_Quat_Identity;
-	map->player.playerCamera.fov = GetState()->options.fov;
-	map->player.playerCamera.nearPlane = DEFAULT_NEAR_PLANE;
-	map->player.playerCamera.farPlane = DEFAULT_FAR_PLANE;
-	map->player.playerCamera.transform.rotation = JPH_Quat_Identity;
-	map->player.playerCamera.recomputeCachedData = true;
+	player->transform.rotation = JPH_Quat_Identity;
+	player->playerCamera.fov = GetState()->options.fov;
+	player->playerCamera.nearPlane = DEFAULT_NEAR_PLANE;
+	player->playerCamera.farPlane = DEFAULT_FAR_PLANE;
+	player->playerCamera.transform.rotation = JPH_Quat_Identity;
+	player->playerCamera.recomputeCachedData = true;
+	player->mutex = SDL_CreateMutex();
 
-	map->player.flashlight.parent = playerBodyId;
-	map->player.flashlight.light.type = LIGHT_TYPE_SPOT;
-	map->player.flashlight.light.color[0] = 1;
-	map->player.flashlight.light.color[1] = 1;
-	map->player.flashlight.light.color[2] = 1;
-	map->player.flashlight.light.brightness = 5;
-	map->player.flashlight.light.constantAttenuation = 2.5f;
-	map->player.flashlight.light.linearAttenuation = 1;
-	map->player.flashlight.light.quadraticAttenuation = 1;
-	map->player.flashlight.light.attenuationMultiplier = 25;
-	map->player.flashlight.light.brightAngle = 15;
-	map->player.flashlight.light.fadingAngle = 25;
+	player->flashlight.parent = playerBodyId;
+	player->flashlight.light.type = LIGHT_TYPE_SPOT;
+	player->flashlight.light.color[0] = 1;
+	player->flashlight.light.color[1] = 1;
+	player->flashlight.light.color[2] = 1;
+	player->flashlight.light.brightness = 5;
+	player->flashlight.light.constantAttenuation = 2.5f;
+	player->flashlight.light.linearAttenuation = 1;
+	player->flashlight.light.quadraticAttenuation = 1;
+	player->flashlight.light.attenuationMultiplier = 25;
+	player->flashlight.light.brightAngle = 15;
+	player->flashlight.light.fadingAngle = 25;
 
-	CreatePlayerPhysics(map);
+	CreatePlayerPhysics(player, physicsSystem);
+}
+
+void DestroyPlayer(Player *player)
+{
+	DestroyMutex(&player->mutex);
 }

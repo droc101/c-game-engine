@@ -4,6 +4,7 @@
 
 #include <engine/debug/FrameGrapher.h>
 #include <engine/helpers/MathEx.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
@@ -33,6 +34,9 @@ static SDL_Mutex *physicsTickMutex;
 
 static List physicsThreadInputEventQueue;
 
+static double lastTickTime = PHYSICS_TARGET_NS_D;
+static uint64_t tickStart = 0;
+
 /**
  * The function to run in the physics thread
  * @warning Only touch this when you have a lock on the mutex
@@ -59,17 +63,23 @@ static inline void UpdateActorLods(const LockingList *actors, const Vector3 came
 {
 	const size_t actorCount = actors->length;
 	const float lodMultiplier = GetState()->options.lodMultiplier;
-	Vector3 actorPosition = {};
 	Vector3 offsetFromCamera = {};
 	for (size_t i = 0; i < actorCount; i++)
 	{
 		Actor *actor = ListGetPointer(*actors, i);
+		actor->previousTickStartTransform = actor->previousTickEndTransform;
+		JPH_BodyInterface_GetPositionAndRotation(actor->bodyInterface,
+												 actor->bodyId,
+												 &actor->previousTickEndTransform.position,
+												 &actor->previousTickEndTransform.rotation);
+		Vector3_Subtract(&actor->previousTickEndTransform.position,
+						 &actor->previousTickStartTransform.position,
+						 &actor->deltaPosition);
 		if (!actor->hasModel || actor->model->lodCount == 1)
 		{
 			continue;
 		}
-		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
-		Vector3_Subtract(&actorPosition, &cameraPosition, &offsetFromCamera);
+		Vector3_Subtract(&actor->previousTickEndTransform.position, &cameraPosition, &offsetFromCamera);
 		const float distanceSquared = Vector3_LengthSquared(&offsetFromCamera);
 		while (actor->currentLod != 0 &&
 			   actor->model->lods[actor->currentLod].distanceSquared * lodMultiplier > distanceSquared)
@@ -90,10 +100,9 @@ static inline void UpdateActorLods(const LockingList *actors, const Vector3 came
  */
 static int PhysicsThreadMain(void * /*data*/)
 {
-	double lastTickTime = PHYSICS_TARGET_NS_D;
 	while (true)
 	{
-		const uint64_t timeStart = GetTimeNs();
+		tickStart = GetTimeNs();
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
 		if (physicsThreadPostQuit)
@@ -106,8 +115,7 @@ static int PhysicsThreadMain(void * /*data*/)
 		for (size_t i = 0; i < physicsThreadInputEventQueue.length; i++)
 		{
 			SDL_Event *event = ListGetPointer(physicsThreadInputEventQueue, i);
-			// TODO: Should the return result be discarded here?
-			InputSystemProcessEvent(physicsThreadInput, event);
+			(void)InputSystemProcessEvent(physicsThreadInput, event);
 			free(event);
 		}
 		ListClear(physicsThreadInputEventQueue);
@@ -149,12 +157,15 @@ static int PhysicsThreadMain(void * /*data*/)
 		}
 
 		uint64_t timeEnd = GetTimeNs();
-		uint64_t timeElapsed = timeEnd - timeStart;
-		SDL_DelayPrecise(PHYSICS_TARGET_NS - timeElapsed);
-		timeEnd = GetTimeNs();
-		timeElapsed = timeEnd - timeStart;
+		uint64_t timeElapsed = timeEnd - tickStart;
+		lastTickTime = max(min(PHYSICS_MIN_NS_D, (double)timeElapsed), PHYSICS_TARGET_NS_D);
+		if (timeElapsed < PHYSICS_TARGET_NS)
+		{
+			SDL_DelayPrecise(PHYSICS_TARGET_NS - timeElapsed);
+			timeEnd = GetTimeNs();
+			timeElapsed = timeEnd - tickStart;
+		}
 		TickGraphUpdate(timeElapsed);
-		lastTickTime = min(PHYSICS_MIN_NS_D, (double)timeElapsed);
 	}
 }
 
@@ -194,17 +205,8 @@ void PhysicsThreadTerminate()
 	SDL_WaitThread(physicsThread, NULL);
 	ListAndContentsFree(physicsThreadInputEventQueue);
 
-	SDL_LockMutex(physicsThreadMutex);
-	SDL_Mutex *threadMutex = physicsThreadMutex;
-	physicsThreadMutex = NULL;
-	SDL_UnlockMutex(threadMutex);
-	SDL_DestroyMutex(threadMutex);
-
-	SDL_LockMutex(physicsTickMutex);
-	SDL_Mutex *tickMutex = physicsTickMutex;
-	physicsTickMutex = NULL;
-	SDL_UnlockMutex(tickMutex);
-	SDL_DestroyMutex(tickMutex);
+	DestroyMutex(&physicsThreadMutex);
+	DestroyMutex(&physicsTickMutex);
 }
 
 void PhysicsThreadLockTickMutex()
@@ -215,4 +217,9 @@ void PhysicsThreadLockTickMutex()
 void PhysicsThreadUnlockTickMutex()
 {
 	SDL_UnlockMutex(physicsTickMutex);
+}
+
+float PhysicsInterpolationFactor()
+{
+	return min((float)((double)(GetTimeNs() - tickStart) / lastTickTime), 1);
 }

@@ -11,7 +11,7 @@
 /// Target physics updates per second (be careful with this)
 #define PHYSICS_TARGET_TPS 60
 /// Minimum physics updates per second. Delta time gets clamped to this valued.
-#define PHYSICS_MIN_TPS 10
+#define PHYSICS_MIN_TPS 30
 
 #define MAX_CONTACT_CONSTRAINTS 16384
 

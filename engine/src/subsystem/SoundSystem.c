@@ -6,6 +6,7 @@
 #include <cglm/vec3.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
@@ -173,7 +174,7 @@ void DestroySoundSystem()
 	MIX_DestroyMixer(soundSys.mixer);
 	MIX_Quit();
 	UnlockSoundSystem();
-	SDL_DestroyMutex(soundSys.mutex);
+	DestroyMutex(&soundSys.mutex);
 }
 
 void UpdateSoundSystem()

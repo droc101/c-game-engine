@@ -121,7 +121,7 @@ Vector2 GetTextureSize(const char *texture);
  * @param actor The actor
  * @param transformMatrix A mat4 MODEL matrix of the actor (Model space to world space)
  */
-void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix);
+void ActorTransformMatrix(const Actor *actor, JPH_Mat44 *transformMatrix);
 
 /**
  * Initialize the rendering system
