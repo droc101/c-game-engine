@@ -9,6 +9,7 @@
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
@@ -289,6 +290,7 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	EXPECT_BYTES_BOOL(sizeof(float), bytesRemaining);
 	map->maxInboundsDistance = ReadFloat(reader);
+	map->player.playerCamera.farPlane = min(map->player.playerCamera.farPlane, map->maxInboundsDistance);
 
 	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
 	map->lightmapWidth = ReadSizeT(reader);
