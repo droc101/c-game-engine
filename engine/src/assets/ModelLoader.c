@@ -151,7 +151,11 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->boundingBoxExtents.x = ReadFloat(reader);
 	model->boundingBoxExtents.y = ReadFloat(reader);
 	model->boundingBoxExtents.z = ReadFloat(reader);
-	model->boundingBoxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, BOUNDING_BOX_CONVEX_RADIUS);
+	JPH_Shape *boxShape = (JPH_Shape *)JPH_BoxShape_Create(&model->boundingBoxExtents, BOUNDING_BOX_CONVEX_RADIUS);
+	model->boundingBoxShape = (JPH_Shape *)JPH_RotatedTranslatedShape_Create(&model->boundingBoxOrigin,
+																			 &JPH_Quat_Identity,
+																			 boxShape);
+	JPH_Shape_Destroy(boxShape);
 
 	if (model->collisionModelType == COLLISION_MODEL_TYPE_DYNAMIC)
 	{
