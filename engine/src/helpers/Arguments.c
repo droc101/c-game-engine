@@ -11,9 +11,9 @@
 #include <string.h>
 
 static int argc;
-static const char **argv;
+static char **argv;
 
-void InitArguments(const int processArgc, const char **processArgv)
+void InitArguments(const int processArgc, char **processArgv)
 {
 	argc = processArgc;
 	argv = processArgv;
@@ -93,7 +93,7 @@ bool HasCliArg(const char *argument)
 	return false;
 }
 
-const char **GetArgv()
+char **GetArgv()
 {
 	return argv;
 }

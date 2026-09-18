@@ -54,7 +54,7 @@ static SDL_Event event;
 static bool shouldQuit = false;
 static double lastFrameTime = TARGET_FPS_NS_D;
 
-void ExecPathInit(const int argc, const char *argv[])
+void ExecPathInit(const int argc, char **argv)
 {
 	if (argc < 1)
 	{

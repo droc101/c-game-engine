@@ -10,7 +10,7 @@
 #include "../include/AnsiCodes.h"
 #include "../include/LibraryLoader.h"
 
-uint8_t GetX86AbiArgument(const int argc, const char *argv[])
+uint8_t GetX86AbiArgument(const int argc, char **argv)
 {
 	for (int i = 0; i < argc; i++)
 	{

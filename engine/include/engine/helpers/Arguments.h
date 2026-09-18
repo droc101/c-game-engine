@@ -10,7 +10,7 @@
 /**
  * Initialize the argument system with argc and argv from the main function.
  */
-void InitArguments(int processArgc, const char **processArgv);
+void InitArguments(int processArgc, char **processArgv);
 
 /**
  * Get a CLI argument's value as a string
@@ -46,6 +46,6 @@ bool HasCliArg(const char *argument);
 /**
  * Get the raw argv array
  */
-const char **GetArgv();
+char **GetArgv();
 
 #endif //ARGUMENTS_H

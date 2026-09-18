@@ -52,8 +52,7 @@ _Noreturn void RestartProgram()
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #else
-	char **argv = (char **)GetArgv();
-	execv(GetState()->executablePath, argv);
+	execv(GetState()->executablePath, GetArgv());
 #endif
 	exit(1);
 }

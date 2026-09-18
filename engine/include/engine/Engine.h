@@ -39,7 +39,7 @@
 typedef struct EngineInitializationInfo
 {
 	const int argc;
-	const char **argv;
+	char **argv;
 	const RegisterGameActorsFunction RegisterGameActors;
 	const ControlRegisterFunction RegisterGameControls;
 	const RegisterGameAchievementsFunction RegisterGameAchievements;
@@ -78,7 +78,7 @@ bool EngineShouldQuit();
  * @param argc Program argument count
  * @param argv Program arguments
  */
-void ExecPathInit(int argc, const char *argv[]);
+void ExecPathInit(int argc, char **argv);
 
 /**
  * Initialize the SDL library
