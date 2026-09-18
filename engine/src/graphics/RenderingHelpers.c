@@ -114,16 +114,6 @@ void ActorTransformMatrix(const Actor *actor, mat4 *transformMatrix)
 		JPH_RMat44 matrix;
 		JPH_BodyInterface_GetWorldTransform(actor->bodyInterface, actor->bodyId, &matrix);
 		memcpy(*transformMatrix, &matrix, sizeof(mat4));
-		if (actor->model != NULL &&
-			(actor->flags & ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION) == ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION)
-		{
-			// glm_translate(*transformMatrix,
-			// 			  (vec3){
-			// 				  -actor->model->boundingBoxOrigin.x,
-			// 				  -actor->model->boundingBoxOrigin.y,
-			// 				  -actor->model->boundingBoxOrigin.z,
-			// 			  });
-		}
 	} else
 	{
 		LogWarning("ActorTransformMatrix called on actor which has no body!\n");
