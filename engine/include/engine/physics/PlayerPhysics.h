@@ -31,9 +31,10 @@ void PlayerPersistentStateDestroy();
 
 /**
  * Create the physics objects for the player in a given map
- * @param map The map to create the player for
+ * @param player The map to create the player for
+ * @param physicsSystem
  */
-void CreatePlayerPhysics(Map *map);
+void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem);
 
 /**
  * Set a player's transform to an arbitrary value

@@ -34,7 +34,7 @@ Map *CreateMap(void)
 	CheckAlloc(map);
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
-	CreatePlayer(map);
+	CreatePlayer(&map->player, map->physicsSystem);
 	map->mapName = NULL;
 	map->transition = NULL;
 	map->fogColor = COLOR(0xff000000);
@@ -126,6 +126,8 @@ void DestroyMap(Map *map)
 		JPH_BodyInterface_RemoveAndDestroyBody(bodyInterface, ListGetUint32(map->joltBodies, i));
 	}
 	ListFree(map->joltBodies);
+
+	DestroyPlayer(&map->player);
 
 	PhysicsDestroyMap(map);
 

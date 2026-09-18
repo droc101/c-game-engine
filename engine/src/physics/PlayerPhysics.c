@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
@@ -33,6 +34,7 @@
 #include <joltc/Physics/Collision/Shape/SubShapeID.h>
 #include <joltc/Physics/Collision/ShapeFilter.h>
 #include <math.h>
+#include <SDL3/SDL_mutex.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -170,9 +172,9 @@ void PlayerPersistentStateDestroy()
 	JPH_ObjectLayerFilter_Destroy(actorRaycastObjectLayerFilter);
 }
 
-void CreatePlayerPhysics(Map *map)
+void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 {
-	assert(map);
+	assert(player && physicsSystem);
 	JPH_Shape *shape = (JPH_Shape *)JPH_CapsuleShape_Create(3.2f, 4.0f);
 	JPH_CharacterVirtualSettings characterSettings = {
 		.base.supportingVolume.normal = Vector3_AxisY,
@@ -183,13 +185,13 @@ void CreatePlayerPhysics(Map *map)
 		.mass = 160.0f,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
-	map->player.joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
-															&map->player.transform.position,
-															NULL,
-															0,
-															map->physicsSystem);
-	JPH_CharacterVirtual_SetUserData(map->player.joltCharacter, (uint64_t)&map->player);
-	JPH_CharacterVirtual_SetListener(map->player.joltCharacter, contactListener);
+	player->joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
+														&player->transform.position,
+														NULL,
+														0,
+														physicsSystem);
+	JPH_CharacterVirtual_SetUserData(player->joltCharacter, (uint64_t)player);
+	JPH_CharacterVirtual_SetListener(player->joltCharacter, contactListener);
 	JPH_Shape_Destroy(shape);
 }
 
@@ -438,78 +440,84 @@ const Color *GetCrosshairColor()
 
 void UpdatePlayerCamera(GlobalState *state, const double delta)
 {
-	Vector2 cameraMotion = v2s(0);
-	if (state->camera == &state->map->player.playerCamera)
+	if (state->camera != &state->map->player.playerCamera)
 	{
-		cameraMotion = GetMouseRel(mainThreadInput);
-		if (fabsf(cameraMotion.x) < 1e-6 && fabsf(cameraMotion.y) < 1e-6)
+		return;
+	}
+
+	Vector2 cameraMotion = GetMouseRel(mainThreadInput);
+	if (fabsf(cameraMotion.x) < 1e-6 && fabsf(cameraMotion.y) < 1e-6)
+	{
+		cameraMotion = v2s(0);
+
+		if (IsInputActionPastDeadzone(physicsThreadInput, &lookUp))
 		{
-			cameraMotion = v2s(0);
-
-			if (IsInputActionPastDeadzone(physicsThreadInput, &lookUp))
-			{
-				cameraMotion.y += InputActionGetAnalogValue(physicsThreadInput, &lookUp);
-			} else if (IsInputActionPastDeadzone(physicsThreadInput, &lookDown))
-			{
-				cameraMotion.y -= InputActionGetAnalogValue(physicsThreadInput, &lookDown);
-			}
-
-			if (IsInputActionPastDeadzone(physicsThreadInput, &lookLeft))
-			{
-				cameraMotion.x += InputActionGetAnalogValue(physicsThreadInput, &lookLeft);
-			} else if (IsInputActionPastDeadzone(physicsThreadInput, &lookRight))
-			{
-				cameraMotion.x -= InputActionGetAnalogValue(physicsThreadInput, &lookRight);
-			}
-			if (state->options.invertHorizontalCamera)
-			{
-				cameraMotion.x *= -1;
-			}
-			cameraMotion.x *= state->options.cameraSpeed / 6.0f;
-
-			if (state->options.invertVerticalCamera)
-			{
-				cameraMotion.y *= -1;
-			}
-			cameraMotion.y *= state->options.cameraSpeed / 6.0f;
-
-			cameraMotion.x *= (float)delta;
-			cameraMotion.y *= (float)delta;
-		} else
+			cameraMotion.y += InputActionGetAnalogValue(physicsThreadInput, &lookUp);
+		} else if (IsInputActionPastDeadzone(physicsThreadInput, &lookDown))
 		{
-			cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
-			cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
-			if (state->options.invertHorizontalCamera)
-			{
-				cameraMotion.x *= -1;
-			}
-			if (state->options.invertVerticalCamera)
-			{
-				cameraMotion.y *= -1;
-			}
+			cameraMotion.y -= InputActionGetAnalogValue(physicsThreadInput, &lookDown);
+		}
+
+		if (IsInputActionPastDeadzone(physicsThreadInput, &lookLeft))
+		{
+			cameraMotion.x += InputActionGetAnalogValue(physicsThreadInput, &lookLeft);
+		} else if (IsInputActionPastDeadzone(physicsThreadInput, &lookRight))
+		{
+			cameraMotion.x -= InputActionGetAnalogValue(physicsThreadInput, &lookRight);
+		}
+		if (state->options.invertHorizontalCamera)
+		{
+			cameraMotion.x *= -1;
+		}
+		cameraMotion.x *= state->options.cameraSpeed / 6.0f;
+
+		if (state->options.invertVerticalCamera)
+		{
+			cameraMotion.y *= -1;
+		}
+		cameraMotion.y *= state->options.cameraSpeed / 6.0f;
+
+		cameraMotion.x *= (float)delta;
+		cameraMotion.y *= (float)delta;
+	} else
+	{
+		cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
+		cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
+		if (state->options.invertHorizontalCamera)
+		{
+			cameraMotion.x *= -1;
+		}
+		if (state->options.invertVerticalCamera)
+		{
+			cameraMotion.y *= -1;
 		}
 	}
 
 	Camera *playerCamera = &state->map->player.playerCamera;
-	Transform *transform = state->map->player.isFreecamActive ? &playerCamera->transform
-															  : &state->map->player.transform;
-	const float currentPitch = JPH_Quat_GetRotationAngle(&transform->rotation, &Vector3_AxisX) + GLM_PI_2f;
+	JPH_Quat *rotation = state->map->player.isFreecamActive ? &playerCamera->transform.rotation
+															: &state->map->player.transform.rotation;
+	JPH_Quat newRotation;
+	const float currentPitch = JPH_Quat_GetRotationAngle(rotation, &Vector3_AxisX) + GLM_PI_2f;
 	JPH_Quat newYaw;
 	JPH_Quat newPitch;
 	JPH_Quat_Rotation(&Vector3_AxisY, cameraMotion.x, &newYaw);
 	JPH_Quat_Rotation(&Vector3_AxisX, clamp(currentPitch + cameraMotion.y, 0, PIf) - currentPitch, &newPitch);
-	JPH_Quat_Multiply(&newYaw, &transform->rotation, &transform->rotation);
-	JPH_Quat_Multiply(&transform->rotation, &newPitch, &transform->rotation);
-	JPH_Quat_Normalized(&transform->rotation, &transform->rotation);
+	JPH_Quat_Multiply(&newYaw, rotation, &newRotation);
+	JPH_Quat_Multiply(&newRotation, &newPitch, &newRotation);
+	JPH_Quat_Normalized(&newRotation, rotation);
 
-	playerCamera->transform.position.x = transform->position.x;
-	playerCamera->transform.position.z = transform->position.z;
-	playerCamera->transform.rotation = transform->rotation;
-	float yPos = transform->position.y;
 	if (!state->map->player.isFreecamActive)
 	{
-		yPos += 4.0f + state->map->player.viewBobbingHeight * 2.0f;
+		Vector3 position;
+		const float interpolationFactor = PhysicsInterpolationFactor();
+
+		SDL_LockMutex(state->map->player.mutex);
+		Vector3_MultiplyScalar(&state->map->player.deltaPosition, interpolationFactor, &position);
+		Vector3_Add(&state->map->player.transform.position, &position, &playerCamera->transform.position);
+		SDL_UnlockMutex(state->map->player.mutex);
+
+		playerCamera->transform.position.y += 4.0f + state->map->player.viewBobbingHeight * 2.0f;
+		playerCamera->transform.rotation = *rotation;
 	}
-	playerCamera->transform.position.y = yPos;
 	playerCamera->showPlayerModel = state->map->player.isFreecamActive;
 }

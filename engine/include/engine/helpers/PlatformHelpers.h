@@ -5,6 +5,7 @@
 #ifndef PLATFORMHELPERS_H
 #define PLATFORMHELPERS_H
 
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 
@@ -82,5 +83,11 @@ void RaiseDebugger();
  * Print the stack trace of the current thread
  */
 void PrintStackTrace();
+
+/**
+ * Fully thread-safe mutex destruction function, since SDL_DestroyMutex is not thread-safe
+ * @param mutex A pointer to the mutex that should be destroyed
+ */
+void DestroyMutex(SDL_Mutex **mutex);
 
 #endif //PLATFORMHELPERS_H

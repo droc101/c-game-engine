@@ -7,6 +7,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>
 #include <errno.h>
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -298,4 +299,13 @@ void PrintStackTrace()
 		LogWarning("Stack trace contained no frames!\n");
 	}
 #endif
+}
+
+void DestroyMutex(SDL_Mutex **mutex)
+{
+	SDL_LockMutex(*mutex);
+	SDL_Mutex *copy = *mutex;
+	*mutex = NULL;
+	SDL_UnlockMutex(copy);
+	SDL_DestroyMutex(copy);
 }

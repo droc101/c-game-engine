@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/helpers/Realloc.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
@@ -485,7 +486,7 @@ void _LockingListFree(LockingList *list)
 	ListLock(*list);
 	_ListFree((List *)list);
 	ListUnlock(*list);
-	SDL_DestroyMutex(list->mutex);
+	DestroyMutex(&list->mutex);
 	list->mutex = NULL;
 }
 

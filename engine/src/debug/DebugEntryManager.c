@@ -2,7 +2,6 @@
 // Created by droc101 on 7/19/26.
 //
 
-#include <engine/physics/PhysicsThread.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/FontLoader.h>
 #include <engine/assets/ModelLoader.h>
@@ -15,6 +14,7 @@
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>

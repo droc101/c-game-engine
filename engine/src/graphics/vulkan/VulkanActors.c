@@ -6,6 +6,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Color.h>
@@ -13,9 +14,9 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
+#include <joltc/Math/Mat44.h>
 #include <joltc/Math/Quat.h>
-#include <joltc/Math/RVec3.h>
-#include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
@@ -426,7 +427,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor, List *lodIns
 	assert(actor->model->materialSlotCount == materialSlotsData->materialSlots.length);
 	const uint32_t instanceIndex = ListGetUint32(*lodInstanceCounts, lodId) - 1;
 	ListSet(*lodInstanceCounts, lodId, instanceIndex);
-	mat4 transformMatrix;
+	JPH_Mat44 transformMatrix;
 	ActorTransformMatrix(actor, &transformMatrix);
 	for (uint32_t j = 0; j < materialSlotsData->materialSlots.length; j++)
 	{
@@ -434,7 +435,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor, List *lodIns
 		const Material *material = &actor->model->materials[materialIndex];
 		const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
 		ActorModelInstanceData *instanceData = &materialSlotData->instanceData[instanceIndex];
-		memcpy(instanceData->transformMatrix, transformMatrix, sizeof(transformMatrix));
+		memcpy(instanceData->transformMatrix, &transformMatrix, sizeof(transformMatrix));
 		memcpy(instanceData->modColor, &actor->modColor, sizeof(Color));
 		memcpy(instanceData->materialColor, &material->color, sizeof(Color));
 		instanceData->textureIndex = TextureIndex(material->texture);
@@ -443,9 +444,15 @@ static inline void UpdateActorModelInstanceData(const Actor *actor, List *lodIns
 
 static inline void UpdateActorWallInstanceData(const Actor *actor, ActorWallInstanceData *actorInstanceData)
 {
-	JPH_RVec3 position;
+	const float interpolationFactor = PhysicsInterpolationFactor();
 	JPH_Quat rotation;
-	JPH_BodyInterface_GetPositionAndRotation(actor->bodyInterface, actor->bodyId, &position, &rotation);
+	JPH_Quat_Slerp(&actor->previousTickStartTransform.rotation,
+				   &actor->previousTickEndTransform.rotation,
+				   interpolationFactor,
+				   &rotation);
+	Vector3 position;
+	Vector3_MultiplyScalar(&actor->deltaPosition, interpolationFactor, &position);
+	Vector3_Add(&actor->previousTickStartTransform.position, &position, &position);
 	const Vector2 axis = {
 		.x = actor->wall->orientation == ACTOR_WALL_ORIENTATION_X_AXIS ? 1 : 0,
 		.y = actor->wall->orientation == ACTOR_WALL_ORIENTATION_Z_AXIS ? 1 : 0,

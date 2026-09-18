@@ -35,4 +35,6 @@ void PhysicsThreadLockTickMutex();
 
 void PhysicsThreadUnlockTickMutex();
 
+float PhysicsInterpolationFactor();
+
 #endif //PHYSICSTHREAD_H

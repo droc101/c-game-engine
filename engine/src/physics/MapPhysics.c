@@ -25,7 +25,9 @@
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include <math.h>
+#include <SDL3/SDL_mutex.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -63,23 +65,30 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 		return;
 	}
 
+	SDL_LockMutex(state->map->player.mutex);
+	Vector3_Add(&state->map->player.transform.position,
+				&state->map->player.deltaPosition,
+				&state->map->player.transform.position);
+	Vector3 newPosition;
+	JPH_CharacterVirtual_GetPosition(state->map->player.joltCharacter, &newPosition);
+	Vector3_Subtract(&newPosition, &state->map->player.transform.position, &state->map->player.deltaPosition);
+	SDL_UnlockMutex(state->map->player.mutex);
+
 	const bool allowMovement = state->camera == &state->map->player.playerCamera;
 
 	MovePlayer(&state->map->player, delta, allowMovement);
 
-	const float deltaTime = (float)delta / PHYSICS_TARGET_TPS;
+	const float deltaTime = (float)(delta / PHYSICS_TARGET_TPS);
 
 	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime, allowMovement);
 
-	Vector2 oldPosition = v2(state->map->player.transform.position.x, state->map->player.transform.position.z);
-	JPH_CharacterVirtual_GetPosition(state->map->player.joltCharacter, &state->map->player.transform.position);
-
-	const float distanceTraveled = Vector2Distance(oldPosition,
-												   v2(state->map->player.transform.position.x,
-													  state->map->player.transform.position.z));
-	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.1);
-	state->map->player.viewBobbingHeight = 0.1f +
-										   sinf((float)(fmod((double)state->physicsFrame / 7.0, 2 * PI))) * bobHeight;
+	// TODO: View bobbing doesn't work with physics interpolation
+	state->map->player.viewBobbingHeight = 0.1f;
+	// const float distanceTraveled = sqrtf(state->map->player.deltaPosition.x * state->map->player.deltaPosition.x +
+	// 									 state->map->player.deltaPosition.z * state->map->player.deltaPosition.z);
+	// const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.1);
+	// state->map->player.viewBobbingHeight = 0.1f +
+	// 									   sinf((float)(fmod((double)state->physicsFrame / 7.0, 2 * PI))) * bobHeight;
 
 	for (size_t i = 0; i < state->map->actors.length; i++)
 	{
