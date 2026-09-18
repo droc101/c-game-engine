@@ -15,7 +15,6 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
@@ -24,7 +23,6 @@
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -37,8 +35,8 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->modColor = COLOR_WHITE;
 	actor->bodyInterface = bodyInterface;
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
-	actor->previousTickStartTransform.rotation = JPH_Quat_Identity;
-	actor->previousTickEndTransform.rotation = JPH_Quat_Identity;
+	actor->previousTickStartTransform = *transform;
+	actor->previousTickEndTransform = *transform;
 	ListInit(actor->ioConnections, LIST_POINTER);
 
 	actor->definition->Init(actor, params, transform); // kindly allow the Actor to initialize itself
@@ -74,6 +72,14 @@ void FreeActor(Actor *actor)
 	ListFree(actor->ioConnections);
 	free(actor);
 	actor = NULL;
+}
+
+void TeleportActor(Actor *actor, const Vector3 *position, const JPH_Activation activation)
+{
+	JPH_BodyInterface_SetPosition(actor->bodyInterface, actor->bodyId, position, activation);
+	actor->previousTickStartTransform.position = *position;
+	actor->previousTickEndTransform.position = *position;
+	actor->deltaPosition = Vector3_Zero;
 }
 
 void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param)
