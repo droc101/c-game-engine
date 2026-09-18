@@ -171,7 +171,7 @@ static void LaserTurnOffHandler(Actor *this, const Actor * /*sender*/, const Par
 	this->visible = false;
 }
 
-static void LaserInit(Actor *this, const KvList params, Transform *transform)
+static void LaserInit(Actor *this, const KvList params, const Transform *transform)
 {
 	LaserData *data = calloc(1, sizeof(LaserData));
 	CheckAlloc(data);
@@ -193,21 +193,22 @@ static void LaserInit(Actor *this, const KvList params, Transform *transform)
 	this->wall->unshaded = true;
 	this->visible = data->on;
 
+	Transform adjustedTransform = *transform;
 	switch (data->height)
 	{
 		case LASER_HEIGHT_FLOOR:
-			transform->position.y += -4.8f;
+			adjustedTransform.position.y += -4.8f;
 			break;
 		case LASER_HEIGHT_CEILING:
-			transform->position.y += 4.8f;
+			adjustedTransform.position.y += 4.8f;
 			break;
 		case LASER_HEIGHT_MIDDLE:
 		default:
-			transform->position.y += 0.0f;
+			adjustedTransform.position.y += 0.0f;
 			break;
 	}
 
-	LaserCreateBody(this, transform);
+	LaserCreateBody(this, &adjustedTransform);
 
 	// TODO: Make harmful - Depends on being able to take damage
 }

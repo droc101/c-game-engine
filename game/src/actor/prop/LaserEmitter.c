@@ -88,7 +88,7 @@ static void LaserEmitterTurnOffHandler(Actor *this, const Actor * /*sender*/, co
 	this->currentSkinIndex = EMITTER_SKIN_OFF;
 }
 
-static void LaserEmitterInit(Actor *this, const KvList params, Transform *transform)
+static void LaserEmitterInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_BLOCK_LASERS;
 
@@ -103,11 +103,6 @@ static void LaserEmitterInit(Actor *this, const KvList params, Transform *transf
 	this->currentSkinIndex = data->height + 1;
 
 	data->transform = *transform;
-	Vector3 forwardVector = {};
-	JPH_Quat_RotateAxisZ(&transform->rotation, &forwardVector);
-	Vector3 offsetVector = {};
-	Vector3_MultiplyScalar(&forwardVector, this->model->boundingBoxExtents.z, &offsetVector);
-	Vector3_Subtract(&transform->position, &offsetVector, &data->transform.position);
 
 	CreateLaserEmitterCollider(this, transform);
 

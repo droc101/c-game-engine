@@ -50,7 +50,7 @@ static void EntranceUpdate(Actor *this, double /*delta*/)
 	}
 }
 
-static void EntranceInit(Actor *this, const KvList params, Transform *transform)
+static void EntranceInit(Actor *this, const KvList params, const Transform *transform)
 {
 	ActorCreateEmptyBody(this, transform);
 	this->extraData = malloc(sizeof(EntranceData));

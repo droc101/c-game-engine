@@ -86,7 +86,7 @@ static void CoinOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 	RemoveActor(this);
 }
 
-static void CoinInit(Actor *this, const KvList params, Transform *transform)
+static void CoinInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->extraData = calloc(1, sizeof(CoinData));
 	CheckAlloc(this->extraData);

@@ -42,7 +42,7 @@ static inline void CreateItemEraserCollider(Actor *this, const Transform *transf
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
-static void ItemEraserInit(Actor *this, const KvList params, Transform *transform)
+static void ItemEraserInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->hasModel = true;
 	this->model = LoadModel(MODEL("eraser_w"));

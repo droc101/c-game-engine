@@ -15,7 +15,7 @@ typedef struct Actor Actor;
 
 typedef struct ActorDefinition ActorDefinition;
 
-typedef void (*ActorInitFunction)(Actor *this, const KvList params, Transform *transform);
+typedef void (*ActorInitFunction)(Actor *this, const KvList params, const Transform *transform);
 
 typedef void (*ActorUpdateFunction)(Actor *this, double delta);
 

@@ -83,7 +83,7 @@ static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const 
 	StopSound(data->effect);
 }
 
-static void SoundPlayerInit(Actor *this, const KvList params, Transform *transform)
+static void SoundPlayerInit(Actor *this, const KvList params, const Transform *transform)
 {
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);

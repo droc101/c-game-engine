@@ -19,7 +19,7 @@ static void IoProxyUpdate(Actor *this, double /*delta*/)
 	}
 }
 
-static void IoProxyInit(Actor *this, const KvList /*params*/, Transform * /*transform*/)
+static void IoProxyInit(Actor *this, const KvList /*params*/, const Transform * /*transform*/)
 {
 	if (GetState()->map->ioProxy != NULL)
 	{

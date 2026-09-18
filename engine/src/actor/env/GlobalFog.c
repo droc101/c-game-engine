@@ -36,7 +36,7 @@ typedef struct GlobalFogData
 	bool startOn;
 } GlobalFogData;
 
-static void GlobalFogInit(Actor *this, const KvList params, Transform *transform)
+static void GlobalFogInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->extraData = calloc(1, sizeof(GlobalFogData));
 	CheckAlloc(this->extraData);

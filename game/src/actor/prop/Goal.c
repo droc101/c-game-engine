@@ -80,7 +80,7 @@ static void GoalOnPlayerContactAdded(Actor *this, JPH_BodyID /*bodyId*/)
 	}
 }
 
-static void GoalInit(Actor *this, const KvList params, Transform *transform)
+static void GoalInit(Actor *this, const KvList params, const Transform *transform)
 {
 	GoalData *data = calloc(1, sizeof(GoalData));
 	CheckAlloc(data);
