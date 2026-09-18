@@ -109,6 +109,7 @@ void DestroyMap(Map *map)
 	free(map->discordRpcIcon);
 	free(map->discordRpcName);
 
+	free(map->indirectLightmapPixels);
 	free(map->lightmapPixels);
 
 	free(map->lights);
