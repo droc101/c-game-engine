@@ -95,7 +95,7 @@ static void TestActorRenderUi(Actor *this)
 	}
 }
 
-static void TestActorInit(Actor *this, const KvList /*params*/, Transform *transform)
+static void TestActorInit(Actor *this, const KvList /*params*/, const Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_ENEMY;
 	this->hasModel = true;

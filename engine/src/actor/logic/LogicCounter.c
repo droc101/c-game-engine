@@ -89,7 +89,7 @@ static void LogicCounterDecrementHandler(Actor *this, const Actor * /*sender*/, 
 	ChangeValue(1, data, this);
 }
 
-static void LogicCounterInit(Actor *this, const KvList params, Transform * /*transform*/)
+static void LogicCounterInit(Actor *this, const KvList params, const Transform * /*transform*/)
 {
 	this->extraData = malloc(sizeof(LogicCounterData));
 	CheckAlloc(this->extraData);

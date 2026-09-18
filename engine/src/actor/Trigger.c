@@ -97,7 +97,7 @@ static void TriggerOnPlayerContactRemoved(Actor *this, JPH_BodyID /*bodyId*/)
 	}
 }
 
-static void TriggerInit(Actor *this, const KvList params, Transform *transform)
+static void TriggerInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->extraData = malloc(sizeof(TriggerData));
 	CheckAlloc(this->extraData);

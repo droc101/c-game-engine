@@ -29,6 +29,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#ifdef JPH_DEBUG_RENDERER
+#include <engine/debug/DebugEntryManager.h>
+#endif
+
 SDL_Surface *ToSDLSurface(const char *texture)
 {
 	const Image *img = LoadImage(texture);

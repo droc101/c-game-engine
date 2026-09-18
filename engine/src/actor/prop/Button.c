@@ -57,7 +57,7 @@ static void ButtonUpdate(Actor *this, const double /*delta*/)
 	}
 }
 
-static void ButtonInit(Actor *this, const KvList params, Transform *transform)
+static void ButtonInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->flags = ACTOR_FLAG_INTERACTABLE;
 	this->hasModel = true;

@@ -33,7 +33,7 @@ typedef struct WorldTextData
 	float visibleDistance;
 } WorldTextData;
 
-static void WorldTextInit(Actor *this, const KvList params, Transform *transform)
+static void WorldTextInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->hasModel = false;
 	this->wall = NULL;

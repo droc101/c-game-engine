@@ -22,7 +22,7 @@ typedef struct CameraData
 	Camera camera;
 } CameraData;
 
-static void CameraInit(Actor *this, const KvList params, Transform *transform)
+static void CameraInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->extraData = AvxAlignedCalloc(sizeof(CameraData));
 	CheckAlloc(this->extraData);

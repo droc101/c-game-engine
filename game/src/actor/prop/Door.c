@@ -315,7 +315,7 @@ static void DoorOnPlayerContactRemoved(Actor *this, const JPH_BodyID bodyId)
 	}
 }
 
-static void DoorInit(Actor *this, const KvList params, Transform *transform)
+static void DoorInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->flags = ACTOR_FLAG_CAN_PUSH_PLAYER | ACTOR_FLAG_CAN_BLOCK_LASERS;
 

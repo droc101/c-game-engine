@@ -81,7 +81,7 @@ static void LogicDecimalExecuteHandler(Actor *this, const Actor * /*sender*/, co
 	ActorFireOutput(this, LOGIC_DECIMAL_OUTPUT_EXECUTION_RESULT, PARAM_BOOL(result));
 }
 
-static void LogicDecimalInit(Actor *this, const KvList params, Transform * /*transform*/)
+static void LogicDecimalInit(Actor *this, const KvList params, const Transform * /*transform*/)
 {
 	this->extraData = malloc(sizeof(LogicDecimalData));
 	CheckAlloc(this->extraData);

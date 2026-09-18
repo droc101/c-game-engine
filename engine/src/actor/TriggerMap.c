@@ -101,7 +101,7 @@ static void TriggerMapOnPlayerContactPersisted(Actor *this, JPH_BodyID /*bodyId*
 	}
 }
 
-static void TriggerMapInit(Actor *this, const KvList params, Transform *transform)
+static void TriggerMapInit(Actor *this, const KvList params, const Transform *transform)
 {
 	this->extraData = malloc(sizeof(TriggerMapData));
 	CheckAlloc(this->extraData);
