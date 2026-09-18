@@ -2,6 +2,7 @@
 // Created by droc101 on 10/7/2025.
 //
 
+#include <../include/engine/physics/PhysicsThread.h>
 #include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
@@ -32,8 +33,6 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/subsystem/SteamworksManager.h>
 #include <engine/subsystem/TextInputSystem.h>
-#include <engine/subsystem/threads/LodThread.h>
-#include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
@@ -55,7 +54,7 @@ static SDL_Event event;
 static bool shouldQuit = false;
 static double lastFrameTime = TARGET_FPS_NS_D;
 
-void ExecPathInit(const int argc, const char *argv[])
+void ExecPathInit(const int argc, char **argv)
 {
 	if (argc < 1)
 	{
@@ -285,8 +284,6 @@ void InitEngine(const EngineInitializationInfo initInfo)
 
 	InitDPrintConsole();
 
-	LodThreadInit();
-
 	LoadingStateDoneCallback = initInfo.LoadingStateDoneCallback;
 	LoadingStateErrorCallback = initInfo.LoadingStateErrorCallback;
 
@@ -417,7 +414,6 @@ void DestroyEngine()
 	ShutdownSteamworks();
 	DiscordDestroy();
 	PhysicsThreadTerminate();
-	LodThreadDestroy();
 	DestroyFrameGrapher();
 	InputDestroy();
 	DestroyGlobalState();

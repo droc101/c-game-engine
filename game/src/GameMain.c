@@ -57,7 +57,7 @@ static void DestroyGame()
 	LaserRaycastFiltersDestroy();
 }
 
-EXPORT_SYM int GameMain(const int argc, const char *argv[])
+EXPORT_SYM int GameMain(const int argc, char *argv[])
 {
 	const EngineInitializationInfo initInfo = {
 		.argc = argc,

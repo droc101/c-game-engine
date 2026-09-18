@@ -15,7 +15,6 @@
 // clang-format on
 #else
 #include <sched.h>
-#include <spawn.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,13 +64,24 @@ void ErrorDialog(const wchar_t *message, const wchar_t *title)
 	// ReSharper restore CppPrintfBadFormat
 	char *zenity_argv[] = {"zenity", "--error", "--no-wrap", "--ok-label=Quit", text_argument, title_argument, NULL};
 
-	pid_t zenity_pid = 0;
-	if (posix_spawnp(&zenity_pid, "zenity", NULL, NULL, zenity_argv, environ) == 0)
+	const pid_t pid = fork();
+	if (pid == -1)
 	{
-		waitpid(zenity_pid, NULL, 0);
+		printf(ANSI_RED "bootstrap: fork() failed: %s" ANSI_RESET, strerror(errno));
+		free(text_argument);
+		free(title_argument);
+		return;
+	}
+	if (pid == 0) // 0 = child
+	{
+		if (execvp(zenity_argv[0], zenity_argv) == -1)
+		{
+			printf(ANSI_RED "bootstrap: execvp() failed: %s\n" ANSI_RESET, strerror(errno));
+		}
 	} else
 	{
-		printf(ANSI_RED "bootstrap: failed to show error dialog via zenity!\n" ANSI_RESET);
+		printf("bootstrap: waiting on zenity exit\n");
+		waitpid(pid, NULL, 0);
 	}
 
 	free(text_argument);

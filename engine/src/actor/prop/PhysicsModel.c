@@ -39,7 +39,6 @@ static inline void CreatePhysicsModelCollider(Actor *this,
 																	 JPH_MotionType_Dynamic,
 																	 OBJECT_LAYER_DYNAMIC,
 																	 this);
-		this->flags = ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
 	}
 
 	if (massOverride > 0)

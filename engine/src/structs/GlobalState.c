@@ -2,6 +2,7 @@
 // Created by droc101 on 4/22/2024.
 //
 
+#include <engine/physics/PhysicsThread.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/MapLoader.h>
 #include <engine/gameState/LoadingState.h>
@@ -17,8 +18,6 @@
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/threads/LodThread.h>
-#include <engine/subsystem/threads/PhysicsThread.h>
 #include <SDL3/SDL_mouse.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -180,7 +179,6 @@ void ProcessStateChangeQueue()
 void ChangeMap(Map *map)
 {
 	PhysicsThreadLockTickMutex();
-	LockLodThreadMutex();
 	state.camera = NULL;
 	if (state.map)
 	{
@@ -188,7 +186,6 @@ void ChangeMap(Map *map)
 	}
 	state.map = map;
 	state.camera = &state.map->player.playerCamera;
-	UnlockLodThreadMutex();
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -242,7 +239,9 @@ bool ChangeMapByName(const char *name)
 	{
 		// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
 		state.map = NULL;
+		PhysicsThreadLockTickMutex();
 		ChangeMap(NULL);
+		PhysicsThreadUnlockTickMutex();
 		return false;
 	}
 	map->mapName = strdup(name);

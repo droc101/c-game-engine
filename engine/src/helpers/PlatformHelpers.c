@@ -52,8 +52,7 @@ _Noreturn void RestartProgram()
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #else
-	char **argv = (char **)GetArgv();
-	execv(GetState()->executablePath, argv);
+	execv(GetState()->executablePath, GetArgv());
 #endif
 	exit(1);
 }
@@ -216,14 +215,13 @@ void OpenFileInDefaultProgram(const char *filePath)
 #ifdef WIN32
 	ShellExecuteA(NULL, "open", filePath, NULL, NULL, 0);
 #else
-	const pid_t ppid = getpid();
 	const pid_t pid = fork();
 	if (pid == -1)
 	{
-		LogError("fork() failed: %s", strerror(errno));
+		LogError("fork() failed: %s\n", strerror(errno));
 		return;
 	}
-	if (pid != ppid) // check if this process is the parent or child
+	if (pid == 0) // 0 = child
 	{
 		char *argv[] = {
 			"xdg-open",
@@ -232,8 +230,7 @@ void OpenFileInDefaultProgram(const char *filePath)
 		};
 		if (execvp("xdg-open", argv) == -1)
 		{
-			LogError("execvp() failed: %s", strerror(errno));
-			return;
+			LogError("execvp() failed: %s\n", strerror(errno));
 		}
 	}
 #endif

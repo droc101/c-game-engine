@@ -11,7 +11,7 @@
  * Get the CLI argument requesting an ABI level override
  * @return 0 for no override, otherwise the requested ABI level
  */
-uint8_t GetX86AbiArgument(int argc, const char *argv[]);
+uint8_t GetX86AbiArgument(int argc, char **argv);
 
 /**
  * Get this system's ABI level

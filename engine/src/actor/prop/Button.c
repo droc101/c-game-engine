@@ -66,9 +66,6 @@ static void ButtonInit(Actor *this, const KvList params, const Transform *transf
 	if (this->model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
 	{
 		shape = this->model->collisionModelShape;
-	} else
-	{
-		this->flags |= ACTOR_FLAG_USING_BOUNDING_BOX_COLLISION;
 	}
 	CreateButtonCollider(this, transform, shape);
 	ButtonData *data = malloc(sizeof(ButtonData));

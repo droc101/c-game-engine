@@ -17,9 +17,9 @@
 #endif
 
 /// The signature to the entry point in the game shared libraries
-typedef int (*GameMainFunction)(int argc, const char *argv[]);
+typedef int (*GameMainFunction)(int argc, char **argv);
 
-int main(const int argc, const char *argv[])
+int main(const int argc, char **argv)
 {
 #ifdef WIN32
 

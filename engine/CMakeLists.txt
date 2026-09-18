@@ -172,14 +172,16 @@ target_sources(engine INTERFACE
         src/helpers/Realloc.c
         include/engine/helpers/Realloc.h
 
+        src/physics/MapPhysics.c
+        include/engine/physics/MapPhysics.h
         src/physics/Navigation.c
         include/engine/physics/Navigation.h
         src/physics/Physics.c
         include/engine/physics/Physics.h
+        src/physics/PhysicsThread.c
+        include/engine/physics/PhysicsThread.h
         src/physics/PlayerPhysics.c
         include/engine/physics/PlayerPhysics.h
-        src/physics/MapPhysics.c
-        include/engine/physics/MapPhysics.h
 
         src/structs/Actor.c
         include/engine/structs/Actor.h
@@ -233,10 +235,6 @@ target_sources(engine INTERFACE
         include/engine/subsystem/SoundSystem.h
         src/subsystem/TextInputSystem.c
         include/engine/subsystem/TextInputSystem.h
-        src/subsystem/threads/LodThread.c
-        include/engine/subsystem/threads/LodThread.h
-        src/subsystem/threads/PhysicsThread.c
-        include/engine/subsystem/threads/PhysicsThread.h
         src/subsystem/Timing.c
         include/engine/subsystem/Timing.h
         src/subsystem/SteamworksManager.cpp

@@ -5,14 +5,17 @@
 #include <engine/debug/FrameGrapher.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
+#include <engine/structs/Actor.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/threads/PhysicsThread.h>
 #include <engine/subsystem/Timing.h>
+#include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mutex.h>
@@ -50,6 +53,35 @@ void PhysicsThreadQueueInputEvent(const SDL_Event *event)
 	SDL_LockMutex(physicsThreadMutex);
 	ListAdd(physicsThreadInputEventQueue, copiedEvent);
 	SDL_UnlockMutex(physicsThreadMutex);
+}
+
+static inline void UpdateActorLods(const LockingList *actors, const Vector3 cameraPosition)
+{
+	const size_t actorCount = actors->length;
+	const float lodMultiplier = GetState()->options.lodMultiplier;
+	Vector3 actorPosition = {};
+	Vector3 offsetFromCamera = {};
+	for (size_t i = 0; i < actorCount; i++)
+	{
+		Actor *actor = ListGetPointer(*actors, i);
+		if (!actor->hasModel || actor->model->lodCount == 1)
+		{
+			continue;
+		}
+		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &actorPosition);
+		Vector3_Subtract(&actorPosition, &cameraPosition, &offsetFromCamera);
+		const float distanceSquared = Vector3_LengthSquared(&offsetFromCamera);
+		while (actor->currentLod != 0 &&
+			   actor->model->lods[actor->currentLod].distanceSquared * lodMultiplier > distanceSquared)
+		{
+			actor->currentLod--;
+		}
+		while (actor->model->lodCount > actor->currentLod + 1 &&
+			   actor->model->lods[actor->currentLod + 1].distanceSquared * lodMultiplier <= distanceSquared)
+		{
+			actor->currentLod++;
+		}
+	}
 }
 
 /**
@@ -99,7 +131,22 @@ static int PhysicsThreadMain(void * /*data*/)
 		UpdateFunction(GetState(), delta);
 		UpdateInputStates(physicsThreadInput);
 		GetState()->physicsFrame++;
-		SDL_UnlockMutex(physicsTickMutex);
+
+		const GlobalState *state = GetState();
+		if (state->map)
+		{
+			const LockingList *actors = &state->map->actors;
+			const Vector3 cameraPosition = state->camera->transform.position;
+
+			ListLock(*actors);
+			SDL_UnlockMutex(physicsTickMutex);
+
+			UpdateActorLods(actors, cameraPosition);
+			ListUnlock(*actors);
+		} else
+		{
+			SDL_UnlockMutex(physicsTickMutex);
+		}
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
@@ -139,13 +186,25 @@ void PhysicsThreadSetFunction(const GameStateFixedUpdateFunction function)
 void PhysicsThreadTerminate()
 {
 	LogDebug("Terminating physics thread...\n");
+
 	SDL_LockMutex(physicsThreadMutex);
 	physicsThreadPostQuit = true;
 	SDL_UnlockMutex(physicsThreadMutex);
+
 	SDL_WaitThread(physicsThread, NULL);
 	ListAndContentsFree(physicsThreadInputEventQueue);
-	SDL_DestroyMutex(physicsThreadMutex);
-	SDL_DestroyMutex(physicsTickMutex);
+
+	SDL_LockMutex(physicsThreadMutex);
+	SDL_Mutex *threadMutex = physicsThreadMutex;
+	physicsThreadMutex = NULL;
+	SDL_UnlockMutex(threadMutex);
+	SDL_DestroyMutex(threadMutex);
+
+	SDL_LockMutex(physicsTickMutex);
+	SDL_Mutex *tickMutex = physicsTickMutex;
+	physicsTickMutex = NULL;
+	SDL_UnlockMutex(tickMutex);
+	SDL_DestroyMutex(tickMutex);
 }
 
 void PhysicsThreadLockTickMutex()
