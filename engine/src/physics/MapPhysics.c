@@ -82,13 +82,11 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 
 	UpdatePlayer(&state->map->player, state->map->physicsSystem, deltaTime, allowMovement);
 
-	// TODO: View bobbing doesn't work with physics interpolation
-	state->map->player.viewBobbingHeight = 0.1f;
-	// const float distanceTraveled = sqrtf(state->map->player.deltaPosition.x * state->map->player.deltaPosition.x +
-	// 									 state->map->player.deltaPosition.z * state->map->player.deltaPosition.z);
-	// const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.1);
-	// state->map->player.viewBobbingHeight = 0.1f +
-	// 									   sinf((float)(fmod((double)state->physicsFrame / 7.0, 2 * PI))) * bobHeight;
+	const float distanceTraveled = sqrtf(state->map->player.deltaPosition.x * state->map->player.deltaPosition.x +
+										 state->map->player.deltaPosition.z * state->map->player.deltaPosition.z);
+	const float bobHeight = remap(distanceTraveled, 0, MOVE_SPEED / PHYSICS_TARGET_TPS, 0, 0.1);
+	state->map->player.viewBobbingHeight = 0.1f +
+										   sinf((float)(fmod((double)state->physicsFrame / 7.0, 2 * PI))) * bobHeight;
 
 	for (size_t i = 0; i < state->map->actors.length; i++)
 	{
