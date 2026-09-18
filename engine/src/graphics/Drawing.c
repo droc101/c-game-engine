@@ -9,6 +9,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/helpers/Macros.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -18,7 +19,6 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
-#include <engine/subsystem/threads/PhysicsThread.h>
 #include <joltc/enums.h>
 #include <joltc/Math/RVec3.h>
 #include <joltc/types.h>
