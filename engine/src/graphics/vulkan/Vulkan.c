@@ -1648,7 +1648,7 @@ static inline void HandleDeferredWork()
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{
-		if (GetMap() != NULL && ShadowMapsEnabled())
+		if (GetMap() != NULL && GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED)
 		{
 			if (shadowMapRenderPass == VK_NULL_HANDLE || frustumCount == 1)
 			{
