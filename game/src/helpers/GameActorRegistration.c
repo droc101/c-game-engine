@@ -3,6 +3,7 @@
 //
 
 #include "helpers/GameActorRegistration.h"
+#include "actor/item/ItemAxisHelper.h"
 #include "actor/item/ItemEraser.h"
 #include "actor/npc/NpcJohn.h"
 #include "actor/npc/TestActor.h"
@@ -24,4 +25,5 @@ void RegisterGameActors()
 	RegisterTestActor();
 	RegisterNpcJohn();
 	RegisterItemEraser();
+	RegisterItemAxisHelper();
 }

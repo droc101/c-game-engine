@@ -28,6 +28,8 @@ static void EraserItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 	(void)this;
 	viewmodel->enabled = true;
 	viewmodel->transform.position.x = 0.5f;
+	viewmodel->transform.position.y = 0.0f;
+	viewmodel->transform.position.z = 0.0f;
 	viewmodel->enabled = true;
 	viewmodel->model = LoadModel(MODEL("eraser"));
 	JPH_Quat_Rotation(&Vector3_AxisY, degToRad(5), &viewmodel->transform.rotation);

@@ -65,6 +65,10 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         src/item/LaserStopperItem.c
         include/actor/item/ItemEraser.h
         src/actor/item/ItemEraser.c
+        src/item/AxisHelperItem.c
+        include/item/AxisHelperItem.h
+        src/actor/item/ItemAxisHelper.c
+        include/actor/item/ItemAxisHelper.h
 )
 
 if (x86_64)
