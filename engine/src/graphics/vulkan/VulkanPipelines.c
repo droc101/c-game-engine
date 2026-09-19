@@ -160,6 +160,16 @@ static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
 		.size = SizeofMember(LightingShaderSpecializationConstants, maxLightCount),
 	},
 	{
+		.constantID = 1,
+		.offset = offsetof(LightingShaderSpecializationConstants, sampleCount),
+		.size = SizeofMember(LightingShaderSpecializationConstants, sampleCount),
+	},
+	{
+		.constantID = 2,
+		.offset = offsetof(LightingShaderSpecializationConstants, sampleRadius),
+		.size = SizeofMember(LightingShaderSpecializationConstants, sampleRadius),
+	},
+	{
 		.constantID = 3,
 		.offset = offsetof(LightingShaderSpecializationConstants, bakedLighting),
 		.size = SizeofMember(LightingShaderSpecializationConstants, bakedLighting),

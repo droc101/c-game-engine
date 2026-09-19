@@ -11,6 +11,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
@@ -483,6 +484,28 @@ typedef struct LightingShaderSpecializationConstants
 	float sampleRadius;
 	VkBool32 bakedLighting;
 } LightingShaderSpecializationConstants;
+
+typedef struct VulkanLight
+{
+	LightType type;
+	Vector3 position;
+	Vector3 negativeForwardDirection;
+	Vector3 color;
+	float brightness;
+	float constantAttenuation;
+	float linearAttenuation;
+	float quadraticAttenuation;
+	float attenuationMultiplier;
+	/// The angle at which the spotlight will retain up to 75% brightness
+	float brightAngle;
+	/// The angle at which the spotlight will reach 0% brightness
+	float fadingAngle;
+	float maxDistance;
+	uint32_t shadowMapIndex;
+	uint32_t cookieTextureIndex;
+	float _padding[4];
+	CGLM_ALIGN_MAT mat4 transformMatrix;
+} VulkanLight;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -517,7 +540,9 @@ extern uint32_t staticLightFrustumCount;
 extern FrustumCullingData *frustums;
 extern uint32_t actorModelsDrawInfoCount;
 extern uint32_t maximumCulledInstanceCount;
+extern VulkanLight *lights;
 extern uint32_t lightCount;
+extern VulkanLight *directionalLight;
 extern uint32_t lightmapTextureSize;
 extern LockingList dynamicLightsToAdd;
 extern LockingList dynamicLightsToRemove;
@@ -546,6 +571,8 @@ void CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModul
 uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
+
+bool ShadowMapsEnabled(void);
 
 uint32_t ShadowMapResolution(void);
 

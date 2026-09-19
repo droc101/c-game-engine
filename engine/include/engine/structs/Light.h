@@ -25,11 +25,12 @@ enum LightType
 struct Light
 {
 	LightType type;
-	/// The world space transform of the light
-	Transform transform;
-	Vector3 negativeForwardDirection;
+	/// The world space position of the light
+	Vector3 position;
+	/// Euler angle rotation for the light, in degrees
+	Vector3 rotation;
 	/// The color of the light
-	vec3 color;
+	Color color;
 	/// The brightness scale of the light
 	float brightness;
 	float constantAttenuation;
@@ -40,10 +41,7 @@ struct Light
 	float brightAngle;
 	/// The angle at which the spotlight will reach 0% brightness
 	float fadingAngle;
-	uint32_t shadowMapIndex;
-	float maxDistance;
-	uint32_t culled;
-	CGLM_ALIGN_MAT mat4 transformMatrix;
+	const char *cookie; // mmmmm tasty
 };
 
 struct DynamicLight

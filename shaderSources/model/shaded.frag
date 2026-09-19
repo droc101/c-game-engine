@@ -2,8 +2,6 @@
 
 #include "../include/lighting.inc.glsl"
 
-layout(set = 0, binding = 1) uniform sampler2D textureSampler[];
-
 layout(location = 0) in vec4 inPosition;
 layout(location = 1) in vec4 inColor;
 layout(location = 2) in vec2 inUV;

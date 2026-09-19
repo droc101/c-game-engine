@@ -27,9 +27,10 @@ void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)
 
 	player->flashlight.parent = playerBodyId;
 	player->flashlight.light.type = LIGHT_TYPE_SPOT;
-	player->flashlight.light.color[0] = 1;
-	player->flashlight.light.color[1] = 1;
-	player->flashlight.light.color[2] = 1;
+	player->flashlight.light.color.r = 1;
+	player->flashlight.light.color.g = 1;
+	player->flashlight.light.color.b = 1;
+	player->flashlight.light.color.a = 1;
 	player->flashlight.light.brightness = 5;
 	player->flashlight.light.constantAttenuation = 2.5f;
 	player->flashlight.light.linearAttenuation = 1;

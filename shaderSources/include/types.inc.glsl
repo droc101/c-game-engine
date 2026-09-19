@@ -6,18 +6,13 @@
 #extension GL_EXT_nonuniform_qualifier : require
 #extension GL_EXT_buffer_reference_uvec2 : require
 
-struct Transform {
-    vec3 position;
-    vec4 rotation;
-};
-
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;
 const uint LIGHT_TYPE_DIRECTIONAL = 3u;
 
 struct Light {
     uint type; // Maps to an enum in C
-    Transform transform;
+    vec3 position;
     vec3 negativeForwardDirection;
     vec3 color;
     float brightness;
@@ -25,12 +20,13 @@ struct Light {
     float linearAttenuation;
     float quadraticAttenuation;
     float attenuationMultiplier;
-    float brightAngle; // 0-90 degrees
+    float brightAngle;
     float fadingAngle;
-    uint shadowMapIndex;
     float maxDistance;
-    float _padding;
-	mat4 transformMatrix;
+    uint shadowMapIndex;
+    uint cookieTextureIndex;
+    float _padding[4];
+    mat4 transformMatrix;
 };
 
 struct Frustum {

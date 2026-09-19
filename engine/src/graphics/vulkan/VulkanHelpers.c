@@ -74,12 +74,16 @@ uint32_t staticLightFrustumCount = 0;
 FrustumCullingData *frustums = NULL;
 uint32_t actorModelsDrawInfoCount = 0;
 uint32_t maximumCulledInstanceCount = 0;
+VulkanLight *lights = NULL;
 uint32_t lightCount = 0;
+VulkanLight *directionalLight = NULL;
 uint32_t lightmapTextureSize = 0;
 LockingList dynamicLightsToAdd = {0};
 LockingList dynamicLightsToRemove = {0};
 List dynamicLights = {0};
 LightingShaderSpecializationConstants lightingShaderSpecializationConstants = {
+	.sampleCount = 32,
+	.sampleRadius = 4,
 	.bakedLighting = VK_TRUE,
 };
 
@@ -135,6 +139,11 @@ inline uint32_t ImageIndex(const Image *image)
 		return imageAssetIdToIndexMap[image->id];
 	}
 	return index;
+}
+
+inline bool ShadowMapsEnabled(void)
+{
+	return GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED && lightCount != 0;
 }
 
 inline uint32_t ShadowMapResolution(void)
@@ -311,7 +320,7 @@ void CreateShadowMapRenderPass(const Map *map)
 		shadowMapRenderPass = VK_NULL_HANDLE;
 	}
 
-	if (map == NULL || GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED || lightCount == 0)
+	if (map == NULL || !ShadowMapsEnabled())
 	{
 		return;
 	}
@@ -448,9 +457,7 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 // TODO: Optimize this function
 void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 {
-	if (map == NULL ||
-		map->directionalLight == NULL ||
-		GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED)
+	if (map == NULL || directionalLight == NULL || !ShadowMapsEnabled())
 	{
 		return;
 	}
@@ -493,7 +500,8 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 		const float p = (float)(i + 1) / 4.0f;
 		const float v = nearPlane + range * p;
 		const float d = LAMBDA * (nearPlane * powf(ratio, p) - v) + v;
-		const float distance = i == 0 ? 0.1f : (i == 1 ? 0.2f : (i == 2 ? 0.5f : 1));
+		// const float distance = i == 0 ? 0.1f : (i == 1 ? 0.2f : (i == 2 ? 0.5f : 1));
+		const float distance = (d - nearPlane) / range;
 
 		vec4 frustumCorners[8];
 		memcpy(frustumCorners, projectedCorners, sizeof(projectedCorners));
@@ -525,11 +533,11 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 		radius = ceilf(radius * 16.0f) / 16.0f;
 
 		vec3 eye;
-		glm_vec3_scale(VECTOR3_TO_VEC3(map->directionalLight->negativeForwardDirection), radius, eye);
+		glm_vec3_scale(VECTOR3_TO_VEC3(directionalLight->negativeForwardDirection), radius, eye);
 		glm_vec3_add(frustumCenter, eye, eye);
 		mat4 viewMatrix;
-		const bool yAligned = fabsf(map->directionalLight->negativeForwardDirection.x) < FLT_EPSILON &&
-							  fabsf(map->directionalLight->negativeForwardDirection.z) < FLT_EPSILON;
+		const bool yAligned = fabsf(directionalLight->negativeForwardDirection.x) < FLT_EPSILON &&
+							  fabsf(directionalLight->negativeForwardDirection.z) < FLT_EPSILON;
 		glm_lookat_lh_zo(eye, frustumCenter, yAligned ? GLM_XUP : GLM_YUP, viewMatrix);
 		mat4 projectionMatrix;
 		glm_ortho_lh_zo(radius, -radius, radius, -radius, radius * 2, 0, projectionMatrix);

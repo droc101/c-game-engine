@@ -69,6 +69,11 @@
       "default": 60.0,
       "minimum": 0.0,
       "maximum": 90.0
+    },
+    "cookie": {
+      "display": "Light Cookie Texture",
+      "type": "string",
+      "default": ""
     }
   }
 }

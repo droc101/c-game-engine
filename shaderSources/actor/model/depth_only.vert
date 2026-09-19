@@ -22,7 +22,7 @@ void main() {
     outTextureIndex = instanceData.textureIndex;
 	const vec4 transformedPosition = instanceData.transformMatrix * vec4(inPosition, 1);
 	if (pushConstants.lightType == LIGHT_TYPE_POINT) {
-        const vec3 lightToWorld = transformedPosition.xyz - lightsData.lights[pushConstants.lightIndex].transform.position;
+        const vec3 lightToWorld = transformedPosition.xyz - lightsData.lights[pushConstants.lightIndex].position;
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * (pointLightViewMatrices[pushConstants.faceIndex] * vec4(lightToWorld, 1));
 	} else if (pushConstants.lightType == LIGHT_TYPE_SPOT) {
 	    gl_Position = lightsData.lights[pushConstants.lightIndex].transformMatrix * transformedPosition;

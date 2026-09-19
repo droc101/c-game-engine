@@ -309,26 +309,22 @@ bool LoadMap(Map *map, Asset *mapData)
 	map->lightCount = ReadUint32(reader);
 	map->lights = malloc(sizeof(Light) * map->lightCount);
 	CheckAlloc(map->lights);
-	EXPECT_BYTES_BOOL((sizeof(float) * 19 + sizeof(uint32_t)) * map->lightCount, bytesRemaining);
 	for (size_t i = 0; i < map->lightCount; i++)
 	{
+		EXPECT_BYTES_BOOL(sizeof(float) * 16 + sizeof(uint32_t), bytesRemaining);
 		Light *light = &map->lights[i];
 		light->type = ReadUint32(reader);
-		light->transform.position.x = ReadFloat(reader);
-		light->transform.position.y = ReadFloat(reader);
-		light->transform.position.z = ReadFloat(reader);
-		Vector3 rotation;
-		rotation.x = glm_rad(ReadFloat(reader));
-		rotation.y = glm_rad(ReadFloat(reader));
-		rotation.z = glm_rad(ReadFloat(reader));
-		JPH_Quat_FromEulerAngles(&rotation, &light->transform.rotation);
-		light->negativeForwardDirection.x = ReadFloat(reader);
-		light->negativeForwardDirection.y = ReadFloat(reader);
-		light->negativeForwardDirection.z = ReadFloat(reader);
+		light->position.x = ReadFloat(reader);
+		light->position.y = ReadFloat(reader);
+		light->position.z = ReadFloat(reader);
+		light->rotation.x = ReadFloat(reader);
+		light->rotation.y = ReadFloat(reader);
+		light->rotation.z = ReadFloat(reader);
 
-		light->color[0] = ReadFloat(reader);
-		light->color[1] = ReadFloat(reader);
-		light->color[2] = ReadFloat(reader);
+		light->color.r = ReadFloat(reader);
+		light->color.g = ReadFloat(reader);
+		light->color.b = ReadFloat(reader);
+		light->color.a = 1;
 
 		light->brightness = ReadFloat(reader);
 		light->constantAttenuation = ReadFloat(reader);
@@ -337,6 +333,9 @@ bool LoadMap(Map *map, Asset *mapData)
 		light->attenuationMultiplier = ReadFloat(reader);
 		light->brightAngle = ReadFloat(reader);
 		light->fadingAngle = ReadFloat(reader);
+		light->cookie = ReadStringSafe(reader, &strLength);
+		bytesRemaining -= strLength;
+		bytesRemaining -= sizeof(size_t);
 
 		if (light->type == LIGHT_TYPE_DIRECTIONAL)
 		{

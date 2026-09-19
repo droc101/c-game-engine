@@ -14,6 +14,7 @@ layout(push_constant) uniform PushConstants {
     uint shadowMapSize;
 } pushConstants;
 
+layout(set = 0, binding = 1) uniform sampler2D textureSampler[];
 layout(set = 0, binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
@@ -121,7 +122,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 lightingColor += factor * lightsData.lights[i].brightness * max(dot(lightsData.lights[i].negativeForwardDirection, normal), 0) * lightsData.lights[i].color;
             }
         } else {
-            const vec3 lightToWorld = lightsData.lights[i].transform.position - position;
+            const vec3 lightToWorld = lightsData.lights[i].position - position;
             const float distance = length(lightToWorld);
             if (distance > lightsData.lights[i].maxDistance) {
                 continue;
@@ -151,7 +152,12 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     if (factor < 1e-6) {
                         continue;
                     }
-                    lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color;
+                    if (lightsData.lights[i].cookieTextureIndex != 0) {
+                        const vec3 cookieColor = texture(textureSampler[nonuniformEXT(lightsData.lights[i].cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5).rgb;
+                        lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color * cookieColor;
+                    } else {
+                        lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color;
+                    }
                 }
             } else {
                 const float normalFactor = dot(lightToWorldNormalized, normal);
