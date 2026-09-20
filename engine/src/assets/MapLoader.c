@@ -307,40 +307,39 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 	map->lightCount = ReadUint32(reader);
-	map->lights = malloc(sizeof(Light) * map->lightCount);
+	map->lights = calloc(map->lightCount, sizeof(Light));
 	CheckAlloc(map->lights);
 	for (size_t i = 0; i < map->lightCount; i++)
 	{
-		EXPECT_BYTES_BOOL(sizeof(float) * 16 + sizeof(uint32_t), bytesRemaining);
+		KvList lightParams;
+		// TODO: Add EXPECT_BYTES for this
+		bytesRemaining -= ReadKvList(reader, lightParams);
 		Light *light = &map->lights[i];
-		light->type = ReadUint32(reader);
-		light->position.x = ReadFloat(reader);
-		light->position.y = ReadFloat(reader);
-		light->position.z = ReadFloat(reader);
-		light->rotation.x = ReadFloat(reader);
-		light->rotation.y = ReadFloat(reader);
-		light->rotation.z = ReadFloat(reader);
 
-		light->color.r = ReadFloat(reader);
-		light->color.g = ReadFloat(reader);
-		light->color.b = ReadFloat(reader);
-		light->color.a = 1;
+		light->type = KvGetByte(lightParams, "type", LIGHT_TYPE_POINT);
+		light->position = KvGetVec3(lightParams, "position", (Vector3){0,0,0});
+		light->rotation = KvGetVec3(lightParams, "rotation", (Vector3){0,0,0});
+		light->color = KvGetColor(lightParams, "color", COLOR_WHITE);
+		light->brightness = KvGetFloat(lightParams, "brightness", 1.0f);
 
-		light->brightness = ReadFloat(reader);
-		light->constantAttenuation = ReadFloat(reader);
-		light->linearAttenuation = ReadFloat(reader);
-		light->quadraticAttenuation = ReadFloat(reader);
-		light->attenuationMultiplier = ReadFloat(reader);
-		light->brightAngle = ReadFloat(reader);
-		light->fadingAngle = ReadFloat(reader);
-		light->cookie = ReadStringSafe(reader, &strLength);
-		bytesRemaining -= strLength;
-		bytesRemaining -= sizeof(size_t);
-
-		if (light->type == LIGHT_TYPE_DIRECTIONAL)
+		if (light->type != LIGHT_TYPE_DIRECTIONAL)
+		{
+			light->constantAttenuation = KvGetFloat(lightParams, "constant_attenuation", 0.0f);
+			light->linearAttenuation = KvGetFloat(lightParams, "linear_attenuation", 0.0f);
+			light->quadraticAttenuation = KvGetFloat(lightParams, "quadratic_attenuation", 1.0f);
+			light->attenuationMultiplier = KvGetFloat(lightParams, "attenuation_multiplier", 2.0f);
+			if (light->type == LIGHT_TYPE_SPOT)
+			{
+				light->brightAngle = KvGetFloat(lightParams, "bright_angle", 30.0f);
+				light->fadingAngle = KvGetFloat(lightParams, "fading_angle", 60.0f);
+				light->cookie = strdup(KvGetString(lightParams, "cookie", ""));
+			}
+		} else
 		{
 			map->directionalLight = light;
 		}
+
+		KvListDestroy(lightParams);
 	}
 
 	EXPECT_EOF_BYTES(bytesRemaining);

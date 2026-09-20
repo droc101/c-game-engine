@@ -7169,6 +7169,63 @@
                     "value": ""
                 }
             }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 416.0,
+                "y": 120.0,
+                "z": 96.0
+            },
+            "rotation": {
+                "x": 270.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "bright_angle": {
+                    "type": "float",
+                    "value": 10.0
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 15.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": "texture/actor/BLOB2.gtex"
+                },
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 8.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                }
+            }
         }
     ]
 }
