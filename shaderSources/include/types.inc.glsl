@@ -6,6 +6,8 @@
 #extension GL_EXT_nonuniform_qualifier : require
 #extension GL_EXT_buffer_reference_uvec2 : require
 
+const uint MAX_LIGHT_COUNT = 128;
+
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;
 const uint LIGHT_TYPE_DIRECTIONAL = 3u;
@@ -161,4 +163,9 @@ struct FrustumCullingData
     UnculledInstanceIndicesBuffer unshadedActorModelsUnculledInstanceIndices;
     OutputInstanceIndicesBuffer unshadedActorModelsInstanceIndices;
     DrawIndexedIndirectBuffer unshadedActorModelsDrawInfo;
+};
+
+struct Cluster {
+    uint lightCount;
+    uint lightIndices[MAX_LIGHT_COUNT];
 };

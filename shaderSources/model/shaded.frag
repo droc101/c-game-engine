@@ -13,7 +13,7 @@ void main() {
     outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
 	outColor.a = 1.0;
 	float fogFactor = clamp((inDistance - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
-	const vec3 lightingColor = MAX_LIGHT_COUNT == 0 ? vec3(1) : getLightingColor(inPosition.xyz, normalize(inNormal), getCascadeIndex(inDistance));
+	const vec3 lightingColor = LIGHT_COUNT == 0 ? vec3(1) : getLightingColor(inPosition.xyz, normalize(inNormal), getCascadeIndex(inDistance));
 	outColor.rgb = mix(outColor.rgb * inColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);
 	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);
 }

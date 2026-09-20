@@ -685,6 +685,54 @@ void CullModels()
 			   "Failed to insert pipeline barrier after culling shader!");
 }
 
+void PopulateClusters()
+{
+	const LunaBufferMemoryBarrier preClearMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
+		.destinationAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+		.buffer = buffers.uniforms.clusters,
+	};
+	const LunaDependencyInfo preClearDependencyInfo = {
+		.bufferMemoryBarrierCount = 1,
+		.bufferMemoryBarriers = &preClearMemoryBarrier,
+	};
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preClearDependencyInfo),
+			   "Failed to insert pipeline barrier before populating clusters!");
+
+	VulkanTest(lunaFillBuffer(device, commandBuffer, buffers.uniforms.clusters, 0, NULL),
+			   "Failed to clear clusters buffer!");
+
+	const LunaBufferMemoryBarrier preDispatchMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
+		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.buffer = buffers.uniforms.clusters,
+	};
+	const LunaDependencyInfo preDispatchDependencyInfo = {
+		.bufferMemoryBarrierCount = 1,
+		.bufferMemoryBarriers = &preDispatchMemoryBarrier,
+	};
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
+			   "Failed to insert pipeline barrier before populating clusters!");
+
+	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
+		.descriptorSetCount = 1,
+		.descriptorSets = &descriptorSets.common.set,
+	};
+	const LunaDispatchInfo dispatchInfo = {
+		.pipeline = pipelines.populateClusters,
+		.descriptorSetBindInfo = &descriptorSetBindInfo,
+		.groupCountX = 1,
+		.groupCountY = 1,
+		.groupCountZ = 8,
+	};
+	VulkanTest(lunaDispatch(device, commandBuffer, &dispatchInfo),
+			   "Failed to dispatch compute shader to populate clusters!");
+}
+
 void EnsureSpaceForUiElements(const size_t quadCount)
 {
 	if (buffers.ui.freeQuads < quadCount)

@@ -2,7 +2,9 @@
 
 #include "shared.inc.glsl"
 
-layout(constant_id = 0) const uint MAX_LIGHT_COUNT = 1;
+#define USE_CLUSTERED
+
+layout(constant_id = 0) const uint LIGHT_COUNT = 1;
 layout(constant_id = 1) const uint SAMPLE_COUNT = 32;
 layout(constant_id = 2) const float SAMPLE_RADIUS = 4.0;
 
@@ -32,9 +34,11 @@ layout(set = 0, binding = 4, scalar) readonly restrict uniform FogBuffer {
 layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
-    // uint lightIndices[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
-    Light lights[MAX_LIGHT_COUNT == 0 ? 1 : MAX_LIGHT_COUNT];
+    Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
 } lightsData;
+layout(set = 0, binding = 8, scalar) readonly restrict buffer Clusters {
+    Cluster clusters[512];
+} clusters;
 
 layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMapAtlas;
 layout(set = 1, binding = 0) uniform sampler2DShadow shadowMaps[];
@@ -54,6 +58,14 @@ uint getCascadeIndex(const float distance) {
         }
     }
     return 4;
+}
+
+uint getClusterIndex(const vec3 position, const float distance) {
+	const float cameraDepth = camera.farPlane - camera.nearPlane;
+	const vec4 transformedPosition = camera.transformMatrix * vec4(position, 1);
+    const vec3 floatingCluster = vec3(transformedPosition.xy / (2 * transformedPosition.w) + 0.5, (distance - camera.nearPlane) / cameraDepth) * 8;
+	const uvec3 cluster = uvec3(clamp(floatingCluster, vec3(0), vec3(7.99999)));
+	return cluster.x + 8 * cluster.y + 64 * cluster.z;
 }
 
 float getLightBrightness(const Light light, const float distance, const float theta) {
@@ -114,14 +126,21 @@ float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord) {
 }
 
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
-    if (MAX_LIGHT_COUNT == 0) {
+    if (LIGHT_COUNT == 0) {
         return vec3(0);
     }
     vec3 lightingColor = vec3(0);
-    for (uint i = 0; i < MAX_LIGHT_COUNT; i++) {
-        if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL) {
+#ifdef USE_CLUSTERED
+    const uint clusterIndex = getClusterIndex(inPosition, inDistance);
+    for (uint i = 0; i < clusters.clusters[clusterIndex].lightCount; i++) {
+        #define light lightsData.lights[clusters.clusters[clusterIndex].lightIndices[i]]
+#else
+    for (uint i = 0; i < LIGHT_COUNT; i++) {
+        #define light lightsData.lights[i]
+#endif
+        if (light.type == LIGHT_TYPE_DIRECTIONAL) {
             if (cascadeIndex == 4) {
-                lightingColor += lightsData.lights[i].brightness * max(dot(lightsData.lights[i].negativeForwardDirection, normal), 0) * lightsData.lights[i].color;
+                lightingColor += light.brightness * max(dot(light.negativeForwardDirection, normal), 0) * light.color;
                 continue;
             }
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
@@ -131,17 +150,17 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (factor < 1e-6) {
                     continue;
                 }
-                lightingColor += factor * lightsData.lights[i].brightness * max(dot(lightsData.lights[i].negativeForwardDirection, normal), 0) * lightsData.lights[i].color;
+                lightingColor += factor * light.brightness * max(dot(light.negativeForwardDirection, normal), 0) * light.color;
             }
         } else {
-            const vec3 lightToWorld = lightsData.lights[i].position - position;
+            const vec3 lightToWorld = light.position - position;
             const float distance = length(lightToWorld);
-            if (distance > lightsData.lights[i].maxDistance) {
+            if (distance > light.maxDistance) {
                 continue;
             }
             const vec3 lightToWorldNormalized = normalize(lightToWorld);
-            if (lightsData.lights[i].type == LIGHT_TYPE_SPOT) {
-                const float dottedDirection = dot(lightToWorldNormalized, lightsData.lights[i].negativeForwardDirection);
+            if (light.type == LIGHT_TYPE_SPOT) {
+                const float dottedDirection = dot(lightToWorldNormalized, light.negativeForwardDirection);
                 if (dottedDirection < 0) {
                     continue;
                 }
@@ -150,25 +169,25 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     continue;
                 }
                 const float theta = degrees(acos(dottedDirection));
-                if (theta > lightsData.lights[i].fadingAngle) {
+                if (theta > light.fadingAngle) {
                     continue;
                 }
-                const vec4 worldPosition = lightsData.lights[i].transformMatrix * vec4(position, 1);
+                const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
                 const vec4 coord = worldPosition / worldPosition.w;
                 if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                    const float brightness = getLightBrightness(lightsData.lights[i], distance, theta);
+                    const float brightness = getLightBrightness(light, distance, theta);
                     if (brightness < MIN_BRIGHTNESS) {
                         continue;
                     }
-                    const float factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], coord.xy, coord.z);
+                    const float factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex)], coord.xy, coord.z);
                     if (factor < 1e-6) {
                         continue;
                     }
-                    if (lightsData.lights[i].cookieTextureIndex != 0) {
-                        const vec3 cookieColor = texture(textureSampler[nonuniformEXT(lightsData.lights[i].cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5).rgb;
-                        lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color * cookieColor;
+                    if (light.cookieTextureIndex != 0) {
+                        const vec3 cookieColor = texture(textureSampler[nonuniformEXT(light.cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5).rgb;
+                        lightingColor += factor * brightness * normalFactor * light.color * cookieColor;
                     } else {
-                        lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color;
+                        lightingColor += factor * brightness * normalFactor * light.color;
                     }
                 }
             } else {
@@ -176,37 +195,37 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (normalFactor < 1e-6) {
                     continue;
                 }
-                const float brightness = getLightBrightness(lightsData.lights[i], distance, 0);
+                const float brightness = getLightBrightness(light, distance, 0);
                 if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
                 const vec3 lightToWorldAbs = abs(lightToWorld);
                 const float scale = max(max(lightToWorldAbs.x, lightToWorldAbs.y), lightToWorldAbs.z);
-                const float comparisonDepth = lightsData.lights[i].transformMatrix[2][2] + lightsData.lights[i].transformMatrix[3][2] / (scale - 0.01);
+                const float comparisonDepth = light.transformMatrix[2][2] + light.transformMatrix[3][2] / (scale - 0.01);
                 float factor;
                 if (scale == lightToWorldAbs.x) {
                     if (scale == lightToWorld.x) {
-                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex)], lightToWorld.zy / -scale, comparisonDepth);
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex)], lightToWorld.zy / -scale, comparisonDepth);
                     } else {
-                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 1], vec2(lightToWorld.z, -lightToWorld.y) / scale, comparisonDepth);
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex) + 1], vec2(lightToWorld.z, -lightToWorld.y) / scale, comparisonDepth);
                     }
                 } else if (scale == lightToWorldAbs.y) {
                     if (scale == lightToWorld.y) {
-                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 2], lightToWorld.xz / scale, comparisonDepth);
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex) + 2], lightToWorld.xz / scale, comparisonDepth);
                     } else {
-                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 3], vec2(lightToWorld.x, -lightToWorld.z) / scale, comparisonDepth);
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex) + 3], vec2(lightToWorld.x, -lightToWorld.z) / scale, comparisonDepth);
                     }
                 } else {
                     if (scale == lightToWorld.z) {
-                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 4], vec2(lightToWorld.x, -lightToWorld.y) / scale, comparisonDepth);
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex) + 4], vec2(lightToWorld.x, -lightToWorld.y) / scale, comparisonDepth);
                     } else {
-                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(lightsData.lights[i].shadowMapIndex) + 5], lightToWorld.xy / -scale, comparisonDepth);
+                        factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex) + 5], lightToWorld.xy / -scale, comparisonDepth);
                     }
                 }
                 if (factor < 1e-6) {
                     continue;
                 }
-                lightingColor += factor * brightness * normalFactor * lightsData.lights[i].color;
+                lightingColor += factor * brightness * normalFactor * light.color;
             }
         }
     }
@@ -214,12 +233,9 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
 }
 
 void debugLighting() {
-    outColor.a = 1;
+    outColor = vec4(0, 0, 0, 1);
     if (ENABLE_CLUSTER_DEBUG) {
-		const uvec3 cluster = uvec3(min(vec3(gl_FragCoord.x / 1920.0, gl_FragCoord.y / 1080.0, inDistance / camera.farPlane) * 8.0, 7.99999));
-		outColor.rgb = (cluster + 1) / 8.0;
-		outColor.rg *= 1 - outColor.b;
-		outColor.b = 0;
+        outColor.r = float(clusters.clusters[getClusterIndex(inPosition, inDistance)].lightCount) / float(LIGHT_COUNT);
 		vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
 		outColor.rgb += vec3((lightingColor.x + lightingColor.y + lightingColor.z) / 12);
         return;

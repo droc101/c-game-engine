@@ -8,6 +8,8 @@
 #include <cglm/vec3.h>
 #include <stdint.h>
 
+#define MAX_LIGHT_COUNT 128
+
 typedef enum LightType LightType;
 
 typedef struct Light Light;

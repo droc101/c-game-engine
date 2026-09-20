@@ -368,6 +368,12 @@ void CreateDescriptorSetLayouts()
 			.descriptorCount = 2,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 		},
+		{
+			.bindingName = "Clusters",
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
+		},
 	};
 	const LunaDescriptorSetLayoutCreationInfo commonDescriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
@@ -561,7 +567,7 @@ void CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 3,
+			.descriptorCount = 4,
 		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
@@ -621,5 +627,16 @@ void WriteDescriptorSet()
 		.descriptorCount = 1,
 		.bufferInfos = &fogBufferInfo,
 	};
-	lunaWriteDescriptorSets(device, 3, (LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite});
+	const LunaDescriptorBufferInfo clustersBufferInfo = {
+		.buffer = buffers.uniforms.clusters,
+	};
+	const LunaWriteDescriptorSet clustersWrite = {
+		.descriptorSet = descriptorSets.common.set,
+		.bindingName = "Clusters",
+		.descriptorCount = 1,
+		.bufferInfos = &clustersBufferInfo,
+	};
+	lunaWriteDescriptorSets(device,
+							4,
+							(LunaWriteDescriptorSet[]){transformMatrixWrite, lightingWrite, fogWrite, clustersWrite});
 }

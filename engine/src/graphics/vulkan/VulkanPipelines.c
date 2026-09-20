@@ -1581,7 +1581,7 @@ static inline void CreateWallActorDepthPipelines(const bool shadowMaps)
 	}
 }
 
-void CreateCullingDataClearPipeline()
+static inline void CreateCullingDataClearPipeline()
 {
 	const LunaPushConstantsRange pushConstantsRange = {
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -1608,7 +1608,7 @@ void CreateCullingDataClearPipeline()
 			   "Failed to create culling pipeline!");
 }
 
-void CreateCullingPipeline()
+static inline void CreateCullingPipeline()
 {
 	const LunaDescriptorSetLayout layouts[] = {
 		descriptorSets.common.layout,
@@ -1630,6 +1630,45 @@ void CreateCullingPipeline()
 	};
 	VulkanTest(lunaCreateComputePipeline(device, &creationInfo, &pipelines.culling),
 			   "Failed to create culling pipeline!");
+}
+
+static inline void CreatePopulateClustersPipeline()
+{
+	const VkSpecializationMapEntry specializationMapEntry = {
+		.constantID = 0,
+		.offset = offsetof(LightingShaderSpecializationConstants, maxLightCount),
+		.size = SizeofMember(LightingShaderSpecializationConstants, maxLightCount),
+	};
+	const VkSpecializationInfo specializationInfo = {
+		.mapEntryCount = 1,
+		.pMapEntries = &specializationMapEntry,
+		.dataSize = sizeof(LightingShaderSpecializationConstants),
+		.pData = &lightingShaderSpecializationConstants,
+	};
+	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
+	CreateShaderModule(SHADER("populate_clusters_c"), SHADER_TYPE_COMP, &shaderModule);
+	const LunaPipelineShaderStageCreationInfo shaderStageCreationInfo = {
+		.stage = VK_SHADER_STAGE_COMPUTE_BIT,
+		.module = shaderModule,
+		.specializationInfo = &specializationInfo,
+	};
+	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
+		.descriptorSetLayoutCount = 1,
+		.descriptorSetLayouts = &descriptorSets.common.layout,
+	};
+	const LunaComputePipelineCreationInfo creationInfo = {
+		.shaderStageCreationInfo = shaderStageCreationInfo,
+		.layoutCreationInfo = layoutCreationInfo,
+	};
+	VulkanTest(lunaCreateComputePipeline(device, &creationInfo, &pipelines.populateClusters),
+			   "Failed to create populate clusters pipeline!");
+}
+
+void CreateComputePipelines()
+{
+	CreateCullingDataClearPipeline();
+	CreateCullingPipeline();
+	CreatePopulateClustersPipeline();
 }
 
 void CreateGraphicsPipelines()

@@ -24,9 +24,7 @@ void CreateRenderPass();
 
 void CreateDescriptorSetLayouts();
 
-void CreateCullingDataClearPipeline();
-
-void CreateCullingPipeline();
+void CreateComputePipelines();
 
 void CreateGraphicsPipelines();
 

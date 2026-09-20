@@ -10,6 +10,7 @@
 #include <cglm/types.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/structs/Color.h>
@@ -74,5 +75,5 @@ void VK_ToggleBakedLighting()
 void VK_ToggleClusterDebug()
 {
 	lightingShaderSpecializationConstants.clusterDebug = !lightingShaderSpecializationConstants.clusterDebug;
-	pendingTasks |= PENDING_TASK_RECREATE_GRAPHICS_PIPELINES;
+	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_SHADERS;
 }

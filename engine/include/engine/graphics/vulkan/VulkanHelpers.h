@@ -259,6 +259,7 @@ typedef struct UniformBuffers
 	LunaBuffer lighting;
 	LunaBuffer fog;
 	LunaBuffer lights;
+	LunaBuffer clusters;
 } UniformBuffers;
 
 typedef struct ActorModelsBuffer
@@ -410,6 +411,7 @@ typedef struct Pipelines
 {
 	LunaComputePipeline culling;
 	LunaComputePipeline clearCullingData;
+	LunaComputePipeline populateClusters;
 
 	LunaGraphicsPipeline ui;
 	DepthPipelines depthPrepass;
@@ -507,6 +509,12 @@ typedef struct VulkanLight
 	float _padding[4];
 	CGLM_ALIGN_MAT mat4 transformMatrix;
 } VulkanLight;
+
+typedef struct Cluster
+{
+	uint32_t lightCount;
+	uint32_t lightIndices[MAX_LIGHT_COUNT];
+} Cluster;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -590,6 +598,8 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map);
 void WriteFrustumsBuffer();
 
 void CullModels();
+
+void PopulateClusters();
 
 void EnsureSpaceForUiElements(size_t quadCount);
 

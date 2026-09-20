@@ -1,0 +1,46 @@
+#version 460
+
+#include "include/shared.inc.glsl"
+
+layout(constant_id = 0) const uint LIGHT_COUNT = 1;
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
+    float cascadeDepths[4];
+	mat4 cascadeMatrices[4];
+    Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
+} lightsData;
+
+layout(set = 0, binding = 8, scalar) restrict buffer Clusters {
+    Cluster clusters[512];
+} clusters;
+
+bool IsVisible(const uint lightIndex, const vec3 clusterPlanes[4], const float nearPlane, const float farPlane) {
+    const vec3 center = (camera.viewMatrix * vec4(lightsData.lights[lightIndex].position, 1)).xyz;
+    const float radius = -lightsData.lights[lightIndex].maxDistance;
+    return nearPlane < center.z - radius && center.z + radius < farPlane &&
+           radius < dot(clusterPlanes[0], center) && radius < dot(clusterPlanes[1], center) &&
+           radius < dot(clusterPlanes[2], center) && radius < dot(clusterPlanes[3], center);
+}
+
+void main() {
+    const uint clusterIndex = gl_GlobalInvocationID.x + 8 * gl_GlobalInvocationID.y + 64 * gl_GlobalInvocationID.z;
+    const vec3 clusterPlanes[4] = {
+        normalize(vec3(camera.frustumPlanes[0] / camera.frustumPlanes[1], 0, -gl_GlobalInvocationID.x / 4.0 + 1.0)),
+        normalize(vec3(-camera.frustumPlanes[0] / camera.frustumPlanes[1], 0, (gl_GlobalInvocationID.x + 1) / 4.0 - 1.0)),
+        normalize(vec3(0, camera.frustumPlanes[2] / camera.frustumPlanes[3], -gl_GlobalInvocationID.y / 4.0 + 1.0)),
+        normalize(vec3(0, -camera.frustumPlanes[2] / camera.frustumPlanes[3], (gl_GlobalInvocationID.y + 1) / 4.0 - 1.0)),
+    };
+
+    const float depthRange = camera.farPlane - camera.nearPlane;
+    const float nearPlane = gl_GlobalInvocationID.z * depthRange / 8.0 + camera.nearPlane;
+    const float farPlane = (gl_GlobalInvocationID.z + 1) * depthRange / 8.0 + camera.nearPlane;
+
+    for (uint i = 0; i < LIGHT_COUNT; i++) {
+        if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL || IsVisible(i, clusterPlanes, nearPlane, farPlane)) {
+            clusters.clusters[clusterIndex].lightIndices[clusters.clusters[clusterIndex].lightCount] = i;
+            clusters.clusters[clusterIndex].lightCount += 1;
+        }
+    }
+}

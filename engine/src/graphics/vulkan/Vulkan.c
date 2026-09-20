@@ -1708,8 +1708,10 @@ static inline void HandleDeferredWork()
 	if (rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_SHADERS)
 	{
 		lunaDestroyComputePipeline(device, pipelines.culling);
+		lunaDestroyComputePipeline(device, pipelines.clearCullingData);
+		lunaDestroyComputePipeline(device, pipelines.populateClusters);
 
-		CreateCullingPipeline();
+		CreateComputePipelines();
 		RecreateGraphicsPipelines();
 		CreateDepthGraphicsPipelines();
 
@@ -1780,9 +1782,8 @@ bool VK_Init(SDL_Window *window)
 	CreateSwapchain();
 	CreateRenderPass();
 	CreateDescriptorSetLayouts();
-	CreateCullingPipeline();
+	CreateComputePipelines();
 	CreateGraphicsPipelines();
-	CreateCullingDataClearPipeline();
 	CreateTextureSamplers();
 	CreateDescriptorSet();
 	CreateBuffers();
@@ -1872,6 +1873,7 @@ void VK_RenderMap(Map *map, Camera *camera)
 	UpdateDynamicLights();
 	UpdateActors();
 	CullModels();
+	PopulateClusters();
 	UpdateShadowMaps(map);
 	UpdateViewModelMatrix(&map->viewmodel);
 
@@ -1934,6 +1936,20 @@ void VK_RenderMap(Map *map, Camera *camera)
 	{
 		DrawSky(&pipelineBindInfo);
 	}
+
+	const LunaBufferMemoryBarrier clustersMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+		.buffer = buffers.uniforms.clusters,
+	};
+	const LunaDependencyInfo clustersDependencyInfo = {
+		.bufferMemoryBarrierCount = 1,
+		.bufferMemoryBarriers = &clustersMemoryBarrier,
+	};
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &clustersDependencyInfo),
+			   "Failed to insert pipeline barrier for clusters!");
 	DrawMap(0, &pipelineBindInfo, false, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
 	DrawActors(0, &pipelineBindInfo, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
 	DrawDebugRenderer(&pipelineBindInfo);

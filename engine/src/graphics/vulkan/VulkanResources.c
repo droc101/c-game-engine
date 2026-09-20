@@ -128,6 +128,15 @@ static inline void CreateUniformBuffers()
 	};
 	VulkanTest(lunaCreateBuffer(device, &lightsBufferCreationInfo, &buffers.uniforms.lights),
 			   "Failed to create lights buffer!");
+	const LunaBufferCreationInfo clustersBufferCreationInfo = {
+		.size = 8 * 8 * 8 * sizeof(Cluster),
+		.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment,
+		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTest(lunaCreateBuffer(device, &clustersBufferCreationInfo, &buffers.uniforms.clusters),
+			   "Failed to create clusters buffer!");
 }
 
 static inline void CreateFrustumsBuffer()
