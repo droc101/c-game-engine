@@ -4,14 +4,7 @@
 
 layout(set = 0, binding = 0) uniform sampler2D lightmap;
 
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec2 inLightmapUV;
-layout(location = 3) in vec3 inNormal;
-layout(location = 4) in float inDistance;
-layout(location = 5) flat in uint inTextureIndex;
-
-layout(location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inLightmapUV;
 
 // w0, w1, w2, and w3 are the four cubic B-spline basis functions
 float w0(float a) {
@@ -74,6 +67,11 @@ vec4 sampleLightmap(const sampler2D lightmap, const vec2 original_uv){
 }
 
 void main() {
+	if (ENABLE_DEBUG_LIGHTING) {
+		debugLighting();
+		return;
+	}
+
     outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
 	outColor.a = 1.0;
     vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));

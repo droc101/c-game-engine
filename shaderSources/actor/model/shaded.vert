@@ -12,8 +12,8 @@ layout(location = 2) in vec4 inColor;
 layout(location = 3) in vec3 inNormal;
 layout(location = 4) in uint inInstanceIndex;
 
-layout(location = 0) out vec4 outPosition;
-layout(location = 1) out vec4 outColor;
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outPosition;
 layout(location = 2) out vec2 outUV;
 layout(location = 3) out vec3 outNormal;
 layout(location = 4) out float outDistance;
@@ -21,8 +21,8 @@ layout(location = 5) flat out uint outTextureIndex;
 
 void main() {
     const ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
-	outPosition = instanceData.transformMatrix * vec4(inPosition, 1);
     outColor = inColor * instanceData.materialColor * instanceData.modColor;
+	outPosition = instanceData.transformMatrix * vec4(inPosition, 1);
     outUV = inUV;
     outNormal = (instanceData.transformMatrix * vec4(inNormal, 0)).xyz;
     outDistance = (camera.viewMatrix * outPosition).z;

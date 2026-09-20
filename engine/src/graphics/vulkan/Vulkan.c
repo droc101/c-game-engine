@@ -1757,11 +1757,11 @@ static inline void HandleDeferredWork()
 
 		pendingTasks &= ~PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
 	}
-	if (pendingTasks & PENDING_TASK_TOGGLE_BAKED_LIGHTING)
+	if (pendingTasks & PENDING_TASK_RECREATE_GRAPHICS_PIPELINES)
 	{
 		RecreateGraphicsPipelines();
 
-		pendingTasks &= ~PENDING_TASK_TOGGLE_BAKED_LIGHTING;
+		pendingTasks &= ~PENDING_TASK_RECREATE_GRAPHICS_PIPELINES;
 	}
 }
 

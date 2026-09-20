@@ -174,6 +174,11 @@ static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
 		.offset = offsetof(LightingShaderSpecializationConstants, bakedLighting),
 		.size = SizeofMember(LightingShaderSpecializationConstants, bakedLighting),
 	},
+	{
+		.constantID = 4,
+		.offset = offsetof(LightingShaderSpecializationConstants, clusterDebug),
+		.size = SizeofMember(LightingShaderSpecializationConstants, clusterDebug),
+	},
 };
 static VkSpecializationInfo lightingSpecializationInfo = {
 	.mapEntryCount = ArrayLength(LIGHTING_SPECIALIZATION_MAP_ENTRIES),

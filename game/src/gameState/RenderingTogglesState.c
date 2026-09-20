@@ -21,10 +21,16 @@
 
 static OptionsMenu *renderingTogglesMenu;
 static bool enableBakedLighting = true;
+static bool enableClusterDebug = false;
 
 static void ToggleBakedLightingCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	VK_ToggleBakedLighting();
+}
+
+static void ToggleClusterDebugCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
+{
+	VK_ToggleClusterDebug();
 }
 
 static void BtnRenderingTogglesBack(Control * /*control*/, void * /*extraData*/)
@@ -77,6 +83,21 @@ static void RenderingTogglesStateSet()
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &enableBakedLighting,
+															  },
+															  NULL));
+
+		OptionsMenuAddLargeControl(renderingTogglesMenu,
+								   CreateOptionsButtonControl(v2s(0),
+															  v2s(0),
+															  "Cluster debug: %s",
+															  ToggleClusterDebugCallback,
+															  TOP_CENTER,
+															  onOffButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &enableClusterDebug,
 															  },
 															  NULL));
 

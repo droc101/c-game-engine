@@ -85,6 +85,7 @@ LightingShaderSpecializationConstants lightingShaderSpecializationConstants = {
 	.sampleCount = 32,
 	.sampleRadius = 4,
 	.bakedLighting = VK_TRUE,
+	.clusterDebug = VK_FALSE,
 };
 
 static CameraUniform uniform;
@@ -380,11 +381,14 @@ void UpdateCameraUniform(Camera *camera)
 {
 	if (camera->recomputeCachedData)
 	{
+		uniform.nearPlane = camera->nearPlane;
+		uniform.farPlane = min(camera->farPlane, GetState()->map->maxInboundsDistance);
+
 		const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
 		glm_perspective_lh_zo(glm_rad(camera->fov),
 							  windowSize.x / windowSize.y,
-							  camera->farPlane,
-							  camera->nearPlane,
+							  uniform.farPlane,
+							  uniform.nearPlane,
 							  camera->projectionMatrix);
 
 		camera->frustumPlanes[1] = 1 / Vector2Length(v2(camera->projectionMatrix[0][0], 1));
@@ -392,8 +396,6 @@ void UpdateCameraUniform(Camera *camera)
 		camera->frustumPlanes[0] = camera->projectionMatrix[0][0] * camera->frustumPlanes[1];
 		camera->frustumPlanes[2] = camera->projectionMatrix[1][1] * camera->frustumPlanes[3];
 
-		uniform.nearPlane = camera->nearPlane;
-		uniform.farPlane = camera->farPlane;
 		uniform.frustumPlanes[0] = camera->frustumPlanes[0];
 		uniform.frustumPlanes[1] = camera->frustumPlanes[1];
 		uniform.frustumPlanes[2] = camera->frustumPlanes[2];
@@ -497,11 +499,7 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 	float previousDistance = 0.0f;
 	for (uint32_t i = 0; i < 4; i++)
 	{
-		const float p = (float)(i + 1) / 4.0f;
-		const float v = nearPlane + range * p;
-		const float d = LAMBDA * (nearPlane * powf(ratio, p) - v) + v;
-		// const float distance = i == 0 ? 0.1f : (i == 1 ? 0.2f : (i == 2 ? 0.5f : 1));
-		const float distance = (d - nearPlane) / range;
+		const float distance = i == 0 ? 0.1f : (i == 1 ? 0.2f : (i == 2 ? 0.5f : 1));
 
 		vec4 frustumCorners[8];
 		memcpy(frustumCorners, projectedCorners, sizeof(projectedCorners));

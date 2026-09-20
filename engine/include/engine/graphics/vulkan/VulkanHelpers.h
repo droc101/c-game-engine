@@ -107,7 +107,7 @@ enum PendingTasksBitFlags
 {
 	PENDING_TASK_UI_BUFFERS_RESIZE_BIT = 1 << 0,
 	PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS = 1 << 1,
-	PENDING_TASK_TOGGLE_BAKED_LIGHTING = 1 << 2,
+	PENDING_TASK_RECREATE_GRAPHICS_PIPELINES = 1 << 2,
 };
 
 typedef struct CameraUniform
@@ -483,6 +483,7 @@ typedef struct LightingShaderSpecializationConstants
 	uint32_t sampleCount;
 	float sampleRadius;
 	VkBool32 bakedLighting;
+	VkBool32 clusterDebug;
 } LightingShaderSpecializationConstants;
 
 typedef struct VulkanLight

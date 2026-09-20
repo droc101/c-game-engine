@@ -11,4 +11,6 @@ void VK_DPrintSceneStatistics();
 
 void VK_ToggleBakedLighting();
 
+void VK_ToggleClusterDebug();
+
 #endif //GAME_VULKANDEBUG_H

@@ -7,6 +7,10 @@ layout(constant_id = 1) const uint SAMPLE_COUNT = 32;
 layout(constant_id = 2) const float SAMPLE_RADIUS = 4.0;
 
 layout(constant_id = 3) const bool ENABLE_BAKED_LIGHTING = true;
+layout(constant_id = 4) const bool ENABLE_CLUSTER_DEBUG = false;
+
+/// Set to true if any of the debug lighting paths should be used
+const bool ENABLE_DEBUG_LIGHTING = ENABLE_CLUSTER_DEBUG;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
@@ -34,6 +38,14 @@ layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
 
 layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMapAtlas;
 layout(set = 1, binding = 0) uniform sampler2DShadow shadowMaps[];
+
+layout(location = 1) in vec3 inPosition;
+layout(location = 2) in vec2 inUV;
+layout(location = 3) in vec3 inNormal;
+layout(location = 4) in float inDistance;
+layout(location = 5) flat in uint inTextureIndex;
+
+layout(location = 0) out vec4 outColor;
 
 uint getCascadeIndex(const float distance) {
     for (uint cascadeIndex = 0; cascadeIndex < 4; ++cascadeIndex) {
@@ -199,4 +211,17 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
         }
     }
     return lightingColor;
+}
+
+void debugLighting() {
+    outColor.a = 1;
+    if (ENABLE_CLUSTER_DEBUG) {
+		const uvec3 cluster = uvec3(min(vec3(gl_FragCoord.x / 1920.0, gl_FragCoord.y / 1080.0, inDistance / camera.farPlane) * 8.0, 7.99999));
+		outColor.rgb = (cluster + 1) / 8.0;
+		outColor.rg *= 1 - outColor.b;
+		outColor.b = 0;
+		vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
+		outColor.rgb += vec3((lightingColor.x + lightingColor.y + lightingColor.z) / 12);
+        return;
+	}
 }
