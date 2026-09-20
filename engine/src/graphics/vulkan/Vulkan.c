@@ -973,6 +973,11 @@ static inline void CreateShadowMaps(const Map *map)
 {
 	CreateShadowMapRenderPass(map);
 	CreateDepthGraphicsPipelines();
+
+	lunaDestroyComputePipeline(device, pipelines.culling);
+	lunaDestroyComputePipeline(device, pipelines.clearCullingData);
+	lunaDestroyComputePipeline(device, pipelines.populateClusters);
+	CreateComputePipelines();
 }
 
 static inline void DrawSky(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)

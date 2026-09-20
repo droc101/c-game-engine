@@ -27,9 +27,9 @@ bool IsVisible(const uint lightIndex, const vec3 clusterPlanes[4], const float n
 void main() {
     const uint clusterIndex = gl_GlobalInvocationID.x + 8 * gl_GlobalInvocationID.y + 64 * gl_GlobalInvocationID.z;
     const vec3 clusterPlanes[4] = {
-        normalize(vec3(camera.frustumPlanes[0] / camera.frustumPlanes[1], 0, -gl_GlobalInvocationID.x / 4.0 + 1.0)),
+        normalize(vec3(camera.frustumPlanes[0] / camera.frustumPlanes[1], 0, gl_GlobalInvocationID.x / -4.0 + 1.0)),
         normalize(vec3(-camera.frustumPlanes[0] / camera.frustumPlanes[1], 0, (gl_GlobalInvocationID.x + 1) / 4.0 - 1.0)),
-        normalize(vec3(0, camera.frustumPlanes[2] / camera.frustumPlanes[3], -gl_GlobalInvocationID.y / 4.0 + 1.0)),
+        normalize(vec3(0, camera.frustumPlanes[2] / camera.frustumPlanes[3], gl_GlobalInvocationID.y / -4.0 + 1.0)),
         normalize(vec3(0, -camera.frustumPlanes[2] / camera.frustumPlanes[3], (gl_GlobalInvocationID.y + 1) / 4.0 - 1.0)),
     };
 
