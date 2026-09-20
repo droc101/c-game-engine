@@ -38,6 +38,7 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
+#include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
@@ -56,6 +57,8 @@
 #include <string.h>
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
+
+#include "engine/physics/PlayerPhysics.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -715,13 +718,17 @@ static inline void CreatePerFrustumBuffers()
 	RequireRealloc();
 }
 
-static inline void LoadLight(Light *light, uint32_t *const frustumIndex, uint32_t *const shadowMapIndex)
+static inline void LoadLight(Light *light,
+							 const uint32_t lightIndex,
+							 uint32_t *const frustumIndex,
+							 uint32_t *const shadowMapIndex,
+							 const JPH_BodyID parent)
 {
 	static const float LIGHT_NEAR_PLANE = 0.01f;
+	const bool hasParent = parent != JPH_BodyId_InvalidBodyID;
 
-	VulkanLight *vulkanLight = &lights[lightCount];
+	VulkanLight *vulkanLight = &lights[lightIndex];
 	vulkanLight->type = light->type;
-	vulkanLight->position = light->position;
 	vulkanLight->color.x = light->color.r;
 	vulkanLight->color.y = light->color.g;
 	vulkanLight->color.z = light->color.b;
@@ -737,18 +744,49 @@ static inline void LoadLight(Light *light, uint32_t *const frustumIndex, uint32_
 											  ? 0
 											  : TextureIndex(light->cookie) + 1;
 
-	const Vector3 rotation = {
-		.x = glm_rad(light->rotation.x) + PIf,
-		.y = glm_rad(light->rotation.y),
-		.z = glm_rad(light->rotation.z),
-	};
-	const float cx = -cosf(rotation.x);
-	vulkanLight->negativeForwardDirection.x = sinf(rotation.y) * cx;
-	vulkanLight->negativeForwardDirection.y = sinf(rotation.x);
-	vulkanLight->negativeForwardDirection.z = cosf(rotation.y) * cx;
-	Vector3_Normalized(&vulkanLight->negativeForwardDirection, &vulkanLight->negativeForwardDirection);
+	versor rotationQuat;
+	if (hasParent)
+	{
+		JPH_Quat joltRotationQuat;
+		JPH_Quat_FromEulerAngles(&light->rotation, &joltRotationQuat);
+		if (parent == playerBodyId)
+		{
+			Vector3_Add(&loadedMap->player.playerCamera.transform.position, &light->position, &vulkanLight->position);
+			JPH_Quat_Multiply(&joltRotationQuat, &loadedMap->player.playerCamera.transform.rotation, &joltRotationQuat);
+		} else
+		{
+			JPH_Quat parentRotationQuat;
+			JPH_BodyInterface_GetPositionAndRotation(JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem),
+													 parent,
+													 &vulkanLight->position,
+													 &parentRotationQuat);
+			Vector3_Add(&vulkanLight->position, &light->position, &vulkanLight->position);
+			JPH_Quat_Multiply(&joltRotationQuat, &parentRotationQuat, &joltRotationQuat);
+		}
+		JPH_Quat_Rotate(&joltRotationQuat, &Vector3_AxisZ, &vulkanLight->negativeForwardDirection);
+		QUAT_TO_VERSOR(joltRotationQuat, rotationQuat);
+		versor rotationOffset;
+		glm_quatv(rotationOffset, GLM_PIf, GLM_XUP);
+		glm_quat_mul(rotationQuat, rotationOffset, rotationQuat);
+	} else
+	{
+		const Vector3 rotation = {
+			.x = glm_rad(light->rotation.x) + PIf,
+			.y = glm_rad(light->rotation.y),
+			.z = glm_rad(light->rotation.z),
+		};
+		vulkanLight->position = light->position;
 
-	switch (light->type)
+		const float cx = -cosf(rotation.x);
+		vulkanLight->negativeForwardDirection.x = sinf(rotation.y) * cx;
+		vulkanLight->negativeForwardDirection.y = sinf(rotation.x);
+		vulkanLight->negativeForwardDirection.z = cosf(rotation.y) * cx;
+		Vector3_Normalized(&vulkanLight->negativeForwardDirection, &vulkanLight->negativeForwardDirection);
+
+		glm_euler_zyx_quat_lh(VECTOR3_TO_VEC3(rotation), rotationQuat);
+	}
+
+	switch (vulkanLight->type)
 	{
 		case LIGHT_TYPE_SPOT:
 		{
@@ -756,11 +794,9 @@ static inline void LoadLight(Light *light, uint32_t *const frustumIndex, uint32_
 			{
 				vulkanLight->shadowMapIndex = (*shadowMapIndex)++;
 			}
-			versor rotationQuat;
-			glm_euler_zyx_quat_lh(VECTOR3_TO_VEC3(rotation), rotationQuat);
-			glm_quat_look(VECTOR3_TO_VEC3(light->position), rotationQuat, frustums[*frustumIndex].viewMatrix);
+			glm_quat_look(VECTOR3_TO_VEC3(vulkanLight->position), rotationQuat, frustums[*frustumIndex].viewMatrix);
 			mat4 projectionMatrix;
-			glm_perspective_lh_zo(glm_rad(2 * light->fadingAngle),
+			glm_perspective_lh_zo(glm_rad(2 * vulkanLight->fadingAngle),
 								  1,
 								  vulkanLight->maxDistance,
 								  LIGHT_NEAR_PLANE,
@@ -800,9 +836,9 @@ static inline void LoadLight(Light *light, uint32_t *const frustumIndex, uint32_
 				{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
 			};
 			vec3 negativeLightPosition = {
-				-light->position.x,
-				-light->position.y,
-				-light->position.z,
+				-vulkanLight->position.x,
+				-vulkanLight->position.y,
+				-vulkanLight->position.z,
 			};
 			for (uint32_t j = 0; j < 6; j++)
 			{
@@ -831,6 +867,7 @@ static inline void LoadLight(Light *light, uint32_t *const frustumIndex, uint32_
 
 static inline void LoadLights(const Map *map)
 {
+	directionalLight = NULL;
 	if (map == NULL ||
 		GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED ||
 		dynamicLights.length + map->lightCount == 0)
@@ -878,13 +915,13 @@ static inline void LoadLights(const Map *map)
 	for (lightCount = 0; lightCount < map->lightCount; lightCount++)
 	{
 		Light *light = &map->lights[lightCount];
-		LoadLight(light, &frustumIndex, &shadowMapIndex);
+		LoadLight(light, lightCount, &frustumIndex, &shadowMapIndex, JPH_BodyId_InvalidBodyID);
 	}
 	staticLightFrustumCount = frustumIndex - 1;
 	for (uint32_t i = 0; i < dynamicLights.length; lightCount++, i++)
 	{
 		DynamicLight *light = ListGetPointer(dynamicLights, i);
-		LoadLight(&light->light, &frustumIndex, &shadowMapIndex);
+		LoadLight(&light->light, lightCount, &frustumIndex, &shadowMapIndex, JPH_BodyId_InvalidBodyID);
 	}
 	lightingShaderSpecializationConstants.maxLightCount = lightCount;
 
@@ -1478,32 +1515,17 @@ static inline void UpdateShadowMaps(const Map *map)
 	}
 }
 
-static inline void UpdateDynamicLight(DynamicLight *light, uint32_t *const frustumIndex)
+static inline void UpdateDynamicLight(const uint32_t index, uint32_t *const frustumIndex)
 {
-	assert(light);
+	assert(frustumIndex);
 	assert(loadedMap);
 
-	// if (light->parent == playerBodyId)
-	// {
-	// 	light->light.transform.position = loadedMap->player.playerCamera.transform.position;
-	// 	light->light.transform.rotation = loadedMap->player.playerCamera.transform.rotation;
-	// } else
-	// {
-	// 	JPH_BodyInterface_GetPositionAndRotation(JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem),
-	// 											 light->parent,
-	// 											 &light->light.transform.position,
-	// 											 &light->light.transform.rotation);
-	// }
-	// Vector3_Add(&light->light.transform.position, &light->relativePosition, &light->light.transform.position);
-	// JPH_Quat_Rotate(&light->light.transform.rotation, &Vector3_AxisZ, &light->light.negativeForwardDirection);
-	//
-	// LoadLight(&light->light, frustumIndex, NULL);
+	DynamicLight *light = ListGetPointer(dynamicLights, index);
+	LoadLight(&light->light, index + loadedMap->lightCount, frustumIndex, NULL, light->parent);
 }
 
 static inline void UpdateDynamicLights()
 {
-	return;
-
 	if (!ShadowMapsEnabled() || dynamicLights.length == 0)
 	{
 		return;
@@ -1514,7 +1536,7 @@ static inline void UpdateDynamicLights()
 	uint32_t frustumIndex = staticLightFrustumCount + 1;
 	for (uint32_t i = 0; i < dynamicLights.length; i++)
 	{
-		UpdateDynamicLight(ListGetPointer(dynamicLights, i), &frustumIndex);
+		UpdateDynamicLight(i, &frustumIndex);
 	}
 
 	assert(frustumCount == frustumIndex);
@@ -1528,21 +1550,17 @@ static inline void UpdateDynamicLights()
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
 			   "Failed to write frustums buffer!");
 
-	for (uint32_t i = 0; i < dynamicLights.length; i++)
-	{
-		const DynamicLight *light = ListGetPointer(dynamicLights, i);
-		const LunaBufferWriteInfo lightsBufferDynamicLightWriteInfo = {
-			.bytes = sizeof(Light),
-			.data = &light->light,
-			.offset = sizeof(float) * 4 + sizeof(mat4) * 4 + (loadedMap->lightCount + i) * sizeof(Light),
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		};
-		VulkanTest(lunaWriteDataToBuffer(device,
-										 commandBuffer,
-										 buffers.uniforms.lights,
-										 &lightsBufferDynamicLightWriteInfo),
-				   "Failed to write lights data to buffer!");
-	}
+	const LunaBufferWriteInfo lightsBufferDynamicLightWriteInfo = {
+		.bytes = dynamicLights.length * sizeof(VulkanLight),
+		.data = &lights[loadedMap->lightCount],
+		.offset = sizeof(float) * 4 + sizeof(mat4) * 4 + loadedMap->lightCount * sizeof(VulkanLight),
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device,
+									 commandBuffer,
+									 buffers.uniforms.lights,
+									 &lightsBufferDynamicLightWriteInfo),
+			   "Failed to write dynamic lights data to buffer!");
 }
 
 static inline void UpdateGlobalLightingUniform(const Map *map)
@@ -1735,6 +1753,7 @@ static inline void HandleDeferredWork()
 								lunaGetBufferSize(buffers.map.unculledShadedDrawInfo),
 								lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo));
 		CreateShadowMaps(loadedMap);
+		LoadLightmap(loadedMap);
 
 		pendingTasks &= ~PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
 	}
@@ -2104,41 +2123,41 @@ void VK_LoadMap(const Map *map)
 
 void VK_AddDynamicLight(const DynamicLight *light)
 {
-	// assert(light);
-	// // A dynamic directional light doesn't make sense just don't do it
-	// assert(light->light.type != LIGHT_TYPE_DIRECTIONAL);
-	// // You can't have a light without a map
-	// assert(loadedMap);
-	// // You can't add the same dynamic light twice
-	// assert(dynamicLights.length == 0 || ListFind(dynamicLights, light) >= dynamicLights.length);
-	// // Internal state check
-	// assert(dynamicLightsToAdd.data);
-	//
-	// ListLock(dynamicLightsToAdd);
-	//
-	// if (dynamicLightsToAdd.length == 0 || ListFind(dynamicLightsToAdd, light) >= dynamicLightsToAdd.length)
-	// {
-	// 	ListAdd(dynamicLightsToAdd, light);
-	// 	pendingTasks |= PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
-	// }
-	//
-	// ListUnlock(dynamicLightsToAdd);
+	assert(light);
+	// A dynamic directional light doesn't make sense just don't do it
+	assert(light->light.type != LIGHT_TYPE_DIRECTIONAL);
+	// You can't have a light without a map
+	assert(loadedMap);
+	// You can't add the same dynamic light twice
+	assert(dynamicLights.length == 0 || ListFind(dynamicLights, light) >= dynamicLights.length);
+	// Internal state check
+	assert(dynamicLightsToAdd.data);
+
+	ListLock(dynamicLightsToAdd);
+
+	if (dynamicLightsToAdd.length == 0 || ListFind(dynamicLightsToAdd, light) >= dynamicLightsToAdd.length)
+	{
+		ListAdd(dynamicLightsToAdd, light);
+		pendingTasks |= PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
+	}
+
+	ListUnlock(dynamicLightsToAdd);
 }
 
 void VK_RemoveDynamicLight(const DynamicLight *light)
 {
-	// assert(light);
-	// assert((dynamicLights.length != 0 && ListFind(dynamicLights, light) < dynamicLights.length) ||
-	// 	   (dynamicLightsToAdd.length != 0 && ListFind(dynamicLightsToAdd, light) < dynamicLightsToAdd.length));
-	// assert(dynamicLightsToRemove.data);
-	//
-	// ListLock(dynamicLightsToRemove);
-	// if (dynamicLightsToRemove.length == 0 || ListFind(dynamicLightsToRemove, light) >= dynamicLightsToRemove.length)
-	// {
-	// 	ListAdd(dynamicLightsToRemove, light);
-	// 	pendingTasks |= PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
-	// }
-	// ListUnlock(dynamicLightsToRemove);
+	assert(light);
+	assert((dynamicLights.length != 0 && ListFind(dynamicLights, light) < dynamicLights.length) ||
+		   (dynamicLightsToAdd.length != 0 && ListFind(dynamicLightsToAdd, light) < dynamicLightsToAdd.length));
+	assert(dynamicLightsToRemove.data);
+
+	ListLock(dynamicLightsToRemove);
+	if (dynamicLightsToRemove.length == 0 || ListFind(dynamicLightsToRemove, light) >= dynamicLightsToRemove.length)
+	{
+		ListAdd(dynamicLightsToRemove, light);
+		pendingTasks |= PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
+	}
+	ListUnlock(dynamicLightsToRemove);
 }
 
 void VK_UpdateViewportSize()

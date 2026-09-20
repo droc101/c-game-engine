@@ -41,14 +41,14 @@ struct Light
 	float brightAngle;
 	/// The angle at which the spotlight will reach 0% brightness
 	float fadingAngle;
-	const char *cookie; // mmmmm tasty
+	char *cookie; // mmmmm tasty
 };
 
 struct DynamicLight
 {
+	/// The @c position and @c rotation fields are treated as being relative to that of the parent
 	Light light;
 	JPH_BodyID parent;
-	Vector3 relativePosition;
 };
 
 #endif //GAME_LIGHT_H

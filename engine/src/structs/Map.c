@@ -117,6 +117,10 @@ void DestroyMap(Map *map)
 	free(map->indirectLightmapPixels);
 	free(map->lightmapPixels);
 
+	for (uint32_t i = 0; i < map->lightCount; i++)
+	{
+		free(map->lights[i].cookie);
+	}
 	free(map->lights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
