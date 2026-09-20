@@ -73,7 +73,8 @@
     "cookie": {
       "display": "Light Cookie Texture",
       "type": "string",
-      "default": ""
+      "default": "",
+      "string_hint": "texture"
     }
   }
 }
