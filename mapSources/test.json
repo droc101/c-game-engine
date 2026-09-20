@@ -3185,13 +3185,13 @@
             },
             "connections": [],
             "params": {
-                "near_plane": {
-                    "type": "float",
-                    "value": 0.009999999776482582
-                },
                 "far_plane": {
                     "type": "float",
                     "value": 4096.0
+                },
+                "near_plane": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -3209,13 +3209,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "is_blue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3233,6 +3233,22 @@
             },
             "connections": [],
             "params": {
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/leafy.gmdl"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "collision": {
+                    "type": "byte",
+                    "value": 2
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -3241,22 +3257,6 @@
                         "b": 0.0,
                         "a": 1.0
                     }
-                },
-                "collision": {
-                    "type": "byte",
-                    "value": 2
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/leafy.gmdl"
-                },
-                "affect_lightmap": {
-                    "type": "bool",
-                    "value": true
                 }
             }
         },
@@ -3274,17 +3274,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 1
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 1
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3302,17 +3302,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 0
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 0
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3330,17 +3330,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "height": {
+                    "type": "byte",
+                    "value": 2
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 2
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3358,17 +3358,17 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "triple_laser_emitter"
+                "height": {
+                    "type": "byte",
+                    "value": 3
                 },
                 "start_on": {
                     "type": "bool",
                     "value": true
                 },
-                "height": {
-                    "type": "byte",
-                    "value": 3
+                "name": {
+                    "type": "string",
+                    "value": "triple_laser_emitter"
                 }
             }
         },
@@ -3407,13 +3407,13 @@
                 }
             ],
             "params": {
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3431,13 +3431,9 @@
             },
             "connections": [],
             "params": {
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
                 "light_color": {
                     "type": "color",
@@ -3448,9 +3444,13 @@
                         "a": 1.0
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
                 }
             }
         },
@@ -3468,18 +3468,6 @@
             },
             "connections": [],
             "params": {
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 600
-                },
-                "name": {
-                    "type": "string",
-                    "value": "goal_light"
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": false
-                },
                 "light_color": {
                     "type": "color",
                     "value": {
@@ -3488,6 +3476,18 @@
                         "b": 0.6617647409439087,
                         "a": 1.0
                     }
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": "goal_light"
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 600
                 }
             }
         },
@@ -3566,29 +3566,29 @@
                 }
             ],
             "params": {
-                "depth": {
-                    "type": "float",
-                    "value": 64.0
-                },
-                "height": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "one_shot": {
-                    "type": "bool",
-                    "value": false
-                },
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
+                "name": {
+                    "type": "string",
+                    "value": ""
                 },
                 "width": {
                     "type": "float",
                     "value": 64.0
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "one_shot": {
+                    "type": "bool",
+                    "value": false
+                },
+                "height": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "depth": {
+                    "type": "float",
+                    "value": 64.0
                 }
             }
         },
@@ -3606,20 +3606,27 @@
             },
             "connections": [],
             "params": {
-                "texture": {
-                    "type": "string",
-                    "value": "texture/level/uvtest.gtex"
-                },
-                "uv_scale": {
+                "uv_offset": {
                     "type": "vec2",
                     "value": {
-                        "x": 8.0,
-                        "y": 8.0
+                        "x": 0.25,
+                        "y": 0.25
                     }
                 },
-                "unshaded": {
+                "solid": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 16.0,
+                        "y": 16.0
+                    }
                 },
                 "color": {
                     "type": "color",
@@ -3630,27 +3637,20 @@
                         "a": 1.0
                     }
                 },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 16.0,
-                        "y": 16.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "solid": {
+                "unshaded": {
                     "type": "bool",
                     "value": false
                 },
-                "uv_offset": {
+                "uv_scale": {
                     "type": "vec2",
                     "value": {
-                        "x": 0.25,
-                        "y": 0.25
+                        "x": 8.0,
+                        "y": 8.0
                     }
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/uvtest.gtex"
                 }
             }
         },
@@ -3668,13 +3668,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "is_blue": {
                     "type": "bool",
                     "value": false
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -3692,6 +3692,26 @@
             },
             "connections": [],
             "params": {
+                "name": {
+                    "type": "string",
+                    "value": "goal_fog"
+                },
+                "fog_start": {
+                    "type": "float",
+                    "value": 160.0
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": false
+                },
+                "fog_end": {
+                    "type": "float",
+                    "value": 320.0
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 600
+                },
                 "fog_color": {
                     "type": "color",
                     "value": {
@@ -3700,26 +3720,6 @@
                         "b": 0.6127451062202454,
                         "a": 1.0
                     }
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 600
-                },
-                "fog_end": {
-                    "type": "float",
-                    "value": 320.0
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": false
-                },
-                "fog_start": {
-                    "type": "float",
-                    "value": 160.0
-                },
-                "name": {
-                    "type": "string",
-                    "value": "goal_fog"
                 }
             }
         },
@@ -3737,6 +3737,26 @@
             },
             "connections": [],
             "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fog_start": {
+                    "type": "float",
+                    "value": 800.0
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                },
+                "fog_end": {
+                    "type": "float",
+                    "value": 1600.0
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
+                },
                 "fog_color": {
                     "type": "color",
                     "value": {
@@ -3745,26 +3765,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
-                "fog_end": {
-                    "type": "float",
-                    "value": 1600.0
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
-                "fog_start": {
-                    "type": "float",
-                    "value": 800.0
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
                 }
             }
         }

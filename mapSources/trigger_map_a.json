@@ -457,13 +457,13 @@
             },
             "connections": [],
             "params": {
-                "near_plane": {
-                    "type": "float",
-                    "value": 0.009999999776482582
-                },
                 "far_plane": {
                     "type": "float",
                     "value": 4096.0
+                },
+                "near_plane": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -481,33 +481,33 @@
             },
             "connections": [],
             "params": {
-                "depth": {
-                    "type": "float",
-                    "value": 32.0
-                },
-                "height": {
-                    "type": "float",
-                    "value": 16.0
-                },
-                "map_name": {
+                "name": {
                     "type": "string",
-                    "value": "trigger_map_b"
-                },
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
-                },
-                "width": {
-                    "type": "float",
-                    "value": 16.0
+                    "value": ""
                 },
                 "entrance_name": {
                     "type": "string",
                     "value": "entrance_b"
                 },
-                "name": {
+                "width": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "map_name": {
                     "type": "string",
-                    "value": ""
+                    "value": "trigger_map_b"
+                },
+                "height": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "depth": {
+                    "type": "float",
+                    "value": 32.0
                 }
             }
         },
