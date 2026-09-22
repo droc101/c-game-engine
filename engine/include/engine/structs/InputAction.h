@@ -6,6 +6,7 @@
 #define GAME_INPUTACTION_H
 
 #include <engine/structs/KVList.h>
+#include <engine/subsystem/Input.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -23,14 +24,6 @@ typedef enum InputActionBindType
 	IA_CONTROLLER_BUTTON,
 	IA_CONTROLLER_AXIS,
 } InputActionBindType;
-
-typedef enum InputActionMouseWheelAxis
-{
-	MOUSE_WHEEL_UP,
-	MOUSE_WHEEL_DOWN,
-	MOUSE_WHEEL_LEFT,
-	MOUSE_WHEEL_RIGHT,
-} InputActionMouseWheelAxis;
 
 typedef enum InputActionControllerAxis
 {
@@ -56,7 +49,7 @@ struct InputAction
 	{
 		SDL_Scancode keyBind;
 		uint8_t mouseButtonBind;
-		InputActionMouseWheelAxis mouseWheelBind;
+		MouseWheelAxis mouseWheelBind;
 	} keyboardMouseBind;
 	union
 	{

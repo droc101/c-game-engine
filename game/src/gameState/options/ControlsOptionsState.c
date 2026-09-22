@@ -55,7 +55,7 @@ static ControlRowData *listenRow;
 
 static List controlRows;
 
-static void BtnControlsOptionsBack(Control */*control*/, void */*extraData*/)
+static void BtnControlsOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&InputOptionsState);
 }
@@ -87,7 +87,7 @@ static void UpdateControlRow(ControlRowData *row)
 	resetButtonData->extraData = row;
 }
 
-static void BtnResetBinding(Control */*control*/, void *extraData)
+static void BtnResetBinding(Control * /*control*/, void *extraData)
 {
 	ControlRowData *row = extraData;
 	listenMode = NOT_LISTNENING;
@@ -95,7 +95,7 @@ static void BtnResetBinding(Control */*control*/, void *extraData)
 	UpdateControlRow(row);
 }
 
-static void BtnEditKbmBinding(Control */*control*/, void *extraData)
+static void BtnEditKbmBinding(Control * /*control*/, void *extraData)
 {
 	if (listenMode != NOT_LISTNENING)
 	{
@@ -107,7 +107,7 @@ static void BtnEditKbmBinding(Control */*control*/, void *extraData)
 	UpdateControlRow(row);
 }
 
-static void BtnEditCtlrBinding(Control */*control*/, void *extraData)
+static void BtnEditCtlrBinding(Control * /*control*/, void *extraData)
 {
 	if (listenMode != NOT_LISTNENING)
 	{
@@ -173,30 +173,27 @@ static void ProcessListening()
 				return;
 			}
 
-			if (listenRow->option->allowAxisBind)
+			const Vector2 mouseWheel = GetMouseWheelTicks(mainThreadInput);
+			if (fabsf(mouseWheel.x) > 0 || fabsf(mouseWheel.y) > 0)
 			{
-				const Vector2 mouseWheel = GetMouseWheelTicks(mainThreadInput);
-				if (fabsf(mouseWheel.x) > 0 || fabsf(mouseWheel.y) > 0)
+				action->keyboardMouseBindType = IA_MOUSE_WHEEL;
+				if (mouseWheel.y > 0)
 				{
-					action->keyboardMouseBindType = IA_MOUSE_WHEEL;
-					if (mouseWheel.y > 0)
-					{
-						action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_UP;
-					} else if (mouseWheel.y < 0)
-					{
-						action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_DOWN;
-					} else if (mouseWheel.x > 0)
-					{
-						action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_RIGHT;
-					} else if (mouseWheel.x < 0)
-					{
-						action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_LEFT;
-					}
-					listenMode = NOT_LISTNENING;
-					ConsumeMouseWheel(mainThreadInput);
-					UpdateControlRow(listenRow);
-					return;
+					action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_UP;
+				} else if (mouseWheel.y < 0)
+				{
+					action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_DOWN;
+				} else if (mouseWheel.x > 0)
+				{
+					action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_RIGHT;
+				} else if (mouseWheel.x < 0)
+				{
+					action->keyboardMouseBind.mouseWheelBind = MOUSE_WHEEL_LEFT;
 				}
+				listenMode = NOT_LISTNENING;
+				ConsumeMouseWheel(mainThreadInput);
+				UpdateControlRow(listenRow);
+				return;
 			}
 		} else if (listenMode == CTLR_LISTEN)
 		{

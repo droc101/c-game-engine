@@ -31,6 +31,14 @@ typedef enum InputState : uint8_t
 	INP_JUST_RELEASED,
 } InputState;
 
+typedef struct MouseWheelState
+{
+	float relativeX;
+	float relativeY;
+	int relativeTicksX;
+	int relativeTicksY;
+} MouseWheelState;
+
 struct InputSystem
 {
 	// every key is tracked, even if it's not used
@@ -50,10 +58,8 @@ struct InputSystem
 	int mouseRelativeX;
 	int mouseRelativeY;
 
-	float mouseWheelRelativeX;
-	float mouseWheelRelativeY;
-	int mouseWheelRelativeTicksX;
-	int mouseWheelRelativeTicksY;
+	MouseWheelState currentMouseWheelState;
+	MouseWheelState lastMouseWheelState;
 
 	bool lastInputWasController;
 };
@@ -217,10 +223,10 @@ bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event)
 			system->lastInputWasController = true;
 			break;
 		case SDL_EVENT_MOUSE_WHEEL:
-			system->mouseWheelRelativeX += event->wheel.x;
-			system->mouseWheelRelativeY += event->wheel.y;
-			system->mouseWheelRelativeTicksX += event->wheel.integer_x;
-			system->mouseWheelRelativeTicksY += event->wheel.integer_y;
+			system->currentMouseWheelState.relativeX += event->wheel.x;
+			system->currentMouseWheelState.relativeY += event->wheel.y;
+			system->currentMouseWheelState.relativeTicksX += event->wheel.integer_x;
+			system->currentMouseWheelState.relativeTicksY += event->wheel.integer_y;
 			system->lastInputWasController = false;
 			break;
 		default:
@@ -278,10 +284,12 @@ void UpdateInputStates(InputSystem *system)
 
 	system->mouseRelativeX = 0;
 	system->mouseRelativeY = 0;
-	system->mouseWheelRelativeX = 0;
-	system->mouseWheelRelativeY = 0;
-	system->mouseWheelRelativeTicksX = 0;
-	system->mouseWheelRelativeTicksY = 0;
+
+	system->lastMouseWheelState = system->currentMouseWheelState;
+	system->currentMouseWheelState.relativeX = 0;
+	system->currentMouseWheelState.relativeY = 0;
+	system->currentMouseWheelState.relativeTicksX = 0;
+	system->currentMouseWheelState.relativeTicksY = 0;
 }
 
 bool IsButtonPressed(const InputSystem *system, const int button)
@@ -344,12 +352,81 @@ Vector2 GetMouseRel(const InputSystem *system)
 
 Vector2 GetMouseWheel(const InputSystem *system)
 {
-	return v2(system->mouseWheelRelativeX, system->mouseWheelRelativeY);
+	return v2(system->currentMouseWheelState.relativeX, system->currentMouseWheelState.relativeY);
 }
 
 Vector2 GetMouseWheelTicks(const InputSystem *system)
 {
-	return v2(system->mouseWheelRelativeTicksX, system->mouseWheelRelativeTicksY);
+	return v2(system->currentMouseWheelState.relativeTicksX, system->currentMouseWheelState.relativeTicksY);
+}
+
+static int GetMouseWheelAxisTicksInternal(const MouseWheelState *state, const MouseWheelAxis axis)
+{
+	const Vector2 wheel = v2(state->relativeTicksX, state->relativeTicksY);
+	switch (axis)
+	{
+		case MOUSE_WHEEL_UP:
+			return (int)fabsf(fmaxf(0.0f, wheel.y));
+		case MOUSE_WHEEL_DOWN:
+			return (int)fabsf(fminf(0.0f, wheel.y));
+		case MOUSE_WHEEL_LEFT:
+			return (int)fabsf(fminf(0.0f, wheel.x));
+		case MOUSE_WHEEL_RIGHT:
+			return (int)fabsf(fmaxf(0.0f, wheel.x));
+	}
+	return 0;
+}
+
+static float GetMouseWheelAxisInternal(const MouseWheelState *state, const MouseWheelAxis axis)
+{
+	const Vector2 wheel = v2(state->relativeX, state->relativeY);
+	switch (axis)
+	{
+		case MOUSE_WHEEL_UP:
+			return fabsf(fmaxf(0.0f, wheel.y));
+		case MOUSE_WHEEL_DOWN:
+			return fabsf(fminf(0.0f, wheel.y));
+		case MOUSE_WHEEL_LEFT:
+			return fabsf(fminf(0.0f, wheel.x));
+		case MOUSE_WHEEL_RIGHT:
+			return fabsf(fmaxf(0.0f, wheel.x));
+	}
+	return 0;
+}
+
+int GetMouseWheelAxisTicks(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return GetMouseWheelAxisTicksInternal(&system->currentMouseWheelState, axis);
+}
+
+float GetMouseWheelAxis(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return GetMouseWheelAxisInternal(&system->currentMouseWheelState, axis);
+}
+
+int GetPreviousMouseWheelAxisTicks(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return GetMouseWheelAxisTicksInternal(&system->lastMouseWheelState, axis);
+}
+
+float GetPreviousMouseWheelAxis(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return GetMouseWheelAxisInternal(&system->lastMouseWheelState, axis);
+}
+
+bool IsMouseWheelAxisPressed(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return GetMouseWheelAxisTicks(system, axis) > 0;
+}
+
+bool IsMouseWheelAxisJustPressed(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return IsMouseWheelAxisPressed(system, axis) && GetPreviousMouseWheelAxisTicks(system, axis) <= 0;
+}
+
+bool IsMouseWheelAxisJustReleased(const InputSystem *system, const MouseWheelAxis axis)
+{
+	return !IsMouseWheelAxisPressed(system, axis) && GetPreviousMouseWheelAxisTicks(system, axis) > 0;
 }
 
 void ConsumeKey(InputSystem *system, const int code)
@@ -386,10 +463,10 @@ void ConsumeAllMouseButtons(InputSystem *system)
 
 void ConsumeMouseWheel(InputSystem *system)
 {
-	system->mouseWheelRelativeTicksX = 0;
-	system->mouseWheelRelativeTicksY = 0;
-	system->mouseWheelRelativeX = 0;
-	system->mouseWheelRelativeY = 0;
+	system->currentMouseWheelState.relativeTicksX = 0;
+	system->currentMouseWheelState.relativeTicksY = 0;
+	system->currentMouseWheelState.relativeX = 0;
+	system->currentMouseWheelState.relativeY = 0;
 }
 
 float GetAxis(const InputSystem *system, const SDL_GamepadAxis axis)
