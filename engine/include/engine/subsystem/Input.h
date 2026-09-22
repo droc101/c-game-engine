@@ -27,6 +27,14 @@ extern InputSystem *mainThreadInput;
 #define CONTROLLER_CANCEL \
 	(GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_SOUTH : SDL_GAMEPAD_BUTTON_EAST)
 
+typedef enum MouseWheelAxis
+{
+	MOUSE_WHEEL_UP,
+	MOUSE_WHEEL_DOWN,
+	MOUSE_WHEEL_LEFT,
+	MOUSE_WHEEL_RIGHT,
+} MouseWheelAxis;
+
 /**
  * Handles controller disconnect event
  * @param which The controller that was disconnected
@@ -158,6 +166,20 @@ Vector2 GetMouseWheel(const InputSystem *system);
  * @return relative mouse wheel movement in ticks
  */
 Vector2 GetMouseWheelTicks(const InputSystem *system);
+
+int GetMouseWheelAxisTicks(const InputSystem *system, MouseWheelAxis axis);
+
+float GetMouseWheelAxis(const InputSystem *system, MouseWheelAxis axis);
+
+int GetPreviousMouseWheelAxisTicks(const InputSystem *system, MouseWheelAxis axis);
+
+float GetPreviousMouseWheelAxis(const InputSystem *system, MouseWheelAxis axis);
+
+bool IsMouseWheelAxisPressed(const InputSystem *system, MouseWheelAxis axis);
+
+bool IsMouseWheelAxisJustPressed(const InputSystem *system, MouseWheelAxis axis);
+
+bool IsMouseWheelAxisJustReleased(const InputSystem *system, MouseWheelAxis axis);
 
 /**
  * Consumes a key press state, so no other input check can see it

@@ -52,46 +52,12 @@ static const char *gamepadButtonLabelNames[] = {
 	"Triangle",
 };
 
-static const char *controllerButtonNames[] = {
+static const char *controllerButtonNames[SDL_GAMEPAD_BUTTON_COUNT] = {
 	"A Button",	   "B Button",	  "X Button",	   "Y Button",		 "Back",	 "Guide",	   "Start",
 	"Left Stick",  "Right Stick", "Left Shoulder", "Right Shoulder", "D-Pad Up", "D-Pad Down", "D-Pad Left",
 	"D-Pad Right", "Misc 1",	  "Paddle 1",	   "Paddle 2",		 "Paddle 3", "Paddle 4",   "Touchpad",
 	"Misc 2",	   "Misc 3",	  "Misc 4",		   "Misc 5",		 "Misc 6",
 };
-
-static int GetMouseWheelAxisTicks(const InputSystem *system, const InputActionMouseWheelAxis axis)
-{
-	const Vector2 wheel = GetMouseWheelTicks(system);
-	switch (axis)
-	{
-		case MOUSE_WHEEL_UP:
-			return (int)fmaxf(0.0f, wheel.y);
-		case MOUSE_WHEEL_DOWN:
-			return (int)fminf(0.0f, wheel.y);
-		case MOUSE_WHEEL_LEFT:
-			return (int)fminf(0.0f, wheel.x);
-		case MOUSE_WHEEL_RIGHT:
-			return (int)fmaxf(0.0f, wheel.x);
-	}
-	return 0;
-}
-
-static float GetMouseWheelAxis(const InputSystem *system, const InputActionMouseWheelAxis axis)
-{
-	const Vector2 wheel = GetMouseWheel(system);
-	switch (axis)
-	{
-		case MOUSE_WHEEL_UP:
-			return fmaxf(0.0f, wheel.y);
-		case MOUSE_WHEEL_DOWN:
-			return fminf(0.0f, wheel.y);
-		case MOUSE_WHEEL_LEFT:
-			return fminf(0.0f, wheel.x);
-		case MOUSE_WHEEL_RIGHT:
-			return fmaxf(0.0f, wheel.x);
-	}
-	return 0;
-}
 
 static float GetInputActionAxis(const InputSystem *system, const InputActionControllerAxis axis)
 {
@@ -140,7 +106,7 @@ bool IsInputActionJustPressed(const InputSystem *system, const InputAction *acti
 		case IA_MOUSE_BUTTON:
 			return IsMouseButtonJustPressed(system, action->keyboardMouseBind.mouseButtonBind);
 		case IA_MOUSE_WHEEL:
-			return GetMouseWheelAxisTicks(system, action->keyboardMouseBind.mouseWheelBind) > 0;
+			return IsMouseWheelAxisJustPressed(system, action->keyboardMouseBind.mouseWheelBind);
 		default:
 			return false;
 	}
@@ -165,7 +131,7 @@ bool IsInputActionJustReleased(const InputSystem *system, const InputAction *act
 		case IA_MOUSE_BUTTON:
 			return IsMouseButtonJustReleased(system, action->keyboardMouseBind.mouseButtonBind);
 		case IA_MOUSE_WHEEL:
-			return GetMouseWheelAxisTicks(system, action->keyboardMouseBind.mouseWheelBind) > 0;
+			return IsMouseWheelAxisJustReleased(system, action->keyboardMouseBind.mouseWheelBind);
 		default:
 			return false;
 	}
@@ -192,7 +158,7 @@ bool IsInputActionPressed(const InputSystem *system, const InputAction *action)
 		case IA_MOUSE_BUTTON:
 			return IsMouseButtonPressed(system, action->keyboardMouseBind.mouseButtonBind);
 		case IA_MOUSE_WHEEL:
-			return GetMouseWheelAxis(system, action->keyboardMouseBind.mouseWheelBind) > 0;
+			return IsMouseWheelAxisPressed(system, action->keyboardMouseBind.mouseWheelBind);
 		default:
 			return false;
 	}
@@ -206,7 +172,7 @@ bool IsInputActionPastDeadzone(const InputSystem *system, const InputAction *act
 	}
 	if (action->keyboardMouseBindType == IA_MOUSE_WHEEL)
 	{
-		return GetMouseWheelAxisTicks(system, action->keyboardMouseBind.mouseWheelBind) > 0;
+		return IsMouseWheelAxisPressed(system, action->keyboardMouseBind.mouseWheelBind);
 	}
 	return IsInputActionPressed(system, action);
 }
