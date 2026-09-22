@@ -102,7 +102,7 @@ static int PhysicsThreadMain(void * /*data*/)
 {
 	while (true)
 	{
-		tickStart = GetTimeNs();
+		const uint64_t timeStart = GetTimeNs();
 		SDL_LockMutex(physicsThreadMutex);
 		SDL_LockMutex(physicsTickMutex);
 		if (physicsThreadPostQuit)
@@ -157,13 +157,14 @@ static int PhysicsThreadMain(void * /*data*/)
 		}
 
 		uint64_t timeEnd = GetTimeNs();
-		uint64_t timeElapsed = timeEnd - tickStart;
+		uint64_t timeElapsed = timeEnd - timeStart;
+		tickStart = timeStart;
 		lastTickTime = max(min(PHYSICS_MIN_NS_D, (double)timeElapsed), PHYSICS_TARGET_NS_D);
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
 			SDL_DelayPrecise(PHYSICS_TARGET_NS - timeElapsed);
 			timeEnd = GetTimeNs();
-			timeElapsed = timeEnd - tickStart;
+			timeElapsed = timeEnd - timeStart;
 		}
 		TickGraphUpdate(timeElapsed);
 	}

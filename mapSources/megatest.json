@@ -7226,6 +7226,30 @@
                     }
                 }
             }
+        },
+        {
+            "class": "item_axis_helper",
+            "position": {
+                "x": -152.0,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "always_give": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
         }
     ]
 }

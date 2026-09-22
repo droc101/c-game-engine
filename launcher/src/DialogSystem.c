@@ -8,7 +8,6 @@
 
 #ifdef WIN32
 #include <stdio.h>
-#include "../include/AnsiCodes.h"
 // clang-format off
 #include <windows.h> // This include must be above commctrl.h otherwise there are compile errors.
 #include <commctrl.h>

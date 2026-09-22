@@ -11,6 +11,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
+#include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
@@ -115,6 +116,15 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
  * @param actor actor to destroy
  */
 void FreeActor(Actor *actor);
+
+/**
+ * Teleports an actor without interpolating its position
+ * @warning THIS FUNCTION IS NOT THREAD-SAFE! Only call from the physics thread!
+ * @param actor The actor to teleport
+ * @param position The position to teleport to
+ * @param activation
+ */
+void TeleportActor(Actor *actor, const Vector3 *position, JPH_Activation activation);
 
 /**
  * Directly trigger an input on an actor

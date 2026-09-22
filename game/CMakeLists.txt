@@ -67,6 +67,10 @@ add_library(game MODULE EXCLUDE_FROM_ALL
         src/actor/item/ItemEraser.c
         include/gameState/RenderingTogglesState.h
         src/gameState/RenderingTogglesState.c
+        src/item/AxisHelperItem.c
+        include/item/AxisHelperItem.h
+        src/actor/item/ItemAxisHelper.c
+        include/actor/item/ItemAxisHelper.h
 )
 
 if (x86_64)

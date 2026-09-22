@@ -424,23 +424,21 @@ void UpdateCameraUniform(Camera *camera)
 
 void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 {
-	mat4 translationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_translate(translationMatrix,
+	mat4 transformMatrix = GLM_MAT4_IDENTITY_INIT;
+	glm_translate(transformMatrix,
 				  (vec3){
 					  viewmodel->transform.position.x,
 					  -viewmodel->transform.position.y,
 					  viewmodel->transform.position.z,
 				  });
 
-	mat4 rotationMatrix = GLM_MAT4_IDENTITY_INIT;
-	glm_rotate(rotationMatrix,
-			   JPH_Quat_GetRotationAngle(&viewmodel->transform.rotation, &Vector3_AxisY),
-			   (vec3){0.0f, -1.0f, 0.0f});
+	versor rotation;
+	QUAT_TO_VERSOR(viewmodel->transform.rotation, rotation);
+	glm_quat_rotate(transformMatrix, rotation, transformMatrix);
 
-	glm_mat4_mul(translationMatrix, rotationMatrix, translationMatrix);
 	mat4 viewmodelMatrix;
 	glm_mat4_inv(uniform.view, viewmodelMatrix);
-	glm_mat4_mul(viewmodelMatrix, translationMatrix, viewmodelMatrix);
+	glm_mat4_mul(viewmodelMatrix, transformMatrix, viewmodelMatrix);
 
 	const size_t instanceCount = lunaGetBufferSize(buffers.viewmodel.instanceData) / sizeof(ModelInstanceData);
 	for (size_t i = 0; i < instanceCount; i++)
