@@ -121,8 +121,8 @@ static inline void CreateUniformBuffers()
 	VulkanTest(lunaCreateBuffer(device, &fogBufferCreationInfo, &buffers.uniforms.fog),
 			   "Failed to create fog uniform buffer!");
 	const LunaBufferCreationInfo lightsBufferCreationInfo = {
-		.alignment = alignment,
-		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment,
+		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};

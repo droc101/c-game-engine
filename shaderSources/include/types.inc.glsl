@@ -31,13 +31,18 @@ struct Light {
     mat4 transformMatrix;
 };
 
+layout(scalar, buffer_reference, buffer_reference_align = 4) writeonly buffer LightsBuffer {
+    Light lights[MAX_LIGHT_COUNT];
+};
+
 struct Frustum {
 	mat4 viewMatrix;
     float nearPlane;
     float farPlane;
     float frustumPlanes[4];
+    uint clusterCount;
 
-    float _padding[6];
+    float _padding[5];
 };
 
 struct CullingInfo {

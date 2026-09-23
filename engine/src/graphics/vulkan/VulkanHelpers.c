@@ -13,6 +13,7 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Camera.h>
@@ -598,10 +599,8 @@ void WriteFrustumsBuffer()
 			   "Failed to write frustums buffer!");
 }
 
-void CullModels()
+void ClearCullingData()
 {
-	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map);
-
 	const LunaMultiBufferMemoryBarrier preClearMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,
 		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT,
@@ -610,7 +609,16 @@ void CullModels()
 		.bufferCount = perFrustumBuffersHandles.length,
 		.buffers = (LunaBuffer *)perFrustumBuffersHandles.data->pointerData,
 	};
+	const LunaBufferMemoryBarrier preClearMainBufferMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
+		.buffer = buffers.frustums,
+	};
 	const LunaDependencyInfo preClearDependencyInfo = {
+		.bufferMemoryBarrierCount = 1,
+		.bufferMemoryBarriers = &preClearMainBufferMemoryBarrier,
 		.multiBufferMemoryBarrierCount = 1,
 		.multiBufferMemoryBarriers = &preClearMemoryBarrier,
 	};
@@ -632,7 +640,7 @@ void CullModels()
 	VulkanTest(lunaDispatch(device, commandBuffer, &clearDispatchInfo),
 			   "Failed to dispatch culling data clear shader!");
 
-	const LunaMultiBufferMemoryBarrier preDispatchMemoryBarrier = {
+	const LunaMultiBufferMemoryBarrier postClearMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
 		.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
@@ -640,13 +648,25 @@ void CullModels()
 		.bufferCount = perFrustumBuffersHandles.length,
 		.buffers = (LunaBuffer *)perFrustumBuffersHandles.data->pointerData,
 	};
-	const LunaDependencyInfo preDispatchDependencyInfo = {
-		.multiBufferMemoryBarrierCount = 1,
-		.multiBufferMemoryBarriers = &preDispatchMemoryBarrier,
+	const LunaBufferMemoryBarrier postClearMainBufferMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+		.buffer = buffers.frustums,
 	};
-	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
-			   "Failed to insert pipeline barrier before culling shader!");
+	const LunaDependencyInfo postClearDependencyInfo = {
+		.bufferMemoryBarrierCount = 1,
+		.bufferMemoryBarriers = &postClearMainBufferMemoryBarrier,
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &postClearMemoryBarrier,
+	};
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &postClearDependencyInfo),
+			   "Failed to insert pipeline barrier after clearing culling data!");
+}
 
+void CullModels()
+{
 	VulkanTest(lunaPushConstantsCompute(device, commandBuffer, pipelines.culling),
 			   "Failed to push constants for culling pipeline!");
 	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.culling.set};
@@ -675,7 +695,18 @@ void CullModels()
 		.bufferCount = perFrustumBuffersHandles.length,
 		.buffers = (LunaBuffer *)perFrustumBuffersHandles.data->pointerData,
 	};
+	const LunaBufferMemoryBarrier postDispatchMainBufferMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT |
+								VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT |
+								VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+		.buffer = buffers.frustums,
+	};
 	const LunaDependencyInfo postDispatchDependencyInfo = {
+		.bufferMemoryBarrierCount = 1,
+		.bufferMemoryBarriers = &postDispatchMainBufferMemoryBarrier,
 		.multiBufferMemoryBarrierCount = 1,
 		.multiBufferMemoryBarriers = &postDispatchMemoryBarrier,
 	};
@@ -716,9 +747,10 @@ void PopulateClusters()
 	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preDispatchDependencyInfo),
 			   "Failed to insert pipeline barrier before populating clusters!");
 
+	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.culling.set};
 	const LunaDescriptorSetBindInfo descriptorSetBindInfo = {
-		.descriptorSetCount = 1,
-		.descriptorSets = &descriptorSets.common.set,
+		.descriptorSetCount = 2,
+		.descriptorSets = descriptorSetHandles,
 	};
 	const LunaDispatchInfo dispatchInfo = {
 		.pipeline = pipelines.populateClusters,
@@ -729,6 +761,22 @@ void PopulateClusters()
 	};
 	VulkanTest(lunaDispatch(device, commandBuffer, &dispatchInfo),
 			   "Failed to dispatch compute shader to populate clusters!");
+
+	const LunaBuffer bufferHandles[] = {buffers.frustums, buffers.uniforms.clusters};
+	const LunaMultiBufferMemoryBarrier clustersMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
+		.bufferCount = ArrayLength(bufferHandles),
+		.buffers = bufferHandles,
+	};
+	const LunaDependencyInfo clustersDependencyInfo = {
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &clustersMemoryBarrier,
+	};
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &clustersDependencyInfo),
+			   "Failed to insert pipeline barrier for clusters!");
 }
 
 void EnsureSpaceForUiElements(const size_t quadCount)

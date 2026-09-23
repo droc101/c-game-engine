@@ -19,6 +19,8 @@ void main() {
     const uint frustumIndex = gl_GlobalInvocationID.y;
     // TODO: This branch will cause threads to require masking the majority of the time!
     if (index == 0) {
+        cullingData.frustums[frustumIndex].frustum.clusterCount = 0;
+
         SetSafe(cullingData.frustums[frustumIndex].shadedOpaqueMapModelsOutputDrawInfo, count, 0);
         SetSafe(cullingData.frustums[frustumIndex].unshadedOpaqueMapModelsOutputDrawInfo, count, 0);
         SetSafe(cullingData.frustums[frustumIndex].shadedMapModelsOutputDrawInfo, count, 0);

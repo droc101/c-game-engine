@@ -156,8 +156,8 @@ static VkSpecializationInfo depthOnlySpecializationInfo = {
 static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
 	{
 		.constantID = 0,
-		.offset = offsetof(LightingShaderSpecializationConstants, maxLightCount),
-		.size = SizeofMember(LightingShaderSpecializationConstants, maxLightCount),
+		.offset = offsetof(LightingShaderSpecializationConstants, lightCount),
+		.size = SizeofMember(LightingShaderSpecializationConstants, lightCount),
 	},
 	{
 		.constantID = 1,
@@ -1636,8 +1636,8 @@ static inline void CreatePopulateClustersPipeline()
 {
 	const VkSpecializationMapEntry specializationMapEntry = {
 		.constantID = 0,
-		.offset = offsetof(LightingShaderSpecializationConstants, maxLightCount),
-		.size = SizeofMember(LightingShaderSpecializationConstants, maxLightCount),
+		.offset = offsetof(LightingShaderSpecializationConstants, lightCount),
+		.size = SizeofMember(LightingShaderSpecializationConstants, lightCount),
 	};
 	const VkSpecializationInfo specializationInfo = {
 		.mapEntryCount = 1,
@@ -1652,9 +1652,13 @@ static inline void CreatePopulateClustersPipeline()
 		.module = shaderModule,
 		.specializationInfo = &specializationInfo,
 	};
+	const LunaDescriptorSetLayout layouts[] = {
+		descriptorSets.common.layout,
+		descriptorSets.culling.layout,
+	};
 	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
-		.descriptorSetLayoutCount = 1,
-		.descriptorSetLayouts = &descriptorSets.common.layout,
+		.descriptorSetLayoutCount = 2,
+		.descriptorSetLayouts = layouts,
 	};
 	const LunaComputePipelineCreationInfo creationInfo = {
 		.shaderStageCreationInfo = shaderStageCreationInfo,

@@ -6,7 +6,7 @@ layout(constant_id = 0) const uint LIGHT_COUNT = 1;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
-layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
+layout(set = 0, binding = 5, scalar) restrict buffer LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
     Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
@@ -15,6 +15,10 @@ layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
 layout(set = 0, binding = 8, scalar) restrict buffer Clusters {
     Cluster clusters[512];
 } clusters;
+
+layout(set = 1, binding = 0, scalar) buffer CullingData {
+    FrustumCullingData frustums[];
+} cullingData;
 
 bool IsVisible(const uint lightIndex, const vec3 clusterPlanes[4], const float nearPlane, const float farPlane) {
     const vec3 center = (camera.viewMatrix * vec4(lightsData.lights[lightIndex].position, 1)).xyz;
@@ -37,10 +41,40 @@ void main() {
     const float nearPlane = gl_GlobalInvocationID.z * depthRange / 8.0 + camera.nearPlane;
     const float farPlane = (gl_GlobalInvocationID.z + 1) * depthRange / 8.0 + camera.nearPlane;
 
+    uint frustumIndex = 1;
     for (uint i = 0; i < LIGHT_COUNT; i++) {
         if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL || IsVisible(i, clusterPlanes, nearPlane, farPlane)) {
             clusters.clusters[clusterIndex].lightIndices[clusters.clusters[clusterIndex].lightCount] = i;
             clusters.clusters[clusterIndex].lightCount += 1;
+
+            switch (lightsData.lights[i].type) {
+                case LIGHT_TYPE_POINT:
+                    atomicAdd(cullingData.frustums[frustumIndex].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[frustumIndex + 1].frustum.clusterCount, 1);
+                    frustumIndex += 2;
+                case LIGHT_TYPE_DIRECTIONAL:
+                    atomicAdd(cullingData.frustums[frustumIndex].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[frustumIndex + 1].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[frustumIndex + 2].frustum.clusterCount, 1);
+                    frustumIndex += 3;
+                default:
+                case LIGHT_TYPE_SPOT:
+                    atomicAdd(cullingData.frustums[frustumIndex].frustum.clusterCount, 1);
+                    frustumIndex += 1;
+            }
+        } else {
+            switch (lightsData.lights[i].type) {
+                case LIGHT_TYPE_POINT:
+                    frustumIndex += 6;
+                    break;
+                default:
+                case LIGHT_TYPE_SPOT:
+                    frustumIndex += 1;
+                    break;
+                case LIGHT_TYPE_DIRECTIONAL:
+                    frustumIndex += 4;
+                    break;
+            }
         }
     }
 }

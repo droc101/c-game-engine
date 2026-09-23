@@ -31,7 +31,7 @@ layout(set = 0, binding = 4, scalar) readonly restrict uniform FogBuffer {
 	float start;
 	float end;
 } fog;
-layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
+layout(set = 0, binding = 5, scalar) readonly restrict buffer LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
     Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
@@ -173,7 +173,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     continue;
                 }
                 const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
-                const vec4 coord = worldPosition / worldPosition.w;
+                const vec4 coord = worldPosition / (worldPosition.w - 0.01);
                 if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
                     const float brightness = getLightBrightness(light, distance, theta);
                     if (brightness < MIN_BRIGHTNESS) {

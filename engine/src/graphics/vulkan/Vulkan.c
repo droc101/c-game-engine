@@ -896,7 +896,7 @@ static inline void LoadLights(const Map *map)
 		AvxAlignedFree(lights);
 		lights = NULL;
 		lightCount = 0;
-		lightingShaderSpecializationConstants.maxLightCount = 0;
+		lightingShaderSpecializationConstants.lightCount = 0;
 		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
 				   "Failed to resize lights buffer!");
 
@@ -923,7 +923,7 @@ static inline void LoadLights(const Map *map)
 		DynamicLight *light = ListGetPointer(dynamicLights, i);
 		LoadLight(&light->light, lightCount, &frustumIndex, &shadowMapIndex, JPH_BodyId_InvalidBodyID);
 	}
-	lightingShaderSpecializationConstants.maxLightCount = lightCount;
+	lightingShaderSpecializationConstants.lightCount = lightCount;
 
 	frustumCount = frustumIndex;
 	CreatePerFrustumBuffers();
@@ -1876,9 +1876,11 @@ void VK_RenderMap(Map *map, Camera *camera)
 	HandleMapChangeFlags(map);
 	UpdateCameraUniform(camera);
 	UpdateDynamicLights();
+	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map);
+	ClearCullingData();
+	PopulateClusters();
 	UpdateActors();
 	CullModels();
-	PopulateClusters();
 	UpdateShadowMaps(map);
 	UpdateViewModelMatrix(&map->viewmodel);
 
@@ -1942,19 +1944,6 @@ void VK_RenderMap(Map *map, Camera *camera)
 		DrawSky(&pipelineBindInfo);
 	}
 
-	const LunaBufferMemoryBarrier clustersMemoryBarrier = {
-		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-		.sourceAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
-		.destinationStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
-		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-		.buffer = buffers.uniforms.clusters,
-	};
-	const LunaDependencyInfo clustersDependencyInfo = {
-		.bufferMemoryBarrierCount = 1,
-		.bufferMemoryBarriers = &clustersMemoryBarrier,
-	};
-	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &clustersDependencyInfo),
-			   "Failed to insert pipeline barrier for clusters!");
 	DrawMap(0, &pipelineBindInfo, false, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
 	DrawActors(0, &pipelineBindInfo, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
 	DrawDebugRenderer(&pipelineBindInfo);

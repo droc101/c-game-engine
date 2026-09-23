@@ -481,7 +481,7 @@ typedef struct ModelActorCullingInfo
 
 typedef struct LightingShaderSpecializationConstants
 {
-	uint32_t maxLightCount;
+	uint32_t lightCount;
 	uint32_t sampleCount;
 	float sampleRadius;
 	VkBool32 bakedLighting;
@@ -596,6 +596,8 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 void UpdateDirectionalLightCascades(const Camera *camera, const Map *map);
 
 void WriteFrustumsBuffer();
+
+void ClearCullingData();
 
 void CullModels();
 
