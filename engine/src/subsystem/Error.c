@@ -21,6 +21,8 @@
 #include <string.h>
 #include <unistd.h>
 
+static bool signalHandlerInvoked = false;
+
 _Noreturn inline void _GameAllocFailure()
 {
 	LogError("Memory Allocation Failed: %s\n", strerror(errno));
@@ -152,6 +154,11 @@ _Noreturn void RenderInitError()
 
 static void SignalHandler(const int sig)
 {
+	if (signalHandlerInvoked)
+	{
+		return;
+	}
+	signalHandlerInvoked = true;
 	switch (sig)
 	{
 		case SIGSEGV:
