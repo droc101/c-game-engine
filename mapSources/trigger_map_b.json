@@ -457,13 +457,13 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
-                    "type": "float",
-                    "value": 0.009999999776482582
-                },
                 "far_z": {
                     "type": "float",
                     "value": 4096.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -485,6 +485,10 @@
                     "type": "float",
                     "value": 32.0
                 },
+                "entrance_name": {
+                    "type": "string",
+                    "value": "entrance_a"
+                },
                 "height": {
                     "type": "float",
                     "value": 16.0
@@ -493,6 +497,10 @@
                     "type": "string",
                     "value": "trigger_map_a"
                 },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
                 "start_enabled": {
                     "type": "bool",
                     "value": true
@@ -500,14 +508,6 @@
                 "width": {
                     "type": "float",
                     "value": 16.0
-                },
-                "entrance_name": {
-                    "type": "string",
-                    "value": "entrance_a"
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
                 }
             }
         },

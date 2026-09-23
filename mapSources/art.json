@@ -2454,13 +2454,13 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
-                    "type": "float",
-                    "value": 0.009999999776482582
-                },
                 "far_z": {
                     "type": "float",
                     "value": 16384.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -2478,6 +2478,15 @@
             },
             "connections": [],
             "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
                 "name": {
                     "type": "string",
                     "value": ""
@@ -2489,16 +2498,7 @@
                         "y": 640.0
                     }
                 },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 1.0,
-                        "g": 1.0,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
-                },
-                "unshaded": {
+                "solid": {
                     "type": "bool",
                     "value": false
                 },
@@ -2506,14 +2506,7 @@
                     "type": "string",
                     "value": "texture/actor/BLOB2.gtex"
                 },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.02500000037252903,
-                        "y": 0.02500000037252903
-                    }
-                },
-                "solid": {
+                "unshaded": {
                     "type": "bool",
                     "value": false
                 },
@@ -2522,6 +2515,13 @@
                     "value": {
                         "x": 0.0,
                         "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.02500000037252903,
+                        "y": 0.02500000037252903
                     }
                 }
             }

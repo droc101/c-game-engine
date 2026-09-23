@@ -1100,44 +1100,6 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1147,11 +1109,49 @@
                         "a": 1.0
                     }
                 },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
                 "size": {
                     "type": "vec2",
                     "value": {
                         "x": 16.0,
                         "y": 16.0
+                    }
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
                     }
                 }
             }
@@ -1170,44 +1170,6 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "stay_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": false
-                },
-                "prevent_player_open": {
-                    "type": "bool",
-                    "value": true
-                },
-                "delay_until_close": {
-                    "type": "float",
-                    "value": 1.0
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/actor/door.gtex"
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1217,11 +1179,49 @@
                         "a": 1.0
                     }
                 },
+                "delay_until_close": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "prevent_player_open": {
+                    "type": "bool",
+                    "value": true
+                },
                 "size": {
                     "type": "vec2",
                     "value": {
                         "x": 16.0,
                         "y": 16.0
+                    }
+                },
+                "stay_open": {
+                    "type": "bool",
+                    "value": true
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/door.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
                     }
                 }
             }
@@ -1240,25 +1240,25 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "camera"
-                },
-                "show_player_model": {
-                    "type": "bool",
-                    "value": true
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
                 },
                 "fov": {
                     "type": "int",
                     "value": 90
                 },
-                "far_z": {
-                    "type": "float",
-                    "value": 4096.0
+                "name": {
+                    "type": "string",
+                    "value": "camera"
                 },
                 "near_z": {
                     "type": "float",
                     "value": 0.009999999776482582
+                },
+                "show_player_model": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -1343,21 +1343,9 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
-                "model": {
-                    "type": "string",
-                    "value": "model/orb.gmdl"
-                },
-                "mass_override": {
-                    "type": "float",
-                    "value": 0.0
+                "allow_pickup": {
+                    "type": "bool",
+                    "value": true
                 },
                 "color": {
                     "type": "color",
@@ -1368,9 +1356,21 @@
                         "a": 1.0
                     }
                 },
-                "allow_pickup": {
-                    "type": "bool",
-                    "value": true
+                "mass_override": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
                 }
             }
         },
@@ -1388,6 +1388,10 @@
             },
             "connections": [],
             "params": {
+                "height": {
+                    "type": "byte",
+                    "value": 1
+                },
                 "name": {
                     "type": "string",
                     "value": ""
@@ -1395,10 +1399,6 @@
                 "start_on": {
                     "type": "bool",
                     "value": true
-                },
-                "height": {
-                    "type": "byte",
-                    "value": 1
                 }
             }
         },
@@ -1416,6 +1416,10 @@
             },
             "connections": [],
             "params": {
+                "height": {
+                    "type": "byte",
+                    "value": 1
+                },
                 "name": {
                     "type": "string",
                     "value": ""
@@ -1423,10 +1427,6 @@
                 "start_on": {
                     "type": "bool",
                     "value": true
-                },
-                "height": {
-                    "type": "byte",
-                    "value": 1
                 }
             }
         },
@@ -1444,6 +1444,14 @@
             },
             "connections": [],
             "params": {
+                "exposure": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
+                },
                 "name": {
                     "type": "string",
                     "value": ""
@@ -1451,14 +1459,6 @@
                 "start_on": {
                     "type": "bool",
                     "value": true
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
-                "exposure": {
-                    "type": "float",
-                    "value": 1.0
                 }
             }
         },
@@ -1476,9 +1476,9 @@
             },
             "connections": [],
             "params": {
-                "constant_attenuation": {
+                "attenuation_multiplier": {
                     "type": "float",
-                    "value": 1.9500000476837158
+                    "value": 160.0
                 },
                 "brightness": {
                     "type": "float",
@@ -1493,9 +1493,9 @@
                         "a": 1.0
                     }
                 },
-                "attenuation_multiplier": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 160.0
+                    "value": 1.9500000476837158
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1521,9 +1521,9 @@
             },
             "connections": [],
             "params": {
-                "constant_attenuation": {
+                "attenuation_multiplier": {
                     "type": "float",
-                    "value": 0.0
+                    "value": 16.0
                 },
                 "brightness": {
                     "type": "float",
@@ -1538,9 +1538,9 @@
                         "a": 1.0
                     }
                 },
-                "attenuation_multiplier": {
+                "constant_attenuation": {
                     "type": "float",
-                    "value": 16.0
+                    "value": 0.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1607,6 +1607,18 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 20.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 4.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1616,33 +1628,21 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 4.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
                 },
                 "fading_angle": {
                     "type": "float",
                     "value": 30.0
                 },
-                "bright_angle": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 20.0
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
                 }
             }
         }
