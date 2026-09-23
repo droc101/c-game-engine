@@ -3290,14 +3290,6 @@
                 "name": {
                     "type": "string",
                     "value": "hide_player_camera"
-                },
-                "far_z": {
-                    "type": "float",
-                    "value": 4096.0
-                },
-                "near_z": {
-                    "type": "float",
-                    "value": 0.009999999776482582
                 }
             }
         },
@@ -3366,7 +3358,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 },
                 {
                     "targetName": "fov_camera",
@@ -3376,7 +3369,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -3431,7 +3425,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 },
                 {
                     "targetName": "hide_player_camera",
@@ -3441,7 +3436,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -3604,7 +3600,7 @@
                 },
                 "text": {
                     "type": "string",
-                    "value": "I/O # refires"
+                    "value": "I/O system"
                 },
                 "font_size": {
                     "type": "int",
@@ -3628,7 +3624,7 @@
         {
             "class": "prop_button",
             "position": {
-                "x": 16.0,
+                "x": 0.0,
                 "y": 0.0,
                 "z": -64.0
             },
@@ -3646,7 +3642,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -3727,7 +3724,7 @@
         {
             "class": "prop_button",
             "position": {
-                "x": 48.0,
+                "x": 64.0,
                 "y": 0.0,
                 "z": -64.0
             },
@@ -3745,7 +3742,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -3782,7 +3780,7 @@
         {
             "class": "prop_world_text",
             "position": {
-                "x": 16.0,
+                "x": -0.0,
                 "y": 0.0,
                 "z": -60.0
             },
@@ -3832,7 +3830,7 @@
         {
             "class": "prop_world_text",
             "position": {
-                "x": 48.0,
+                "x": 64.0,
                 "y": 0.0,
                 "z": -60.0
             },
@@ -5172,6 +5170,56 @@
             },
             "connections": [],
             "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "text": {
+                    "type": "string",
+                    "value": "invisible but solid"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 256.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
                 "name": {
                     "type": "string",
                     "value": ""
@@ -5417,7 +5465,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -5472,7 +5521,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 },
                 {
                     "targetName": "positional_music",
@@ -5482,7 +5532,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -5537,7 +5588,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -5588,7 +5640,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 },
                 {
                     "targetName": "coin_cling",
@@ -5598,7 +5651,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -7230,9 +7284,9 @@
         {
             "class": "item_axis_helper",
             "position": {
-                "x": -152.0,
+                "x": -160.0,
                 "y": 0.0,
-                "z": -0.0
+                "z": -16.0
             },
             "rotation": {
                 "x": 0.0,
@@ -7248,6 +7302,441 @@
                 "always_give": {
                     "type": "bool",
                     "value": true
+                }
+            }
+        },
+        {
+            "class": "item_eraser",
+            "position": {
+                "x": -160.0,
+                "y": 0.0,
+                "z": 16.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "always_give": {
+                    "type": "bool",
+                    "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 40.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 1000
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "button_with_delayed_sound"
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 48.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "button_with_delayed_sound",
+                    "targetInput": "cancel_queued_io",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 40.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "plays sound after ~1000ms"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 48.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "cancels queued i/o from button to the left"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "test_actor",
+            "position": {
+                "x": 32.0,
+                "y": 4.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "killed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 1000
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 32.0,
+                "y": 0.0,
+                "z": -84.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "plays sound ~1000ms after killed"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 20.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                },
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "stop",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 1
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 20.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "value": "play sound, cancel ~1ms later"
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
                 }
             }
         }

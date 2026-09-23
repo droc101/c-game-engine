@@ -24,6 +24,7 @@ typedef struct Actor Actor;
 typedef struct ActorConnection ActorConnection;
 
 #define ACTOR_INPUT_KILL "kill"
+#define ACTOR_INPUT_CANCEL_QUEUED_IO "cancel_queued_io"
 
 #define ACTOR_OUTPUT_SPAWNED "spawned"
 #define ACTOR_OUTPUT_KILLED "killed"
@@ -49,6 +50,7 @@ struct ActorConnection
 	Param outParamOverride;
 	/// The number of times this output will fire before it is removed. 0 means unlimited.
 	size_t numRefires;
+	uint16_t delayMs;
 };
 
 struct Actor
@@ -161,5 +163,7 @@ void ActorCreateEmptyBody(Actor *this, const Transform *transform);
  * @param this The actor this signal was sent to
  */
 void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/);
+
+void ActorSignalCancelQueuedIo(Actor *this, const Actor */*sender*/, const Param */*param*/);
 
 #endif //GAME_ACTOR_H

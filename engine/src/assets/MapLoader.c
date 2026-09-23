@@ -120,6 +120,8 @@ bool LoadMap(Map *map, Asset *mapData)
 			}
 			EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 			connection->numRefires = ReadSizeT(reader);
+			EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
+			connection->delayMs = ReadUint16(reader);
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;

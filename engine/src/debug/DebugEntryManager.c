@@ -189,6 +189,14 @@ static void DebugEntryAssetLoaders()
 	DPrintFontLoader();
 }
 
+static void DebugEntryIoQueue()
+{
+	if (GetState()->map)
+	{
+		DPrintF("IO Queue Size: %zu", COLOR_WHITE, GetState()->map->ioQueue.length);
+	}
+}
+
 #pragma endregion
 
 bool IsDebugEntryVisible(const char *key)
@@ -226,6 +234,7 @@ void InitDebugEntryManager()
 	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
 	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("io_queue", DebugEntryIoQueue, DEBUG_ENTRY_DISABLED, 5);
 
 	// Console
 	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);

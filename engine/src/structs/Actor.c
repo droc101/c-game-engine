@@ -87,7 +87,13 @@ void TeleportActor(Actor *actor, const Vector3 *position, const JPH_Activation a
 
 void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, const Param *param)
 {
-	LogDebug("Triggering input \"%s\" on actor %p from actor %p\n", input, receiver, sender);
+	if (sender)
+	{
+		LogDebug("Triggering input \"%s\" on actor %p (%s) from actor %p (%s)\n", input, receiver, receiver->definition->className, sender, sender->definition->className);
+	} else
+	{
+		LogDebug("Triggering input \"%s\" on actor %p (%s)\n", input, receiver, receiver->definition->className);
+	}
 	const ActorInputHandlerFunction handler = GetActorInputHandler(receiver->definition, input);
 	if (handler)
 	{
@@ -106,25 +112,12 @@ void ActorFireOutput(Actor *sender, const char *output, const Param defaultParam
 		ActorConnection *connection = ListGetPointer(sender->ioConnections, i);
 		if (strcmp(connection->sourceActorOutput, output) == 0)
 		{
-			List actors;
-			GetActorsByName(connection->targetActorName, GetState()->map, &actors);
-			if (actors.length == 0)
+			const Param *param = &defaultParam;
+			if (connection->outParamOverride.type != PARAM_TYPE_NONE)
 			{
-				LogWarning("Tried to fire signal to actor %s, but it was not found!\n", connection->targetActorName);
-			} else
-			{
-				for (size_t j = 0; j < actors.length; j++)
-				{
-					Actor *actor = ListGetPointer(actors, j);
-					const Param *param = &defaultParam;
-					if (connection->outParamOverride.type != PARAM_TYPE_NONE)
-					{
-						param = &connection->outParamOverride;
-					}
-					ActorTriggerInput(sender, actor, connection->targetActorInput, param);
-				}
+				param = &connection->outParamOverride;
 			}
-			ListFree(actors);
+			QueueIOConnection(GetState()->map, sender, connection, param);
 
 			// connections that have 0 refires at this point have infinite refires
 			if (connection->numRefires > 0)
@@ -154,6 +147,21 @@ void DestroyActorConnection(ActorConnection *connection)
 void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	RemoveActor(this);
+}
+
+void ActorSignalCancelQueuedIo(Actor *this, const Actor */*sender*/, const Param */*param*/)
+{
+	Map *map = GetState()->map;
+	ListLock(map->ioQueue);
+	for (int i = (int)map->ioQueue.length - 1; i >= 0; i--)
+	{
+		QueuedIoConnection *connection = ListGetPointer(map->ioQueue, i);
+		if (connection->source == this)
+		{
+			connection->processed = true; // this causes it to be skipped and freed
+		}
+	}
+	ListUnlock(map->ioQueue);
 }
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)

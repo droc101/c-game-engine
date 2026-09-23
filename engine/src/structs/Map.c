@@ -19,6 +19,7 @@
 #include <engine/structs/Player.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/subsystem/Timing.h>
 #include <joltc/joltc.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <limits.h>
@@ -53,6 +54,7 @@ Map *CreateMap(void)
 	map->lights = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
+	ListInit(map->ioQueue, LIST_POINTER);
 	ListInit(map->joltBodies, LIST_UINT32);
 
 	Item *item = GetItem();
@@ -135,6 +137,14 @@ void DestroyMap(Map *map)
 
 	PhysicsDestroyMap(map);
 
+	ListLock(map->ioQueue);
+	for (size_t i = 0; i < map->ioQueue.length; i++)
+	{
+		FreeQueuedIOConnection(ListGetPointer(map->ioQueue, i));
+	}
+	ListUnlock(map->ioQueue);
+	ListAndContentsFree(map->ioQueue);
+
 	ListAndContentsFree(map->namedActorNames);
 	ListFree(map->namedActorPointers);
 	ListFree(map->actors);
@@ -157,6 +167,17 @@ void RemoveActor(Actor *actor)
 {
 	Map *map = GetState()->map;
 	ActorFireOutput(actor, ACTOR_OUTPUT_KILLED, PARAM_NONE);
+
+	ListLock(map->ioQueue);
+	for (int i = (int)map->ioQueue.length - 1; i >= 0; i--)
+	{
+		QueuedIoConnection *connection = ListGetPointer(map->ioQueue, i);
+		if (connection->source == actor)
+		{
+			connection->source = NULL;
+		}
+	}
+	ListUnlock(map->ioQueue);
 
 	// Remove the actor from the named actor lists if it's there
 	const size_t nameIdx = ListFind(map->namedActorPointers, actor);
@@ -235,4 +256,85 @@ void RenderMap(Map *map, Camera *camera)
 		}
 	}
 	ListUnlock(map->actors);
+}
+
+void ProcessQueuedIOConnection(QueuedIoConnection *connection)
+{
+	connection->processed = true;
+	List actors;
+	GetActorsByName(connection->targetActorName, GetState()->map, &actors);
+	if (actors.length == 0)
+	{
+		LogWarning("Tried to fire signal to actor %s, but it was not found!\n", connection->targetActorName);
+	} else
+	{
+		for (size_t j = 0; j < actors.length; j++)
+		{
+			Actor *actor = ListGetPointer(actors, j);
+			ActorTriggerInput(connection->source, actor, connection->targetActorInput, &connection->param);
+		}
+		ListFree(actors);
+	}
+}
+
+void FreeQueuedIOConnection(QueuedIoConnection *connection)
+{
+	free(connection->targetActorName);
+	free(connection->targetActorInput);
+	FreeParam(&connection->param);
+}
+
+static int QueuedIOConnectionDelayComparison(const void *pc1, const void *pc2)
+{
+	const QueuedIoConnection *c1 = pc1;
+	const QueuedIoConnection *c2 = pc2;
+	return (int64_t)c1->scheduledTime - (int64_t)c2->scheduledTime;
+}
+
+void ProcessIOQueue(Map *map)
+{
+	ListLock(map->ioQueue);
+
+	qsort(map->ioQueue.data->pointerData,
+		  map->ioQueue.length,
+		  sizeof(QueuedIoConnection *),
+		  QueuedIOConnectionDelayComparison);
+
+	const size_t time = GetTimeMs();
+	for (size_t i = 0; i < map->ioQueue.length; i++)
+	{
+		QueuedIoConnection *connection = ListGetPointer(map->ioQueue, i);
+		if (!connection->processed && connection->scheduledTime <= time)
+		{
+			ProcessQueuedIOConnection(connection);
+		}
+	}
+
+	for (int i = (int)map->ioQueue.length - 1; i >= 0; i--)
+	{
+		QueuedIoConnection *connection = ListGetPointer(map->ioQueue, i);
+		if (connection->processed)
+		{
+			FreeQueuedIOConnection(connection);
+			free(connection);
+			ListRemoveAt(map->ioQueue, i);
+		}
+	}
+
+	ListUnlock(map->ioQueue);
+}
+
+void QueueIOConnection(Map *map, Actor *sender, ActorConnection *connection, const Param *param)
+{
+	QueuedIoConnection *qc = malloc(sizeof(QueuedIoConnection));
+	CheckAlloc(qc);
+	qc->source = sender;
+	qc->targetActorName = strdup(connection->targetActorName);
+	qc->targetActorInput = strdup(connection->targetActorInput);
+	qc->scheduledTime = GetTimeMs() + connection->delayMs;
+	CopyParam(param, &qc->param);
+	qc->processed = false;
+	ListLock(map->ioQueue);
+	ListAdd(map->ioQueue, qc);
+	ListUnlock(map->ioQueue);
 }

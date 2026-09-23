@@ -70,6 +70,7 @@ void RegisterDefaultActorInputs(ActorDefinition *definition)
 {
 	ActorInputHandlerFunctionDict_init(definition->inputHandlers);
 	RegisterActorInput(definition, ACTOR_INPUT_KILL, ActorSignalKill);
+	RegisterActorInput(definition, ACTOR_INPUT_CANCEL_QUEUED_IO, ActorSignalCancelQueuedIo);
 }
 
 void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
