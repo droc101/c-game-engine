@@ -273,8 +273,8 @@ void ProcessQueuedIOConnection(QueuedIoConnection *connection)
 			Actor *actor = ListGetPointer(actors, j);
 			ActorTriggerInput(connection->source, actor, connection->targetActorInput, &connection->param);
 		}
-		ListFree(actors);
 	}
+	ListFree(actors);
 }
 
 void FreeQueuedIOConnection(QueuedIoConnection *connection)
@@ -286,8 +286,8 @@ void FreeQueuedIOConnection(QueuedIoConnection *connection)
 
 static int QueuedIOConnectionDelayComparison(const void *pc1, const void *pc2)
 {
-	const QueuedIoConnection *c1 = pc1;
-	const QueuedIoConnection *c2 = pc2;
+	const QueuedIoConnection *c1 = *(QueuedIoConnection**)pc1;
+	const QueuedIoConnection *c2 = *(QueuedIoConnection**)pc2;
 	return (int64_t)c1->scheduledTime - (int64_t)c2->scheduledTime;
 }
 
