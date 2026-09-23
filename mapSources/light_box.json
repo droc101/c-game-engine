@@ -1158,6 +1158,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 40.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 5.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1167,17 +1175,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 5.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 40.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1203,6 +1203,14 @@
             },
             "connections": [],
             "params": {
+                "exposure": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
+                },
                 "name": {
                     "type": "string",
                     "value": "light_tonemap"
@@ -1210,14 +1218,6 @@
                 "start_on": {
                     "type": "bool",
                     "value": true
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
-                "exposure": {
-                    "type": "float",
-                    "value": 1.0
                 }
             }
         },
@@ -1235,6 +1235,14 @@
             },
             "connections": [],
             "params": {
+                "exposure": {
+                    "type": "float",
+                    "value": 0.25
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
+                },
                 "name": {
                     "type": "string",
                     "value": "dark_tonemap"
@@ -1242,14 +1250,6 @@
                 "start_on": {
                     "type": "bool",
                     "value": false
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
-                "exposure": {
-                    "type": "float",
-                    "value": 0.25
                 }
             }
         },
@@ -1274,21 +1274,22 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
                 "name": {
                     "type": "string",
                     "value": ""
                 },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
                 },
                 "on_skin": {
                     "type": "int",
@@ -1298,13 +1299,13 @@
                     "type": "int",
                     "value": 100
                 },
-                "off_skin": {
-                    "type": "int",
-                    "value": 0
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
                 },
-                "model": {
-                    "type": "string",
-                    "value": "model/wall_button.gmdl"
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -1329,21 +1330,22 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
                 "name": {
                     "type": "string",
                     "value": ""
                 },
-                "start_pressed": {
-                    "type": "bool",
-                    "value": false
-                },
-                "toggle_mode": {
-                    "type": "bool",
-                    "value": false
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
                 },
                 "on_skin": {
                     "type": "int",
@@ -1353,13 +1355,13 @@
                     "type": "int",
                     "value": 100
                 },
-                "off_skin": {
-                    "type": "int",
-                    "value": 0
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
                 },
-                "model": {
-                    "type": "string",
-                    "value": "model/wall_button.gmdl"
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -1386,6 +1388,10 @@
                         "a": 1.0
                     }
                 },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
                 "size": {
                     "type": "vec2",
                     "value": {
@@ -1401,13 +1407,6 @@
                     "type": "string",
                     "value": "texture/flashbang.gtex"
                 },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
                 "unshaded": {
                     "type": "bool",
                     "value": false
@@ -1419,9 +1418,12 @@
                         "y": 0.0
                     }
                 },
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
                 }
             }
         },
@@ -1439,6 +1441,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 48.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1448,17 +1458,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 48.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1484,6 +1486,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 48.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1493,17 +1503,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 48.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1529,6 +1531,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1538,17 +1548,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 32.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1574,6 +1576,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 12.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1583,17 +1593,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 12.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1619,6 +1621,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 12.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1628,17 +1638,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 12.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1664,6 +1666,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 12.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1673,17 +1683,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 12.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1709,6 +1711,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 12.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1718,17 +1728,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 12.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1754,6 +1756,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 12.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1763,17 +1773,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 12.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1799,6 +1801,14 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 12.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1808,17 +1818,9 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 12.0
                 },
                 "linear_attenuation": {
                     "type": "float",
@@ -1844,6 +1846,10 @@
             },
             "connections": [],
             "params": {
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1852,10 +1858,6 @@
                         "b": 1.0,
                         "a": 1.0
                     }
-                },
-                "brightness": {
-                    "type": "float",
-                    "value": 1.0
                 }
             }
         },
@@ -1873,13 +1875,13 @@
             },
             "connections": [],
             "params": {
-                "near_plane": {
-                    "type": "float",
-                    "value": 0.009999999776482582
-                },
                 "far_plane": {
                     "type": "float",
                     "value": 4096.0
+                },
+                "near_plane": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -1897,13 +1899,13 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
                 "always_give": {
                     "type": "bool",
                     "value": true
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -1921,6 +1923,18 @@
             },
             "connections": [],
             "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 30.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 100.0
+                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -1930,14 +1944,6 @@
                         "a": 1.0
                     }
                 },
-                "brightness": {
-                    "type": "float",
-                    "value": 100.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
-                },
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
@@ -1946,21 +1952,17 @@
                     "type": "string",
                     "value": ""
                 },
-                "linear_attenuation": {
-                    "type": "float",
-                    "value": 0.0
-                },
-                "attenuation_multiplier": {
-                    "type": "float",
-                    "value": 2.0
-                },
                 "fading_angle": {
                     "type": "float",
                     "value": 20.0
                 },
-                "bright_angle": {
+                "linear_attenuation": {
                     "type": "float",
-                    "value": 30.0
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
                 }
             }
         }

@@ -3237,14 +3237,6 @@
                     "type": "bool",
                     "value": true
                 },
-                "model": {
-                    "type": "string",
-                    "value": "model/leafy.gmdl"
-                },
-                "skin": {
-                    "type": "int",
-                    "value": 0
-                },
                 "collision": {
                     "type": "byte",
                     "value": 2
@@ -3257,6 +3249,14 @@
                         "b": 0.0,
                         "a": 1.0
                     }
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/leafy.gmdl"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
                 }
             }
         },
@@ -3278,13 +3278,13 @@
                     "type": "byte",
                     "value": 1
                 },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3306,13 +3306,13 @@
                     "type": "byte",
                     "value": 0
                 },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3334,13 +3334,13 @@
                     "type": "byte",
                     "value": 2
                 },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
                 "name": {
                     "type": "string",
                     "value": ""
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3362,13 +3362,13 @@
                     "type": "byte",
                     "value": 3
                 },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
                 "name": {
                     "type": "string",
                     "value": "triple_laser_emitter"
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         },
@@ -3393,7 +3393,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 },
                 {
                     "targetName": "goal_fog",
@@ -3403,7 +3404,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
@@ -3431,9 +3433,9 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
                 },
                 "light_color": {
                     "type": "color",
@@ -3444,13 +3446,13 @@
                         "a": 1.0
                     }
                 },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
                 "start_on": {
                     "type": "bool",
                     "value": true
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
                 }
             }
         },
@@ -3468,6 +3470,10 @@
             },
             "connections": [],
             "params": {
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 600
+                },
                 "light_color": {
                     "type": "color",
                     "value": {
@@ -3477,17 +3483,13 @@
                         "a": 1.0
                     }
                 },
-                "start_on": {
-                    "type": "bool",
-                    "value": false
-                },
                 "name": {
                     "type": "string",
                     "value": "goal_light"
                 },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 600
+                "start_on": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3552,7 +3554,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 },
                 {
                     "targetName": "triple_laser_emitter",
@@ -3562,31 +3565,32 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "width": {
+                "depth": {
                     "type": "float",
                     "value": 64.0
-                },
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
-                },
-                "one_shot": {
-                    "type": "bool",
-                    "value": false
                 },
                 "height": {
                     "type": "float",
                     "value": 32.0
                 },
-                "depth": {
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "one_shot": {
+                    "type": "bool",
+                    "value": false
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "width": {
                     "type": "float",
                     "value": 64.0
                 }
@@ -3606,16 +3610,14 @@
             },
             "connections": [],
             "params": {
-                "uv_offset": {
-                    "type": "vec2",
+                "color": {
+                    "type": "color",
                     "value": {
-                        "x": 0.25,
-                        "y": 0.25
+                        "r": 0.7843137383460999,
+                        "g": 0.3019607961177826,
+                        "b": 1.0,
+                        "a": 1.0
                     }
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": false
                 },
                 "name": {
                     "type": "string",
@@ -3628,18 +3630,24 @@
                         "y": 16.0
                     }
                 },
-                "color": {
-                    "type": "color",
-                    "value": {
-                        "r": 0.7843137383460999,
-                        "g": 0.3019607961177826,
-                        "b": 1.0,
-                        "a": 1.0
-                    }
+                "solid": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/uvtest.gtex"
                 },
                 "unshaded": {
                     "type": "bool",
                     "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.25,
+                        "y": 0.25
+                    }
                 },
                 "uv_scale": {
                     "type": "vec2",
@@ -3647,10 +3655,6 @@
                         "x": 8.0,
                         "y": 8.0
                     }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/level/uvtest.gtex"
                 }
             }
         },
@@ -3692,26 +3696,6 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": "goal_fog"
-                },
-                "fog_start": {
-                    "type": "float",
-                    "value": 160.0
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": false
-                },
-                "fog_end": {
-                    "type": "float",
-                    "value": 320.0
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 600
-                },
                 "fog_color": {
                     "type": "color",
                     "value": {
@@ -3720,6 +3704,26 @@
                         "b": 0.6127451062202454,
                         "a": 1.0
                     }
+                },
+                "fog_end": {
+                    "type": "float",
+                    "value": 320.0
+                },
+                "fog_start": {
+                    "type": "float",
+                    "value": 160.0
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 600
+                },
+                "name": {
+                    "type": "string",
+                    "value": "goal_fog"
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": false
                 }
             }
         },
@@ -3737,26 +3741,6 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "fog_start": {
-                    "type": "float",
-                    "value": 800.0
-                },
-                "start_on": {
-                    "type": "bool",
-                    "value": true
-                },
-                "fog_end": {
-                    "type": "float",
-                    "value": 1600.0
-                },
-                "interpolation_ticks": {
-                    "type": "int",
-                    "value": 60
-                },
                 "fog_color": {
                     "type": "color",
                     "value": {
@@ -3765,6 +3749,26 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "fog_end": {
+                    "type": "float",
+                    "value": 1600.0
+                },
+                "fog_start": {
+                    "type": "float",
+                    "value": 800.0
+                },
+                "interpolation_ticks": {
+                    "type": "int",
+                    "value": 60
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
                 }
             }
         }
