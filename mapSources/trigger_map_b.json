@@ -456,7 +456,16 @@
                 "z": 0.0
             },
             "connections": [],
-            "params": {}
+            "params": {
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                }
+            }
         },
         {
             "class": "trigger_map",
@@ -472,33 +481,33 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "entrance_name": {
-                    "type": "string",
-                    "value": "entrance_a"
-                },
-                "width": {
+                "depth": {
                     "type": "float",
-                    "value": 16.0
-                },
-                "start_enabled": {
-                    "type": "bool",
-                    "value": true
-                },
-                "map_name": {
-                    "type": "string",
-                    "value": "trigger_map_a"
+                    "value": 32.0
                 },
                 "height": {
                     "type": "float",
                     "value": 16.0
                 },
-                "depth": {
+                "map_name": {
+                    "type": "string",
+                    "value": "trigger_map_a"
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "width": {
                     "type": "float",
-                    "value": 32.0
+                    "value": 16.0
+                },
+                "entrance_name": {
+                    "type": "string",
+                    "value": "entrance_a"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },

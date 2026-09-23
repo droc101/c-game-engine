@@ -4,7 +4,8 @@
   "inputs": {
     "kill": {
       "description": "Remove this actor"
-    }
+    },
+    "cancel_queued_io": {}
   },
   "outputs": {
     "spawned": {

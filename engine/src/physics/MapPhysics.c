@@ -94,6 +94,8 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 		a->definition->Update(a, delta);
 	}
 
+	ProcessIOQueue(state->map);
+
 	// TODO proper UI for switching items
 	if (allowMovement)
 	{

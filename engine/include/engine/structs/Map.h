@@ -26,6 +26,7 @@ typedef struct Map Map;
 typedef struct MapVertex MapVertex;
 typedef struct MapModel MapModel;
 typedef struct MapTransition MapTransition;
+typedef struct QueuedIOConnection QueuedIoConnection;
 
 typedef enum MapChangeFlags MapChangeFlags;
 
@@ -66,6 +67,16 @@ struct MapTransition
 	char *entranceName;
 	Vector3 relativePosition;
 	Vector3 relativeAngles;
+};
+
+struct QueuedIOConnection
+{
+	Actor *source;
+	char *targetActorName;
+	char *targetActorInput;
+	size_t scheduledTime;
+	Param param;
+	bool processed;
 };
 
 struct Map
@@ -112,6 +123,8 @@ struct Map
 	LockingList namedActorNames;
 	/// The map of named actors in the map (value portion)
 	List namedActorPointers;
+
+	LockingList ioQueue;
 
 	/// A pointer to the I/O proxy actor, if it exists
 	Actor *ioProxy;
@@ -201,5 +214,13 @@ void GetActorsByName(const char *name, const Map *map, List *actors);
  * @param camera The camera to view from
  */
 void RenderMap(Map *map, const Camera *camera);
+
+void ProcessQueuedIOConnection(QueuedIoConnection *connection);
+
+void FreeQueuedIOConnection(QueuedIoConnection *connection);
+
+void ProcessIOQueue(Map *map);
+
+void QueueIOConnection(Map *map, Actor *sender, ActorConnection *connection, const Param *param);
 
 #endif //GAME_MAP_H

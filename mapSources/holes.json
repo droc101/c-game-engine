@@ -533404,13 +533404,17 @@
             },
             "connections": [],
             "params": {
-                "constant_attenuation": {
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "linear_attenuation": {
                     "type": "float",
                     "value": 0.0
                 },
-                "brightness": {
+                "attenuation_multiplier": {
                     "type": "float",
-                    "value": 40.0
+                    "value": 800.0
                 },
                 "color": {
                     "type": "color",
@@ -533421,17 +533425,13 @@
                         "a": 1.0
                     }
                 },
-                "attenuation_multiplier": {
+                "brightness": {
                     "type": "float",
-                    "value": 800.0
+                    "value": 40.0
                 },
-                "linear_attenuation": {
+                "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
-                },
-                "quadratic_attenuation": {
-                    "type": "float",
-                    "value": 1.0
                 }
             }
         },
@@ -533449,43 +533449,6 @@
             },
             "connections": [],
             "params": {
-                "name": {
-                    "type": "string",
-                    "value": ""
-                },
-                "uv_offset": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 0.0,
-                        "y": 0.0
-                    }
-                },
-                "unshaded": {
-                    "type": "bool",
-                    "value": true
-                },
-                "uv_scale": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                },
-                "texture": {
-                    "type": "string",
-                    "value": "texture/flashbang.gtex"
-                },
-                "solid": {
-                    "type": "bool",
-                    "value": false
-                },
-                "size": {
-                    "type": "vec2",
-                    "value": {
-                        "x": 64.0,
-                        "y": 64.0
-                    }
-                },
                 "color": {
                     "type": "color",
                     "value": {
@@ -533494,6 +533457,43 @@
                         "b": 1.0,
                         "a": 1.0
                     }
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 64.0,
+                        "y": 64.0
+                    }
+                },
+                "solid": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/flashbang.gtex"
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": true
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         },
@@ -533511,13 +533511,13 @@
             },
             "connections": [],
             "params": {
-                "near_z": {
-                    "type": "float",
-                    "value": 0.009999999776482582
-                },
                 "far_z": {
                     "type": "float",
                     "value": 16384.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         }

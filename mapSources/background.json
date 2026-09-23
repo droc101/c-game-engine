@@ -1055,7 +1055,16 @@
                 "z": 0.0
             },
             "connections": [],
-            "params": {}
+            "params": {
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
+                }
+            }
         },
         {
             "class": "test_actor",
@@ -1242,6 +1251,14 @@
                 "fov": {
                     "type": "int",
                     "value": 90
+                },
+                "far_z": {
+                    "type": "float",
+                    "value": 4096.0
+                },
+                "near_z": {
+                    "type": "float",
+                    "value": 0.009999999776482582
                 }
             }
         },
@@ -1266,7 +1283,8 @@
                     "overridesParam": false,
                     "param": {
                         "type": "none"
-                    }
+                    },
+                    "delay_msec": 0
                 }
             ],
             "params": {}
