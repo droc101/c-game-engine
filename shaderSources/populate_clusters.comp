@@ -41,26 +41,33 @@ void main() {
     const float nearPlane = gl_GlobalInvocationID.z * depthRange / 8.0 + camera.nearPlane;
     const float farPlane = (gl_GlobalInvocationID.z + 1) * depthRange / 8.0 + camera.nearPlane;
 
-    uint frustumIndex = 1;
+    uint frustumIndex = lightsData.cascadeMatrices[0][3][3] < 1e-6 ? 1 : 5;
     for (uint i = 0; i < LIGHT_COUNT; i++) {
         if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL || IsVisible(i, clusterPlanes, nearPlane, farPlane)) {
             clusters.clusters[clusterIndex].lightIndices[clusters.clusters[clusterIndex].lightCount] = i;
             clusters.clusters[clusterIndex].lightCount += 1;
 
             switch (lightsData.lights[i].type) {
+                case LIGHT_TYPE_DIRECTIONAL:
+                    atomicAdd(cullingData.frustums[1].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[2].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[3].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[4].frustum.clusterCount, 1);
+                    break;
                 case LIGHT_TYPE_POINT:
                     atomicAdd(cullingData.frustums[frustumIndex].frustum.clusterCount, 1);
                     atomicAdd(cullingData.frustums[frustumIndex + 1].frustum.clusterCount, 1);
-                    frustumIndex += 2;
-                case LIGHT_TYPE_DIRECTIONAL:
-                    atomicAdd(cullingData.frustums[frustumIndex].frustum.clusterCount, 1);
-                    atomicAdd(cullingData.frustums[frustumIndex + 1].frustum.clusterCount, 1);
                     atomicAdd(cullingData.frustums[frustumIndex + 2].frustum.clusterCount, 1);
-                    frustumIndex += 3;
+                    atomicAdd(cullingData.frustums[frustumIndex + 3].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[frustumIndex + 4].frustum.clusterCount, 1);
+                    atomicAdd(cullingData.frustums[frustumIndex + 5].frustum.clusterCount, 1);
+                    frustumIndex += 6;
+                    break;
                 default:
                 case LIGHT_TYPE_SPOT:
                     atomicAdd(cullingData.frustums[frustumIndex].frustum.clusterCount, 1);
                     frustumIndex += 1;
+                    break;
             }
         } else {
             switch (lightsData.lights[i].type) {
@@ -72,7 +79,6 @@ void main() {
                     frustumIndex += 1;
                     break;
                 case LIGHT_TYPE_DIRECTIONAL:
-                    frustumIndex += 4;
                     break;
             }
         }

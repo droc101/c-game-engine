@@ -946,6 +946,20 @@ static inline void LoadLights(const Map *map)
 	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, lightsBufferSize),
 			   "Failed to resize lights buffer!");
 
+	if (!directionalLight)
+	{
+		const size_t size = sizeof(float) * 4 + sizeof(mat4) * 4;
+		void *data = calloc(size, 1);
+		const LunaBufferWriteInfo bufferWriteInfo = {
+			.bytes = size,
+			.data = data,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		};
+		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
+				   "Failed to clear directional light cascades from lights buffer!");
+		free(data);
+	}
+
 	const LunaBufferWriteInfo bufferWriteInfo = {
 		.bytes = lightCount * sizeof(VulkanLight),
 		.data = lights,
