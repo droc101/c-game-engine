@@ -697,7 +697,7 @@ void CullModels()
 	};
 	const LunaBufferMemoryBarrier postDispatchMainBufferMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
-		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT |
 								VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT |
 								VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,

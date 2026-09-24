@@ -1891,9 +1891,9 @@ void VK_RenderMap(Map *map, Camera *camera)
 	UpdateCameraUniform(camera);
 	UpdateDynamicLights();
 	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map);
+	UpdateActors(); // TODO: Ideally this would be called after dispatching culling and cluster population
 	ClearCullingData();
 	PopulateClusters();
-	UpdateActors();
 	CullModels();
 	UpdateShadowMaps(map);
 	UpdateViewModelMatrix(&map->viewmodel);
