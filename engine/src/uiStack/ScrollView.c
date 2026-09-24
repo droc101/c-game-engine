@@ -93,7 +93,7 @@ void ProcessScrollView(ScrollView *view)
 	const Control imposter = {.position = view->position, .size = view->size, .anchor = view->anchor};
 	view->anchoredPosition = CalculateControlPosition(&imposter, NULL);
 
-	view->scrollBarData.scrollPos += (int)GetMouseWheelTicks(mainThreadInput).y * 20;
+	view->scrollBarData.scrollPos += ((int)GetMouseWheelTicks(mainThreadInput).y) * (20 * GetState()->options.scrollSpeed);
 
 	if (IsDebugEntryVisible("ui_stack_layout_bounds"))
 	{

@@ -487,29 +487,29 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 		{
 			cameraMotion.x -= InputActionGetAnalogValue(physicsThreadInput, &lookRight);
 		}
-		if (state->options.invertHorizontalCamera)
+		if (state->options.invertHorizontalController)
 		{
 			cameraMotion.x *= -1;
 		}
-		cameraMotion.x *= state->options.cameraSpeed / 6.0f;
+		cameraMotion.x *= state->options.controllerCameraSpeed / 6.0f;
 
-		if (state->options.invertVerticalCamera)
+		if (state->options.invertVerticalMouse)
 		{
 			cameraMotion.y *= -1;
 		}
-		cameraMotion.y *= state->options.cameraSpeed / 6.0f;
+		cameraMotion.y *= state->options.controllerCameraSpeed / 6.0f;
 
 		cameraMotion.x *= (float)delta;
 		cameraMotion.y *= (float)delta;
 	} else
 	{
-		cameraMotion.x *= -state->options.cameraSpeed / 120.0f;
-		cameraMotion.y *= -state->options.cameraSpeed / 120.0f;
-		if (state->options.invertHorizontalCamera)
+		cameraMotion.x *= -state->options.mouseCameraSpeed / 120.0f;
+		cameraMotion.y *= -state->options.mouseCameraSpeed / 120.0f;
+		if (state->options.invertHorizontalMouse)
 		{
 			cameraMotion.x *= -1;
 		}
-		if (state->options.invertVerticalCamera)
+		if (state->options.invertVerticalMouse)
 		{
 			cameraMotion.y *= -1;
 		}
