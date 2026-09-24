@@ -341,28 +341,16 @@ void EngineIteration()
 		SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
 	}
 
-	if (!FrameStart())
+	if (FrameStart())
 	{
-		if (state->gameState->UpdateGame)
+		if (state->gameState->RenderGame)
 		{
-			state->gameState->UpdateGame(state, delta);
+			state->gameState->RenderGame(state, delta);
 		}
-		UpdateSoundSystem();
-		if (state->requestExit)
-		{
-			shouldQuit = true;
-		}
-		if (IsLowFPSModeEnabled())
-		{
-			SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
-		}
-		return;
+		RenderDebugEntries();
+
+		FrameEnd();
 	}
-
-	state->gameState->RenderGame(state, delta);
-	RenderDebugEntries();
-
-	FrameEnd();
 
 	ProcessDPrintConsole();
 

@@ -355,6 +355,8 @@ void CreateDescriptorSetLayouts()
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
+			// TODO: Remove once LoadLights synchronizes against the previous frame's command buffer
+			.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
 		},
 		{
 			.bindingName = "Shadow Maps",

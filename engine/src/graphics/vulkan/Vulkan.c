@@ -978,6 +978,7 @@ static inline void LoadLights(const Map *map)
 		.descriptorCount = 1,
 		.bufferInfos = &lightsBufferInfo,
 	};
+	// TODO: This is a race condition against the previous frame since we haven't waited for that frame to finish yet
 	lunaWriteDescriptorSets(device, 2, (LunaWriteDescriptorSet[]){frustumsDescriptorWrite, lightsDescriptorWrite});
 
 	UpdateLightCount();
