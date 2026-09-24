@@ -13,7 +13,6 @@ typedef struct PointLightData
 {
 	DynamicLight dlight;
 	bool isLightOn;
-	bool wantLightOn;
 } PointLightData;
 
 static void PointLightInit(Actor *this, const KvList params, const Transform *transform)
@@ -25,7 +24,7 @@ static void PointLightInit(Actor *this, const KvList params, const Transform *tr
 	PointLightData *data = this->extraData;
 	data->dlight.parent = this->bodyId;
 	data->dlight.light.type = LIGHT_TYPE_POINT;
-	data->wantLightOn = KvGetBool(params, "start_on", true);
+	data->isLightOn = KvGetBool(params, "start_on", true);
 
 	data->dlight.light.color = KvGetColor(params, "color", COLOR_WHITE);
 	data->dlight.light.brightness = KvGetFloat(params, "brightness", 1.0f);
@@ -34,20 +33,16 @@ static void PointLightInit(Actor *this, const KvList params, const Transform *tr
 	data->dlight.light.linearAttenuation = KvGetFloat(params, "linear_attenuation", 0.0f);
 	data->dlight.light.quadraticAttenuation = KvGetFloat(params, "quadratic_attenuation", 1.0f);
 	data->dlight.light.attenuationMultiplier = KvGetFloat(params, "attenuation_multiplier", 32.0f);
+
+	if (data->isLightOn)
+	{
+		AddDynamicLight(&data->dlight);
+	}
 }
 
 static void PointLightUpdate(Actor *this, double /*delta*/)
 {
 	PointLightData *data = this->extraData;
-	if (!data->isLightOn && data->wantLightOn)
-	{
-		data->isLightOn = true;
-		AddDynamicLight(&data->dlight);
-	} else if (data->isLightOn && !data->wantLightOn)
-	{
-		data->isLightOn = false;
-		RemoveDynamicLight(&data->dlight);
-	}
 }
 
 static void PointLightDestroy(Actor *this)
@@ -63,13 +58,21 @@ static void PointLightDestroy(Actor *this)
 static void PointLightTurnOnHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	PointLightData *data = this->extraData;
-	data->wantLightOn = true;
+	if (!data->isLightOn)
+	{
+		data->isLightOn = true;
+		AddDynamicLight(&data->dlight);
+	}
 }
 
 static void PointLightTurnOffHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	PointLightData *data = this->extraData;
-	data->wantLightOn = false;
+	if (data->isLightOn)
+	{
+		data->isLightOn = false;
+		RemoveDynamicLight(&data->dlight);
+	}
 }
 
 ActorDefinition pointLightActorDefinition = {

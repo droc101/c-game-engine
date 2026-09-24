@@ -978,7 +978,6 @@ static inline void LoadLights(const Map *map)
 		.descriptorCount = 1,
 		.bufferInfos = &lightsBufferInfo,
 	};
-	// TODO: This is a race condition against the previous frame since we haven't waited for that frame to finish yet
 	lunaWriteDescriptorSets(device, 2, (LunaWriteDescriptorSet[]){frustumsDescriptorWrite, lightsDescriptorWrite});
 
 	UpdateLightCount();
@@ -1765,17 +1764,20 @@ static inline void HandleDeferredWork()
 								lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo));
 		CreateShadowMapRenderPass(NULL);
 
-		LoadLights(loadedMap);
-		CreateMapModelDrawInfos(true,
-								&buffers.opaqueMap,
-								lunaGetBufferSize(buffers.opaqueMap.unculledShadedDrawInfo),
-								lunaGetBufferSize(buffers.opaqueMap.unculledUnshadedDrawInfo));
-		CreateMapModelDrawInfos(false,
-								&buffers.map,
-								lunaGetBufferSize(buffers.map.unculledShadedDrawInfo),
-								lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo));
-		CreateShadowMaps(loadedMap);
-		LoadLightmap(loadedMap);
+		if (GetMap() != NULL)
+		{
+			LoadLights(loadedMap);
+			CreateMapModelDrawInfos(true,
+									&buffers.opaqueMap,
+									lunaGetBufferSize(buffers.opaqueMap.unculledShadedDrawInfo),
+									lunaGetBufferSize(buffers.opaqueMap.unculledUnshadedDrawInfo));
+			CreateMapModelDrawInfos(false,
+									&buffers.map,
+									lunaGetBufferSize(buffers.map.unculledShadedDrawInfo),
+									lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo));
+			CreateShadowMaps(loadedMap);
+			LoadLightmap(loadedMap);
+		}
 
 		pendingTasks &= ~PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
 	}
@@ -1867,9 +1869,13 @@ bool VK_FrameStart()
 		return false;
 	}
 
+	VulkanTest(lunaResetCommandBuffer(device, commandBuffer, 0), "Failed to reset command buffer!");
+
 	HandleDeferredWork();
 
-	VulkanTestResizeSwapchain(lunaBeginFrame(device, commandBuffer), "Failed to begin frame!");
+	VulkanTestResizeSwapchain(lunaBeginFrame(device), "Failed to begin frame!");
+
+	VulkanTest(lunaBeginSingleUseCommandBuffer(device, commandBuffer), "Failed to begin command buffer for frame!");
 
 	renderPassStarted = false;
 	buffers.ui.freeQuads = buffers.ui.allocatedQuads;
@@ -1883,10 +1889,7 @@ bool VK_FrameStart()
 
 void VK_RenderMap(Map *map, Camera *camera)
 {
-	if (map != loadedMap)
-	{
-		VK_LoadMap(map);
-	}
+	assert(map == loadedMap);
 
 	HandleMapChangeFlags(map);
 	UpdateCameraUniform(camera);
@@ -2118,6 +2121,7 @@ void VK_Cleanup()
  */
 void VK_LoadMap(const Map *map)
 {
+	VulkanTest(lunaResetCommandBuffer(device, commandBuffer, 0), "Failed to reset command buffer!");
 	ListClear(dynamicLights);
 	if (map == NULL)
 	{
@@ -2126,6 +2130,8 @@ void VK_LoadMap(const Map *map)
 		loadedMap = NULL;
 		return;
 	}
+
+	VulkanTest(lunaBeginSingleUseCommandBuffer(device, commandBuffer), "Failed to begin command buffer for frame!");
 
 	LoadLights(map);
 	LoadLightmap(map);
@@ -2144,6 +2150,18 @@ void VK_LoadMap(const Map *map)
 	}
 
 	loadedMap = map;
+
+	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+	const LunaCommandBufferSubmitInfo submitInfo = {
+		.queue = queue,
+		.waitSemaphoreCount = 1,
+		.waitSemaphores = &semaphore,
+		.waitDstStageMasks = &waitStage,
+		.signalSemaphoreCount = 1,
+		.signalSemaphores = &semaphore,
+	};
+	VulkanTest(lunaEndAndSubmitCommandBuffer(device, commandBuffer, &submitInfo),
+			   "Failed to submit command buffer after loading map!");
 }
 
 void VK_AddDynamicLight(const DynamicLight *light)
