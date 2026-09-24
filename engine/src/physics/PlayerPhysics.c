@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
@@ -38,8 +39,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "engine/graphics/vulkan/Vulkan.h"
 
 const float MOVE_SPEED = 96.0f;
 const float SLOW_MOVE_SPEED = 9.6f;
@@ -311,11 +310,11 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 	{
 		if (player->isFlashlightOn)
 		{
-			VK_RemoveDynamicLight(&player->flashlight);
+			RemoveDynamicLight(&player->flashlight);
 			player->isFlashlightOn = false;
 		} else
 		{
-			VK_AddDynamicLight(&player->flashlight);
+			AddDynamicLight(&player->flashlight);
 			player->isFlashlightOn = true;
 		}
 	}

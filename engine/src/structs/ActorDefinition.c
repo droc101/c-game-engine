@@ -9,6 +9,8 @@
 #include <engine/actor/env/GlobalLight.h>
 #include <engine/actor/env/TonemapController.h>
 #include <engine/actor/IoProxy.h>
+#include <engine/actor/light/PointLight.h>
+#include <engine/actor/light/SpotLight.h>
 #include <engine/actor/logic/LogicBinary.h>
 #include <engine/actor/logic/LogicCounter.h>
 #include <engine/actor/logic/LogicDecimal.h>
@@ -95,6 +97,8 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterTriggerMap();
 	RegisterEntrance();
 	RegisterWorldText();
+	RegisterPointLight();
+	RegisterSpotLight();
 
 	if (RegisterGameActors)
 	{

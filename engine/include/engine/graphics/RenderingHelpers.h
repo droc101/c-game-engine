@@ -215,4 +215,21 @@ void DPrintGPUInfo();
  */
 Vector2 ProjectPosition(vec3 position, Camera *camera);
 
+/**
+ * Load a dynamic light
+ * @warning The pointer passed to this function is stored!
+ *			Therefore, it must live until VK_RemoveDynamicLight is called with the same pointer
+ * @param light The light to load
+ * @return True if the light was successfully added, or false if something failed
+ */
+void AddDynamicLight(const DynamicLight *light);
+
+/**
+ * Remove a dynamic light so that it is no longer rendered
+ * @note This function does not free the memory pointed to by @c light
+ * @param light The light to remove. Must exactly match a pointer previously passed to VK_AddDynamicLight
+ * @return True if the light was successfully removed, or false if something failed
+ */
+void RemoveDynamicLight(const DynamicLight *light);
+
 #endif //GAME_RENDERINGHELPERS_H

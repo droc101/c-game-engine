@@ -1,0 +1,27 @@
+{
+  "description": "Base realtime light class",
+  "virtual": true,
+  "extends": "actor",
+  "inputs": {
+    "turn_on": {},
+    "turn_off": {}
+  },
+  "params": {
+    "color": {
+      "display": "Light Color",
+      "type": "color",
+      "description": "The color of this light"
+    },
+    "brightness": {
+      "display": "Brightness Scale",
+      "type": "float",
+      "default": 1.0,
+      "minimum": 0.0,
+      "description": "The brightness scale of this light, used for HDR lights (brighter than 1.0)"
+    },
+    "start_on": {
+      "type": "bool",
+      "default": true
+    }
+  }
+}

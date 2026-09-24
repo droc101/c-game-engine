@@ -269,3 +269,13 @@ Vector2 ProjectPosition(vec3 position, Camera *camera)
 
 	return v2(x, y);
 }
+
+void AddDynamicLight(const DynamicLight *light)
+{
+	VK_AddDynamicLight(light);
+}
+
+void RemoveDynamicLight(const DynamicLight *light)
+{
+	VK_RemoveDynamicLight(light);
+}

@@ -90,11 +90,11 @@
                     "z": 16.0
                 },
                 {
-                    "x": 448.0,
+                    "x": 576.0,
                     "z": 16.0
                 },
                 {
-                    "x": 448.0,
+                    "x": 576.0,
                     "z": 128.0
                 },
                 {
@@ -963,11 +963,11 @@
                     "z": -128.0
                 },
                 {
-                    "x": 448.0,
+                    "x": 576.0,
                     "z": -128.0
                 },
                 {
-                    "x": 448.0,
+                    "x": 576.0,
                     "z": -16.0
                 },
                 {
@@ -1060,11 +1060,11 @@
                     "z": -16.0
                 },
                 {
-                    "x": 448.0,
+                    "x": 576.0,
                     "z": -16.0
                 },
                 {
-                    "x": 448.0,
+                    "x": 576.0,
                     "z": 16.0
                 },
                 {
@@ -2428,6 +2428,200 @@
                 {
                     "x": 344.0,
                     "z": 104.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 464.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 496.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 496.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 464.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 528.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 560.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 560.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 528.0,
+                    "z": 32.0
                 }
             ]
         }
@@ -7727,6 +7921,868 @@
                 "text": {
                     "type": "string",
                     "value": "play sound, cancel ~1ms later"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 512.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 512.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_point_rt",
+            "position": {
+                "x": 512.0,
+                "y": 0.0,
+                "z": 96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.6582279205322266,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "point_dlight"
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 512.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "light_point_rt"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_model_static",
+            "position": {
+                "x": 512.0,
+                "y": 0.0,
+                "z": 96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
+                },
+                "collision": {
+                    "type": "byte",
+                    "value": 2
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/axis_helper.gmdl"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 496.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "point_dlight",
+                    "targetInput": "turn_on",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 528.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "point_dlight",
+                    "targetInput": "turn_off",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 496.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "turn on"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 528.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "turn off"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 512.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "light_spot_rt"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "light_spot_rt",
+            "position": {
+                "x": 544.0,
+                "y": 48.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 270.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 15.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.39240509271621704,
+                        "g": 1.0,
+                        "b": 0.8384873867034912,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 20.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "spot_dlight"
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "light_spot_rt",
+            "position": {
+                "x": 480.0,
+                "y": 48.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 270.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 15.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 2.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.39240509271621704,
+                        "g": 1.0,
+                        "b": 0.8384873867034912,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": "texture/interface/menu_logo.gtex"
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 20.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "spot_dlight"
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "start_on": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 496.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "spot_dlight",
+                    "targetInput": "turn_on",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 528.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "spot_dlight",
+                    "targetInput": "turn_off",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 496.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "turn on"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 528.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "turn off"
                 },
                 "text_color": {
                     "type": "color",
