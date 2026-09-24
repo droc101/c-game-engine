@@ -1,6 +1,7 @@
 {
   "description": "Spotlight",
   "extends": "light_point",
+  "editor_only": true,
   "renderers": [
     {
       "type": "point",

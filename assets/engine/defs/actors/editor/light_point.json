@@ -1,6 +1,7 @@
 {
   "description": "Point light",
   "extends": "light",
+  "editor_only": true,
   "renderers": [
     {
       "type": "point",

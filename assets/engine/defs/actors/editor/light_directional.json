@@ -1,6 +1,7 @@
 {
   "description": "Directional (sun) light",
   "extends": "light",
+  "editor_only": true,
   "renderers": [
     {
       "type": "point",

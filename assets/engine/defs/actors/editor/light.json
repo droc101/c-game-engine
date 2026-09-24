@@ -1,6 +1,7 @@
 {
   "description": "Base light class",
   "virtual": true,
+  "editor_only": true,
   "params": {
     "color": {
       "display": "Light Color",
