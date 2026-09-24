@@ -24,10 +24,12 @@ static void DefaultOptions(Options *options)
 	options->uiVolume = 1.0f;
 	options->masterVolume = 1.0f;
 	options->fullscreen = false;
-	options->cameraSpeed = 1;
+	options->controllerCameraSpeed = 1;
+	options->mouseCameraSpeed = 1;
 	options->rumbleStrength = 1.0f;
 	options->controllerDeadzone = 0.1f;
 	options->controllerSwapOkCancel = false;
+	options->scrollSpeed = 1.0f;
 	options->preferWayland = true;
 	options->fov = 90.0f;
 	options->maxFps = 0;
@@ -48,8 +50,11 @@ static void DefaultOptions(Options *options)
 
 static bool ValidateOptions(const Options *options)
 {
-	// ignore controller mode
-	if (options->cameraSpeed < 0.01 || options->cameraSpeed > 2.00)
+	if (options->controllerCameraSpeed < 0.01 || options->controllerCameraSpeed > 2.00)
+	{
+		return false;
+	}
+	if (options->mouseCameraSpeed < 0.01 || options->mouseCameraSpeed > 2.00)
 	{
 		return false;
 	}
@@ -115,10 +120,16 @@ void LoadOptions(Options *options)
 	if (ReadKvlFile(OPTIONS_FILE, list))
 	{
 		options->enableDiscordRpc = KvGetBool(list, "enable_discord_rpc", true);
-		options->cameraSpeed = KvGetFloat(list, "camera_speed", 1.0f);
+		options->controllerCameraSpeed = KvGetFloat(list, "controller_camera_speed", 1.0f);
+		options->mouseCameraSpeed = KvGetFloat(list, "mouse_camera_speed", 1.0f);
 		options->rumbleStrength = KvGetFloat(list, "rumble_strength", 1.0f);
 		options->controllerDeadzone = KvGetFloat(list, "controller_deadzone", 0.1f);
 		options->controllerSwapOkCancel = KvGetBool(list, "controller_swap_ok_cancel", false);
+		options->invertHorizontalController = KvGetBool(list, "controller_invert_x", false);
+		options->invertVerticalController = KvGetBool(list, "controller_invert_y", false);
+		options->invertHorizontalMouse = KvGetBool(list, "mouse_invert_x", false);
+		options->invertVerticalMouse = KvGetBool(list, "mouse_invert_y", false);
+		options->scrollSpeed = KvGetFloat(list, "scroll_speed", 1.0f);
 
 		KvList controls;
 		if (KvGetList(list, "controls", controls))
@@ -195,10 +206,16 @@ void SaveOptions(Options *options)
 
 	KvSetBool(list, "enable_discord_rpc", options->enableDiscordRpc);
 
-	KvSetFloat(list, "camera_speed", options->cameraSpeed);
+	KvSetFloat(list, "controller_camera_speed", options->controllerCameraSpeed);
+	KvSetFloat(list, "mouse_camera_speed", options->mouseCameraSpeed);
 	KvSetFloat(list, "rumble_strength", options->rumbleStrength);
 	KvSetFloat(list, "controller_deadzone", options->controllerDeadzone);
 	KvSetBool(list, "controller_swap_ok_cancel", options->controllerSwapOkCancel);
+	KvSetBool(list, "controller_invert_x", options->invertHorizontalController);
+	KvSetBool(list, "controller_invert_y", options->invertVerticalController);
+	KvSetBool(list, "mouse_invert_x", options->invertHorizontalMouse);
+	KvSetBool(list, "mouse_invert_y", options->invertVerticalMouse);
+	KvSetFloat(list, "scroll_speed", options->scrollSpeed);
 
 	KvList controls;
 	KvListCreate(controls);

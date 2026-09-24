@@ -107,7 +107,71 @@ static void InputOptionsStateSet()
 													   BtnControlsOptions,
 													   TOP_CENTER,
 													   NULL));
-		OptionsMenuAddSection(inputOptionsMenu, "Camera Options");
+		OptionsMenuAddSection(inputOptionsMenu, "Mouse Options");
+		OptionsMenuAddSmallControl(inputOptionsMenu,
+								   CreateSliderControl(v2(0, 0),
+													   v2(750, 40),
+													   "Camera Sensitivity",
+													   NULL,
+													   TOP_CENTER,
+													   0.01f,
+													   2.00f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_FLOAT,
+														   .floatValue = &GetState()->options.mouseCameraSpeed,
+													   },
+													   0.01f,
+													   0.1f,
+													   SliderLabelPercent,
+													   NULL));
+		OptionsMenuAddSmallControl(inputOptionsMenu,
+								   CreateSliderControl(v2(0, 0),
+													   v2(750, 40),
+													   "Scroll Sensitivity",
+													   NULL,
+													   TOP_CENTER,
+													   0.01f,
+													   2.00f,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_FLOAT,
+														   .floatValue = &GetState()->options.scrollSpeed,
+													   },
+													   0.01f,
+													   0.1f,
+													   SliderLabelPercent,
+													   NULL));
+		OptionsMenuAddSmallControl(inputOptionsMenu,
+								   CreateOptionsButtonControl(v2(-190, 0),
+															  v2(370, 40),
+															  "Horizontal Mouse Motion: %s",
+															  NULL,
+															  TOP_CENTER,
+															  invertCameraButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()
+																						->options
+																						.invertHorizontalMouse,
+															  },
+															  NULL));
+		OptionsMenuAddSmallControl(inputOptionsMenu,
+								   CreateOptionsButtonControl(v2(190, 0),
+															  v2(370, 40),
+															  "Vertical Mouse Motion: %s",
+															  NULL,
+															  TOP_CENTER,
+															  invertCameraButtonValues,
+															  2,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_BOOL,
+																  .boolValue = &GetState()
+																						->options.invertVerticalMouse,
+															  },
+															  NULL));
+		OptionsMenuAddSection(inputOptionsMenu, "Controller Options");
 		OptionsMenuAddLargeControl(inputOptionsMenu,
 								   CreateSliderControl(v2(0, 0),
 													   v2(750, 40),
@@ -118,7 +182,7 @@ static void InputOptionsStateSet()
 													   2.00f,
 													   (ControlValue){
 														   .type = CONTROL_VALUE_FLOAT,
-														   .floatValue = &GetState()->options.cameraSpeed,
+														   .floatValue = &GetState()->options.controllerCameraSpeed,
 													   },
 													   0.01f,
 													   0.1f,
@@ -137,7 +201,7 @@ static void InputOptionsStateSet()
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &GetState()
 																						->options
-																						.invertHorizontalCamera,
+																						.invertHorizontalController,
 															  },
 															  NULL));
 		OptionsMenuAddSmallControl(inputOptionsMenu,
@@ -152,10 +216,9 @@ static void InputOptionsStateSet()
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &GetState()
-																						->options.invertVerticalCamera,
+																						->options.invertVerticalController,
 															  },
 															  NULL));
-		OptionsMenuAddSection(inputOptionsMenu, "Controller Options");
 		OptionsMenuAddSmallControl(inputOptionsMenu,
 								   CreateSliderControl(v2(-190, 0),
 													   v2(370, 40),

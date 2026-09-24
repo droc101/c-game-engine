@@ -46,18 +46,19 @@ struct Options
 	bool enableDiscordRpc;
 
 	/* Controls */
-	/// The look speed (it affects controller speed too)
-	float cameraSpeed;
+	float controllerCameraSpeed;
+	float mouseCameraSpeed;
 	/// The strength of the rumble
 	float rumbleStrength;
-	/// Whether to invert the camera X axis
-	bool invertHorizontalCamera;
-	/// Whether to invert the camera Y axis
-	bool invertVerticalCamera;
+	bool invertHorizontalMouse;
+	bool invertVerticalMouse;
+	bool invertHorizontalController;
+	bool invertVerticalController;
 	/// Controller axis deadzone
 	float controllerDeadzone;
 	/// Whether to swap the controller A and B buttons
 	bool controllerSwapOkCancel;
+	float scrollSpeed;
 
 	/* Video */
 
