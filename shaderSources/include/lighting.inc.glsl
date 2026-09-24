@@ -147,7 +147,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
             const vec4 coord = worldPosition / worldPosition.w;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
                 const float factor = sampleDirectionalShadowMap(cascadeIndex, coord.xyz);
-                if (factor < 1e-6) {
+                if (factor < EPSILON) {
                     continue;
                 }
                 lightingColor += factor * light.brightness * max(dot(light.negativeForwardDirection, normal), 0) * light.color;
@@ -165,7 +165,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     continue;
                 }
                 const float normalFactor = dot(lightToWorldNormalized, normal);
-                if (normalFactor < 1e-6) {
+                if (normalFactor < EPSILON) {
                     continue;
                 }
                 const float theta = degrees(acos(dottedDirection));
@@ -180,7 +180,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                         continue;
                     }
                     const float factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex)], coord.xy, coord.z);
-                    if (factor < 1e-6) {
+                    if (factor < EPSILON) {
                         continue;
                     }
                     if (light.cookieTextureIndex != 0) {
@@ -192,7 +192,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 }
             } else {
                 const float normalFactor = dot(lightToWorldNormalized, normal);
-                if (normalFactor < 1e-6) {
+                if (normalFactor < EPSILON) {
                     continue;
                 }
                 const float brightness = getLightBrightness(light, distance, 0);
@@ -222,7 +222,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                         factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex) + 5], lightToWorld.xy / -scale, comparisonDepth);
                     }
                 }
-                if (factor < 1e-6) {
+                if (factor < EPSILON) {
                     continue;
                 }
                 lightingColor += factor * brightness * normalFactor * light.color;

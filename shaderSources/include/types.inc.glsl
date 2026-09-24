@@ -7,6 +7,7 @@
 #extension GL_EXT_buffer_reference_uvec2 : require
 
 const uint MAX_LIGHT_COUNT = 128;
+const float EPSILON = 1e-6;
 
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;

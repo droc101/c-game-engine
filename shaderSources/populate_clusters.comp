@@ -41,7 +41,7 @@ void main() {
     const float nearPlane = gl_GlobalInvocationID.z * depthRange / 8.0 + camera.nearPlane;
     const float farPlane = (gl_GlobalInvocationID.z + 1) * depthRange / 8.0 + camera.nearPlane;
 
-    uint frustumIndex = lightsData.cascadeMatrices[0][3][3] < 1e-6 ? 1 : 5;
+    uint frustumIndex = lightsData.cascadeMatrices[0][3][3] < EPSILON ? 1 : 5;
     for (uint i = 0; i < LIGHT_COUNT; i++) {
         if (lightsData.lights[i].type == LIGHT_TYPE_DIRECTIONAL || IsVisible(i, clusterPlanes, nearPlane, farPlane)) {
             clusters.clusters[clusterIndex].lightIndices[clusters.clusters[clusterIndex].lightCount] = i;
