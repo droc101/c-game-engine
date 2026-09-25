@@ -174,7 +174,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                         continue;
                     }
                     if (light.cookieTextureIndex != 0) {
-                        const vec3 cookieColor = texture(textureSampler[nonuniformEXT(light.cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5).rgb;
+                        const vec3 cookieColor = textureLod(textureSampler[nonuniformEXT(light.cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5, 0).rgb;
                         lightingColor += factor * brightness * normalFactor * light.color * cookieColor;
                     } else {
                         lightingColor += factor * brightness * normalFactor * light.color;
@@ -258,5 +258,8 @@ bool debugLighting() {
             outColor.rgb += vec3((lightingColor.x + lightingColor.y + lightingColor.z) / 12);
             return true;
         }
+        case DEBUG_RENDERING_DEPTH_ONLY:
+			outColor.rgb = vec3(inDistance / ((camera.farPlane - 500) - camera.nearPlane));
+            return true;
     }
 }

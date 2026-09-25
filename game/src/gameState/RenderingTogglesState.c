@@ -69,6 +69,11 @@ OptionsButtonValue debugRenderingOptionValues[] = {
 		.tooltip = NULL,
 		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_NO_LIGHT_FALLOFF},
 	},
+	{
+		.text = "Depth",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_DEPTH_ONLY},
+	},
 };
 
 static void ToggleBakedLightingCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
@@ -141,7 +146,7 @@ static void RenderingTogglesStateSet()
 															  SetDebugRenderingCallback,
 															  TOP_CENTER,
 															  debugRenderingOptionValues,
-															  9,
+															  10,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_DWORD,
