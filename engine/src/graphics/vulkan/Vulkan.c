@@ -896,7 +896,7 @@ static inline void LoadLights(const Map *map)
 		AvxAlignedFree(lights);
 		lights = NULL;
 		lightCount = 0;
-		lightingShaderSpecializationConstants.lightCount = 0;
+		specializationConstants.lightCount = 0;
 		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
 				   "Failed to resize lights buffer!");
 
@@ -923,7 +923,7 @@ static inline void LoadLights(const Map *map)
 		DynamicLight *light = ListGetPointer(dynamicLights, i);
 		LoadLight(&light->light, lightCount, &frustumIndex, &shadowMapIndex, JPH_BodyId_InvalidBodyID);
 	}
-	lightingShaderSpecializationConstants.lightCount = lightCount;
+	specializationConstants.lightCount = lightCount;
 
 	frustumCount = frustumIndex;
 	CreatePerFrustumBuffers();

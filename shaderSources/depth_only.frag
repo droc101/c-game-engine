@@ -2,8 +2,6 @@
 
 #include "include/shadow_maps_shared.inc.glsl"
 
-layout(binding = 1) uniform sampler2D textureSampler[];
-
 layout(location = 0, component = 0) in vec2 inUv;
 layout(location = 0, component = 3) in float inAlpha;
 layout(location = 1) flat in uint inTextureIndex;

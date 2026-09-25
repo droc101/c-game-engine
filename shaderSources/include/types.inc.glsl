@@ -175,3 +175,15 @@ struct Cluster {
     uint lightCount;
     uint lightIndices[MAX_LIGHT_COUNT];
 };
+
+#pragma region enum DebugRendering
+const uint DEBUG_RENDERING_DISABLED = 0;
+const uint DEBUG_RENDERING_DISABLE_LIGHTING = 1;
+const uint DEBUG_RENDERING_UNTEXTURED = 2;
+const uint DEBUG_RENDERING_NORMALS = 3;
+const uint DEBUG_RENDERING_UVS = 4;
+const uint DEBUG_RENDERING_SHOW_CLUSTERS = 5;
+const uint DEBUG_RENDERING_SHOW_CLUSTER_LIGHT_COUNTS = 6;
+const uint DEBUG_RENDERING_ONLY_LIGHTING = 7;
+const uint DEBUG_RENDERING_NO_LIGHT_FALLOFF = 8;
+#pragma endregion

@@ -153,37 +153,43 @@ static VkSpecializationInfo depthOnlySpecializationInfo = {
 	.pMapEntries = &DEPTH_ONLY_SPECIALIZATION_MAP_ENTRY,
 	.dataSize = sizeof(uint32_t),
 };
+static const VkSpecializationMapEntry UNSHADED_SPECIALIZATION_MAP_ENTRY = {
+	.constantID = 0,
+	.offset = offsetof(SpecializationConstants, debugRendering),
+	.size = SizeofMember(SpecializationConstants, debugRendering),
+};
+static VkSpecializationInfo unshadedSpecializationInfo = {
+	.mapEntryCount = 1,
+	.pMapEntries = &UNSHADED_SPECIALIZATION_MAP_ENTRY,
+	.dataSize = sizeof(SpecializationConstants),
+};
 static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
-	{
-		.constantID = 0,
-		.offset = offsetof(LightingShaderSpecializationConstants, lightCount),
-		.size = SizeofMember(LightingShaderSpecializationConstants, lightCount),
-	},
+	UNSHADED_SPECIALIZATION_MAP_ENTRY,
 	{
 		.constantID = 1,
-		.offset = offsetof(LightingShaderSpecializationConstants, sampleCount),
-		.size = SizeofMember(LightingShaderSpecializationConstants, sampleCount),
+		.offset = offsetof(SpecializationConstants, lightCount),
+		.size = SizeofMember(SpecializationConstants, lightCount),
 	},
 	{
 		.constantID = 2,
-		.offset = offsetof(LightingShaderSpecializationConstants, sampleRadius),
-		.size = SizeofMember(LightingShaderSpecializationConstants, sampleRadius),
+		.offset = offsetof(SpecializationConstants, sampleCount),
+		.size = SizeofMember(SpecializationConstants, sampleCount),
 	},
 	{
 		.constantID = 3,
-		.offset = offsetof(LightingShaderSpecializationConstants, bakedLighting),
-		.size = SizeofMember(LightingShaderSpecializationConstants, bakedLighting),
+		.offset = offsetof(SpecializationConstants, sampleRadius),
+		.size = SizeofMember(SpecializationConstants, sampleRadius),
 	},
 	{
 		.constantID = 4,
-		.offset = offsetof(LightingShaderSpecializationConstants, clusterDebug),
-		.size = SizeofMember(LightingShaderSpecializationConstants, clusterDebug),
+		.offset = offsetof(SpecializationConstants, bakedLighting),
+		.size = SizeofMember(SpecializationConstants, bakedLighting),
 	},
 };
-static VkSpecializationInfo lightingSpecializationInfo = {
+static VkSpecializationInfo shadedSpecializationInfo = {
 	.mapEntryCount = ArrayLength(LIGHTING_SPECIALIZATION_MAP_ENTRIES),
 	.pMapEntries = LIGHTING_SPECIALIZATION_MAP_ENTRIES,
-	.dataSize = sizeof(LightingShaderSpecializationConstants),
+	.dataSize = sizeof(SpecializationConstants),
 };
 #pragma endregion shared
 
@@ -298,7 +304,7 @@ static inline void CreateShadedMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = fragShaderModule,
-			.specializationInfo = &lightingSpecializationInfo,
+			.specializationInfo = &shadedSpecializationInfo,
 		},
 	};
 
@@ -387,6 +393,7 @@ static inline void CreateUnshadedMapPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelUnshadedFragShaderModule,
+			.specializationInfo = &unshadedSpecializationInfo,
 		},
 	};
 
@@ -465,6 +472,7 @@ static inline void CreateSkyPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = fragShaderModule,
+			.specializationInfo = &unshadedSpecializationInfo,
 		},
 	};
 
@@ -546,7 +554,7 @@ static inline void CreateShadedModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &lightingSpecializationInfo,
+			.specializationInfo = &shadedSpecializationInfo,
 		},
 	};
 
@@ -665,6 +673,7 @@ static inline void CreateUnshadedModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelUnshadedFragShaderModule,
+			.specializationInfo = &unshadedSpecializationInfo,
 		},
 	};
 
@@ -777,7 +786,7 @@ static inline void CreateShadedActorModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &lightingSpecializationInfo,
+			.specializationInfo = &shadedSpecializationInfo,
 		},
 	};
 
@@ -865,6 +874,7 @@ static inline void CreateUnshadedActorModelPipeline()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelUnshadedFragShaderModule,
+			.specializationInfo = &unshadedSpecializationInfo,
 		},
 	};
 
@@ -948,7 +958,7 @@ static inline void CreateActorWallPipelines()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelShadedFragShaderModule,
-			.specializationInfo = &lightingSpecializationInfo,
+			.specializationInfo = &shadedSpecializationInfo,
 		},
 	};
 	const LunaPipelineShaderStageCreationInfo unshadedShaderStages[] = {
@@ -959,6 +969,7 @@ static inline void CreateActorWallPipelines()
 		{
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = modelUnshadedFragShaderModule,
+			.specializationInfo = &unshadedSpecializationInfo,
 		},
 	};
 
@@ -1636,14 +1647,14 @@ static inline void CreatePopulateClustersPipeline()
 {
 	const VkSpecializationMapEntry specializationMapEntry = {
 		.constantID = 0,
-		.offset = offsetof(LightingShaderSpecializationConstants, lightCount),
-		.size = SizeofMember(LightingShaderSpecializationConstants, lightCount),
+		.offset = offsetof(SpecializationConstants, lightCount),
+		.size = SizeofMember(SpecializationConstants, lightCount),
 	};
 	const VkSpecializationInfo specializationInfo = {
 		.mapEntryCount = 1,
 		.pMapEntries = &specializationMapEntry,
-		.dataSize = sizeof(LightingShaderSpecializationConstants),
-		.pData = &lightingShaderSpecializationConstants,
+		.dataSize = sizeof(SpecializationConstants),
+		.pData = &specializationConstants,
 	};
 	LunaShaderModule shaderModule = LUNA_NULL_HANDLE;
 	CreateShaderModule(SHADER("populate_clusters_c"), SHADER_TYPE_COMP, &shaderModule);
@@ -1682,7 +1693,8 @@ void CreateGraphicsPipelines()
 	descriptorSetLayouts[1] = descriptorSets.shadowMaps.layout;
 	lightingShadersPushConstantsRange.dataPointer = &lightmapTextureSize;
 	depthOnlySpecializationInfo.pData = &lightCount;
-	lightingSpecializationInfo.pData = &lightingShaderSpecializationConstants;
+	unshadedSpecializationInfo.pData = &specializationConstants;
+	shadedSpecializationInfo.pData = &specializationConstants;
 
 	CreateShaderModule(SHADER("model/shaded_f"), SHADER_TYPE_FRAG, &modelShadedFragShaderModule);
 	CreateShaderModule(SHADER("model/unshaded_f"), SHADER_TYPE_FRAG, &modelUnshadedFragShaderModule);

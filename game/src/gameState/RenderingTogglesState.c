@@ -21,16 +21,64 @@
 
 static OptionsMenu *renderingTogglesMenu;
 static bool enableBakedLighting = true;
-static bool enableClusterDebug = false;
+static DebugRendering debugRendering = DEBUG_RENDERING_DISABLED;
+
+OptionsButtonValue debugRenderingOptionValues[] = {
+	{
+		.text = "Off",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_DISABLED},
+	},
+	{
+		.text = "Disable lighting",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_DISABLE_LIGHTING},
+	},
+	{
+		.text = "Untextured",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_UNTEXTURED},
+	},
+	{
+		.text = "Normals",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_NORMALS},
+	},
+	{
+		.text = "UVs",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_UVS},
+	},
+	{
+		.text = "Clusters",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_SHOW_CLUSTERS},
+	},
+	{
+		.text = "Cluster light count",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_SHOW_CLUSTER_LIGHT_COUNTS},
+	},
+	{
+		.text = "Only lighting",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_ONLY_LIGHTING},
+	},
+	{
+		.text = "No light falloff",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_NO_LIGHT_FALLOFF},
+	},
+};
 
 static void ToggleBakedLightingCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	VK_ToggleBakedLighting();
 }
 
-static void ToggleClusterDebugCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
+static void SetDebugRenderingCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
-	VK_ToggleClusterDebug();
+	VK_SetDebugRendering(debugRendering);
 }
 
 static void BtnRenderingTogglesBack(Control * /*control*/, void * /*extraData*/)
@@ -89,15 +137,15 @@ static void RenderingTogglesStateSet()
 		OptionsMenuAddLargeControl(renderingTogglesMenu,
 								   CreateOptionsButtonControl(v2s(0),
 															  v2s(0),
-															  "Cluster debug: %s",
-															  ToggleClusterDebugCallback,
+															  "Debug rendering option: %s",
+															  SetDebugRenderingCallback,
 															  TOP_CENTER,
-															  onOffButtonValues,
-															  2,
+															  debugRenderingOptionValues,
+															  9,
 															  NULL,
 															  (ControlValue){
-																  .type = CONTROL_VALUE_BOOL,
-																  .boolValue = &enableClusterDebug,
+																  .type = CONTROL_VALUE_DWORD,
+																  .dwordValue = &debugRendering,
 															  },
 															  NULL));
 

@@ -1,18 +1,14 @@
 // Include only. This file will not compile as a standalone module.
 
-#include "shared.inc.glsl"
+#include "model_fragment.inc.glsl"
 
 #define USE_CLUSTERED
 
-layout(constant_id = 0) const uint LIGHT_COUNT = 1;
-layout(constant_id = 1) const uint SAMPLE_COUNT = 32;
-layout(constant_id = 2) const float SAMPLE_RADIUS = 4.0;
+layout(constant_id = 1) const uint LIGHT_COUNT = 1;
+layout(constant_id = 2) const uint SAMPLE_COUNT = 32;
+layout(constant_id = 3) const float SAMPLE_RADIUS = 4.0;
 
-layout(constant_id = 3) const bool ENABLE_BAKED_LIGHTING = true;
-layout(constant_id = 4) const bool ENABLE_CLUSTER_DEBUG = false;
-
-/// Set to true if any of the debug lighting paths should be used
-const bool ENABLE_DEBUG_LIGHTING = ENABLE_CLUSTER_DEBUG;
+layout(constant_id = 4) const bool ENABLE_BAKED_LIGHTING = true;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
@@ -20,7 +16,6 @@ layout(push_constant) uniform PushConstants {
     uint shadowMapSize;
 } pushConstants;
 
-layout(set = 0, binding = 1) uniform sampler2D textureSampler[];
 layout(set = 0, binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
@@ -44,12 +39,8 @@ layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMapAt
 layout(set = 1, binding = 0) uniform sampler2DShadow shadowMaps[];
 
 layout(location = 1) in vec3 inPosition;
-layout(location = 2) in vec2 inUV;
-layout(location = 3) in vec3 inNormal;
-layout(location = 4) in float inDistance;
-layout(location = 5) flat in uint inTextureIndex;
-
-layout(location = 0) out vec4 outColor;
+layout(location = 2) in vec3 inNormal;
+layout(location = 3) in float inDistance;
 
 uint getCascadeIndex(const float distance) {
     for (uint cascadeIndex = 0; cascadeIndex < 4; ++cascadeIndex) {
@@ -69,13 +60,13 @@ uint getClusterIndex(const vec3 position, const float distance) {
 }
 
 float getLightBrightness(const Light light, const float distance, const float theta) {
-    float multiplierSquared;
-    float brightness;
-    if (light.type == LIGHT_TYPE_DIRECTIONAL) {
-        brightness = light.brightness;
+    if (DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
+        return 1.0;
+    } else if (light.type == LIGHT_TYPE_DIRECTIONAL) {
+        return light.brightness;
     } else {
-        multiplierSquared = light.attenuationMultiplier * light.attenuationMultiplier;
-        brightness = (multiplierSquared * light.brightness) /
+        float multiplierSquared = light.attenuationMultiplier * light.attenuationMultiplier;
+        float brightness = (multiplierSquared * light.brightness) /
             (multiplierSquared * light.constantAttenuation +
                 light.attenuationMultiplier * light.linearAttenuation * distance +
                 light.quadraticAttenuation * distance * distance);
@@ -86,9 +77,8 @@ float getLightBrightness(const Light light, const float distance, const float th
                 brightness *= 0.75 * (light.fadingAngle - theta) / (light.fadingAngle - light.brightAngle);
             }
         }
+        return brightness;
     } 
-
-    return brightness;
 }
 
 vec2 getSoftShadowKernel(const float sampleIndex) {
@@ -232,12 +222,41 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
     return lightingColor;
 }
 
-void debugLighting() {
+bool debugLighting() {
+    if (DEBUG_RENDERING == DEBUG_RENDERING_DISABLED) {
+        return false;
+    }
     outColor = vec4(0, 0, 0, 1);
-    if (ENABLE_CLUSTER_DEBUG) {
-        outColor.r = float(clusters.clusters[getClusterIndex(inPosition, inDistance)].lightCount) / float(LIGHT_COUNT);
-		vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
-		outColor.rgb += vec3((lightingColor.x + lightingColor.y + lightingColor.z) / 12);
-        return;
-	}
+    switch (DEBUG_RENDERING) {
+        case DEBUG_RENDERING_DISABLE_LIGHTING:
+        case DEBUG_RENDERING_UNTEXTURED:
+        case DEBUG_RENDERING_ONLY_LIGHTING:
+        case DEBUG_RENDERING_NO_LIGHT_FALLOFF:
+        default:
+            return false;
+        case DEBUG_RENDERING_NORMALS:
+        {
+            outColor.rgb = (normalize(inNormal) + 1) / 2.0;
+            return true;
+        }
+        case DEBUG_RENDERING_UVS:
+        {
+            outColor.rg = mod(inUV, 1);
+            return true;
+        }
+        case DEBUG_RENDERING_SHOW_CLUSTERS:
+        {
+            vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
+            const uint index = getClusterIndex(inPosition, inDistance);
+            outColor.rgb += vec3(index % 8, (index / 8) % 8, 0) / 8 / (1 + index / 64) + lightingColor / 12;
+            return true;
+        }
+        case DEBUG_RENDERING_SHOW_CLUSTER_LIGHT_COUNTS:
+        {
+            outColor.r = float(clusters.clusters[getClusterIndex(inPosition, inDistance)].lightCount) / float(LIGHT_COUNT);
+            vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
+            outColor.rgb += vec3((lightingColor.x + lightingColor.y + lightingColor.z) / 12);
+            return true;
+        }
+    }
 }

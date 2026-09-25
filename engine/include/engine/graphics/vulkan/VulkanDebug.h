@@ -5,12 +5,25 @@
 #ifndef GAME_VULKANDEBUG_H
 #define GAME_VULKANDEBUG_H
 
+typedef enum DebugRendering
+{
+	DEBUG_RENDERING_DISABLED = 0,
+	DEBUG_RENDERING_DISABLE_LIGHTING = 1,
+	DEBUG_RENDERING_UNTEXTURED = 2,
+	DEBUG_RENDERING_NORMALS = 3,
+	DEBUG_RENDERING_UVS = 4,
+	DEBUG_RENDERING_SHOW_CLUSTERS = 5,
+	DEBUG_RENDERING_SHOW_CLUSTER_LIGHT_COUNTS = 6,
+	DEBUG_RENDERING_ONLY_LIGHTING = 7,
+	DEBUG_RENDERING_NO_LIGHT_FALLOFF = 8,
+} DebugRendering;
+
 void VK_DPrintDevice();
 
 void VK_DPrintSceneStatistics();
 
 void VK_ToggleBakedLighting();
 
-void VK_ToggleClusterDebug();
+void VK_SetDebugRendering(DebugRendering value);
 
 #endif //GAME_VULKANDEBUG_H

@@ -68,12 +68,12 @@ void VK_DPrintSceneStatistics()
 
 void VK_ToggleBakedLighting()
 {
-	lightingShaderSpecializationConstants.bakedLighting = !lightingShaderSpecializationConstants.bakedLighting;
+	specializationConstants.bakedLighting = !specializationConstants.bakedLighting;
 	pendingTasks |= PENDING_TASK_RECREATE_GRAPHICS_PIPELINES;
 }
 
-void VK_ToggleClusterDebug()
+void VK_SetDebugRendering(const DebugRendering value)
 {
-	lightingShaderSpecializationConstants.clusterDebug = !lightingShaderSpecializationConstants.clusterDebug;
+	specializationConstants.debugRendering = value;
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_SHADERS;
 }

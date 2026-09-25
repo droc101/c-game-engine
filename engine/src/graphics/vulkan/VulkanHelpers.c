@@ -82,11 +82,11 @@ uint32_t lightmapTextureSize = 0;
 LockingList dynamicLightsToAdd = {0};
 LockingList dynamicLightsToRemove = {0};
 List dynamicLights = {0};
-LightingShaderSpecializationConstants lightingShaderSpecializationConstants = {
+SpecializationConstants specializationConstants = {
+	.debugRendering = DEBUG_RENDERING_DISABLED,
 	.sampleCount = 32,
 	.sampleRadius = 4,
 	.bakedLighting = VK_TRUE,
-	.clusterDebug = VK_FALSE,
 };
 
 static CameraUniform uniform;

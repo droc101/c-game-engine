@@ -2,8 +2,6 @@
 
 #include "include/shared.inc.glsl"
 
-layout(binding = 1) uniform sampler2D textureSampler[];
-
 layout(binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;

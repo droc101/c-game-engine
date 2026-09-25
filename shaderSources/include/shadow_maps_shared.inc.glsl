@@ -1,5 +1,6 @@
 // Include only. This file will not compile as a standalone module.
 
+#define DEPTH_ONLY
 #include "shared.inc.glsl"
 
 layout(constant_id = 0) const uint LIGHT_COUNT = 1;

@@ -67,16 +67,22 @@ vec4 sampleLightmap(const sampler2D lightmap, const vec2 original_uv){
 }
 
 void main() {
-	if (ENABLE_DEBUG_LIGHTING) {
-		debugLighting();
+	if (debugLighting()) {
 		return;
 	}
 
-    outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
-	outColor.a = 1.0;
+	getTextureColor();
     vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
 	if (ENABLE_BAKED_LIGHTING) {
 		lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
+	}
+	if (DEBUG_RENDERING == DEBUG_RENDERING_ONLY_LIGHTING || DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
+		outColor.rgb = clamp(lightingColor * globalLighting.exposure, 0.0, 1.0);
+		outColor.a = 1.0;
+		return;
+	}
+	if (DEBUG_RENDERING == DEBUG_RENDERING_DISABLE_LIGHTING) {
+		lightingColor = vec3(1);
 	}
 	float fogFactor = clamp((inDistance - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);

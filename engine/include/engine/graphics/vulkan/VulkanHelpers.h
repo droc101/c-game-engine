@@ -9,6 +9,7 @@
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Light.h>
@@ -481,12 +482,12 @@ typedef struct ModelActorCullingInfo
 
 typedef struct LightingShaderSpecializationConstants
 {
+	DebugRendering debugRendering;
 	uint32_t lightCount;
 	uint32_t sampleCount;
 	float sampleRadius;
 	VkBool32 bakedLighting;
-	VkBool32 clusterDebug;
-} LightingShaderSpecializationConstants;
+} SpecializationConstants;
 
 typedef struct VulkanLight
 {
@@ -556,7 +557,7 @@ extern uint32_t lightmapTextureSize;
 extern LockingList dynamicLightsToAdd;
 extern LockingList dynamicLightsToRemove;
 extern List dynamicLights;
-extern LightingShaderSpecializationConstants lightingShaderSpecializationConstants;
+extern SpecializationConstants specializationConstants;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t

@@ -11,8 +11,8 @@ layout(location = 1) in vec2 inUV;
 layout(location = 2) in uint inInstanceIndex;
 
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec2 outUV;
-layout(location = 2) flat out uint outTextureIndex;
+layout(location = 10) out vec2 outUV;
+layout(location = 11) flat out uint outTextureIndex;
 
 vec3 rotateVec3ByQuat(vec3 point, vec4 quat){ 
     return point + 2.0 * cross(quat.xyz, cross(quat.xyz, point) + quat.w * point);
