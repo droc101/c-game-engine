@@ -68,7 +68,7 @@ void FixupPath(char *path);
 
 /**
  * Create a directory at the given path
- * @note 0660 permissions used on Linux
+ * @note 0750 permissions used on Linux
  * @param path The path of the directory to create
  * @return Success/failure
  */
