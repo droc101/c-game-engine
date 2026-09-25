@@ -257,7 +257,7 @@ bool MakeDirectory(const char *path)
 #ifdef WIN32
 	return mkdir(path) != 0;
 #else
-	return mkdir(path, 0660) != 0;
+	return mkdir(path, 0750) != 0;
 #endif
 }
 
