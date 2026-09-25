@@ -57,6 +57,11 @@ bool LoadMap(Map *map, Asset *mapData)
 	if (map->renderSky)
 	{
 		map->skyTexture = ReadStringSafe(reader, &strLength);
+		if (!map->skyTexture)
+		{
+			LogError("Failed to read map sky texture!\n");
+			return false;
+		}
 		bytesRemaining -= strLength;
 		bytesRemaining -= sizeof(size_t);
 	} else
@@ -64,9 +69,19 @@ bool LoadMap(Map *map, Asset *mapData)
 		map->skyTexture = NULL;
 	}
 	map->discordRpcIcon = ReadStringSafe(reader, &strLength);
+	if (!map->discordRpcIcon)
+	{
+		LogError("Failed to read Discord RPC icon\n");
+		return false;
+	}
 	bytesRemaining -= strLength;
 	bytesRemaining -= sizeof(size_t);
 	map->discordRpcName = ReadStringSafe(reader, &strLength);
+	if (!map->discordRpcName)
+	{
+		LogError("Failed to read Discord RPC name\n");
+		return false;
+	}
 	bytesRemaining -= strLength;
 	bytesRemaining -= sizeof(size_t);
 
@@ -76,6 +91,11 @@ bool LoadMap(Map *map, Asset *mapData)
 	{
 		size_t actorClassLength = 0;
 		char *actorClass = ReadStringSafe(reader, &actorClassLength);
+		if (!actorClass)
+		{
+			LogError("Failed to read actor classname\n");
+			return false;
+		}
 		bytesRemaining -= actorClassLength;
 		bytesRemaining -= sizeof(size_t);
 
@@ -99,12 +119,27 @@ bool LoadMap(Map *map, Asset *mapData)
 			ActorConnection *connection = malloc(sizeof(ActorConnection));
 			CheckAlloc(connection);
 			connection->sourceActorOutput = ReadStringSafe(reader, &strLength);
+			if (!connection->sourceActorOutput)
+			{
+				LogError("Failed to read I/O connection output name\n");
+				return false;
+			}
 			bytesRemaining -= strLength;
 			bytesRemaining -= sizeof(size_t);
 			connection->targetActorName = ReadStringSafe(reader, &strLength);
+			if (!connection->targetActorName)
+			{
+				LogError("Failed to read I/O connection target name\n");
+				return false;
+			}
 			bytesRemaining -= strLength;
 			bytesRemaining -= sizeof(size_t);
 			connection->targetActorInput = ReadStringSafe(reader, &strLength);
+			if (!connection->targetActorInput)
+			{
+				LogError("Failed to read I/O connection input name\n");
+				return false;
+			}
 			bytesRemaining -= strLength;
 			bytesRemaining -= sizeof(size_t);
 			EXPECT_BYTES_BOOL(1, bytesRemaining);
@@ -173,6 +208,11 @@ bool LoadMap(Map *map, Asset *mapData)
 	{
 		MapModel *model = &map->models[i];
 		char *materialName = ReadStringSafe(reader, &strLength);
+		if (!materialName)
+		{
+			LogError("Failed to read map material name\n");
+			return false;
+		}
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);

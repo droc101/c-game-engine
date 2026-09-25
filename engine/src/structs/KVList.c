@@ -41,6 +41,7 @@ size_t ReadParam(DataReader *reader, Param *out)
 			out->colorValue.a = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_STRING:
+			// TODO refactor this function to be able to null check this
 			out->stringValue = ReadStringSafe(reader, NULL);
 			break;
 		case PARAM_TYPE_ARRAY:
@@ -245,6 +246,7 @@ size_t ReadKvList(DataReader *reader, KvList out)
 	for (size_t _ = 0; _ < numParams; _++)
 	{
 		size_t keyLength = 0;
+		// TODO refactor this function to be able to null check this
 		char *key = ReadStringSafe(reader, &keyLength);
 		Param param;
 		(void)ReadParam(reader, &param);

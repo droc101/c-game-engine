@@ -75,6 +75,11 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	{
 		Material *mat = &model->materials[i];
 		mat->texture = ReadStringSafe(reader, &strLength);
+		if (!mat->texture)
+		{
+			LogError("Failed to read model texture name\n");
+			return NULL;
+		}
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t) + 1, bytesRemaining);

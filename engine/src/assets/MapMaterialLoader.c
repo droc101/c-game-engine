@@ -69,6 +69,11 @@ MapMaterial *LoadMapMaterial(const char *path)
 	size_t strLength = 0;
 
 	material->texture = ReadStringSafe(reader, &strLength);
+	if (!material->texture)
+	{
+		LogError("Failed to read material texture name\n");
+		return NULL;
+	}
 	bytesRemaining -= sizeof(size_t);
 	bytesRemaining -= strLength;
 	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
