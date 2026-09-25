@@ -842,6 +842,7 @@ static inline void LoadLight(Light *light,
 			};
 			for (uint32_t j = 0; j < 6; j++)
 			{
+				glm_mat4_identity(frustums[*frustumIndex].viewMatrix);
 				glm_mat4_ins3(transforms[j], frustums[*frustumIndex].viewMatrix);
 				glm_translate(frustums[*frustumIndex].viewMatrix, negativeLightPosition);
 
@@ -2169,8 +2170,6 @@ void VK_AddDynamicLight(const DynamicLight *light)
 	assert(light);
 	// A dynamic directional light doesn't make sense just don't do it
 	assert(light->light.type != LIGHT_TYPE_DIRECTIONAL);
-	// You can't have a light without a map
-	assert(loadedMap);
 	// You can't add the same dynamic light twice
 	assert(dynamicLights.length == 0 || ListFind(dynamicLights, light) >= dynamicLights.length);
 	// Internal state check
