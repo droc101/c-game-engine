@@ -93,9 +93,10 @@ struct Param
  * Read a param from bytes
  * @param reader DataReader to read from
  * @param out The param to read to
- * @return Number of bytes read
+ * @param bytesRemaining Bytes remaining in DataReader buffer, must not be NULL.
+ * @return Success/fail
  */
-size_t ReadParam(DataReader *reader, Param *out);
+bool ReadParam(DataReader *reader, Param *out, size_t *bytesRemaining);
 
 /**
  * Write a param to a DataWriter
@@ -135,9 +136,10 @@ void KvListCopy(const KvList source, KvList dest);
  * Read a KvList from bytes
  * @param reader DataReader to read from
  * @param out The KvList to read to (will be created)
- * @return Number of bytes read
+ * @param bytesRemaining Bytes remaining in DataReader buffer, must not be NULL.
+ * @return Success/failure
  */
-size_t ReadKvList(DataReader *reader, KvList out);
+bool ReadKvList(DataReader *reader, KvList out, size_t *bytesRemaining);
 
 /**
  * Write a KvList to a DataWriter

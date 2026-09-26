@@ -63,7 +63,7 @@ static void LoadingStateUpdate(GlobalState *state, const double delta)
 		const uint64_t realLoadStart = GetTimeNs();
 		if (!ChangeMapByName(loadStateLevelname))
 		{
-			LogError("Failed to load map \"s\"\n", loadStateLevelname);
+			LogError("Failed to load map \"%s\"\n", loadStateLevelname);
 			if (LoadingStateErrorCallback)
 			{
 				LoadingStateErrorCallback();

@@ -14,58 +14,81 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "engine/assets/AssetReader.h"
+
 #pragma region Param Functions
 
-size_t ReadParam(DataReader *reader, Param *out)
+bool ReadParam(DataReader *reader, Param *out, size_t *bytesRemaining)
 {
-	const size_t initialOffset = DataReaderGetOffset(reader);
+	EXPECT_BYTES_BOOL(sizeof(uint8_t), *bytesRemaining);
 	out->type = ReadUint8(reader);
 	switch (out->type)
 	{
 		case PARAM_TYPE_BYTE:
+			EXPECT_BYTES_BOOL(sizeof(uint8_t), *bytesRemaining);
 			out->byteValue = ReadUint8(reader);
 			break;
 		case PARAM_TYPE_INTEGER:
+			EXPECT_BYTES_BOOL(sizeof(int32_t), *bytesRemaining);
 			out->intValue = ReadInt32(reader);
 			break;
 		case PARAM_TYPE_FLOAT:
+			EXPECT_BYTES_BOOL(sizeof(float), *bytesRemaining);
 			out->floatValue = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_BOOL:
+			EXPECT_BYTES_BOOL(sizeof(uint8_t), *bytesRemaining);
 			out->boolValue = ReadUint8(reader) != 0;
 			break;
 		case PARAM_TYPE_COLOR:
+			EXPECT_BYTES_BOOL(sizeof(float) * 4, *bytesRemaining);
 			out->colorValue.r = ReadFloat(reader);
 			out->colorValue.g = ReadFloat(reader);
 			out->colorValue.b = ReadFloat(reader);
 			out->colorValue.a = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_STRING:
-			// TODO refactor this function to be able to null check this
-			out->stringValue = ReadStringSafe(reader, NULL);
+			size_t stringLength = 0;
+			out->stringValue = ReadStringSafe(reader, &stringLength);
+			if (!out->stringValue)
+			{
+				return false;
+			}
+			*bytesRemaining -= stringLength;
+			*bytesRemaining -= sizeof(size_t);
 			break;
 		case PARAM_TYPE_ARRAY:
+			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 			out->arrayValue.length = ReadSizeT(reader);
 			out->arrayValue.data = malloc(sizeof(Param) * out->arrayValue.length);
 			CheckAlloc(out->arrayValue.data);
 			for (size_t i = 0; i < out->arrayValue.length; i++)
 			{
 				Param *arrayIndex = &out->arrayValue.data[i];
-				(void)ReadParam(reader, arrayIndex);
+				if (!ReadParam(reader, arrayIndex, bytesRemaining))
+				{
+					return false;
+				}
 			}
 			break;
 		case PARAM_TYPE_KV_LIST:
 			out->kvListValue = malloc(sizeof(KvList));
-			(void)ReadKvList(reader, out->kvListValue);
+			if (!ReadKvList(reader, out->kvListValue, bytesRemaining))
+			{
+				return false;
+			}
 			break;
 		case PARAM_TYPE_UINT_64:
+			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 			out->uint64value = ReadSizeT(reader);
 			break;
 		case PARAM_TYPE_VEC2:
+			EXPECT_BYTES_BOOL(sizeof(float) * 2, *bytesRemaining);
 			out->vec2value.x = ReadFloat(reader);
 			out->vec2value.y = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_VEC3:
+			EXPECT_BYTES_BOOL(sizeof(float) * 3, *bytesRemaining);
 			out->vec3value.x = ReadFloat(reader);
 			out->vec3value.y = ReadFloat(reader);
 			out->vec3value.z = ReadFloat(reader);
@@ -73,7 +96,7 @@ size_t ReadParam(DataReader *reader, Param *out)
 		default:
 			break;
 	}
-	return DataReaderGetOffset(reader) - initialOffset;
+	return true;
 }
 
 void CopyParam(const Param *source, Param *dest)
@@ -238,23 +261,31 @@ void KvListCreate(KvList list)
 	KvList_init(list);
 }
 
-size_t ReadKvList(DataReader *reader, KvList out)
+bool ReadKvList(DataReader *reader, KvList out, size_t *bytesRemaining)
 {
-	const size_t initialOffset = DataReaderGetOffset(reader);
 	KvListCreate(out);
+	EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 	const size_t numParams = ReadSizeT(reader);
 	for (size_t _ = 0; _ < numParams; _++)
 	{
 		size_t keyLength = 0;
-		// TODO refactor this function to be able to null check this
 		char *key = ReadStringSafe(reader, &keyLength);
+		if (!key)
+		{
+			return false;
+		}
+		*bytesRemaining -= keyLength;
+		*bytesRemaining -= sizeof(size_t);
 		Param param;
-		(void)ReadParam(reader, &param);
+		if (!ReadParam(reader, &param, bytesRemaining))
+		{
+			return false;
+		}
 		KvSetUnsafe(out, key, param);
 		free(key);
 		FreeParam(&param);
 	}
-	return DataReaderGetOffset(reader) - initialOffset;
+	return true;
 }
 
 void WriteKvList(const KvList list, DataWriter *writer)

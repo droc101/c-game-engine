@@ -144,11 +144,12 @@ bool LoadMap(Map *map, Asset *mapData)
 			bytesRemaining -= sizeof(size_t);
 			EXPECT_BYTES_BOOL(1, bytesRemaining);
 			uint8_t hasOverride = ReadUint8(reader);
-			// TODO data size validation for params
 			if (hasOverride)
 			{
-				size_t paramSize = ReadParam(reader, &connection->outParamOverride);
-				bytesRemaining -= paramSize;
+				if (!ReadParam(reader, &connection->outParamOverride, &bytesRemaining))
+				{
+					return false;
+				}
 			} else
 			{
 				connection->outParamOverride.type = PARAM_TYPE_NONE;
@@ -160,8 +161,10 @@ bool LoadMap(Map *map, Asset *mapData)
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;
-		// TODO: Add EXPECT_BYTES for this
-		bytesRemaining -= ReadKvList(reader, params);
+		if (!ReadKvList(reader, params, &bytesRemaining))
+		{
+			return false;
+		}
 
 		if (strcmp(actorClass, "player") == 0)
 		{
@@ -354,8 +357,10 @@ bool LoadMap(Map *map, Asset *mapData)
 	for (size_t i = 0; i < map->lightCount; i++)
 	{
 		KvList lightParams;
-		// TODO: Add EXPECT_BYTES for this
-		bytesRemaining -= ReadKvList(reader, lightParams);
+		if (!ReadKvList(reader, lightParams, &bytesRemaining))
+		{
+			return false;
+		}
 		Light *light = &map->lights[i];
 
 		light->type = KvGetByte(lightParams, "type", LIGHT_TYPE_POINT);
