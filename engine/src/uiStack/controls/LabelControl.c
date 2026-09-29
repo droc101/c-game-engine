@@ -8,13 +8,14 @@
 #include <engine/subsystem/Error.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 Control *CreateLabelControl(const char *str,
 							const uint32_t size,
-							const Color color,
+							UiTextColorset *colorset,
 							const Vector2 rectPos,
 							const Vector2 rectSize,
 							const ControlAnchor anchor,
@@ -32,7 +33,7 @@ Control *CreateLabelControl(const char *str,
 	LabelControlData *data = malloc(sizeof(LabelControlData));
 	CheckAlloc(data);
 	data->size = size;
-	data->color = color;
+	data->colorset = colorset;
 	data->font = font;
 	data->hAlign = hAlign;
 	data->vAlign = vAlign;
@@ -55,12 +56,19 @@ void DrawLabelControl(const Control *c, ControlState /*state*/, Vector2 position
 	{
 		DrawTextAligned(data->str,
 						data->size,
-						COLOR_BLACK,
+						data->colorset->shadowColor,
 						Vector2Add(v2s(2), position),
 						c->size,
 						data->hAlign,
 						data->vAlign,
 						data->font);
 	}
-	DrawTextAligned(data->str, data->size, data->color, position, c->size, data->hAlign, data->vAlign, data->font);
+	DrawTextAligned(data->str,
+					data->size,
+					data->colorset->textColor,
+					position,
+					c->size,
+					data->hAlign,
+					data->vAlign,
+					data->font);
 }

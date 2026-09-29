@@ -11,6 +11,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -48,7 +49,7 @@ void DestroyHeaderFooterControl(const Control *c)
 	free(data);
 }
 
-void AlwaysUpdateHeaderFooterControl(UiStack */*stack*/, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
+void AlwaysUpdateHeaderFooterControl(UiStack * /*stack*/, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
 	c->size.x = ScaledWindowWidthFloat();
 }
@@ -67,7 +68,7 @@ void DrawHeaderFooterControl(const Control *c, ControlState /*state*/, Vector2 p
 	{
 		DrawTextAligned(data->label,
 						32,
-						COLOR_WHITE,
+						uiTheme.primaryText.textColor,
 						position,
 						c->size,
 						FONT_HALIGN_CENTER,

@@ -9,6 +9,7 @@
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -18,7 +19,7 @@ struct LabelControlData
 {
 	const char *str;
 	uint32_t size;
-	Color color;
+	UiTextColorset *colorset;
 	FontHorizontalAlign hAlign;
 	FontVerticalAlign vAlign;
 	char *font;
@@ -27,7 +28,7 @@ struct LabelControlData
 
 Control *CreateLabelControl(const char *str,
 							uint32_t size,
-							Color color,
+							UiTextColorset *colorset,
 							Vector2 rectPos,
 							Vector2 rectSize,
 							ControlAnchor anchor,

@@ -18,6 +18,7 @@
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -126,7 +127,7 @@ static void OptionsStateSet()
 		UiStackPush(optionsStack,
 					CreateLabelControl("Options",
 									   32,
-									   COLOR_WHITE,
+									   &uiTheme.primaryText,
 									   v2s(0),
 									   v2(480, 100),
 									   TOP_CENTER,

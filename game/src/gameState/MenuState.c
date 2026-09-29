@@ -19,6 +19,7 @@
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <time.h>
@@ -85,7 +86,7 @@ static void MenuStateSet()
 		UiStackPush(menuStack,
 					CreateLabelControl(versionStringBuffer,
 									   16,
-									   COLOR(0xFFa0a0a0),
+									   &uiTheme.secondaryText,
 									   v2s(0),
 									   v2(DEF_WIDTH, 60),
 									   BOTTOM_CENTER,
@@ -101,7 +102,7 @@ static void MenuStateSet()
 			UiStackPush(menuStack,
 						CreateLabelControl("the",
 										   64,
-										   COLOR_WHITE,
+										   &uiTheme.primaryText,
 										   v2(0, 16),
 										   v2(480, 64),
 										   TOP_CENTER,

@@ -18,6 +18,7 @@
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -51,7 +52,7 @@ static OptionsButtonValue invertCameraButtonValues[2] = {
 	},
 };
 
-static void BtnInputOptionsBack(Control */*control*/, void */*extraData*/)
+static void BtnInputOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
@@ -70,7 +71,7 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-static void BtnControlsOptions(Control */*control*/, void */*extraData*/)
+static void BtnControlsOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&ControlsOptionsState);
 }
@@ -152,8 +153,7 @@ static void InputOptionsStateSet()
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &GetState()
-																						->options
-																						.invertHorizontalMouse,
+																						->options.invertHorizontalMouse,
 															  },
 															  NULL));
 		OptionsMenuAddSmallControl(inputOptionsMenu,
@@ -167,8 +167,7 @@ static void InputOptionsStateSet()
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
-																  .boolValue = &GetState()
-																						->options.invertVerticalMouse,
+																  .boolValue = &GetState()->options.invertVerticalMouse,
 															  },
 															  NULL));
 		OptionsMenuAddSection(inputOptionsMenu, "Controller Options");
@@ -216,7 +215,8 @@ static void InputOptionsStateSet()
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &GetState()
-																						->options.invertVerticalController,
+																						->options
+																						.invertVerticalController,
 															  },
 															  NULL));
 		OptionsMenuAddSmallControl(inputOptionsMenu,
@@ -270,7 +270,7 @@ static void InputOptionsStateSet()
 		OptionsMenuAddLargeControl(inputOptionsMenu,
 								   CreateLabelControl(controllerNameBuffer,
 													  16,
-													  COLOR_WHITE,
+													  &uiTheme.primaryText,
 													  v2(0, 0),
 													  v2(750, 40),
 													  TOP_CENTER,

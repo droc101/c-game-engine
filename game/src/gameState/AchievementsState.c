@@ -17,6 +17,7 @@
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -26,12 +27,12 @@
 
 static OptionsMenu *achievementsOptionsMenu = NULL;
 
-static void DoneButton(Control */*control*/, void */*extraData*/)
+static void DoneButton(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&MenuState);
 }
 
-static void ResetButton(Control */*control*/, void */*extraData*/)
+static void ResetButton(Control * /*control*/, void * /*extraData*/)
 {
 	ResetAchievements();
 	SetGameState(&AchievementsState);
@@ -98,7 +99,7 @@ static void AchievementsStateSet()
 			OptionsMenuAddControl(achievementsOptionsMenu,
 								  CreateLabelControl("(none)",
 													 16,
-													 COLOR(0xFF808080),
+													 &uiTheme.disabledText,
 													 v2(0, 0),
 													 v2(750, 16),
 													 TOP_CENTER,
@@ -119,7 +120,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl(ach->name,
 														 16,
-														 COLOR_WHITE,
+														 &uiTheme.primaryText,
 														 v2(72, 0),
 														 v2(750 - 72, 32),
 														 TOP_LEFT,
@@ -130,7 +131,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl(ach->description,
 														 16,
-														 COLOR(0xFF808080),
+														 &uiTheme.secondaryText,
 														 v2(72, 40),
 														 v2(750 - 72, 64 - 40),
 														 TOP_LEFT,
@@ -153,7 +154,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl("(none)",
 														 16,
-														 COLOR(0xFF808080),
+														 &uiTheme.disabledText,
 														 v2(0, 0),
 														 v2(750, 16),
 														 TOP_CENTER,
@@ -166,7 +167,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl("Some hidden achievements...",
 														 16,
-														 COLOR(0xFF808080),
+														 &uiTheme.disabledText,
 														 v2(0, 0),
 														 v2(750, 16),
 														 TOP_CENTER,
@@ -188,7 +189,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl(ach->name,
 														 16,
-														 COLOR_WHITE,
+														 &uiTheme.primaryText,
 														 v2(72, 0),
 														 v2(750 - 72, 32),
 														 TOP_LEFT,
@@ -199,7 +200,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl(ach->description,
 														 16,
-														 COLOR(0xFF808080),
+														 &uiTheme.secondaryText,
 														 v2(72, 40),
 														 v2(750 - 72, 64 - 40),
 														 TOP_LEFT,
@@ -215,7 +216,7 @@ static void AchievementsStateSet()
 				OptionsMenuAddControl(achievementsOptionsMenu,
 									  CreateLabelControl("...and some hidden achievements",
 														 16,
-														 COLOR(0xFF808080),
+														 &uiTheme.disabledText,
 														 v2(0, 0),
 														 v2(750, 16),
 														 TOP_CENTER,

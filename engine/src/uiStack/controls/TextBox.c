@@ -14,6 +14,7 @@
 #include <engine/subsystem/Timing.h>
 #include <engine/uiStack/controls/TextBox.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -64,17 +65,17 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 	{
 		DrawTextAligned(data->placeholder,
 						16,
-					COLOR(0x7F000000),
+						uiTheme.placeholderText.textColor,
 						v2(position.x + 6, position.y + 6),
-					v2(control->size.x - 12, control->size.y - 12),
-					FONT_HALIGN_LEFT,
-					FONT_VALIGN_MIDDLE,
+						v2(control->size.x - 12, control->size.y - 12),
+						FONT_HALIGN_LEFT,
+						FONT_VALIGN_MIDDLE,
 						FONT("small_font"));
 	} else
 	{
 		DrawTextAligned(data->text,
 						16,
-						COLOR_BLACK,
+						uiTheme.inputText.textColor,
 						v2(position.x + 6, position.y + 6),
 						v2(control->size.x - 12, control->size.y - 12),
 						FONT_HALIGN_LEFT,
@@ -88,7 +89,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 	{
 		DrawTextAligned("_",
 						16,
-						COLOR_BLACK,
+						uiTheme.inputText.textColor,
 						v2(position.x + 6 + textSize.x, position.y + 6 + 4),
 						v2(12, control->size.y - 12),
 						FONT_HALIGN_LEFT,
@@ -102,7 +103,7 @@ void DrawTextBox(const Control *control, ControlState /*state*/, const Vector2 p
 	UpdateTextInputRect();
 	DrawTextAligned(data->ime_edit,
 					16,
-					COLOR(0x7F000000),
+					uiTheme.placeholderText.textColor,
 					v2(position.x + 6 + data->input.cursorOffsetPixels, position.y + 6),
 					v2(control->size.x - 12 - data->input.cursorOffsetPixels, control->size.y - 12),
 					FONT_HALIGN_LEFT,

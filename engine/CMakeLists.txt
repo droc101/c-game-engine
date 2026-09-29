@@ -270,6 +270,8 @@ target_sources(engine INTERFACE
         include/engine/uiStack/UiStack.h
         src/uiStack/ScrollView.c
         include/engine/uiStack/ScrollView.h
+        src/uiStack/UiTheme.c
+        include/engine/uiStack/UiTheme.h
 
         src/Engine.c
         include/engine/Engine.h

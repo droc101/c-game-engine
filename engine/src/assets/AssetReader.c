@@ -23,6 +23,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <engine/uiStack/UiTheme.h>
 #include <errno.h>
 #include <m-core.h>
 #include <stdbool.h>
@@ -361,6 +362,8 @@ void HotReloadAssets()
 
 	DestroyAssetCache();
 	AssetCacheInit();
+
+	LoadUiTheme();
 
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 }

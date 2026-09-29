@@ -20,6 +20,7 @@
 #include <engine/uiStack/controls/IconButton.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <gameState/OptionsState.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
@@ -370,7 +371,7 @@ static void ControlsOptionsStateSet()
 			OptionsMenuAddControl(controlOptionsMenu,
 								  CreateLabelControl(cat->categoryName,
 													 16,
-													 COLOR_WHITE,
+													 &uiTheme.primaryText,
 													 v2s(0),
 													 v2(750, 40),
 													 TOP_LEFT,
@@ -386,7 +387,7 @@ static void ControlsOptionsStateSet()
 				OptionsMenuAddControl(controlOptionsMenu,
 									  CreateLabelControl(entry->displayName,
 														 16,
-														 COLOR_WHITE,
+														 &uiTheme.primaryText,
 														 v2s(0),
 														 v2(750 - 40 - 6 - 190 - 6 - 190 - 6, 40),
 														 TOP_LEFT,

@@ -13,6 +13,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -174,7 +175,7 @@ void DrawOptionsButton(const Control *c, ControlState state, Vector2 position)
 
 	DrawTextAligned(label,
 					16,
-					COLOR_BLACK,
+					uiTheme.buttonText.textColor,
 					position,
 					c->size,
 					FONT_HALIGN_CENTER,

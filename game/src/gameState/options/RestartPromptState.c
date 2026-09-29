@@ -18,6 +18,7 @@
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -25,12 +26,12 @@
 
 static UiStack *menuStack = NULL;
 
-static void BtnDontRelaunch(Control */*control*/, void */*extraData*/)
+static void BtnDontRelaunch(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&OptionsState);
 }
 
-static void BtnRelaunch(Control */*control*/, void */*extraData*/)
+static void BtnRelaunch(Control * /*control*/, void * /*extraData*/)
 {
 	RestartProgram();
 }
@@ -72,7 +73,7 @@ static void RestartPromptStateSet()
 		UiStackPush(menuStack,
 					CreateLabelControl("Restart Required",
 									   32,
-									   COLOR_WHITE,
+									   &uiTheme.primaryText,
 									   v2(0, -70),
 									   v2(550, 40),
 									   MIDDLE_CENTER,
@@ -84,7 +85,7 @@ static void RestartPromptStateSet()
 					CreateLabelControl("You have changed options that require a relaunch. Would you like to relaunch "
 									   "now?",
 									   16,
-									   COLOR_WHITE,
+									   &uiTheme.primaryText,
 									   v2(0, -30),
 									   v2(DEF_WIDTH, 40),
 									   MIDDLE_CENTER,

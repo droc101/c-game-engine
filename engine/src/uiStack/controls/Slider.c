@@ -12,6 +12,7 @@
 #include <engine/subsystem/Input.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
@@ -231,9 +232,9 @@ void UpdateSlider(UiStack *stack, Control *c, Vector2 /*localMousePos*/, const u
 	{
 		const float newVal = remap(GetMousePos(mainThreadInput).x - c->anchoredPosition.x,
 								   0.0,
-									c->size.x,
-									data->min,
-									data->max);
+								   c->size.x,
+								   data->min,
+								   data->max);
 
 		float step = data->step;
 		if (IsKeyPressed(mainThreadInput, SDL_SCANCODE_LSHIFT) || IsKeyPressed(mainThreadInput, SDL_SCANCODE_RSHIFT))
@@ -261,7 +262,7 @@ void DrawSlider(const Control *c, const ControlState /*state*/, const Vector2 po
 	char *buf = data->getLabel(c);
 	DrawTextAligned(buf,
 					16,
-					COLOR_BLACK,
+					uiTheme.sliderText.shadowColor,
 					Vector2Add(position, v2s(2)),
 					c->size,
 					FONT_HALIGN_CENTER,
@@ -269,7 +270,7 @@ void DrawSlider(const Control *c, const ControlState /*state*/, const Vector2 po
 					FONT("small_font"));
 	DrawTextAligned(buf,
 					16,
-					COLOR_WHITE,
+					uiTheme.sliderText.textColor,
 					position,
 					c->size,
 					FONT_HALIGN_CENTER,

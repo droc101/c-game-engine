@@ -34,6 +34,7 @@
 #include <engine/subsystem/SteamworksManager.h>
 #include <engine/subsystem/TextInputSystem.h>
 #include <engine/subsystem/Timing.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
@@ -283,6 +284,8 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	}
 
 	InitDPrintConsole();
+
+	LoadUiTheme();
 
 	LoadingStateDoneCallback = initInfo.LoadingStateDoneCallback;
 	LoadingStateErrorCallback = initInfo.LoadingStateErrorCallback;

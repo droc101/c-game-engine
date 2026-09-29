@@ -12,6 +12,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -86,10 +87,9 @@ void DrawButton(const Control *c, const ControlState state, const Vector2 positi
 		}
 
 
-
 		DrawTextAligned(data->text,
 						16,
-						COLOR_BLACK,
+						uiTheme.buttonText.textColor,
 						position,
 						c->size,
 						FONT_HALIGN_CENTER,
@@ -100,12 +100,11 @@ void DrawButton(const Control *c, const ControlState state, const Vector2 positi
 		DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_disabled"));
 		DrawTextAligned(data->text,
 						16,
-						COLOR(0x80ffffff),
+						uiTheme.disabledText.textColor,
 						position,
 						c->size,
 						FONT_HALIGN_CENTER,
 						FONT_VALIGN_MIDDLE,
 						FONT("small_font"));
-
 	}
 }

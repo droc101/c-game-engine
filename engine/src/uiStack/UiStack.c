@@ -25,6 +25,7 @@
 #include <engine/uiStack/controls/TextBox.h>
 #include <engine/uiStack/controls/VScrollBar.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
@@ -393,7 +394,7 @@ void DrawUiStack(const UiStack *stack)
 	}
 }
 
-Vector2 CalculateControlPosition(const Control *control, const void */*positioningData*/)
+Vector2 CalculateControlPosition(const Control *control, const void * /*positioningData*/)
 {
 	Vector2 pos = control->position;
 	const ControlAnchor anchor = control->anchor;
@@ -528,5 +529,5 @@ void RenderTooltipAt(const char *text, Vector2 origin)
 	origin.y = fmaxf(0, origin.y);
 
 	DrawNinePatchTexture(origin, size, 12, 12, TEXTURE("interface/tooltip"));
-	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, COLOR_WHITE, FONT("small_font"));
+	FontDrawString(Vector2Add(origin, v2s(12)), text, 16, uiTheme.primaryText.textColor, FONT("small_font"));
 }
