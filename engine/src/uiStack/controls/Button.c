@@ -68,27 +68,44 @@ void UpdateButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_
 
 void DrawButton(const Control *c, const ControlState state, const Vector2 position)
 {
-	switch (state)
-	{
-		case NORMAL:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button"));
-			break;
-		case HOVER:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_hover"));
-			break;
-		case ACTIVE:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_pressed"));
-			break;
-	}
-
 	const ButtonData *data = (ButtonData *)c->controlData;
 
-	DrawTextAligned(data->text,
-					16,
-					COLOR_BLACK,
-					position,
-					c->size,
-					FONT_HALIGN_CENTER,
-					FONT_VALIGN_MIDDLE,
-					FONT("small_font"));
+	if (data->enabled)
+	{
+		switch (state)
+		{
+			case NORMAL:
+				DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button"));
+				break;
+			case HOVER:
+				DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_hover"));
+				break;
+			case ACTIVE:
+				DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_pressed"));
+				break;
+		}
+
+
+
+		DrawTextAligned(data->text,
+						16,
+						COLOR_BLACK,
+						position,
+						c->size,
+						FONT_HALIGN_CENTER,
+						FONT_VALIGN_MIDDLE,
+						FONT("small_font"));
+	} else
+	{
+		DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_disabled"));
+		DrawTextAligned(data->text,
+						16,
+						COLOR(0x80ffffff),
+						position,
+						c->size,
+						FONT_HALIGN_CENTER,
+						FONT_VALIGN_MIDDLE,
+						FONT("small_font"));
+
+	}
 }

@@ -6,6 +6,7 @@
 #define GAME_DPRINT_H
 
 #include <engine/structs/Color.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /**
@@ -30,5 +31,7 @@ void DPrint(const char *str, Color color);
 void DPrintF(const char *format, Color color, ...);
 
 void DPrintSpacing(uint32_t spacing);
+
+void DPrintSetSide(bool isRightSide);
 
 #endif //GAME_DPRINT_H

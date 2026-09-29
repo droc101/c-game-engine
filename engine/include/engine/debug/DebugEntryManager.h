@@ -19,12 +19,21 @@ typedef enum DebugEntryMode
 	DEBUG_ENTRY_MODE_MAX,
 } DebugEntryMode;
 
+typedef enum DebugEntrySide
+{
+	DEBUG_ENTRY_LEFT_SIDE,
+	DEBUG_ENTRY_RIGHT_SIDE,
+	DEBUG_ENTRY_NO_SIDE,
+} DebugEntrySide;
+
 typedef struct DebugEntry
 {
 	char *key;
 	DebugEntryFunction process;
 	DebugEntryMode mode;
 	DebugEntryMode defaultMode;
+	DebugEntrySide side;
+	DebugEntrySide defaultSide;
 	int spacing;
 } DebugEntry;
 

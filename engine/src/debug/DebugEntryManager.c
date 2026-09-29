@@ -48,6 +48,7 @@ static bool expandedMenu = false;
 static void RegisterDebugEntry(const char *key,
 							   const DebugEntryFunction entry,
 							   const DebugEntryMode defaultMode,
+							   const DebugEntrySide defaultSide,
 							   const int spacing)
 {
 	DebugEntry *e = malloc(sizeof(DebugEntry));
@@ -57,6 +58,8 @@ static void RegisterDebugEntry(const char *key,
 	e->process = entry;
 	e->mode = defaultMode;
 	e->defaultMode = defaultMode;
+	e->side = defaultSide;
+	e->defaultSide = defaultSide;
 	e->spacing = spacing;
 	ListAdd(debugEntries, e);
 }
@@ -217,32 +220,32 @@ void InitDebugEntryManager()
 {
 	ListInit(debugEntries, LIST_POINTER);
 	// Version group
-	RegisterDebugEntry("engine_version", DebugEntryVersion, DEBUG_ENTRY_SHOWN, 5);
-	RegisterDebugEntry("git_commit", DebugEntryGitCommit, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("engine_version", DebugEntryVersion, DEBUG_ENTRY_SHOWN, DEBUG_ENTRY_RIGHT_SIDE, 5);
+	RegisterDebugEntry("git_commit", DebugEntryGitCommit, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_LEFT_SIDE, 5);
 
 	// Normal debug entries
-	RegisterDebugEntry("fps", DebugEntryFPS, DEBUG_ENTRY_SHOWN, 5);
-	RegisterDebugEntry("tps", DebugEntryTPS, DEBUG_ENTRY_SHOWN, 5);
-	RegisterDebugEntry("fps_graph", FrameGraphDraw, DEBUG_ENTRY_TOGGLE, 0);
-	RegisterDebugEntry("tps_graph", TickGraphDraw, DEBUG_ENTRY_TOGGLE, 0);
-	RegisterDebugEntry("player_position", DebugEntryPlayerPosition, DEBUG_ENTRY_TOGGLE, 5);
-	RegisterDebugEntry("player_velocity", DebugEntryPlayerVelocity, DEBUG_ENTRY_TOGGLE, 5);
-	RegisterDebugEntry("player_actor_interaction", DebugEntryPlayerActor, DEBUG_ENTRY_TOGGLE, 5);
-	RegisterDebugEntry("map", DebugEntryMap, DEBUG_ENTRY_DISABLED, 5);
-	RegisterDebugEntry("scene_statistics", VK_DPrintSceneStatistics, DEBUG_ENTRY_DISABLED, 5);
-	RegisterDebugEntry("camera", DebugEntryCamera, DEBUG_ENTRY_DISABLED, 5);
-	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, 5);
-	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, 5);
-	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, 5);
-	RegisterDebugEntry("io_queue", DebugEntryIoQueue, DEBUG_ENTRY_DISABLED, 5);
+	RegisterDebugEntry("fps", DebugEntryFPS, DEBUG_ENTRY_SHOWN, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("tps", DebugEntryTPS, DEBUG_ENTRY_SHOWN, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("fps_graph", FrameGraphDraw, DEBUG_ENTRY_TOGGLE, DEBUG_ENTRY_NO_SIDE, 0);
+	RegisterDebugEntry("tps_graph", TickGraphDraw, DEBUG_ENTRY_TOGGLE, DEBUG_ENTRY_NO_SIDE, 0);
+	RegisterDebugEntry("player_position", DebugEntryPlayerPosition, DEBUG_ENTRY_TOGGLE, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("player_velocity", DebugEntryPlayerVelocity, DEBUG_ENTRY_TOGGLE, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("player_actor_interaction", DebugEntryPlayerActor, DEBUG_ENTRY_TOGGLE, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("map", DebugEntryMap, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("scene_statistics", VK_DPrintSceneStatistics, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("camera", DebugEntryCamera, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_LEFT_SIDE, 5);
+	RegisterDebugEntry("system_specs", DebugEntrySystem, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_RIGHT_SIDE, 5);
+	RegisterDebugEntry("sound_system", DPrintSoundSystem, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_RIGHT_SIDE, 5);
+	RegisterDebugEntry("asset_caches", DebugEntryAssetLoaders, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_RIGHT_SIDE, 5);
+	RegisterDebugEntry("io_queue", DebugEntryIoQueue, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_RIGHT_SIDE, 5);
 
 	// Console
-	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, 5);
+	RegisterDebugEntry("console", DrawDPrintConsole, DEBUG_ENTRY_SHOWN, DEBUG_ENTRY_LEFT_SIDE, 5);
 
 	// Nonstandard debug entries
-	RegisterDebugEntry("ui_stack_layout_bounds", NULL, DEBUG_ENTRY_DISABLED, 0);
+	RegisterDebugEntry("ui_stack_layout_bounds", NULL, DEBUG_ENTRY_DISABLED, DEBUG_ENTRY_NO_SIDE, 0);
 #ifdef JPH_DEBUG_RENDERER
-	RegisterDebugEntry("jolt_debug_renderer", NULL, DEBUG_ENTRY_TOGGLE, 0);
+	RegisterDebugEntry("jolt_debug_renderer", NULL, DEBUG_ENTRY_TOGGLE, DEBUG_ENTRY_NO_SIDE, 0);
 #endif
 }
 
@@ -258,10 +261,12 @@ void RenderDebugEntries()
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
 		if (ent->process && (ent->mode == DEBUG_ENTRY_SHOWN || (ent->mode == DEBUG_ENTRY_TOGGLE && expandedMenu)))
 		{
+			DPrintSetSide(ent->side == DEBUG_ENTRY_RIGHT_SIDE);
 			ent->process();
 			DPrintSpacing(ent->spacing);
 		}
 	}
+	DPrintSetSide(false);
 }
 
 void LoadDebugEntrySettings(KvList from)
@@ -272,11 +277,21 @@ void LoadDebugEntrySettings(KvList from)
 		for (size_t i = 0; i < debugEntries.length; i++)
 		{
 			DebugEntry *ent = ListGetPointer(debugEntries, i);
-			ent->mode = KvGetByte(debugEntrySettings, ent->key, ent->defaultMode);
+			KvList entryKvl;
+			if (KvGetList(debugEntrySettings, ent->key, entryKvl))
+			{
+				ent->mode = KvGetByte(entryKvl, "display_mode", ent->defaultMode);
+				ent->side = KvGetByte(entryKvl, "display_side", ent->defaultSide);
+				KvListDestroy(entryKvl);
+			}
 			if (ent->mode >= DEBUG_ENTRY_MODE_MAX)
 			{
 				LogWarning("Invalid saved mode %d for debug entry \"%s\"\n", ent->mode, ent->key);
 				ent->mode = ent->defaultMode;
+			}
+			if (ent->side > DEBUG_ENTRY_NO_SIDE)
+			{
+				LogWarning("Invalid saved side %s for debug entry \"%s\"\n", ent->side, ent->key);
 			}
 		}
 		KvListDestroy(debugEntrySettings);
@@ -301,7 +316,16 @@ void SaveDebugEntrySettings(KvList to)
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
 		const DebugEntry *ent = ListGetPointer(debugEntries, i);
-		KvSetByte(debugEntrySettings, ent->key, ent->mode);
+		KvList entryKvl;
+		KvListCreate(entryKvl);
+		KvSetByte(entryKvl, "display_mode", ent->mode);
+		if (ent->defaultSide != DEBUG_ENTRY_NO_SIDE)
+		{
+			KvSetByte(entryKvl, "display_side", ent->side);
+		}
+
+		KvSetList(debugEntrySettings, ent->key, entryKvl);
+		KvListDestroy(entryKvl);
 	}
 	KvSetList(to, "debug_entries", debugEntrySettings);
 	KvSetBool(to, "extended_menu_visible", expandedMenu);
