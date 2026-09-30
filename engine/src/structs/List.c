@@ -261,7 +261,7 @@ void _LockingListRemoveAt(LockingList *list, const size_t index)
 }
 
 
-void _ListInsertAfter(List *list, size_t index, void *data)
+void _ListInsert(List *list, size_t index, void *data)
 {
 	assert(list);
 
@@ -271,11 +271,9 @@ void _ListInsertAfter(List *list, size_t index, void *data)
 		return;
 	}
 
-	assert(index <= list->length);
+	assert(index < list->length);
 
-	index++;
 	list->length++;
-	// TODO: handle LIST_NESTED (even if said handling is an assert/error)
 	switch (list->data->type)
 	{
 		case LIST_POINTER:
@@ -310,15 +308,17 @@ void _ListInsertAfter(List *list, size_t index, void *data)
 					sizeof(int32_t) * (list->length - index - 1));
 			list->data->int32Data[index] = (int32_t)(uintptr_t)data;
 			break;
+		default:
+			Error("Unimplemented ListInsert on LIST_NESTED");
 	}
 }
 
-void _LockingListInsertAfter(LockingList *list, const size_t index, void *data)
+void _LockingListInsert(LockingList *list, const size_t index, void *data)
 {
 	assert(list);
 
 	ListLock(*list);
-	_ListInsertAfter((List *)list, index, data);
+	_ListInsert((List *)list, index, data);
 	ListUnlock(*list);
 }
 
@@ -332,7 +332,6 @@ size_t _ListFind(const List *list, const void *data)
 
 	for (size_t i = 0; i < list->length; i++)
 	{
-		// TODO: handle LIST_NESTED (even if said handling is an assert/error)
 		switch (list->data->type)
 		{
 			case LIST_POINTER:
@@ -359,6 +358,8 @@ size_t _ListFind(const List *list, const void *data)
 					return i;
 				}
 				break;
+			default:
+				Error("Unimplemented ListFind on LIST_NESTED");
 		}
 	}
 	return -1;
@@ -374,7 +375,6 @@ size_t _LockingListFind(LockingList *list, const void *data)
 	ListLock(*list);
 	for (size_t i = 0; i < list->length; i++)
 	{
-		// TODO: handle LIST_NESTED (even if said handling is an assert/error)
 		switch (list->data->type)
 		{
 			case LIST_POINTER:
@@ -405,6 +405,8 @@ size_t _LockingListFind(LockingList *list, const void *data)
 					return i;
 				}
 				break;
+			default:
+				Error("Unimplemented LockingListFind on LIST_NESTED");
 		}
 	}
 	ListUnlock(*list);

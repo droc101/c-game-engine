@@ -199,7 +199,7 @@ void InitAddonLoader()
 
 static void RemoveAddonAssetPaths()
 {
-	for (size_t i = gameConfig.assetPaths.length - 1; i > 0; i--)
+	for (int i = (int)gameConfig.assetPaths.length - 1; i >= 0; i--)
 	{
 		const AssetPath *path = ListGetPointer(gameConfig.assetPaths, i);
 		if ((path->flags & ASSET_PATH_RUNTIME_LOADED) != 0)
@@ -227,7 +227,7 @@ void ApplyAddonAssetPaths()
 	for (size_t i = enabledAddons.length - 1; i != SIZE_MAX; i--)
 	{
 		Addon *addon = GetAddonById(ListGetPointer(enabledAddons, i));
-		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath); // TODO this needs to be inserted AT index 0, not after
+		ListInsert(gameConfig.assetPaths, 0, &addon->assetPath);
 	}
 }
 
