@@ -70,7 +70,7 @@ static OptionsButtonValue preferWaylandButtonValues[2] = {
 	},
 };
 
-static void BtnVideoOptionsBack(Control */*control*/, void */*extraData*/)
+static void BtnVideoOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	if (hasChangedVideoOptions)
@@ -81,9 +81,19 @@ static void BtnVideoOptionsBack(Control */*control*/, void */*extraData*/)
 	SetGameState(&OptionsState);
 }
 
-static char *SliderLabelShadowMapQuality(const Control *slider)
+static char *SliderLabelShadowMapResolution(const Control *slider)
 {
 	char *labels[] = {"Disabled", "128px", "256px", "512px", "1024px", "2048px", "4096px"};
+	const SliderData *data = (SliderData *)slider->controlData;
+	char *buf = malloc(64);
+	CheckAlloc(buf);
+	sprintf(buf, "%s: %s", data->label, labels[(int)GetSliderValueAsFloat(slider->controlData)]);
+	return buf;
+}
+
+static char *SliderLabelShadowMapSoftShadowQuality(const Control *slider)
+{
+	char *labels[] = {"Lowest", "Low", "Medium", "High", "Ultra"};
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
@@ -137,18 +147,18 @@ static char *SliderLabelMaxFps(const Control *slider)
 	return buf;
 }
 
-static void OptBtnFullscreenChanged(const OptionsButtonValue */*value*/, void */*extraData*/)
+static void OptBtnFullscreenChanged(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
 }
 
-static void ToggleVsyncCallback(const OptionsButtonValue */*value*/, void */*extraData*/)
+static void ToggleVsyncCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	hasChangedVideoOptions = true; // Until Luna can do this
 	rendererQueuedActions |= QUEUED_ACTION_TOGGLE_VSYNC;
 }
 
-static void ClearTexturesOptBtnCallback(const OptionsButtonValue */*value*/, void * /*extraData*/)
+static void ClearTexturesOptBtnCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
@@ -158,15 +168,20 @@ static void ClearTexturesSliderCallback(const ControlValue * /*value*/)
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 }
 
-static void RequireRestartCallback(const OptionsButtonValue */*value*/, void */*extraData*/)
+static void RequireRestartCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	hasChangedVideoOptions = true;
 	// Change will happen next restart
 }
 
-static void SldOptionsShadowMapQuality(const ControlValue * /*value*/)
+static void SldOptionsShadowMapResolution(const ControlValue * /*value*/)
 {
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
+}
+
+static void SldOptionsShadowMapSoftShadowQuality(const ControlValue * /*value*/)
+{
+	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY;
 }
 
 static void UpdateMsaaCallback(const ControlValue * /*value*/)
@@ -180,7 +195,8 @@ static void UpdateVideoPresetCallback(const ControlValue * /*value*/)
 	ApplyVideoPreset(&GetState()->options, currentVideoPreset);
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES |
 							 QUEUED_ACTION_UPDATE_MSAA |
-							 QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
+							 QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION |
+							 QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY;
 	hasChangedVideoOptions = true; // until luna can change msaa
 }
 
@@ -356,18 +372,35 @@ static void VideoOptionsStateSet()
 								   CreateSliderControl(v2s(0),
 													   v2s(0),
 													   "Shadow Resolution",
-													   SldOptionsShadowMapQuality,
+													   SldOptionsShadowMapResolution,
 													   TOP_CENTER,
 													   0.0,
 													   6.0,
 													   (ControlValue){
 														   .type = CONTROL_VALUE_DWORD,
-														   .dwordValue = &GetState()->options.shadowMapQuality,
+														   .dwordValue = &GetState()->options.shadowMapResolution,
 													   },
 													   1,
 													   1,
-													   SliderLabelShadowMapQuality,
+													   SliderLabelShadowMapResolution,
 													   "The resolution to use for shadow maps"));
+		OptionsMenuAddLargeControl(videoOptionsMenu,
+								   CreateSliderControl(v2s(0),
+													   v2s(0),
+													   "Soft Shadow Quality",
+													   SldOptionsShadowMapSoftShadowQuality,
+													   TOP_CENTER,
+													   0.0,
+													   4.0,
+													   (ControlValue){
+														   .type = CONTROL_VALUE_DWORD,
+														   .dwordValue = &GetState()
+																				  ->options.shadowMapSoftShadowQuality,
+													   },
+													   1,
+													   1,
+													   SliderLabelShadowMapSoftShadowQuality,
+													   "Quality of the soft shadow edges"));
 		OptionsMenuAddLargeControl(videoOptionsMenu,
 								   CreateSliderControl(v2s(0),
 													   v2s(0),

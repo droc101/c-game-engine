@@ -13,7 +13,8 @@ typedef struct VideoPresetData
 	bool mipmaps;
 	float lodMultiplier;
 	OptionsAnisotropy anisotropy;
-	OptionsShadowMapResolution shadowMapQuality;
+	OptionsShadowMapResolution shadowMapResolution;
+	OptionsShadowMapSoftShadowQuality shadowMapSoftShadowQuality;
 } VideoPresetData;
 
 static const VideoPresetData VERY_LOW_PRESET = {
@@ -21,7 +22,8 @@ static const VideoPresetData VERY_LOW_PRESET = {
 	.mipmaps = false,
 	.lodMultiplier = 0.5f,
 	.anisotropy = ANISOTROPY_NONE,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_DISABLED,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_DISABLED,
+	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST,
 };
 
 static const VideoPresetData LOW_PRESET = {
@@ -29,7 +31,8 @@ static const VideoPresetData LOW_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_4X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_512,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_512,
+	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW,
 };
 
 static const VideoPresetData MEDIUM_PRESET = {
@@ -37,7 +40,8 @@ static const VideoPresetData MEDIUM_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_8X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_1024,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_1024,
+	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM,
 };
 
 static const VideoPresetData HIGH_PRESET = {
@@ -45,7 +49,8 @@ static const VideoPresetData HIGH_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.5f,
 	.anisotropy = ANISOTROPY_16X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_2048,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_2048,
+	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH,
 };
 
 static const VideoPresetData ULTRA_PRESET = {
@@ -53,7 +58,8 @@ static const VideoPresetData ULTRA_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 2.0f,
 	.anisotropy = ANISOTROPY_16X,
-	.shadowMapQuality = SHADOW_MAP_RESOLUTION_4096,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_4096,
+	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA,
 };
 
 static bool IsPresetDataActive(const VideoPresetData *preset, const Options *options)
@@ -62,7 +68,8 @@ static bool IsPresetDataActive(const VideoPresetData *preset, const Options *opt
 		   options->mipmaps == preset->mipmaps &&
 		   options->lodMultiplier == preset->lodMultiplier &&
 		   options->anisotropy == preset->anisotropy &&
-		   options->shadowMapQuality == preset->shadowMapQuality;
+		   options->shadowMapResolution == preset->shadowMapResolution &&
+		   options->shadowMapSoftShadowQuality == preset->shadowMapSoftShadowQuality;
 }
 
 static void ApplyPresetData(const VideoPresetData *preset, Options *options)
@@ -71,7 +78,8 @@ static void ApplyPresetData(const VideoPresetData *preset, Options *options)
 	options->mipmaps = preset->mipmaps;
 	options->lodMultiplier = preset->lodMultiplier;
 	options->anisotropy = preset->anisotropy;
-	options->shadowMapQuality = preset->shadowMapQuality;
+	options->shadowMapResolution = preset->shadowMapResolution;
+	options->shadowMapSoftShadowQuality = preset->shadowMapSoftShadowQuality;
 }
 
 VideoPreset GetCurrentVideoPreset(const Options *options)

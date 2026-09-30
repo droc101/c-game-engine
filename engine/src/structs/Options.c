@@ -31,7 +31,6 @@ static void DefaultOptions(Options *options)
 	options->controllerSwapOkCancel = false;
 	options->scrollSpeed = 1.0f;
 	options->preferWayland = true;
-	options->shadowMapQuality = SHADOW_MAP_RESOLUTION_256;
 	options->fov = 90.0f;
 	options->maxFps = 0;
 	options->preferredGpuType = GPU_TYPE_DEDICATED;
@@ -179,7 +178,10 @@ void LoadOptions(Options *options)
 			options->mipmaps = KvGetBool(list, "mipmaps", true);
 			options->lodMultiplier = KvGetFloat(list, "lod_multiplier", 1.0f);
 			options->anisotropy = KvGetByte(list, "anisotropy", ANISOTROPY_16X);
-			options->shadowMapQuality = KvGetByte(list, "shadow_map_quality", SHADOW_MAP_RESOLUTION_256);
+			options->shadowMapResolution = KvGetByte(list, "shadow_map_resolution", SHADOW_MAP_RESOLUTION_1024);
+			options->shadowMapSoftShadowQuality = KvGetByte(list,
+															"shadow_map_soft_shadow_quality",
+															SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM);
 		}
 
 		options->musicVolume = KvGetFloat(list, "music_volume", 1.0f);
@@ -249,7 +251,8 @@ void SaveOptions(Options *options)
 		KvSetBool(list, "mipmaps", options->mipmaps);
 		KvSetFloat(list, "lod_multiplier", options->lodMultiplier);
 		KvSetByte(list, "anisotropy", options->anisotropy);
-		KvSetByte(list, "shadow_map_quality", options->shadowMapQuality);
+		KvSetByte(list, "shadow_map_resolution", options->shadowMapResolution);
+		KvSetByte(list, "shadow_map_soft_shadow_quality", options->shadowMapSoftShadowQuality);
 	}
 
 	KvSetFloat(list, "music_volume", options->musicVolume);

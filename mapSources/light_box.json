@@ -1929,7 +1929,7 @@
                 },
                 "bright_angle": {
                     "type": "float",
-                    "value": 30.0
+                    "value": 20.0
                 },
                 "brightness": {
                     "type": "float",
@@ -1954,7 +1954,7 @@
                 },
                 "fading_angle": {
                     "type": "float",
-                    "value": 20.0
+                    "value": 30.0
                 },
                 "linear_attenuation": {
                     "type": "float",

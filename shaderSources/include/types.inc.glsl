@@ -23,12 +23,13 @@ struct Light {
     float linearAttenuation;
     float quadraticAttenuation;
     float attenuationMultiplier;
-    float brightAngle;
-    float fadingAngle;
+    float brightSin;
+    float fadingSin;
+    float fadingCos;
     float maxDistance;
     uint shadowMapIndex;
     uint cookieTextureIndex;
-    float _padding[4];
+    float _padding[3];
     mat4 transformMatrix;
 };
 

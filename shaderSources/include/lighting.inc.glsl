@@ -34,6 +34,9 @@ layout(set = 0, binding = 5, scalar) readonly restrict buffer LightsData {
 layout(set = 0, binding = 8, scalar) readonly restrict buffer Clusters {
     Cluster clusters[512];
 } clusters;
+layout(set = 0, binding = 9, scalar) readonly restrict uniform SoftShadowKernels {
+    vec2 kernels[SAMPLE_COUNT];
+} softShadowKernels;
 
 layout(set = 0, binding = 6) uniform sampler2DShadow directionalLightShadowMapAtlas;
 layout(set = 1, binding = 0) uniform sampler2DShadow shadowMaps[];
@@ -59,7 +62,7 @@ uint getClusterIndex(const vec3 position, const float distance) {
 	return cluster.x + 8 * cluster.y + 64 * cluster.z;
 }
 
-float getLightBrightness(const Light light, const float distance, const float theta) {
+float getLightBrightness(const Light light, const float distance, const float angularDistance) {
     if (DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
         return 1.0;
     } else if (light.type == LIGHT_TYPE_DIRECTIONAL) {
@@ -71,20 +74,14 @@ float getLightBrightness(const Light light, const float distance, const float th
                 light.attenuationMultiplier * light.linearAttenuation * distance +
                 light.quadraticAttenuation * distance * distance);
         if (light.type == LIGHT_TYPE_SPOT) {
-            if (theta < light.brightAngle) {
-                brightness *= 0.75 + 0.25 * (light.brightAngle - theta) / light.brightAngle;
+            if (angularDistance < light.brightSin) {
+                brightness *= 0.75 + 0.25 * (light.brightSin - angularDistance) / light.brightSin;
             } else {
-                brightness *= 0.75 * (light.fadingAngle - theta) / (light.fadingAngle - light.brightAngle);
+                brightness *= 0.75 * (light.fadingSin - angularDistance) / (light.fadingSin - light.brightSin);
             }
         }
         return brightness;
-    } 
-}
-
-vec2 getSoftShadowKernel(const float sampleIndex) {
-    float r = sqrt(sampleIndex + 0.5) / sqrt(float(SAMPLE_COUNT));
-    float theta = sampleIndex * 2.4;
-    return vec2(cos(theta) * r, sin(theta) * r);
+    }
 }
 
 float sampleShadowMapInternal(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth, const float size) {
@@ -92,19 +89,19 @@ float sampleShadowMapInternal(nonuniformEXT sampler2DShadow shadowMap, const vec
         return texture(shadowMap, vec3(uv, depth));
     }
 
-    const float r = fract(dot(gl_FragCoord.xy, MAGIC)) * 6.283185307179586;
-    const float sr = sin(r);
-    const float cr = cos(r);
+    const float r = fract(dot(gl_FragCoord.xy, MAGIC));
+    const float sr = size * sin(r);
+    const float cr = size * cos(r);
     const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
 
-    float sum = 0.0;
-    vec2 sampleUv = uv + size * (diskRotation * getSoftShadowKernel(0));
+    float factors[SAMPLE_COUNT];
     for (uint i = 0; i < SAMPLE_COUNT; i++) {
-        float factor = texture(shadowMap, vec3(sampleUv, depth));
-        sampleUv = uv + size * (diskRotation * getSoftShadowKernel(i + 1));
-        sum += factor;
+        factors[i] = texture(shadowMap, vec3(uv + diskRotation * softShadowKernels.kernels[i], depth));
     }
-    return sum / float(SAMPLE_COUNT);
+    for (uint i = 1; i < SAMPLE_COUNT; i++) {
+        factors[0] += factors[i];
+    }
+    return factors[0] / float(SAMPLE_COUNT);
 }
 
 float sampleShadowMap(nonuniformEXT sampler2DShadow shadowMap, const vec2 uv, const float depth) {
@@ -151,24 +148,20 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
             const vec3 lightToWorldNormalized = normalize(lightToWorld);
             if (light.type == LIGHT_TYPE_SPOT) {
                 const float dottedDirection = dot(lightToWorldNormalized, light.negativeForwardDirection);
-                if (dottedDirection < 0) {
+                if (dottedDirection < light.fadingCos) {
+                    continue;
+                }
+                const float brightness = getLightBrightness(light, distance, sqrt(1 - dottedDirection * dottedDirection));
+                if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
                 const float normalFactor = dot(lightToWorldNormalized, normal);
                 if (normalFactor < EPSILON) {
                     continue;
                 }
-                const float theta = degrees(acos(dottedDirection));
-                if (theta > light.fadingAngle) {
-                    continue;
-                }
                 const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
                 const vec4 coord = worldPosition / (worldPosition.w - 0.01);
                 if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
-                    const float brightness = getLightBrightness(light, distance, theta);
-                    if (brightness < MIN_BRIGHTNESS) {
-                        continue;
-                    }
                     const float factor = sampleShadowMap(shadowMaps[nonuniformEXT(light.shadowMapIndex)], coord.xy, coord.z);
                     if (factor < EPSILON) {
                         continue;

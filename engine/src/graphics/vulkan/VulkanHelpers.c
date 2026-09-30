@@ -10,6 +10,7 @@
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -27,7 +28,6 @@
 #include <engine/structs/Viewmodel.h>
 #include <engine/subsystem/Error.h>
 #include <float.h>
-#include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
@@ -145,12 +145,12 @@ inline uint32_t ImageIndex(const Image *image)
 
 inline bool ShadowMapsEnabled(void)
 {
-	return GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED && lightCount != 0;
+	return GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED && lightCount != 0;
 }
 
 inline uint32_t ShadowMapResolution(void)
 {
-	switch (GetState()->options.shadowMapQuality)
+	switch (GetState()->options.shadowMapResolution)
 	{
 		case SHADOW_MAP_RESOLUTION_128:
 			lightmapTextureSize = 128;
@@ -597,6 +597,43 @@ void WriteFrustumsBuffer()
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
 			   "Failed to write frustums buffer!");
+}
+
+void UpdateSoftShadowKernels()
+{
+	const uint32_t bufferSize = sizeof(vec2) * specializationConstants.sampleCount;
+	vec2 *data = malloc(bufferSize);
+	CheckAlloc(data);
+
+	for (uint32_t i = 0; i < specializationConstants.sampleCount; i++)
+	{
+		const float index = (float)i;
+		const float r = sqrtf(index + 0.5f) / sqrtf((float)specializationConstants.sampleCount);
+		const float theta = index * 2.4f;
+		data[i][0] = cosf(theta) * r;
+		data[i][1] = sinf(theta) * r;
+	}
+
+	const LunaBufferWriteInfo writeInfo = {
+		.bytes = bufferSize,
+		.data = data,
+		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.softShadowKernels, &writeInfo),
+			   "Failed to write to soft shadow kernels buffer!");
+
+	const LunaDescriptorBufferInfo bufferInfo = {
+		.buffer = buffers.uniforms.softShadowKernels,
+	};
+	const LunaWriteDescriptorSet descriptorWrite = {
+		.descriptorSet = descriptorSets.common.set,
+		.bindingName = "Soft Shadow Kernels",
+		.descriptorCount = 1,
+		.bufferInfos = &bufferInfo,
+	};
+	lunaWriteDescriptorSets(device, 1, &descriptorWrite);
+
+	free(data);
 }
 
 void ClearCullingData()

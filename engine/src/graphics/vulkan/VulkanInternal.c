@@ -374,6 +374,12 @@ void CreateDescriptorSetLayouts()
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
 		},
+		{
+			.bindingName = "Soft Shadow Kernels",
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		},
 	};
 	const LunaDescriptorSetLayoutCreationInfo commonDescriptorSetLayoutCreationInfo = {
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
@@ -563,7 +569,7 @@ void CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 3,
+			.descriptorCount = 4,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,

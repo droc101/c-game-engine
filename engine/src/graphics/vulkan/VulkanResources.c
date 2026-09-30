@@ -137,6 +137,17 @@ static inline void CreateUniformBuffers()
 	};
 	VulkanTest(lunaCreateBuffer(device, &clustersBufferCreationInfo, &buffers.uniforms.clusters),
 			   "Failed to create clusters buffer!");
+
+	const LunaBufferCreationInfo softShadowKernelsBufferCreationInfo = {
+		.size = sizeof(vec2) * specializationConstants.sampleCount,
+		.alignment = alignment,
+		.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTest(lunaCreateBuffer(device, &softShadowKernelsBufferCreationInfo, &buffers.uniforms.softShadowKernels),
+			   "Failed to create soft shadow kernels uniform buffer!");
+	UpdateSoftShadowKernels();
 }
 
 static inline void CreateFrustumsBuffer()

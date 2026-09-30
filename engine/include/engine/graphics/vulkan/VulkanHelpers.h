@@ -261,6 +261,7 @@ typedef struct UniformBuffers
 	LunaBuffer fog;
 	LunaBuffer lights;
 	LunaBuffer clusters;
+	LunaBuffer softShadowKernels;
 } UniformBuffers;
 
 typedef struct ActorModelsBuffer
@@ -500,14 +501,13 @@ typedef struct VulkanLight
 	float linearAttenuation;
 	float quadraticAttenuation;
 	float attenuationMultiplier;
-	/// The angle at which the spotlight will retain up to 75% brightness
-	float brightAngle;
-	/// The angle at which the spotlight will reach 0% brightness
-	float fadingAngle;
+	float brightSin;
+	float fadingSin;
+	float fadingCos;
 	float maxDistance;
 	uint32_t shadowMapIndex;
 	uint32_t cookieTextureIndex;
-	float _padding[4];
+	float _padding[3];
 	CGLM_ALIGN_MAT mat4 transformMatrix;
 } VulkanLight;
 
@@ -597,6 +597,8 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 void UpdateDirectionalLightCascades(const Camera *camera, const Map *map);
 
 void WriteFrustumsBuffer();
+
+void UpdateSoftShadowKernels();
 
 void ClearCullingData();
 

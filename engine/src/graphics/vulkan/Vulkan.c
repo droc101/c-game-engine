@@ -737,8 +737,12 @@ static inline void LoadLight(Light *light,
 	vulkanLight->linearAttenuation = light->linearAttenuation;
 	vulkanLight->quadraticAttenuation = light->quadraticAttenuation;
 	vulkanLight->attenuationMultiplier = light->attenuationMultiplier;
-	vulkanLight->brightAngle = light->brightAngle;
-	vulkanLight->fadingAngle = light->fadingAngle;
+	if (light->type == LIGHT_TYPE_SPOT)
+	{
+		vulkanLight->brightSin = fabsf(sinf(glm_rad(light->brightAngle)));
+		vulkanLight->fadingSin = fabsf(sinf(glm_rad(light->fadingAngle)));
+		vulkanLight->fadingCos = fabsf(cosf(glm_rad(light->fadingAngle)));
+	}
 	vulkanLight->maxDistance = GetMaxLightDistance(light);
 	vulkanLight->cookieTextureIndex = (light->cookie == NULL || light->cookie[0] == '\0')
 											  ? 0
@@ -796,7 +800,7 @@ static inline void LoadLight(Light *light,
 			}
 			glm_quat_look(VECTOR3_TO_VEC3(vulkanLight->position), rotationQuat, frustums[*frustumIndex].viewMatrix);
 			mat4 projectionMatrix;
-			glm_perspective_lh_zo(glm_rad(2 * vulkanLight->fadingAngle),
+			glm_perspective_lh_zo(glm_rad(2 * light->fadingAngle),
 								  1,
 								  vulkanLight->maxDistance,
 								  LIGHT_NEAR_PLANE,
@@ -870,7 +874,7 @@ static inline void LoadLights(const Map *map)
 {
 	directionalLight = NULL;
 	if (map == NULL ||
-		GetState()->options.shadowMapQuality == SHADOW_MAP_RESOLUTION_DISABLED ||
+		GetState()->options.shadowMapResolution == SHADOW_MAP_RESOLUTION_DISABLED ||
 		dynamicLights.length + map->lightCount == 0)
 	{
 		AvxAlignedFree(frustums);
@@ -1686,7 +1690,7 @@ static inline void HandleDeferredWork()
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{
-		if (GetMap() != NULL && GetState()->options.shadowMapQuality != SHADOW_MAP_RESOLUTION_DISABLED)
+		if (GetMap() != NULL && GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED)
 		{
 			if (shadowMapRenderPass == VK_NULL_HANDLE || frustumCount == 1)
 			{
@@ -1736,6 +1740,43 @@ static inline void HandleDeferredWork()
 		CreateDepthGraphicsPipelines();
 
 		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_SHADERS;
+	}
+	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY)
+	{
+		switch (GetState()->options.shadowMapSoftShadowQuality)
+		{
+			default:
+			case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST:
+				specializationConstants.sampleCount = 0;
+				break;
+			case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW:
+				specializationConstants.sampleCount = 4;
+				specializationConstants.sampleRadius = 2;
+				break;
+			case SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM:
+				specializationConstants.sampleCount = 8;
+				specializationConstants.sampleRadius = 2;
+				break;
+			case SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH:
+				specializationConstants.sampleCount = 16;
+				specializationConstants.sampleRadius = 4;
+				break;
+			case SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA:
+				specializationConstants.sampleCount = 32;
+				specializationConstants.sampleRadius = 4;
+				break;
+		}
+
+		RecreateGraphicsPipelines();
+
+		VulkanTest(lunaResizeBuffer(device,
+									commandBuffer,
+									&buffers.uniforms.softShadowKernels,
+									sizeof(vec2) * specializationConstants.sampleCount),
+				   "Failed to resize soft shadow kernels buffer!");
+		UpdateSoftShadowKernels();
+
+		rendererQueuedActions &= ~QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY;
 	}
 	if (pendingTasks & PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS)
 	{
@@ -1859,6 +1900,9 @@ bool VK_Init(SDL_Window *window)
 			VK_API_VERSION_PATCH(physicalDeviceProperties.apiVersion));
 
 	InitActorLoadingVariables();
+
+	// TODO: Ideally we'd get this right the first time rather than recreating all the pipelines frame one
+	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY;
 
 	return true;
 }
