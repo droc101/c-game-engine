@@ -22,6 +22,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "engine/helpers/Arguments.h"
+
 #define ADDONS_PATH "addons"
 #define ADDON_CONFIG_FILENAME "addon.kvl"
 #define ADDON_ICON_FILENAME "icon.gtex"
@@ -223,6 +225,11 @@ void DestroyAddonLoader()
 void ApplyAddonAssetPaths()
 {
 	RemoveAddonAssetPaths();
+
+	if (HasCliArg("--disable-addons"))
+	{
+		return;
+	}
 
 	for (size_t i = enabledAddons.length - 1; i != SIZE_MAX; i--)
 	{
