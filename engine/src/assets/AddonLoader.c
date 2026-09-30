@@ -227,7 +227,7 @@ void ApplyAddonAssetPaths()
 	for (size_t i = enabledAddons.length - 1; i != SIZE_MAX; i--)
 	{
 		Addon *addon = GetAddonById(ListGetPointer(enabledAddons, i));
-		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
+		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath); // TODO this needs to be inserted AT index 0, not after
 	}
 }
 

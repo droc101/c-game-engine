@@ -364,6 +364,7 @@ void HotReloadAssets()
 	AssetCacheInit();
 
 	LoadUiTheme();
+	SetWindowIcon();
 
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 }

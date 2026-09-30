@@ -45,6 +45,8 @@ static SDL_Window *window;
 static int windowWidth;
 static int windowHeight;
 
+static SDL_Surface *windowIcon = NULL;
+
 RendererQueuedAction rendererQueuedActions = 0;
 
 void SetGameWindow(SDL_Window *w)
@@ -278,4 +280,17 @@ void AddDynamicLight(const DynamicLight *light)
 void RemoveDynamicLight(const DynamicLight *light)
 {
 	VK_RemoveDynamicLight(light);
+}
+
+void SetWindowIcon()
+{
+	if (windowIcon)
+	{
+		SDL_DestroySurface(windowIcon);
+	}
+	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
+	if (!SDL_SetWindowIcon(window, windowIcon))
+	{
+		LogError("Failed to set window icon: %s\n", SDL_GetError());
+	}
 }

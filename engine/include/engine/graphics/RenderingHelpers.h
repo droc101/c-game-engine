@@ -232,4 +232,9 @@ void AddDynamicLight(const DynamicLight *light);
  */
 void RemoveDynamicLight(const DynamicLight *light);
 
+/**
+ * (Re)set the window icon
+ */
+void SetWindowIcon();
+
 #endif //GAME_RENDERINGHELPERS_H

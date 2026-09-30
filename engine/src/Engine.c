@@ -50,7 +50,6 @@
 #include <stdint.h>
 #include <string.h>
 
-static SDL_Surface *windowIcon;
 static SDL_Event event;
 static bool shouldQuit = false;
 static double lastFrameTime = TARGET_FPS_NS_D;
@@ -155,10 +154,6 @@ void WindowAndRenderInit()
 
 	SDL_SetWindowMinimumSize(window, MIN_WIDTH, MIN_HEIGHT);
 	SDL_SetWindowMaximumSize(window, MAX_WIDTH, MAX_HEIGHT);
-
-	LogDebug("Setting window icon...\n");
-	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
-	SDL_SetWindowIcon(window, windowIcon);
 
 	SetWindowFocused(true);
 }
@@ -286,6 +281,7 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	InitDPrintConsole();
 
 	LoadUiTheme();
+	SetWindowIcon();
 
 	LoadingStateDoneCallback = initInfo.LoadingStateDoneCallback;
 	LoadingStateErrorCallback = initInfo.LoadingStateErrorCallback;
@@ -414,8 +410,6 @@ void DestroyEngine()
 	RenderDestroy();
 	LogDebug("Cleaning up window...\n");
 	SDL_DestroyWindow(GetGameWindow());
-	LogDebug("Cleaning up icon...\n");
-	SDL_DestroySurface(windowIcon);
 	DestroyAssetCache(); // Free all assets
 	DestroyAddonLoader();
 	DestroyGameConfig();
