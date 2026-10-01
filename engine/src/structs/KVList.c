@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/DataWriter.h>
 #include <engine/structs/Color.h>
@@ -13,8 +14,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "engine/assets/AssetReader.h"
 
 #pragma region Param Functions
 

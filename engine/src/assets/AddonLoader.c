@@ -8,6 +8,7 @@
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/KvlFile.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
@@ -21,8 +22,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#include "engine/helpers/Arguments.h"
 
 #define ADDONS_PATH "addons"
 #define ADDON_CONFIG_FILENAME "addon.kvl"
@@ -144,7 +143,6 @@ static void RescanAddons()
 	{
 		if (errno == ENOENT)
 		{
-
 			if (!MakeDirectory(ADDONS_PATH))
 			{
 				LogError("Failed to create addons directory: %s\n", strerror(errno));

@@ -2,7 +2,6 @@
 // Created by droc101 on 10/7/2025.
 //
 
-#include <../include/engine/physics/PhysicsThread.h>
 #include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
@@ -19,6 +18,7 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Achievements.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ControlOptions.h>

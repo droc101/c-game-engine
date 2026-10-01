@@ -3,11 +3,10 @@
 //
 
 #include <engine/actor/light/PointLight.h>
-#include <engine/structs/ActorDefinition.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Actor.h>
+#include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Light.h>
-
-#include "engine/graphics/RenderingHelpers.h"
 
 typedef struct PointLightData
 {

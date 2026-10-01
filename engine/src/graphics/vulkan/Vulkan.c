@@ -22,6 +22,7 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
@@ -57,8 +58,6 @@
 #include <string.h>
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
-
-#include "engine/physics/PlayerPhysics.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/graphics/vulkan/VulkanResources.h>
