@@ -295,6 +295,12 @@ void ProcessIOQueue(Map *map)
 {
 	ListLock(map->ioQueue);
 
+	if (map->ioQueue.length == 0)
+	{
+		ListUnlock(map->ioQueue);
+		return;
+	}
+
 	qsort(map->ioQueue.data->pointerData,
 		  map->ioQueue.length,
 		  sizeof(QueuedIoConnection *),
