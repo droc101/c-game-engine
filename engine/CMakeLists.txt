@@ -100,6 +100,8 @@ target_sources(engine INTERFACE
         include/engine/actor/light/PointLight.h
         src/actor/light/SpotLight.c
         include/engine/actor/light/SpotLight.h
+        src/actor/logic/LogicFunction.c
+        include/engine/actor/logic/LogicFunction.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

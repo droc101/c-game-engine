@@ -14,6 +14,7 @@
 #include <engine/actor/logic/LogicBinary.h>
 #include <engine/actor/logic/LogicCounter.h>
 #include <engine/actor/logic/LogicDecimal.h>
+#include <engine/actor/logic/LogicFunction.h>
 #include <engine/actor/prop/Button.h>
 #include <engine/actor/prop/PhysicsModel.h>
 #include <engine/actor/prop/Sprite.h>
@@ -99,6 +100,7 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterWorldText();
 	RegisterPointLight();
 	RegisterSpotLight();
+	RegisterLogicFunction();
 
 	if (RegisterGameActors)
 	{

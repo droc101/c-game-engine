@@ -1,0 +1,26 @@
+{
+  "description": "Repeatable set of I/O",
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "enable": {},
+    "disable": {},
+    "execute": {}
+  },
+  "outputs": {
+    "on_run": {
+      "description": "Emitted when this function is ran"
+    }
+  },
+  "params": {
+    "start_enabled": {
+      "default": true,
+      "type": "bool"
+    }
+  }
+}
