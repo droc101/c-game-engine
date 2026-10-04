@@ -2480,9 +2480,11 @@ void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *textur
 		vertices[i].a = color.a;
 		vertices[i].textureIndex = TextureIndex(texture);
 	}
-	for (size_t i = 0; i < triangleArray->indexCount; i++)
+	for (size_t i = 0; i < triangleArray->indexCount / 3; i++)
 	{
-		indices[i] = (*triangleArray->indices)[i] + vertexOffset;
+		indices[i * 3 + 0] = triangleArray->indices[i][0] + vertexOffset;
+		indices[i * 3 + 1] = triangleArray->indices[i][1] + vertexOffset;
+		indices[i * 3 + 2] = triangleArray->indices[i][2] + vertexOffset;
 	}
 
 	buffers.ui.freeQuads -= quadCount;

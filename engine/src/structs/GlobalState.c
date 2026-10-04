@@ -185,7 +185,7 @@ void ChangeMap(Map *map)
 		DestroyMap(state.map);
 	}
 	state.map = map;
-	state.camera = &state.map->player.playerCamera;
+	state.camera = map ? &state.map->player.playerCamera : NULL;
 	PhysicsThreadUnlockTickMutex();
 }
 
