@@ -56,5 +56,5 @@ void RegisterLogicFunction()
 	RegisterActorInput(&logicFunctionActorDefinition, LOGIC_FUNCTION_INPUT_ENABLE, LogicFunctionEnableHandler);
 	RegisterActorInput(&logicFunctionActorDefinition, LOGIC_FUNCTION_INPUT_DISABLE, LogicFunctionDisableHandler);
 	RegisterActorInput(&logicFunctionActorDefinition, LOGIC_FUNCTION_INPUT_RUN, LogicFunctionRunHandler);
-	RegisterActor(LOGIC_FUNCTION_OUTPUT_ON_RUN, &logicFunctionActorDefinition);
+	RegisterActor(LOGIC_FUNCTION_ACTOR_NAME, &logicFunctionActorDefinition);
 }

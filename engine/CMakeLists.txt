@@ -102,6 +102,18 @@ target_sources(engine INTERFACE
         include/engine/actor/light/SpotLight.h
         src/actor/logic/LogicFunction.c
         include/engine/actor/logic/LogicFunction.h
+        src/actor/logic/LogicTimer.c
+        include/engine/actor/logic/LogicTimer.h
+        src/actor/logic/LogicBranch.c
+        include/engine/actor/logic/LogicBranch.h
+        src/actor/logic/LogicRandom.c
+        include/engine/actor/logic/LogicRandom.h
+        src/actor/logic/LogicCast.c
+        include/engine/actor/logic/LogicCast.h
+        src/actor/logic/LogicAchievement.c
+        include/engine/actor/logic/LogicAchievement.h
+        src/actor/logic/LogicStatistic.c
+        include/engine/actor/logic/LogicStatistic.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

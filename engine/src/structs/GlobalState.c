@@ -179,6 +179,7 @@ void ProcessStateChangeQueue()
 void ChangeMap(Map *map)
 {
 	PhysicsThreadLockTickMutex();
+	srand(425);
 	state.camera = NULL;
 	if (state.map)
 	{

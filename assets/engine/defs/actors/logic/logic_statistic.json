@@ -1,0 +1,34 @@
+{
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "add": {
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ]
+    },
+    "set": {
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ]
+    }
+  },
+  "outputs": {},
+  "params": {
+    "statistic": {
+      "default": "",
+      "type": "string"
+    }
+  }
+}

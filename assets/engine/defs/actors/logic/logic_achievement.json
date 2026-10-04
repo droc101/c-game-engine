@@ -1,0 +1,19 @@
+{
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "grant": {}
+  },
+  "outputs": {},
+  "params": {
+    "achievement": {
+      "default": "",
+      "type": "string"
+    }
+  }
+}

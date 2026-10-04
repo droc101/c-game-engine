@@ -1,0 +1,38 @@
+{
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "switch": {
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ]
+    }
+  },
+  "outputs": {
+    "on_value_one": {},
+    "on_value_two": {},
+    "on_value_three": {},
+    "on_value_four": {},
+    "on_value_five": {},
+    "on_value_six": {},
+    "on_value_seven": {},
+    "on_value_eight": {},
+    "on_value_nine": {},
+    "on_value_ten": {},
+    "on_value_eleven": {},
+    "on_value_twelve": {},
+    "on_value_thirteen": {},
+    "on_value_fourteen": {},
+    "on_value_fifteen": {},
+    "on_value_sixteen": {}
+  },
+  "params": {}
+}

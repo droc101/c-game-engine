@@ -1,0 +1,38 @@
+{
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "cast": {
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64",
+        "bool"
+      ]
+    }
+  },
+  "outputs": {
+    "on_cast_byte": {
+      "type": "byte"
+    },
+    "on_cast_int": {
+      "type": "int"
+    },
+    "on_cast_float": {
+      "type": "float"
+    },
+    "on_cast_bool": {
+      "type": "bool"
+    },
+    "on_cast_size_t": {
+      "type": "uint64"
+    }
+  },
+  "params": {}
+}

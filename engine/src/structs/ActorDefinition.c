@@ -11,10 +11,16 @@
 #include <engine/actor/IoProxy.h>
 #include <engine/actor/light/PointLight.h>
 #include <engine/actor/light/SpotLight.h>
+#include <engine/actor/logic/LogicAchievement.h>
 #include <engine/actor/logic/LogicBinary.h>
+#include <engine/actor/logic/LogicBranch.h>
+#include <engine/actor/logic/LogicCast.h>
 #include <engine/actor/logic/LogicCounter.h>
 #include <engine/actor/logic/LogicDecimal.h>
 #include <engine/actor/logic/LogicFunction.h>
+#include <engine/actor/logic/LogicRandom.h>
+#include <engine/actor/logic/LogicStatistic.h>
+#include <engine/actor/logic/LogicTimer.h>
 #include <engine/actor/prop/Button.h>
 #include <engine/actor/prop/PhysicsModel.h>
 #include <engine/actor/prop/Sprite.h>
@@ -101,6 +107,12 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterPointLight();
 	RegisterSpotLight();
 	RegisterLogicFunction();
+	RegisterLogicRandom();
+	RegisterLogicCast();
+	RegisterLogicAchievement();
+	RegisterLogicStatistic();
+	RegisterLogicBranch();
+	RegisterLogicTimer();
 
 	if (RegisterGameActors)
 	{
