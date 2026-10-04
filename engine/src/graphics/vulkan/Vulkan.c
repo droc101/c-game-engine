@@ -987,6 +987,29 @@ static inline void LoadLights(const Map *map)
 	UpdateLightCount();
 }
 
+static inline void UpdateLightTextureIndices(const Map *map)
+{
+	assert(map != NULL &&
+		   GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED &&
+		   dynamicLights.length + map->lightCount != 0);
+	for (uint32_t i = 0; i < map->lightCount; i++)
+	{
+		const Light *light = &map->lights[i];
+		lights[i].cookieTextureIndex = (light->cookie == NULL || light->cookie[0] == '\0')
+											   ? 0
+											   : TextureIndex(light->cookie) + 1;
+	}
+
+	const LunaBufferWriteInfo bufferWriteInfo = {
+		.bytes = map->lightCount * sizeof(VulkanLight),
+		.data = lights,
+		.offset = sizeof(float) * 4 + sizeof(mat4) * 4,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
+			   "Failed to write lights data to buffer!");
+}
+
 static inline void CreateShadowMaps(const Map *map)
 {
 	CreateShadowMapRenderPass(map);
@@ -1683,6 +1706,7 @@ static inline void HandleDeferredWork()
 			{
 				skyTextureIndex = TextureIndex(loadedMap->skyTexture);
 			}
+			UpdateLightTextureIndices(GetMap());
 			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
