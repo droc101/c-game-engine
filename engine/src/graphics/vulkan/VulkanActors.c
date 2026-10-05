@@ -14,6 +14,7 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/Math/Mat44.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
@@ -593,7 +594,12 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 	ActorTransformMatrix(actor, &transformMatrix);
 	for (uint32_t j = 0; j < materialSlotsData->materialSlots.length; j++)
 	{
-		const uint32_t materialIndex = actor->model->skinMaterialIndices[actor->currentSkinIndex][j];
+		const uint32_t skinIndex = actor->currentSkinIndex < actor->model->skinCount ? actor->currentSkinIndex : 0;
+		if (skinIndex != actor->currentSkinIndex)
+		{
+			LogWarning("Actor skin index %u out of bounds! Defaulting to index 0.", actor->currentSkinIndex);
+		}
+		const uint32_t materialIndex = actor->model->skinMaterialIndices[skinIndex][j];
 		const Material *material = &actor->model->materials[materialIndex];
 		const MaterialSlotData *materialSlotData = ListGetPointer(materialSlotsData->materialSlots, j);
 
