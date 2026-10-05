@@ -114,6 +114,8 @@ target_sources(engine INTERFACE
         include/engine/actor/logic/LogicAchievement.h
         src/actor/logic/LogicStatistic.c
         include/engine/actor/logic/LogicStatistic.h
+        src/actor/logic/LogicPrint.c
+        include/engine/actor/logic/LogicPrint.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

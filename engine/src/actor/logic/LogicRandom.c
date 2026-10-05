@@ -55,7 +55,7 @@ static void LogicRandomTriggerHandler(Actor *this, const Actor * /*sender*/, con
 		LOGIC_RANDOM_OUTPUT_ON_VALUE_FIFTEEN,
 		LOGIC_RANDOM_OUTPUT_ON_VALUE_SIXTEEN,
 	};
-	ActorFireOutput(this, outputs[value], PARAM_NONE);
+	ActorFireOutput(this, outputs[value-1], PARAM_NONE);
 }
 
 static void LogicRandomInit(Actor *this, const KvList params, const Transform * /*transform*/)

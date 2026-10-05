@@ -10,7 +10,7 @@
   "inputs": {
     "enable": {},
     "disable": {},
-    "execute": {}
+    "run": {}
   },
   "outputs": {
     "on_run": {

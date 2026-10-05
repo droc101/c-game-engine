@@ -1,0 +1,35 @@
+{
+  "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "print_value": {
+      "types": [
+        "byte",
+        "int",
+        "uint64",
+        "float",
+        "bool",
+        "string",
+        "color",
+        "vec2",
+        "vec3"
+      ]
+    }
+  },
+  "outputs": {},
+  "params": {
+    "prefix": {
+      "default": "",
+      "type": "string"
+    },
+    "suffix": {
+      "default": "",
+      "type": "string"
+    }
+  }
+}

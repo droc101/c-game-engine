@@ -56,7 +56,7 @@ static void LogicBranchSwitchHandler(Actor *this, const Actor * /*sender*/, cons
 		LOGIC_BRANCH_OUTPUT_ON_VALUE_FIFTEEN,
 		LOGIC_BRANCH_OUTPUT_ON_VALUE_SIXTEEN,
 	};
-	ActorFireOutput(this, outputs[value], PARAM_NONE);
+	ActorFireOutput(this, outputs[value-1], PARAM_NONE);
 }
 
 static void LogicBranchInit(Actor */*this*/, const KvList /*params*/, const Transform * /*transform*/) {}

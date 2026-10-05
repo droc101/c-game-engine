@@ -18,6 +18,7 @@
 #include <engine/actor/logic/LogicCounter.h>
 #include <engine/actor/logic/LogicDecimal.h>
 #include <engine/actor/logic/LogicFunction.h>
+#include <engine/actor/logic/LogicPrint.h>
 #include <engine/actor/logic/LogicRandom.h>
 #include <engine/actor/logic/LogicStatistic.h>
 #include <engine/actor/logic/LogicTimer.h>
@@ -87,25 +88,19 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	LogDebug("Registering actors...\n");
 	ActorDefinitionDict_init(actorDefinitions);
 
-	RegisterIoProxy();
+	//env_*
+	RegisterGlobalLight();
+	RegisterGlobalFog();
+	RegisterTonemapController();
+
+	//light_*
+	RegisterPointLight();
+	RegisterSpotLight();
+
+	//logic_*
 	RegisterLogicBinary();
 	RegisterLogicCounter();
 	RegisterLogicDecimal();
-	RegisterSoundPlayer();
-	RegisterSprite();
-	RegisterStaticModel();
-	RegisterTrigger();
-	RegisterGlobalLight();
-	RegisterGlobalFog();
-	RegisterPhysicsModel();
-	RegisterTonemapController();
-	RegisterCamera();
-	RegisterButton();
-	RegisterTriggerMap();
-	RegisterEntrance();
-	RegisterWorldText();
-	RegisterPointLight();
-	RegisterSpotLight();
 	RegisterLogicFunction();
 	RegisterLogicRandom();
 	RegisterLogicCast();
@@ -113,6 +108,22 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterLogicStatistic();
 	RegisterLogicBranch();
 	RegisterLogicTimer();
+	RegisterLogicPrint();
+
+	//prop_*
+	RegisterSprite();
+	RegisterStaticModel();
+	RegisterButton();
+	RegisterWorldText();
+	RegisterPhysicsModel();
+
+	//other
+	RegisterIoProxy();
+	RegisterSoundPlayer();
+	RegisterTrigger();
+	RegisterCamera();
+	RegisterTriggerMap();
+	RegisterEntrance();
 
 	if (RegisterGameActors)
 	{

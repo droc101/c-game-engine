@@ -47,7 +47,7 @@ static void LogicTimerInit(Actor *this, const KvList params, const Transform * /
 	data->running = KvGetBool(params, "autostart", true);
 }
 
-static void LogicTimerIUpdate(Actor *this, const double /*delta*/)
+static void LogicTimerUpdate(Actor *this, const double /*delta*/)
 {
 	LogicTimerData *data = this->extraData;
 	if (data->running)
@@ -63,6 +63,7 @@ static void LogicTimerIUpdate(Actor *this, const double /*delta*/)
 
 ActorDefinition logicTimerActorDefinition = {
 	.Init = LogicTimerInit,
+	.Update = LogicTimerUpdate,
 };
 
 void RegisterLogicTimer()

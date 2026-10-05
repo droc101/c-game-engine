@@ -86,7 +86,13 @@ static void LogicCounterIncrementHandler(Actor *this, const Actor * /*sender*/, 
 static void LogicCounterDecrementHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	LogicCounterData *data = (LogicCounterData *)this->extraData;
-	ChangeValue(1, data, this);
+	ChangeValue(-1, data, this);
+}
+
+static void LogicCounterGetValueHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
+{
+	const LogicCounterData *data = (LogicCounterData *)this->extraData;
+	ActorFireOutput(this, LOGIC_COUNTER_OUTPUT_VALUE, PARAM_INT(data->counter));
 }
 
 static void LogicCounterInit(Actor *this, const KvList params, const Transform * /*transform*/)
@@ -113,5 +119,6 @@ void RegisterLogicCounter()
 	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_SUBTRACT, LogicCounterSubtractHandler);
 	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_INCREMENT, LogicCounterIncrementHandler);
 	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_DECREMENT, LogicCounterDecrementHandler);
+	RegisterActorInput(&logicCounterActorDefinition, LOGIC_COUNTER_INPUT_GET_VALUE, LogicCounterGetValueHandler);
 	RegisterActor(LOGIC_COUNTER_ACTOR_NAME, &logicCounterActorDefinition);
 }

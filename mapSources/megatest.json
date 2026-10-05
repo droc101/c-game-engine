@@ -90,11 +90,11 @@
                     "z": 16.0
                 },
                 {
-                    "x": 576.0,
+                    "x": 960.0,
                     "z": 16.0
                 },
                 {
-                    "x": 576.0,
+                    "x": 960.0,
                     "z": 128.0
                 },
                 {
@@ -963,11 +963,11 @@
                     "z": -128.0
                 },
                 {
-                    "x": 576.0,
+                    "x": 960.0,
                     "z": -128.0
                 },
                 {
-                    "x": 576.0,
+                    "x": 960.0,
                     "z": -16.0
                 },
                 {
@@ -1060,11 +1060,11 @@
                     "z": -16.0
                 },
                 {
-                    "x": 576.0,
+                    "x": 960.0,
                     "z": -16.0
                 },
                 {
-                    "x": 576.0,
+                    "x": 960.0,
                     "z": 16.0
                 },
                 {
@@ -2621,6 +2621,588 @@
                 },
                 {
                     "x": 528.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 592.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 624.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 624.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 592.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 656.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 688.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 688.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 656.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 720.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 752.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 752.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 720.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 784.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 816.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 816.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 784.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 848.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 880.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 880.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 848.0,
+                    "z": 32.0
+                }
+            ]
+        },
+        {
+            "name": "",
+            "floorHeight": 128.0,
+            "ceilingHeight": 144.0,
+            "floorMaterial": {
+                "material": "material/dev/uv_test.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "ceilingMaterial": {
+                "material": "material/tools/invisible.gmtl",
+                "uvOffset": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "uvScale": {
+                    "x": 1.0,
+                    "y": 1.0
+                },
+                "units_per_luxel": 1.0
+            },
+            "wallMaterials": [
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "material": "material/dev/wall_test.gmtl",
+                    "uvOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "uvScale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "units_per_luxel": 1.0
+                }
+            ],
+            "points": [
+                {
+                    "x": 912.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 944.0,
+                    "z": -32.0
+                },
+                {
+                    "x": 944.0,
+                    "z": 32.0
+                },
+                {
+                    "x": 912.0,
                     "z": 32.0
                 }
             ]
@@ -8783,6 +9365,2259 @@
                 "text": {
                     "type": "string",
                     "value": "turn off"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 640.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 768.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 896.0,
+                "y": 64.0,
+                "z": -120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 640.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 768.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 896.0,
+                "y": 64.0,
+                "z": 120.0
+            },
+            "rotation": {
+                "x": 247.5,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 3.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 640.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "logic_function"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "logic_function",
+            "position": {
+                "x": 640.0,
+                "y": 0.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "on_run",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                },
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "pause",
+                    "sourceOutput": "on_run",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 32
+                },
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "resume",
+                    "sourceOutput": "on_run",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 150
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "function"
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 640.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "function",
+                    "targetInput": "run",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 608.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "function",
+                    "targetInput": "enable",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 672.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "function",
+                    "targetInput": "disable",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 608.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "enable"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 640.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "run"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 672.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "disable"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 640.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "logic_timer"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "logic_timer",
+            "position": {
+                "x": 640.0,
+                "y": 0.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "coin_cling",
+                    "targetInput": "play",
+                    "sourceOutput": "on_timer_expired",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "autostart": {
+                    "type": "bool",
+                    "value": false
+                },
+                "interval_msec": {
+                    "type": "uint64",
+                    "value": 1000
+                },
+                "name": {
+                    "type": "string",
+                    "value": "timer"
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 624.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "timer",
+                    "targetInput": "start",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 656.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "timer",
+                    "targetInput": "stop",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 624.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "start"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 656.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "stop"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "logic_print",
+            "position": {
+                "x": 784.0,
+                "y": 0.0,
+                "z": -100.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "random_printer"
+                },
+                "prefix": {
+                    "type": "string",
+                    "value": "random value: "
+                },
+                "suffix": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "logic_random",
+            "position": {
+                "x": 748.0,
+                "y": 0.0,
+                "z": -100.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "random_printer",
+                    "targetInput": "print_value",
+                    "sourceOutput": "random_value",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "max_value": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": "random"
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "logic_random (paired w/ logic_print)"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "random",
+                    "targetInput": "get_random_number",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "random value"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "logic_cast",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": 80.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "cast printer",
+                    "targetInput": "print_value",
+                    "sourceOutput": "on_cast_float",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "cast"
+                }
+            }
+        },
+        {
+            "class": "logic_print",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": 96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "cast printer"
+                },
+                "prefix": {
+                    "type": "string",
+                    "value": "cast value: "
+                },
+                "suffix": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "logic_counter",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": 88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "cast",
+                    "targetInput": "cast",
+                    "sourceOutput": "counter_changed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "clamp_to_max": {
+                    "type": "bool",
+                    "value": true
+                },
+                "clamp_to_min": {
+                    "type": "bool",
+                    "value": true
+                },
+                "counter": {
+                    "type": "int",
+                    "value": 0
+                },
+                "max": {
+                    "type": "int",
+                    "value": 100
+                },
+                "min": {
+                    "type": "int",
+                    "value": 0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "cast counter"
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": 32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "logic_cast (to float)"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "cast counter",
+                    "targetInput": "increment",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 50
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 768.0,
+                "y": 0.0,
+                "z": 60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "count up and cast to float"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": 880.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "category": {
+                    "type": "byte",
+                    "value": 1
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "sound_branch_0"
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/sfx/popup.gsnd"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "category": {
+                    "type": "byte",
+                    "value": 1
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "sound_branch_1"
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/sfx/coincling.gsnd"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "sound_player",
+            "position": {
+                "x": 912.0,
+                "y": 0.0,
+                "z": -88.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "category": {
+                    "type": "byte",
+                    "value": 1
+                },
+                "loops": {
+                    "type": "int",
+                    "value": 0
+                },
+                "name": {
+                    "type": "string",
+                    "value": "sound_branch_2"
+                },
+                "positional": {
+                    "type": "bool",
+                    "value": false
+                },
+                "preload": {
+                    "type": "bool",
+                    "value": true
+                },
+                "sound": {
+                    "type": "string",
+                    "value": "sound/sfx/popdown.gsnd"
+                },
+                "volume": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "logic_branch",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -80.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "sound_branch_0",
+                    "targetInput": "play",
+                    "sourceOutput": "on_value_one",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                },
+                {
+                    "targetName": "sound_branch_1",
+                    "targetInput": "play",
+                    "sourceOutput": "on_value_two",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                },
+                {
+                    "targetName": "sound_branch_2",
+                    "targetInput": "play",
+                    "sourceOutput": "on_value_three",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "branch"
+                }
+            }
+        },
+        {
+            "class": "logic_counter",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -72.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "branch",
+                    "targetInput": "switch",
+                    "sourceOutput": "value",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                },
+                {
+                    "targetName": "branch_printer",
+                    "targetInput": "print_value",
+                    "sourceOutput": "value",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "clamp_to_max": {
+                    "type": "bool",
+                    "value": true
+                },
+                "clamp_to_min": {
+                    "type": "bool",
+                    "value": true
+                },
+                "counter": {
+                    "type": "int",
+                    "value": 1
+                },
+                "max": {
+                    "type": "int",
+                    "value": 3
+                },
+                "min": {
+                    "type": "int",
+                    "value": 1
+                },
+                "name": {
+                    "type": "string",
+                    "value": "branch_counter"
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 880.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "branch_counter",
+                    "targetInput": "increment",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 912.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "branch_counter",
+                    "targetInput": "decrement",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 880.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "branch number up"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 912.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "branch number down"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "logic_branch"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_button",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "connections": [
+                {
+                    "targetName": "branch_counter",
+                    "targetInput": "get_value",
+                    "sourceOutput": "pressed",
+                    "numRefires": 0,
+                    "overridesParam": false,
+                    "param": {
+                        "type": "none"
+                    },
+                    "delay_msec": 0
+                }
+            ],
+            "params": {
+                "model": {
+                    "type": "string",
+                    "value": "model/wall_button.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "off_skin": {
+                    "type": "int",
+                    "value": 0
+                },
+                "on_skin": {
+                    "type": "int",
+                    "value": 1
+                },
+                "reset_delay_ms": {
+                    "type": "int",
+                    "value": 100
+                },
+                "start_pressed": {
+                    "type": "bool",
+                    "value": false
+                },
+                "toggle_mode": {
+                    "type": "bool",
+                    "value": false
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -60.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "take branch"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "logic_print",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": -96.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "branch_printer"
+                },
+                "prefix": {
+                    "type": "string",
+                    "value": "branch #: "
+                },
+                "suffix": {
+                    "type": "string",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": 896.0,
+                "y": 0.0,
+                "z": 64.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 32
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "im so EMPTY"
                 },
                 "text_color": {
                     "type": "color",
