@@ -1,5 +1,6 @@
 {
   "extends": "actor",
+  "description": "Unlocks an achievement via I/O",
   "renderers": [
     {
       "type": "point",
@@ -7,13 +8,17 @@
     }
   ],
   "inputs": {
-    "grant": {}
+    "grant": {
+      "description": "Unlock this achievement"
+    }
   },
   "outputs": {},
   "params": {
     "achievement": {
+      "display": "Achievement",
       "default": "",
-      "type": "string"
+      "type": "string",
+      "description": "The internal name of the achievement to unlock"
     }
   }
 }

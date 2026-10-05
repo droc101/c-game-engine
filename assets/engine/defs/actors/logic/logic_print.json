@@ -1,4 +1,5 @@
 {
+  "description": "Prints values to the console for debugging",
   "extends": "actor",
   "renderers": [
     {
@@ -8,6 +9,7 @@
   ],
   "inputs": {
     "print_value": {
+      "description": "Print the provided param to the console with the prefix and suffix specified in the actor params",
       "types": [
         "byte",
         "int",
@@ -24,10 +26,14 @@
   "outputs": {},
   "params": {
     "prefix": {
+      "display": "Prefix",
+      "description": "The prefix for the value printed to console. A space is NOT automatically added.",
       "default": "",
       "type": "string"
     },
     "suffix": {
+      "display": "Suffix",
+      "description": "The suffix for the value printed to console. A space is NOT automatically added.",
       "default": "",
       "type": "string"
     }

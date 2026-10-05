@@ -20,8 +20,10 @@
       "description": "The brightness scale of this light, used for HDR lights (brighter than 1.0)"
     },
     "start_on": {
+      "display": "Start On",
       "type": "bool",
-      "default": true
+      "default": true,
+      "description": "Whether this light should be on by default"
     }
   }
 }

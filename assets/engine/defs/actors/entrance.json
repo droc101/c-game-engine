@@ -2,6 +2,8 @@
   "description": "Player spawnpoint used by trigger_map actors",
   "extends": "actor",
   "outputs": {
-    "used": {}
+    "used": {
+      "description": "The player has spawned at this entrance"
+    }
   }
 }

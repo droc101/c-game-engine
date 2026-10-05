@@ -22,7 +22,9 @@
       "type": "int",
       "description": "Subtract from the counter"
     },
-    "get_value": {}
+    "get_value": {
+      "description": "Fire the \"value\" output with the current value of the counter"
+    }
   },
   "outputs": {
     "hit_max": {
@@ -42,6 +44,7 @@
       "description": "Emitted whenever the counter processes an operation. The param contains the current value of the counter."
     },
     "value": {
+      "description": "Emitted with the current value of the counter",
       "type": "int"
     }
   },

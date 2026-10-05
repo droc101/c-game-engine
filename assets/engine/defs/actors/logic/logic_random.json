@@ -1,5 +1,6 @@
 {
   "extends": "actor",
+  "description": "Performs branching (switch-case) based on RNG from 1 to 16",
   "renderers": [
     {
       "type": "point",
@@ -12,27 +13,62 @@
   },
   "outputs": {
     "random_value": {
+      "description": "Emitted as the result of the \"get_random_value\" input, containing the next random number",
       "type": "int"
     },
-    "on_value_one": {},
-    "on_value_two": {},
-    "on_value_three": {},
-    "on_value_four": {},
-    "on_value_five": {},
-    "on_value_six": {},
-    "on_value_seven": {},
-    "on_value_eight": {},
-    "on_value_nine": {},
-    "on_value_ten": {},
-    "on_value_eleven": {},
-    "on_value_twelve": {},
-    "on_value_thirteen": {},
-    "on_value_fourteen": {},
-    "on_value_fifteen": {},
-    "on_value_sixteen": {}
+    "on_value_one": {
+      "description": "Fired when input = 1"
+    },
+    "on_value_two": {
+      "description": "Fired when input = 2"
+    },
+    "on_value_three": {
+      "description": "Fired when input = 3"
+    },
+    "on_value_four": {
+      "description": "Fired when input = 4"
+    },
+    "on_value_five": {
+      "description": "Fired when input = 5"
+    },
+    "on_value_six": {
+      "description": "Fired when input = 6"
+    },
+    "on_value_seven": {
+      "description": "Fired when input = 7"
+    },
+    "on_value_eight": {
+      "description": "Fired when input = 8"
+    },
+    "on_value_nine": {
+      "description": "Fired when input = 9"
+    },
+    "on_value_ten": {
+      "description": "Fired when input = 10"
+    },
+    "on_value_eleven": {
+      "description": "Fired when input = 11"
+    },
+    "on_value_twelve": {
+      "description": "Fired when input = 12"
+    },
+    "on_value_thirteen": {
+      "description": "Fired when input = 13"
+    },
+    "on_value_fourteen": {
+      "description": "Fired when input = 14"
+    },
+    "on_value_fifteen": {
+      "description": "Fired when input = 15"
+    },
+    "on_value_sixteen": {
+      "description": "Fired when input = 16"
+    }
   },
   "params": {
     "max_value": {
+      "display": "Max value",
+      "description": "The maximum value this logic_random can choose",
       "type": "int",
       "min": 1,
       "max": 16,

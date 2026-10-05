@@ -1,24 +1,35 @@
 {
   "extends": "actor",
+  "description": "In-world text",
   "params": {
     "text": {
       "default": "",
-      "type": "string"
+      "type": "string",
+      "display": "Text",
+      "description": "The text to display"
     },
     "font_size": {
+      "display": "Font size",
+      "description": "The font size, in pixels",
       "default": 16,
       "min": 1,
       "type": "int"
     },
     "text_color": {
+      "display": "Text color",
+      "description": "The color of the text",
       "type": "color",
       "default": -1
     },
     "background_color": {
+      "display": "Background color",
+      "description": "The color of the background",
       "type": "color",
       "default": 128
     },
     "visible_distance": {
+      "display": "Visibility Distance",
+      "description": "How close the camera has to be for the text to be visible",
       "type": "float",
       "default": 80
     }

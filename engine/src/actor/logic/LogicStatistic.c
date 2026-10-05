@@ -57,8 +57,8 @@ static void LogicStatisticAddHandler(Actor *this, const Actor * /*sender*/, cons
 
 static void LogicStatisticSetHandler(Actor *this, const Actor * /*sender*/, const Param *param)
 {
-	int intValue = 1;
-	float floatValue = 1;
+	int intValue = 0;
+	float floatValue = 0;
 	switch (param->type)
 	{
 		case PARAM_TYPE_BYTE:

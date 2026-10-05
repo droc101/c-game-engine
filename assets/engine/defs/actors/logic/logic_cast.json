@@ -1,5 +1,6 @@
 {
   "extends": "actor",
+  "description": "Casts between different numerical types",
   "renderers": [
     {
       "type": "point",
@@ -8,6 +9,7 @@
   ],
   "inputs": {
     "cast": {
+      "description": "Cast the input number into various other numeric formats",
       "types": [
         "byte",
         "int",
@@ -19,18 +21,23 @@
   },
   "outputs": {
     "on_cast_byte": {
+      "description": "Emitted with the input number cast to a byte",
       "type": "byte"
     },
     "on_cast_int": {
+      "description": "Emitted with the input number cast to an integer",
       "type": "int"
     },
     "on_cast_float": {
+      "description": "Emitted with the input number cast to a float",
       "type": "float"
     },
     "on_cast_bool": {
+      "description": "Emitted with the input number cast to a boolean",
       "type": "bool"
     },
     "on_cast_size_t": {
+      "description": "Emitted with the input number cast to a uint64",
       "type": "uint64"
     }
   },

@@ -14,14 +14,18 @@
   ],
   "params": {
     "near_plane": {
+      "display": "Near Plane",
       "default": 0.01,
       "type": "float",
-      "minimum": 0
+      "minimum": 0,
+      "description": "The near plane of the player's camera"
     },
     "far_plane": {
+      "display": "Far Plane",
       "default": 4096,
       "type": "float",
-      "minimum": 0
+      "minimum": 0,
+      "description": "The maximum far plane of the player's camera. Will be clamped to the maximum level bounds."
     }
   }
 }

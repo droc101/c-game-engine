@@ -14,6 +14,7 @@
   "outputs": {},
   "params": {
     "always_give": {
+      "display": "Always give",
       "type": "bool",
       "description": "Whether the player should always pick up this item even if they already have it",
       "default": false

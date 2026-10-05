@@ -1,5 +1,6 @@
 {
   "extends": "actor",
+  "description": "Manages a statistic via I/O",
   "renderers": [
     {
       "type": "point",
@@ -8,6 +9,7 @@
   ],
   "inputs": {
     "add": {
+      "description": "Add the specified value (or one) to the statistic",
       "types": [
         "byte",
         "int",
@@ -16,6 +18,7 @@
       ]
     },
     "set": {
+      "description": "Set the statistic to the specified value (or zero)",
       "types": [
         "byte",
         "int",
@@ -27,6 +30,8 @@
   "outputs": {},
   "params": {
     "statistic": {
+      "display": "Statistic",
+      "description": "The internal name of the statistic to manage",
       "default": "",
       "type": "string"
     }
