@@ -34,6 +34,15 @@ static void LogicDecimalOperandAHandler(Actor *this, const Actor * /*sender*/, c
 	if (param->type == PARAM_TYPE_FLOAT)
 	{
 		data->operandA = param->floatValue;
+	} else if (param->type == PARAM_TYPE_BYTE)
+	{
+		data->operandA = param->byteValue;
+	} else if (param->type == PARAM_TYPE_INTEGER)
+	{
+		data->operandA = (float)param->intValue;
+	} else if (param->type == PARAM_TYPE_UINT_64)
+	{
+		data->operandA = (float)param->uint64value;
 	}
 }
 
@@ -43,6 +52,15 @@ static void LogicDecimalOperandBHandler(Actor *this, const Actor * /*sender*/, c
 	if (param->type == PARAM_TYPE_FLOAT)
 	{
 		data->operandB = param->floatValue;
+	} else if (param->type == PARAM_TYPE_BYTE)
+	{
+		data->operandB = param->byteValue;
+	} else if (param->type == PARAM_TYPE_INTEGER)
+	{
+		data->operandB = (float)param->intValue;
+	} else if (param->type == PARAM_TYPE_UINT_64)
+	{
+		data->operandB = (float)param->uint64value;
 	}
 }
 
@@ -86,8 +104,8 @@ static void LogicDecimalInit(Actor *this, const KvList params, const Transform *
 	this->extraData = malloc(sizeof(LogicDecimalData));
 	CheckAlloc(this->extraData);
 	LogicDecimalData *data = this->extraData;
-	data->operandA = KvGetFloat(params, "operandA", .0f);
-	data->operandB = KvGetFloat(params, "operandB", .0f);
+	data->operandA = KvGetFloat(params, "operand_a", .0f);
+	data->operandB = KvGetFloat(params, "operand_b", .0f);
 	data->operation = KvGetByte(params, "operation", DECIMAL_OP_EQUAL);
 }
 
