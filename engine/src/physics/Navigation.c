@@ -16,40 +16,40 @@ float PlayerRelativeAngle(const Actor *actor)
 	return 0.0f;
 }
 
-static bool IsPlayerVisibleInternal(const Actor *actor,
-									const NavigationConfig navigationConfig,
-									const Vector3 *playerPosition,
-									const float relativeAngle,
-									const Vector3 *playerRelativePosition)
-{
-	(void)actor;
-	(void)navigationConfig;
-	(void)playerPosition;
-	(void)relativeAngle;
-	(void)playerRelativePosition;
-	// const float agroDistance = navigationConfig.agroTicksRemaining > 0.5 ? navigationConfig.deAgroDistance
-	// 																	 : navigationConfig.agroDistance;
-	// if (Vector2Distance(actor->transform.position, playerPosition) > agroDistance)
-	// {
-	// 	return false;
-	// }
-	// if (fabsf(relativeAngle) > navigationConfig.fov / 2)
-	// {
-	// 	return false;
-	// }
-
-	return false;
-
-	// b2ShapeId raycastHit = b2_nullShapeId;
-	// b2World_CastRay(GetState()->map->worldId,
-	// 				actor->position,
-	// 				playerRelativePosition,
-	// 				(b2QueryFilter){.categoryBits = COLLISION_GROUP_ACTOR, .maskBits = ~COLLISION_GROUP_TRIGGER},
-	// 				RaycastCallback,
-	// 				&raycastHit);
-	//
-	// return b2Shape_IsValid(raycastHit) && b2Shape_GetFilter(raycastHit).categoryBits & COLLISION_GROUP_PLAYER;
-}
+// static bool IsPlayerVisibleInternal(const Actor *actor,
+// 									const NavigationConfig navigationConfig,
+// 									const Vector3 *playerPosition,
+// 									const float relativeAngle,
+// 									const Vector3 *playerRelativePosition)
+// {
+// 	(void)actor;
+// 	(void)navigationConfig;
+// 	(void)playerPosition;
+// 	(void)relativeAngle;
+// 	(void)playerRelativePosition;
+// 	// const float agroDistance = navigationConfig.agroTicksRemaining > 0.5 ? navigationConfig.deAgroDistance
+// 	// 																	 : navigationConfig.agroDistance;
+// 	// if (Vector2Distance(actor->transform.position, playerPosition) > agroDistance)
+// 	// {
+// 	// 	return false;
+// 	// }
+// 	// if (fabsf(relativeAngle) > navigationConfig.fov / 2)
+// 	// {
+// 	// 	return false;
+// 	// }
+//
+// 	return false;
+//
+// 	// b2ShapeId raycastHit = b2_nullShapeId;
+// 	// b2World_CastRay(GetState()->map->worldId,
+// 	// 				actor->position,
+// 	// 				playerRelativePosition,
+// 	// 				(b2QueryFilter){.categoryBits = COLLISION_GROUP_ACTOR, .maskBits = ~COLLISION_GROUP_TRIGGER},
+// 	// 				RaycastCallback,
+// 	// 				&raycastHit);
+// 	//
+// 	// return b2Shape_IsValid(raycastHit) && b2Shape_GetFilter(raycastHit).categoryBits & COLLISION_GROUP_PLAYER;
+// }
 
 bool IsPlayerVisible(const Actor *actor, const NavigationConfig navigationConfig)
 {

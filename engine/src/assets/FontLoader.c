@@ -111,9 +111,9 @@ static Font *LoadFontInternal(const char *asset)
 	const Image *img = LoadImage(font->texture);
 	EXPECT_BYTES(1, bytesRemaining);
 	font->charCount = ReadUint8(reader);
-	memset(font->charWidths, 0, ArrayLength(font->charWidths));
-	memset(font->charStartUVs, 0, ArrayLength(font->charStartUVs));
-	memset(font->charEndUVs, 0, ArrayLength(font->charEndUVs));
+	memset(font->charWidths, 0, sizeof(font->charWidths));
+	memset(font->charStartUVs, 0, sizeof(font->charStartUVs));
+	memset(font->charEndUVs, 0, sizeof(font->charEndUVs));
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{

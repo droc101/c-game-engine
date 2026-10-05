@@ -43,9 +43,9 @@ static void SpotLightInit(Actor *this, const KvList params, const Transform *tra
 	}
 }
 
-static void SpotLightUpdate(Actor *this, double /*delta*/)
+static void SpotLightUpdate(Actor * /*this*/, double /*delta*/)
 {
-	SpotLightData *data = this->extraData;
+	// SpotLightData *data = this->extraData;
 }
 
 static void SpotLightDestroy(Actor *this)

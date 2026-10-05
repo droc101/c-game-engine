@@ -40,7 +40,8 @@ endif()
 get_filename_component(DEPS_ABS_PATH "${FETCHCONTENT_BASE_DIR}" ABSOLUTE)
 get_filename_component(REPO_ABS_PATH "${CMAKE_SOURCE_DIR}" ABSOLUTE)
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -Wundef -fPIC -fcanon-prefix-map -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
+set(COMPILER_WARNING_FLAGS -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -Wundef)
+set(CMAKE_C_FLAGS "-fPIC -fcanon-prefix-map -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
 
 if (WIN32)
     set(CMAKE_C_FLAGS "-static-libgcc -static-libstdc++ ${CMAKE_C_FLAGS}")

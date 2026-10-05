@@ -463,13 +463,13 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 		return;
 	}
 
-	static const float LAMBDA = 0.95f; // Adjusts the range of each split. Tweak to find optimal values
+	// static const float LAMBDA = 0.95f; // Adjusts the range of each split. Tweak to find optimal values
 
 	const float nearPlane = camera->nearPlane;
 	const float farPlane = min(camera->farPlane, map->maxInboundsDistance);
 
 	const float range = farPlane - nearPlane;
-	const float ratio = farPlane / nearPlane;
+	// const float ratio = farPlane / nearPlane;
 
 	const Vector2 windowSize = ActualWindowSizeIgnoreDPI();
 	mat4 transformMatrix;

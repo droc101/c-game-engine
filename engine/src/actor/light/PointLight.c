@@ -39,9 +39,9 @@ static void PointLightInit(Actor *this, const KvList params, const Transform *tr
 	}
 }
 
-static void PointLightUpdate(Actor *this, double /*delta*/)
+static void PointLightUpdate(Actor * /*this*/, double /*delta*/)
 {
-	PointLightData *data = this->extraData;
+	// PointLightData *data = this->extraData;
 }
 
 static void PointLightDestroy(Actor *this)
