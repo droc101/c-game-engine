@@ -65,7 +65,7 @@ jobs:
       - name: Configure & Build For Distribution
         if: ${{ inputs.buildForDistribution }}
         shell: msys2 {0}
-        run: bash BuildForDistribution.sh "build-${{ matrix.build_type }}" ${{ matrix.build_type }}
+        run: scripts/build.py --build-dir="build-${{ matrix.build_type }}" --build-type=${{ matrix.build_type }}
 
       - name: Upload results
         uses: actions/upload-artifact@v7
