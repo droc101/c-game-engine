@@ -17,6 +17,8 @@ option(ENABLE_STEAMWORKS "Whether or not to enable Steamworks integration. You m
 set(STEAMWORKS_SDK_PATH "/path/to/steamworks/sdk" CACHE STRING "The absolute path to the Steamworks SDK. Do not add a trailing slash.")
 set(STEAMWORKS_APP_ID "480" CACHE STRING "The Steam AppID to use with Steamworks")
 
+option(ENABLE_ASAN "Enable the Address Sanitizer (https://github.com/google/sanitizers/wiki/AddressSanitizer)" OFF)
+
 #endregion
 
 #region Compile flags
@@ -43,8 +45,12 @@ get_filename_component(REPO_ABS_PATH "${CMAKE_SOURCE_DIR}" ABSOLUTE)
 set(COMPILER_WARNING_FLAGS -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -Wundef)
 set(CMAKE_C_FLAGS "-fPIC -fcanon-prefix-map -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
 
+if (ENABLE_ASAN)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fvisibility=default")
+endif ()
+
 if (WIN32)
-    set(CMAKE_C_FLAGS "-static-libgcc -static-libstdc++ ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static-libstdc++")
 endif ()
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
