@@ -901,6 +901,7 @@ static inline void LoadLights(const Map *map)
 		lights = NULL;
 		lightCount = 0;
 		specializationConstants.lightCount = 0;
+		specializationConstants.hasStaticLight = VK_FALSE;
 		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
 				   "Failed to resize lights buffer!");
 
@@ -921,6 +922,7 @@ static inline void LoadLights(const Map *map)
 		Light *light = &map->lights[lightCount];
 		LoadLight(light, lightCount, &frustumIndex, &shadowMapIndex, JPH_BodyId_InvalidBodyID);
 	}
+	specializationConstants.hasStaticLight = map->lightCount != 0;
 	staticLightFrustumCount = frustumIndex - 1;
 	for (uint32_t i = 0; i < dynamicLights.length; lightCount++, i++)
 	{
@@ -1841,7 +1843,10 @@ static inline void HandleDeferredWork()
 									lunaGetBufferSize(buffers.map.unculledShadedDrawInfo),
 									lunaGetBufferSize(buffers.map.unculledUnshadedDrawInfo));
 			CreateShadowMaps(loadedMap);
-			LoadLightmap(loadedMap);
+			if (staticLightFrustumCount != 0)
+			{
+				LoadLightmap(loadedMap);
+			}
 		}
 
 		pendingTasks &= ~PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS;
@@ -1978,7 +1983,7 @@ void VK_RenderMap(Map *map, Camera *camera)
 	VulkanTest(lunaBeginRenderPass(device, commandBuffer, renderPass, &beginInfo), "Failed to begin render pass!");
 	renderPassStarted = true;
 
-	const VkViewport viewport = {
+	VkViewport viewport = {
 		.width = (float)extent.width,
 		.height = (float)extent.height,
 		.maxDepth = 1,
@@ -2040,6 +2045,8 @@ void VK_RenderMap(Map *map, Camera *camera)
 	// Viewmodel must be drawn last
 	if (map->viewmodel.enabled && camera == &map->player.playerCamera)
 	{
+		viewport.minDepth = 0.5f;
+		viewport.maxDepth = 1;
 		DrawViewmodel(&pipelineBindInfo);
 	}
 }

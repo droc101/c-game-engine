@@ -84,6 +84,15 @@ static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_EQUAL_STATE = {
 	.maxDepthBounds = 1,
 };
 
+static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE_VIEWMODEL = {
+	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+	.depthTestEnable = VK_TRUE,
+	.depthWriteEnable = VK_TRUE,
+	.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL,
+	.minDepthBounds = 0.5f,
+	.maxDepthBounds = 1,
+};
+
 static const VkPipelineDepthStencilStateCreateInfo DEPTH_STENCIL_STATE_UNUSED = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 };
@@ -172,16 +181,21 @@ static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
 	},
 	{
 		.constantID = 2,
+		.offset = offsetof(SpecializationConstants, hasStaticLight),
+		.size = SizeofMember(SpecializationConstants, hasStaticLight),
+	},
+	{
+		.constantID = 3,
 		.offset = offsetof(SpecializationConstants, sampleCount),
 		.size = SizeofMember(SpecializationConstants, sampleCount),
 	},
 	{
-		.constantID = 3,
+		.constantID = 4,
 		.offset = offsetof(SpecializationConstants, sampleRadius),
 		.size = SizeofMember(SpecializationConstants, sampleRadius),
 	},
 	{
-		.constantID = 4,
+		.constantID = 5,
 		.offset = offsetof(SpecializationConstants, bakedLighting),
 		.size = SizeofMember(SpecializationConstants, bakedLighting),
 	},
@@ -648,7 +662,7 @@ static inline void CreateShadedModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.depthStencilState = &DEPTH_STENCIL_STATE_VIEWMODEL,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
@@ -761,7 +775,7 @@ static inline void CreateUnshadedModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
+		.depthStencilState = &DEPTH_STENCIL_STATE_VIEWMODEL,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,

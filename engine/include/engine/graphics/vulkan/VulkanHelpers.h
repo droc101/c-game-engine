@@ -485,6 +485,7 @@ typedef struct LightingShaderSpecializationConstants
 {
 	DebugRendering debugRendering;
 	uint32_t lightCount;
+	VkBool32 hasStaticLight;
 	uint32_t sampleCount;
 	float sampleRadius;
 	VkBool32 bakedLighting;

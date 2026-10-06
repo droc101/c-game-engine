@@ -5,10 +5,11 @@
 #define USE_CLUSTERED
 
 layout(constant_id = 1) const uint LIGHT_COUNT = 1;
-layout(constant_id = 2) const uint SAMPLE_COUNT = 32;
-layout(constant_id = 3) const float SAMPLE_RADIUS = 4.0;
+layout(constant_id = 2) const bool HAS_STATIC_LIGHT = false;
+layout(constant_id = 3) const uint SAMPLE_COUNT = 32;
+layout(constant_id = 4) const float SAMPLE_RADIUS = 4.0;
 
-layout(constant_id = 4) const bool ENABLE_BAKED_LIGHTING = true;
+layout(constant_id = 5) const bool ENABLE_BAKED_LIGHTING = true;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
