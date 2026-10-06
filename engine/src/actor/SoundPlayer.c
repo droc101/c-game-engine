@@ -48,9 +48,16 @@ static void SoundPlayerDestroy(Actor *this)
 
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
+	SoundPlayerData *data = this->extraData;
+
+	if (data->effect)
+	{
+		StopSound(data->effect);
+		data->effect = NULL;
+	}
+
 	JPH_RVec3 position;
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	SoundPlayerData *data = this->extraData;
 	const SoundRequest request = {
 		.soundAsset = data->asset,
 		.category = data->category,
@@ -68,19 +75,29 @@ static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const 
 static void SoundPlayerPauseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	PauseSound(data->effect);
+	if (data->effect)
+	{
+		PauseSound(data->effect);
+	}
 }
 
 static void SoundPlayerResumeHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	ResumeSound(data->effect);
+	if (data->effect)
+	{
+		ResumeSound(data->effect);
+	}
 }
 
 static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	const SoundPlayerData *data = this->extraData;
-	StopSound(data->effect);
+	SoundPlayerData *data = this->extraData;
+	if (data->effect)
+	{
+		StopSound(data->effect);
+		data->effect = NULL;
+	}
 }
 
 static void SoundPlayerInit(Actor *this, const KvList params, const Transform *transform)

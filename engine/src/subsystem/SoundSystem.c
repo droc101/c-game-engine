@@ -189,7 +189,7 @@ void UpdateSoundSystem()
 	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		if (MIX_TrackPlaying(soundSys.tracks[i]))
+		if (MIX_TrackPlaying(soundSys.tracks[i]) || MIX_TrackPaused(soundSys.tracks[i]))
 		{
 			if (soundSys.channels[i] == NULL)
 			{
@@ -255,7 +255,7 @@ static MIX_Track *FindAvailableTrack(uint8_t *index)
 {
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		if (!MIX_TrackPlaying(soundSys.tracks[i]))
+		if (!MIX_TrackPlaying(soundSys.tracks[i]) && !MIX_TrackPaused(soundSys.tracks[i]))
 		{
 			if (soundSys.channels[i] != NULL)
 			{
