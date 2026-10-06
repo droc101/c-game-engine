@@ -6,6 +6,7 @@
 #include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -93,7 +94,8 @@ void ProcessScrollView(ScrollView *view)
 	const Control imposter = {.position = view->position, .size = view->size, .anchor = view->anchor};
 	view->anchoredPosition = CalculateControlPosition(&imposter, NULL);
 
-	view->scrollBarData.scrollPos += ((int)GetMouseWheelTicks(mainThreadInput).y) * (20 * GetState()->options.scrollSpeed);
+	view->scrollBarData.scrollPos += ((int)GetMouseWheelTicks(mainThreadInput).y) *
+									 (20 * GetState()->options.scrollSpeed);
 
 	if (IsDebugEntryVisible("ui_stack_layout_bounds"))
 	{

@@ -6,11 +6,8 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
-#include <stdbool.h>
-#include <stdlib.h>
 
 static void LogicBranchSwitchHandler(Actor *this, const Actor * /*sender*/, const Param *param)
 {
@@ -56,10 +53,10 @@ static void LogicBranchSwitchHandler(Actor *this, const Actor * /*sender*/, cons
 		LOGIC_BRANCH_OUTPUT_ON_VALUE_FIFTEEN,
 		LOGIC_BRANCH_OUTPUT_ON_VALUE_SIXTEEN,
 	};
-	ActorFireOutput(this, outputs[value-1], PARAM_NONE);
+	ActorFireOutput(this, outputs[value - 1], PARAM_NONE);
 }
 
-static void LogicBranchInit(Actor */*this*/, const KvList /*params*/, const Transform * /*transform*/) {}
+static void LogicBranchInit(Actor * /*this*/, const KvList /*params*/, const Transform * /*transform*/) {}
 
 ActorDefinition logicBranchActorDefinition = {
 	.Init = LogicBranchInit,

@@ -35,7 +35,7 @@ Vector2 MeasureTextNChars(const char *str, const uint32_t size, const char *font
 	int textWidth = 0;
 	int textHeight = (int)size;
 	int tempWidth = 0;
-	Font *fontAsset = LoadFont(font);
+	const Font *fontAsset = LoadFont(font);
 	const double sizeMultiplier = (double)size / fontAsset->defaultSize;
 	for (size_t j = 0; j < n; j++)
 	{
@@ -141,7 +141,7 @@ void DrawTextAligned(const char *str,
 					 const FontVerticalAlign vAlign,
 					 const char *font)
 {
-	Font *fontAsset = LoadFont(font);
+	const Font *fontAsset = LoadFont(font);
 	const size_t stringLength = strlen(str);
 	float *verts = malloc(stringLength * sizeof(float[4][4]));
 	CheckAlloc(verts);
@@ -244,7 +244,7 @@ void DrawTextAligned(const char *str,
 				indices[indexOffset + k] += vertexOffset;
 			}
 
-			lx += fSize;
+			lx += (float)fSize;
 		}
 		c += (int)strlen(line);
 		y += (int)(size + fontAsset->lineSpacing);

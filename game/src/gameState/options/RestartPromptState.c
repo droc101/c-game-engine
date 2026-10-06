@@ -9,7 +9,6 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/helpers/PlatformHelpers.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>

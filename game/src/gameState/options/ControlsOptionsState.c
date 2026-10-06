@@ -7,7 +7,6 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -49,7 +48,7 @@ typedef struct ControlRowData
 } ControlRowData;
 
 static OptionsMenu *controlOptionsMenu;
-static char *filter = NULL;
+// static char *filter = NULL;
 
 static ListenMode listenMode;
 static ControlRowData *listenRow;
@@ -120,15 +119,16 @@ static void BtnEditCtlrBinding(Control * /*control*/, void *extraData)
 	UpdateControlRow(row);
 }
 
-static void FilterTextChanged(const char *newFilter)
-{
-	free(filter);
-	filter = NULL;
-	if (newFilter && strlen(newFilter) > 0)
-	{
-		filter = strdup(newFilter);
-	}
-}
+// TODO: reimplement this, may be best to wait for ggui
+// static void FilterTextChanged(const char *newFilter)
+// {
+// 	free(filter);
+// 	filter = NULL;
+// 	if (newFilter && strlen(newFilter) > 0)
+// 	{
+// 		filter = strdup(newFilter);
+// 	}
+// }
 
 static void ProcessListening()
 {

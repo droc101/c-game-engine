@@ -18,7 +18,6 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>

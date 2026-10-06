@@ -6,7 +6,6 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/uiStack/controls/HeaderFooterControl.h>

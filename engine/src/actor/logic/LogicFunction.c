@@ -7,7 +7,6 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
 #include <stdlib.h>

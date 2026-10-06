@@ -12,7 +12,6 @@
 #include <engine/debug/FrameBenchmark.h>
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
-#include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/helpers/MathEx.h>
@@ -42,7 +41,6 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_mouse.h>
-#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>

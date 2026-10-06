@@ -10,7 +10,6 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
@@ -22,6 +21,7 @@
 #include <engine/uiStack/UiTheme.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <time.h>
 #include "gameState/AchievementsState.h"
 #include "gameState/AddonsState.h"
@@ -33,28 +33,28 @@ bool menuStateFadeIn = false;
 static bool easterEgg = false;
 static char versionStringBuffer[256];
 
-static void StartGame(Control *, void *)
+static void StartGame(Control * /*button*/, void * /*extraData*/)
 {
 	SetGameState(&LevelSelectState);
 }
 
-static void QuitGame(Control *, void *)
+static void QuitGame(Control * /*button*/, void * /*extraData*/)
 {
 	GetState()->requestExit = true;
 }
 
-static void OpenOptions(Control *, void *)
+static void OpenOptions(Control * /*button*/, void * /*extraData*/)
 {
 	optionsStateInGame = false;
 	SetGameState(&OptionsState);
 }
 
-static void OpenAddons(Control *, void *)
+static void OpenAddons(Control * /*button*/, void * /*extraData*/)
 {
 	SetGameState(&AddonsState);
 }
 
-static void OpenAchievements(Control *, void *)
+static void OpenAchievements(Control * /*button*/, void * /*extraData*/)
 {
 	SetGameState(&AchievementsState);
 }
@@ -129,7 +129,7 @@ static void MenuStateSet()
 										OpenAchievements,
 										MIDDLE_CENTER,
 										NULL));
-		opY += opSpacing * 1.5;
+		opY += opSpacing * 1.5f;
 		UiStackPush(menuStack, CreateButtonControl(v2(0, opY), v2(480, 40), "Quit", QuitGame, MIDDLE_CENTER, NULL));
 		opY += opSpacing;
 	}

@@ -14,9 +14,7 @@
 #include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
-#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <stdbool.h>

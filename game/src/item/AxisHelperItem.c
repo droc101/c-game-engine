@@ -5,22 +5,16 @@
 #include "item/AxisHelperItem.h"
 #include <cglm/quat.h>
 #include <engine/assets/AssetReader.h>
-#include <engine/helpers/MathEx.h>
+#include <engine/assets/ModelLoader.h>
 #include <engine/physics/Physics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/Color.h>
-#include <engine/structs/ControlOptions.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/InputAction.h>
 #include <engine/structs/Item.h>
-#include <engine/structs/KVList.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Viewmodel.h>
-#include <engine/subsystem/Input.h>
 #include <stdbool.h>
-#include <wchar.h>
-#include "actor/prop/LaserEmitter.h"
 
 static void AxisHelperItemSwitchFunction(Item *this, Viewmodel *viewmodel)
 {

@@ -3,7 +3,6 @@
 //
 
 #include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/uiStack/controls/LabelControl.h>

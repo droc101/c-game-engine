@@ -5,7 +5,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>

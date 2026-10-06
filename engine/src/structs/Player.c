@@ -7,12 +7,12 @@
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Light.h>
-#include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <SDL3/SDL_mutex.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem)

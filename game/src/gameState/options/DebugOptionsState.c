@@ -8,12 +8,12 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
+#include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
@@ -27,7 +27,7 @@
 #include <string.h>
 
 static OptionsMenu *debugOptionsMenu;
-static char *filter = NULL;
+// static char *filter = NULL;
 
 static OptionsButtonValue debugModeButtonValues[3] = {
 	{
@@ -116,15 +116,16 @@ static void OptBtnEntrySideChanged(const OptionsButtonValue *value, void *extraD
 	entry->side = value->value.dwordValue;
 }
 
-static void FilterTextChanged(const char *newFilter)
-{
-	free(filter);
-	filter = NULL;
-	if (newFilter && strlen(newFilter) > 0)
-	{
-		filter = strdup(newFilter);
-	}
-}
+// TODO: reimplement this, may be best to wait for ggui
+// static void FilterTextChanged(const char *newFilter)
+// {
+// 	free(filter);
+// 	filter = NULL;
+// 	if (newFilter && strlen(newFilter) > 0)
+// 	{
+// 		filter = strdup(newFilter);
+// 	}
+// }
 
 static void DebugOptionsStateUpdate(GlobalState *state, const double delta)
 {

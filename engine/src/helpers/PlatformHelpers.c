@@ -8,8 +8,8 @@
 #include <engine/subsystem/Logging.h>
 #include <errno.h>
 #include <SDL3/SDL_mutex.h>
-#include <SDL3/SDL_video.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
 

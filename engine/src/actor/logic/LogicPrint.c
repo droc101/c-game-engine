@@ -9,8 +9,8 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
-#include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct LogicPrintData
 {

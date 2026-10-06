@@ -40,6 +40,6 @@ void DestroyImage(const Control *c)
 
 void DrawImage(const Control *c, ControlState /*state*/, Vector2 position)
 {
-	ImageData *data = c->controlData;
+	const ImageData *data = c->controlData;
 	DrawTexture(position, c->size, data->texture);
 }

@@ -16,12 +16,14 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -364,8 +366,8 @@ bool LoadMap(Map *map, Asset *mapData)
 		Light *light = &map->lights[i];
 
 		light->type = KvGetByte(lightParams, "type", LIGHT_TYPE_POINT);
-		light->position = KvGetVec3(lightParams, "position", (Vector3){0,0,0});
-		light->rotation = KvGetVec3(lightParams, "rotation", (Vector3){0,0,0});
+		light->position = KvGetVec3(lightParams, "position", (Vector3){0, 0, 0});
+		light->rotation = KvGetVec3(lightParams, "rotation", (Vector3){0, 0, 0});
 		light->color = KvGetColor(lightParams, "color", COLOR_WHITE);
 		light->brightness = KvGetFloat(lightParams, "brightness", 1.0f);
 
@@ -396,5 +398,5 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	LoadMapModels(map);
 
-	return map;
+	return true;
 }

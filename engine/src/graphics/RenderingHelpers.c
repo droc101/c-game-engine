@@ -20,6 +20,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
@@ -28,16 +29,15 @@
 #include <float.h>
 #include <joltc/Math/Mat44.h>
 #include <joltc/Math/Quat.h>
-#include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
-#include <joltc/Physics/Body/BodyInterface.h>
 #include <math.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 
 static bool windowFocused;
 

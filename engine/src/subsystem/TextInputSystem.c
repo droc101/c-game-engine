@@ -28,10 +28,10 @@ void UpdateTextInputRect()
 	if (CurrentTextInput != NULL)
 	{
 		const SDL_Rect rect = {
-			(int)(CurrentTextInput->rectOrigin.x * GetState()->uiScale),
-			(int)(CurrentTextInput->rectOrigin.y * GetState()->uiScale),
-			(int)(CurrentTextInput->rectSize.x * GetState()->uiScale),
-			(int)(CurrentTextInput->rectSize.y * GetState()->uiScale),
+			.x = (int)(CurrentTextInput->rectOrigin.x * GetState()->uiScale),
+			.y = (int)(CurrentTextInput->rectOrigin.y * GetState()->uiScale),
+			.w = (int)(CurrentTextInput->rectSize.x * GetState()->uiScale),
+			.h = (int)(CurrentTextInput->rectSize.y * GetState()->uiScale),
 		};
 		SDL_SetTextInputArea(GetGameWindow(), &rect, CurrentTextInput->cursorOffsetPixels);
 	}

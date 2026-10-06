@@ -261,7 +261,7 @@ void _LockingListRemoveAt(LockingList *list, const size_t index)
 }
 
 
-void _ListInsert(List *list, size_t index, void *data)
+void _ListInsert(List *list, const size_t index, void *data)
 {
 	assert(list);
 

@@ -4,7 +4,6 @@
 
 #include <engine/physics/Navigation.h>
 #include <engine/structs/Actor.h>
-#include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 
 float PlayerRelativeAngle(const Actor *actor)

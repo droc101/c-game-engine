@@ -136,7 +136,7 @@ static char *SliderLabelMaxFps(const Control *slider)
 	const SliderData *data = (SliderData *)slider->controlData;
 	char *buf = malloc(64);
 	CheckAlloc(buf);
-	float value = GetSliderValueAsFloat(slider->controlData);
+	const float value = GetSliderValueAsFloat(slider->controlData);
 	if (value == 0)
 	{
 		sprintf(buf, "%s: Unlimited", data->label);

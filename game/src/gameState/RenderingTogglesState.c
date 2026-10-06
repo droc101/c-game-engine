@@ -23,7 +23,7 @@ static OptionsMenu *renderingTogglesMenu;
 static bool enableBakedLighting = true;
 static DebugRendering debugRendering = DEBUG_RENDERING_DISABLED;
 
-OptionsButtonValue debugRenderingOptionValues[] = {
+static OptionsButtonValue debugRenderingOptionValues[] = {
 	{
 		.text = "Off",
 		.tooltip = NULL,

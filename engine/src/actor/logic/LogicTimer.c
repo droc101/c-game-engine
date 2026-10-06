@@ -7,10 +7,10 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Logging.h>
 #include <engine/subsystem/Timing.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 typedef struct LogicTimerData

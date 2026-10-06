@@ -8,7 +8,6 @@
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/Achievements.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>

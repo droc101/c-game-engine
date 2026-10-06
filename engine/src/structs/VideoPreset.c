@@ -2,7 +2,6 @@
 // Created by droc101 on 8/5/26.
 //
 
-#include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/VideoPreset.h>
 #include <stdbool.h>

@@ -18,7 +18,6 @@
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Dict.h>
-#include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>

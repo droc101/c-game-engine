@@ -6,7 +6,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
@@ -110,7 +109,7 @@ void DestroyOptionsButton(const Control *c)
 
 void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
-	OptionsButtonData *data = (OptionsButtonData *)c->controlData;
+	const OptionsButtonData *data = (OptionsButtonData *)c->controlData;
 	if (data->enabled && HasActivation(stack, c))
 	{
 		size_t index = FindCurrentValueIndex(data);

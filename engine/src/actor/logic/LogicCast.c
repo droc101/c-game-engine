@@ -6,11 +6,10 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include <stdint.h>
 
 static void LogicCastCastHandler(Actor *this, const Actor * /*sender*/, const Param *param)
 {

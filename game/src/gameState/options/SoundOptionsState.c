@@ -4,7 +4,6 @@
 
 #include "gameState/options/SoundOptionsState.h"
 #include <engine/graphics/Drawing.h>
-#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -12,21 +11,17 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
-#include <engine/uiStack/controls/Button.h>
-#include <engine/uiStack/controls/HeaderFooterControl.h>
 #include <engine/uiStack/controls/Slider.h>
-#include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include "gameState/OptionsState.h"
 #include "helpers/OptionsMenu.h"
 
 static OptionsMenu *soundOptionsMenu = NULL;
 
-static void BtnSoundOptionsBack(Control */*control*/, void */*extraData*/)
+static void BtnSoundOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);

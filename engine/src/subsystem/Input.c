@@ -8,6 +8,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
+#include <math.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_joystick.h>

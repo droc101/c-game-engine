@@ -174,6 +174,7 @@ void DrawUiStack(const UiStack *stack);
 /**
  * Calculate the position of a control based on its anchor
  * @param control The control to calculate the position for
+ * @param positioningData Extra data for positioning, unused here
  * @return The anchored position of the control
  */
 Vector2 CalculateControlPosition(const Control *control, const void *positioningData);

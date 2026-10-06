@@ -4,9 +4,13 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
+#include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
 #include <engine/uiStack/UiTheme.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 UiTheme uiTheme;
 

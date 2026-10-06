@@ -42,7 +42,12 @@ static void LogoSplashStateRender(GlobalState *State, const double /*delta*/)
 		return;
 	}
 
-	const SDL_Rect destRect = {ScaledWindowWidth() / 2 - 150, ScaledWindowHeight() / 2 - 150, 300, 300};
+	const SDL_Rect destRect = {
+		.x = ScaledWindowWidth() / 2 - 150,
+		.y = ScaledWindowHeight() / 2 - 150,
+		.w = 300,
+		.h = 300,
+	};
 
 	// HIGH EFFORT FANCY ANIMATION
 	float alpha = 1.0f;

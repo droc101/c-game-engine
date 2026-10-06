@@ -7,6 +7,7 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
@@ -262,7 +263,7 @@ List controlCategories;
 void RegisterControl(char *key,
 					 char *displayName,
 					 InputAction *action,
-					 bool allowAxisBind,
+					 const bool allowAxisBind,
 					 const InputAction *defaultAction,
 					 ControlCategory *category)
 {
@@ -360,7 +361,7 @@ void DefaultControls()
 		ControlCategory *cat = ListGetPointer(controlCategories, i);
 		for (size_t j = 0; j < cat->controlOptions.length; j++)
 		{
-			ControlOption *opt = ListGetPointer(cat->controlOptions, j);
+			const ControlOption *opt = ListGetPointer(cat->controlOptions, j);
 			memcpy(opt->action, opt->defaultAction, sizeof(InputAction));
 		}
 	}

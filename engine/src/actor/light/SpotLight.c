@@ -6,7 +6,14 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/Color.h>
+#include <engine/structs/KVList.h>
 #include <engine/structs/Light.h>
+#include <engine/subsystem/Error.h>
+#include <joltc/Math/Transform.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct SpotLightData
 {

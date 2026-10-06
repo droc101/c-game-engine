@@ -21,7 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef BUILDSTYLE_RELEASE
 static bool signalHandlerInvoked = false;
+#endif
 
 _Noreturn inline void _GameAllocFailure()
 {
@@ -152,6 +154,7 @@ _Noreturn void RenderInitError()
 	exit(1);
 }
 
+#ifdef BUILDSTYLE_RELEASE
 static void SignalHandler(const int sig)
 {
 	if (signalHandlerInvoked)
@@ -173,6 +176,7 @@ static void SignalHandler(const int sig)
 			break;
 	}
 }
+#endif
 
 void ErrorHandlerInit()
 {
