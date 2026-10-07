@@ -150,14 +150,22 @@ static inline void CreateUniformBuffers()
 	UpdateSoftShadowKernels();
 }
 
-static inline void CreateFrustumsBuffer()
+static inline void CreateFrustumsBuffers()
 {
-	const LunaBufferCreationInfo creationInfo = {
+	const LunaBufferCreationInfo cullingDatasBufferCreationInfo = {
 		.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
 		.queueFamilyIndexCount = 1,
 		.queueFamilyIndices = &queueFamilyIndex,
 	};
-	VulkanTest(lunaCreateBuffer(device, &creationInfo, &buffers.frustums), "Failed to create frustums buffer!");
+	VulkanTest(lunaCreateBuffer(device, &cullingDatasBufferCreationInfo, &buffers.frustumCullingDatas),
+			   "Failed to create frustum culling datas buffer!");
+	const LunaBufferCreationInfo shadowMapsBufferCreationInfo = {
+		.usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		.queueFamilyIndexCount = 1,
+		.queueFamilyIndices = &queueFamilyIndex,
+	};
+	VulkanTest(lunaCreateBuffer(device, &shadowMapsBufferCreationInfo, &buffers.frustumShadowMaps),
+			   "Failed to create frustum shadow maps buffer!");
 }
 
 static inline void CreateActorModelsBuffers()
@@ -535,7 +543,7 @@ void CreateBuffers()
 {
 	CreateUiBuffers();
 	CreateUniformBuffers();
-	CreateFrustumsBuffer();
+	CreateFrustumsBuffers();
 	CreateActorModelsBuffers();
 	CreateActorWallsBuffers();
 	CreateMapModelsBuffers(&buffers.opaqueMap);

@@ -379,7 +379,8 @@ typedef struct Buffers
 	UiBuffer ui;
 	UniformBuffers uniforms;
 	/// A buffer containing one FrustumCullingData structure per frustum
-	LunaBuffer frustums;
+	LunaBuffer frustumCullingDatas;
+	LunaBuffer frustumShadowMaps;
 	ActorModelsBuffer actorModels;
 	ActorWallsBuffer actorWalls;
 	MapModelsBuffer opaqueMap;
@@ -463,7 +464,6 @@ typedef struct DescriptorSets
 {
 	DescriptorSet common;
 	DescriptorSet culling;
-	DescriptorSet shadowMaps;
 } DescriptorSets;
 
 typedef struct CullingInfo
@@ -486,6 +486,7 @@ typedef struct LightingShaderSpecializationConstants
 	DebugRendering debugRendering;
 	uint32_t lightCount;
 	VkBool32 hasStaticLight;
+	uint32_t shadowMapAtlasSize;
 	uint32_t sampleCount;
 	float sampleRadius;
 	VkBool32 bakedLighting;
@@ -508,7 +509,8 @@ typedef struct VulkanLight
 	float maxDistance;
 	uint32_t shadowMapIndex;
 	uint32_t cookieTextureIndex;
-	float _padding[3];
+	float _padding;
+	VkDeviceAddress frustumShadowMaps;
 	CGLM_ALIGN_MAT mat4 transformMatrix;
 } VulkanLight;
 
@@ -517,6 +519,13 @@ typedef struct Cluster
 	uint32_t lightCount;
 	uint32_t lightIndices[MAX_LIGHT_COUNT];
 } Cluster;
+
+typedef struct FrustumData
+{
+	uint32_t resolution;
+	uint32_t offsetX;
+	uint32_t offsetY;
+} FrustumShadowMap;
 #pragma endregion typedefs
 
 #pragma region variables
@@ -543,22 +552,27 @@ extern uint32_t skyTextureIndex;
 extern uint32_t shadowMapSlotsAvailable;
 extern ShadowMapPushConstants shadowMapPushConstants;
 extern VkRenderPass shadowMapRenderPass;
-extern List shadowMaps;
-extern List shadowMapFramebuffers;
+extern LunaImage shadowMapAtlas;
+extern LunaImage directionalLightShadowMapAtlas;
+extern VkFramebuffer shadowMapFramebuffer;
+extern VkFramebuffer directionalLightShadowMapFramebuffer;
 extern List perFrustumBuffersHandles;
 extern uint32_t frustumCount;
 extern uint32_t staticLightFrustumCount;
-extern FrustumCullingData *frustums;
+extern FrustumCullingData *frustumCullingDatas;
+extern FrustumShadowMap *frustumShadowMaps;
 extern uint32_t actorModelsDrawInfoCount;
 extern uint32_t maximumCulledInstanceCount;
 extern VulkanLight *lights;
 extern uint32_t lightCount;
 extern VulkanLight *directionalLight;
-extern uint32_t lightmapTextureSize;
+extern uint32_t shadowMapFrustumTextureSize;
 extern LockingList dynamicLightsToAdd;
 extern LockingList dynamicLightsToRemove;
 extern List dynamicLights;
 extern SpecializationConstants specializationConstants;
+
+static const uint32_t DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE = 16384;
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t
@@ -585,8 +599,6 @@ uint32_t ImageIndex(const Image *image);
 
 bool ShadowMapsEnabled(void);
 
-uint32_t ShadowMapResolution(void);
-
 void CreateShadowMapRenderPass(const Map *map);
 
 void CreateDepthGraphicsPipelines(void);
@@ -597,7 +609,9 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel);
 
 void UpdateDirectionalLightCascades(const Camera *camera, const Map *map);
 
-void WriteFrustumsBuffer();
+void WriteFrustumCullingDatasBuffer();
+
+void WriteFrustumShadowMapsBuffer();
 
 void UpdateSoftShadowKernels();
 

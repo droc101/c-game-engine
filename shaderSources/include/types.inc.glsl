@@ -9,6 +9,15 @@
 const uint MAX_LIGHT_COUNT = 128;
 const float EPSILON = 1e-6;
 
+struct FrustumShadowMap {
+	uint resolution;
+	uvec2 offset;
+};
+
+layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer FrustumShadowMapBuffer {
+    FrustumShadowMap shadowMaps[];
+};
+
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;
 const uint LIGHT_TYPE_DIRECTIONAL = 3u;
@@ -29,12 +38,9 @@ struct Light {
     float maxDistance;
     uint shadowMapIndex;
     uint cookieTextureIndex;
-    float _padding[3];
+    float _padding;
+    FrustumShadowMapBuffer frustumShadowMaps;
     mat4 transformMatrix;
-};
-
-layout(scalar, buffer_reference, buffer_reference_align = 4) writeonly buffer LightsBuffer {
-    Light lights[MAX_LIGHT_COUNT];
 };
 
 struct Frustum {

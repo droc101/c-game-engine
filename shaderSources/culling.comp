@@ -60,6 +60,7 @@ uint GetCount() {
 }
 
 bool IsVisible(const vec3 position, const float radius, const uint castsShadows, const uint frustumIndex) {
+    return true;
     // TODO: Use the frustum information from index 0 and remove the frustum information from the camera
     if (frustumIndex == 0) {
         const vec3 center = (camera.viewMatrix * vec4(position, 1)).xyz;

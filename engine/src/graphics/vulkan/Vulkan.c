@@ -281,31 +281,38 @@ static inline void CreateMapModelDrawInfos(const bool opaque,
 
 		if (opaque)
 		{
-			frustums[i].shadedOpaqueMapModelsCullingInfo = lunaGetBufferDeviceAddress(device,
-																					  buffer->shadedCullingInfo);
-			frustums[i]
+			frustumCullingDatas[i]
+					.shadedOpaqueMapModelsCullingInfo = lunaGetBufferDeviceAddress(device, buffer->shadedCullingInfo);
+			frustumCullingDatas[i]
 					.shadedOpaqueMapModelsUnculledDrawInfo = lunaGetBufferDeviceAddress(device,
 																						buffer->unculledShadedDrawInfo);
-			frustums[i].shadedOpaqueMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device, *shadedDrawInfo);
+			frustumCullingDatas[i].shadedOpaqueMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device,
+																									*shadedDrawInfo);
 
-			frustums[i].unshadedOpaqueMapModelsCullingInfo = lunaGetBufferDeviceAddress(device,
-																						buffer->unshadedCullingInfo);
-			frustums[i].unshadedOpaqueMapModelsUnculledDrawInfo = lunaGetBufferDeviceAddress(
+			frustumCullingDatas[i]
+					.unshadedOpaqueMapModelsCullingInfo = lunaGetBufferDeviceAddress(device,
+																					 buffer->unshadedCullingInfo);
+			frustumCullingDatas[i].unshadedOpaqueMapModelsUnculledDrawInfo = lunaGetBufferDeviceAddress(
 					device,
 					buffer->unculledUnshadedDrawInfo);
-			frustums[i].unshadedOpaqueMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device, *unshadedDrawInfo);
+			frustumCullingDatas[i]
+					.unshadedOpaqueMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device, *unshadedDrawInfo);
 		} else
 		{
-			frustums[i].shadedMapModelsCullingInfo = lunaGetBufferDeviceAddress(device, buffer->shadedCullingInfo);
-			frustums[i].shadedMapModelsUnculledDrawInfo = lunaGetBufferDeviceAddress(device,
-																					 buffer->unculledShadedDrawInfo);
-			frustums[i].shadedMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device, *shadedDrawInfo);
+			frustumCullingDatas[i].shadedMapModelsCullingInfo = lunaGetBufferDeviceAddress(device,
+																						   buffer->shadedCullingInfo);
+			frustumCullingDatas[i]
+					.shadedMapModelsUnculledDrawInfo = lunaGetBufferDeviceAddress(device,
+																				  buffer->unculledShadedDrawInfo);
+			frustumCullingDatas[i].shadedMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device, *shadedDrawInfo);
 
-			frustums[i].unshadedMapModelsCullingInfo = lunaGetBufferDeviceAddress(device, buffer->unshadedCullingInfo);
-			frustums[i]
+			frustumCullingDatas[i]
+					.unshadedMapModelsCullingInfo = lunaGetBufferDeviceAddress(device, buffer->unshadedCullingInfo);
+			frustumCullingDatas[i]
 					.unshadedMapModelsUnculledDrawInfo = lunaGetBufferDeviceAddress(device,
 																					buffer->unculledUnshadedDrawInfo);
-			frustums[i].unshadedMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device, *unshadedDrawInfo);
+			frustumCullingDatas[i].unshadedMapModelsOutputDrawInfo = lunaGetBufferDeviceAddress(device,
+																								*unshadedDrawInfo);
 		}
 	}
 }
@@ -512,7 +519,7 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 	free(shadedCullingInfo);
 	free(unshadedCullingInfo);
 
-	WriteFrustumsBuffer();
+	WriteFrustumCullingDatasBuffer();
 
 	const LunaMultiBufferMemoryBarrier perFrustumBuffesBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
@@ -746,6 +753,8 @@ static inline void LoadLight(Light *light,
 	vulkanLight->cookieTextureIndex = (light->cookie == NULL || light->cookie[0] == '\0')
 											  ? 0
 											  : TextureIndex(light->cookie) + 1;
+	vulkanLight->frustumShadowMaps = lunaGetBufferDeviceAddress(device, buffers.frustumShadowMaps) +
+									 sizeof(FrustumShadowMap) * (*frustumIndex);
 
 	versor rotationQuat;
 	if (hasParent)
@@ -797,23 +806,25 @@ static inline void LoadLight(Light *light,
 			{
 				vulkanLight->shadowMapIndex = (*shadowMapIndex)++;
 			}
-			glm_quat_look(VECTOR3_TO_VEC3(vulkanLight->position), rotationQuat, frustums[*frustumIndex].viewMatrix);
+			glm_quat_look(VECTOR3_TO_VEC3(vulkanLight->position),
+						  rotationQuat,
+						  frustumCullingDatas[*frustumIndex].viewMatrix);
 			mat4 projectionMatrix;
 			glm_perspective_lh_zo(glm_rad(2 * light->fadingAngle),
 								  1,
 								  vulkanLight->maxDistance,
 								  LIGHT_NEAR_PLANE,
 								  projectionMatrix);
-			glm_mat4_mul(projectionMatrix, frustums[*frustumIndex].viewMatrix, vulkanLight->transformMatrix);
+			glm_mat4_mul(projectionMatrix, frustumCullingDatas[*frustumIndex].viewMatrix, vulkanLight->transformMatrix);
 
-			frustums[*frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
-			frustums[*frustumIndex].farPlane = vulkanLight->maxDistance;
-			frustums[*frustumIndex].frustumPlanes[1] = 1 / Vector2Length(v2(projectionMatrix[0][0], 1));
-			frustums[*frustumIndex].frustumPlanes[3] = 1 / Vector2Length(v2(projectionMatrix[1][1], 1));
-			frustums[*frustumIndex].frustumPlanes[0] = projectionMatrix[0][0] *
-													   frustums[*frustumIndex].frustumPlanes[1];
-			frustums[*frustumIndex].frustumPlanes[2] = projectionMatrix[1][1] *
-													   frustums[*frustumIndex].frustumPlanes[3];
+			frustumCullingDatas[*frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
+			frustumCullingDatas[*frustumIndex].farPlane = vulkanLight->maxDistance;
+			frustumCullingDatas[*frustumIndex].frustumPlanes[1] = 1 / Vector2Length(v2(projectionMatrix[0][0], 1));
+			frustumCullingDatas[*frustumIndex].frustumPlanes[3] = 1 / Vector2Length(v2(projectionMatrix[1][1], 1));
+			frustumCullingDatas[*frustumIndex].frustumPlanes[0] = projectionMatrix[0][0] *
+																  frustumCullingDatas[*frustumIndex].frustumPlanes[1];
+			frustumCullingDatas[*frustumIndex].frustumPlanes[2] = projectionMatrix[1][1] *
+																  frustumCullingDatas[*frustumIndex].frustumPlanes[3];
 			(*frustumIndex)++;
 		}
 		break;
@@ -845,24 +856,30 @@ static inline void LoadLight(Light *light,
 			};
 			for (uint32_t j = 0; j < 6; j++)
 			{
-				glm_mat4_identity(frustums[*frustumIndex].viewMatrix);
-				glm_mat4_ins3(transforms[j], frustums[*frustumIndex].viewMatrix);
-				glm_translate(frustums[*frustumIndex].viewMatrix, negativeLightPosition);
+				glm_mat4_identity(frustumCullingDatas[*frustumIndex].viewMatrix);
+				glm_mat4_ins3(transforms[j], frustumCullingDatas[*frustumIndex].viewMatrix);
+				glm_translate(frustumCullingDatas[*frustumIndex].viewMatrix, negativeLightPosition);
 
-				frustums[*frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
-				frustums[*frustumIndex].farPlane = vulkanLight->maxDistance;
-				frustums[*frustumIndex].frustumPlanes[1] = 1 / Vector2Length(v2(vulkanLight->transformMatrix[0][0], 1));
-				frustums[*frustumIndex].frustumPlanes[3] = 1 / Vector2Length(v2(vulkanLight->transformMatrix[1][1], 1));
-				frustums[*frustumIndex].frustumPlanes[0] = vulkanLight->transformMatrix[0][0] *
-														   frustums[*frustumIndex].frustumPlanes[1];
-				frustums[*frustumIndex].frustumPlanes[2] = vulkanLight->transformMatrix[1][1] *
-														   frustums[*frustumIndex].frustumPlanes[3];
+				frustumCullingDatas[*frustumIndex].nearPlane = LIGHT_NEAR_PLANE;
+				frustumCullingDatas[*frustumIndex].farPlane = vulkanLight->maxDistance;
+				frustumCullingDatas[*frustumIndex]
+						.frustumPlanes[1] = 1 / Vector2Length(v2(vulkanLight->transformMatrix[0][0], 1));
+				frustumCullingDatas[*frustumIndex]
+						.frustumPlanes[3] = 1 / Vector2Length(v2(vulkanLight->transformMatrix[1][1], 1));
+				frustumCullingDatas[*frustumIndex].frustumPlanes[0] = vulkanLight->transformMatrix[0][0] *
+																	  frustumCullingDatas[*frustumIndex]
+																			  .frustumPlanes[1];
+				frustumCullingDatas[*frustumIndex].frustumPlanes[2] = vulkanLight->transformMatrix[1][1] *
+																	  frustumCullingDatas[*frustumIndex]
+																			  .frustumPlanes[3];
 				(*frustumIndex)++;
 			}
 		}
 		break;
 		case LIGHT_TYPE_DIRECTIONAL:
 			directionalLight = vulkanLight;
+			directionalLight->frustumShadowMaps = lunaGetBufferDeviceAddress(device, buffers.frustumShadowMaps) +
+												  sizeof(FrustumShadowMap);
 			break;
 		default:
 			return;
@@ -876,17 +893,19 @@ static inline void LoadLights(const Map *map)
 		GetState()->options.shadowMapResolution == SHADOW_MAP_RESOLUTION_DISABLED ||
 		dynamicLights.length + map->lightCount == 0)
 	{
-		AvxAlignedFree(frustums);
-		frustums = AvxAlignedCalloc(sizeof(FrustumCullingData));
-		CheckAlloc(frustums);
+		AvxAlignedFree(frustumCullingDatas);
+		frustumCullingDatas = AvxAlignedCalloc(sizeof(FrustumCullingData));
+		CheckAlloc(frustumCullingDatas);
+		free(frustumShadowMaps);
+		frustumShadowMaps = NULL;
 		frustumCount = 1; // Just the camera's frustum
 		staticLightFrustumCount = 0; // No lights
 		CreatePerFrustumBuffers();
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustums, sizeof(FrustumCullingData)),
-				   "Failed to resize frustums buffer!");
-		WriteFrustumsBuffer();
+		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustumCullingDatas, sizeof(FrustumCullingData)),
+				   "Failed to resize frustum culling datas buffer!");
+		WriteFrustumCullingDatasBuffer();
 		const LunaDescriptorBufferInfo frustumsBufferInfo = {
-			.buffer = buffers.frustums,
+			.buffer = buffers.frustumCullingDatas,
 		};
 		const LunaWriteDescriptorSet frustumsDescriptorWrite = {
 			.descriptorSet = descriptorSets.culling.set,
@@ -909,9 +928,18 @@ static inline void LoadLights(const Map *map)
 		return;
 	}
 
-	AvxAlignedFree(frustums);
-	frustums = AvxAlignedCalloc(sizeof(FrustumCullingData) * ((map->lightCount + dynamicLights.length) * 6 + 1));
-	CheckAlloc(frustums);
+	AvxAlignedFree(frustumCullingDatas);
+	frustumCullingDatas = AvxAlignedCalloc(sizeof(FrustumCullingData) *
+										   ((map->lightCount + dynamicLights.length) * 6 + 1));
+	CheckAlloc(frustumCullingDatas);
+
+	const size_t frustumShadowMapsBufferSize = sizeof(FrustumShadowMap) * (map->lightCount + dynamicLights.length) * 6;
+	free(frustumShadowMaps);
+	frustumShadowMaps = malloc(frustumShadowMapsBufferSize);
+	CheckAlloc(frustumShadowMaps);
+	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustumShadowMaps, frustumShadowMapsBufferSize),
+			   "Failed to resize frustum shadow maps buffer!");
+
 	AvxAlignedFree(lights);
 	lights = AvxAlignedCalloc(sizeof(VulkanLight) * (map->lightCount + dynamicLights.length));
 	CheckAlloc(lights);
@@ -934,12 +962,14 @@ static inline void LoadLights(const Map *map)
 	frustumCount = frustumIndex;
 	CreatePerFrustumBuffers();
 
-	const size_t frustumBufferSize = sizeof(FrustumCullingData) * frustumCount;
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustums, frustumBufferSize),
-			   "Failed to resize frustums buffer!");
-	WriteFrustumsBuffer();
+	WriteFrustumShadowMapsBuffer();
+
+	const size_t frustumCullingDatasBufferSize = sizeof(FrustumCullingData) * frustumCount;
+	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustumCullingDatas, frustumCullingDatasBufferSize),
+			   "Failed to resize frustum culling datas buffer!");
+	WriteFrustumCullingDatasBuffer();
 	const LunaDescriptorBufferInfo frustumsBufferInfo = {
-		.buffer = buffers.frustums,
+		.buffer = buffers.frustumCullingDatas,
 	};
 	const LunaWriteDescriptorSet frustumsDescriptorWrite = {
 		.descriptorSet = descriptorSets.culling.set,
@@ -1424,112 +1454,130 @@ static inline void DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pipelin
 #endif
 }
 
-static inline void UpdateLightShadowMaps(const VulkanLight *light,
-										 uint32_t *const frustumIndex,
-										 uint32_t *const framebufferIndex)
+static inline VkRect2D GetFrustumScissor(const uint32_t size, uint32_t frustumIndex)
 {
+	frustumIndex -= directionalLight == NULL ? 1 : 5;
+	assert(frustumIndex < 88); // TODO: Implement a fix for this
+
+	const uint32_t quadrantSize = size / 2;
+
+	VkRect2D scissor;
+	if (frustumIndex < 4)
+	{
+		scissor.extent.width = quadrantSize / 2;
+		scissor.extent.height = quadrantSize / 2;
+		scissor.offset.x = (int)(scissor.extent.width * (frustumIndex % 2));
+		scissor.offset.y = (int)(scissor.extent.height * (frustumIndex / 2));
+	} else if (frustumIndex < 8)
+	{
+		frustumIndex -= 4;
+		scissor.extent.width = quadrantSize / 2;
+		scissor.extent.height = quadrantSize / 2;
+		scissor.offset.x = (int)(scissor.extent.width * (frustumIndex % 2) + quadrantSize);
+		scissor.offset.y = (int)(scissor.extent.height * (frustumIndex / 2));
+	} else if (frustumIndex < 24)
+	{
+		frustumIndex -= 8;
+		scissor.extent.width = quadrantSize / 4;
+		scissor.extent.height = quadrantSize / 4;
+		scissor.offset.x = (int)(scissor.extent.width * (frustumIndex % 4));
+		scissor.offset.y = (int)(scissor.extent.height * (frustumIndex / 4) + quadrantSize);
+	} else
+	{
+		frustumIndex -= 24;
+		scissor.extent.width = quadrantSize / 8;
+		scissor.extent.height = quadrantSize / 8;
+		scissor.offset.x = (int)(scissor.extent.width * (frustumIndex % 8) + quadrantSize);
+		scissor.offset.y = (int)(scissor.extent.height * (frustumIndex / 8) + quadrantSize);
+	}
+	return scissor;
+}
+
+static inline void UpdateDirectionalLightShadowMap(VkViewport *viewport,
+												   VkRect2D *scissor,
+												   const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+	assert(directionalLight);
+
+	directionalLight->frustumShadowMaps = lunaGetBufferDeviceAddress(device, buffers.frustumShadowMaps) +
+										  sizeof(FrustumShadowMap);
+
 	const VkCommandBuffer vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
-	const uint32_t size = ShadowMapResolution();
-	const VkExtent2D extent = {
-		.width = size,
-		.height = size,
-	};
-	VkViewport viewport = {
-		.width = (float)extent.width,
-		.height = (float)extent.height,
-		.maxDepth = 1,
-	};
-	const LunaViewportBindInfo viewportBindInfo = {
-		.viewportCount = 1,
-		.viewports = &viewport,
-	};
-	VkRect2D scissor = {
-		.extent = extent,
-	};
-	const LunaScissorBindInfo scissorBindInfo = {
-		.scissorCount = 1,
-		.scissors = &scissor,
-	};
-	const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
-		{
-			.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
-			.bindInfo.viewportBindInfo = &viewportBindInfo,
-		},
-		{
-			.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
-			.bindInfo.scissorBindInfo = &scissorBindInfo,
-		},
-	};
-	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
-		.dynamicStates = dynamicStateBindInfos,
-	};
-	shadowMapPushConstants.lightType = light->type;
 
 	const VkClearValue depthClearValue = {
 		.depthStencil.depth = 0,
 	};
-	VkRenderPassBeginInfo beginInfo = {
+	const VkRenderPassBeginInfo beginInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 		.renderPass = shadowMapRenderPass,
-		.renderArea.extent = extent,
+		.framebuffer = directionalLightShadowMapFramebuffer,
+		.renderArea.extent.width = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE,
+		.renderArea.extent.height = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE,
 		.clearValueCount = 1,
 		.pClearValues = &depthClearValue,
 	};
+	vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	if (light->type == LIGHT_TYPE_DIRECTIONAL)
+	shadowMapPushConstants.lightType = LIGHT_TYPE_DIRECTIONAL;
+	for (shadowMapPushConstants.cascadeIndex = 0; shadowMapPushConstants.cascadeIndex < 4;
+		 shadowMapPushConstants.cascadeIndex++)
 	{
-		const VkRenderPassBeginInfo directionalLightRenderPassBeginInfo = {
-			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-			.renderPass = shadowMapRenderPass,
-			.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex),
-			.renderArea.extent.width = 2 * size,
-			.renderArea.extent.height = 2 * size,
-			.clearValueCount = 1,
-			.pClearValues = &depthClearValue,
-		};
-		vkCmdBeginRenderPass(vkCommandBuffer, &directionalLightRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-		for (shadowMapPushConstants.cascadeIndex = 0; shadowMapPushConstants.cascadeIndex < 4;
-			 shadowMapPushConstants.cascadeIndex++)
-		{
-			scissor.offset.x = (int)(size * (shadowMapPushConstants.cascadeIndex % 2));
-			scissor.offset.y = (int)(size * (shadowMapPushConstants.cascadeIndex / 2));
-			viewport.x = (float)scissor.offset.x;
-			viewport.y = (float)scissor.offset.y;
+		const uint32_t frustumIndex = shadowMapPushConstants.cascadeIndex + 1;
+		frustumShadowMaps[frustumIndex].resolution = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE / 2;
 
-			DrawMap(shadowMapPushConstants.cascadeIndex + 1,
-					&pipelineBindInfo,
-					false,
-					pipelines.directionalLightShadowMaps.mapFrontFaces,
-					pipelines.directionalLightShadowMaps.mapFrontFaces);
-			DrawMap(shadowMapPushConstants.cascadeIndex + 1,
-					&pipelineBindInfo,
-					false,
-					pipelines.directionalLightShadowMaps.mapBackFaces,
-					pipelines.directionalLightShadowMaps.mapBackFaces);
-			DrawActors(shadowMapPushConstants.cascadeIndex + 1,
-					   &pipelineBindInfo,
-					   pipelines.directionalLightShadowMaps.modelActors,
-					   pipelines.directionalLightShadowMaps.wallActors);
-		}
-		vkCmdEndRenderPass(vkCommandBuffer);
-		(*framebufferIndex)++;
-		return;
+		scissor->extent.width = frustumShadowMaps[frustumIndex].resolution;
+		scissor->extent.height = frustumShadowMaps[frustumIndex].resolution;
+		scissor->offset.x = (int)(scissor->extent.width * (shadowMapPushConstants.cascadeIndex % 2));
+		scissor->offset.y = (int)(scissor->extent.height * (shadowMapPushConstants.cascadeIndex / 2));
+		viewport->width = (float)scissor->extent.width;
+		viewport->height = (float)scissor->extent.height;
+		viewport->x = (float)scissor->offset.x;
+		viewport->y = (float)scissor->offset.y;
+
+		DrawMap(frustumIndex,
+				pipelineBindInfo,
+				false,
+				pipelines.directionalLightShadowMaps.mapFrontFaces,
+				pipelines.directionalLightShadowMaps.mapFrontFaces);
+		DrawMap(frustumIndex,
+				pipelineBindInfo,
+				false,
+				pipelines.directionalLightShadowMaps.mapBackFaces,
+				pipelines.directionalLightShadowMaps.mapBackFaces);
+		DrawActors(frustumIndex,
+				   pipelineBindInfo,
+				   pipelines.directionalLightShadowMaps.modelActors,
+				   pipelines.directionalLightShadowMaps.wallActors);
 	}
 
+	vkCmdEndRenderPass(vkCommandBuffer);
+}
+
+static inline void UpdateLightShadowMap(VulkanLight *light,
+										uint32_t *const frustumIndex,
+										VkViewport *viewport,
+										VkRect2D *scissor,
+										const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+	assert(light->type != LIGHT_TYPE_DIRECTIONAL);
+
+	shadowMapPushConstants.lightType = light->type;
 	const uint32_t lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
 	for (shadowMapPushConstants.faceIndex = 0; shadowMapPushConstants.faceIndex < lightFrustumCount;
 		 shadowMapPushConstants.faceIndex++)
 	{
-		beginInfo.framebuffer = ListGetPointer(shadowMapFramebuffers, *framebufferIndex);
-		vkCmdBeginRenderPass(vkCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		*scissor = GetFrustumScissor(specializationConstants.shadowMapAtlasSize, *frustumIndex);
+		viewport->width = (float)scissor->extent.width;
+		viewport->height = (float)scissor->extent.height;
+		viewport->x = (float)scissor->offset.x;
+		viewport->y = (float)scissor->offset.y;
+		frustumShadowMaps[*frustumIndex].resolution = scissor->extent.width;
+		frustumShadowMaps[*frustumIndex].offsetX = scissor->offset.x;
+		frustumShadowMaps[*frustumIndex].offsetY = scissor->offset.y;
 
-		DrawMap(*frustumIndex, &pipelineBindInfo, false, pipelines.shadowMaps.opaqueMap, pipelines.shadowMaps.map);
-		DrawActors(*frustumIndex, &pipelineBindInfo, pipelines.shadowMaps.modelActors, pipelines.shadowMaps.wallActors);
+		DrawMap(*frustumIndex, pipelineBindInfo, false, pipelines.shadowMaps.opaqueMap, pipelines.shadowMaps.map);
+		DrawActors(*frustumIndex, pipelineBindInfo, pipelines.shadowMaps.modelActors, pipelines.shadowMaps.wallActors);
 
-		vkCmdEndRenderPass(vkCommandBuffer);
-
-		(*framebufferIndex)++;
 		(*frustumIndex)++;
 	}
 }
@@ -1548,19 +1596,72 @@ static inline void UpdateShadowMaps(const Map *map)
 	VulkanTest(lunaBindDescriptorSets(device, commandBuffer, pipelines.shadowMaps.map, &descriptorSetBindInfo),
 			   "Failed to bind descriptor sets!");
 
-	uint32_t frustumIndex = map->directionalLight == NULL ? 1 : 5;
-	uint32_t framebufferIndex = 0;
+	VkViewport viewport = {
+		.maxDepth = 1,
+	};
+	const LunaViewportBindInfo viewportBindInfo = {
+		.viewportCount = 1,
+		.viewports = &viewport,
+	};
+	VkRect2D scissor;
+	const LunaScissorBindInfo scissorBindInfo = {
+		.scissorCount = 1,
+		.scissors = &scissor,
+	};
+	const LunaDynamicStateBindInfo dynamicStateBindInfos[] = {
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_VIEWPORT,
+			.bindInfo.viewportBindInfo = &viewportBindInfo,
+		},
+		{
+			.dynamicStateType = VK_DYNAMIC_STATE_SCISSOR,
+			.bindInfo.scissorBindInfo = &scissorBindInfo,
+		},
+	};
+	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
+		.dynamicStates = dynamicStateBindInfos,
+	};
+
+	if (directionalLight)
+	{
+		UpdateDirectionalLightShadowMap(&viewport, &scissor, &pipelineBindInfo);
+	}
+
+	const VkClearValue depthClearValue = {
+		.depthStencil.depth = 0,
+	};
+	const VkRenderPassBeginInfo beginInfo = {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+		.renderPass = shadowMapRenderPass,
+		.framebuffer = shadowMapFramebuffer,
+		.renderArea.extent.width = specializationConstants.shadowMapAtlasSize,
+		.renderArea.extent.height = specializationConstants.shadowMapAtlasSize,
+		.clearValueCount = 1,
+		.pClearValues = &depthClearValue,
+	};
+	vkCmdBeginRenderPass(lunaGetVkCommandBuffer(commandBuffer), &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+	uint32_t frustumIndex = directionalLight == NULL ? 1 : 5;
 	for (shadowMapPushConstants.lightIndex = 0; shadowMapPushConstants.lightIndex < map->lightCount;
 		 shadowMapPushConstants.lightIndex++)
 	{
-		const VulkanLight *light = &lights[shadowMapPushConstants.lightIndex];
-		UpdateLightShadowMaps(light, &frustumIndex, &framebufferIndex);
+		VulkanLight *light = &lights[shadowMapPushConstants.lightIndex];
+		if (light->type == LIGHT_TYPE_DIRECTIONAL)
+		{
+			continue;
+		}
+		UpdateLightShadowMap(light, &frustumIndex, &viewport, &scissor, &pipelineBindInfo);
 	}
 	for (uint32_t i = 0; i < dynamicLights.length; shadowMapPushConstants.lightIndex++, i++)
 	{
-		const VulkanLight *light = &lights[shadowMapPushConstants.lightIndex];
-		UpdateLightShadowMaps(light, &frustumIndex, &framebufferIndex);
+		VulkanLight *light = &lights[shadowMapPushConstants.lightIndex];
+		UpdateLightShadowMap(light, &frustumIndex, &viewport, &scissor, &pipelineBindInfo);
 	}
+
+	vkCmdEndRenderPass(lunaGetVkCommandBuffer(commandBuffer));
+
+	WriteFrustumShadowMapsBuffer();
 }
 
 static inline void UpdateDynamicLight(const uint32_t index, uint32_t *const frustumIndex)
@@ -1591,11 +1692,11 @@ static inline void UpdateDynamicLights()
 
 	const LunaBufferWriteInfo frustumBufferWriteInfo = {
 		.bytes = sizeof(FrustumCullingData) * (frustumCount - staticLightFrustumCount - 1),
-		.data = &frustums[staticLightFrustumCount + 1],
+		.data = &frustumCullingDatas[staticLightFrustumCount + 1],
 		.offset = sizeof(FrustumCullingData) * (staticLightFrustumCount + 1),
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumCullingDatas, &frustumBufferWriteInfo),
 			   "Failed to write frustums buffer!");
 
 	const LunaBufferWriteInfo lightsBufferDynamicLightWriteInfo = {
@@ -2009,25 +2110,15 @@ void VK_RenderMap(Map *map, Camera *camera)
 			.bindInfo.scissorBindInfo = &scissorBindInfo,
 		},
 	};
-	const LunaDescriptorSet descriptorSetHandles[] = {
-		descriptorSets.common.set,
-		descriptorSets.shadowMaps.set,
-	};
 	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-		.descriptorSetBindInfo.descriptorSetCount = ArrayLength(descriptorSetHandles),
-		.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
-		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
-		.dynamicStates = dynamicStateBindInfos,
-	};
-
-	const LunaGraphicsPipelineBindInfo prepassPipelineBindInfo = {
 		.descriptorSetBindInfo.descriptorSetCount = 1,
 		.descriptorSetBindInfo.descriptorSets = &descriptorSets.common.set,
 		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
-	DrawMap(0, &prepassPipelineBindInfo, true, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
-	DrawActors(0, &prepassPipelineBindInfo, pipelines.depthPrepass.modelActors, pipelines.depthPrepass.wallActors);
+
+	DrawMap(0, &pipelineBindInfo, true, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
+	DrawActors(0, &pipelineBindInfo, pipelines.depthPrepass.modelActors, pipelines.depthPrepass.wallActors);
 	lunaNextSubpass(commandBuffer);
 
 	if (map->renderSky)
@@ -2127,13 +2218,9 @@ bool VK_FrameEnd()
 				.bindInfo.scissorBindInfo = &scissorBindInfo,
 			},
 		};
-		const LunaDescriptorSet descriptorSetHandles[] = {
-			descriptorSets.common.set,
-			descriptorSets.shadowMaps.set,
-		};
 		const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
-			.descriptorSetBindInfo.descriptorSetCount = ArrayLength(descriptorSetHandles),
-			.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
+			.descriptorSetBindInfo.descriptorSetCount = 1,
+			.descriptorSetBindInfo.descriptorSets = &descriptorSets.common.set,
 			.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 			.dynamicStates = dynamicStateBindInfos,
 		};

@@ -67,23 +67,27 @@ uint32_t skyTextureIndex = 0;
 uint32_t shadowMapSlotsAvailable = 0;
 ShadowMapPushConstants shadowMapPushConstants = {0};
 VkRenderPass shadowMapRenderPass = VK_NULL_HANDLE;
-List shadowMaps = {0};
-List shadowMapFramebuffers = {0};
+LunaImage shadowMapAtlas = LUNA_NULL_HANDLE;
+LunaImage directionalLightShadowMapAtlas = LUNA_NULL_HANDLE;
+VkFramebuffer shadowMapFramebuffer = VK_NULL_HANDLE;
+VkFramebuffer directionalLightShadowMapFramebuffer = VK_NULL_HANDLE;
 List perFrustumBuffersHandles = {0};
 uint32_t frustumCount = 0;
 uint32_t staticLightFrustumCount = 0;
-FrustumCullingData *frustums = NULL;
+FrustumCullingData *frustumCullingDatas = NULL;
+FrustumShadowMap *frustumShadowMaps = NULL;
 uint32_t actorModelsDrawInfoCount = 0;
 uint32_t maximumCulledInstanceCount = 0;
 VulkanLight *lights = NULL;
 uint32_t lightCount = 0;
 VulkanLight *directionalLight = NULL;
-uint32_t lightmapTextureSize = 0;
+uint32_t shadowMapFrustumTextureSize = 0;
 LockingList dynamicLightsToAdd = {0};
 LockingList dynamicLightsToRemove = {0};
 List dynamicLights = {0};
 SpecializationConstants specializationConstants = {
 	.debugRendering = DEBUG_RENDERING_DISABLED,
+	.shadowMapAtlasSize = 16384,
 	.sampleCount = 32,
 	.sampleRadius = 4,
 	.bakedLighting = VK_TRUE,
@@ -148,48 +152,19 @@ inline bool ShadowMapsEnabled(void)
 	return GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED && lightCount != 0;
 }
 
-inline uint32_t ShadowMapResolution(void)
-{
-	switch (GetState()->options.shadowMapResolution)
-	{
-		case SHADOW_MAP_RESOLUTION_128:
-			lightmapTextureSize = 128;
-			break;
-		case SHADOW_MAP_RESOLUTION_256:
-			lightmapTextureSize = 256;
-			break;
-		case SHADOW_MAP_RESOLUTION_512:
-			lightmapTextureSize = 512;
-			break;
-		case SHADOW_MAP_RESOLUTION_1024:
-			lightmapTextureSize = 1024;
-			break;
-		case SHADOW_MAP_RESOLUTION_2048:
-			lightmapTextureSize = 2048;
-			break;
-		case SHADOW_MAP_RESOLUTION_4096:
-			lightmapTextureSize = 4096;
-			break;
-		default:
-			lightmapTextureSize = 0;
-			break;
-	}
-	return lightmapTextureSize;
-}
-
-static inline void CreateLightFrustumShadowMapImage(const Light *light, uint32_t *const shadowMapCount)
+static inline void CreateShadowMapAtlases()
 {
 	const VkDevice vkDevice = lunaGetVkDevice(device);
-	const uint32_t lightSize = ShadowMapResolution();
 	const LunaImageWriteInfo depthAttachmentWriteInfo = {
 		.destinationStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
 								VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
 		.destinationAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 	};
-	const LunaImageCreationInfo shadowMapCreationInfo = {
+
+	LunaImageCreationInfo atlasCreationInfo = {
 		.format = VK_FORMAT_D32_SFLOAT,
-		.width = lightSize,
-		.height = lightSize,
+		.width = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE,
+		.height = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 		.queueFamilyIndexCount = 1,
@@ -198,105 +173,49 @@ static inline void CreateLightFrustumShadowMapImage(const Light *light, uint32_t
 		.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
 		.writeInfo = depthAttachmentWriteInfo,
 	};
+	VulkanTest(lunaCreateImage(device, commandBuffer, &atlasCreationInfo, &directionalLightShadowMapAtlas),
+			   "Failed to create directional light shadow map atlas!");
+	VkImageView imageView = lunaGetVkImageView(directionalLightShadowMapAtlas);
 
-	LunaImage *image = LUNA_NULL_HANDLE;
-	VkImageView imageView = VK_NULL_HANDLE;
-	const VkFramebufferCreateInfo framebufferCreateInfo = {
+	VkFramebufferCreateInfo framebufferCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 		.renderPass = shadowMapRenderPass,
 		.attachmentCount = 1,
 		.pAttachments = &imageView,
-		.width = lightSize,
-		.height = lightSize,
+		.width = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE,
+		.height = DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE,
 		.layers = 1,
 	};
-	LunaDescriptorImageInfo shadowMapImageInfos[6] = {
+	VulkanTest(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, &directionalLightShadowMapFramebuffer),
+			   "Failed to create directional light shadow map framebuffer!");
+
+	atlasCreationInfo.width = specializationConstants.shadowMapAtlasSize;
+	atlasCreationInfo.height = specializationConstants.shadowMapAtlasSize;
+	VulkanTest(lunaCreateImage(device, commandBuffer, &atlasCreationInfo, &shadowMapAtlas),
+			   "Failed to create shadow map atlas!");
+	imageView = lunaGetVkImageView(shadowMapAtlas);
+
+	framebufferCreateInfo.width = specializationConstants.shadowMapAtlasSize;
+	framebufferCreateInfo.height = specializationConstants.shadowMapAtlasSize;
+	VulkanTest(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, &shadowMapFramebuffer),
+			   "Failed to create shadow map framebuffer!");
+
+	LunaDescriptorImageInfo shadowMapImageInfos[2] = {
 		{
 			.sampler = textureSamplers.shadowMaps,
+			.image = directionalLightShadowMapAtlas,
 			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		},
 		{
 			.sampler = textureSamplers.shadowMaps,
-			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		},
-		{
-			.sampler = textureSamplers.shadowMaps,
-			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		},
-		{
-			.sampler = textureSamplers.shadowMaps,
-			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		},
-		{
-			.sampler = textureSamplers.shadowMaps,
-			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		},
-		{
-			.sampler = textureSamplers.shadowMaps,
+			.image = shadowMapAtlas,
 			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 		},
 	};
-	const uint32_t lightFrustumCount = light->type == LIGHT_TYPE_POINT ? 6 : 1;
-	if (light->type == LIGHT_TYPE_DIRECTIONAL)
-	{
-		image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-		const LunaImageCreationInfo directionalShadowMapAtlasCreationInfo = {
-			.format = VK_FORMAT_D32_SFLOAT,
-			.width = lightSize * 2,
-			.height = lightSize * 2,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-			.queueFamilyIndexCount = 1,
-			.queueFamilyIndices = &queueFamilyIndex,
-			.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
-			.writeInfo = depthAttachmentWriteInfo,
-		};
-		VulkanTest(lunaCreateImage(device, commandBuffer, &directionalShadowMapAtlasCreationInfo, image),
-				   "Failed to create spot light shadow map image!");
-		imageView = lunaGetVkImageView(*image);
-
-		const VkFramebufferCreateInfo directionalLightShadowMapAtlasFramebufferCreateInfo = {
-			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-			.renderPass = shadowMapRenderPass,
-			.attachmentCount = 1,
-			.pAttachments = &imageView,
-			.width = 2 * lightSize,
-			.height = 2 * lightSize,
-			.layers = 1,
-		};
-		VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-		VulkanTest(vkCreateFramebuffer(vkDevice,
-									   &directionalLightShadowMapAtlasFramebufferCreateInfo,
-									   NULL,
-									   framebuffer),
-				   "Failed to create spot light shadow map framebuffer!");
-
-		shadowMapImageInfos->image = *image;
-	} else
-	{
-		*shadowMapCount += lightFrustumCount;
-		for (uint32_t i = 0; i < lightFrustumCount; i++)
-		{
-			image = ListAdd(shadowMaps, LUNA_NULL_HANDLE);
-			VulkanTest(lunaCreateImage(device, commandBuffer, &shadowMapCreationInfo, image),
-					   "Failed to create spot light shadow map image!");
-
-			imageView = lunaGetVkImageView(*image);
-			VkFramebuffer *framebuffer = ListAdd(shadowMapFramebuffers, VK_NULL_HANDLE);
-			VulkanTest(vkCreateFramebuffer(vkDevice, &framebufferCreateInfo, NULL, framebuffer),
-					   "Failed to create spot light shadow map framebuffer!");
-
-			shadowMapImageInfos[i].image = *image;
-		}
-	}
-
 	const LunaWriteDescriptorSet shadowMapDescriptorWrite = {
-		.bindingName = "Shadow Maps",
-		.descriptorSet = light->type == LIGHT_TYPE_DIRECTIONAL ? descriptorSets.common.set
-															   : descriptorSets.shadowMaps.set,
-		.descriptorArrayElement = light->type == LIGHT_TYPE_DIRECTIONAL ? 0 : *shadowMapCount - lightFrustumCount,
-		.descriptorCount = lightFrustumCount,
+		.bindingName = "Shadow Map Atlases",
+		.descriptorSet = descriptorSets.common.set,
+		.descriptorCount = 2,
 		.imageInfos = shadowMapImageInfos,
 	};
 	lunaWriteDescriptorSets(device, 1, &shadowMapDescriptorWrite);
@@ -307,16 +226,15 @@ void CreateShadowMapRenderPass(const Map *map)
 	const VkDevice vkDevice = lunaGetVkDevice(device);
 	if (shadowMapRenderPass != VK_NULL_HANDLE)
 	{
-		for (uint32_t i = 0; i < shadowMapFramebuffers.length; i++)
-		{
-			vkDestroyFramebuffer(vkDevice, ListGetPointer(shadowMapFramebuffers, i), NULL);
-		}
-		ListFree(shadowMapFramebuffers);
-		for (uint32_t i = 0; i < shadowMaps.length; i++)
-		{
-			lunaDestroyImage(device, (LunaImage)ListGetPointer(shadowMaps, i));
-		}
-		ListFree(shadowMaps);
+		vkDestroyFramebuffer(vkDevice, directionalLightShadowMapFramebuffer, NULL);
+		directionalLightShadowMapFramebuffer = VK_NULL_HANDLE;
+		vkDestroyFramebuffer(vkDevice, shadowMapFramebuffer, NULL);
+		shadowMapFramebuffer = VK_NULL_HANDLE;
+
+		lunaDestroyImage(device, directionalLightShadowMapAtlas);
+		directionalLightShadowMapAtlas = LUNA_NULL_HANDLE;
+		lunaDestroyImage(device, shadowMapAtlas);
+		shadowMapAtlas = LUNA_NULL_HANDLE;
 
 		vkDestroyRenderPass(vkDevice, shadowMapRenderPass, NULL);
 		shadowMapRenderPass = VK_NULL_HANDLE;
@@ -363,19 +281,7 @@ void CreateShadowMapRenderPass(const Map *map)
 	VulkanTest(vkCreateRenderPass(vkDevice, &renderPassCreateInfo, NULL, &shadowMapRenderPass),
 			   "Failed to create shadow map render pass!");
 
-	ListInit(shadowMaps, LIST_POINTER);
-	ListInit(shadowMapFramebuffers, LIST_POINTER);
-	uint32_t shadowMapCount = 0;
-	for (uint32_t i = 0; i < map->lightCount; i++)
-	{
-		const Light *light = &map->lights[i];
-		CreateLightFrustumShadowMapImage(light, &shadowMapCount);
-	}
-	for (uint32_t i = 0; i < dynamicLights.length; i++)
-	{
-		const DynamicLight *light = ListGetPointer(dynamicLights, i);
-		CreateLightFrustumShadowMapImage(&light->light, &shadowMapCount);
-	}
+	CreateShadowMapAtlases();
 }
 
 void UpdateCameraUniform(Camera *camera)
@@ -551,7 +457,7 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 		glm_plane_normalize(frustumX);
 		glm_plane_normalize(frustumY);
 
-		FrustumCullingData *frustum = &frustums[i + 1];
+		FrustumCullingData *frustum = &frustumCullingDatas[i + 1];
 		glm_mat4_copy(viewMatrix, frustum->viewMatrix);
 		frustum->nearPlane = -FLT_MAX;
 		frustum->farPlane = radius * 2;
@@ -580,23 +486,34 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 			   "Failed to write directional light cascade transform matrices to buffer!");
 	const LunaBufferWriteInfo frustumsWriteInfo = {
 		.bytes = sizeof(FrustumCullingData) * 4,
-		.data = &frustums[1],
+		.data = &frustumCullingDatas[1],
 		.offset = sizeof(FrustumCullingData),
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumsWriteInfo),
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumCullingDatas, &frustumsWriteInfo),
 			   "Failed to write directional light frustums to buffer!");
 }
 
-void WriteFrustumsBuffer()
+void WriteFrustumCullingDatasBuffer()
 {
-	const LunaBufferWriteInfo frustumBufferWriteInfo = {
+	const LunaBufferWriteInfo writeInfo = {
 		.bytes = sizeof(FrustumCullingData) * frustumCount,
-		.data = frustums,
+		.data = frustumCullingDatas,
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustums, &frustumBufferWriteInfo),
-			   "Failed to write frustums buffer!");
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumCullingDatas, &writeInfo),
+			   "Failed to write frustum culling datas buffer!");
+}
+
+void WriteFrustumShadowMapsBuffer()
+{
+	const LunaBufferWriteInfo writeInfo = {
+		.bytes = sizeof(FrustumShadowMap) * frustumCount,
+		.data = frustumShadowMaps,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumShadowMaps, &writeInfo),
+			   "Failed to write frustum shadow maps buffer!");
 }
 
 void UpdateSoftShadowKernels()
@@ -651,7 +568,7 @@ void ClearCullingData()
 		.sourceAccessMask = VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
-		.buffer = buffers.frustums,
+		.buffer = buffers.frustumCullingDatas,
 	};
 	const LunaDependencyInfo preClearDependencyInfo = {
 		.bufferMemoryBarrierCount = 1,
@@ -690,7 +607,7 @@ void ClearCullingData()
 		.sourceAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT,
 		.destinationStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-		.buffer = buffers.frustums,
+		.buffer = buffers.frustumCullingDatas,
 	};
 	const LunaDependencyInfo postClearDependencyInfo = {
 		.bufferMemoryBarrierCount = 1,
@@ -739,7 +656,7 @@ void CullModels()
 								VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT |
 								VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
 		.destinationAccessMask = VK_ACCESS_2_SHADER_READ_BIT,
-		.buffer = buffers.frustums,
+		.buffer = buffers.frustumCullingDatas,
 	};
 	const LunaDependencyInfo postDispatchDependencyInfo = {
 		.bufferMemoryBarrierCount = 1,
@@ -799,7 +716,7 @@ void PopulateClusters()
 	VulkanTest(lunaDispatch(device, commandBuffer, &dispatchInfo),
 			   "Failed to dispatch compute shader to populate clusters!");
 
-	const LunaBuffer bufferHandles[] = {buffers.frustums, buffers.uniforms.clusters};
+	const LunaBuffer bufferHandles[] = {buffers.frustumCullingDatas, buffers.uniforms.clusters};
 	const LunaMultiBufferMemoryBarrier clustersMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT,
 		.sourceAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,

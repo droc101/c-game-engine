@@ -101,10 +101,13 @@ bool CreateLogicalDevice()
 		.pNext = &vulkan12Features,
 		.features = vulkan10Features,
 	};
+	const char *const extensions[] = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+	};
 	const LunaDeviceCreationInfo2 deviceCreationInfo = {
-		.extensionCount = 2,
-		.extensionNames = (const char *const[]){VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-												VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME},
+		.extensionCount = ArrayLength(extensions),
+		.extensionNames = extensions,
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
 		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
@@ -357,9 +360,9 @@ void CreateDescriptorSetLayouts()
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT,
 		},
 		{
-			.bindingName = "Shadow Maps",
+			.bindingName = "Shadow Map Atlases",
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
+			.descriptorCount = 2,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
 		{
@@ -407,25 +410,6 @@ void CreateDescriptorSetLayouts()
 											 &cullingDescriptorSetLayoutCreationInfo,
 											 &descriptorSets.culling.layout),
 			   "Failed to create culling descriptor set layout!");
-
-	const uint32_t shadowMapDescriptorSlots = freeResourceCount < textureCount ? 0 : freeResourceCount - textureCount;
-	shadowMapSlotsAvailable = min(min(physicalDeviceProperties.limits.maxDescriptorSetSampledImages,
-									  shadowMapDescriptorSlots),
-								  16384);
-	const LunaDescriptorSetLayoutBinding shadowMapsBinding = {
-		.bindingName = "Shadow Maps",
-		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.descriptorCount = shadowMapSlotsAvailable,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-	};
-	const LunaDescriptorSetLayoutCreationInfo shadowMapsDescriptorSetLayoutCreationInfo = {
-		.bindingCount = 1,
-		.bindings = &shadowMapsBinding,
-	};
-	VulkanTest(lunaCreateDescriptorSetLayout(device,
-											 &shadowMapsDescriptorSetLayoutCreationInfo,
-											 &descriptorSets.shadowMaps.layout),
-			   "Failed to create shadow maps descriptor set layout!");
 }
 
 void CreateTextureSamplers()
@@ -588,12 +572,10 @@ void CreateDescriptorSet()
 	const LunaDescriptorSetLayout layouts[] = {
 		descriptorSets.common.layout,
 		descriptorSets.culling.layout,
-		descriptorSets.shadowMaps.layout,
 	};
 	LunaDescriptorSet *descriptorSetHandles[] = {
 		&descriptorSets.common.set,
 		&descriptorSets.culling.set,
-		&descriptorSets.shadowMaps.set,
 	};
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,

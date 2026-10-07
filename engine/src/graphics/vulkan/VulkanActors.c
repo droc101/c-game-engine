@@ -439,7 +439,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 			ListSet(perFrustumBuffersHandles, drawInfoShadedIndex, *shadedDrawInfo);
 			ListSet(perFrustumBuffersHandles, drawInfoShadedIndex + 1, *unshadedDrawInfo);
 
-			FrustumCullingData *frustum = &frustums[i];
+			FrustumCullingData *frustum = &frustumCullingDatas[i];
 			frustum->shadedActorModelsCullingInfo = lunaGetBufferDeviceAddress(device,
 																			   buffers.actorModels.shadedCullingInfo);
 			frustum->shadedActorModelsUnculledInstanceIndices = lunaGetBufferDeviceAddress(
@@ -505,12 +505,13 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 			const uint32_t index = PER_FRUSTUM_BUFFER_COUNT * i + PER_FRUSTUM_BUFFER_WALL_ACTOR_INSTANCE_INDICES_OFFSET;
 			ListSet(perFrustumBuffersHandles, index, *buffer);
 
-			frustums[i].shadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
-																				 buffers.actorWalls.shadedCullingInfo);
-			frustums[i].shadedActorWallsDrawInfo = lunaGetBufferDeviceAddress(
+			frustumCullingDatas[i]
+					.shadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
+																			  buffers.actorWalls.shadedCullingInfo);
+			frustumCullingDatas[i].shadedActorWallsDrawInfo = lunaGetBufferDeviceAddress(
 					device,
 					(LunaBuffer)ListGetPointer(buffers.actorWalls.shadedDrawInfo, i));
-			frustums[i].shadedActorWallsInstanceIndices = lunaGetBufferDeviceAddress(device, *buffer);
+			frustumCullingDatas[i].shadedActorWallsInstanceIndices = lunaGetBufferDeviceAddress(device, *buffer);
 		}
 	}
 	if (reallocInfo->shouldReallocUnshadedWalls)
@@ -543,13 +544,13 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 			const uint32_t index = PER_FRUSTUM_BUFFER_COUNT * i + PER_FRUSTUM_BUFFER_WALL_ACTOR_INSTANCE_INDICES_OFFSET;
 			ListSet(perFrustumBuffersHandles, index + 1, *buffer);
 
-			frustums[i]
+			frustumCullingDatas[i]
 					.unshadedActorWallsCullingInfo = lunaGetBufferDeviceAddress(device,
 																				buffers.actorWalls.unshadedCullingInfo);
-			frustums[i].unshadedActorWallsDrawInfo = lunaGetBufferDeviceAddress(
+			frustumCullingDatas[i].unshadedActorWallsDrawInfo = lunaGetBufferDeviceAddress(
 					device,
 					(LunaBuffer)ListGetPointer(buffers.actorWalls.unshadedDrawInfo, i));
-			frustums[i].unshadedActorWallsInstanceIndices = lunaGetBufferDeviceAddress(device, *buffer);
+			frustumCullingDatas[i].unshadedActorWallsInstanceIndices = lunaGetBufferDeviceAddress(device, *buffer);
 		}
 	}
 	if (reallocInfo->shouldReallocShadedWalls || reallocInfo->shouldReallocUnshadedWalls)
@@ -575,7 +576,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 	}
 
 	allocatedBufferCount = frustumCount;
-	WriteFrustumsBuffer();
+	WriteFrustumCullingDatasBuffer();
 }
 
 static inline void UpdateActorModelInstanceData(const Actor *actor,

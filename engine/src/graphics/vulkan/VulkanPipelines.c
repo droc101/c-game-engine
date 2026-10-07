@@ -111,19 +111,16 @@ static const VkPipelineColorBlendStateCreateInfo SHADOW_MAP_COLOR_BLENDING = {
 	.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 };
 
-static LunaDescriptorSetLayout descriptorSetLayouts[2];
-static const LunaPipelineLayoutCreationInfo PIPELINE_LAYOUT_CREATION_INFO = {
-	.descriptorSetLayoutCount = 2,
-	.descriptorSetLayouts = descriptorSetLayouts,
+static LunaPipelineLayoutCreationInfo pipelineLayoutCreationInfo = {
+	.descriptorSetLayoutCount = 1,
 };
 
 static LunaPushConstantsRange lightingShadersPushConstantsRange = {
 	.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	.size = sizeof(uint32_t),
 };
-static const LunaPipelineLayoutCreationInfo LIGHTING_PIPELINE_LAYOUT_CREATION_INFO = {
-	.descriptorSetLayoutCount = 2,
-	.descriptorSetLayouts = descriptorSetLayouts,
+static LunaPipelineLayoutCreationInfo lightingPipelineLayoutCreationInfo = {
+	.descriptorSetLayoutCount = 1,
 	.pushConstantRangeCount = 1,
 	.pushConstantsRanges = &lightingShadersPushConstantsRange,
 };
@@ -186,16 +183,21 @@ static const VkSpecializationMapEntry LIGHTING_SPECIALIZATION_MAP_ENTRIES[] = {
 	},
 	{
 		.constantID = 3,
+		.offset = offsetof(SpecializationConstants, shadowMapAtlasSize),
+		.size = SizeofMember(SpecializationConstants, shadowMapAtlasSize),
+	},
+	{
+		.constantID = 4,
 		.offset = offsetof(SpecializationConstants, sampleCount),
 		.size = SizeofMember(SpecializationConstants, sampleCount),
 	},
 	{
-		.constantID = 4,
+		.constantID = 5,
 		.offset = offsetof(SpecializationConstants, sampleRadius),
 		.size = SizeofMember(SpecializationConstants, sampleRadius),
 	},
 	{
-		.constantID = 5,
+		.constantID = 6,
 		.offset = offsetof(SpecializationConstants, bakedLighting),
 		.size = SizeofMember(SpecializationConstants, bakedLighting),
 	},
@@ -294,7 +296,7 @@ static inline void CreateUIPipeline()
 		.depthStencilState = &DEPTH_STENCIL_STATE_UNUSED,
 		.colorBlendState = &UI_PIPELINE_COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -385,7 +387,7 @@ static inline void CreateShadedMapPipeline()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -462,7 +464,7 @@ static inline void CreateUnshadedMapPipeline()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -525,8 +527,8 @@ static inline void CreateSkyPipeline()
 		.dataPointer = &skyTextureIndex,
 	};
 	const LunaPipelineLayoutCreationInfo skyPipelineLayoutCreationInfo = {
-		.descriptorSetLayoutCount = PIPELINE_LAYOUT_CREATION_INFO.descriptorSetLayoutCount,
-		.descriptorSetLayouts = PIPELINE_LAYOUT_CREATION_INFO.descriptorSetLayouts,
+		.descriptorSetLayoutCount = pipelineLayoutCreationInfo.descriptorSetLayoutCount,
+		.descriptorSetLayouts = pipelineLayoutCreationInfo.descriptorSetLayouts,
 		.pushConstantRangeCount = 1,
 		.pushConstantsRanges = &pushConstantsRange,
 	};
@@ -665,7 +667,7 @@ static inline void CreateShadedModelPipeline()
 		.depthStencilState = &DEPTH_STENCIL_STATE_VIEWMODEL,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -778,7 +780,7 @@ static inline void CreateUnshadedModelPipeline()
 		.depthStencilState = &DEPTH_STENCIL_STATE_VIEWMODEL,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -866,7 +868,7 @@ static inline void CreateShadedActorModelPipeline()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -948,7 +950,7 @@ static inline void CreateUnshadedActorModelPipeline()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &pipelineInfo,
@@ -1037,7 +1039,7 @@ static inline void CreateActorWallPipelines()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = LIGHTING_PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &shadedPipelineInfo,
@@ -1056,7 +1058,7 @@ static inline void CreateActorWallPipelines()
 		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &unshadedPipelineInfo,
@@ -1133,7 +1135,7 @@ static inline void CreateDebugDrawPipeline()
 		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &linesPipelineInfo,
@@ -1152,7 +1154,7 @@ static inline void CreateDebugDrawPipeline()
 		.depthStencilState = &DEPTH_STENCIL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
-		.layoutCreationInfo = PIPELINE_LAYOUT_CREATION_INFO,
+		.layoutCreationInfo = pipelineLayoutCreationInfo,
 	};
 	VulkanTest(lunaCreateGraphicsPipeline(device,
 										  &trianglesPipelineInfo,
@@ -1703,9 +1705,9 @@ void CreateComputePipelines()
 void CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
-	descriptorSetLayouts[0] = descriptorSets.common.layout;
-	descriptorSetLayouts[1] = descriptorSets.shadowMaps.layout;
-	lightingShadersPushConstantsRange.dataPointer = &lightmapTextureSize;
+	pipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
+	lightingPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
+	lightingShadersPushConstantsRange.dataPointer = &shadowMapFrustumTextureSize;
 	depthOnlySpecializationInfo.pData = &lightCount;
 	unshadedSpecializationInfo.pData = &specializationConstants;
 	shadedSpecializationInfo.pData = &specializationConstants;
