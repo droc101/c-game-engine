@@ -93,7 +93,7 @@ float sampleShadowMapInternal(nonuniformEXT sampler2DShadow shadowMap, const vec
     const float cr = size * cos(r);
     const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
 
-    float factors[SAMPLE_COUNT];
+    float factors[SAMPLE_COUNT == 0 ? 1 : SAMPLE_COUNT];
     for (uint i = 0; i < SAMPLE_COUNT; i++) {
         factors[i] = texture(shadowMap, vec3(uv + diskRotation * softShadowKernels.kernels[i], depth));
     }
