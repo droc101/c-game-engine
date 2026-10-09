@@ -182,15 +182,14 @@ static inline void LoadViewmodel(const Viewmodel *viewmodel)
 {
 	if (viewmodel->model == NULL)
 	{
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.vertices, 0),
+		VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.vertices, 0),
 				   "Failed to resize viewmodel vertex buffer!");
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.indices, 0),
-				   "Failed to resize viewmodel index buffer!");
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.instanceData, 0),
+		VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.indices, 0), "Failed to resize viewmodel index buffer!");
+		VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.instanceData, 0),
 				   "Failed to resize viewmodel instance data buffer!");
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.shadedDrawInfo, 0),
+		VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.shadedDrawInfo, 0),
 				   "Failed to resize viewmodel shaded material draw info buffer!");
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.unshadedDrawInfo, 0),
+		VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.unshadedDrawInfo, 0),
 				   "Failed to resize viewmodel unshaded material draw info buffer!");
 		return;
 	}
@@ -218,23 +217,20 @@ static inline void LoadViewmodel(const Viewmodel *viewmodel)
 	}
 
 	const size_t vertexBufferSize = lod->vertexCount * sizeof(ModelVertex);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.vertices, vertexBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.vertices, vertexBufferSize),
 			   "Failed to resize viewmodel vertex buffer!");
 	const size_t indexBufferSize = lod->totalIndexCount * sizeof(uint32_t);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.viewmodel.indices, indexBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffers.viewmodel.indices, indexBufferSize),
 			   "Failed to resize viewmodel index buffer!");
 	VulkanTest(lunaResizeBuffer(device,
-								commandBuffer,
 								&buffers.viewmodel.instanceData,
 								(shadedMaterialCount + unshadedMaterialCount) * sizeof(ModelInstanceData)),
 			   "Failed to resize viewmodel instance data buffer!");
 	VulkanTest(lunaResizeBuffer(device,
-								commandBuffer,
 								&buffers.viewmodel.shadedDrawInfo,
 								shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand)),
 			   "Failed to resize viewmodel shaded material draw info buffer!");
 	VulkanTest(lunaResizeBuffer(device,
-								commandBuffer,
 								&buffers.viewmodel.unshadedDrawInfo,
 								unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand)),
 			   "Failed to resize viewmodel unshaded material draw info buffer!");
@@ -266,12 +262,9 @@ static inline void CreateMapModelDrawInfos(const bool opaque,
 	{
 		LunaBuffer *shadedDrawInfo = (LunaBuffer *)&ListGetPointer(buffer->shadedDrawInfo, i);
 		LunaBuffer *unshadedDrawInfo = (LunaBuffer *)&ListGetPointer(buffer->unshadedDrawInfo, i);
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, shadedDrawInfo, shadedDrawInfoBufferSize + sizeof(uint32_t)),
+		VulkanTest(lunaResizeBuffer(device, shadedDrawInfo, shadedDrawInfoBufferSize + sizeof(uint32_t)),
 				   "Failed to resize map shaded draw info buffer!");
-		VulkanTest(lunaResizeBuffer(device,
-									commandBuffer,
-									unshadedDrawInfo,
-									unshadedDrawInfoBufferSize + sizeof(uint32_t)),
+		VulkanTest(lunaResizeBuffer(device, unshadedDrawInfo, unshadedDrawInfoBufferSize + sizeof(uint32_t)),
 				   "Failed to resize map unshaded draw info buffer!");
 		const uint32_t shadedIndex = PER_FRUSTUM_BUFFER_COUNT * i +
 									 (opaque ? PER_FRUSTUM_BUFFER_OPAQUE_MAP_DRAW_INFO_OFFSET
@@ -353,26 +346,24 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 	maximumCulledInstanceCount = max(maximumCulledInstanceCount, unshadedMaterialCount);
 
 	const size_t vertexBufferSize = totalVertexCount * sizeof(MapVertex);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->vertices, vertexBufferSize),
-			   "Failed to resize map vertex buffer!");
+	VulkanTest(lunaResizeBuffer(device, &buffer->vertices, vertexBufferSize), "Failed to resize map vertex buffer!");
 	const size_t indexBufferSize = totalIndexCount * sizeof(uint32_t);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->indices, indexBufferSize),
-			   "Failed to resize map index buffer!");
+	VulkanTest(lunaResizeBuffer(device, &buffer->indices, indexBufferSize), "Failed to resize map index buffer!");
 	const size_t instanceDataBufferSize = totalMaterialCount * sizeof(uint32_t);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->instanceData, instanceDataBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffer->instanceData, instanceDataBufferSize),
 			   "Failed to resize map instance data buffer!");
 
 	const size_t shadedDrawInfoBufferSize = shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
 	const size_t unshadedDrawInfoBufferSize = unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->unculledShadedDrawInfo, shadedDrawInfoBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffer->unculledShadedDrawInfo, shadedDrawInfoBufferSize),
 			   "Failed to resize unculled map shaded draw info buffer!");
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->unculledUnshadedDrawInfo, unshadedDrawInfoBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffer->unculledUnshadedDrawInfo, unshadedDrawInfoBufferSize),
 			   "Failed to resize unculled map unshaded draw info buffer!");
 	const size_t shadedCullingInfoBufferSize = sizeof(uint32_t) + shadedMaterialCount * sizeof(CullingInfo);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->shadedCullingInfo, shadedCullingInfoBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffer->shadedCullingInfo, shadedCullingInfoBufferSize),
 			   "Failed to resize map shaded culling info buffer!");
 	const size_t unshadedCullingInfoBufferSize = sizeof(uint32_t) + unshadedMaterialCount * sizeof(CullingInfo);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffer->unshadedCullingInfo, unshadedCullingInfoBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffer->unshadedCullingInfo, unshadedCullingInfoBufferSize),
 			   "Failed to resize map unshaded culling info buffer!");
 	CreateMapModelDrawInfos(opaque, buffer, shadedDrawInfoBufferSize, unshadedDrawInfoBufferSize);
 
@@ -479,7 +470,7 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 									 buffer->unculledUnshadedDrawInfo,
 									 &unshadedDrawInfoBufferWriteInfo),
 			   "Failed to write data to unculled map unshaded draw info buffer!");
-	VulkanTest(lunaWriteUintToBuffer(device, commandBuffer, buffer->shadedCullingInfo, 0, shadedMaterialCount, NULL),
+	VulkanTest(lunaWriteUintToBuffer(device, commandBuffer, buffer->shadedCullingInfo, 0, shadedMaterialCount),
 			   "Failed to write map shaded culling info count to buffer!");
 	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
 		.bytes = shadedMaterialCount * sizeof(CullingInfo),
@@ -492,12 +483,7 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 									 buffer->shadedCullingInfo,
 									 &shadedCullingInfoBufferWriteInfo),
 			   "Failed to write data to map shaded culling info buffer!");
-	VulkanTest(lunaWriteUintToBuffer(device,
-									 commandBuffer,
-									 buffer->unshadedCullingInfo,
-									 0,
-									 unshadedMaterialCount,
-									 NULL),
+	VulkanTest(lunaWriteUintToBuffer(device, commandBuffer, buffer->unshadedCullingInfo, 0, unshadedMaterialCount),
 			   "Failed to write map unshaded culling info count to buffer!");
 	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
 		.bytes = unshadedMaterialCount * sizeof(CullingInfo),
@@ -646,27 +632,21 @@ static inline void CreatePerFrustumBuffers()
 {
 	for (uint32_t i = 0; i < perFrustumBuffersHandles.length; i++)
 	{
-		lunaDestroyBuffer(device, (LunaBuffer)ListGetPointer(perFrustumBuffersHandles, i));
+		lunaDestroyBuffer((LunaBuffer)ListGetPointer(perFrustumBuffersHandles, i));
 	}
 
 	ListFree(perFrustumBuffersHandles);
 	ListInit(perFrustumBuffersHandles, LIST_POINTER);
 
 	const LunaBufferCreationInfo drawInfoBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 	};
 	const LunaBufferCreationInfo actorWallDrawInfoBufferCreationInfo = {
 		.size = sizeof(VkDrawIndirectCommand),
-		.usage = VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 	};
 	const LunaBufferCreationInfo instanceIndicesBufferCreationInfo = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 	};
 	List *drawInfoBufferLists[] = {
 		&buffers.actorModels.shadedDrawInfo,
@@ -901,7 +881,7 @@ static inline void LoadLights(const Map *map)
 		frustumCount = 1; // Just the camera's frustum
 		staticLightFrustumCount = 0; // No lights
 		CreatePerFrustumBuffers();
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustumCullingDatas, sizeof(FrustumCullingData)),
+		VulkanTest(lunaResizeBuffer(device, &buffers.frustumCullingDatas, sizeof(FrustumCullingData)),
 				   "Failed to resize frustum culling datas buffer!");
 		WriteFrustumCullingDatasBuffer();
 		const LunaDescriptorBufferInfo frustumsBufferInfo = {
@@ -921,8 +901,7 @@ static inline void LoadLights(const Map *map)
 		lightCount = 0;
 		specializationConstants.lightCount = 0;
 		specializationConstants.hasStaticLight = VK_FALSE;
-		VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, 0),
-				   "Failed to resize lights buffer!");
+		VulkanTest(lunaResizeBuffer(device, &buffers.uniforms.lights, 0), "Failed to resize lights buffer!");
 
 		UpdateLightCount();
 		return;
@@ -937,7 +916,7 @@ static inline void LoadLights(const Map *map)
 	free(frustumShadowMaps);
 	frustumShadowMaps = malloc(frustumShadowMapsBufferSize);
 	CheckAlloc(frustumShadowMaps);
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustumShadowMaps, frustumShadowMapsBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffers.frustumShadowMaps, frustumShadowMapsBufferSize),
 			   "Failed to resize frustum shadow maps buffer!");
 
 	AvxAlignedFree(lights);
@@ -965,7 +944,7 @@ static inline void LoadLights(const Map *map)
 	WriteFrustumShadowMapsBuffer();
 
 	const size_t frustumCullingDatasBufferSize = sizeof(FrustumCullingData) * frustumCount;
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.frustumCullingDatas, frustumCullingDatasBufferSize),
+	VulkanTest(lunaResizeBuffer(device, &buffers.frustumCullingDatas, frustumCullingDatasBufferSize),
 			   "Failed to resize frustum culling datas buffer!");
 	WriteFrustumCullingDatasBuffer();
 	const LunaDescriptorBufferInfo frustumsBufferInfo = {
@@ -979,8 +958,7 @@ static inline void LoadLights(const Map *map)
 	};
 
 	const size_t lightsBufferSize = sizeof(float) * 4 + sizeof(mat4) * 4 + sizeof(VulkanLight) * lightCount;
-	VulkanTest(lunaResizeBuffer(device, commandBuffer, &buffers.uniforms.lights, lightsBufferSize),
-			   "Failed to resize lights buffer!");
+	VulkanTest(lunaResizeBuffer(device, &buffers.uniforms.lights, lightsBufferSize), "Failed to resize lights buffer!");
 
 	if (!directionalLight)
 	{
@@ -1021,9 +999,12 @@ static inline void LoadLights(const Map *map)
 
 static inline void UpdateLightTextureIndices(const Map *map)
 {
-	assert(map != NULL &&
-		   GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED &&
-		   dynamicLights.length + map->lightCount != 0);
+	if (map == NULL ||
+		GetState()->options.shadowMapResolution == SHADOW_MAP_RESOLUTION_DISABLED ||
+		dynamicLights.length + map->lightCount == 0)
+	{
+		return;
+	}
 	for (uint32_t i = 0; i < map->lightCount; i++)
 	{
 		const Light *light = &map->lights[i];
@@ -1809,10 +1790,8 @@ static inline void HandleDeferredWork()
 			{
 				skyTextureIndex = TextureIndex(loadedMap->skyTexture);
 			}
-			UpdateLightTextureIndices(GetMap());
 			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
 		}
-		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{
@@ -1855,6 +1834,14 @@ static inline void HandleDeferredWork()
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION;
 	}
+	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_TEXTURES)
+	{
+		if (GetMap() != NULL)
+		{
+			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
+		}
+		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
+	}
 	if (rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_SHADERS)
 	{
 		lunaDestroyComputePipeline(device, pipelines.culling);
@@ -1896,7 +1883,6 @@ static inline void HandleDeferredWork()
 		RecreateGraphicsPipelines();
 
 		VulkanTest(lunaResizeBuffer(device,
-									commandBuffer,
 									&buffers.uniforms.softShadowKernels,
 									sizeof(vec2) * specializationConstants.sampleCount),
 				   "Failed to resize soft shadow kernels buffer!");
@@ -2051,6 +2037,9 @@ bool VK_FrameStart()
 
 	VulkanTest(lunaBeginSingleUseCommandBuffer(device, commandBuffer), "Failed to begin command buffer for frame!");
 
+	// TODO: Remove this once better solution is found
+	clearStagingBuffer(device);
+
 	renderPassStarted = false;
 	buffers.ui.freeQuads = buffers.ui.allocatedQuads;
 #ifdef JPH_DEBUG_RENDERER
@@ -2144,17 +2133,11 @@ void VK_RenderMap(Map *map, Camera *camera)
 
 bool VK_FrameEnd()
 {
-	if ((pendingTasks & PENDING_TASK_UI_BUFFERS_RESIZE_BIT) == PENDING_TASK_UI_BUFFERS_RESIZE_BIT)
+	if (pendingTasks & PENDING_TASK_UI_BUFFERS_RESIZE_BIT)
 	{
-		VulkanTest(lunaGrowBuffer(device,
-								  commandBuffer,
-								  &buffers.ui.vertexBuffer,
-								  buffers.ui.allocatedQuads * 4 * sizeof(UiVertex)),
+		VulkanTest(lunaResizeBuffer(device, &buffers.ui.vertexBuffer, buffers.ui.allocatedQuads * 4 * sizeof(UiVertex)),
 				   "Failed to recreate UI vertex buffer!");
-		VulkanTest(lunaGrowBuffer(device,
-								  commandBuffer,
-								  &buffers.ui.indexBuffer,
-								  buffers.ui.allocatedQuads * 6 * sizeof(uint32_t)),
+		VulkanTest(lunaResizeBuffer(device, &buffers.ui.indexBuffer, buffers.ui.allocatedQuads * 6 * sizeof(uint32_t)),
 				   "Failed to recreate UI index buffer!");
 
 		pendingTasks &= ~PENDING_TASK_UI_BUFFERS_RESIZE_BIT;

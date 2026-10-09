@@ -20,7 +20,6 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
-#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
@@ -684,8 +683,7 @@ void PopulateClusters()
 	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &preClearDependencyInfo),
 			   "Failed to insert pipeline barrier before populating clusters!");
 
-	VulkanTest(lunaFillBuffer(device, commandBuffer, buffers.uniforms.clusters, 0, NULL),
-			   "Failed to clear clusters buffer!");
+	VulkanTest(lunaFillBuffer(device, commandBuffer, buffers.uniforms.clusters, 0), "Failed to clear clusters buffer!");
 
 	const LunaBufferMemoryBarrier preDispatchMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT,
