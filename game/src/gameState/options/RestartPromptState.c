@@ -98,8 +98,6 @@ static void RestartPromptStateSet()
 					CreateButtonControl(v2(190, 50), v2(370, 40), "No", BtnDontRelaunch, MIDDLE_CENTER, NULL));
 	}
 	UiStackResetFocus(menuStack);
-
-	EnterMenuBackgroundState();
 }
 
 static void RestartPromptStateDestroy()
