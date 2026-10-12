@@ -5,6 +5,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
@@ -37,7 +38,7 @@ void CreateInstance()
 	const char *const *extensionNames = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
 	VulkanTestBool(extensionNames, "Failed to acquire extensions required for SDL window!\n");
 
-	const LunaInstanceCreationInfo instanceCreationInfo = {
+	LunaInstanceCreationInfo instanceCreationInfo = {
 		.apiVersion = VK_API_VERSION_1_2,
 
 		.extensionCount = extensionCount,
@@ -47,6 +48,14 @@ void CreateInstance()
 		.enableValidation = true,
 #endif
 	};
+
+#ifdef BUILDSTYLE_DEBUG
+	if (HasCliArg("--disable-validation"))
+	{
+		instanceCreationInfo.enableValidation = false;
+	}
+#endif
+
 	VulkanTest(lunaCreateInstance(&instanceCreationInfo), "Failed to create instance!");
 }
 
