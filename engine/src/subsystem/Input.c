@@ -3,11 +3,13 @@
 //
 
 #include <assert.h>
+#include <engine/helpers/Realloc.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <math.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gamepad.h>
@@ -65,16 +67,29 @@ struct InputSystem
 	bool lastInputWasController;
 };
 
+SDL_JoystickID currentGamepadId;
 static SDL_Gamepad *currentGamepad;
 static SDL_Joystick *currentJoystick;
 static bool gamepadHasBasicHaptics;
 static bool gamepadHasTriggerHaptics;
 
+OptionsButtonOptions controllerOptions = {
+	.numValues = 0,
+	.values = NULL,
+};
+
 InputSystem *physicsThreadInput = NULL;
 InputSystem *mainThreadInput = NULL;
 
-static bool FindGamepad()
+static bool UpdateAvailableGamepads()
 {
+	for (size_t i = 0; i < controllerOptions.numValues; i++)
+	{
+		const OptionsButtonValue *value = &controllerOptions.values[i];
+		free(value->text);
+	}
+	controllerOptions.numValues = 0;
+
 	int numGamepads = 0;
 	SDL_JoystickID *gamepads = SDL_GetGamepads(&numGamepads);
 	for (int i = 0; i < numGamepads; i++)
@@ -82,24 +97,44 @@ static bool FindGamepad()
 		const SDL_JoystickID gamepad = gamepads[i];
 		if (SDL_IsGamepad(gamepad))
 		{
-			currentGamepad = SDL_OpenGamepad(gamepad);
-			currentJoystick = SDL_GetGamepadJoystick(currentGamepad);
-			const SDL_PropertiesID gamepadProps = SDL_GetGamepadProperties(currentGamepad);
-			gamepadHasBasicHaptics = SDL_GetBooleanProperty(gamepadProps, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false);
-			gamepadHasTriggerHaptics = SDL_GetBooleanProperty(gamepadProps,
-															  SDL_PROP_GAMEPAD_CAP_TRIGGER_RUMBLE_BOOLEAN,
-															  false);
-
-			LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(currentGamepad));
-			LogDebug("Controller features basic haptics: %s\n", gamepadHasBasicHaptics ? "yes" : "no");
-			LogDebug("Controller features trigger haptics: %s\n", gamepadHasTriggerHaptics ? "yes" : "no");
-
-			SDL_free(gamepads);
-			return true;
+			controllerOptions.numValues++;
+			controllerOptions.values = GameReallocArray(controllerOptions.values, controllerOptions.numValues, sizeof(OptionsButtonValue));
+			OptionsButtonValue *value = &controllerOptions.values[controllerOptions.numValues - 1];
+			value->value.type = CONTROL_VALUE_DWORD;
+			value->value.dwordValue = gamepad;
+			value->text = strdup(SDL_GetGamepadNameForID(gamepad));
+			value->tooltip = NULL;
 		}
 	}
 	SDL_free(gamepads);
 	return false;
+}
+
+bool SetCurrentController(const SDL_JoystickID gamepad)
+{
+	if (!SDL_IsGamepad(gamepad))
+	{
+		return false;
+	}
+
+	if (currentGamepadId != 0)
+	{
+		SDL_CloseGamepad(currentGamepad);
+		SDL_CloseJoystick(currentJoystick);
+	}
+
+	currentGamepadId = gamepad;
+	currentGamepad = SDL_OpenGamepad(gamepad);
+	currentJoystick = SDL_GetGamepadJoystick(currentGamepad);
+	const SDL_PropertiesID gamepadProps = SDL_GetGamepadProperties(currentGamepad);
+	gamepadHasBasicHaptics = SDL_GetBooleanProperty(gamepadProps, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false);
+	gamepadHasTriggerHaptics = SDL_GetBooleanProperty(gamepadProps, SDL_PROP_GAMEPAD_CAP_TRIGGER_RUMBLE_BOOLEAN, false);
+
+	LogInfo("Using controller \"%s\"\n", SDL_GetGamepadName(currentGamepad));
+	LogDebug("Controller features basic haptics: %s\n", gamepadHasBasicHaptics ? "yes" : "no");
+	LogDebug("Controller features trigger haptics: %s\n", gamepadHasTriggerHaptics ? "yes" : "no");
+
+	return true;
 }
 
 void Rumble(const float strength, const uint32_t time, const InputSystem *system)
@@ -111,31 +146,42 @@ void Rumble(const float strength, const uint32_t time, const InputSystem *system
 	}
 }
 
+static bool SelectGamepad()
+{
+	if (currentGamepadId != 0)
+	{
+		// already have gamepad, don't switch it up in the middle of gameplay
+		return true;
+	}
+
+	for (size_t i = 0; i < controllerOptions.numValues; i++)
+	{
+		if (SetCurrentController(controllerOptions.values[i].value.dwordValue))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void HandleGamepadDisconnect(const SDL_JoystickID which)
 {
-	if (currentGamepad == NULL)
+	if (currentGamepadId == which)
 	{
-		return;
+		SDL_CloseGamepad(currentGamepad);
+		SDL_CloseJoystick(currentJoystick);
+		currentGamepadId = 0;
+		currentGamepad = NULL;
+		currentJoystick = NULL;
 	}
-	if (SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)) != which)
-	{
-		return;
-	}
-	SDL_CloseGamepad(currentGamepad);
-	SDL_CloseJoystick(currentJoystick);
-	currentGamepad = NULL;
-	currentJoystick = NULL;
-	FindGamepad(); // try to find another controller
+	UpdateAvailableGamepads();
+	SelectGamepad(); // try to find another controller
 }
 
 void HandleGamepadConnect()
 {
-	if (currentGamepad)
-	{
-		// disconnect the current controller to use the new one
-		HandleGamepadDisconnect(SDL_GetJoystickID(SDL_GetGamepadJoystick(currentGamepad)));
-	}
-	FindGamepad();
+	UpdateAvailableGamepads();
+	SelectGamepad();
 }
 
 static void UpdateInputState(InputState *statePtr, bool *queueReleasePtr, const InputState newState)
@@ -553,4 +599,12 @@ void InputDestroy()
 	LogDebug("Cleaning up input system...\n");
 	free(mainThreadInput);
 	free(physicsThreadInput);
+	for (size_t i = 0; i < controllerOptions.numValues; i++)
+	{
+		const OptionsButtonValue *value = &controllerOptions.values[i];
+		free(value->text);
+	}
+	free(controllerOptions.values);
+	controllerOptions.values = NULL;
+	controllerOptions.numValues = 0;
 }

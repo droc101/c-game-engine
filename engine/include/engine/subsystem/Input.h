@@ -5,12 +5,13 @@
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
 
-#include <SDL3/SDL_scancode.h>
 #include <engine/structs/GlobalState.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Vector2.h>
+#include <engine/uiStack/controls/OptionsButton.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_joystick.h>
+#include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -18,6 +19,9 @@ typedef struct InputSystem InputSystem;
 
 extern InputSystem *physicsThreadInput;
 extern InputSystem *mainThreadInput;
+
+extern SDL_JoystickID currentGamepadId;
+extern OptionsButtonOptions controllerOptions;
 
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
 
@@ -34,6 +38,8 @@ typedef enum MouseWheelAxis
 	MOUSE_WHEEL_LEFT,
 	MOUSE_WHEEL_RIGHT,
 } MouseWheelAxis;
+
+bool SetCurrentController(SDL_JoystickID gamepad);
 
 /**
  * Handles controller disconnect event

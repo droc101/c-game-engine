@@ -89,6 +89,16 @@ static OptionsButtonValue debugSideButtonValues[3] = {
 	},
 };
 
+static OptionsButtonOptions debugModeOptions = {
+	.numValues = 3,
+	.values = debugModeButtonValues,
+};
+
+static OptionsButtonOptions debugSideOptions = {
+	.numValues = 3,
+	.values = debugSideButtonValues,
+};
+
 static void BtnDebugOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&OptionsState);
@@ -179,8 +189,7 @@ static void DebugOptionsStateSet()
 															 "%s",
 															 OptBtnEntryChanged,
 															 TOP_RIGHT,
-															 debugModeButtonValues,
-															 DEBUG_ENTRY_MODE_MAX,
+															 &debugModeOptions,
 															 entry,
 															 (ControlValue){
 																 .type = CONTROL_VALUE_DWORD,
@@ -195,8 +204,7 @@ static void DebugOptionsStateSet()
 																 "%s",
 																 OptBtnEntrySideChanged,
 																 TOP_RIGHT,
-																 debugSideButtonValues,
-																 DEBUG_ENTRY_NO_SIDE,
+																 &debugSideOptions,
 																 entry,
 																 (ControlValue){
 																	 .type = CONTROL_VALUE_DWORD,

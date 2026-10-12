@@ -169,8 +169,7 @@ static void OptionsStateSet()
 											   "Discord Integration: %s",
 											   CbOptionsEnableDiscordRpc,
 											   TOP_CENTER,
-											   onOffButtonValues,
-											   2,
+											   &onOffButtonOptions,
 											   NULL,
 											   discordRpcValue,
 											   NULL));

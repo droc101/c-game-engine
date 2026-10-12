@@ -76,6 +76,11 @@ static OptionsButtonValue debugRenderingOptionValues[] = {
 	},
 };
 
+static OptionsButtonOptions debugRenderingOptions = {
+	.numValues = 10,
+	.values = debugRenderingOptionValues,
+};
+
 static void ToggleBakedLightingCallback(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	VK_ToggleBakedLighting();
@@ -130,8 +135,7 @@ static void RenderingTogglesStateSet()
 															  "Baked lighting: %s",
 															  ToggleBakedLightingCallback,
 															  TOP_CENTER,
-															  onOffButtonValues,
-															  2,
+															  &onOffButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -145,8 +149,7 @@ static void RenderingTogglesStateSet()
 															  "Debug rendering option: %s",
 															  SetDebugRenderingCallback,
 															  TOP_CENTER,
-															  debugRenderingOptionValues,
-															  10,
+															  &debugRenderingOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_DWORD,

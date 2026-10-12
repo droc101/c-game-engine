@@ -70,6 +70,16 @@ static OptionsButtonValue preferWaylandButtonValues[2] = {
 	},
 };
 
+static OptionsButtonOptions gpuTypeOptions = {
+	.numValues = 3,
+	.values = gpuTypeButtonValues,
+};
+
+static OptionsButtonOptions preferWaylandOptions = {
+	.numValues = 2,
+	.values = preferWaylandButtonValues,
+};
+
 static void BtnVideoOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
@@ -281,8 +291,7 @@ static void VideoOptionsStateSet()
 															  "VSync: %s",
 															  ToggleVsyncCallback,
 															  TOP_CENTER,
-															  onOffButtonValues,
-															  2,
+															  &onOffButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -297,8 +306,7 @@ static void VideoOptionsStateSet()
 															  "Limit Background FPS: %s",
 															  NULL,
 															  TOP_CENTER,
-															  yesNoButtonValues,
-															  2,
+															  &yesNoButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -313,8 +321,7 @@ static void VideoOptionsStateSet()
 															  "Fullscreen: %s",
 															  OptBtnFullscreenChanged,
 															  TOP_CENTER,
-															  onOffButtonValues,
-															  2,
+															  &onOffButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -327,8 +334,7 @@ static void VideoOptionsStateSet()
 															  "Preferred GPU Type: %s",
 															  RequireRestartCallback,
 															  TOP_CENTER,
-															  gpuTypeButtonValues,
-															  3,
+															  &gpuTypeOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_DWORD,
@@ -342,8 +348,7 @@ static void VideoOptionsStateSet()
 															  "Video Platform: %s",
 															  RequireRestartCallback,
 															  TOP_CENTER,
-															  preferWaylandButtonValues,
-															  2,
+															  &preferWaylandOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -439,8 +444,7 @@ static void VideoOptionsStateSet()
 															  "Mipmaps: %s",
 															  ClearTexturesOptBtnCallback,
 															  TOP_CENTER,
-															  onOffButtonValues,
-															  2,
+															  &onOffButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
