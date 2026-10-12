@@ -55,6 +55,7 @@ struct SoundChannel
 
 struct SoundSystem
 {
+	SDL_AudioDeviceID outputDevice;
 	/// mixer instance
 	MIX_Mixer *mixer;
 	/// Whether the audio system has been started successfully
@@ -123,7 +124,8 @@ void InitSoundSystem()
 		return;
 	}
 
-	soundSys.mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+	soundSys.outputDevice = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+	soundSys.mixer = MIX_CreateMixerDevice(soundSys.outputDevice, NULL);
 	if (!soundSys.mixer)
 	{
 		soundSys.isAudioStarted = false;
@@ -409,6 +411,7 @@ void DPrintSoundSystem()
 	DPrintF("Sound System Active: %s", COLOR_WHITE, soundSys.isAudioStarted ? "Yes" : "No");
 	if (soundSys.isAudioStarted)
 	{
+		DPrintF("Output Device: %s", COLOR_WHITE, SDL_GetAudioDeviceName(soundSys.outputDevice));
 		int numPlayingSounds = 0;
 		for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 		{
