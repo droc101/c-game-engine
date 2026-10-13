@@ -101,7 +101,11 @@ static inline void CreateUniformBuffers()
 	};
 	VulkanTest(lunaCreateBuffer(device, &fogBufferCreationInfo, &buffers.uniforms.fog),
 			   "Failed to create fog uniform buffer!");
-	VulkanTest(lunaCreateBuffer(device, &storageBufferCreationInfo, &buffers.uniforms.lights),
+	const LunaBufferCreationInfo lightsBufferCreationInfo = {
+		.alignment = physicalDeviceProperties.limits.minUniformBufferOffsetAlignment,
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+	};
+	VulkanTest(lunaCreateBuffer(device, &lightsBufferCreationInfo, &buffers.uniforms.lights),
 			   "Failed to create lights buffer!");
 	const LunaBufferCreationInfo clustersBufferCreationInfo = {
 		.size = 8 * 8 * 8 * sizeof(Cluster),
@@ -221,9 +225,9 @@ static inline void CreateActorWallsBuffers()
 		},
 	};
 	const LunaBufferWriteInfo vertexDataWriteInfo = {
-		.bytes = sizeof(vertices),
+		.size = sizeof(vertices),
 		.data = vertices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 
 	const LunaBufferCreationInfo verticesBufferCreationInfo = {
@@ -303,9 +307,9 @@ static inline void CreatePlayerBuffers()
 	VulkanTest(lunaCreateBuffer(device, &vertexBufferCreationInfo, &buffers.player.buffers.vertices),
 			   "Failed to create player model vertex buffer!");
 	const LunaBufferWriteInfo vertexDataWriteInfo = {
-		.bytes = vertexBufferSize,
+		.size = vertexBufferSize,
 		.data = lod->vertexData,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.player.buffers.vertices, &vertexDataWriteInfo),
 			   "Failed to write player vertex data to buffer!");
@@ -369,9 +373,9 @@ static inline void CreatePlayerBuffers()
 	}
 
 	const LunaBufferWriteInfo indexDataWriteInfo = {
-		.bytes = indexBufferSize,
+		.size = indexBufferSize,
 		.data = indices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.player.buffers.indices, &indexDataWriteInfo),
 			   "Failed to write player index data to buffer!");
@@ -384,9 +388,9 @@ static inline void CreatePlayerBuffers()
 	VulkanTest(lunaCreateBuffer(device, &shadedDrawInfoBufferCreationInfo, &buffers.player.buffers.shadedDrawInfo),
 			   "Failed to create player model shaded draw info buffer!");
 	const LunaBufferWriteInfo shadedDrawInfoDataWriteInfo = {
-		.bytes = shadedDrawInfoSize,
+		.size = shadedDrawInfoSize,
 		.data = shadedDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -402,9 +406,9 @@ static inline void CreatePlayerBuffers()
 	VulkanTest(lunaCreateBuffer(device, &unshadedDrawInfoBufferCreationInfo, &buffers.player.buffers.unshadedDrawInfo),
 			   "Failed to create player model unshaded draw info buffer!");
 	const LunaBufferWriteInfo unshadedDrawInfoDataWriteInfo = {
-		.bytes = unshadedDrawInfoSize,
+		.size = unshadedDrawInfoSize,
 		.data = unshadedDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,

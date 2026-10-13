@@ -107,9 +107,9 @@ static inline void LoadSky(const ModelDefinition *model)
 	}
 	assert(lunaGetBufferSize(buffers.sky.vertices) == sizeof(SkyVertex) * lod->vertexCount);
 	const LunaBufferWriteInfo vertexBufferWriteInfo = {
-		.bytes = sizeof(SkyVertex) * lod->vertexCount,
+		.size = sizeof(SkyVertex) * lod->vertexCount,
 		.data = vertices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.sky.vertices, &vertexBufferWriteInfo),
 			   "Failed to write sky model vertex data to buffer!");
@@ -119,9 +119,9 @@ static inline void LoadSky(const ModelDefinition *model)
 	skyModelIndexCount = lod->components->indexCount;
 	assert(lunaGetBufferSize(buffers.sky.indices) == sizeof(uint32_t) * skyModelIndexCount);
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
-		.bytes = sizeof(uint32_t) * skyModelIndexCount,
+		.size = sizeof(uint32_t) * skyModelIndexCount,
 		.data = lod->components->indices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.sky.indices, &indexBufferWriteInfo),
 			   "Failed to write sky model index data to buffer!");
@@ -141,10 +141,10 @@ static inline void UpdateViewmodel(const Viewmodel *viewmodel)
 		instanceData.materialColor = material->color;
 		instanceData.textureIndex = TextureIndex(material->texture);
 		const LunaBufferWriteInfo instanceDataBufferWriteInfo = {
-			.bytes = SizeofMember(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, textureIndex),
+			.size = SizeofMember(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, textureIndex),
 			.data = &(instanceData.materialColor),
 			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, materialColor),
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device,
 										 commandBuffer,
@@ -160,11 +160,11 @@ static inline void UpdateViewmodel(const Viewmodel *viewmodel)
 			.firstInstance = i,
 		};
 		const LunaBufferWriteInfo drawInfoBufferWriteInfo = {
-			.bytes = sizeof(VkDrawIndexedIndirectCommand),
+			.size = sizeof(VkDrawIndexedIndirectCommand),
 			.data = &drawInfo,
 			.offset = (material->shader == SHADER_SHADED ? shadedCount : i - shadedCount) *
 					  sizeof(VkDrawIndexedIndirectCommand),
-			.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device,
 										 commandBuffer,
@@ -237,16 +237,16 @@ static inline void LoadViewmodel(const Viewmodel *viewmodel)
 			   "Failed to resize viewmodel unshaded material draw info buffer!");
 
 	const LunaBufferWriteInfo vertexBufferWriteInfo = {
-		.bytes = vertexBufferSize,
+		.size = vertexBufferSize,
 		.data = lod->vertexData,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.vertices, &vertexBufferWriteInfo),
 			   "Failed to write data to viewmodel vertex buffer!");
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
-		.bytes = indexBufferSize,
+		.size = indexBufferSize,
 		.data = indices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.indices, &indexBufferWriteInfo),
 			   "Failed to write data to viewmodel index buffer!");
@@ -432,30 +432,30 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 	}
 
 	const LunaBufferWriteInfo vertexBufferWriteInfo = {
-		.bytes = vertexBufferSize,
+		.size = vertexBufferSize,
 		.data = vertices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffer->vertices, &vertexBufferWriteInfo),
 			   "Failed to write data to map vertex buffer!");
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
-		.bytes = indexBufferSize,
+		.size = indexBufferSize,
 		.data = indices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffer->indices, &indexBufferWriteInfo),
 			   "Failed to write data to map index buffer!");
 	const LunaBufferWriteInfo instanceDataBufferWriteInfo = {
-		.bytes = instanceDataBufferSize,
+		.size = instanceDataBufferSize,
 		.data = textureIndices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffer->instanceData, &instanceDataBufferWriteInfo),
 			   "Failed to write data to map per-material data buffer!");
 	const LunaBufferWriteInfo shadedDrawInfoBufferWriteInfo = {
-		.bytes = shadedDrawInfoBufferSize,
+		.size = shadedDrawInfoBufferSize,
 		.data = shadedDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -463,9 +463,9 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 									 &shadedDrawInfoBufferWriteInfo),
 			   "Failed to write data to unculled map shaded draw info buffer!");
 	const LunaBufferWriteInfo unshadedDrawInfoBufferWriteInfo = {
-		.bytes = unshadedDrawInfoBufferSize,
+		.size = unshadedDrawInfoBufferSize,
 		.data = unshadedDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -475,10 +475,10 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 	VulkanTest(lunaWriteUintToBuffer(device, commandBuffer, buffer->shadedCullingInfo, 0, shadedMaterialCount),
 			   "Failed to write map shaded culling info count to buffer!");
 	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
-		.bytes = shadedMaterialCount * sizeof(CullingInfo),
+		.size = shadedMaterialCount * sizeof(CullingInfo),
 		.data = shadedCullingInfo,
 		.offset = sizeof(uint32_t),
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -488,10 +488,10 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 	VulkanTest(lunaWriteUintToBuffer(device, commandBuffer, buffer->unshadedCullingInfo, 0, unshadedMaterialCount),
 			   "Failed to write map unshaded culling info count to buffer!");
 	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
-		.bytes = unshadedMaterialCount * sizeof(CullingInfo),
+		.size = unshadedMaterialCount * sizeof(CullingInfo),
 		.data = unshadedCullingInfo,
 		.offset = sizeof(uint32_t),
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -550,9 +550,9 @@ static inline void UpdateMapInstanceData(const Map *map, const bool opaque, cons
 		materialIndex++;
 	}
 	const LunaBufferWriteInfo instanceDataBufferWriteInfo = {
-		.bytes = lunaGetBufferSize(buffer->instanceData),
+		.size = lunaGetBufferSize(buffer->instanceData),
 		.data = textureIndices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffer->instanceData, &instanceDataBufferWriteInfo),
 			   "Failed to update map instance data buffer!");
@@ -969,9 +969,9 @@ static inline void LoadLights(const Map *map)
 		const size_t size = sizeof(float) * 4 + sizeof(mat4) * 4;
 		void *data = calloc(size, 1);
 		const LunaBufferWriteInfo bufferWriteInfo = {
-			.bytes = size,
+			.size = size,
 			.data = data,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
 				   "Failed to clear directional light cascades from lights buffer!");
@@ -979,10 +979,10 @@ static inline void LoadLights(const Map *map)
 	}
 
 	const LunaBufferWriteInfo bufferWriteInfo = {
-		.bytes = lightCount * sizeof(VulkanLight),
+		.size = lightCount * sizeof(VulkanLight),
 		.data = lights,
 		.offset = sizeof(float) * 4 + sizeof(mat4) * 4,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
 			   "Failed to write lights data to buffer!");
@@ -1018,10 +1018,10 @@ static inline void UpdateLightTextureIndices(const Map *map)
 	}
 
 	const LunaBufferWriteInfo bufferWriteInfo = {
-		.bytes = map->lightCount * sizeof(VulkanLight),
+		.size = map->lightCount * sizeof(VulkanLight),
 		.data = lights,
 		.offset = sizeof(float) * 4 + sizeof(mat4) * 4,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &bufferWriteInfo),
 			   "Failed to write lights data to buffer!");
@@ -1338,9 +1338,9 @@ static inline void DrawPlayer(const Map *map, const LunaGraphicsPipelineBindInfo
 			memcpy(buffers.player.instanceData + slotIndex, &transformMatrix, sizeof(transformMatrix));
 		}
 		const LunaBufferWriteInfo instanceDataWriteInfo = {
-			.bytes = sizeof(ModelInstanceData) * buffers.player.modelDefinition->materialSlotCount,
+			.size = sizeof(ModelInstanceData) * buffers.player.modelDefinition->materialSlotCount,
 			.data = buffers.player.instanceData,
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device,
 										 commandBuffer,
@@ -1401,9 +1401,9 @@ static inline void DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pipelin
 	if (buffers.debugDrawLines.bytesUsed != 0)
 	{
 		const LunaBufferWriteInfo writeInfo = {
-			.bytes = buffers.debugDrawLines.bytesUsed,
+			.size = buffers.debugDrawLines.bytesUsed,
 			.data = buffers.debugDrawLines.vertices,
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.debugDrawLines.buffer, &writeInfo),
 				   "Failed to write debug Jolt debug renderer lines to buffer!");
@@ -1419,9 +1419,9 @@ static inline void DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pipelin
 	if (buffers.debugDrawTriangles.bytesUsed != 0)
 	{
 		const LunaBufferWriteInfo writeInfo = {
-			.bytes = buffers.debugDrawTriangles.bytesUsed,
+			.size = buffers.debugDrawTriangles.bytesUsed,
 			.data = buffers.debugDrawTriangles.vertices,
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.debugDrawTriangles.buffer, &writeInfo),
 				   "Failed to write Jolt debug renderer triangles to buffer!");
@@ -1676,19 +1676,19 @@ static inline void UpdateDynamicLights()
 	assert(frustumCount == frustumIndex);
 
 	const LunaBufferWriteInfo frustumBufferWriteInfo = {
-		.bytes = sizeof(FrustumCullingData) * (frustumCount - staticLightFrustumCount - 1),
+		.size = sizeof(FrustumCullingData) * (frustumCount - staticLightFrustumCount - 1),
 		.data = &frustumCullingDatas[staticLightFrustumCount + 1],
 		.offset = sizeof(FrustumCullingData) * (staticLightFrustumCount + 1),
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_STORAGE_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumCullingDatas, &frustumBufferWriteInfo),
 			   "Failed to write frustums buffer!");
 
 	const LunaBufferWriteInfo lightsBufferDynamicLightWriteInfo = {
-		.bytes = dynamicLights.length * sizeof(VulkanLight),
+		.size = dynamicLights.length * sizeof(VulkanLight),
 		.data = &lights[loadedMap->lightCount],
 		.offset = sizeof(float) * 4 + sizeof(mat4) * 4 + loadedMap->lightCount * sizeof(VulkanLight),
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -1704,9 +1704,9 @@ static inline void UpdateGlobalLightingUniform(const Map *map)
 		.exposure = map->exposure,
 	};
 	const LunaBufferWriteInfo lightingBufferWriteInfo = {
-		.bytes = sizeof(GlobalLightingUniform),
+		.size = sizeof(GlobalLightingUniform),
 		.data = &globalLightingUniform,
-		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_FRAGMENT_SHADER_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lighting, &lightingBufferWriteInfo),
 			   "Failed to update lighting data!");
@@ -1720,9 +1720,9 @@ static inline void UpdateFogUniform(const Map *map)
 		.end = map->fogEnd,
 	};
 	const LunaBufferWriteInfo fogBufferWriteInfo = {
-		.bytes = sizeof(fog),
+		.size = sizeof(fog),
 		.data = &fog,
-		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_FRAGMENT_SHADER_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.fog, &fogBufferWriteInfo),
 			   "Failed to update fog data!");
@@ -1842,7 +1842,7 @@ static inline void HandleDeferredWork()
 	{
 		if (GetMap() != NULL)
 		{
-			GetMap()->changeFlags |= MAP_VIEWMODEL_CHANGED;
+			UpdateLightTextureIndices(GetMap());
 		}
 		rendererQueuedActions &= ~QUEUED_ACTION_CLEAR_ALL_TEXTURES;
 	}
@@ -2042,7 +2042,7 @@ bool VK_FrameStart()
 	VulkanTest(lunaBeginSingleUseCommandBuffer(device, commandBuffer), "Failed to begin command buffer for frame!");
 
 	// TODO: Remove this once better solution is found
-	clearStagingBuffer(device);
+	lunaClearStagingBuffer(device);
 
 	renderPassStarted = false;
 	buffers.ui.freeQuads = buffers.ui.allocatedQuads;
@@ -2148,16 +2148,15 @@ bool VK_FrameEnd()
 	}
 	if (buffers.ui.freeQuads != buffers.ui.allocatedQuads)
 	{
-		// TODO: This write is the cause of the glitching (and crash) when pausing the game
 		const LunaBufferWriteInfo vertexBufferWriteInfo = {
-			.bytes = (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 4 * sizeof(UiVertex),
+			.size = (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 4 * sizeof(UiVertex),
 			.data = buffers.ui.vertexData,
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 		};
 		const LunaBufferWriteInfo indexBufferWriteInfo = {
-			.bytes = (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 6 * sizeof(uint32_t),
+			.size = (buffers.ui.allocatedQuads - buffers.ui.freeQuads) * 6 * sizeof(uint32_t),
 			.data = buffers.ui.indexData,
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.ui.vertexBuffer, &vertexBufferWriteInfo),
 				   "Failed to write UI vertex buffer!");

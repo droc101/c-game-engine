@@ -320,9 +320,9 @@ void UpdateCameraUniform(Camera *camera)
 	glm_mat4_mul(camera->projectionMatrix, uniform.view, uniform.transform);
 	uniform.position = camera->transform.position;
 	const LunaBufferWriteInfo bufferWriteInfo = {
-		.bytes = sizeof(CameraUniform),
+		.size = sizeof(CameraUniform),
 		.data = &uniform,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.camera, &bufferWriteInfo),
 			   "Failed to write camera uniform!");
@@ -350,10 +350,10 @@ void UpdateViewModelMatrix(const Viewmodel *viewmodel)
 	for (size_t i = 0; i < instanceCount; i++)
 	{
 		const LunaBufferWriteInfo writeInfo = {
-			.bytes = sizeof(mat4),
+			.size = sizeof(mat4),
 			.data = viewmodelMatrix,
 			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
-			.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 		};
 		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.viewmodel.instanceData, &writeInfo),
 				   "Failed to write viewmodel transform matrix to instance data buffer!");
@@ -469,25 +469,25 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 	}
 
 	const LunaBufferWriteInfo depthsWriteInfo = {
-		.bytes = sizeof(float) * 4,
+		.size = sizeof(float) * 4,
 		.data = depths,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &depthsWriteInfo),
 			   "Failed to write directional light cascade depths to buffer!");
 	const LunaBufferWriteInfo matricesWriteInfo = {
-		.bytes = sizeof(mat4) * 4,
+		.size = sizeof(mat4) * 4,
 		.data = matrices,
 		.offset = sizeof(float) * 4,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.lights, &matricesWriteInfo),
 			   "Failed to write directional light cascade transform matrices to buffer!");
 	const LunaBufferWriteInfo frustumsWriteInfo = {
-		.bytes = sizeof(FrustumCullingData) * 4,
+		.size = sizeof(FrustumCullingData) * 4,
 		.data = &frustumCullingDatas[1],
 		.offset = sizeof(FrustumCullingData),
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumCullingDatas, &frustumsWriteInfo),
 			   "Failed to write directional light frustums to buffer!");
@@ -496,9 +496,9 @@ void UpdateDirectionalLightCascades(const Camera *camera, const Map *map)
 void WriteFrustumCullingDatasBuffer()
 {
 	const LunaBufferWriteInfo writeInfo = {
-		.bytes = sizeof(FrustumCullingData) * frustumCount,
+		.size = sizeof(FrustumCullingData) * frustumCount,
 		.data = frustumCullingDatas,
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_STORAGE_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumCullingDatas, &writeInfo),
 			   "Failed to write frustum culling datas buffer!");
@@ -507,9 +507,9 @@ void WriteFrustumCullingDatasBuffer()
 void WriteFrustumShadowMapsBuffer()
 {
 	const LunaBufferWriteInfo writeInfo = {
-		.bytes = sizeof(FrustumShadowMap) * frustumCount,
+		.size = sizeof(FrustumShadowMap) * frustumCount,
 		.data = frustumShadowMaps,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.frustumShadowMaps, &writeInfo),
 			   "Failed to write frustum shadow maps buffer!");
@@ -531,9 +531,9 @@ void UpdateSoftShadowKernels()
 	}
 
 	const LunaBufferWriteInfo writeInfo = {
-		.bytes = bufferSize,
+		.size = bufferSize,
 		.data = data,
-		.stageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_FRAGMENT_SHADER_UNIFORM_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.uniforms.softShadowKernels, &writeInfo),
 			   "Failed to write to soft shadow kernels buffer!");

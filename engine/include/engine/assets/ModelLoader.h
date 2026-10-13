@@ -76,7 +76,7 @@ struct ModelVertex
 	Vector3 normal;
 	/// The lightmap UV for the vertex
 	Vector2 lightmapUv;
-} __attribute__((packed));
+};
 
 struct ModelComponent
 {

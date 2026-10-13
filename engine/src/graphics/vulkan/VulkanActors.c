@@ -66,10 +66,6 @@ typedef struct
 	bool shouldReallocUnshadedWalls;
 } InstanceDataReallocInfo;
 
-// TODO: Investigate a solution that does not require keeping all of this on the CPU
-static ModelVertex *vertices;
-static uint32_t *indices;
-
 static uint32_t allocatedBufferCount;
 static size_t bufferVertexCount;
 static size_t bufferIndexCount;
@@ -83,6 +79,8 @@ static ModelActorCullingInfo *unshadedModelsCullingInfo;
 static ActorWallInstanceData *wallsInstanceData;
 static CullingInfo *shadedWallsCullingInfo;
 static CullingInfo *unshadedWallsCullingInfo;
+static ModelVertex *vertices;
+static uint32_t *indices;
 
 /// A list of uint32_t model ids that are currently loaded
 static List loadedModelIds;
@@ -187,16 +185,16 @@ static inline void LoadModelLods(const ModelDefinition *model)
 	}
 
 	const LunaBufferWriteInfo vertexBufferWriteInfo = {
-		.bytes = verticesSize,
+		.size = verticesSize,
 		.data = vertices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.actorModels.vertices, &vertexBufferWriteInfo),
 			   "Failed to write model vertex data to buffer!");
 	const LunaBufferWriteInfo indexBufferWriteInfo = {
-		.bytes = indicesSize,
+		.size = indicesSize,
 		.data = indices,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.actorModels.indices, &indexBufferWriteInfo),
 			   "Failed to write model index data to buffer!");
@@ -661,17 +659,20 @@ static inline void WriteActorModelBuffers(const InstanceDataReallocInfo *realloc
 		   reallocInfo->shadedModelInstanceCount + reallocInfo->unshadedModelInstanceCount);
 
 	const LunaBufferWriteInfo instanceDataWriteInfo = {
-		.bytes = reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData),
+		.size = reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData),
 		.data = modelsInstanceData,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.sourceStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		.sourceAccessMask = VK_ACCESS_2_SHADER_STORAGE_READ_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		.destinationAccessMask = VK_ACCESS_2_SHADER_STORAGE_READ_BIT,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.actorModels.instanceData, &instanceDataWriteInfo),
 			   "Failed to write actor models instance data to buffer!");
 
 	const LunaBufferWriteInfo shadedUnculledInstanceIndicesWriteInfo = {
-		.bytes = reallocInfo->shadedModelInstanceCount * sizeof(uint32_t),
+		.size = reallocInfo->shadedModelInstanceCount * sizeof(uint32_t),
 		.data = shadedModelsInstanceIndices,
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -679,9 +680,9 @@ static inline void WriteActorModelBuffers(const InstanceDataReallocInfo *realloc
 									 &shadedUnculledInstanceIndicesWriteInfo),
 			   "Failed to write shaded actor models unculled instance indices to buffer!");
 	const LunaBufferWriteInfo unshadedUnculledInstanceIndicesWriteInfo = {
-		.bytes = reallocInfo->unshadedModelInstanceCount * sizeof(uint32_t),
+		.size = reallocInfo->unshadedModelInstanceCount * sizeof(uint32_t),
 		.data = unshadedModelsInstanceIndices,
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -696,10 +697,10 @@ static inline void WriteActorModelBuffers(const InstanceDataReallocInfo *realloc
 									 reallocInfo->shadedModelInstanceCount),
 			   "Failed to write actor model shaded culling info count to buffer!");
 	const LunaBufferWriteInfo shadedCullingInfoBufferWriteInfo = {
-		.bytes = reallocInfo->shadedModelInstanceCount * sizeof(ModelActorCullingInfo),
+		.size = reallocInfo->shadedModelInstanceCount * sizeof(ModelActorCullingInfo),
 		.data = shadedModelsCullingInfo,
 		.offset = sizeof(uint32_t),
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -713,10 +714,10 @@ static inline void WriteActorModelBuffers(const InstanceDataReallocInfo *realloc
 									 reallocInfo->unshadedModelInstanceCount),
 			   "Failed to write actor model unshaded culling info count to buffer!");
 	const LunaBufferWriteInfo unshadedCullingInfoBufferWriteInfo = {
-		.bytes = reallocInfo->unshadedModelInstanceCount * sizeof(ModelActorCullingInfo),
+		.size = reallocInfo->unshadedModelInstanceCount * sizeof(ModelActorCullingInfo),
 		.data = unshadedModelsCullingInfo,
 		.offset = sizeof(uint32_t),
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -726,14 +727,14 @@ static inline void WriteActorModelBuffers(const InstanceDataReallocInfo *realloc
 
 	const uint32_t drawInfoBytes = reallocInfo->modelDrawCount * sizeof(VkDrawIndexedIndirectCommand);
 	const LunaBufferWriteInfo shadedDrawInfoBufferWriteInfo = {
-		.bytes = drawInfoBytes,
+		.size = drawInfoBytes,
 		.data = shadedModelsDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 	};
 	const LunaBufferWriteInfo unshadedDrawInfoBufferWriteInfo = {
-		.bytes = drawInfoBytes,
+		.size = drawInfoBytes,
 		.data = unshadedModelsDrawInfo,
-		.stageFlags = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
 	};
 	for (uint32_t i = 0; i < frustumCount; i++)
 	{
@@ -749,19 +750,19 @@ static inline void WriteActorModelBuffers(const InstanceDataReallocInfo *realloc
 static inline void WriteActorWallBuffers()
 {
 	const LunaBufferWriteInfo instanceDataWriteInfo = {
-		.bytes = sizeof(ActorWallInstanceData) *
-				 (buffers.actorWalls.shadedInstanceCount + buffers.actorWalls.unshadedInstanceCount),
+		.size = sizeof(ActorWallInstanceData) *
+				(buffers.actorWalls.shadedInstanceCount + buffers.actorWalls.unshadedInstanceCount),
 		.data = wallsInstanceData,
-		.stageFlags = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.actorWalls.instanceData, &instanceDataWriteInfo),
 			   "Failed to write actor walls instance data to buffer!");
 
 	const LunaBufferWriteInfo shadedWallsCullingInfoWriteInfo = {
-		.bytes = sizeof(CullingInfo) * buffers.actorWalls.shadedInstanceCount,
+		.size = sizeof(CullingInfo) * buffers.actorWalls.shadedInstanceCount,
 		.offset = sizeof(uint32_t),
 		.data = shadedWallsCullingInfo,
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,
@@ -770,10 +771,10 @@ static inline void WriteActorWallBuffers()
 			   "Failed to write shaded actor walls culling info to buffer!");
 
 	const LunaBufferWriteInfo unshadedWallsCullingInfoWriteInfo = {
-		.bytes = sizeof(CullingInfo) * buffers.actorWalls.unshadedInstanceCount,
+		.size = sizeof(CullingInfo) * buffers.actorWalls.unshadedInstanceCount,
 		.offset = sizeof(uint32_t),
 		.data = unshadedWallsCullingInfo,
-		.stageFlags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_COMPUTE_SHADER_BUFFER_DEVICE_ADDRESS,
 	};
 	VulkanTest(lunaWriteDataToBuffer(device,
 									 commandBuffer,

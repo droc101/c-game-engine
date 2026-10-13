@@ -6,7 +6,7 @@ layout(constant_id = 0) const uint LIGHT_COUNT = 1;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
-layout(set = 0, binding = 5, scalar) restrict buffer LightsData {
+layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
     Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];

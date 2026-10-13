@@ -12,7 +12,7 @@ layout(push_constant) uniform PushConstants {
     uint cascadeIndex;
 } pushConstants;
 
-layout(set = 0, binding = 5, scalar) readonly restrict buffer LightsData {
+layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
     Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
