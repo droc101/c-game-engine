@@ -12,6 +12,7 @@ detect_platform()
 message(STATUS "Fetching SDL3...")
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out/bin) # TODO SDL3 seems to put its DLLs in the RUNTIME output dir for some reason
+# TODO may be able to disable requirement of libwinpthread on windows with SDL_PTHREADS
 disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI_DEFAULT SDL_POWER_DEFAULT
         SDL_SENSOR_DEFAULT SDL_DIALOG_DEFAULT SDL_TRAY_DEFAULT SDL_DISKAUDIO SDL_DUMMYAUDIO SDL_DUMMYVIDEO SDL_OPENGLES
         SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM SDL_OPENGL)
@@ -24,7 +25,9 @@ fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git release-3.*.* SDL3
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
-find_package(ZLIB REQUIRED)
+message(STATUS "Fetching zlib...")
+disable_options(ZLIB_BUILD_TESTING ZLIB_BUILD_SHARED ZLIB_INSTALL)
+fetch_package_tag(https://github.com/madler/zlib v1.* zlib)
 
 fetch_dict()
 
@@ -321,7 +324,7 @@ endif ()
 target_link_libraries(engine INTERFACE
         SDL3::SDL3
         SDL3_mixer::SDL3_mixer-shared
-        ZLIB::ZLIB
+        zlibstatic
         joltc
         cglm
         dict

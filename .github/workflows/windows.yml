@@ -45,7 +45,6 @@ jobs:
             git
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-cmake
-            mingw-w64-ucrt-x86_64-zlib
             mingw-w64-ucrt-x86_64-python
           update: true
 
