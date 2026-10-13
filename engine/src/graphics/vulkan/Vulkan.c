@@ -197,7 +197,8 @@ static inline void LoadViewmodel(const Viewmodel *viewmodel)
 	const uint32_t *materialIndices = model->skinMaterialIndices[viewmodel->modelSkin];
 	const ModelLod *lod = model->lods;
 
-	uint32_t indices[lod->totalIndexCount];
+	uint32_t *indices = malloc(sizeof(uint32_t) * lod->totalIndexCount);
+	CheckAlloc(indices);
 	size_t indexCount = 0;
 	size_t shadedMaterialCount = 0;
 	size_t unshadedMaterialCount = 0;
@@ -251,6 +252,7 @@ static inline void LoadViewmodel(const Viewmodel *viewmodel)
 			   "Failed to write data to viewmodel index buffer!");
 
 	UpdateViewmodel(viewmodel);
+	free(indices);
 }
 
 static inline void CreateMapModelDrawInfos(const bool opaque,
@@ -534,7 +536,8 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 static inline void UpdateMapInstanceData(const Map *map, const bool opaque, const MapModelsBuffer *buffer)
 {
 	const size_t materialCount = lunaGetBufferSize(buffer->instanceData) / sizeof(uint32_t);
-	uint32_t textureIndices[materialCount];
+	uint32_t *textureIndices = malloc(sizeof(uint32_t) * materialCount);
+	CheckAlloc(textureIndices);
 	size_t materialIndex = 0;
 	for (size_t i = 0; i < map->modelCount; i++)
 	{
@@ -553,6 +556,7 @@ static inline void UpdateMapInstanceData(const Map *map, const bool opaque, cons
 	};
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffer->instanceData, &instanceDataBufferWriteInfo),
 			   "Failed to update map instance data buffer!");
+	free(textureIndices);
 }
 
 static inline void LoadLightmap(const Map *map)

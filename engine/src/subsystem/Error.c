@@ -72,7 +72,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	const int buttonCount = 4;
 #endif
 
-	SDL_MessageBoxButtonData buttons[buttonCount];
+	SDL_MessageBoxButtonData buttons[4];
 	buttons[0].buttonID = 0;
 	buttons[0].text = "Exit";
 	buttons[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
