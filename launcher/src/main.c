@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
 
 #include "../include/AnsiCodes.h"
 #include "../include/DialogSystem.h"
@@ -47,7 +46,7 @@ int main(const int argc, char **argv)
 	if (argc < 1)
 	{
 		printf(ANSI_RED "bootstrap: argc < 1\n" ANSI_RESET);
-		ErrorDialog(L"Missing executable path argument", L"Fatal Error");
+		ErrorDialog("Missing executable path argument", "Fatal Error");
 		return -1;
 	}
 
@@ -84,7 +83,7 @@ int main(const int argc, char **argv)
 	if (!library_basename)
 	{
 		printf(ANSI_RED "bootstrap: failed to find a compatible game library\n" ANSI_RESET);
-		ErrorDialog(L"Failed to find a game executable compatible with your system's CPU.", L"Fatal Error");
+		ErrorDialog("Failed to find a game executable compatible with your system's CPU.", "Fatal Error");
 		return -1;
 	}
 
@@ -103,7 +102,7 @@ int main(const int argc, char **argv)
 		}
 	}
 	printf(ANSI_RED "bootstrap: error loading game library: %s\n" ANSI_RESET, LibraryLoaderError());
-	ErrorDialog(L"Failed to load the game executable.", L"Fatal Error");
+	ErrorDialog("Failed to load the game executable.", "Fatal Error");
 
 	return -1;
 }

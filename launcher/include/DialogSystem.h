@@ -21,6 +21,6 @@ void InitDialogSystem();
  * @param message The message (body text)
  * @param title The title bar text and instruction (top) text
  */
-void ErrorDialog(const wchar_t *message, const wchar_t *title);
+void ErrorDialog(const char *message, const char *title);
 
 #endif //GAME_DIALOGSYSTEM_H

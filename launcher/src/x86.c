@@ -2,13 +2,14 @@
 // Created by droc101 on 11/14/25.
 //
 
-#include "../include/x86.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "../include/AnsiCodes.h"
 #include "../include/LibraryLoader.h"
+#include "../include/x86.h"
 
 uint8_t GetX86AbiArgument(const int argc, char **argv)
 {
