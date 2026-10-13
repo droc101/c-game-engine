@@ -30,7 +30,7 @@ static const VideoPresetData LOW_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_4X,
-	.shadowMapResolution = SHADOW_MAP_RESOLUTION_512,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_2048,
 	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW,
 };
 
@@ -39,7 +39,7 @@ static const VideoPresetData MEDIUM_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.0f,
 	.anisotropy = ANISOTROPY_8X,
-	.shadowMapResolution = SHADOW_MAP_RESOLUTION_1024,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_4096,
 	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM,
 };
 
@@ -48,7 +48,7 @@ static const VideoPresetData HIGH_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 1.5f,
 	.anisotropy = ANISOTROPY_16X,
-	.shadowMapResolution = SHADOW_MAP_RESOLUTION_2048,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_8192,
 	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH,
 };
 
@@ -57,7 +57,7 @@ static const VideoPresetData ULTRA_PRESET = {
 	.mipmaps = true,
 	.lodMultiplier = 2.0f,
 	.anisotropy = ANISOTROPY_16X,
-	.shadowMapResolution = SHADOW_MAP_RESOLUTION_4096,
+	.shadowMapResolution = SHADOW_MAP_RESOLUTION_16384,
 	.shadowMapSoftShadowQuality = SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA,
 };
 

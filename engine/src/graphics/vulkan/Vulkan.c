@@ -1027,9 +1027,26 @@ static inline void UpdateLightTextureIndices(const Map *map)
 			   "Failed to write lights data to buffer!");
 }
 
+static inline void RecreateGraphicsPipelines()
+{
+	lunaDestroyGraphicsPipeline(device, pipelines.ui);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedMap);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedMap);
+	lunaDestroyGraphicsPipeline(device, pipelines.sky);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorModel);
+	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
+	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
+
+	CreateGraphicsPipelines();
+}
+
 static inline void CreateShadowMaps(const Map *map)
 {
 	CreateShadowMapRenderPass(map);
+	RecreateGraphicsPipelines();
 	CreateDepthGraphicsPipelines();
 
 	lunaDestroyComputePipeline(device, pipelines.culling);
@@ -1749,22 +1766,6 @@ static inline void HandleMapChangeFlags(Map *map)
 	map->changeFlags = 0;
 }
 
-static inline void RecreateGraphicsPipelines()
-{
-	lunaDestroyGraphicsPipeline(device, pipelines.ui);
-	lunaDestroyGraphicsPipeline(device, pipelines.shadedMap);
-	lunaDestroyGraphicsPipeline(device, pipelines.unshadedMap);
-	lunaDestroyGraphicsPipeline(device, pipelines.sky);
-	lunaDestroyGraphicsPipeline(device, pipelines.shadedModel);
-	lunaDestroyGraphicsPipeline(device, pipelines.unshadedModel);
-	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorModel);
-	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorModel);
-	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
-	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
-
-	CreateGraphicsPipelines();
-}
-
 /// Handles the rendererQueuedActions and pendingTasks bit masks
 static inline void HandleDeferredWork()
 {
@@ -1799,6 +1800,27 @@ static inline void HandleDeferredWork()
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{
+		switch (GetState()->options.shadowMapResolution)
+		{
+			case SHADOW_MAP_RESOLUTION_1024:
+				specializationConstants.shadowMapAtlasSize = 1024;
+				break;
+			case SHADOW_MAP_RESOLUTION_2048:
+				specializationConstants.shadowMapAtlasSize = 2048;
+				break;
+			case SHADOW_MAP_RESOLUTION_4096:
+				specializationConstants.shadowMapAtlasSize = 4096;
+				break;
+			case SHADOW_MAP_RESOLUTION_8192:
+				specializationConstants.shadowMapAtlasSize = 8192;
+				break;
+			case SHADOW_MAP_RESOLUTION_16384:
+				specializationConstants.shadowMapAtlasSize = 16384;
+				break;
+			default:
+				specializationConstants.shadowMapAtlasSize = 0;
+				break;
+		}
 		if (GetMap() != NULL && GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED)
 		{
 			if (shadowMapRenderPass == VK_NULL_HANDLE || frustumCount == 1)

@@ -572,7 +572,7 @@ extern LockingList dynamicLightsToRemove;
 extern List dynamicLights;
 extern SpecializationConstants specializationConstants;
 
-static const uint32_t DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE = 16384;
+#define DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE (specializationConstants.shadowMapAtlasSize)
 
 /// Simply a collection of constants that are used to prevent significant usage of magic numbers
 enum PerFrustumBufferMagicConstants : uint32_t
