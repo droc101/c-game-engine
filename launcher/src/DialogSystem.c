@@ -35,7 +35,7 @@ void InitDialogSystem()
 #endif
 }
 
-static const wchar_t *ToWideChar(const char *string)
+static wchar_t *ToWideChar(const char *string)
 {
 	const size_t stringSize = strlen(string) + 1;
 	wchar_t *wideString = malloc(sizeof(wchar_t) * stringSize);
