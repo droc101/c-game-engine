@@ -12,6 +12,7 @@
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
@@ -19,6 +20,7 @@
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Options.h>
 #include <engine/structs/Vector2.h>
@@ -27,16 +29,15 @@
 #include <float.h>
 #include <joltc/Math/Mat44.h>
 #include <joltc/Math/Quat.h>
-#include <joltc/Math/RMat44.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
-#include <joltc/Physics/Body/BodyInterface.h>
 #include <math.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 
 static bool windowFocused;
 
@@ -44,8 +45,9 @@ static SDL_Window *window;
 static int windowWidth;
 static int windowHeight;
 
+static SDL_Surface *windowIcon = NULL;
+
 RendererQueuedAction rendererQueuedActions = 0;
-static OptionsMsaa qaNewFramebufferMsaaValue = MSAA_NONE;
 
 void SetGameWindow(SDL_Window *w)
 {
@@ -132,11 +134,6 @@ void ActorTransformMatrix(const Actor *actor, JPH_Mat44 *transformMatrix)
 	}
 }
 
-bool RenderPreInit()
-{
-	return VK_PreInit();
-}
-
 bool RenderInit()
 {
 	return VK_Init(GetGameWindow());
@@ -149,17 +146,17 @@ void RenderDestroy()
 
 bool FrameStart()
 {
-	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
-	{
-		HotReloadAssets();
-		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
-	}
 	return VK_FrameStart();
 }
 
 void FrameEnd()
 {
-	VK_FrameEnd();
+	(void)VK_FrameEnd(); // The return value of this is safe to ignore, since it'll be caught at the start of next frame
+	if ((rendererQueuedActions & QUEUED_ACTION_RELOAD_ALL_ASSETS) != 0)
+	{
+		HotReloadAssets();
+		rendererQueuedActions &= ~QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	}
 }
 
 inline float GetAutoUiScale()
@@ -241,10 +238,10 @@ void DPrintGPUInfo()
 
 Vector2 ProjectPosition(vec3 position, Camera *camera)
 {
-	const Vector2 windowSize = ActualWindowSize();
+	const Vector2 windowSize = v2(windowWidth, windowHeight);
 	const float aspect = windowSize.x / windowSize.y;
 	mat4 perspectiveMatrix;
-	glm_perspective_lh_zo(glm_rad(camera->fov), aspect, camera->nearZ, camera->farZ, perspectiveMatrix);
+	glm_perspective_lh_zo(glm_rad(camera->fov), aspect, camera->nearPlane, camera->farPlane, perspectiveMatrix);
 
 	versor rotationQuat;
 	QUAT_TO_VERSOR(camera->transform.rotation, rotationQuat);
@@ -273,4 +270,27 @@ Vector2 ProjectPosition(vec3 position, Camera *camera)
 	const float y = ((ndc[1] + 1.0f) * 0.5f) * windowSize.y;
 
 	return v2(x, y);
+}
+
+void AddDynamicLight(const DynamicLight *light)
+{
+	VK_AddDynamicLight(light);
+}
+
+void RemoveDynamicLight(const DynamicLight *light)
+{
+	VK_RemoveDynamicLight(light);
+}
+
+void SetWindowIcon()
+{
+	if (windowIcon)
+	{
+		SDL_DestroySurface(windowIcon);
+	}
+	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
+	if (!SDL_SetWindowIcon(window, windowIcon))
+	{
+		LogError("Failed to set window icon: %s\n", SDL_GetError());
+	}
 }

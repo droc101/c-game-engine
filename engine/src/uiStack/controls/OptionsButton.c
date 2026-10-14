@@ -6,13 +6,13 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -22,9 +22,9 @@
 
 static size_t FindCurrentValueIndex(const OptionsButtonData *data)
 {
-	for (size_t i = 0; i < data->numValues; i++)
+	for (size_t i = 0; i < data->options->numValues; i++)
 	{
-		const LiteralControlValue *current = &data->values[i].value;
+		const LiteralControlValue *current = &data->options->values[i].value;
 		bool same = false;
 		switch (data->value.type)
 		{
@@ -54,7 +54,7 @@ static size_t FindCurrentValueIndex(const OptionsButtonData *data)
 
 static const OptionsButtonValue *FindCurrentValue(const OptionsButtonData *data)
 {
-	return &data->values[FindCurrentValueIndex(data)];
+	return &data->options->values[FindCurrentValueIndex(data)];
 }
 
 Control *CreateOptionsButtonControl(const Vector2 position,
@@ -62,8 +62,7 @@ Control *CreateOptionsButtonControl(const Vector2 position,
 									char *text,
 									const OptionsButtonCallback callback,
 									const ControlAnchor anchor,
-									OptionsButtonValue *values,
-									const size_t numValues,
+									OptionsButtonOptions *options,
 									void *extraData,
 									const ControlValue value,
 									char *alwaysTooltip)
@@ -81,20 +80,19 @@ Control *CreateOptionsButtonControl(const Vector2 position,
 	data->alwaysTooltip = alwaysTooltip;
 	data->callback = callback;
 	data->enabled = true;
-	data->values = values;
-	data->numValues = numValues;
+	data->options = options;
 	data->callbackExtraData = extraData;
 	data->value = value;
 
-	for (size_t i = 0; i < numValues; i++)
+	for (size_t i = 0; i < data->options->numValues; i++)
 	{
-		assert(values[i].value.type == value.type);
+		assert(data->options->values[i].value.type == value.type);
 	}
 
 	if (data->alwaysTooltip)
 	{
 		btn->tooltip = data->alwaysTooltip;
-	} else
+	} else if (data->options->numValues != 0)
 	{
 		btn->tooltip = FindCurrentValue(data)->tooltip;
 	}
@@ -109,20 +107,24 @@ void DestroyOptionsButton(const Control *c)
 
 void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, uint32_t /*ctlIndex*/)
 {
-	OptionsButtonData *data = (OptionsButtonData *)c->controlData;
+	const OptionsButtonData *data = (OptionsButtonData *)c->controlData;
+	if (data->options->numValues == 0)
+	{
+		return;
+	}
 	if (data->enabled && HasActivation(stack, c))
 	{
 		size_t index = FindCurrentValueIndex(data);
 		index++;
-		if (index >= data->numValues)
+		if (index >= data->options->numValues)
 		{
 			index = 0;
 		}
 		if (!data->alwaysTooltip)
 		{
-			c->tooltip = data->values[index].tooltip;
+			c->tooltip = data->options->values[index].tooltip;
 		}
-		const LiteralControlValue *value = &data->values[index].value;
+		const LiteralControlValue *value = &data->options->values[index].value;
 		switch (data->value.type)
 		{
 			case CONTROL_VALUE_BOOL:
@@ -143,7 +145,7 @@ void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, 
 		}
 		if (data->callback)
 		{
-			data->callback(&data->values[index], data->callbackExtraData);
+			data->callback(&data->options->values[index], data->callbackExtraData);
 		}
 		(void)PlaySound(SOUND("sfx/click"), SOUND_CATEGORY_UI);
 		ConsumeMouseButton(mainThreadInput, SDL_BUTTON_LEFT);
@@ -154,27 +156,40 @@ void UpdateOptionsButton(UiStack *stack, Control *c, Vector2 /*localMousePos*/, 
 
 void DrawOptionsButton(const Control *c, ControlState state, Vector2 position)
 {
-	switch (state)
-	{
-		case NORMAL:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button"));
-			break;
-		case HOVER:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_hover"));
-			break;
-		case ACTIVE:
-			DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_pressed"));
-			break;
-	}
-
 	const OptionsButtonData *data = (OptionsButtonData *)c->controlData;
 
+	if (data->options->numValues != 0)
+	{
+		switch (state)
+		{
+			case NORMAL:
+				DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button"));
+				break;
+			case HOVER:
+				DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_hover"));
+				break;
+			case ACTIVE:
+				DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_pressed"));
+				break;
+		}
+	} else
+	{
+		DrawNinePatchTexture(c->anchoredPosition, c->size, 8, 8, TEXTURE("interface/button_disabled"));
+	}
+
+
 	char label[256] = {0};
-	snprintf(label, 256, data->text, FindCurrentValue(data)->text);
+	if (data->options->numValues == 0)
+	{
+		snprintf(label, 256, data->text, "(none)");
+	} else
+	{
+		snprintf(label, 256, data->text, FindCurrentValue(data)->text);
+	}
 
 	DrawTextAligned(label,
 					16,
-					COLOR_BLACK,
+					data->options->numValues == 0 ? uiTheme.disabledText.textColor : uiTheme.buttonText.textColor,
 					position,
 					c->size,
 					FONT_HALIGN_CENTER,
@@ -182,7 +197,7 @@ void DrawOptionsButton(const Control *c, ControlState state, Vector2 position)
 					FONT("small_font"));
 }
 
-OptionsButtonValue onOffButtonValues[2] = {
+static OptionsButtonValue onOffButtonValues[2] = {
 	{
 		.text = "Off",
 		.tooltip = NULL,
@@ -203,7 +218,7 @@ OptionsButtonValue onOffButtonValues[2] = {
 	},
 };
 
-OptionsButtonValue yesNoButtonValues[2] = {
+static OptionsButtonValue yesNoButtonValues[2] = {
 	{
 		.text = "No",
 		.tooltip = NULL,
@@ -222,4 +237,13 @@ OptionsButtonValue yesNoButtonValues[2] = {
 					.boolValue = true,
 				},
 	},
+};
+
+OptionsButtonOptions onOffButtonOptions = {
+	.numValues = 2,
+	.values = onOffButtonValues,
+};
+OptionsButtonOptions yesNoButtonOptions = {
+	.numValues = 2,
+	.values = yesNoButtonValues,
 };

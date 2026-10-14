@@ -14,9 +14,7 @@
 #include <engine/subsystem/Error.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
-#include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
-#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <stdbool.h>
@@ -111,12 +109,6 @@ static void LaserEmitterInit(Actor *this, const KvList params, const Transform *
 
 ActorDefinition laserEmitterActorDefinition = {
 	.Update = LaserEmitterUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = LaserEmitterInit,
 };
 

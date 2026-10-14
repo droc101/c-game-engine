@@ -1,5 +1,4 @@
 #include <engine/Engine.h>
-#include <engine/gameState/LoadingState.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/subsystem/Logging.h>

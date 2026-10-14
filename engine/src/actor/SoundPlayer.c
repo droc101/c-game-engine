@@ -20,7 +20,7 @@
 typedef struct SoundPlayerData
 {
 	char *asset; // asset name of the sound effect to play
-	SoundChannel *effect;
+	SoundHandle effect;
 	int loops;
 	float volume;
 	SoundCategory category;
@@ -32,14 +32,14 @@ static void SoundPlayerSoundDone(void *pData)
 {
 	if (pData)
 	{
-		((SoundPlayerData *)pData)->effect = NULL;
+		((SoundPlayerData *)pData)->effect = SOUND_SYSTEM_INVALID_HANDLE;
 	}
 }
 
 static void SoundPlayerDestroy(Actor *this)
 {
 	const SoundPlayerData *data = this->extraData;
-	if (data->effect)
+	if (data->effect != SOUND_SYSTEM_INVALID_HANDLE)
 	{
 		StopSound(data->effect);
 	}
@@ -48,9 +48,16 @@ static void SoundPlayerDestroy(Actor *this)
 
 static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
+	SoundPlayerData *data = this->extraData;
+
+	if (data->effect != SOUND_SYSTEM_INVALID_HANDLE)
+	{
+		StopSound(data->effect);
+		data->effect = SOUND_SYSTEM_INVALID_HANDLE;
+	}
+
 	JPH_RVec3 position;
 	JPH_BodyInterface_GetPosition(this->bodyInterface, this->bodyId, &position);
-	SoundPlayerData *data = this->extraData;
 	const SoundRequest request = {
 		.soundAsset = data->asset,
 		.category = data->category,
@@ -68,26 +75,36 @@ static void SoundPlayerPlayHandler(Actor *this, const Actor * /*sender*/, const 
 static void SoundPlayerPauseHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	PauseSound(data->effect);
+	if (data->effect != SOUND_SYSTEM_INVALID_HANDLE)
+	{
+		PauseSound(data->effect);
+	}
 }
 
 static void SoundPlayerResumeHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	const SoundPlayerData *data = this->extraData;
-	ResumeSound(data->effect);
+	if (data->effect != SOUND_SYSTEM_INVALID_HANDLE)
+	{
+		ResumeSound(data->effect);
+	}
 }
 
 static void SoundPlayerStopHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
-	const SoundPlayerData *data = this->extraData;
-	StopSound(data->effect);
+	SoundPlayerData *data = this->extraData;
+	if (data->effect != SOUND_SYSTEM_INVALID_HANDLE)
+	{
+		StopSound(data->effect);
+		data->effect = SOUND_SYSTEM_INVALID_HANDLE;
+	}
 }
 
 static void SoundPlayerInit(Actor *this, const KvList params, const Transform *transform)
 {
 	SoundPlayerData *data = calloc(1, sizeof(SoundPlayerData));
 	CheckAlloc(data);
-	data->effect = NULL;
+	data->effect = SOUND_SYSTEM_INVALID_HANDLE;
 	const char *soundAsset = KvGetString(params, "sound", "sfx/click");
 	data->asset = malloc(strlen(soundAsset) + 1);
 	sprintf(data->asset, "%s", soundAsset);
@@ -101,12 +118,6 @@ static void SoundPlayerInit(Actor *this, const KvList params, const Transform *t
 }
 
 ActorDefinition soundPlayerActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = SoundPlayerDestroy,
 	.Init = SoundPlayerInit,
 };

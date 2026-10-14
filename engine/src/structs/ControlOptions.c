@@ -7,6 +7,7 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Input.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
@@ -198,11 +199,27 @@ static const InputAction DEFAULT_BENCHMARK = {
 				.keyBind = SDL_SCANCODE_F10,
 			},
 };
+static const InputAction DEFAULT_RELOAD_SHADERS = {
+	.keyboardMouseBindType = IA_KEY,
+	.controllerBindType = IA_UNBOUND,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F5,
+			},
+};
 static const InputAction DEFAULT_TOGGLE_FULLSCREEN = {
 	.keyboardMouseBindType = IA_KEY,
 	.keyboardMouseBind =
 			{
 				.keyBind = SDL_SCANCODE_F11,
+			},
+	.controllerBindType = IA_UNBOUND,
+};
+static const InputAction DEFAULT_TOGGLE_FLASHLIGHT = {
+	.keyboardMouseBindType = IA_KEY,
+	.keyboardMouseBind =
+			{
+				.keyBind = SDL_SCANCODE_F,
 			},
 	.controllerBindType = IA_UNBOUND,
 };
@@ -234,8 +251,10 @@ InputAction debugMenu;
 InputAction noclip;
 InputAction freecam;
 InputAction benchmark;
+InputAction reloadShaders;
 
 InputAction fullscreen;
+InputAction flashlight;
 
 #pragma endregion
 
@@ -244,7 +263,7 @@ List controlCategories;
 void RegisterControl(char *key,
 					 char *displayName,
 					 InputAction *action,
-					 bool allowAxisBind,
+					 const bool allowAxisBind,
 					 const InputAction *defaultAction,
 					 ControlCategory *category)
 {
@@ -320,12 +339,14 @@ void RegisterControls(const ControlRegisterFunction RegisterGameControls)
 
 	ControlCategory *miscCat = RegisterControlCategory("Miscellaneous", "miscellaneous");
 	RegisterControl("toggle_fullscreen", "Toggle Fullscreen", &fullscreen, false, &DEFAULT_TOGGLE_FULLSCREEN, miscCat);
+	RegisterControl("toggle_flashlight", "Toggle Flashlight", &flashlight, false, &DEFAULT_TOGGLE_FLASHLIGHT, miscCat);
 
 	ControlCategory *debugCat = RegisterControlCategory("Debug", "debug");
 	RegisterControl("toggle_debug_menu", "Toggle Debug Menu", &debugMenu, false, &DEFAULT_DEBUG_MENU, debugCat);
 	RegisterControl("toggle_noclip", "Toggle Noclip", &noclip, false, &DEFAULT_NOCLIP, debugCat);
 	RegisterControl("toggle_freecam", "Toggle Freecam", &freecam, false, &DEFAULT_FREECAM, debugCat);
 	RegisterControl("toggle_benchmark", "Start/Stop Benchmark", &benchmark, false, &DEFAULT_BENCHMARK, debugCat);
+	RegisterControl("reload_shaders", "Reload Shaders", &reloadShaders, false, &DEFAULT_RELOAD_SHADERS, debugCat);
 
 	if (RegisterGameControls)
 	{
@@ -340,7 +361,7 @@ void DefaultControls()
 		ControlCategory *cat = ListGetPointer(controlCategories, i);
 		for (size_t j = 0; j < cat->controlOptions.length; j++)
 		{
-			ControlOption *opt = ListGetPointer(cat->controlOptions, j);
+			const ControlOption *opt = ListGetPointer(cat->controlOptions, j);
 			memcpy(opt->action, opt->defaultAction, sizeof(InputAction));
 		}
 	}

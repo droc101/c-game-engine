@@ -8,15 +8,16 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
+#include <engine/uiStack/controls/Button.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <gameState/OptionsState.h>
 #include <helpers/OptionsMenu.h>
 #include <SDL3/SDL_scancode.h>
@@ -26,9 +27,9 @@
 #include <string.h>
 
 static OptionsMenu *debugOptionsMenu;
-static char *filter = NULL;
+// static char *filter = NULL;
 
-static OptionsButtonValue buttonValues[3] = {
+static OptionsButtonValue debugModeButtonValues[3] = {
 	{
 		.text = "Disabled",
 		.tooltip = "This debug option will never be shown",
@@ -58,12 +59,52 @@ static OptionsButtonValue buttonValues[3] = {
 	},
 };
 
-static void BtnDebugOptionsBack(Control */*control*/, void */*extraData*/)
+static OptionsButtonValue debugSideButtonValues[3] = {
+	{
+		.text = "Left Side",
+		.tooltip = NULL,
+		.value =
+				{
+					.type = CONTROL_VALUE_DWORD,
+					.dwordValue = DEBUG_ENTRY_LEFT_SIDE,
+				},
+	},
+	{
+		.text = "Right Side",
+		.tooltip = NULL,
+		.value =
+				{
+					.type = CONTROL_VALUE_DWORD,
+					.dwordValue = DEBUG_ENTRY_RIGHT_SIDE,
+				},
+	},
+	{
+		.text = "N/A",
+		.tooltip = NULL,
+		.value =
+				{
+					.type = CONTROL_VALUE_DWORD,
+					.dwordValue = DEBUG_ENTRY_NO_SIDE,
+				},
+	},
+};
+
+static OptionsButtonOptions debugModeOptions = {
+	.numValues = 3,
+	.values = debugModeButtonValues,
+};
+
+static OptionsButtonOptions debugSideOptions = {
+	.numValues = 3,
+	.values = debugSideButtonValues,
+};
+
+static void BtnDebugOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&OptionsState);
 }
 
-static void BtnDebugOptionsReset(Control */*control*/, void */*extraData*/)
+static void BtnDebugOptionsReset(Control * /*control*/, void * /*extraData*/)
 {
 	for (size_t i = 0; i < debugEntries.length; i++)
 	{
@@ -79,15 +120,22 @@ static void OptBtnEntryChanged(const OptionsButtonValue *value, void *extraData)
 	entry->mode = value->value.dwordValue;
 }
 
-static void FilterTextChanged(const char *newFilter)
+static void OptBtnEntrySideChanged(const OptionsButtonValue *value, void *extraData)
 {
-	free(filter);
-	filter = NULL;
-	if (newFilter && strlen(newFilter) > 0)
-	{
-		filter = strdup(newFilter);
-	}
+	DebugEntry *entry = extraData;
+	entry->side = value->value.dwordValue;
 }
+
+// TODO: reimplement this, may be best to wait for ggui
+// static void FilterTextChanged(const char *newFilter)
+// {
+// 	free(filter);
+// 	filter = NULL;
+// 	if (newFilter && strlen(newFilter) > 0)
+// 	{
+// 		filter = strdup(newFilter);
+// 	}
+// }
 
 static void DebugOptionsStateUpdate(GlobalState *state, const double delta)
 {
@@ -127,7 +175,7 @@ static void DebugOptionsStateSet()
 			OptionsMenuAddControl(debugOptionsMenu,
 								  CreateLabelControl(entry->key,
 													 16,
-													 COLOR_WHITE,
+													 &uiTheme.primaryText,
 													 v2(0, 0),
 													 v2(750 - 220 - 6, 40),
 													 TOP_LEFT,
@@ -141,14 +189,35 @@ static void DebugOptionsStateSet()
 															 "%s",
 															 OptBtnEntryChanged,
 															 TOP_RIGHT,
-															 buttonValues,
-															 DEBUG_ENTRY_MODE_MAX,
+															 &debugModeOptions,
 															 entry,
 															 (ControlValue){
 																 .type = CONTROL_VALUE_DWORD,
 																 .dwordValue = &entry->mode,
 															 },
 															 NULL));
+			if (entry->defaultSide != DEBUG_ENTRY_NO_SIDE)
+			{
+				OptionsMenuAddControl(debugOptionsMenu,
+									  CreateOptionsButtonControl(v2(-230, 0),
+																 v2(220, 40),
+																 "%s",
+																 OptBtnEntrySideChanged,
+																 TOP_RIGHT,
+																 &debugSideOptions,
+																 entry,
+																 (ControlValue){
+																	 .type = CONTROL_VALUE_DWORD,
+																	 .dwordValue = &entry->side,
+																 },
+																 NULL));
+			} else
+			{
+				Control *sideButton = CreateButtonControl(v2(-230, 0), v2(220, 40), "N/A", NULL, TOP_RIGHT, NULL);
+				((ButtonData *)sideButton->controlData)->enabled = false;
+				sideButton->allowFocus = false;
+				OptionsMenuAddControl(debugOptionsMenu, sideButton);
+			}
 			OptionsMenuNextRow(debugOptionsMenu);
 		}
 

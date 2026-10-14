@@ -7,7 +7,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/uiStack/controls/Button.h>
@@ -15,6 +14,7 @@
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/ScrollView.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -52,7 +52,7 @@ void OptionsMenuAddSection(OptionsMenu *menu, char *label)
 	{
 		Control *labelControl = CreateLabelControl(label,
 												   16,
-												   COLOR_WHITE,
+												   &uiTheme.primaryText,
 												   v2(0, menu->yPos),
 												   v2(750, 40),
 												   TOP_CENTER,

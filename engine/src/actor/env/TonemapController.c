@@ -97,11 +97,6 @@ static void TonemapControllerDestroy(Actor *this)
 
 ActorDefinition tonemapControllerActorDefinition = {
 	.Update = TonemapControllerUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = TonemapControllerDestroy,
 	.Init = TonemapControllerInit,
 };

@@ -8,6 +8,7 @@
 #include <engine/assets/GameConfigLoader.h>
 #include <engine/assets/KvlFile.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/KVList.h>
@@ -16,6 +17,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -142,7 +144,6 @@ static void RescanAddons()
 	{
 		if (errno == ENOENT)
 		{
-
 			if (!MakeDirectory(ADDONS_PATH))
 			{
 				LogError("Failed to create addons directory: %s\n", strerror(errno));
@@ -199,7 +200,7 @@ void InitAddonLoader()
 
 static void RemoveAddonAssetPaths()
 {
-	for (size_t i = gameConfig.assetPaths.length - 1; i > 0; i--)
+	for (int i = (int)gameConfig.assetPaths.length - 1; i >= 0; i--)
 	{
 		const AssetPath *path = ListGetPointer(gameConfig.assetPaths, i);
 		if ((path->flags & ASSET_PATH_RUNTIME_LOADED) != 0)
@@ -224,10 +225,15 @@ void ApplyAddonAssetPaths()
 {
 	RemoveAddonAssetPaths();
 
+	if (HasCliArg("--disable-addons"))
+	{
+		return;
+	}
+
 	for (size_t i = enabledAddons.length - 1; i != SIZE_MAX; i--)
 	{
 		Addon *addon = GetAddonById(ListGetPointer(enabledAddons, i));
-		ListInsertAfter(gameConfig.assetPaths, 0, &addon->assetPath);
+		ListInsert(gameConfig.assetPaths, 0, &addon->assetPath);
 	}
 }
 

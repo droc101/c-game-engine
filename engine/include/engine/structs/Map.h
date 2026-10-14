@@ -46,12 +46,18 @@ struct MapVertex
 	Vector2 uv;
 	/// The Lightmap UV coordinate
 	Vector2 lightmapUv;
+	/// The normal vector at the vertex
+	Vector3 normal;
 };
 
 struct MapModel
 {
 	/// The material this model uses
 	MapMaterial *material;
+	/// The center of the bounding box of the model
+	Vector3 center;
+	/// The distance from the center of the bounding box to each side of the model
+	Vector3 halfExtent;
 	/// The number of vertices in this model
 	uint32_t vertexCount;
 	/// The vertices in this model
@@ -94,6 +100,8 @@ struct Map
 	size_t modelCount;
 	/// The map models
 	MapModel *models;
+
+	float maxInboundsDistance;
 
 	List joltBodies;
 
@@ -138,13 +146,17 @@ struct Map
 	size_t lightmapWidth;
 	/// The height of the lightmap in pixels
 	size_t lightmapHeight;
-	/// The lightmap data in RGBA16F format
+	/// The lightmap data in RGBA16F format, containing only indirect lighting
+	void *indirectLightmapPixels;
+	/// The lightmap data in RGBA16F format, containing both indirect and direct lighting
 	void *lightmapPixels;
 
-	/// The number of point lights in the level
-	uint16_t lightCount;
-	/// The point lights in this level
-	Light *pointLights;
+	/// The number of lights in the level
+	uint32_t lightCount;
+	/// The lights in this level
+	Light *lights;
+	/// The directional light, or NULL if there is not one
+	Light *directionalLight;
 
 	MapTransition *transition;
 };
@@ -213,7 +225,7 @@ void GetActorsByName(const char *name, const Map *map, List *actors);
  * @param map The map to render
  * @param camera The camera to view from
  */
-void RenderMap(Map *map, const Camera *camera);
+void RenderMap(Map *map, Camera *camera);
 
 void ProcessQueuedIOConnection(QueuedIoConnection *connection);
 

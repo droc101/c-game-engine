@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
@@ -42,6 +43,7 @@
 const float MOVE_SPEED = 96.0f;
 const float SLOW_MOVE_SPEED = 9.6f;
 const float MAX_WALKABLE_SLOPE = 50.0f;
+JPH_BodyID playerBodyId = 0xfffffffe;
 static const float JUMP_SPEED = 68.0f;
 static const float ACTOR_RAYCAST_MAX_DISTANCE = 160.0f;
 static const float HELD_ACTOR_OFFSET = 14.0f;
@@ -114,7 +116,10 @@ static void OnContactAdded(const JPH_CharacterVirtual * /*character*/,
 	if (actor)
 	{
 		ioSettings->canPushCharacter = (actor->flags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
-		actor->definition->OnPlayerContactAdded(actor, bodyId);
+		if (actor->definition->OnPlayerContactAdded)
+		{
+			actor->definition->OnPlayerContactAdded(actor, bodyId);
+		}
 	}
 }
 
@@ -130,7 +135,10 @@ static void OnContactPersisted(const JPH_CharacterVirtual * /*character*/,
 	if (actor)
 	{
 		ioSettings->canPushCharacter = (actor->flags & ACTOR_FLAG_CAN_PUSH_PLAYER) == ACTOR_FLAG_CAN_PUSH_PLAYER;
-		actor->definition->OnPlayerContactPersisted(actor, bodyId);
+		if (actor->definition->OnPlayerContactPersisted)
+		{
+			actor->definition->OnPlayerContactPersisted(actor, bodyId);
+		}
 	}
 }
 
@@ -140,7 +148,7 @@ static void OnContactRemoved(const JPH_CharacterVirtual * /*character*/,
 {
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(GetState()->map->physicsSystem);
 	Actor *actor = (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, bodyId);
-	if (actor)
+	if (actor && actor->definition->OnPlayerContactRemoved)
 	{
 		actor->definition->OnPlayerContactRemoved(actor, bodyId);
 	}
@@ -298,6 +306,18 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 
 void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const float deltaTime, const bool allowInput)
 {
+	if (allowInput && IsInputActionJustPressed(physicsThreadInput, &flashlight))
+	{
+		if (player->isFlashlightOn)
+		{
+			RemoveDynamicLight(&player->flashlight);
+			player->isFlashlightOn = false;
+		} else
+		{
+			AddDynamicLight(&player->flashlight);
+			player->isFlashlightOn = true;
+		}
+	}
 	if (allowInput && !player->isNoclipActive && IsInputActionJustPressed(physicsThreadInput, &freecam))
 	{
 		player->isFreecamActive = !player->isFreecamActive;
@@ -396,7 +416,8 @@ void UpdatePlayer(Player *player, const JPH_PhysicsSystem *physicsSystem, const 
 							   (raycastResult.fraction * ACTOR_RAYCAST_MAX_DISTANCE < 16.0f))
 					{
 						crosshairColor = CROSSHAIR_COLOR_INTERACTABLE;
-						if (IsInputActionJustPressed(physicsThreadInput, &interact))
+						if (IsInputActionJustPressed(physicsThreadInput, &interact) &&
+							player->targetedActor->definition->Interact)
 						{
 							player->targetedActor->definition->Interact(player->targetedActor);
 						}

@@ -12,19 +12,26 @@
 static bool benchRunning = false;
 static uint64_t benchStartTime;
 static uint64_t benchFrameCount;
+
+#ifdef BENCHMARK_RECORD_HIGH_LOW_TIMES
 static uint64_t highestFrameNs;
 static uint64_t lowestFrameNs;
 
 static uint64_t benchFrameStartTime;
+#endif
 
 static void BenchStart()
 {
 	benchRunning = true;
 	benchStartTime = GetTimeNs();
 	benchFrameCount = 0;
+
+#ifdef BENCHMARK_RECORD_HIGH_LOW_TIMES
 	highestFrameNs = 0;
 	lowestFrameNs = ULONG_MAX;
 	BenchFrameStart();
+#endif
+
 	LogInfo("Benchmark started\n");
 }
 

@@ -28,6 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct SoundSystem SoundSystem;
+typedef struct SoundChannel SoundChannel;
+
 struct SoundChannel
 {
 	/// The audio playing on this channel
@@ -51,10 +54,14 @@ struct SoundChannel
 	vec3 originalPosition;
 	/// The SDL point associated with the track, or NULL if this channel is not positioned
 	MIX_Point3D *position;
+
+	/// The handle used to access this channel
+	SoundHandle handle;
 };
 
 struct SoundSystem
 {
+	SDL_AudioDeviceID outputDevice;
 	/// mixer instance
 	MIX_Mixer *mixer;
 	/// Whether the audio system has been started successfully
@@ -64,9 +71,10 @@ struct SoundSystem
 	/// currently playing sounds
 	SoundChannel *channels[SOUND_SYSTEM_CHANNEL_COUNT];
 	SDL_Mutex *mutex;
+	SoundHandle nextHandle;
 };
 
-SoundSystem soundSys;
+static SoundSystem soundSys;
 
 static void LockSoundSystem()
 {
@@ -123,7 +131,10 @@ void InitSoundSystem()
 		return;
 	}
 
-	soundSys.mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+	soundSys.nextHandle = 0;
+
+	soundSys.outputDevice = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+	soundSys.mixer = MIX_CreateMixerDevice(soundSys.outputDevice, NULL);
 	if (!soundSys.mixer)
 	{
 		soundSys.isAudioStarted = false;
@@ -189,7 +200,7 @@ void UpdateSoundSystem()
 	LockSoundSystem();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		if (MIX_TrackPlaying(soundSys.tracks[i]))
+		if (MIX_TrackPlaying(soundSys.tracks[i]) || MIX_TrackPaused(soundSys.tracks[i]))
 		{
 			if (soundSys.channels[i] == NULL)
 			{
@@ -255,7 +266,7 @@ static MIX_Track *FindAvailableTrack(uint8_t *index)
 {
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		if (!MIX_TrackPlaying(soundSys.tracks[i]))
+		if (!MIX_TrackPlaying(soundSys.tracks[i]) && !MIX_TrackPaused(soundSys.tracks[i]))
 		{
 			if (soundSys.channels[i] != NULL)
 			{
@@ -272,7 +283,7 @@ static MIX_Track *FindAvailableTrack(uint8_t *index)
 	return NULL;
 }
 
-SoundChannel *PlaySound(const char *soundAsset, const SoundCategory category)
+SoundHandle PlaySound(const char *soundAsset, const SoundCategory category)
 {
 	const SoundRequest request = {
 		.soundAsset = soundAsset,
@@ -286,40 +297,40 @@ SoundChannel *PlaySound(const char *soundAsset, const SoundCategory category)
 	return PlaySoundEx(&request);
 }
 
-SoundChannel *PlaySoundEx(const SoundRequest *request)
+SoundHandle PlaySoundEx(const SoundRequest *request)
 {
 	LockSoundSystem();
 	if (!soundSys.isAudioStarted)
 	{
 		UnlockSoundSystem();
-		return NULL;
+		return SOUND_SYSTEM_INVALID_HANDLE;
 	}
 	const Asset *wav = LoadAsset(request->soundAsset, true, false);
 	if (wav == NULL)
 	{
 		LogError("Failed to load sound effect asset.\n");
 		UnlockSoundSystem();
-		return NULL;
+		return SOUND_SYSTEM_INVALID_HANDLE;
 	}
 	if (wav->type != ASSET_TYPE_WAV)
 	{
 		LogError("PlaySoundEx Error: Asset is not a sound effect file.\n");
 		UnlockSoundSystem();
-		return NULL;
+		return SOUND_SYSTEM_INVALID_HANDLE;
 	}
 	SDL_IOStream *stream = SDL_IOFromConstMem(wav->data, wav->size);
 	if (!stream)
 	{
 		LogError("SDL_IOFromConstMem Error: %s\n", SDL_GetError());
 		UnlockSoundSystem();
-		return NULL;
+		return SOUND_SYSTEM_INVALID_HANDLE;
 	}
 	MIX_Audio *audio = MIX_LoadAudio_IO(soundSys.mixer, stream, request->preload, true);
 	if (audio == NULL)
 	{
 		LogError("MIX_LoadAudio_IO Error: %s\n", SDL_GetError());
 		UnlockSoundSystem();
-		return NULL;
+		return SOUND_SYSTEM_INVALID_HANDLE;
 	}
 	uint8_t index = 0;
 	MIX_Track *track = FindAvailableTrack(&index);
@@ -328,7 +339,7 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 		LogError("PlaySoundEffect Error: No available tracks.\n");
 		MIX_DestroyAudio(audio);
 		UnlockSoundSystem();
-		return NULL;
+		return SOUND_SYSTEM_INVALID_HANDLE;
 	}
 
 	SoundChannel *effect = malloc(sizeof(SoundChannel));
@@ -341,6 +352,14 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	effect->callback = request->completionCallback;
 	effect->callbackData = request->completionCallbackData;
 	effect->originalVolume = request->volume;
+	effect->handle = soundSys.nextHandle;
+	soundSys.nextHandle++;
+	// why do i even bother with this
+	if (soundSys.nextHandle == SOUND_SYSTEM_INVALID_HANDLE)
+	{
+		LogWarning("SoundSys handle overflow, resetting to 0\n");
+		soundSys.nextHandle = 0;
+	}
 	if (request->positional)
 	{
 		MIX_Point3D *point = malloc(sizeof(MIX_Point3D));
@@ -368,24 +387,49 @@ SoundChannel *PlaySoundEx(const SoundRequest *request)
 	SDL_DestroyProperties(props);
 
 	UnlockSoundSystem();
-	return effect;
+	return effect->handle;
 }
 
-inline void PauseSound(const SoundChannel *effect)
+static SoundChannel *HandleToChannel(const SoundHandle handle)
 {
-	MIX_PauseTrack(effect->track);
-}
-
-inline void ResumeSound(const SoundChannel *effect)
-{
-	MIX_ResumeTrack(effect->track);
-}
-
-inline void StopSound(const SoundChannel *effect)
-{
-	if (!MIX_StopTrack(effect->track, 0)) // TODO argument for fade_out_frames?
+	for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
-		LogError("MIX_StopTrack failed: %s", SDL_GetError());
+		SoundChannel *channel = soundSys.channels[i];
+		if (channel && channel->handle == handle)
+		{
+			return channel;
+		}
+	}
+	return NULL;
+}
+
+inline void PauseSound(const SoundHandle effect)
+{
+	const SoundChannel *channel = HandleToChannel(effect);
+	if (channel)
+	{
+		MIX_PauseTrack(channel->track);
+	}
+}
+
+inline void ResumeSound(const SoundHandle effect)
+{
+	const SoundChannel *channel = HandleToChannel(effect);
+	if (channel)
+	{
+		MIX_ResumeTrack(channel->track);
+	}
+}
+
+inline void StopSound(const SoundHandle effect)
+{
+	const SoundChannel *channel = HandleToChannel(effect);
+	if (channel)
+	{
+		if (!MIX_StopTrack(channel->track, 0)) // TODO argument for fade_out_frames?
+		{
+			LogError("MIX_StopTrack failed: %s", SDL_GetError());
+		}
 	}
 }
 
@@ -397,7 +441,7 @@ void StopAllSounds()
 		const SoundChannel *channel = soundSys.channels[i];
 		if (channel)
 		{
-			StopSound(channel);
+			StopSound(channel->handle);
 		}
 	}
 	UnlockSoundSystem();
@@ -409,6 +453,7 @@ void DPrintSoundSystem()
 	DPrintF("Sound System Active: %s", COLOR_WHITE, soundSys.isAudioStarted ? "Yes" : "No");
 	if (soundSys.isAudioStarted)
 	{
+		DPrintF("Output Device: %s", COLOR_WHITE, SDL_GetAudioDeviceName(soundSys.outputDevice));
 		int numPlayingSounds = 0;
 		for (size_t i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 		{
@@ -418,6 +463,7 @@ void DPrintSoundSystem()
 			}
 		}
 		DPrintF("Sounds: %d/%d", COLOR_WHITE, numPlayingSounds, SOUND_SYSTEM_CHANNEL_COUNT);
+		DPrintF("Next Handle: %zu", COLOR_WHITE, soundSys.nextHandle);
 	}
 	UnlockSoundSystem();
 }

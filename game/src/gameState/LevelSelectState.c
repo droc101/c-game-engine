@@ -17,6 +17,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Input.h>
+#include <engine/uiStack/UiTheme.h>
 #include <gameState/MenuState.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_scancode.h>
@@ -80,9 +81,11 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 			continue;
 		}
 		const float yPos = (float)(345 + ((i - selectedLevel) * 60));
+		Color alphaPrimaryColor = uiTheme.primaryText.textColor;
+		alphaPrimaryColor.a = 0.3125f;
 		DrawTextAligned(ListGetPointer(levelList, i),
 						32,
-						COLOR(0x50ffffff),
+						alphaPrimaryColor,
 						v2(50, yPos),
 						v2(ScaledWindowWidthFloat() - 50, 60),
 						FONT_HALIGN_LEFT,
@@ -90,15 +93,15 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 						FONT("small_font"));
 	}
 
-	FontDrawString(v2(52, 52), "Map Select", 64, COLOR_BLACK, FONT("small_font"));
-	FontDrawString(v2(50, 50), "Map Select", 64, COLOR_WHITE, FONT("small_font"));
+	FontDrawString(v2(52, 52), "Map Select", 64, uiTheme.primaryText.shadowColor, FONT("small_font"));
+	FontDrawString(v2(50, 50), "Map Select", 64, uiTheme.primaryText.textColor, FONT("small_font"));
 
 	DrawRect(0, 315, ScaledWindowWidth(), 120, COLOR(0x80000000));
 	if (levelList.length == 0)
 	{
 		DrawTextAligned("No Levels Found",
 						32,
-						COLOR_WHITE,
+						uiTheme.primaryText.textColor,
 						v2(50, 345),
 						v2(ScaledWindowWidthFloat() - 50, 60),
 						FONT_HALIGN_LEFT,
@@ -108,7 +111,7 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 	{
 		DrawTextAligned(ListGetPointer(levelList, selectedLevel),
 						32,
-						COLOR_WHITE,
+						uiTheme.primaryText.textColor,
 						v2(50, 345),
 						v2(ScaledWindowWidthFloat() - 50, 60),
 						FONT_HALIGN_LEFT,
@@ -116,8 +119,12 @@ static void LevelSelectStateRender(GlobalState *state, const double /*delta*/)
 						FONT("small_font"));
 		char progress[64];
 		snprintf(progress, 64, "Map %02d/%02zu", selectedLevel + 1, levelList.length);
-		FontDrawString(v2(50, 325), progress, 16, COLOR_WHITE, FONT("small_font"));
-		FontDrawString(v2(50, 409), "Up/Down to change, space to play", 16, COLOR_WHITE, FONT("small_font"));
+		FontDrawString(v2(50, 325), progress, 16, uiTheme.primaryText.textColor, FONT("small_font"));
+		FontDrawString(v2(50, 409),
+					   "Up/Down to change, space to play",
+					   16,
+					   uiTheme.primaryText.textColor,
+					   FONT("small_font"));
 	}
 }
 

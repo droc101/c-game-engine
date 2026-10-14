@@ -69,17 +69,12 @@ static void JohnInit(Actor *this, const KvList /*params*/, const Transform *tran
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 16.0f;
 	this->wall->unshaded = false;
+	this->wall->castsShadows = true;
 	CreateNpcJohnCollider(this, transform);
 }
 
 ActorDefinition npcJohnActorDefinition = {
 	.Update = JohnUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = JohnInit,
 };
 

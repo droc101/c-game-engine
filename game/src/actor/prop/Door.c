@@ -340,6 +340,7 @@ static void DoorInit(Actor *this, const KvList params, const Transform *transfor
 	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
 	this->wall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->wall->unshaded = KvGetBool(params, "unshaded", false);
+	this->wall->castsShadows = true;
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 
 	CreateDoorBodies(this, transform, KvGetBool(params, "prevent_player_open", false));
@@ -350,8 +351,6 @@ ActorDefinition doorActorDefinition = {
 	.OnPlayerContactAdded = DoorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = DoorOnPlayerContactPersisted,
 	.OnPlayerContactRemoved = DoorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = DoorDestroy,
 	.Init = DoorInit,
 };

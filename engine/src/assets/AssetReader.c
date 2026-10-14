@@ -23,6 +23,7 @@
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
+#include <engine/uiStack/UiTheme.h>
 #include <errno.h>
 #include <m-core.h>
 #include <stdbool.h>
@@ -45,7 +46,7 @@ static AssetCache assetCache;
 
 static FILE *OpenAssetFile(const char *relPath, const bool isCodeAsset)
 {
-	if (strlen(relPath) == 0)
+	if (relPath && *relPath == '\0')
 	{
 		LogError("Asset name must not be empty!\n");
 		return NULL;
@@ -358,10 +359,14 @@ void RemoveAssetFromCache(const char *relPath)
 void HotReloadAssets()
 {
 	assert(GetState()->map == NULL);
+
 	StopAllSounds();
 
 	DestroyAssetCache();
 	AssetCacheInit();
+
+	LoadUiTheme();
+	SetWindowIcon();
 
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 }

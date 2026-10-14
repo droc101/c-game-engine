@@ -191,6 +191,7 @@ static void LaserInit(Actor *this, const KvList params, const Transform *transfo
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 16.0f;
 	this->wall->unshaded = true;
+	this->wall->castsShadows = false;
 	this->visible = data->on;
 
 	Transform adjustedTransform = *transform;
@@ -233,12 +234,6 @@ void LaserRaycastFiltersDestroy()
 
 ActorDefinition laserActorDefinition = {
 	.Update = LaserUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = LaserInit,
 };
 

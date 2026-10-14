@@ -61,8 +61,8 @@ void _LockingListInit(LockingList *list, enum _ListType listType);
 void _ListCopy(const List *restrict oldList, List *restrict newList);
 void _LockingListCopy(const LockingList *restrict oldList, LockingList *restrict newList);
 
-void _ListAdd(List *list, void *data);
-void _LockingListAdd(LockingList *list, void *data);
+void **_ListAdd(List *list, void *data);
+void **_LockingListAdd(LockingList *list, void *data);
 
 void _ListSet(const List *list, size_t index, void *data);
 void _LockingListSet(const LockingList *list, size_t index, void *data);
@@ -70,8 +70,8 @@ void _LockingListSet(const LockingList *list, size_t index, void *data);
 void _ListRemoveAt(List *list, size_t index);
 void _LockingListRemoveAt(LockingList *list, size_t index);
 
-void _ListInsertAfter(List *list, size_t index, void *data);
-void _LockingListInsertAfter(LockingList *list, size_t index, void *data);
+void _ListInsert(List *list, size_t index, void *data);
+void _LockingListInsert(LockingList *list, size_t index, void *data);
 
 size_t _ListFind(const List *list, const void *data);
 size_t _LockingListFind(LockingList *list, const void *data);
@@ -121,7 +121,7 @@ void _LockingListAndContentsFree(LockingList *list);
  * @param data Data to append
  */
 #define ListAdd(list, data) \
-	_Generic((list), List: _ListAdd, LockingList: _LockingListAdd)(&(list), (void *)(uintptr_t)(data))
+	(void *)_Generic((list), List: _ListAdd, LockingList: _LockingListAdd)(&(list), (void *)(uintptr_t)(data))
 
 /**
  * Remove an item from the list by index
@@ -133,13 +133,13 @@ void _LockingListAndContentsFree(LockingList *list);
 	_Generic((list), List: _ListRemoveAt, LockingList: _LockingListRemoveAt)(&(list), (index))
 
 /**
- * Insert an item after a node
+ * Insert an item at an index
  * @param list List to insert into
- * @param index Index to insert after
+ * @param index Index to insert at
  * @param data Data to insert
  */
-#define ListInsertAfter(list, index, data) \
-	_Generic((list), List: _ListInsertAfter, LockingList: _LockingListInsertAfter)(&(list), \
+#define ListInsert(list, index, data) \
+	_Generic((list), List: _ListInsert, LockingList: _LockingListInsert)(&(list), \
 																				   (index), \
 																				   (void *)(uintptr_t)(data))
 
@@ -149,11 +149,8 @@ void _LockingListAndContentsFree(LockingList *list);
 * @param index The index to get
 */
 #define ListGetPointer(list, index) \
-	(_Generic((list), \
-			 List: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), \
-					(list).data->pointerData), \
-			 LockingList: ((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), \
-						   (list).data->pointerData))[index])
+	(_Generic((list), List: (list).data->pointerData, LockingList: (list).data->pointerData) \
+			 [((assert((size_t)(index) < (list).length), assert((list).data->type == LIST_POINTER)), index)])
 
 /**
 * Get an item of type @c uint64_t from the list by index

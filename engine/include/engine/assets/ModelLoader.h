@@ -23,6 +23,7 @@ typedef enum CollisionModelType CollisionModelType;
 
 typedef struct Material Material;
 typedef struct ModelVertex ModelVertex;
+typedef struct ModelComponent ModelComponent;
 typedef struct ModelLod ModelLod;
 typedef struct ModelDefinition ModelDefinition;
 typedef struct ModelConvexHull ModelConvexHull;
@@ -59,6 +60,8 @@ struct Material
 	Color color;
 	/// The shader to use for this material
 	ModelShader shader;
+	/// If this material should cast shadows or not
+	bool castsShadows;
 };
 
 struct ModelVertex
@@ -73,7 +76,19 @@ struct ModelVertex
 	Vector3 normal;
 	/// The lightmap UV for the vertex
 	Vector2 lightmapUv;
-} __attribute__((packed));
+};
+
+struct ModelComponent
+{
+	/// The number of indices in this component
+	uint32_t indexCount;
+	/// The indices for this component
+	uint32_t *indices;
+	/// The offset of the center of this component relative to the model's origin
+	Vector3 centerOffset;
+	/// The radius of the smallest sphere that fully encloses this component
+	float radius;
+};
 
 struct ModelLod
 {
@@ -93,10 +108,8 @@ struct ModelLod
 
 	/// The total number of indices across all material slots
 	uint32_t totalIndexCount;
-	/// The number of indices in each material slot, indexed with a slot number
-	uint32_t *indexCount;
-	/// Index data for each material slot, indexed with a slot number
-	uint32_t **indexData;
+	/// The components of this lod that are used for each material slot, indexed using a slot index
+	ModelComponent *components;
 };
 
 struct ModelDefinition

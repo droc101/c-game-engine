@@ -1056,11 +1056,11 @@
             },
             "connections": [],
             "params": {
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
                 },
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 }
@@ -1240,7 +1240,7 @@
             },
             "connections": [],
             "params": {
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
                 },
@@ -1252,7 +1252,7 @@
                     "type": "string",
                     "value": "camera"
                 },
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 },
@@ -1631,6 +1631,10 @@
                 "constant_attenuation": {
                     "type": "float",
                     "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
                 },
                 "fading_angle": {
                     "type": "float",

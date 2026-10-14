@@ -10,27 +10,31 @@
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 
-bool CreateInstance();
+void CreateInstance();
 
-bool CreateSurface(SDL_Window *window);
+void CreateSurface(SDL_Window *window);
 
 bool CreateLogicalDevice();
 
-bool CreateCommandBuffers();
+void CreateCommandBuffers();
 
-bool CreateSwapchain();
+void CreateSwapchain();
 
-bool CreateRenderPass();
+void CreateRenderPass();
 
-bool CreateDescriptorSetLayouts();
+void CreateDescriptorSetLayouts();
 
-bool CreateGraphicsPipelines();
+void CreateComputePipelines();
 
-bool CreateTextureSamplers();
+void CreateGraphicsPipelines();
 
-bool CreateBuffers();
+void UpdateLightCount();
 
-bool CreateDescriptorSet();
+void CreateTextureSamplers();
+
+void CreateBuffers();
+
+void CreateDescriptorSet();
 
 void WriteDescriptorSet();
 

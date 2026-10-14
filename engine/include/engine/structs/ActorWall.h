@@ -42,6 +42,8 @@ struct ActorWall
 	float height;
 	/// Whether the wall should be rendered without shading
 	bool unshaded;
+	/// Whether the wall should cast shadows or not
+	bool castsShadows;
 };
 
 /**

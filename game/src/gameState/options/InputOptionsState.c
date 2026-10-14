@@ -7,7 +7,6 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
@@ -18,6 +17,7 @@
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/controls/Slider.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -27,8 +27,6 @@
 #include "helpers/OptionsMenu.h"
 
 static OptionsMenu *inputOptionsMenu;
-
-static char controllerNameBuffer[256];
 
 static OptionsButtonValue invertCameraButtonValues[2] = {
 	{
@@ -51,10 +49,20 @@ static OptionsButtonValue invertCameraButtonValues[2] = {
 	},
 };
 
-static void BtnInputOptionsBack(Control */*control*/, void */*extraData*/)
+static OptionsButtonOptions invertCameraButtonOptions = {
+	.numValues = 2,
+	.values = invertCameraButtonValues,
+};
+
+static void BtnInputOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	SetGameState(&OptionsState);
+}
+
+static void OptBtnControllerChanged(const OptionsButtonValue *value, void * /*extraData*/)
+{
+	SetCurrentController(value->value.dwordValue);
 }
 
 static void InputOptionsStateUpdate(GlobalState *state, const double delta)
@@ -70,7 +78,7 @@ static void InputOptionsStateUpdate(GlobalState *state, const double delta)
 	}
 }
 
-static void BtnControlsOptions(Control */*control*/, void */*extraData*/)
+static void BtnControlsOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&ControlsOptionsState);
 }
@@ -86,13 +94,6 @@ static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 	}
 
 	ProcessOptionsMenu(inputOptionsMenu);
-
-	const char *controllerName = GetControllerName();
-	if (!controllerName)
-	{
-		controllerName = "No Controller Connected";
-	}
-	snprintf(controllerNameBuffer, 128, "Controller: %s", controllerName);
 }
 
 static void InputOptionsStateSet()
@@ -146,14 +147,12 @@ static void InputOptionsStateSet()
 															  "Horizontal Mouse Motion: %s",
 															  NULL,
 															  TOP_CENTER,
-															  invertCameraButtonValues,
-															  2,
+															  &invertCameraButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &GetState()
-																						->options
-																						.invertHorizontalMouse,
+																						->options.invertHorizontalMouse,
 															  },
 															  NULL));
 		OptionsMenuAddSmallControl(inputOptionsMenu,
@@ -162,13 +161,11 @@ static void InputOptionsStateSet()
 															  "Vertical Mouse Motion: %s",
 															  NULL,
 															  TOP_CENTER,
-															  invertCameraButtonValues,
-															  2,
+															  &invertCameraButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
-																  .boolValue = &GetState()
-																						->options.invertVerticalMouse,
+																  .boolValue = &GetState()->options.invertVerticalMouse,
 															  },
 															  NULL));
 		OptionsMenuAddSection(inputOptionsMenu, "Controller Options");
@@ -194,8 +191,7 @@ static void InputOptionsStateSet()
 															  "Horizontal Camera: %s",
 															  NULL,
 															  TOP_CENTER,
-															  invertCameraButtonValues,
-															  2,
+															  &invertCameraButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -210,13 +206,13 @@ static void InputOptionsStateSet()
 															  "Vertical Camera: %s",
 															  NULL,
 															  TOP_CENTER,
-															  invertCameraButtonValues,
-															  2,
+															  &invertCameraButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
 																  .boolValue = &GetState()
-																						->options.invertVerticalController,
+																						->options
+																						.invertVerticalController,
 															  },
 															  NULL));
 		OptionsMenuAddSmallControl(inputOptionsMenu,
@@ -257,8 +253,7 @@ static void InputOptionsStateSet()
 															  "Swap controller OK/Cancel buttons: %s",
 															  NULL,
 															  TOP_CENTER,
-															  yesNoButtonValues,
-															  2,
+															  &yesNoButtonOptions,
 															  NULL,
 															  (ControlValue){
 																  .type = CONTROL_VALUE_BOOL,
@@ -268,16 +263,18 @@ static void InputOptionsStateSet()
 															  },
 															  NULL));
 		OptionsMenuAddLargeControl(inputOptionsMenu,
-								   CreateLabelControl(controllerNameBuffer,
-													  16,
-													  COLOR_WHITE,
-													  v2(0, 0),
-													  v2(750, 40),
-													  TOP_CENTER,
-													  FONT_HALIGN_CENTER,
-													  FONT_VALIGN_MIDDLE,
-													  FONT("small_font"),
-													  true));
+								   CreateOptionsButtonControl(v2(0, 0),
+															  v2(750, 40),
+															  "Controller: %s",
+															  OptBtnControllerChanged,
+															  TOP_CENTER,
+															  &controllerOptions,
+															  NULL,
+															  (ControlValue){
+																  .type = CONTROL_VALUE_DWORD,
+																  .dwordValue = &currentGamepadId,
+															  },
+															  NULL));
 
 		OptionsMenuAddSimpleHeaderFooter(inputOptionsMenu, "Input Options", BtnInputOptionsBack);
 	}

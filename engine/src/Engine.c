@@ -2,7 +2,6 @@
 // Created by droc101 on 10/7/2025.
 //
 
-#include <../include/engine/physics/PhysicsThread.h>
 #include <engine/assets/AddonLoader.h>
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/GameConfigLoader.h>
@@ -13,12 +12,12 @@
 #include <engine/debug/FrameBenchmark.h>
 #include <engine/debug/FrameGrapher.h>
 #include <engine/Engine.h>
-#include <engine/graphics/Drawing.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Achievements.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ControlOptions.h>
@@ -34,6 +33,7 @@
 #include <engine/subsystem/SteamworksManager.h>
 #include <engine/subsystem/TextInputSystem.h>
 #include <engine/subsystem/Timing.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
@@ -41,7 +41,6 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_mouse.h>
-#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
@@ -49,7 +48,6 @@
 #include <stdint.h>
 #include <string.h>
 
-static SDL_Surface *windowIcon;
 static SDL_Event event;
 static bool shouldQuit = false;
 static double lastFrameTime = TARGET_FPS_NS_D;
@@ -125,7 +123,10 @@ void WindowAndRenderInit()
 	SDL_Window *window = SDL_CreateWindow(gameConfig.gameTitle,
 										  width,
 										  height,
-										  SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN | SDL_WINDOW_VULKAN);
+										  SDL_WINDOW_RESIZABLE |
+												  SDL_WINDOW_HIGH_PIXEL_DENSITY |
+												  SDL_WINDOW_HIDDEN |
+												  SDL_WINDOW_VULKAN);
 	if (window == NULL)
 	{
 		LogError("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -151,10 +152,6 @@ void WindowAndRenderInit()
 
 	SDL_SetWindowMinimumSize(window, MIN_WIDTH, MIN_HEIGHT);
 	SDL_SetWindowMaximumSize(window, MAX_WIDTH, MAX_HEIGHT);
-
-	LogDebug("Setting window icon...\n");
-	windowIcon = ToSDLSurface(TEXTURE("interface/icon"));
-	SDL_SetWindowIcon(window, windowIcon);
 
 	SetWindowFocused(true);
 }
@@ -268,11 +265,6 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	InitState();
 	PhysicsThreadInit();
 
-	if (!RenderPreInit())
-	{
-		RenderInitError();
-	}
-
 	InitSoundSystem();
 
 	WindowAndRenderInit();
@@ -285,6 +277,9 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	}
 
 	InitDPrintConsole();
+
+	LoadUiTheme();
+	SetWindowIcon();
 
 	LoadingStateDoneCallback = initInfo.LoadingStateDoneCallback;
 	LoadingStateErrorCallback = initInfo.LoadingStateErrorCallback;
@@ -311,24 +306,6 @@ void EngineIteration()
 
 	const double delta = lastFrameTime / TARGET_FPS_NS_D;
 
-	if (!FrameStart())
-	{
-		if (state->gameState->UpdateGame)
-		{
-			state->gameState->UpdateGame(state, delta);
-		}
-		UpdateSoundSystem();
-		if (state->requestExit)
-		{
-			shouldQuit = true;
-		}
-		if (IsLowFPSModeEnabled())
-		{
-			SDL_Delay(LOW_FPS_MODE_SLEEP_MS);
-		}
-		return;
-	}
-
 	ResetDPrintYPos();
 
 	if (state->gameState->UpdateGame)
@@ -348,6 +325,11 @@ void EngineIteration()
 		GetState()->options.fullscreen = !GetState()->options.fullscreen;
 		SDL_SetWindowFullscreen(GetGameWindow(), GetState()->options.fullscreen);
 	}
+	if (IsInputActionJustPressed(mainThreadInput, &reloadShaders))
+	{
+		LogInfo("Reloading shaders...\n");
+		rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_SHADERS;
+	}
 
 	if (state->gameState->enableRelativeMouseMode)
 	{
@@ -356,12 +338,18 @@ void EngineIteration()
 		SDL_WarpMouseInWindow(GetGameWindow(), realWndSize.x / 2, realWndSize.y / 2);
 	}
 
-	state->gameState->RenderGame(state, delta);
-	RenderDebugEntries();
+	if (FrameStart())
+	{
+		if (state->gameState->RenderGame)
+		{
+			state->gameState->RenderGame(state, delta);
+		}
+		RenderDebugEntries();
+
+		FrameEnd();
+	}
 
 	ProcessDPrintConsole();
-
-	FrameEnd();
 
 	UpdateSoundSystem();
 
@@ -420,8 +408,6 @@ void DestroyEngine()
 	RenderDestroy();
 	LogDebug("Cleaning up window...\n");
 	SDL_DestroyWindow(GetGameWindow());
-	LogDebug("Cleaning up icon...\n");
-	SDL_DestroySurface(windowIcon);
 	DestroyAssetCache(); // Free all assets
 	DestroyAddonLoader();
 	DestroyGameConfig();

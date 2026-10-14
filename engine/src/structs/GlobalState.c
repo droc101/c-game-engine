@@ -4,6 +4,7 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/MapLoader.h>
+#include <engine/gameState/LoadingState.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
@@ -178,13 +179,14 @@ void ProcessStateChangeQueue()
 void ChangeMap(Map *map)
 {
 	PhysicsThreadLockTickMutex();
+	srand(425);
 	state.camera = NULL;
 	if (state.map)
 	{
 		DestroyMap(state.map);
 	}
 	state.map = map;
-	state.camera = &state.map->player.playerCamera;
+	state.camera = map ? &state.map->player.playerCamera : NULL;
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -231,14 +233,14 @@ bool ChangeMapByName(const char *name)
 		LogError("Failed to load map due to map name %s being too long\n", name);
 		return false;
 	}
-	GetState()->saveData->blueCoins = 0;
+	state.saveData->blueCoins = 0;
 	Map *map = CreateMap();
 	ChangeMap(map);
 	if (!LoadMap(map, LoadAsset(mapPath, false, false)))
 	{
-		PhysicsThreadLockTickMutex();
 		// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
 		state.map = NULL;
+		PhysicsThreadLockTickMutex();
 		ChangeMap(NULL);
 		PhysicsThreadUnlockTickMutex();
 		return false;
@@ -246,4 +248,14 @@ bool ChangeMapByName(const char *name)
 	map->mapName = strdup(name);
 	DiscordUpdateRPC();
 	return true;
+}
+
+void ReloadMap()
+{
+	if (state.map)
+	{
+		free(loadStateLevelname); // For some reason we *sometimes* leave a value in here so this is a saftey free
+		loadStateLevelname = strdup(state.map->mapName);
+		SetGameState(&LoadingState);
+	}
 }

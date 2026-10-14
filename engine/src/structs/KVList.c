@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/DataWriter.h>
 #include <engine/structs/Color.h>
@@ -16,55 +17,77 @@
 
 #pragma region Param Functions
 
-size_t ReadParam(DataReader *reader, Param *out)
+bool ReadParam(DataReader *reader, Param *out, size_t *bytesRemaining)
 {
-	const size_t initialOffset = DataReaderGetOffset(reader);
+	EXPECT_BYTES_BOOL(sizeof(uint8_t), *bytesRemaining);
 	out->type = ReadUint8(reader);
 	switch (out->type)
 	{
 		case PARAM_TYPE_BYTE:
+			EXPECT_BYTES_BOOL(sizeof(uint8_t), *bytesRemaining);
 			out->byteValue = ReadUint8(reader);
 			break;
 		case PARAM_TYPE_INTEGER:
+			EXPECT_BYTES_BOOL(sizeof(int32_t), *bytesRemaining);
 			out->intValue = ReadInt32(reader);
 			break;
 		case PARAM_TYPE_FLOAT:
+			EXPECT_BYTES_BOOL(sizeof(float), *bytesRemaining);
 			out->floatValue = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_BOOL:
+			EXPECT_BYTES_BOOL(sizeof(uint8_t), *bytesRemaining);
 			out->boolValue = ReadUint8(reader) != 0;
 			break;
 		case PARAM_TYPE_COLOR:
+			EXPECT_BYTES_BOOL(sizeof(float) * 4, *bytesRemaining);
 			out->colorValue.r = ReadFloat(reader);
 			out->colorValue.g = ReadFloat(reader);
 			out->colorValue.b = ReadFloat(reader);
 			out->colorValue.a = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_STRING:
-			out->stringValue = ReadStringSafe(reader, NULL);
+			size_t stringLength = 0;
+			out->stringValue = ReadStringSafe(reader, &stringLength);
+			if (!out->stringValue)
+			{
+				return false;
+			}
+			*bytesRemaining -= stringLength;
+			*bytesRemaining -= sizeof(size_t);
 			break;
 		case PARAM_TYPE_ARRAY:
+			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 			out->arrayValue.length = ReadSizeT(reader);
 			out->arrayValue.data = malloc(sizeof(Param) * out->arrayValue.length);
 			CheckAlloc(out->arrayValue.data);
 			for (size_t i = 0; i < out->arrayValue.length; i++)
 			{
 				Param *arrayIndex = &out->arrayValue.data[i];
-				(void)ReadParam(reader, arrayIndex);
+				if (!ReadParam(reader, arrayIndex, bytesRemaining))
+				{
+					return false;
+				}
 			}
 			break;
 		case PARAM_TYPE_KV_LIST:
 			out->kvListValue = malloc(sizeof(KvList));
-			(void)ReadKvList(reader, out->kvListValue);
+			if (!ReadKvList(reader, out->kvListValue, bytesRemaining))
+			{
+				return false;
+			}
 			break;
 		case PARAM_TYPE_UINT_64:
+			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 			out->uint64value = ReadSizeT(reader);
 			break;
 		case PARAM_TYPE_VEC2:
+			EXPECT_BYTES_BOOL(sizeof(float) * 2, *bytesRemaining);
 			out->vec2value.x = ReadFloat(reader);
 			out->vec2value.y = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_VEC3:
+			EXPECT_BYTES_BOOL(sizeof(float) * 3, *bytesRemaining);
 			out->vec3value.x = ReadFloat(reader);
 			out->vec3value.y = ReadFloat(reader);
 			out->vec3value.z = ReadFloat(reader);
@@ -72,7 +95,7 @@ size_t ReadParam(DataReader *reader, Param *out)
 		default:
 			break;
 	}
-	return DataReaderGetOffset(reader) - initialOffset;
+	return true;
 }
 
 void CopyParam(const Param *source, Param *dest)
@@ -237,22 +260,31 @@ void KvListCreate(KvList list)
 	KvList_init(list);
 }
 
-size_t ReadKvList(DataReader *reader, KvList out)
+bool ReadKvList(DataReader *reader, KvList out, size_t *bytesRemaining)
 {
-	const size_t initialOffset = DataReaderGetOffset(reader);
 	KvListCreate(out);
+	EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 	const size_t numParams = ReadSizeT(reader);
 	for (size_t _ = 0; _ < numParams; _++)
 	{
 		size_t keyLength = 0;
 		char *key = ReadStringSafe(reader, &keyLength);
+		if (!key)
+		{
+			return false;
+		}
+		*bytesRemaining -= keyLength;
+		*bytesRemaining -= sizeof(size_t);
 		Param param;
-		(void)ReadParam(reader, &param);
+		if (!ReadParam(reader, &param, bytesRemaining))
+		{
+			return false;
+		}
 		KvSetUnsafe(out, key, param);
 		free(key);
 		FreeParam(&param);
 	}
-	return DataReaderGetOffset(reader) - initialOffset;
+	return true;
 }
 
 void WriteKvList(const KvList list, DataWriter *writer)
@@ -304,7 +336,7 @@ uint8_t KvGetByte(const KvList list, const char *key, const uint8_t defaultValue
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_BYTE,
-										  (Param[]){{PARAM_TYPE_BYTE, .byteValue = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_BYTE, .byteValue = defaultValue}});
 	assert(p);
 	return p->byteValue;
 }
@@ -314,7 +346,7 @@ int KvGetInt(const KvList list, const char *key, const int defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_INTEGER,
-										  (Param[]){{PARAM_TYPE_INTEGER, .intValue = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_INTEGER, .intValue = defaultValue}});
 	assert(p);
 	return p->intValue;
 }
@@ -324,7 +356,7 @@ float KvGetFloat(const KvList list, const char *key, const float defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_FLOAT,
-										  (Param[]){{PARAM_TYPE_FLOAT, .floatValue = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_FLOAT, .floatValue = defaultValue}});
 	assert(p);
 	return p->floatValue;
 }
@@ -334,7 +366,7 @@ bool KvGetBool(const KvList list, const char *key, const bool defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_BOOL,
-										  (Param[]){{PARAM_TYPE_BOOL, .boolValue = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_BOOL, .boolValue = defaultValue}});
 	assert(p);
 	return p->boolValue;
 }
@@ -344,7 +376,7 @@ const char *KvGetString(const KvList list, const char *key, const char *defaultV
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_STRING,
-										  (Param[]){{PARAM_TYPE_STRING, .stringValue = ""}});
+										  (Param[]){{.type = PARAM_TYPE_STRING, .stringValue = ""}});
 	assert(p);
 	return p->stringValue[0] ? p->stringValue : defaultValue;
 }
@@ -354,7 +386,7 @@ Color KvGetColor(const KvList list, const char *key, const Color defaultValue)
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_COLOR,
-										  (Param[]){{PARAM_TYPE_COLOR, .colorValue = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_COLOR, .colorValue = defaultValue}});
 	assert(p);
 	return p->colorValue;
 }
@@ -364,7 +396,7 @@ uint64_t KvGetUint64(const KvList list, const char *key, const uint64_t defaultV
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_UINT_64,
-										  (Param[]){{PARAM_TYPE_UINT_64, .uint64value = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_UINT_64, .uint64value = defaultValue}});
 	assert(p);
 	return p->uint64value;
 }
@@ -395,7 +427,7 @@ Vector2 KvGetVec2(const KvList list, const char *key, const Vector2 defaultValue
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_VEC2,
-										  (Param[]){{PARAM_TYPE_VEC2, .vec2value = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_VEC2, .vec2value = defaultValue}});
 	assert(p);
 	return p->vec2value;
 }
@@ -405,7 +437,7 @@ Vector3 KvGetVec3(const KvList list, const char *key, const Vector3 defaultValue
 	const Param *p = KvGetTypeWithDefault(list,
 										  key,
 										  PARAM_TYPE_VEC3,
-										  (Param[]){{PARAM_TYPE_VEC3, .vec3value = defaultValue}});
+										  (Param[]){{.type = PARAM_TYPE_VEC3, .vec3value = defaultValue}});
 	assert(p);
 	return p->vec3value;
 }
@@ -416,22 +448,22 @@ Vector3 KvGetVec3(const KvList list, const char *key, const Vector3 defaultValue
 
 inline void KvSetByte(KvList list, const char *key, const uint8_t value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_BYTE, .byteValue = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_BYTE, .byteValue = value});
 }
 
 inline void KvSetInt(KvList list, const char *key, const int value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_INTEGER, .intValue = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_INTEGER, .intValue = value});
 }
 
 inline void KvSetFloat(KvList list, const char *key, const float value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_FLOAT, .floatValue = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_FLOAT, .floatValue = value});
 }
 
 inline void KvSetBool(KvList list, const char *key, const bool value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_BOOL, .boolValue = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_BOOL, .boolValue = value});
 }
 
 void KvSetString(KvList list, const char *key, const char *value)
@@ -441,22 +473,22 @@ void KvSetString(KvList list, const char *key, const char *value)
 	{
 		value = "";
 	}
-	KvSet(list, key, (Param){PARAM_TYPE_STRING, .stringValue = strdup(value)});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_STRING, .stringValue = strdup(value)});
 }
 
 inline void KvSetColor(KvList list, const char *key, const Color value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_COLOR, .colorValue = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_COLOR, .colorValue = value});
 }
 
 inline void KvSetUint64(KvList list, const char *key, const uint64_t value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_UINT_64, .uint64value = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_UINT_64, .uint64value = value});
 }
 
 void KvSetParamArray(KvList list, const char *key, const ParamArray array)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_ARRAY, .arrayValue = array});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_ARRAY, .arrayValue = array});
 	for (size_t i = 0; i < array.length; i++)
 	{
 		FreeParam(&array.data[i]);
@@ -466,17 +498,17 @@ void KvSetParamArray(KvList list, const char *key, const ParamArray array)
 
 void KvSetList(KvList list, const char *key, KvList value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_KV_LIST, .kvListValue = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_KV_LIST, .kvListValue = value});
 }
 
 inline void KvSetVec2(KvList list, const char *key, const Vector2 value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_VEC2, .vec2value = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_VEC2, .vec2value = value});
 }
 
 inline void KvSetVec3(KvList list, const char *key, const Vector3 value)
 {
-	KvSet(list, key, (Param){PARAM_TYPE_VEC3, .vec3value = value});
+	KvSet(list, key, (Param){.type = PARAM_TYPE_VEC3, .vec3value = value});
 }
 
 void KvSetUnsafe(KvList list, const char *key, const Param value)

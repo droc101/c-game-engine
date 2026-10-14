@@ -5,13 +5,13 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/CheckBox.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -75,7 +75,7 @@ void DrawCheckbox(const Control *c, ControlState /*state*/, const Vector2 positi
 	const CheckBoxData *data = (CheckBoxData *)c->controlData;
 	DrawTextAligned(data->label,
 					16,
-					COLOR_BLACK,
+					uiTheme.primaryText.shadowColor,
 					v2(c->anchoredPosition.x + 42, c->anchoredPosition.y + 2),
 					v2(c->size.x - 40, c->size.y),
 					FONT_HALIGN_LEFT,
@@ -83,7 +83,7 @@ void DrawCheckbox(const Control *c, ControlState /*state*/, const Vector2 positi
 					FONT("small_font"));
 	DrawTextAligned(data->label,
 					16,
-					COLOR_WHITE,
+					uiTheme.primaryText.shadowColor,
 					v2(c->anchoredPosition.x + 40, c->anchoredPosition.y),
 					v2(c->size.x - 40, c->size.y),
 					FONT_HALIGN_LEFT,

@@ -9,11 +9,21 @@
   ],
   "inputs": {
     "operand_a": {
-      "type": "int",
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ],
       "description": "Set operand A for the next execution"
     },
     "operand_b": {
-      "type": "int",
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ],
       "description": "Set operand B for the next execution"
     },
     "execute": {
@@ -39,6 +49,16 @@
       "type": "byte",
       "options": "decimal_operation",
       "description": "The operation this logic_decimal performs"
+    },
+    "operand_a": {
+      "display": "Initial Operand A",
+      "type": "float",
+      "description": "Initial value for operand A"
+    },
+    "operand_b": {
+      "display": "Initial Operand B",
+      "type": "float",
+      "description": "Initial value for operand B"
     }
   }
 }

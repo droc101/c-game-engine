@@ -16,17 +16,17 @@ disable_options(SDL_GPU_DEFAULT SDL_RENDER_DEFAULT SDL_CAMERA_DEFAULT SDL_HIDAPI
         SDL_SENSOR_DEFAULT SDL_DIALOG_DEFAULT SDL_TRAY_DEFAULT SDL_DISKAUDIO SDL_DUMMYAUDIO SDL_DUMMYVIDEO SDL_OPENGLES
         SDL_DIRECTX SDL_VIVANTE SDL_OFFSCREEN SDL_DUMMYCAMERA SDL_HIDAPI SDL_VIRTUAL_JOYSTICK SDL_KMSDRM SDL_OPENGL)
 fetch_package_tag(https://github.com/libsdl-org/SDL.git release-3.*.* SDL3)
-target_compile_options(SDL3-shared PRIVATE "-w")
 
 message(STATUS "Fetching SDL3_mixer...")
 disable_options(SDLMIXER_AIFF SDLMIXER_VOC SDLMIXER_AU SDLMIXER_FLAC SDLMIXER_GME SDLMIXER_MOD SDLMIXER_MP3
         SDLMIXER_MIDI SDLMIXER_OPUS SDLMIXER_VORBIS_STB SDLMIXER_VORBIS_VORBISFILE SDLMIXER_WAVPACK)
 fetch_package_tag(https://github.com/libsdl-org/SDL_mixer.git release-3.*.* SDL3_mixer)
-target_compile_options(SDL3_mixer-shared PRIVATE "-w")
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out)
 
-find_package(ZLIB REQUIRED)
+message(STATUS "Fetching zlib...")
+disable_options(ZLIB_BUILD_TESTING ZLIB_BUILD_SHARED ZLIB_INSTALL)
+fetch_package_tag(https://github.com/madler/zlib v1.* zlib)
 
 fetch_dict()
 
@@ -34,7 +34,7 @@ message(STATUS "Fetching Luna...")
 FetchContent_Declare(
         Luna
         GIT_REPOSITORY https://github.com/NBT22/Luna
-        GIT_TAG c1d27e14eb09c54693d9eb874a3bb1e2462f4d17
+        GIT_TAG 2185e84fec2d0b0e2cc290b538053ed1295b4b28
         GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(Luna)
@@ -51,6 +51,7 @@ fetch_package_tag(https://github.com/recp/cglm.git v0.*.* cglm)
 if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(JPH_BUILD_TYPE RelWithDebInfo)
 endif ()
+set(CROSS_PLATFORM_DETERMINISTIC ON)
 message(STATUS "Fetching JoltC/Jolt...")
 fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14ecd27 joltc)
 
@@ -96,6 +97,26 @@ target_sources(engine INTERFACE
         include/engine/actor/Entrance.h
         src/actor/prop/WorldText.c
         include/engine/actor/prop/WorldText.h
+        src/actor/light/PointLight.c
+        include/engine/actor/light/PointLight.h
+        src/actor/light/SpotLight.c
+        include/engine/actor/light/SpotLight.h
+        src/actor/logic/LogicFunction.c
+        include/engine/actor/logic/LogicFunction.h
+        src/actor/logic/LogicTimer.c
+        include/engine/actor/logic/LogicTimer.h
+        src/actor/logic/LogicBranch.c
+        include/engine/actor/logic/LogicBranch.h
+        src/actor/logic/LogicRandom.c
+        include/engine/actor/logic/LogicRandom.h
+        src/actor/logic/LogicCast.c
+        include/engine/actor/logic/LogicCast.h
+        src/actor/logic/LogicAchievement.c
+        include/engine/actor/logic/LogicAchievement.h
+        src/actor/logic/LogicStatistic.c
+        include/engine/actor/logic/LogicStatistic.h
+        src/actor/logic/LogicPrint.c
+        include/engine/actor/logic/LogicPrint.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -157,17 +178,20 @@ target_sources(engine INTERFACE
         src/graphics/vulkan/VulkanPipelines.c
         src/graphics/vulkan/VulkanResources.c
         include/engine/graphics/vulkan/VulkanResources.h
+        src/graphics/vulkan/VulkanDebug.c
+        include/engine/graphics/vulkan/VulkanDebug.h
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h
+        src/helpers/BackgroundMapManager.c
+        include/engine/helpers/BackgroundMapManager.h
+        include/engine/helpers/Macros.h
         src/helpers/MathEx.c
         include/engine/helpers/MathEx.h
         src/helpers/PlatformHelpers.c
         include/engine/helpers/PlatformHelpers.h
         src/helpers/Realloc.c
         include/engine/helpers/Realloc.h
-        src/helpers/BackgroundMapManager.c
-        include/engine/helpers/BackgroundMapManager.h
 
         src/physics/MapPhysics.c
         include/engine/physics/MapPhysics.h
@@ -263,12 +287,15 @@ target_sources(engine INTERFACE
         include/engine/uiStack/UiStack.h
         src/uiStack/ScrollView.c
         include/engine/uiStack/ScrollView.h
+        src/uiStack/UiTheme.c
+        include/engine/uiStack/UiTheme.h
 
         src/Engine.c
         include/engine/Engine.h
 )
 set_target_properties(engine PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "-Wl,-rpath='$ORIGIN'" PREFIX "")
 target_include_directories(engine INTERFACE include)
+target_compile_options(engine INTERFACE ${COMPILER_WARNING_FLAGS})
 if (x86_64 AND USE_DISCORD_SDK)
     target_compile_definitions(engine INTERFACE ENABLE_DISCORD_SDK)
     target_include_directories(engine INTERFACE ${DISCORD_GAME_SDK_DIR}/c/)
@@ -296,7 +323,7 @@ endif ()
 target_link_libraries(engine INTERFACE
         SDL3::SDL3
         SDL3_mixer::SDL3_mixer-shared
-        ZLIB::ZLIB
+        zlibstatic
         joltc
         cglm
         dict

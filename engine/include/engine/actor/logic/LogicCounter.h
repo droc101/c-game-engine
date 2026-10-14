@@ -15,12 +15,14 @@ extern ActorDefinition logicCounterActorDefinition;
 #define LOGIC_COUNTER_INPUT_DECREMENT "decrement"
 #define LOGIC_COUNTER_INPUT_ADD "add"
 #define LOGIC_COUNTER_INPUT_SUBTRACT "subtract"
+#define LOGIC_COUNTER_INPUT_GET_VALUE "get_value"
 
 #define LOGIC_COUNTER_OUTPUT_HIT_MAX "hit_max"
 #define LOGIC_COUNTER_OUTPUT_HIT_MIN "hit_min"
 #define LOGIC_COUNTER_OUTPUT_LEFT_MAX "left_max"
 #define LOGIC_COUNTER_OUTPUT_LEFT_MIN "left_min"
 #define LOGIC_COUNTER_OUTPUT_COUNTER_CHANGED "counter_changed"
+#define LOGIC_COUNTER_OUTPUT_VALUE "value"
 
 void RegisterLogicCounter();
 

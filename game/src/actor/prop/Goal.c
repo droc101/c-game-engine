@@ -98,6 +98,7 @@ static void GoalInit(Actor *this, const KvList params, const Transform *transfor
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = 16.0f;
 	this->wall->unshaded = false;
+	this->wall->castsShadows = true;
 
 	const Transform adjustedTransform = {
 		.position = transform->position,
@@ -109,11 +110,6 @@ static void GoalInit(Actor *this, const KvList params, const Transform *transfor
 ActorDefinition goalActorDefinition = {
 	.Update = GoalUpdate,
 	.OnPlayerContactAdded = GoalOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = GoalInit,
 };
 

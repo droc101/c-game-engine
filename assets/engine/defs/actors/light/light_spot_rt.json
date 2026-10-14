@@ -1,0 +1,56 @@
+{
+  "description": "Realtime Spotlight",
+  "extends": "light_point_rt",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color"
+    },
+    {
+      "type": "orientation",
+      "color": "$color"
+    },
+    {
+      "type": "cone",
+      "color": [
+        "$color:r*0.5",
+        "$color:g*0.5",
+        "$color:b*0.5"
+      ],
+      "angle": "$fading_angle",
+      "length": 80,
+      "is_gizmo": true,
+      "num_sides": 32
+    },
+    {
+      "type": "cone",
+      "color": "$color",
+      "angle": "$bright_angle",
+      "length": 80,
+      "is_gizmo": true,
+      "num_sides": 32
+    }
+  ],
+  "params": {
+    "bright_angle": {
+      "display": "Bright Angle",
+      "type": "float",
+      "default": 45.0,
+      "minimum": 0.0,
+      "maximum": 90.0
+    },
+    "fading_angle": {
+      "display": "Fading angle",
+      "type": "float",
+      "default": 60.0,
+      "minimum": 0.0,
+      "maximum": 90.0
+    },
+    "cookie": {
+      "display": "Light Cookie Texture",
+      "type": "string",
+      "default": "",
+      "string_hint": "texture"
+    }
+  }
+}

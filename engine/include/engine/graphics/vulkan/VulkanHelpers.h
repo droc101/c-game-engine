@@ -9,66 +9,85 @@
 #include <engine/assets/ModelLoader.h>
 #include <engine/assets/ShaderLoader.h>
 #include <engine/assets/TextureLoader.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
-#include <engine/subsystem/Logging.h>
+#include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h> // NOLINT(*-include-cleaner): Used in a macro
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <luna/lunaTypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
 #pragma region macros
 #define FRAMES_IN_FLIGHT 1
 
-#define SizeofMember(Type, member) (sizeof(((Type *)0)->member))
+#define VulkanRecoveryOption(_returnValue, _recoveryMethod) \
+	if (_result == (_returnValue)) \
+	{ \
+		_recoveryMethod; \
+	} else
+#define VulkanTestRecoverable(_function, _recover, ...) \
+	{ \
+		const VkResult _result = _function; \
+		if (_result != VK_SUCCESS) \
+		{ \
+			_recover \
+			{ \
+				LogInternal("VULKAN", 31, true, __VA_ARGS__); \
+				LogInternal(NULL, 31, true, "Error code: %d\n", _result); \
+				char _buffer[1024]; \
+				_buffer[1023] = '\0'; \
+				snprintf(_buffer, 1024, __VA_ARGS__); \
+				Error(_buffer); \
+			} \
+		} \
+	}
+#define VulkanTest(_function, ...) VulkanTestRecoverable(_function, {}, __VA_ARGS__)
+#define VulkanTestBoolRecoverable(_function, _recover, ...) \
+	{ \
+		if (!(_function)) \
+		{ \
+			_recover \
+			{ \
+				LogInternal("VULKAN", 31, true, __VA_ARGS__); \
+				char _buffer[1024]; \
+				_buffer[1023] = '\0'; \
+				snprintf(_buffer, 1024, __VA_ARGS__); \
+				Error(_buffer); \
+			} \
+		} \
+	}
+#define VulkanTestBool(_function, ...) VulkanTestBoolRecoverable(_function, {}, __VA_ARGS__)
 
-#define VulkanLogError(...) LogInternal("VULKAN", 31, true, __VA_ARGS__)
-// TODO Use LogInternal
-#define VulkanTestInternal(function, returnValue, ...) \
-	{ \
-		const VkResult result = function; \
-		if (result != VK_SUCCESS) \
-		{ \
-			LogInternal("VULKAN", 31, false, __VA_ARGS__); \
-			LogInternal(NULL, 31, true, "Error code: %d\n", result); \
-			if (result == VK_ERROR_DEVICE_LOST) \
-			{ \
-				LogInfo("See https://starflight.dev/media/VK_ERROR_DEVICE_LOST.webp for more information\n"); \
-			} \
-			return returnValue; \
-		} \
-	}
-#define VulkanTestReturnResult(function, ...) VulkanTestInternal(function, result, __VA_ARGS__)
-#define VulkanTest(function, ...) VulkanTestInternal(function, false, __VA_ARGS__)
-#define VulkanTestResizeSwapchain(function, ...) \
-	{ \
-		const VkResult resizeCheckResult = function; \
-		if (resizeCheckResult != VK_SUCCESS) \
-		{ \
-			if (resizeCheckResult == VK_ERROR_OUT_OF_DATE_KHR || resizeCheckResult == VK_SUBOPTIMAL_KHR) \
-			{ \
-				const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
-				swapChainExtent.width = windowSize.x; \
-				swapChainExtent.height = windowSize.y; \
-				const LunaSwapchainResizeInfo swapchainResizeInfo = { \
-					.newSize = swapChainExtent, \
-					.renderPassCount = 1, \
-					.renderPasses = &renderPass, \
-					.queueFamilyIndexCount = 1, \
-					.queueFamilyIndices = &queueFamilyIndex, \
-				}; \
-				VulkanTest(lunaResizeSwapchain(device, &swapchainResizeInfo), "Failed to resize swapchain!"); \
-				return false; \
-			} \
-			VulkanTest(resizeCheckResult, __VA_ARGS__); \
-		} \
-	}
+#define VulkanTestResizeSwapchain(_function, ...) \
+	VulkanTestRecoverable(_function, \
+						  VulkanRecoveryOption(VK_SUBOPTIMAL_KHR, {}) \
+								  VulkanRecoveryOption(VK_ERROR_OUT_OF_DATE_KHR, ({ \
+														   const Vector2 windowSize = ActualWindowSizeIgnoreDPI(); \
+														   const LunaSwapchainResizeInfo swapchainResizeInfo = { \
+															   .newSize.width = windowSize.x, \
+															   .newSize.height = windowSize.y, \
+															   .renderPassCount = 1, \
+															   .renderPasses = &renderPass, \
+															   .queueFamilyIndexCount = 1, \
+															   .queueFamilyIndices = &queueFamilyIndex, \
+														   }; \
+														   VulkanTest(lunaResizeSwapchain(device, \
+																						  &swapchainResizeInfo), \
+																	  "Failed to resize swapchain!"); \
+														   return false; \
+													   })), \
+						  __VA_ARGS__)
 #pragma endregion macros
 
 #pragma region typedefs
@@ -88,12 +107,18 @@ enum VendorIDs
 enum PendingTasksBitFlags
 {
 	PENDING_TASK_UI_BUFFERS_RESIZE_BIT = 1 << 0,
+	PENDING_TASK_ADD_OR_REMOVE_DYNAMIC_LIGHTS = 1 << 1,
+	PENDING_TASK_RECREATE_GRAPHICS_PIPELINES = 1 << 2,
 };
 
 typedef struct CameraUniform
 {
 	mat4 transform;
+	mat4 view;
 	Vector3 position;
+	float nearPlane;
+	float farPlane;
+	float frustumPlanes[4];
 } CameraUniform;
 
 typedef struct GlobalLightingUniform
@@ -155,10 +180,11 @@ typedef struct ModelInstanceData
 typedef struct ActorModelInstanceData
 {
 	mat4 transformMatrix;
-	vec4 modColor;
-	vec4 materialColor;
+	Color modColor;
+	Color materialColor;
 	uint32_t textureIndex;
-} __attribute__((aligned(32))) ActorModelInstanceData;
+	float _padding[7]; // I hate alignment
+} ActorModelInstanceData;
 
 typedef struct ActorWallInstanceData
 {
@@ -172,6 +198,51 @@ typedef struct ActorWallInstanceData
 	Vector2 uvOffset;
 	Color modColor;
 } ActorWallInstanceData;
+
+typedef struct FrustumCullingData
+{
+	mat4 viewMatrix;
+	float nearPlane;
+	float farPlane;
+	float frustumPlanes[4];
+
+	float _padding[6];
+
+
+	VkDeviceAddress shadedOpaqueMapModelsCullingInfo;
+	VkDeviceAddress shadedOpaqueMapModelsUnculledDrawInfo;
+	VkDeviceAddress shadedOpaqueMapModelsOutputDrawInfo;
+
+	VkDeviceAddress unshadedOpaqueMapModelsCullingInfo;
+	VkDeviceAddress unshadedOpaqueMapModelsUnculledDrawInfo;
+	VkDeviceAddress unshadedOpaqueMapModelsOutputDrawInfo;
+
+	VkDeviceAddress shadedMapModelsCullingInfo;
+	VkDeviceAddress shadedMapModelsUnculledDrawInfo;
+	VkDeviceAddress shadedMapModelsOutputDrawInfo;
+
+	VkDeviceAddress unshadedMapModelsCullingInfo;
+	VkDeviceAddress unshadedMapModelsUnculledDrawInfo;
+	VkDeviceAddress unshadedMapModelsOutputDrawInfo;
+
+	VkDeviceAddress shadedActorWallsCullingInfo;
+	VkDeviceAddress shadedActorWallsInstanceIndices;
+	VkDeviceAddress shadedActorWallsDrawInfo;
+
+	VkDeviceAddress unshadedActorWallsCullingInfo;
+	VkDeviceAddress unshadedActorWallsInstanceIndices;
+	VkDeviceAddress unshadedActorWallsDrawInfo;
+
+	VkDeviceAddress shadedActorModelsCullingInfo;
+	VkDeviceAddress shadedActorModelsUnculledInstanceIndices;
+	VkDeviceAddress shadedActorModelsInstanceIndices;
+	VkDeviceAddress shadedActorModelsDrawInfo;
+
+	VkDeviceAddress unshadedActorModelsCullingInfo;
+	VkDeviceAddress unshadedActorModelsUnculledInstanceIndices;
+	VkDeviceAddress unshadedActorModelsInstanceIndices;
+	VkDeviceAddress unshadedActorModelsDrawInfo;
+} FrustumCullingData;
 
 typedef struct UiBuffer
 {
@@ -189,18 +260,82 @@ typedef struct UniformBuffers
 	LunaBuffer lighting;
 	LunaBuffer fog;
 	LunaBuffer lights;
+	LunaBuffer clusters;
+	LunaBuffer softShadowKernels;
 } UniformBuffers;
 
-/**
- * Contains the required buffers for a model that can have multiple materials
- *
- * Models with multiple materials are always drawn using lunaDrawIndexedIndirect regardless of if they are instanced.
- * This is done due to the fact that each different material becomes a driver-dispatched draw call, and would have to be
- * individually dispatched draw calls if it were not using indirect draw.
- *
- * Vertex and index data does not need to be duplicated for each frame in flight due to the fact that it is in local
- * space and only the instance data should be changing on a frame-to-frame basis.
- */
+typedef struct ActorModelsBuffer
+{
+	/// A buffer containing per-vertex data
+	LunaBuffer vertices;
+	/// A buffer containing the index data to use along-side the per-vertex data
+	LunaBuffer indices;
+	/// A buffer containing the instance data for all instances of all lod components. Should be treated as unsorted
+	LunaBuffer instanceData;
+	/// A buffer containing the instance data index for each instance of each shaded lod component
+	LunaBuffer shadedUnculledInstanceIndices;
+	/// A buffer containing the instance data index for each instance of each unshaded lod component
+	LunaBuffer unshadedUnculledInstanceIndices;
+	/// A list of LunaBuffer handles containing the uint32_t indices used to get the instance data for each instance to draw
+	List shadedInstanceIndices;
+	/// A list of LunaBuffer handles containing the uint32_t indices used to get the instance data for each instance to draw
+	List unshadedInstanceIndices;
+	/// A list of LunaBuffer handles containing the structures required for the shaded materials indirect draw calls
+	List shadedDrawInfo;
+	/// A list of LunaBuffer handles containing the structures required for the unshaded materials indirect draw calls
+	List unshadedDrawInfo;
+	/// A buffer containing information about each shaded material instance that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded material instance that is used for culling
+	LunaBuffer unshadedCullingInfo;
+} ActorModelsBuffer;
+
+typedef struct ActorWallsBuffer
+{
+	/// The number of shaded actor walls in the map
+	uint32_t shadedInstanceCount;
+	/// The number of unshaded actor walls in the map
+	uint32_t unshadedInstanceCount;
+	/// A buffer of the 12 ActorWallVertex values corresponding to the two faces of the quad
+	LunaBuffer vertices;
+	/// A buffer containing the ActorWallInstanceData for each actor wall
+	LunaBuffer instanceData;
+	/// A list of LunaBuffer handles containing uint32_t instance indices emitted by culling for each shaded actor wall
+	List shadedInstanceIndices;
+	/// A list of LunaBuffer handles containing uint32_t instance indices emitted by culling for each unshaded actor wall
+	List unshadedInstanceIndices;
+	/// A list of LunaBuffer handles containing the VkDrawIndirectCommand for each shaded actor wall
+	List shadedDrawInfo;
+	/// A list of LunaBuffer handles containing the VkDrawIndirectCommand for each unshaded actor wall
+	List unshadedDrawInfo;
+	/// A buffer containing information about each shaded actor wall that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded actor wall that is used for culling
+	LunaBuffer unshadedCullingInfo;
+} ActorWallsBuffer;
+
+typedef struct MapModelsBuffer
+{
+	/// A buffer containing per-vertex data
+	LunaBuffer vertices;
+	/// A buffer containing the index data to use along-side the per-vertex data
+	LunaBuffer indices;
+	/// A buffer containing the instance data for each instance of each model section
+	LunaBuffer instanceData;
+	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
+	LunaBuffer unculledShadedDrawInfo;
+	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
+	LunaBuffer unculledUnshadedDrawInfo;
+	/// A list of LunaBuffer handles containing the structures required for the shaded materials indirect draw calls
+	List shadedDrawInfo;
+	/// A list of LunaBuffer handles containing the structures required for the unshaded materials indirect draw calls
+	List unshadedDrawInfo;
+	/// A buffer containing information about each shaded material instance that is used for culling
+	LunaBuffer shadedCullingInfo;
+	/// A buffer containing information about each unshaded material instance that is used for culling
+	LunaBuffer unshadedCullingInfo;
+} MapModelsBuffer;
+
 typedef struct ModelBuffer
 {
 	/// A buffer containing per-vertex data
@@ -208,11 +343,11 @@ typedef struct ModelBuffer
 	/// A buffer containing the index data to use along-side the per-vertex data
 	LunaBuffer indices;
 	/// A buffer containing the instance data for each instance of each model section
-	LunaBuffer instanceData; //[FRAMES_IN_FLIGHT];
-	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the shaded materials draw call
-	LunaBuffer shadedDrawInfo; //[FRAMES_IN_FLIGHT];
-	/// A buffer containing the VkDrawIndexedIndirectCommand structures required for the unshaded materials draw call
-	LunaBuffer unshadedDrawInfo; //[FRAMES_IN_FLIGHT];
+	LunaBuffer instanceData;
+	/// A buffer containing the structures required for the shaded materials indirect draw call
+	LunaBuffer shadedDrawInfo;
+	/// A buffer containing the structures required for the unshaded materials indirect draw call
+	LunaBuffer unshadedDrawInfo;
 } ModelBuffer;
 
 typedef struct SkyBuffer
@@ -220,20 +355,6 @@ typedef struct SkyBuffer
 	LunaBuffer vertices;
 	LunaBuffer indices;
 } SkyBuffer;
-
-typedef struct ActorWallBuffer
-{
-	/// A buffer of the 12 ActorWallVertex values corresponding to the two faces of the quad
-	LunaBuffer vertices;
-	/// A buffer containing the ActorWallInstanceData for each shaded actor wall
-	LunaBuffer shadedInstanceData;
-	/// The number of shaded actor walls in the map
-	uint32_t shadedInstanceCount;
-	/// A buffer containing the ActorWallInstanceData for each unshaded actor wall
-	LunaBuffer unshadedInstanceData;
-	/// The number of unshaded actor walls in the map
-	uint32_t unshadedInstanceCount;
-} ActorWallBuffer;
 
 typedef struct PlayerModelBuffer
 {
@@ -255,13 +376,17 @@ typedef struct DebugDrawBuffer
 
 typedef struct Buffers
 {
-	UiBuffer ui; //[FRAMES_IN_FLIGHT];
-	UniformBuffers uniforms; //[FRAMES_IN_FLIGHT];
+	UiBuffer ui;
+	UniformBuffers uniforms;
+	/// A buffer containing one FrustumCullingData structure per frustum
+	LunaBuffer frustumCullingDatas;
+	LunaBuffer frustumShadowMaps;
+	ActorModelsBuffer actorModels;
+	ActorWallsBuffer actorWalls;
+	MapModelsBuffer opaqueMap;
+	MapModelsBuffer map;
 	ModelBuffer viewmodel;
-	ModelBuffer actorModels;
-	ModelBuffer map;
 	SkyBuffer sky;
-	ActorWallBuffer actorWalls;
 	PlayerModelBuffer player;
 #ifdef JPH_DEBUG_RENDERER
 	DebugDrawBuffer debugDrawLines;
@@ -269,9 +394,30 @@ typedef struct Buffers
 #endif
 } Buffers;
 
+typedef struct DepthPipelines
+{
+	LunaGraphicsPipeline opaqueMap;
+	LunaGraphicsPipeline map;
+	LunaGraphicsPipeline modelActors;
+	LunaGraphicsPipeline wallActors;
+} DepthPipelines;
+
+typedef struct DirectionalShadowMapPipelines
+{
+	LunaGraphicsPipeline mapFrontFaces;
+	LunaGraphicsPipeline mapBackFaces;
+	LunaGraphicsPipeline modelActors;
+	LunaGraphicsPipeline wallActors;
+} DirectionalShadowMapPipelines;
+
 typedef struct Pipelines
 {
+	LunaComputePipeline culling;
+	LunaComputePipeline clearCullingData;
+	LunaComputePipeline populateClusters;
+
 	LunaGraphicsPipeline ui;
+	DepthPipelines depthPrepass;
 	LunaGraphicsPipeline shadedMap;
 	LunaGraphicsPipeline unshadedMap;
 	LunaGraphicsPipeline sky;
@@ -281,6 +427,8 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorModel;
 	LunaGraphicsPipeline shadedActorWall;
 	LunaGraphicsPipeline unshadedActorWall;
+	DepthPipelines shadowMaps;
+	DirectionalShadowMapPipelines directionalLightShadowMaps;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
 	LunaGraphicsPipeline debugDrawTriangles;
@@ -295,20 +443,92 @@ typedef struct TextureSamplers
 	LunaSampler nearestRepeatNoAnisotropy;
 	LunaSampler linearNoRepeatNoAnisotropy;
 	LunaSampler nearestNoRepeatNoAnisotropy;
+	LunaSampler shadowMaps;
 } TextureSamplers;
 
-typedef struct DescriptorSetLayouts
+typedef struct ShadowMapPushConstants
 {
-	LunaDescriptorSetLayout transform;
-	LunaDescriptorSetLayout all;
-	LunaDescriptorSetLayout globalLighting;
-	LunaDescriptorSetLayout fog;
-} DescriptorSetLayouts;
+	uint32_t lightType;
+	uint32_t lightIndex;
+	uint32_t faceIndex;
+	uint32_t cascadeIndex;
+} ShadowMapPushConstants;
+
+typedef struct DescriptorSet
+{
+	LunaDescriptorSetLayout layout;
+	LunaDescriptorSet set;
+} DescriptorSet;
+
+typedef struct DescriptorSets
+{
+	DescriptorSet common;
+	DescriptorSet culling;
+} DescriptorSets;
+
+typedef struct CullingInfo
+{
+	Vector3 position;
+	float radius;
+	uint32_t castsShadows;
+} CullingInfo;
+
+typedef struct ModelActorCullingInfo
+{
+	Vector3 position;
+	float radius;
+	uint32_t castsShadows;
+	uint32_t drawInfoIndex;
+} ModelActorCullingInfo;
+
+typedef struct LightingShaderSpecializationConstants
+{
+	DebugRendering debugRendering;
+	uint32_t lightCount;
+	VkBool32 hasStaticLight;
+	uint32_t shadowMapAtlasSize;
+	uint32_t sampleCount;
+	float sampleRadius;
+	VkBool32 bakedLighting;
+} SpecializationConstants;
+
+typedef struct VulkanLight
+{
+	LightType type;
+	Vector3 position;
+	Vector3 negativeForwardDirection;
+	Vector3 color;
+	float brightness;
+	float constantAttenuation;
+	float linearAttenuation;
+	float quadraticAttenuation;
+	float attenuationMultiplier;
+	float brightSin;
+	float fadingSin;
+	float fadingCos;
+	float maxDistance;
+	uint32_t shadowMapIndex;
+	uint32_t cookieTextureIndex;
+	float _padding;
+	VkDeviceAddress frustumShadowMaps;
+	CGLM_ALIGN_MAT mat4 transformMatrix;
+} VulkanLight;
+
+typedef struct Cluster
+{
+	uint32_t lightCount;
+	uint32_t lightIndices[MAX_LIGHT_COUNT];
+} Cluster;
+
+typedef struct FrustumData
+{
+	uint32_t resolution;
+	uint32_t offsetX;
+	uint32_t offsetY;
+} FrustumShadowMap;
 #pragma endregion typedefs
 
 #pragma region variables
-// TODO: Make sure these are all needed and are all as they should be
-
 extern bool minimized;
 extern LunaDevice device;
 extern VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -319,33 +539,87 @@ extern LunaCommandBuffer commandBuffer;
 extern LunaCommandBuffer secondaryCommandBuffer;
 extern LunaSemaphore semaphore;
 extern VkSurfaceKHR surface;
-extern VkExtent2D swapChainExtent;
 extern VkSampleCountFlagBits msaaSamples;
 extern LunaRenderPass renderPass;
 extern uint32_t imageAssetIdToIndexMap[MAX_TEXTURES];
 extern TextureSamplers textureSamplers;
 extern LockingList textures;
-extern LunaDescriptorSetLayout descriptorSetLayout;
-extern LunaDescriptorSet descriptorSet;
+extern DescriptorSets descriptorSets;
 extern Buffers buffers;
 extern Pipelines pipelines;
 extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
 extern uint32_t skyTextureIndex;
+extern uint32_t shadowMapSlotsAvailable;
+extern ShadowMapPushConstants shadowMapPushConstants;
+extern VkRenderPass shadowMapRenderPass;
+extern LunaImage shadowMapAtlas;
+extern LunaImage directionalLightShadowMapAtlas;
+extern VkFramebuffer shadowMapFramebuffer;
+extern VkFramebuffer directionalLightShadowMapFramebuffer;
+extern List perFrustumBuffersHandles;
+extern uint32_t frustumCount;
+extern uint32_t staticLightFrustumCount;
+extern FrustumCullingData *frustumCullingDatas;
+extern FrustumShadowMap *frustumShadowMaps;
+extern uint32_t actorModelsDrawInfoCount;
+extern uint32_t maximumCulledInstanceCount;
+extern VulkanLight *lights;
+extern uint32_t lightCount;
+extern VulkanLight *directionalLight;
+extern uint32_t shadowMapFrustumTextureSize;
+extern LockingList dynamicLightsToAdd;
+extern LockingList dynamicLightsToRemove;
+extern List dynamicLights;
+extern SpecializationConstants specializationConstants;
+
+#define DIRECTIONAL_LIGHT_SHADOW_MAP_ATLAS_SIZE (specializationConstants.shadowMapAtlasSize)
+
+/// Simply a collection of constants that are used to prevent significant usage of magic numbers
+enum PerFrustumBufferMagicConstants : uint32_t
+{
+	PER_FRUSTUM_BUFFER_MODEL_ACTOR_DRAW_INFO_OFFSET = 0,
+	PER_FRUSTUM_BUFFER_WALL_ACTOR_DRAW_INFO_OFFSET = 2,
+	PER_FRUSTUM_BUFFER_OPAQUE_MAP_DRAW_INFO_OFFSET = 4,
+	PER_FRUSTUM_BUFFER_MAP_DRAW_INFO_OFFSET = 6,
+	PER_FRUSTUM_BUFFER_MODEL_ACTOR_INSTANCE_INDICES_OFFSET = 8,
+	PER_FRUSTUM_BUFFER_WALL_ACTOR_INSTANCE_INDICES_OFFSET = 10,
+	PER_FRUSTUM_BUFFER_COUNT = 12,
+};
 #pragma endregion variables
 
-bool ClearTextureCache();
+void ClearTextureCache();
 
-bool ClearModelCache();
+void ClearModelCache();
 
-VkResult CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
+void CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
 
 uint32_t TextureIndex(const char *texture);
 
 uint32_t ImageIndex(const Image *image);
 
-VkResult UpdateCameraUniform(const Camera *camera);
+bool ShadowMapsEnabled(void);
 
-VkResult UpdateViewModelMatrix(const Viewmodel *viewmodel);
+void CreateShadowMapRenderPass(const Map *map);
+
+void CreateDepthGraphicsPipelines(void);
+
+void UpdateCameraUniform(Camera *camera);
+
+void UpdateViewModelMatrix(const Viewmodel *viewmodel);
+
+void UpdateDirectionalLightCascades(const Camera *camera, const Map *map);
+
+void WriteFrustumCullingDatasBuffer();
+
+void WriteFrustumShadowMapsBuffer();
+
+void UpdateSoftShadowKernels();
+
+void ClearCullingData();
+
+void CullModels();
+
+void PopulateClusters();
 
 void EnsureSpaceForUiElements(size_t quadCount);
 

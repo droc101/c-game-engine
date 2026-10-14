@@ -19,8 +19,8 @@
 #define VIEWMODEL_FOV 70
 
 // default near & far planes also defined in camera.json and player.json actor definitions
-#define DEFAULT_NEAR_Z 0.01
-#define DEFAULT_FAR_Z 4096
+#define DEFAULT_NEAR_PLANE 0.01
+#define DEFAULT_FAR_PLANE 4096
 
 // TODO: use viewmodel near and far planes
 #define VIEWMODEL_NEAR_Z 0.01
@@ -50,6 +50,9 @@ enum RendererQueuedAction
 	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
 	QUEUED_ACTION_TOGGLE_VSYNC = 1 << 4,
+	QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION = 1 << 5,
+	QUEUED_ACTION_RELOAD_ALL_SHADERS = 1 << 6,
+	QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY = 1 << 7,
 };
 
 extern RendererQueuedAction rendererQueuedActions;
@@ -120,12 +123,6 @@ Vector2 GetTextureSize(const char *texture);
  * @param transformMatrix A mat4 MODEL matrix of the actor (Model space to world space)
  */
 void ActorTransformMatrix(const Actor *actor, JPH_Mat44 *transformMatrix);
-
-/**
- * Perform any pre-initialization for the rendering system
- * This is called before the window is created.
- */
-bool RenderPreInit();
 
 /**
  * Initialize the rendering system
@@ -218,5 +215,27 @@ void DPrintGPUInfo();
  * @return Screen-space position, or {FLT_MAX, FLT_MAX} if off screen
  */
 Vector2 ProjectPosition(vec3 position, Camera *camera);
+
+/**
+ * Load a dynamic light
+ * @warning The pointer passed to this function is stored!
+ *			Therefore, it must live until VK_RemoveDynamicLight is called with the same pointer
+ * @param light The light to load
+ * @return True if the light was successfully added, or false if something failed
+ */
+void AddDynamicLight(const DynamicLight *light);
+
+/**
+ * Remove a dynamic light so that it is no longer rendered
+ * @note This function does not free the memory pointed to by @c light
+ * @param light The light to remove. Must exactly match a pointer previously passed to VK_AddDynamicLight
+ * @return True if the light was successfully removed, or false if something failed
+ */
+void RemoveDynamicLight(const DynamicLight *light);
+
+/**
+ * (Re)set the window icon
+ */
+void SetWindowIcon();
 
 #endif //GAME_RENDERINGHELPERS_H

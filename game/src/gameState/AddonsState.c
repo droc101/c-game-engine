@@ -9,7 +9,6 @@
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
@@ -20,6 +19,7 @@
 #include <engine/uiStack/controls/Image.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -42,21 +42,21 @@ static void ApplyAddons()
 	}
 }
 
-static void DoneButton(Control */*control*/, void */*extraData*/)
+static void DoneButton(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	ApplyAddons();
 	SetGameState(&MenuState);
 }
 
-static void EnableAddonBtn(Control */*control*/, void *pAddon)
+static void EnableAddonBtn(Control * /*control*/, void *pAddon)
 {
 	hasMadeChanges = true;
 	SetAddonEnabled(pAddon, true);
 	shouldRebuildUiStack = true;
 }
 
-static void DisableAddonBtn(Control */*control*/, void *pAddon)
+static void DisableAddonBtn(Control * /*control*/, void *pAddon)
 {
 	hasMadeChanges = true;
 	SetAddonEnabled(pAddon, false);
@@ -70,7 +70,7 @@ static void Swap(List *list, const size_t a, const size_t b)
 	ListSet(*list, b, first);
 }
 
-static void BtnAddonPriUp(Control */*control*/, void *addonIndexInAddress)
+static void BtnAddonPriUp(Control * /*control*/, void *addonIndexInAddress)
 {
 	hasMadeChanges = true;
 	const size_t index = (size_t)addonIndexInAddress;
@@ -79,7 +79,7 @@ static void BtnAddonPriUp(Control */*control*/, void *addonIndexInAddress)
 	shouldRebuildUiStack = true;
 }
 
-static void BtnAddonPriDown(Control */*control*/, void *addonIndexInAddress)
+static void BtnAddonPriDown(Control * /*control*/, void *addonIndexInAddress)
 {
 	hasMadeChanges = true;
 	const size_t index = (size_t)addonIndexInAddress;
@@ -102,7 +102,7 @@ static void ReconstructUiStack()
 		OptionsMenuAddControl(addonsOptionsMenu,
 							  CreateLabelControl("No Addons Found",
 												 16,
-												 COLOR_WHITE,
+												 &uiTheme.primaryText,
 												 v2(0, 0),
 												 v2(750, 32),
 												 TOP_CENTER,
@@ -130,7 +130,7 @@ static void ReconstructUiStack()
 			OptionsMenuAddControl(addonsOptionsMenu,
 								  CreateLabelControl("(none)",
 													 16,
-													 COLOR(0xFF808080),
+													 &uiTheme.disabledText,
 													 v2(0, 0),
 													 v2(750, 16),
 													 TOP_CENTER,
@@ -149,7 +149,7 @@ static void ReconstructUiStack()
 			OptionsMenuAddControl(addonsOptionsMenu,
 								  CreateLabelControl(a->displayName,
 													 16,
-													 COLOR_WHITE,
+													 &uiTheme.primaryText,
 													 v2(104, 0),
 													 v2(750 - 104 - 128, 32),
 													 TOP_LEFT,
@@ -160,7 +160,7 @@ static void ReconstructUiStack()
 			OptionsMenuAddControl(addonsOptionsMenu,
 								  CreateLabelControl(a->description,
 													 16,
-													 COLOR(0xFFEEEEEE),
+													 &uiTheme.secondaryText,
 													 v2(104, 40),
 													 v2(750 - 104 - 128, 96 - 40),
 													 TOP_LEFT,
@@ -204,7 +204,7 @@ static void ReconstructUiStack()
 			OptionsMenuAddControl(addonsOptionsMenu,
 								  CreateLabelControl("(none)",
 													 16,
-													 COLOR(0xFF808080),
+													 &uiTheme.disabledText,
 													 v2(0, 0),
 													 v2(750, 16),
 													 TOP_CENTER,
@@ -223,7 +223,7 @@ static void ReconstructUiStack()
 			OptionsMenuAddControl(addonsOptionsMenu,
 								  CreateLabelControl(a->displayName,
 													 16,
-													 COLOR_WHITE,
+													 &uiTheme.primaryText,
 													 v2(104, 0),
 													 v2(750 - 104 - 128, 32),
 													 TOP_LEFT,
@@ -234,7 +234,7 @@ static void ReconstructUiStack()
 			OptionsMenuAddControl(addonsOptionsMenu,
 								  CreateLabelControl(a->description,
 													 16,
-													 COLOR(0xFFEEEEEE),
+													 &uiTheme.secondaryText,
 													 v2(104, 40),
 													 v2(750 - 104 - 128, 96 - 40),
 													 TOP_LEFT,

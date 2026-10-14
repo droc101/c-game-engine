@@ -1875,11 +1875,11 @@
             },
             "connections": [],
             "params": {
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
                 },
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 }
@@ -1929,11 +1929,11 @@
                 },
                 "bright_angle": {
                     "type": "float",
-                    "value": 30.0
+                    "value": 20.0
                 },
                 "brightness": {
                     "type": "float",
-                    "value": 4.0
+                    "value": 100.0
                 },
                 "color": {
                     "type": "color",
@@ -1948,9 +1948,13 @@
                     "type": "float",
                     "value": 0.0
                 },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
                 "fading_angle": {
                     "type": "float",
-                    "value": 20.0
+                    "value": 30.0
                 },
                 "linear_attenuation": {
                     "type": "float",

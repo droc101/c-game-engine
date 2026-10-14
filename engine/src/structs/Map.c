@@ -4,6 +4,7 @@
 
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
@@ -31,7 +32,7 @@
 
 Map *CreateMap(void)
 {
-	Map *map = calloc(1, sizeof(Map));
+	Map *map = AvxAlignedCalloc(sizeof(Map));
 	CheckAlloc(map);
 	ListInit(map->actors, LIST_POINTER);
 	PhysicsInitMap(map);
@@ -50,7 +51,7 @@ Map *CreateMap(void)
 	map->changeFlags = 0;
 	map->exposure = 1.0f;
 	map->lightCount = 0;
-	map->pointLights = NULL;
+	map->lights = NULL;
 	ListInit(map->namedActorNames, LIST_POINTER);
 	ListInit(map->namedActorPointers, LIST_POINTER);
 	ListInit(map->ioQueue, LIST_POINTER);
@@ -78,8 +79,6 @@ void FreeLoadTimeMapData(Map *map)
 		model->vertices = NULL;
 		model->indices = NULL;
 	}
-	free(map->lightmapPixels);
-	map->lightmapPixels = NULL;
 }
 
 void DestroyMap(Map *map)
@@ -117,9 +116,14 @@ void DestroyMap(Map *map)
 	free(map->discordRpcIcon);
 	free(map->discordRpcName);
 
+	free(map->indirectLightmapPixels);
 	free(map->lightmapPixels);
 
-	free(map->pointLights);
+	for (uint32_t i = 0; i < map->lightCount; i++)
+	{
+		free(map->lights[i].cookie);
+	}
+	free(map->lights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
@@ -144,8 +148,7 @@ void DestroyMap(Map *map)
 	ListAndContentsFree(map->namedActorNames);
 	ListFree(map->namedActorPointers);
 	ListFree(map->actors);
-	free(map);
-
+	AvxAlignedFree(map);
 	PhysicsThreadUnlockTickMutex();
 }
 
@@ -238,7 +241,7 @@ void GetActorsByName(const char *name, const Map *map, List *actors)
 	ListUnlock(map->namedActorNames);
 }
 
-void RenderMap(Map *map, const Camera *camera)
+void RenderMap(Map *map, Camera *camera)
 {
 	JoltDebugRendererDrawBodies(map->physicsSystem);
 	RenderMap3D(map, camera);
@@ -247,7 +250,10 @@ void RenderMap(Map *map, const Camera *camera)
 	for (size_t i = 0; i < map->actors.length; i++)
 	{
 		Actor *actor = ListGetPointer(map->actors, i);
-		actor->definition->RenderUi(actor);
+		if (actor->definition->RenderUi)
+		{
+			actor->definition->RenderUi(actor);
+		}
 	}
 	ListUnlock(map->actors);
 }
@@ -288,6 +294,12 @@ static int QueuedIOConnectionDelayComparison(const void *pc1, const void *pc2)
 void ProcessIOQueue(Map *map)
 {
 	ListLock(map->ioQueue);
+
+	if (map->ioQueue.length == 0)
+	{
+		ListUnlock(map->ioQueue);
+		return;
+	}
 
 	qsort(map->ioQueue.data->pointerData,
 		  map->ioQueue.length,

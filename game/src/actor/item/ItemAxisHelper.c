@@ -79,13 +79,8 @@ static void ItemEraserInteracted(Actor *this)
 }
 
 ActorDefinition itemAxisHelperActorDefinition = {
-	.Update = DefaultActorUpdate,
 	.OnPlayerContactAdded = ItemEraserOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
 	.Interact = ItemEraserInteracted,
-	.Destroy = DefaultActorDestroy,
 	.Init = ItemAxisHelperInit,
 };
 

@@ -4,6 +4,7 @@
 
 #include <engine/actor/Camera.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/Camera.h>
@@ -13,7 +14,7 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 typedef struct CameraData
@@ -23,14 +24,15 @@ typedef struct CameraData
 
 static void CameraInit(Actor *this, const KvList params, const Transform *transform)
 {
-	this->extraData = calloc(1, sizeof(CameraData));
+	this->extraData = AvxAlignedCalloc(sizeof(CameraData));
 	CheckAlloc(this->extraData);
 	CameraData *data = this->extraData;
 	memcpy(&data->camera.transform, transform, sizeof(Transform));
 	data->camera.fov = (float)KvGetInt(params, "fov", 90);
+	data->camera.nearPlane = KvGetFloat(params, "near_plane", DEFAULT_NEAR_PLANE);
+	data->camera.farPlane = KvGetFloat(params, "far_plane", DEFAULT_FAR_PLANE);
 	data->camera.showPlayerModel = KvGetBool(params, "show_player_model", true);
-	data->camera.nearZ = KvGetFloat(params, "near_z", DEFAULT_NEAR_Z);
-	data->camera.farZ = KvGetFloat(params, "far_z", DEFAULT_FAR_Z);
+	data->camera.recomputeCachedData = true;
 	ActorCreateEmptyBody(this, transform);
 }
 
@@ -44,6 +46,12 @@ static void CameraUpdate(Actor *this, double /*delta*/)
 												 &data->camera.transform.position,
 												 &data->camera.transform.rotation);
 	}
+}
+
+static void CameraDestroy(Actor *this)
+{
+	AvxAlignedFree(this->extraData);
+	this->extraData = NULL;
 }
 
 static void CameraEnableHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
@@ -63,12 +71,7 @@ static void CameraDisableHandler(Actor *this, const Actor * /*sender*/, const Pa
 
 ActorDefinition cameraActorDefinition = {
 	.Update = CameraUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
+	.Destroy = CameraDestroy,
 	.Init = CameraInit,
 };
 

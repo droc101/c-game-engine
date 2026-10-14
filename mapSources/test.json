@@ -3185,11 +3185,11 @@
             },
             "connections": [],
             "params": {
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
                 },
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 }

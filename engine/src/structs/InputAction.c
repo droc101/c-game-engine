@@ -6,7 +6,6 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/InputAction.h>
 #include <engine/structs/KVList.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Input.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>

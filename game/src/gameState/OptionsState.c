@@ -7,7 +7,6 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
@@ -18,6 +17,7 @@
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/controls/OptionsButton.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -27,11 +27,12 @@
 #include "gameState/options/SoundOptionsState.h"
 #include "gameState/options/VideoOptionsState.h"
 #include "gameState/PauseState.h"
+#include "gameState/RenderingTogglesState.h"
 
 static UiStack *optionsStack = NULL;
 bool optionsStateInGame = false;
 
-static void BtnOptionsBack(Control */*control*/, void */*extraData*/)
+static void BtnOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
 	SaveOptions(&GetState()->options);
 	if (optionsStateInGame)
@@ -80,27 +81,32 @@ static void OptionsStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(optionsStack);
 }
 
-static void BtnVideoOptions(Control */*control*/, void */*extraData*/)
+static void BtnVideoOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&VideoOptionsState);
 }
 
-static void BtnSoundOptions(Control */*control*/, void */*extraData*/)
+static void BtnSoundOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&SoundOptionsState);
 }
 
-static void BtnInputOptions(Control */*control*/, void */*extraData*/)
+static void BtnInputOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&InputOptionsState);
 }
 
-static void BtnDebugOptions(Control */*control*/, void */*extraData*/)
+static void BtnDebugOptions(Control * /*control*/, void * /*extraData*/)
 {
 	SetGameState(&DebugOptionsState);
 }
 
-static void CbOptionsEnableDiscordRpc(const OptionsButtonValue */*value*/, void */*extraData*/)
+static void BtnRenderingToggles(Control * /*control*/, void * /*extraData*/)
+{
+	SetGameState(&RenderingTogglesState);
+}
+
+static void CbOptionsEnableDiscordRpc(const OptionsButtonValue * /*value*/, void * /*extraData*/)
 {
 	if (!GetState()->options.enableDiscordRpc)
 	{
@@ -120,7 +126,7 @@ static void OptionsStateSet()
 		UiStackPush(optionsStack,
 					CreateLabelControl("Options",
 									   32,
-									   COLOR_WHITE,
+									   &uiTheme.primaryText,
 									   v2s(0),
 									   v2(480, 100),
 									   TOP_CENTER,
@@ -143,6 +149,14 @@ static void OptionsStateSet()
 		opY += opSpacing;
 		UiStackPush(optionsStack,
 					CreateButtonControl(v2(0, opY), v2(480, 40), "Debug Options", BtnDebugOptions, TOP_CENTER, NULL));
+		opY += opSpacing;
+		UiStackPush(optionsStack,
+					CreateButtonControl(v2(0, opY),
+										v2(480, 40),
+										"Rendering Toggles",
+										BtnRenderingToggles,
+										TOP_CENTER,
+										NULL));
 #ifdef ENABLE_DISCORD_SDK
 		opY += opSpacing * 1.5f;
 		const ControlValue discordRpcValue = {
@@ -155,8 +169,7 @@ static void OptionsStateSet()
 											   "Discord Integration: %s",
 											   CbOptionsEnableDiscordRpc,
 											   TOP_CENTER,
-											   onOffButtonValues,
-											   2,
+											   &onOffButtonOptions,
 											   NULL,
 											   discordRpcValue,
 											   NULL));

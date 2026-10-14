@@ -1,8 +1,6 @@
 #version 460
 
-#extension GL_EXT_nonuniform_qualifier : require
-
-layout(binding = 1) uniform sampler2D textureSampler[];
+#include "include/shared.inc.glsl"
 
 layout(location = 0) in vec4 inColor;
 layout(location = 1) in vec2 inUV;

@@ -57,6 +57,7 @@
     },
     "entrance_name": {
       "display": "Entrance Name",
+      "description": "The name of the entrance actor the player should spawn at, or an empty string for none",
       "type": "string"
     }
   }

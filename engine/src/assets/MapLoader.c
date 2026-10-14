@@ -9,18 +9,21 @@
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ActorWall.h>
 #include <engine/structs/Asset.h>
+#include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
+#include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -56,6 +59,11 @@ bool LoadMap(Map *map, Asset *mapData)
 	if (map->renderSky)
 	{
 		map->skyTexture = ReadStringSafe(reader, &strLength);
+		if (!map->skyTexture)
+		{
+			LogError("Failed to read map sky texture!\n");
+			return false;
+		}
 		bytesRemaining -= strLength;
 		bytesRemaining -= sizeof(size_t);
 	} else
@@ -63,9 +71,19 @@ bool LoadMap(Map *map, Asset *mapData)
 		map->skyTexture = NULL;
 	}
 	map->discordRpcIcon = ReadStringSafe(reader, &strLength);
+	if (!map->discordRpcIcon)
+	{
+		LogError("Failed to read Discord RPC icon\n");
+		return false;
+	}
 	bytesRemaining -= strLength;
 	bytesRemaining -= sizeof(size_t);
 	map->discordRpcName = ReadStringSafe(reader, &strLength);
+	if (!map->discordRpcName)
+	{
+		LogError("Failed to read Discord RPC name\n");
+		return false;
+	}
 	bytesRemaining -= strLength;
 	bytesRemaining -= sizeof(size_t);
 
@@ -75,6 +93,11 @@ bool LoadMap(Map *map, Asset *mapData)
 	{
 		size_t actorClassLength = 0;
 		char *actorClass = ReadStringSafe(reader, &actorClassLength);
+		if (!actorClass)
+		{
+			LogError("Failed to read actor classname\n");
+			return false;
+		}
 		bytesRemaining -= actorClassLength;
 		bytesRemaining -= sizeof(size_t);
 
@@ -98,21 +121,37 @@ bool LoadMap(Map *map, Asset *mapData)
 			ActorConnection *connection = malloc(sizeof(ActorConnection));
 			CheckAlloc(connection);
 			connection->sourceActorOutput = ReadStringSafe(reader, &strLength);
+			if (!connection->sourceActorOutput)
+			{
+				LogError("Failed to read I/O connection output name\n");
+				return false;
+			}
 			bytesRemaining -= strLength;
 			bytesRemaining -= sizeof(size_t);
 			connection->targetActorName = ReadStringSafe(reader, &strLength);
+			if (!connection->targetActorName)
+			{
+				LogError("Failed to read I/O connection target name\n");
+				return false;
+			}
 			bytesRemaining -= strLength;
 			bytesRemaining -= sizeof(size_t);
 			connection->targetActorInput = ReadStringSafe(reader, &strLength);
+			if (!connection->targetActorInput)
+			{
+				LogError("Failed to read I/O connection input name\n");
+				return false;
+			}
 			bytesRemaining -= strLength;
 			bytesRemaining -= sizeof(size_t);
 			EXPECT_BYTES_BOOL(1, bytesRemaining);
 			uint8_t hasOverride = ReadUint8(reader);
-			// TODO data size validation for params
 			if (hasOverride)
 			{
-				size_t paramSize = ReadParam(reader, &connection->outParamOverride);
-				bytesRemaining -= paramSize;
+				if (!ReadParam(reader, &connection->outParamOverride, &bytesRemaining))
+				{
+					return false;
+				}
 			} else
 			{
 				connection->outParamOverride.type = PARAM_TYPE_NONE;
@@ -124,13 +163,15 @@ bool LoadMap(Map *map, Asset *mapData)
 			ListAdd(ioConnections, connection);
 		}
 		KvList params;
-		// TODO: Add EXPECT_BYTES for this
-		bytesRemaining -= ReadKvList(reader, params);
+		if (!ReadKvList(reader, params, &bytesRemaining))
+		{
+			return false;
+		}
 
 		if (strcmp(actorClass, "player") == 0)
 		{
-			map->player.playerCamera.nearZ = KvGetFloat(params, "near_z", DEFAULT_NEAR_Z);
-			map->player.playerCamera.farZ = KvGetFloat(params, "far_z", DEFAULT_FAR_Z);
+			map->player.playerCamera.nearPlane = KvGetFloat(params, "near_plane", DEFAULT_NEAR_PLANE);
+			map->player.playerCamera.farPlane = KvGetFloat(params, "far_plane", DEFAULT_FAR_PLANE);
 			SetPlayerTransform(&map->player, &xfm);
 			KvListDestroy(params);
 			ListFree(ioConnections);
@@ -172,11 +213,24 @@ bool LoadMap(Map *map, Asset *mapData)
 	{
 		MapModel *model = &map->models[i];
 		char *materialName = ReadStringSafe(reader, &strLength);
+		if (!materialName)
+		{
+			LogError("Failed to read map material name\n");
+			return false;
+		}
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
 		assert(model->material);
 		free(materialName);
+
+		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
+		model->center.x = ReadFloat(reader);
+		model->center.y = ReadFloat(reader);
+		model->center.z = ReadFloat(reader);
+		model->halfExtent.x = ReadFloat(reader);
+		model->halfExtent.y = ReadFloat(reader);
+		model->halfExtent.z = ReadFloat(reader);
 
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->vertexCount = ReadUint32(reader);
@@ -185,7 +239,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
 			MapVertex *vertex = model->vertices + j;
-			EXPECT_BYTES_BOOL(sizeof(float) * 7, bytesRemaining);
+			EXPECT_BYTES_BOOL(sizeof(float) * 10, bytesRemaining);
 			vertex->position.x = ReadFloat(reader);
 			vertex->position.y = ReadFloat(reader);
 			vertex->position.z = ReadFloat(reader);
@@ -193,6 +247,9 @@ bool LoadMap(Map *map, Asset *mapData)
 			vertex->uv.y = ReadFloat(reader);
 			vertex->lightmapUv.x = ReadFloat(reader);
 			vertex->lightmapUv.y = ReadFloat(reader);
+			vertex->normal.x = ReadFloat(reader);
+			vertex->normal.y = ReadFloat(reader);
+			vertex->normal.z = ReadFloat(reader);
 		}
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->indexCount = ReadUint32(reader);
@@ -278,47 +335,60 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);
 
+	EXPECT_BYTES_BOOL(sizeof(float), bytesRemaining);
+	map->maxInboundsDistance = ReadFloat(reader);
+	map->player.playerCamera.farPlane = min(map->player.playerCamera.farPlane, map->maxInboundsDistance);
+
 	EXPECT_BYTES_BOOL(sizeof(size_t) * 2, bytesRemaining);
 	map->lightmapWidth = ReadSizeT(reader);
 	map->lightmapHeight = ReadSizeT(reader);
-	size_t lightmapDataSize = sizeof(uint16_t) *
-							  4 *
-							  map->lightmapHeight *
-							  map->lightmapWidth; // uint16_t because float16
+	size_t lightmapDataSize = sizeof(_Float16) * 4 * map->lightmapHeight * map->lightmapWidth;
 	EXPECT_BYTES_BOOL(lightmapDataSize, bytesRemaining);
 	map->lightmapPixels = malloc(lightmapDataSize);
 	CheckAlloc(map->lightmapPixels);
 	ReadBuffer(reader, lightmapDataSize, map->lightmapPixels);
+	EXPECT_BYTES_BOOL(lightmapDataSize, bytesRemaining);
+	map->indirectLightmapPixels = malloc(lightmapDataSize);
+	CheckAlloc(map->indirectLightmapPixels);
+	ReadBuffer(reader, lightmapDataSize, map->indirectLightmapPixels);
 
-	EXPECT_BYTES_BOOL(sizeof(uint16_t), bytesRemaining);
-	map->lightCount = ReadUint16(reader);
-	map->pointLights = malloc(sizeof(Light) * map->lightCount);
-	CheckAlloc(map->pointLights);
-	EXPECT_BYTES_BOOL((sizeof(float) * 16 + sizeof(uint32_t)) * map->lightCount, bytesRemaining);
+	EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
+	map->lightCount = ReadUint32(reader);
+	map->lights = calloc(map->lightCount, sizeof(Light));
+	CheckAlloc(map->lights);
 	for (size_t i = 0; i < map->lightCount; i++)
 	{
-		Light *light = &map->pointLights[i];
-		light->type = ReadUint32(reader);
-		light->transform.position.x = ReadFloat(reader);
-		light->transform.position.y = ReadFloat(reader);
-		light->transform.position.z = ReadFloat(reader);
-		Vector3 rotation;
-		rotation.x = ReadFloat(reader);
-		rotation.y = ReadFloat(reader);
-		rotation.z = ReadFloat(reader);
-		JPH_Quat_FromEulerAngles(&rotation, &light->transform.rotation);
+		KvList lightParams;
+		if (!ReadKvList(reader, lightParams, &bytesRemaining))
+		{
+			return false;
+		}
+		Light *light = &map->lights[i];
 
-		light->color[0] = ReadFloat(reader);
-		light->color[1] = ReadFloat(reader);
-		light->color[2] = ReadFloat(reader);
+		light->type = KvGetByte(lightParams, "type", LIGHT_TYPE_POINT);
+		light->position = KvGetVec3(lightParams, "position", (Vector3){0, 0, 0});
+		light->rotation = KvGetVec3(lightParams, "rotation", (Vector3){0, 0, 0});
+		light->color = KvGetColor(lightParams, "color", COLOR_WHITE);
+		light->brightness = KvGetFloat(lightParams, "brightness", 1.0f);
 
-		light->brightness = ReadFloat(reader);
-		light->constantAttenuation = ReadFloat(reader);
-		light->linearAttenuation = ReadFloat(reader);
-		light->quadraticAttenuation = ReadFloat(reader);
-		light->attenuationMultiplier = ReadFloat(reader);
-		light->brightAngle = ReadFloat(reader);
-		light->fadingAngle = ReadFloat(reader);
+		if (light->type != LIGHT_TYPE_DIRECTIONAL)
+		{
+			light->constantAttenuation = KvGetFloat(lightParams, "constant_attenuation", 0.0f);
+			light->linearAttenuation = KvGetFloat(lightParams, "linear_attenuation", 0.0f);
+			light->quadraticAttenuation = KvGetFloat(lightParams, "quadratic_attenuation", 1.0f);
+			light->attenuationMultiplier = KvGetFloat(lightParams, "attenuation_multiplier", 2.0f);
+			if (light->type == LIGHT_TYPE_SPOT)
+			{
+				light->brightAngle = KvGetFloat(lightParams, "bright_angle", 30.0f);
+				light->fadingAngle = KvGetFloat(lightParams, "fading_angle", 60.0f);
+				light->cookie = strdup(KvGetString(lightParams, "cookie", ""));
+			}
+		} else
+		{
+			map->directionalLight = light;
+		}
+
+		KvListDestroy(lightParams);
 	}
 
 	EXPECT_EOF_BYTES(bytesRemaining);
@@ -328,5 +398,5 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	LoadMapModels(map);
 
-	return map;
+	return true;
 }

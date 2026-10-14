@@ -445,6 +445,11 @@ float GetFloatStatistic(const char *stat)
 	return (*StatDict_get(statistics, stat))->value.floatValue;
 }
 
+StatType GetStatisticType(const char *stat)
+{
+	return (*StatDict_get(statistics, stat))->type;
+}
+
 void UnlockAchievement(const char *ach)
 {
 	Achievement *a = *AchievementDict_get(achievements, ach);

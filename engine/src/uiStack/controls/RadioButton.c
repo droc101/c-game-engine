@@ -5,7 +5,6 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -13,6 +12,7 @@
 #include <engine/subsystem/SoundSystem.h>
 #include <engine/uiStack/controls/RadioButton.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <stdbool.h>
@@ -99,10 +99,9 @@ void DrawRadioButton(const Control *c, ControlState /*state*/, const Vector2 pos
 {
 	const RadioButtonData *data = (RadioButtonData *)c->controlData;
 
-	const Color textColor = data->checked ? COLOR_WHITE : COLOR(0xFFc0c0c0);
 	DrawTextAligned(data->label,
 					16,
-					COLOR_BLACK,
+					uiTheme.primaryText.shadowColor,
 					v2(c->anchoredPosition.x + 42, c->anchoredPosition.y + 2),
 					v2(c->size.x - 40, c->size.y),
 					FONT_HALIGN_LEFT,
@@ -110,7 +109,7 @@ void DrawRadioButton(const Control *c, ControlState /*state*/, const Vector2 pos
 					FONT("small_font"));
 	DrawTextAligned(data->label,
 					16,
-					textColor,
+					uiTheme.primaryText.textColor,
 					v2(c->anchoredPosition.x + 40, c->anchoredPosition.y),
 					v2(c->size.x - 40, c->size.y),
 					FONT_HALIGN_LEFT,

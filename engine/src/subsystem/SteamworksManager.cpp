@@ -28,7 +28,9 @@ namespace
 	};
 } // namespace
 
+#ifdef ENABLE_STEAMWORKS
 static SteamworksCallbackListener *callbackListener = nullptr;
+#endif
 static bool steamworksRunning = false;
 
 bool InitSteamworks()
@@ -95,6 +97,8 @@ bool IsSteamAchievementUnlocked(const char *achievement)
 			LogError("Failed to get achievement \"%s\" from Steam, does it exist?\n", achievement);
 		}
 	}
+#else
+	(void)achievement;
 #endif
 	return false;
 }
@@ -113,6 +117,8 @@ int32_t GetSteamIntegerStatistic(const char *statistic)
 			LogError("Failed to get stat \"%s\" from Steam, does it exist?\n", statistic);
 		}
 	}
+#else
+	(void)statistic;
 #endif
 	return 0;
 }
@@ -131,6 +137,8 @@ float GetSteamFloatStatistic(const char *statistic)
 			LogError("Failed to get stat \"%s\" from Steam, does it exist?\n", statistic);
 		}
 	}
+#else
+	(void)statistic;
 #endif
 	return 0.0f;
 }
@@ -154,6 +162,9 @@ void SetSteamAchievementUnlocked(const char *achievement, bool unlocked)
 			}
 		}
 	}
+#else
+	(void)achievement;
+	(void)unlocked;
 #endif
 }
 
@@ -167,6 +178,9 @@ void SetSteamIntegerStatistic(const char *statistic, const int32_t value)
 			LogError("Failed to set Steam stat \"%s\", does it exist?\n", statistic);
 		}
 	}
+#else
+	(void)statistic;
+	(void)value;
 #endif
 }
 
@@ -180,6 +194,9 @@ void SetSteamFloatStatistic(const char *statistic, const float value)
 			LogError("Failed to set Steam stat \"%s\", does it exist?\n", statistic);
 		}
 	}
+#else
+	(void)statistic;
+	(void)value;
 #endif
 }
 

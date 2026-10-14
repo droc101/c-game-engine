@@ -76,11 +76,12 @@ bool ReadKvlFile(const char *path, KvList output)
 	}
 
 	DataReader *reader = CreateDataReader(buffer, bufferSize, 0);
-	ReadKvList(reader, output);
+	size_t bytesRemaining = bufferSize;
+	const bool success = ReadKvList(reader, output, &bytesRemaining);
 	free(buffer);
 	DestroyDataReader(reader);
 
-	return true;
+	return success;
 }
 
 bool WriteKvlFile(const char *path, KvList input)

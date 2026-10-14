@@ -11,6 +11,8 @@
 typedef enum OptionsMsaa OptionsMsaa;
 typedef enum OptionsAnisotropy OptionsAnisotropy;
 typedef enum OptionsGpuType OptionsGpuType;
+typedef enum OptionsShadowMapResolution OptionsShadowMapResolution;
+typedef enum OptionsShadowMapSoftShadowQuality OptionsShadowMapSoftShadowQuality;
 
 typedef struct Options Options;
 
@@ -39,6 +41,25 @@ enum OptionsGpuType
 	GPU_TYPE_INTEGRATED,
 	GPU_TYPE_DEDICATED,
 	GPU_TYPE_SOFTWARE,
+};
+
+enum OptionsShadowMapResolution
+{
+	SHADOW_MAP_RESOLUTION_DISABLED = 0,
+	SHADOW_MAP_RESOLUTION_1024 = 1,
+	SHADOW_MAP_RESOLUTION_2048 = 2,
+	SHADOW_MAP_RESOLUTION_4096 = 3,
+	SHADOW_MAP_RESOLUTION_8192 = 4,
+	SHADOW_MAP_RESOLUTION_16384 = 5,
+};
+
+enum OptionsShadowMapSoftShadowQuality
+{
+	SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST,
+	SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW,
+	SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM,
+	SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH,
+	SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA,
 };
 
 struct Options
@@ -76,6 +97,10 @@ struct Options
 	bool limitFpsWhenUnfocused;
 	/// The LOD distance multiplier
 	float lodMultiplier;
+	/// What the resolution of the realtime shadow maps should be
+	OptionsShadowMapResolution shadowMapResolution;
+	/// How soft the shadow map shadows should be
+	OptionsShadowMapSoftShadowQuality shadowMapSoftShadowQuality;
 	/// Field of view
 	float fov;
 	/// Anisotropy level

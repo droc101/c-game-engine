@@ -120,11 +120,6 @@ static void GlobalFogDestroy(Actor *this)
 
 ActorDefinition globalFogActorDefinition = {
 	.Update = GlobalFogUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = GlobalFogDestroy,
 	.Init = GlobalFogInit,
 };

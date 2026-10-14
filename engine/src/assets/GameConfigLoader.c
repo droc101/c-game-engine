@@ -89,8 +89,12 @@ void LoadGameConfig(const char *game)
 		Error("Invalid game configuration");
 	}
 	DataReader *reader = CreateDataReaderFromAsset(asset);
+	size_t bytesRemaining = asset->size;
 	KvList configList = {};
-	ReadKvList(reader, configList);
+	if (!ReadKvList(reader, configList, &bytesRemaining))
+	{
+		Error("Failed to read game configuration!");
+	}
 	DestroyDataReader(reader);
 
 	gameConfig.gameTitle = strdup(KvGetString(configList, "game_title", "Untitled"));

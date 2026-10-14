@@ -9,31 +9,17 @@
 #include <engine/graphics/RenderingHelpers.h> // NOLINT(*-include-cleaner)
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/Map.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef BUILDSTYLE_DEBUG
-/**
- * Additional validation for Vulkan code
- * This will only work if the Vulkan SDK is installed on the device running the program.
- * @warning NOT FOR RELEASE BUILDS
- * @see https://docs.vulkan.org/guide/latest/validation_overview.html
- * @see https://vulkan.lunarg.com/doc/sdk/latest/windows/khronos_validation_layer.html
- */
-#define VK_ENABLE_VALIDATION_LAYER
-#endif
-
 #define VK_X_TO_NDC(x) ((float)(x) / ScaledWindowWidthFloat() * 2.0f - 1.0f)
 #define VK_Y_TO_NDC(y) ((float)(y) / ScaledWindowHeightFloat() * 2.0f - 1.0f)
 
-bool VK_PreInit();
-
 bool VK_Init(SDL_Window *window);
-
-void VK_DPrintDevice();
 
 bool VK_FrameStart();
 
@@ -45,16 +31,33 @@ bool VK_FrameStart();
  * @param camera The camera from which the map should be rendered
  * @return @c VK_SUCCESS if the map was rendered successfully, or a meaningful result code otherwise
  */
-bool VK_RenderMap(Map *map, const Camera *camera);
+void VK_RenderMap(Map *map, Camera *camera);
 
 bool VK_FrameEnd();
 
 /// A function used to destroy the Vulkan objects when they are no longer needed.
 void VK_Cleanup();
 
-bool VK_LoadMap(const Map *map);
+void VK_LoadMap(const Map *map);
 
-bool VK_UpdateViewportSize();
+/**
+ * Load a dynamic light
+ * @warning The pointer passed to this function is stored!
+ *			Therefore, it must live until VK_RemoveDynamicLight is called with the same pointer
+ * @param light The light to load
+ * @return True if the light was successfully added, or false if something failed
+ */
+void VK_AddDynamicLight(const DynamicLight *light);
+
+/**
+ * Remove a dynamic light so that it is no longer rendered
+ * @note This function does not free the memory pointed to by @c light
+ * @param light The light to remove. Must exactly match a pointer previously passed to VK_AddDynamicLight
+ * @return True if the light was successfully removed, or false if something failed
+ */
+void VK_RemoveDynamicLight(const DynamicLight *light);
+
+void VK_UpdateViewportSize();
 
 void VK_Minimize();
 
@@ -91,9 +94,9 @@ void VK_DrawTexturedQuadRegionMod(int x,
 
 void VK_DrawTexturedQuadsBatched(const float *vertices, int quadCount, const char *texture, Color color);
 
-void VK_DrawLine(int startX, int startY, int endX, int endY, int thickness, Color color);
+void VK_DrawLine(Vector2 start, Vector2 end, float thickness, Color color);
 
-void VK_DrawRectOutline(int x, int y, int w, int h, int thickness, Color color);
+void VK_DrawRectOutline(Vector2 position, Vector2 size, float thickness, Color color);
 
 void VK_DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, Color color);
 

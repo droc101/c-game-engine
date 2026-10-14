@@ -112,16 +112,12 @@ static void CoinInit(Actor *this, const KvList params, const Transform *transfor
 	this->wall->uvOffset = v2s(0.0f);
 	this->wall->height = SIZE;
 	this->wall->unshaded = false;
+	this->wall->castsShadows = true;
 }
 
 ActorDefinition coinActorDefinition = {
 	.Update = CoinUpdate,
 	.OnPlayerContactAdded = CoinOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = CoinInit,
 };
 

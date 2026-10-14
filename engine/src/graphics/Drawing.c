@@ -4,11 +4,12 @@
 
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/TextureLoader.h>
-#include <engine/debug/DebugEntryManager.h>
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
+#include <engine/helpers/Macros.h>
+#include <engine/physics/PhysicsThread.h>
 #include <engine/physics/PlayerPhysics.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
@@ -56,12 +57,12 @@ SDL_Surface *ToSDLSurface(const char *texture)
 
 inline void DrawLine(const Vector2 start, const Vector2 end, const float thickness, const Color color)
 {
-	VK_DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, (int)(thickness * GetState()->uiScale), color);
+	VK_DrawLine(start, end, thickness * (float)GetState()->uiScale, color);
 }
 
 inline void DrawOutlineRect(const Vector2 pos, const Vector2 size, const float thickness, const Color color)
 {
-	VK_DrawRectOutline((int)pos.x, (int)pos.y, (int)size.x, (int)size.y, (int)(thickness * GetState()->uiScale), color);
+	VK_DrawRectOutline(pos, size, thickness * (float)GetState()->uiScale, color);
 }
 
 inline void DrawTexture(const Vector2 pos, const Vector2 size, const char *texture)
@@ -195,9 +196,9 @@ void DrawNinePatchTexture(const Vector2 pos,
 
 	const UiTriangleArray tris = {
 		.vertices = vertices,
-		.vertexCount = sizeof(vertices) / (sizeof(float) * 4),
+		.vertexCount = ArrayLength(vertices),
 		.indices = indices,
-		.indexCount = sizeof(indices) / sizeof(uint32_t),
+		.indexCount = ArrayLength(indices) * ArrayLength(*indices),
 	};
 
 	DrawUiTriangles(&tris, texture, COLOR_WHITE);
@@ -305,7 +306,9 @@ void RenderHUD()
 	}
 }
 
-void RenderMap3D(Map *map, const Camera *cam)
+void RenderMap3D(Map *map, Camera *camera)
 {
-	VK_RenderMap(map, cam);
+	PhysicsThreadLockTickMutex();
+	VK_RenderMap(map, camera);
+	PhysicsThreadUnlockTickMutex();
 }

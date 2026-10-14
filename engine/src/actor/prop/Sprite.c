@@ -55,6 +55,7 @@ static void SpriteInit(Actor *this, const KvList params, const Transform *transf
 	this->wall->uvScale = KvGetVec2(params, "uv_scale", v2s(1.0f));
 	this->wall->uvOffset = KvGetVec2(params, "uv_offset", v2s(0.0f));
 	this->wall->unshaded = KvGetBool(params, "unshaded", false);
+	this->wall->castsShadows = true;
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	if (KvGetBool(params, "solid", false))
 	{
@@ -66,13 +67,6 @@ static void SpriteInit(Actor *this, const KvList params, const Transform *transf
 }
 
 ActorDefinition spriteActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
-	.Destroy = DefaultActorDestroy,
 	.Init = SpriteInit,
 };
 

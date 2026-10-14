@@ -13,6 +13,7 @@
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
+#include <engine/subsystem/Discord.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/Timing.h>
@@ -26,6 +27,8 @@ typedef enum LoadingStateStage
 {
 	/// Drawing the first frame ("LOADING" text)
 	LSS_WAITING_FOR_FRAME,
+	/// Reloading all assets to prevent unused memory from pooling up
+	LSS_RELOADING_ASSETS,
 	/// Loading the map from disk and performing the first frame update
 	LSS_LOADING_LEVEL,
 	/// Performing the first physics tick
@@ -62,7 +65,7 @@ static void LoadingStateUpdate(GlobalState *state, const double delta)
 		const uint64_t realLoadStart = GetTimeNs();
 		if (!ChangeMapByName(loadStateLevelname))
 		{
-			LogError("Failed to load map: %s\n", loadStateLevelname);
+			LogError("Failed to load map \"%s\"\n", loadStateLevelname);
 			if (LoadingStateErrorCallback)
 			{
 				LoadingStateErrorCallback();
@@ -111,7 +114,11 @@ static void LoadingStateRender(GlobalState * /*state*/, const double /*delta*/)
 					FONT("small_font"));
 	if (stage == LSS_WAITING_FOR_FRAME)
 	{
-		stage = LSS_LOADING_LEVEL;
+		stage = LSS_RELOADING_ASSETS;
+		rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
+	} else if (stage == LSS_RELOADING_ASSETS)
+	{
+		stage =  LSS_LOADING_LEVEL;
 	}
 }
 
@@ -120,11 +127,14 @@ static void LoadingStateSet()
 	levelLoadStartTime = GetTimeMs();
 	assert(loadStateLevelname);
 	stage = LSS_WAITING_FOR_FRAME;
+	ChangeMap(NULL);
+	GetState()->rpcState = UNKNOWN;
 }
 
 static void LoadingStateDestroy()
 {
 	free(loadStateLevelname);
+	loadStateLevelname = NULL;
 	if (loadStateTransition)
 	{
 		free(loadStateTransition->entranceName);

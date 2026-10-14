@@ -125,12 +125,7 @@ static void TriggerMapDestroy(Actor *this)
 }
 
 ActorDefinition triggerMapActorDefinition = {
-	.Update = DefaultActorUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
 	.OnPlayerContactPersisted = TriggerMapOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = TriggerMapDestroy,
 	.Init = TriggerMapInit,
 };

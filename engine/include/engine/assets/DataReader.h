@@ -64,6 +64,7 @@ void ReadBuffer(DataReader *reader, size_t readSize, void *dest);
  * @param reader The DataReader to read to
  * @param outLength Where to write the length of the string read
  * @return A pointer (must be freed) of the string read
+ * @note This can return NULL, check for that
  */
 char *ReadStringSafe(DataReader *reader, size_t *outLength);
 

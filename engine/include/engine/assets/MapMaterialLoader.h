@@ -34,6 +34,8 @@ struct MapMaterial
 	ModelShader shader;
 	/// The sound class this material uses
 	SoundClass soundClass;
+	/// If this material should cast shadows or not
+	bool castsShadows;
 };
 
 /**

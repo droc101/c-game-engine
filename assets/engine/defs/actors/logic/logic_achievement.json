@@ -1,0 +1,24 @@
+{
+  "extends": "actor",
+  "description": "Unlocks an achievement via I/O",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "grant": {
+      "description": "Unlock this achievement"
+    }
+  },
+  "outputs": {},
+  "params": {
+    "achievement": {
+      "display": "Achievement",
+      "default": "",
+      "type": "string",
+      "description": "The internal name of the achievement to unlock"
+    }
+  }
+}

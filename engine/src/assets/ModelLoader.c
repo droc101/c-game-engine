@@ -75,14 +75,20 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	{
 		Material *mat = &model->materials[i];
 		mat->texture = ReadStringSafe(reader, &strLength);
+		if (!mat->texture)
+		{
+			LogError("Failed to read model texture name\n");
+			return NULL;
+		}
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
-		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t), bytesRemaining);
+		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t) + 1, bytesRemaining);
 		mat->color.r = ReadFloat(reader);
 		mat->color.g = ReadFloat(reader);
 		mat->color.b = ReadFloat(reader);
 		mat->color.a = ReadFloat(reader);
 		mat->shader = ReadUint32(reader);
+		mat->castsShadows = ReadUint8(reader) != 0;
 	}
 
 	model->skinMaterialIndices = malloc(sizeof(uint32_t *) * model->skinCount);
@@ -126,21 +132,24 @@ ModelDefinition *LoadModelInternal(const char *asset)
 
 		EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);
 		lod->totalIndexCount = ReadUint32(reader);
-		const size_t indexCountSize = model->materialSlotCount * sizeof(uint32_t);
-		EXPECT_BYTES(indexCountSize, bytesRemaining);
-		lod->indexCount = malloc(indexCountSize);
-		CheckAlloc(lod->indexCount);
-		ReadBuffer(reader, indexCountSize, lod->indexCount);
-
-		lod->indexData = malloc(sizeof(uint32_t *) * model->materialSlotCount);
-		CheckAlloc(lod->indexData);
+		lod->components = malloc(model->materialSlotCount * sizeof(ModelComponent));
+		CheckAlloc(lod->components);
 		for (uint32_t j = 0; j < model->materialSlotCount; j++)
 		{
-			EXPECT_BYTES(lod->indexCount[j] * sizeof(uint32_t), bytesRemaining);
-			uint32_t *indexData = malloc(lod->indexCount[j] * sizeof(uint32_t));
-			CheckAlloc(indexData);
-			lod->indexData[j] = indexData;
-			ReadBuffer(reader, lod->indexCount[j] * sizeof(uint32_t), indexData);
+			ModelComponent *component = &lod->components[j];
+			EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);
+			component->indexCount = ReadUint32(reader);
+			const size_t indicesBufferSize = component->indexCount * sizeof(uint32_t);
+			component->indices = malloc(indicesBufferSize);
+			CheckAlloc(component->indices);
+			EXPECT_BYTES(indicesBufferSize, bytesRemaining);
+			ReadBuffer(reader, indicesBufferSize, component->indices);
+			EXPECT_BYTES(sizeof(float) * 3, bytesRemaining);
+			component->centerOffset.x = ReadFloat(reader);
+			component->centerOffset.y = ReadFloat(reader);
+			component->centerOffset.z = ReadFloat(reader);
+			EXPECT_BYTES(sizeof(float), bytesRemaining);
+			component->radius = ReadFloat(reader);
 		}
 	}
 
@@ -293,10 +302,9 @@ void FreeModel(ModelDefinition *model)
 		free(lod->vertexData);
 		for (uint32_t j = 0; j < model->materialSlotCount; j++)
 		{
-			free(lod->indexData[j]);
+			free(lod->components[j].indices);
 		}
-		free(lod->indexData);
-		free(lod->indexCount);
+		free(lod->components);
 	}
 
 	for (uint32_t i = 0; i < model->materialCount; i++)

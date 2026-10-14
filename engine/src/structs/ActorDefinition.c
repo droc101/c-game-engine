@@ -9,9 +9,19 @@
 #include <engine/actor/env/GlobalLight.h>
 #include <engine/actor/env/TonemapController.h>
 #include <engine/actor/IoProxy.h>
+#include <engine/actor/light/PointLight.h>
+#include <engine/actor/light/SpotLight.h>
+#include <engine/actor/logic/LogicAchievement.h>
 #include <engine/actor/logic/LogicBinary.h>
+#include <engine/actor/logic/LogicBranch.h>
+#include <engine/actor/logic/LogicCast.h>
 #include <engine/actor/logic/LogicCounter.h>
 #include <engine/actor/logic/LogicDecimal.h>
+#include <engine/actor/logic/LogicFunction.h>
+#include <engine/actor/logic/LogicPrint.h>
+#include <engine/actor/logic/LogicRandom.h>
+#include <engine/actor/logic/LogicStatistic.h>
+#include <engine/actor/logic/LogicTimer.h>
 #include <engine/actor/prop/Button.h>
 #include <engine/actor/prop/PhysicsModel.h>
 #include <engine/actor/prop/Sprite.h>
@@ -34,14 +44,7 @@ void RegisterActor(const char *actorTypeName, ActorDefinition *definition)
 	assert(ActorDefinitionDict_get(actorDefinitions, actorTypeName) == NULL); // Actor name already registered
 	assert(actorTypeName != NULL);
 	assert(definition != NULL);
-	assert(definition->Update != NULL);
-	assert(definition->OnPlayerContactAdded != NULL);
-	assert(definition->OnPlayerContactPersisted != NULL);
-	assert(definition->OnPlayerContactRemoved != NULL);
-	assert(definition->RenderUi != NULL);
-	assert(definition->Interact != NULL);
 	assert(definition->Init != NULL);
-	assert(definition->Destroy != NULL);
 #ifdef BUILDSTYLE_DEBUG
 	ActorInputHandlerFunctionDict_iterator it;
 	ActorInputHandlerFunctionDict_it(it, definition->inputHandlers);
@@ -85,23 +88,42 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	LogDebug("Registering actors...\n");
 	ActorDefinitionDict_init(actorDefinitions);
 
-	RegisterIoProxy();
+	//env_*
+	RegisterGlobalLight();
+	RegisterGlobalFog();
+	RegisterTonemapController();
+
+	//light_*
+	RegisterPointLight();
+	RegisterSpotLight();
+
+	//logic_*
 	RegisterLogicBinary();
 	RegisterLogicCounter();
 	RegisterLogicDecimal();
-	RegisterSoundPlayer();
+	RegisterLogicFunction();
+	RegisterLogicRandom();
+	RegisterLogicCast();
+	RegisterLogicAchievement();
+	RegisterLogicStatistic();
+	RegisterLogicBranch();
+	RegisterLogicTimer();
+	RegisterLogicPrint();
+
+	//prop_*
 	RegisterSprite();
 	RegisterStaticModel();
-	RegisterTrigger();
-	RegisterGlobalLight();
-	RegisterGlobalFog();
-	RegisterPhysicsModel();
-	RegisterTonemapController();
-	RegisterCamera();
 	RegisterButton();
+	RegisterWorldText();
+	RegisterPhysicsModel();
+
+	//other
+	RegisterIoProxy();
+	RegisterSoundPlayer();
+	RegisterTrigger();
+	RegisterCamera();
 	RegisterTriggerMap();
 	RegisterEntrance();
-	RegisterWorldText();
 
 	if (RegisterGameActors)
 	{

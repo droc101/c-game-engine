@@ -86,31 +86,36 @@ void _LockingListCopy(const LockingList *restrict oldList, LockingList *restrict
 }
 
 
-void _ListAdd(List *list, void *data)
+void **_ListAdd(List *list, void *data)
 {
 	assert(list);
 
+	void **result = NULL;
 	switch (list->data->type)
 	{
 		case LIST_POINTER:
 			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length + 1, sizeof(void *));
 			CheckAlloc(list->data->pointerData);
 			list->data->pointerData[list->length] = data;
+			result = &list->data->pointerData[list->length];
 			break;
 		case LIST_UINT64:
 			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length + 1, sizeof(uint64_t));
 			CheckAlloc(list->data->uint64Data);
 			list->data->uint64Data[list->length] = (uint64_t)(uintptr_t)data;
+			result = (void **)&list->data->uint64Data[list->length];
 			break;
 		case LIST_UINT32:
 			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length + 1, sizeof(uint32_t));
 			CheckAlloc(list->data->uint32Data);
 			list->data->uint32Data[list->length] = (uint32_t)(uintptr_t)data;
+			result = (void **)&list->data->uint32Data[list->length];
 			break;
 		case LIST_INT32:
 			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length + 1, sizeof(int32_t));
 			CheckAlloc(list->data->int32Data);
 			list->data->int32Data[list->length] = (int32_t)(uintptr_t)data;
+			result = (void **)&list->data->int32Data[list->length];
 			break;
 		case LIST_NESTED:
 			list->data->nestedListData = GameReallocArray(list->data->nestedListData, list->length + 1, sizeof(List));
@@ -122,18 +127,23 @@ void _ListAdd(List *list, void *data)
 			{
 				ListInit(list->data->nestedListData[list->length], LIST_POINTER);
 			}
+			result = (void **)&list->data->nestedListData[list->length];
 			break;
 	}
 	list->length++;
+
+	return result;
 }
 
-void _LockingListAdd(LockingList *list, void *data)
+void **_LockingListAdd(LockingList *list, void *data)
 {
 	assert(list);
 
 	ListLock(*list);
-	_ListAdd((List *)list, data);
+	void **result = _ListAdd((List *)list, data);
 	ListUnlock(*list);
+
+	return result;
 }
 
 
@@ -251,7 +261,7 @@ void _LockingListRemoveAt(LockingList *list, const size_t index)
 }
 
 
-void _ListInsertAfter(List *list, size_t index, void *data)
+void _ListInsert(List *list, const size_t index, void *data)
 {
 	assert(list);
 
@@ -261,11 +271,9 @@ void _ListInsertAfter(List *list, size_t index, void *data)
 		return;
 	}
 
-	assert(index <= list->length);
+	assert(index < list->length);
 
-	index++;
 	list->length++;
-	// TODO: handle LIST_NESTED (even if said handling is an assert/error)
 	switch (list->data->type)
 	{
 		case LIST_POINTER:
@@ -300,15 +308,17 @@ void _ListInsertAfter(List *list, size_t index, void *data)
 					sizeof(int32_t) * (list->length - index - 1));
 			list->data->int32Data[index] = (int32_t)(uintptr_t)data;
 			break;
+		default:
+			Error("Unimplemented ListInsert on LIST_NESTED");
 	}
 }
 
-void _LockingListInsertAfter(LockingList *list, const size_t index, void *data)
+void _LockingListInsert(LockingList *list, const size_t index, void *data)
 {
 	assert(list);
 
 	ListLock(*list);
-	_ListInsertAfter((List *)list, index, data);
+	_ListInsert((List *)list, index, data);
 	ListUnlock(*list);
 }
 
@@ -322,7 +332,6 @@ size_t _ListFind(const List *list, const void *data)
 
 	for (size_t i = 0; i < list->length; i++)
 	{
-		// TODO: handle LIST_NESTED (even if said handling is an assert/error)
 		switch (list->data->type)
 		{
 			case LIST_POINTER:
@@ -349,6 +358,8 @@ size_t _ListFind(const List *list, const void *data)
 					return i;
 				}
 				break;
+			default:
+				Error("Unimplemented ListFind on LIST_NESTED");
 		}
 	}
 	return -1;
@@ -364,7 +375,6 @@ size_t _LockingListFind(LockingList *list, const void *data)
 	ListLock(*list);
 	for (size_t i = 0; i < list->length; i++)
 	{
-		// TODO: handle LIST_NESTED (even if said handling is an assert/error)
 		switch (list->data->type)
 		{
 			case LIST_POINTER:
@@ -395,6 +405,8 @@ size_t _LockingListFind(LockingList *list, const void *data)
 					return i;
 				}
 				break;
+			default:
+				Error("Unimplemented LockingListFind on LIST_NESTED");
 		}
 	}
 	ListUnlock(*list);

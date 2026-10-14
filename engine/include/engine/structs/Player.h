@@ -8,6 +8,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
@@ -43,11 +44,14 @@ struct Player
 	bool hasHeldActor;
 	bool isNoclipActive;
 	bool isFreecamActive;
+	bool isFlashlightOn;
 
 	/// The player's camera
 	Camera playerCamera;
 	/// The height of view bobbing
 	float viewBobbingHeight;
+	/// The player's flashlight
+	DynamicLight flashlight;
 
 	/// Mutex used for synchronizing player position for interpolation
 	SDL_Mutex *mutex;

@@ -18,7 +18,6 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Player.h>
-#include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
@@ -91,7 +90,10 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 	for (size_t i = 0; i < state->map->actors.length; i++)
 	{
 		Actor *a = ListGetPointer(state->map->actors, i);
-		a->definition->Update(a, delta);
+		if (a->definition->Update)
+		{
+			a->definition->Update(a, delta);
+		}
 	}
 
 	ProcessIOQueue(state->map);

@@ -17,7 +17,6 @@ struct DiscordApplication
 {
 	struct IDiscordCore *core;
 	struct IDiscordActivityManager *activityManager;
-	DiscordUserId user_id;
 };
 
 static struct DiscordApplication app;

@@ -21,7 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef BUILDSTYLE_RELEASE
 static bool signalHandlerInvoked = false;
+#endif
 
 _Noreturn inline void _GameAllocFailure()
 {
@@ -70,7 +72,7 @@ _Noreturn void _ErrorInternal(char *error, const char *file, const int line, con
 	const int buttonCount = 4;
 #endif
 
-	SDL_MessageBoxButtonData buttons[buttonCount];
+	SDL_MessageBoxButtonData buttons[4];
 	buttons[0].buttonID = 0;
 	buttons[0].text = "Exit";
 	buttons[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
@@ -152,6 +154,7 @@ _Noreturn void RenderInitError()
 	exit(1);
 }
 
+#ifdef BUILDSTYLE_RELEASE
 static void SignalHandler(const int sig)
 {
 	if (signalHandlerInvoked)
@@ -173,6 +176,7 @@ static void SignalHandler(const int sig)
 			break;
 	}
 }
+#endif
 
 void ErrorHandlerInit()
 {

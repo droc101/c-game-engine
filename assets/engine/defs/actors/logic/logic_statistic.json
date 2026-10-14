@@ -1,0 +1,39 @@
+{
+  "extends": "actor",
+  "description": "Manages a statistic via I/O",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "add": {
+      "description": "Add the specified value (or one) to the statistic",
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ]
+    },
+    "set": {
+      "description": "Set the statistic to the specified value (or zero)",
+      "types": [
+        "byte",
+        "int",
+        "float",
+        "uint64"
+      ]
+    }
+  },
+  "outputs": {},
+  "params": {
+    "statistic": {
+      "display": "Statistic",
+      "description": "The internal name of the statistic to manage",
+      "default": "",
+      "type": "string"
+    }
+  }
+}

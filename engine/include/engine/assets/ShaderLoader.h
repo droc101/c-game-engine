@@ -22,7 +22,7 @@ enum ShaderType
 	SHADER_TYPE_VERT,
 	/// Compute shader
 	SHADER_TYPE_COMP,
-	/// Geometry Shader
+	/// Geometry shader
 	SHADER_TYPE_GEOM,
 };
 

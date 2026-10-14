@@ -34,7 +34,6 @@
 
 static const char *spawnActorOnce = NULL;
 static const char *spawnActorEveryTick = NULL;
-static double lastTickDelta = 0.0f;
 
 static void MainStateUpdate(GlobalState *state, const double delta)
 {
@@ -86,8 +85,6 @@ static void MainStateFixedUpdate(GlobalState *state, const double delta)
 	}
 
 	MapFixedUpdate(state, delta);
-
-	lastTickDelta = delta;
 }
 
 static void MainStateRender(GlobalState *state, const double /*delta*/)

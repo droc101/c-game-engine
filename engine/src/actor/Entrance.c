@@ -68,11 +68,6 @@ static void EntranceDestroy(Actor *this)
 
 ActorDefinition entranceActorDefinition = {
 	.Update = EntranceUpdate,
-	.OnPlayerContactAdded = DefaultActorOnPlayerContactAdded,
-	.OnPlayerContactPersisted = DefaultActorOnPlayerContactPersisted,
-	.OnPlayerContactRemoved = DefaultActorOnPlayerContactRemoved,
-	.RenderUi = DefaultActorRenderUi,
-	.Interact = DefaultActorInteract,
 	.Destroy = EntranceDestroy,
 	.Init = EntranceInit,
 };

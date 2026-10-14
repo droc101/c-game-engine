@@ -7,7 +7,6 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/helpers/BackgroundMapManager.h>
-#include <engine/structs/Color.h>
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
@@ -20,6 +19,7 @@
 #include <engine/uiStack/controls/IconButton.h>
 #include <engine/uiStack/controls/LabelControl.h>
 #include <engine/uiStack/UiStack.h>
+#include <engine/uiStack/UiTheme.h>
 #include <gameState/OptionsState.h>
 #include <math.h>
 #include <SDL3/SDL_gamepad.h>
@@ -48,7 +48,7 @@ typedef struct ControlRowData
 } ControlRowData;
 
 static OptionsMenu *controlOptionsMenu;
-static char *filter = NULL;
+// static char *filter = NULL;
 
 static ListenMode listenMode;
 static ControlRowData *listenRow;
@@ -119,15 +119,16 @@ static void BtnEditCtlrBinding(Control * /*control*/, void *extraData)
 	UpdateControlRow(row);
 }
 
-static void FilterTextChanged(const char *newFilter)
-{
-	free(filter);
-	filter = NULL;
-	if (newFilter && strlen(newFilter) > 0)
-	{
-		filter = strdup(newFilter);
-	}
-}
+// TODO: reimplement this, may be best to wait for ggui
+// static void FilterTextChanged(const char *newFilter)
+// {
+// 	free(filter);
+// 	filter = NULL;
+// 	if (newFilter && strlen(newFilter) > 0)
+// 	{
+// 		filter = strdup(newFilter);
+// 	}
+// }
 
 static void ProcessListening()
 {
@@ -370,7 +371,7 @@ static void ControlsOptionsStateSet()
 			OptionsMenuAddControl(controlOptionsMenu,
 								  CreateLabelControl(cat->categoryName,
 													 16,
-													 COLOR_WHITE,
+													 &uiTheme.primaryText,
 													 v2s(0),
 													 v2(750, 40),
 													 TOP_LEFT,
@@ -386,7 +387,7 @@ static void ControlsOptionsStateSet()
 				OptionsMenuAddControl(controlOptionsMenu,
 									  CreateLabelControl(entry->displayName,
 														 16,
-														 COLOR_WHITE,
+														 &uiTheme.primaryText,
 														 v2s(0),
 														 v2(750 - 40 - 6 - 190 - 6 - 190 - 6, 40),
 														 TOP_LEFT,

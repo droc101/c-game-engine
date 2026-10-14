@@ -43,7 +43,6 @@ if (WIN32)
     )
 
     set(DLLS
-            zlib1.dll
             libwinpthread-1.dll
     )
 

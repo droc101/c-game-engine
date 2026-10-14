@@ -42,6 +42,7 @@ void EnterMenuBackgroundState()
 {
 	if (!IsBackgroundMapLoaded())
 	{
+		rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
 		backgroundMapLoadFrameCounter = 0;
 		placeholderOpacity = 1.0f;
 		dontLoadBackgroundMap = HasCliArg("--no-background-map");

@@ -2191,7 +2191,7 @@
                 "units_per_luxel": 1.0
             },
             "ceilingMaterial": {
-                "material": "material/white_light.gmtl",
+                "material": "material/dev/ceiling_test.gmtl",
                 "uvOffset": {
                     "x": 0.0,
                     "y": 0.0
@@ -4339,7 +4339,7 @@
         {
             "class": "player",
             "position": {
-                "x": -96.0,
+                "x": 272.0,
                 "y": -4.0,
                 "z": 0.0
             },
@@ -4350,11 +4350,11 @@
             },
             "connections": [],
             "params": {
-                "far_z": {
+                "far_plane": {
                     "type": "float",
                     "value": 4096.0
                 },
-                "near_z": {
+                "near_plane": {
                     "type": "float",
                     "value": 0.009999999776482582
                 }
@@ -5071,7 +5071,7 @@
             "position": {
                 "x": -216.0,
                 "y": 0.0,
-                "z": -132.0
+                "z": -120.0
             },
             "rotation": {
                 "x": 240.0,
@@ -5092,6 +5092,140 @@
                         "b": 0.8312236070632935,
                         "a": 1.0
                     }
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 448.0,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 270.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 30.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_spot",
+            "position": {
+                "x": 324.0,
+                "y": 0.0,
+                "z": -44.0
+            },
+            "rotation": {
+                "x": 235.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "bright_angle": {
+                    "type": "float",
+                    "value": 45.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "cookie": {
+                    "type": "string",
+                    "value": ""
+                },
+                "fading_angle": {
+                    "type": "float",
+                    "value": 60.0
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 0.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "prop_physbox",
+            "position": {
+                "x": 288.0,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": ""
                 }
             }
         }

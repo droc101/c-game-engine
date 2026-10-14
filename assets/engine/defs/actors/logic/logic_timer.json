@@ -1,0 +1,40 @@
+{
+  "extends": "actor",
+  "description": "Fires outputs on a repeating timer",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "#FFFF00"
+    }
+  ],
+  "inputs": {
+    "start": {
+      "description": "(Re)start the timer"
+    },
+    "stop": {
+      "description": "Stop the timer"
+    },
+    "fire": {
+      "description": "Fire the \"on_timer_expired\" output immediately"
+    }
+  },
+  "outputs": {
+    "on_timer_expired": {
+      "description": "The timer has expired. It will automatically restart."
+    }
+  },
+  "params": {
+    "autostart": {
+      "display": "Autostart",
+      "description": "Whether to automatically start this timer",
+      "default": true,
+      "type": "bool"
+    },
+    "interval_msec": {
+      "display": "Interval (milliseconds)",
+      "description": "The time this timer counts down for, in milliseconds",
+      "type": "uint64",
+      "default": 1000
+    }
+  }
+}

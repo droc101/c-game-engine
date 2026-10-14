@@ -185,6 +185,8 @@ int32_t GetIntegerStatistic(const char *stat);
  */
 float GetFloatStatistic(const char *stat);
 
+StatType GetStatisticType(const char *stat);
+
 /**
  * Unlock an achievement
  */

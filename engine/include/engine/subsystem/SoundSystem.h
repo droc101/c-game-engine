@@ -9,15 +9,15 @@
 /// (sounds that can play at the same time)
 #define SOUND_SYSTEM_CHANNEL_COUNT 32
 
+#define SOUND_SYSTEM_INVALID_HANDLE UINT64_MAX
+
 typedef enum SoundCategory SoundCategory;
 
 typedef void (*SoundFinishedCallback)(void *data);
 
-typedef struct SoundSystem SoundSystem;
-typedef struct SoundChannel SoundChannel;
 typedef struct SoundRequest SoundRequest;
 
-extern SoundSystem soundSys;
+typedef uint64_t SoundHandle;
 
 enum SoundCategory
 {
@@ -79,7 +79,7 @@ void UpdateVolume();
  * @return A SoundChannel handle, or NULL on failure
  * @warning If there are no free channels, the sound will not play.
  */
-SoundChannel *PlaySound(const char *soundAsset, SoundCategory category);
+SoundHandle PlaySound(const char *soundAsset, SoundCategory category);
 
 /**
  * Attempt to play a sound
@@ -87,26 +87,26 @@ SoundChannel *PlaySound(const char *soundAsset, SoundCategory category);
  * @return A SoundChannel handle, or NULL on failure
  * @warning If there are no free channels, the sound will not play.
  */
-SoundChannel *PlaySoundEx(const SoundRequest *request);
+SoundHandle PlaySoundEx(const SoundRequest *request);
 
 /**
  * Pause a sound
  * @param effect The sound to pause
  * @warning Make sure to either stop or resume it at some point, or it will forever occupy a sound channel
  */
-void PauseSound(const SoundChannel *effect);
+void PauseSound(SoundHandle effect);
 
 /**
  * Resume a sound
  * @param effect The sound to resume
  */
-void ResumeSound(const SoundChannel *effect);
+void ResumeSound(SoundHandle effect);
 
 /**
  * Stop a sound
  * @param effect The sound to stop
  */
-void StopSound(const SoundChannel *effect);
+void StopSound(SoundHandle effect);
 
 /**
  * Immediately stop all sounds

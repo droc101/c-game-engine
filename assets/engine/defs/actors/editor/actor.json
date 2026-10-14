@@ -5,7 +5,9 @@
     "kill": {
       "description": "Remove this actor"
     },
-    "cancel_queued_io": {}
+    "cancel_queued_io": {
+      "description": "Cancel queued I/O from this actor"
+    }
   },
   "outputs": {
     "spawned": {
