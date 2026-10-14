@@ -39,8 +39,8 @@ static const VkPipelineRasterizationStateCreateInfo RASTERIZER = {
 #ifdef JPH_DEBUG_RENDERER
 #ifndef JPH_DEBUG_RENDERER_WIREFRAME
 	.depthBiasEnable = VK_TRUE,
-	.depthBiasConstantFactor = 10,
-	.depthBiasSlopeFactor = 10,
+	.depthBiasConstantFactor = -10,
+	.depthBiasSlopeFactor = -10,
 #endif
 #endif
 	.lineWidth = 1,

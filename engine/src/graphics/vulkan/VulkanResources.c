@@ -424,20 +424,9 @@ static inline void CreatePlayerBuffers()
 static inline void CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
-	const LunaBufferCreationInfo linesVertexBuffer = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTest(lunaCreateBuffer(device, &linesVertexBuffer, &buffers.debugDrawLines.buffer),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.debugDrawLines.buffer),
 			   "Failed to create debug draw lines buffer!");
-
-	const LunaBufferCreationInfo vertexVertexBuffer = {
-		.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.queueFamilyIndexCount = 1,
-		.queueFamilyIndices = &queueFamilyIndex,
-	};
-	VulkanTest(lunaCreateBuffer(device, &vertexVertexBuffer, &buffers.debugDrawTriangles.buffer),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.debugDrawTriangles.buffer),
 			   "Failed to create debug draw triangles buffer!");
 #endif
 }
@@ -462,15 +451,9 @@ void CreateBuffers()
 void ResizeDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
-	VulkanTest(lunaGrowBuffer(device,
-							  commandBuffer,
-							  &buffers.debugDrawLines.buffer,
-							  buffers.debugDrawLines.allocatedSize),
+	VulkanTest(lunaResizeBuffer(device, &buffers.debugDrawLines.buffer, buffers.debugDrawLines.allocatedSize),
 			   "Failed to grow debug draw lines buffer!");
-	VulkanTest(lunaGrowBuffer(device,
-							  commandBuffer,
-							  &buffers.debugDrawTriangles.buffer,
-							  buffers.debugDrawTriangles.allocatedSize),
+	VulkanTest(lunaResizeBuffer(device, &buffers.debugDrawTriangles.buffer, buffers.debugDrawTriangles.allocatedSize),
 			   "Failed to grow debug draw triangles buffer!");
 #endif
 }
