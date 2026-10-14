@@ -2068,6 +2068,7 @@ bool VK_FrameStart()
 	VulkanTest(lunaBeginSingleUseCommandBuffer(device, commandBuffer), "Failed to begin command buffer for frame!");
 
 	// TODO: Remove this once better solution is found
+	lunaDeviceWaitIdle(device);
 	lunaClearStagingBuffer(device);
 
 	renderPassStarted = false;
