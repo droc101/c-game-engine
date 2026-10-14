@@ -11,7 +11,6 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
-#include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
@@ -473,15 +472,11 @@ void LoadTexture(const Image *image)
 	}
 	if (!image->filter && image->repeat)
 	{
-		sampler = useMipmaps && GetState()->options.anisotropy != ANISOTROPY_NONE
-						  ? textureSamplers.linearRepeatAnisotropy
-						  : textureSamplers.nearestRepeatNoAnisotropy;
+		sampler = textureSamplers.nearestRepeatNoAnisotropy;
 	}
 	if (!image->filter && !image->repeat)
 	{
-		sampler = useMipmaps && GetState()->options.anisotropy != ANISOTROPY_NONE
-						  ? textureSamplers.linearNoRepeatAnisotropy
-						  : textureSamplers.nearestNoRepeatNoAnisotropy;
+		sampler = textureSamplers.nearestNoRepeatNoAnisotropy;
 	}
 
 	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
