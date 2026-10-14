@@ -74,10 +74,15 @@ static OptionsButtonValue debugRenderingOptionValues[] = {
 		.tooltip = NULL,
 		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_DEPTH_ONLY},
 	},
+	{
+		.text = "Primitives",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_PRIMITIVES},
+	},
 };
 
 static OptionsButtonOptions debugRenderingOptions = {
-	.numValues = 10,
+	.numValues = 11,
 	.values = debugRenderingOptionValues,
 };
 

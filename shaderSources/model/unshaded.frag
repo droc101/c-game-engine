@@ -40,6 +40,14 @@ bool debugLighting() {
         case DEBUG_RENDERING_DEPTH_ONLY:
 			outColor.rgb = vec3(((1 - gl_FragCoord.z) / gl_FragCoord.w) / (camera.farPlane - camera.nearPlane));
             return true;
+        case DEBUG_RENDERING_PRIMITIVES:
+        {
+            uint hash = gl_PrimitiveID * 747796405u + 2891336453u;
+            hash = ((hash >> ((hash >> 28u) + 4u)) ^ hash) * 277803737u;
+            hash = (hash >> 22u) ^ hash;
+            outColor.rgb = vec3(float(hash & 0xFFu),float((hash >> 8) & 0xFFu),float((hash >> 16) & 0xFFu)) / 255.0;
+            return true;
+        }
     }
 }
 
