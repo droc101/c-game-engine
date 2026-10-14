@@ -108,7 +108,6 @@ float sampleShadowMap(const vec2 uv, const float depth, const FrustumShadowMap s
 }
 
 float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord, const float resolution) {
-    debugPrintfEXT("%f\n", resolution);
     return sampleShadowMapInternal(directionalLightShadowMapAtlas, (coord.xy * 0.25 + 0.25 + vec2(cascadeIndex % 2, cascadeIndex / 2) * 0.5) , coord.z, SAMPLE_RADIUS / (2 * resolution));
 }
 

@@ -1459,7 +1459,11 @@ static inline void DrawDebugRenderer(const LunaGraphicsPipelineBindInfo *pipelin
 static inline VkRect2D GetFrustumScissor(const uint32_t size, uint32_t frustumIndex)
 {
 	frustumIndex -= directionalLight == NULL ? 1 : 5;
-	assert(frustumIndex < 88); // TODO: Implement a fix for this
+	if (frustumIndex >= 88)
+	{
+		// LogWarning("Frustum %d out of range!\n", frustumIndex);
+		frustumIndex = 87;
+	}
 
 	const uint32_t quadrantSize = size / 2;
 
