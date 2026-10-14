@@ -2,7 +2,7 @@
 
 #include "../include/lighting.inc.glsl"
 
-layout(set = 0, binding = 0) uniform sampler2D lightmap;
+layout(set = 0, binding = 2) uniform sampler2D lightmap;
 
 layout(location = 0) in vec2 inLightmapUV;
 

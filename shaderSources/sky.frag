@@ -2,7 +2,7 @@
 
 #include "include/shared.inc.glsl"
 
-layout(binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
+layout(binding = 4, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
 } globalLighting;
@@ -16,6 +16,5 @@ layout(location = 0) in vec2 inUV;
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    outColor = texture(textureSampler[nonuniformEXT(pushConstants.textureIndex)], inUV);
-   	outColor.rgb = clamp(outColor.rgb * globalLighting.exposure, 0.0, 1.0);
+   	outColor.rgb = clamp(sampleTexture(pushConstants.textureIndex, inUV).rgb * globalLighting.exposure, 0.0, 1.0);
 }

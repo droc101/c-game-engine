@@ -439,10 +439,10 @@ typedef struct TextureSamplers
 {
 	LunaSampler linearRepeatAnisotropy;
 	LunaSampler linearNoRepeatAnisotropy;
-	LunaSampler linearRepeatNoAnisotropy;
-	LunaSampler nearestRepeatNoAnisotropy;
-	LunaSampler linearNoRepeatNoAnisotropy;
 	LunaSampler nearestNoRepeatNoAnisotropy;
+	LunaSampler linearNoRepeatNoAnisotropy;
+	LunaSampler nearestRepeatNoAnisotropy;
+	LunaSampler linearRepeatNoAnisotropy;
 	LunaSampler shadowMaps;
 } TextureSamplers;
 

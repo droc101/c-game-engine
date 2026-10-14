@@ -16,7 +16,7 @@
 #define MAX_TEXTURES 512
 
 #if MAX_TEXTURES > 500000
-#error "The required minimum for the maxPerStageDescriptorUpdateAfterBindSamplers limit is 500000, which should not be exceeded."
+#error "The required minimum for the maxPerStageDescriptorUpdateAfterBindSamplers limit is 500000, which should not be exceeded. Additionally, the upper two bits must remain unused, since they're used for texture metadata by the Vulkan code."
 #endif
 
 #define MISSING_TEXTURE_NAME "dynamic/missingtex"

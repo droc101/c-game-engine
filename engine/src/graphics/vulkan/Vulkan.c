@@ -1993,8 +1993,8 @@ bool VK_Init(SDL_Window *window)
 	CreateDescriptorSetLayouts();
 	CreateComputePipelines();
 	CreateGraphicsPipelines();
-	CreateTextureSamplers();
 	CreateDescriptorSet();
+	CreateTextureSamplers();
 	CreateBuffers();
 	WriteDescriptorSet();
 

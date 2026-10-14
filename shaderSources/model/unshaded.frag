@@ -5,12 +5,12 @@
 
 layout(location = 0) in vec4 inColor;
 
-layout(binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
+layout(binding = 4, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
 } globalLighting;
 
-layout(binding = 4, scalar) readonly restrict uniform FogBuffer {
+layout(binding = 5, scalar) readonly restrict uniform FogBuffer {
 	vec3 color;
 	float colorAlpha;
 	float start;
