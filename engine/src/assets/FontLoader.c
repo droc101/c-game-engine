@@ -117,11 +117,11 @@ static Font *LoadFontInternal(const char *asset)
 	EXPECT_BYTES(2 * font->charCount, bytesRemaining);
 	for (int i = 0; i < font->charCount; i++)
 	{
-		const char chr = (char)ReadUint8(reader);
+		const uint8_t chr = ReadUint8(reader);
 		const uint8_t width = ReadUint8(reader);
-		font->charWidths[(int)chr] = width;
-		font->charStartUVs[(int)chr] = (float)((double)i / font->charCount); // Casting through double here is required
-		font->charEndUVs[(int)chr] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)img->width); // Here too
+		font->charWidths[chr] = width;
+		font->charStartUVs[chr] = (float)((double)i / font->charCount); // Casting through double here is required
+		font->charEndUVs[chr] = (float)((double)(i + 1) / font->charCount - 1.0 / (double)img->width); // Here too
 	}
 	EXPECT_EOF_BYTES(bytesRemaining);
 	font->name = strdup(asset);

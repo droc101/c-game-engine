@@ -60,6 +60,7 @@ bool ReadParam(DataReader *reader, Param *out, size_t *bytesRemaining)
 			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 			out->arrayValue.length = ReadSizeT(reader);
 			out->arrayValue.data = malloc(sizeof(Param) * out->arrayValue.length);
+			// TODO: If `out->arrayValue.length` is large enough this will cause an unrecoverable error
 			CheckAlloc(out->arrayValue.data);
 			for (size_t i = 0; i < out->arrayValue.length; i++)
 			{
