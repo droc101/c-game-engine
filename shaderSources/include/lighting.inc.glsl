@@ -166,7 +166,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                         continue;
                     }
                     if (light.cookieTextureIndex != 0) {
-                        const vec3 cookieColor = vec3(1);//textureLod(textureSampler[nonuniformEXT(light.cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5, 0).rgb;
+                        const vec3 cookieColor = sampleTexture(light.cookieTextureIndex - 1, coord.xy * 0.5 + 0.5).rgb;
                         lightingColor += factor * brightness * normalFactor * light.color * cookieColor;
                     } else {
                         lightingColor += factor * brightness * normalFactor * light.color;

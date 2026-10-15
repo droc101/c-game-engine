@@ -1770,6 +1770,58 @@ static inline void HandleMapChangeFlags(Map *map)
 	map->changeFlags = 0;
 }
 
+static inline uint32_t GetShadowMapAtlasSize()
+{
+	switch (GetState()->options.shadowMapResolution)
+	{
+		case SHADOW_MAP_RESOLUTION_1024:
+			return 1024;
+		case SHADOW_MAP_RESOLUTION_2048:
+			return 2048;
+		case SHADOW_MAP_RESOLUTION_4096:
+			return 4096;
+		case SHADOW_MAP_RESOLUTION_8192:
+			return 8192;
+		case SHADOW_MAP_RESOLUTION_16384:
+			return 16384;
+		default:
+			return 0;
+	}
+}
+
+static inline uint32_t GetShadowSampleCount()
+{
+	switch (GetState()->options.shadowMapSoftShadowQuality)
+	{
+		default:
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST:
+			return 0;
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW:
+			return 4;
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM:
+			return 8;
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH:
+			return 16;
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA:
+			return 32;
+	}
+}
+static inline float GetShadowSampleRadius()
+{
+	switch (GetState()->options.shadowMapSoftShadowQuality)
+	{
+		default:
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST:
+			return 0;
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW:
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM:
+			return 2;
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH:
+		case SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA:
+			return 4;
+	}
+}
+
 /// Handles the rendererQueuedActions and pendingTasks bit masks
 static inline void HandleDeferredWork()
 {
@@ -1804,27 +1856,7 @@ static inline void HandleDeferredWork()
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION)
 	{
-		switch (GetState()->options.shadowMapResolution)
-		{
-			case SHADOW_MAP_RESOLUTION_1024:
-				specializationConstants.shadowMapAtlasSize = 1024;
-				break;
-			case SHADOW_MAP_RESOLUTION_2048:
-				specializationConstants.shadowMapAtlasSize = 2048;
-				break;
-			case SHADOW_MAP_RESOLUTION_4096:
-				specializationConstants.shadowMapAtlasSize = 4096;
-				break;
-			case SHADOW_MAP_RESOLUTION_8192:
-				specializationConstants.shadowMapAtlasSize = 8192;
-				break;
-			case SHADOW_MAP_RESOLUTION_16384:
-				specializationConstants.shadowMapAtlasSize = 16384;
-				break;
-			default:
-				specializationConstants.shadowMapAtlasSize = 0;
-				break;
-		}
+		specializationConstants.shadowMapAtlasSize = GetShadowMapAtlasSize();
 		if (GetMap() != NULL && GetState()->options.shadowMapResolution != SHADOW_MAP_RESOLUTION_DISABLED)
 		{
 			if (shadowMapRenderPass == VK_NULL_HANDLE || frustumCount == 1)
@@ -1886,29 +1918,8 @@ static inline void HandleDeferredWork()
 	}
 	if (rendererQueuedActions & QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY)
 	{
-		switch (GetState()->options.shadowMapSoftShadowQuality)
-		{
-			default:
-			case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST:
-				specializationConstants.sampleCount = 0;
-				break;
-			case SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW:
-				specializationConstants.sampleCount = 4;
-				specializationConstants.sampleRadius = 2;
-				break;
-			case SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM:
-				specializationConstants.sampleCount = 8;
-				specializationConstants.sampleRadius = 2;
-				break;
-			case SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH:
-				specializationConstants.sampleCount = 16;
-				specializationConstants.sampleRadius = 4;
-				break;
-			case SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA:
-				specializationConstants.sampleCount = 32;
-				specializationConstants.sampleRadius = 4;
-				break;
-		}
+		specializationConstants.sampleCount = GetShadowSampleCount();
+		specializationConstants.sampleRadius = GetShadowSampleRadius();
 
 		RecreateGraphicsPipelines();
 
@@ -1979,6 +1990,11 @@ static inline void HandleDeferredWork()
 bool VK_Init(SDL_Window *window)
 {
 	LogDebug("Initializing Vulkan renderer...\n");
+
+	specializationConstants.shadowMapAtlasSize = GetShadowMapAtlasSize();
+	specializationConstants.sampleCount = GetShadowSampleCount();
+	specializationConstants.sampleRadius = GetShadowSampleRadius();
+
 	CreateInstance();
 	CreateSurface(window);
 	if (!CreateLogicalDevice())
