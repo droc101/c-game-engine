@@ -13,8 +13,6 @@ on:
         type: boolean
 
 jobs:
-  linux-arm:
-    uses: './.github/workflows/linux-arm.yml'
   linux-x86_64:
     uses: './.github/workflows/linux-x86_64.yml'
     with:
