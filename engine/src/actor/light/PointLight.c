@@ -55,6 +55,7 @@ static void PointLightDestroy(Actor *this)
 	PointLightData *data = this->extraData;
 	if (data->isLightOn)
 	{
+		// TODO: This only queues the light for removal, and when FreeActor calls this function it will allow the Vulkan code to still reference this pointer after it has been freed
 		RemoveDynamicLight(&data->dlight);
 		data->isLightOn = false;
 	}

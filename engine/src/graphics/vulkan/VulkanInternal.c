@@ -586,6 +586,10 @@ void CreateDescriptorSet()
 			.descriptorCount = min(MAX_TEXTURES, sampledImageCount),
 		},
 		{
+			.type = VK_DESCRIPTOR_TYPE_SAMPLER,
+			.descriptorCount = 6,
+		},
+		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 3,
 		},

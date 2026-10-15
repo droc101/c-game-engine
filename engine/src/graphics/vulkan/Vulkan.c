@@ -911,12 +911,12 @@ static inline void LoadLights(const Map *map)
 		return;
 	}
 
+	frustumCount = (map->lightCount + dynamicLights.length) * 6 + 1;
 	AvxAlignedFree(frustumCullingDatas);
-	frustumCullingDatas = AvxAlignedCalloc(sizeof(FrustumCullingData) *
-										   ((map->lightCount + dynamicLights.length) * 6 + 1));
+	frustumCullingDatas = AvxAlignedCalloc(sizeof(FrustumCullingData) * frustumCount);
 	CheckAlloc(frustumCullingDatas);
 
-	const size_t frustumShadowMapsBufferSize = sizeof(FrustumShadowMap) * (map->lightCount + dynamicLights.length) * 6;
+	const size_t frustumShadowMapsBufferSize = sizeof(FrustumShadowMap) * frustumCount;
 	free(frustumShadowMaps);
 	frustumShadowMaps = malloc(frustumShadowMapsBufferSize);
 	CheckAlloc(frustumShadowMaps);

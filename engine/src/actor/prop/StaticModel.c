@@ -53,7 +53,7 @@ static void StaticModelInit(Actor *this, const KvList params, const Transform *t
 	{
 		LogWarning("Tried to create a " STATIC_MODEL_ACTOR_NAME
 				   " with full collision, but the model file (\"%s\") does not have any!\n",
-				   KvGetString(params, "model", "leafy"));
+				   KvGetString(params, "model", "UNKNOWN"));
 		collisionType = 0;
 	}
 	switch (collisionType)

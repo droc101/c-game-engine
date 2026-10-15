@@ -492,7 +492,7 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 		}
 		cameraMotion.x *= state->options.controllerCameraSpeed / 6.0f;
 
-		if (state->options.invertVerticalMouse)
+		if (state->options.invertVerticalController)
 		{
 			cameraMotion.y *= -1;
 		}

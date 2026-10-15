@@ -12,6 +12,7 @@
 #include <engine/subsystem/Error.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -60,10 +61,13 @@ static void SpotLightDestroy(Actor *this)
 	SpotLightData *data = this->extraData;
 	if (data->isLightOn)
 	{
+		// TODO: This only queues the light for removal, and when FreeActor calls this function it will allow the Vulkan code to still reference this pointer after it has been freed
 		RemoveDynamicLight(&data->dlight);
 		data->isLightOn = false;
 	}
-	free(data->dlight.light.cookie);
+	void *cookieCopy = data->dlight.light.cookie;
+	data->dlight.light.cookie = NULL;
+	free(cookieCopy);
 }
 
 static void SpotLightTurnOnHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)

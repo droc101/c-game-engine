@@ -5,6 +5,7 @@
 #include <engine/assets/AddonLoader.h>
 #include <engine/assets/KvlFile.h>
 #include <engine/debug/DebugEntryManager.h>
+#include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/structs/ControlOptions.h>
 #include <engine/structs/KVList.h>
@@ -201,6 +202,9 @@ void LoadOptions(Options *options)
 		LogWarning("Options file is invalid, using defaults\n");
 		DefaultOptions(options);
 	}
+
+	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION |
+							 QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY;
 }
 
 void SaveOptions(Options *options)
