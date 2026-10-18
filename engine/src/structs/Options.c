@@ -138,7 +138,7 @@ void LoadOptions(Options *options)
 			KvListDestroy(controls);
 		} else
 		{
-			DestroyControls();
+			DefaultControls();
 		}
 
 		KvList debugOptions;

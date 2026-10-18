@@ -101,6 +101,7 @@ bool CreateLogicalDevice()
 		.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
 	};
 	const VkPhysicalDeviceFeatures vulkan10Features = {
+		.geometryShader = VK_TRUE,
 		.samplerAnisotropy = VK_TRUE,
 		.multiDrawIndirect = VK_TRUE,
 		.drawIndirectFirstInstance = VK_TRUE,
@@ -332,17 +333,24 @@ void CreateDescriptorSetLayouts()
 	assert(MAX_TEXTURES < sampledImageCount);
 	const LunaDescriptorSetLayoutBinding commonBindings[] = {
 		{
+			.bindingName = "Textures",
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+			.descriptorCount = textureCount,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+		},
+		{
+			.bindingName = "Samplers",
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+			.descriptorCount = 6,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			// .immutableSamplers = &textureSamplers.linearRepeatAnisotropy
+		},
+		{
 			.bindingName = "Lightmap",
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		},
-		{
-			.bindingName = "Textures",
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = textureCount,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.bindingFlags = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
 		},
 		{
 			.bindingName = "Camera",
@@ -545,6 +553,23 @@ void CreateTextureSamplers()
 	VulkanTest(lunaCreateSampler(device, &shadowMapAtlasSamplerCreateInfo, &textureSamplers.shadowMaps),
 			   "Failed to create shadow map atlas texture sampler!");
 
+	const LunaDescriptorImageInfo samplerInfos[6] = {
+		{.sampler = textureSamplers.linearRepeatAnisotropy},
+		{.sampler = textureSamplers.linearNoRepeatAnisotropy},
+		{.sampler = textureSamplers.nearestNoRepeatNoAnisotropy},
+		{.sampler = textureSamplers.linearNoRepeatNoAnisotropy},
+		{.sampler = textureSamplers.nearestRepeatNoAnisotropy},
+		{.sampler = textureSamplers.linearRepeatNoAnisotropy},
+	};
+	const LunaWriteDescriptorSet descriptorWrite = {
+		.descriptorSet = descriptorSets.common.set,
+		.bindingName = "Samplers",
+		.descriptorArrayElement = 0,
+		.descriptorCount = 6,
+		.imageInfos = samplerInfos,
+	};
+	lunaWriteDescriptorSets(device, 1, &descriptorWrite);
+
 	ListInit(textures, LIST_UINT64);
 	memset(imageAssetIdToIndexMap, -1, sizeof(*imageAssetIdToIndexMap) * MAX_TEXTURES);
 }
@@ -557,8 +582,20 @@ void CreateDescriptorSet()
 	LunaDescriptorPool descriptorPool = LUNA_NULL_HANDLE;
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
+			.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+			.descriptorCount = min(MAX_TEXTURES, sampledImageCount),
+		},
+		{
+			.type = VK_DESCRIPTOR_TYPE_SAMPLER,
+			.descriptorCount = 6,
+		},
+		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = min(MAX_TEXTURES, sampledImageCount) + min(sampledImageCount, 16384) + 1 + 1,
+			.descriptorCount = 3,
+		},
+		{
+			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 3,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

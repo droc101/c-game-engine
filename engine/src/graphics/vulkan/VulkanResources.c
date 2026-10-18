@@ -11,6 +11,7 @@
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
@@ -458,26 +459,27 @@ void ResizeDebugDrawBuffers()
 #endif
 }
 
+static inline uint32_t ImageMetadataBits(const Image *image)
+{
+	uint32_t bits = 0;
+	if (image->filter)
+	{
+		bits |= (1u << 31u);
+	}
+	if (image->repeat)
+	{
+		bits |= (1u << 30u);
+	}
+	if (image->mipmaps && GetState()->options.mipmaps && GetState()->options.anisotropy)
+	{
+		bits |= (1u << 29u);
+	}
+	return bits;
+}
+
 void LoadTexture(const Image *image)
 {
 	const bool useMipmaps = GetState()->options.mipmaps && image->mipmaps;
-	LunaSampler sampler = LUNA_NULL_HANDLE;
-	if (image->filter && image->repeat)
-	{
-		sampler = useMipmaps ? textureSamplers.linearRepeatAnisotropy : textureSamplers.linearRepeatNoAnisotropy;
-	}
-	if (image->filter && !image->repeat)
-	{
-		sampler = useMipmaps ? textureSamplers.linearNoRepeatAnisotropy : textureSamplers.linearNoRepeatNoAnisotropy;
-	}
-	if (!image->filter && image->repeat)
-	{
-		sampler = textureSamplers.nearestRepeatNoAnisotropy;
-	}
-	if (!image->filter && !image->repeat)
-	{
-		sampler = textureSamplers.nearestNoRepeatNoAnisotropy;
-	}
 
 	const VkPipelineStageFlags2 waitStage = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
 	// TODO: Using the same semaphore for wait and signal slows down loading multiple textures per frame.
@@ -512,14 +514,13 @@ void LoadTexture(const Image *image)
 		.writeInfo.destinationStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 		.writeInfo.destinationAccessMask = VK_ACCESS_SHADER_READ_BIT,
 		.writeInfo.submitInfo = &submitInfo,
-		.sampler = sampler,
 	};
 	const size_t index = textures.length;
 	LunaImage *lunaImage = ListAdd(textures, LUNA_NULL_HANDLE);
 	// TODO: This should only be fatal if the missing texture fails to load
 	VulkanTest(lunaCreateImage(device, secondaryCommandBuffer, &imageCreationInfo, lunaImage),
 			   "Failed to create texture!");
-	imageAssetIdToIndexMap[image->id] = index;
+	imageAssetIdToIndexMap[image->id] = index | ImageMetadataBits(image);
 
 	const LunaDescriptorImageInfo imageInfo = {
 		.image = *lunaImage,

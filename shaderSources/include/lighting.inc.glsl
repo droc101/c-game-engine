@@ -14,29 +14,29 @@ layout(constant_id = 6) const bool ENABLE_BAKED_LIGHTING = true;
 
 const float MIN_BRIGHTNESS = 1.0 / 256.0;
 
-layout(set = 0, binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
+layout(set = 0, binding = 4, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
 } globalLighting;
-layout(set = 0, binding = 4, scalar) readonly restrict uniform FogBuffer {
+layout(set = 0, binding = 5, scalar) readonly restrict uniform FogBuffer {
 	vec3 color;
 	float colorAlpha;
 	float start;
 	float end;
 } fog;
-layout(set = 0, binding = 5, scalar) readonly restrict uniform LightsData {
+layout(set = 0, binding = 6, scalar) readonly restrict uniform LightsData {
     float cascadeDepths[4];
 	mat4 cascadeMatrices[4];
     Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
 } lightsData;
-layout(set = 0, binding = 8, scalar) readonly restrict buffer Clusters {
+layout(set = 0, binding = 9, scalar) readonly restrict buffer Clusters {
     Cluster clusters[512];
 } clusters;
-layout(set = 0, binding = 9, scalar) readonly restrict uniform SoftShadowKernels {
+layout(set = 0, binding = 10, scalar) readonly restrict uniform SoftShadowKernels {
     vec2 kernels[SAMPLE_COUNT == 0 ? 1 : SAMPLE_COUNT];
 } softShadowKernels;
 
-layout(set = 0, binding = 6) uniform sampler2DShadow shadowMapAtlases[2];
+layout(set = 0, binding = 7) uniform sampler2DShadow shadowMapAtlases[2];
 #define directionalLightShadowMapAtlas (shadowMapAtlases[0])
 #define shadowMapAtlas (shadowMapAtlases[1])
 
@@ -166,7 +166,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                         continue;
                     }
                     if (light.cookieTextureIndex != 0) {
-                        const vec3 cookieColor = textureLod(textureSampler[nonuniformEXT(light.cookieTextureIndex - 1)], coord.xy * 0.5 + 0.5, 0).rgb;
+                        const vec3 cookieColor = sampleTexture(light.cookieTextureIndex - 1, coord.xy * 0.5 + 0.5).rgb;
                         lightingColor += factor * brightness * normalFactor * light.color * cookieColor;
                     } else {
                         lightingColor += factor * brightness * normalFactor * light.color;
@@ -253,5 +253,13 @@ bool debugLighting() {
         case DEBUG_RENDERING_DEPTH_ONLY:
 			outColor.rgb = vec3(inDistance / ((camera.farPlane - 500) - camera.nearPlane));
             return true;
+        case DEBUG_RENDERING_PRIMITIVES:
+        {
+            uint hash = gl_PrimitiveID * 747796405u + 2891336453u;
+            hash = ((hash >> ((hash >> 28u) + 4u)) ^ hash) * 277803737u;
+            hash = (hash >> 22u) ^ hash;
+            outColor.rgb = vec3(float(hash & 0xFFu),float((hash >> 8) & 0xFFu),float((hash >> 16) & 0xFFu)) / 255.0;
+            return true;
+        }
     }
 }

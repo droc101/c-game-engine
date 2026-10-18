@@ -345,7 +345,13 @@ Asset *LoadAsset(const char *relPath, const bool cache, const bool isCodeAsset)
 
 	if (!DecompressAsset(file, asset))
 	{
-		free(asset);
+		if (cache)
+		{
+			AssetCache_erase(assetCache, relPath);
+		} else
+		{
+			free(asset);
+		}
 		return NULL;
 	}
 	return asset;

@@ -39,7 +39,7 @@ Vector2 MeasureTextNChars(const char *str, const uint32_t size, const char *font
 	const double sizeMultiplier = (double)size / fontAsset->defaultSize;
 	for (size_t j = 0; j < n; j++)
 	{
-		const int fSize = (int)((fontAsset->charWidths[(int)str[j]] + fontAsset->charSpacing) * sizeMultiplier);
+		const int fSize = (int)((fontAsset->charWidths[((uint8_t *)str)[j]] + fontAsset->charSpacing) * sizeMultiplier);
 		tempWidth += fSize;
 		if (str[j] == ' ')
 		{
@@ -195,7 +195,8 @@ void DrawTextAligned(const char *str,
 		const float ly = (float)y;
 		for (size_t j = 0; line[j] != '\0'; j++)
 		{
-			const int fSize = (int)((fontAsset->charWidths[(int)line[j]] + fontAsset->charSpacing) * sizeMultiplier);
+			const int fSize = (int)((fontAsset->charWidths[((uint8_t *)line)[j]] + fontAsset->charSpacing) *
+									sizeMultiplier);
 
 			if (line[j] == ' ')
 			{
@@ -207,8 +208,8 @@ void DrawTextAligned(const char *str,
 
 			const Vector2 ndcPos = v2(X_TO_NDC(lx), Y_TO_NDC(ly));
 			const Vector2 ndcPosEnd = v2(X_TO_NDC(lx + width), Y_TO_NDC(ly + quadHeight));
-			const float charUVStart = fontAsset->charStartUVs[(int)line[j]];
-			const float charUVEnd = fontAsset->charEndUVs[(int)line[j]];
+			const float charUVStart = fontAsset->charStartUVs[((uint8_t *)line)[j]];
+			const float charUVEnd = fontAsset->charEndUVs[((uint8_t *)line)[j]];
 
 			const size_t charIndex = c + j;
 			const size_t vertexOffset = charIndex * 4;

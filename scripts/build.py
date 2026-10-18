@@ -47,13 +47,13 @@ def do_build(build_dir: str, build_type: str, configure_flags: list[str], build_
     configure_process = subprocess.run(configure_arguments)
     if configure_process.returncode != 0:
         print(f"Failed to configure: return code {configure_process.returncode}")
-        quit()
+        sys.exit(configure_process.returncode)
 
     build_arguments = ["cmake", "--build", build_dir, "-j"] + build_flags
     build_process = subprocess.run(build_arguments)
     if build_process.returncode != 0:
         print(f"Failed to build: return code {build_process.returncode}")
-        quit()
+        sys.exit(build_process.returncode)
 
 
 def main():
@@ -72,7 +72,7 @@ def main():
 
     if not os.path.isfile("CMakeLists.txt"):
         print("No CMakeLists.txt found, please run this from the root of the source tree.")
-        quit()
+        sys.exit(-1)
 
     x86_versions = ["1", "2", "3", "4"]
     if args.x86_version != "*":

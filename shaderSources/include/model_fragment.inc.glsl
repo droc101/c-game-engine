@@ -14,7 +14,7 @@ void getTextureColor() {
 #   define SHOULD_SAMPLE_TEXTURE DEBUG_RENDERING != DEBUG_RENDERING_UNTEXTURED && DEBUG_RENDERING != DEBUG_RENDERING_ONLY_LIGHTING && DEBUG_RENDERING != DEBUG_RENDERING_NO_LIGHT_FALLOFF
 #endif
     if (SHOULD_SAMPLE_TEXTURE) {
-    	outColor = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUV);
+    	outColor = sampleTexture(inTextureIndex, inUV);
 		outColor.a = 1.0;
 	} else {
 		outColor = vec4(1);

@@ -394,11 +394,11 @@ void DestroyEngine()
 {
 	SDL_HideWindow(GetGameWindow());
 	SaveOptions(&GetState()->options);
+	PhysicsThreadTerminate(); // Should always have this first so that the physics thread doesn't use an already destroyed system
 	DestroyDPrintConsole();
 	DestroyAchievementSystem();
 	ShutdownSteamworks();
 	DiscordDestroy();
-	PhysicsThreadTerminate();
 	DestroyFrameGrapher();
 	InputDestroy();
 	DestroyGlobalState();

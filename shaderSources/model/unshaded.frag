@@ -5,12 +5,12 @@
 
 layout(location = 0) in vec4 inColor;
 
-layout(binding = 3, scalar) readonly restrict uniform GlobalLightingBuffer {
+layout(binding = 4, scalar) readonly restrict uniform GlobalLightingBuffer {
 	vec4 color;
 	float exposure;
 } globalLighting;
 
-layout(binding = 4, scalar) readonly restrict uniform FogBuffer {
+layout(binding = 5, scalar) readonly restrict uniform FogBuffer {
 	vec3 color;
 	float colorAlpha;
 	float start;
@@ -40,6 +40,14 @@ bool debugLighting() {
         case DEBUG_RENDERING_DEPTH_ONLY:
 			outColor.rgb = vec3(((1 - gl_FragCoord.z) / gl_FragCoord.w) / (camera.farPlane - camera.nearPlane));
             return true;
+        case DEBUG_RENDERING_PRIMITIVES:
+        {
+            uint hash = gl_PrimitiveID * 747796405u + 2891336453u;
+            hash = ((hash >> ((hash >> 28u) + 4u)) ^ hash) * 277803737u;
+            hash = (hash >> 22u) ^ hash;
+            outColor.rgb = vec3(float(hash & 0xFFu),float((hash >> 8) & 0xFFu),float((hash >> 16) & 0xFFu)) / 255.0;
+            return true;
+        }
     }
 }
 

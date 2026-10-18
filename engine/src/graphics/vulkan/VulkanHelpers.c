@@ -669,6 +669,11 @@ void CullModels()
 
 void PopulateClusters()
 {
+	if (!ShadowMapsEnabled())
+	{
+		return;
+	}
+
 	const LunaBufferMemoryBarrier preClearMemoryBarrier = {
 		.sourceStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
 		.sourceAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT,

@@ -89,7 +89,12 @@ void ActorTriggerInput(const Actor *sender, Actor *receiver, const char *input, 
 {
 	if (sender)
 	{
-		LogDebug("Triggering input \"%s\" on actor %p (%s) from actor %p (%s)\n", input, receiver, receiver->definition->className, sender, sender->definition->className);
+		LogDebug("Triggering input \"%s\" on actor %p (%s) from actor %p (%s)\n",
+				 input,
+				 receiver,
+				 receiver->definition->className,
+				 sender,
+				 sender->definition->className);
 	} else
 	{
 		LogDebug("Triggering input \"%s\" on actor %p (%s)\n", input, receiver, receiver->definition->className);
@@ -128,6 +133,7 @@ void ActorFireOutput(Actor *sender, const char *output, const Param defaultParam
 					// get vaporized idiot
 					DestroyActorConnection(connection);
 					ListRemoveAt(sender->ioConnections, i);
+					i--; // Make sure not to skip the next connection
 				}
 			}
 		}
@@ -149,7 +155,7 @@ void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*para
 	RemoveActor(this);
 }
 
-void ActorSignalCancelQueuedIo(Actor *this, const Actor */*sender*/, const Param */*param*/)
+void ActorSignalCancelQueuedIo(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	Map *map = GetState()->map;
 	ListLock(map->ioQueue);

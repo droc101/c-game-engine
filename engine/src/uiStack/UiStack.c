@@ -326,11 +326,15 @@ void SetFocusedControl(UiStack *stack, const uint32_t index)
 
 void ChangeFocusedControl(UiStack *stack, const int32_t by)
 {
-	const int64_t focusedCtrl = stack->focusedControl;
+	int64_t focusedCtrl = stack->focusedControl;
+	if (focusedCtrl == UINT32_MAX)
+	{
+		focusedCtrl = 0;
+	}
 	// for loop here to prevent going forever if there is no focusable control
 	for (size_t i = 1; i <= stack->controls.length; i++)
 	{
-		int64_t controlIndex = focusedCtrl + (i * by);
+		int64_t controlIndex = focusedCtrl + ((int64_t)i * by);
 		controlIndex = wrap(controlIndex, 0, stack->controls.length);
 		const Control *control = ListGetPointer(stack->controls, controlIndex);
 		if (control->allowFocus)

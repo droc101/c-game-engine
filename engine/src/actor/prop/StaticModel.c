@@ -44,8 +44,10 @@ static inline void CreateStaticModelCollider(Actor *this, const Transform *trans
 
 static void StaticModelInit(Actor *this, const KvList params, const Transform *transform)
 {
+	static const char *DEFAULT_MODEL = "model/quad.gmdl";
+
 	this->hasModel = true;
-	this->model = LoadModel(KvGetString(params, "model", "model/quad.gmdl"));
+	this->model = LoadModel(KvGetString(params, "model", DEFAULT_MODEL));
 	this->currentSkinIndex = KvGetInt(params, "skin", 0);
 	this->modColor = KvGetColor(params, "color", COLOR_WHITE);
 	uint8_t collisionType = KvGetByte(params, "collision", 2);
@@ -53,7 +55,7 @@ static void StaticModelInit(Actor *this, const KvList params, const Transform *t
 	{
 		LogWarning("Tried to create a " STATIC_MODEL_ACTOR_NAME
 				   " with full collision, but the model file (\"%s\") does not have any!\n",
-				   KvGetString(params, "model", "leafy"));
+				   KvGetString(params, "model", DEFAULT_MODEL));
 		collisionType = 0;
 	}
 	switch (collisionType)

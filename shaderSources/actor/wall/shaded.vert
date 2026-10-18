@@ -2,7 +2,7 @@
 
 #include "../../include/shared.inc.glsl"
 
-layout(binding = 7, scalar) readonly restrict buffer InstanceData {
+layout(binding = 8, scalar) readonly restrict buffer InstanceData {
     ActorWallInstanceData instanceDatas[];
 } instanceDatas;
 

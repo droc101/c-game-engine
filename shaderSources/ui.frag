@@ -4,15 +4,16 @@
 
 layout(location = 0) in vec4 inColor;
 layout(location = 1) in vec2 inUV;
-layout(location = 2) flat in uint textureIndex;
+layout(location = 2) flat in uint inTextureIndex;
 
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    if (textureIndex == -1) {
+    if (inTextureIndex == -1) {
     	outColor = inColor;
     } else {
-        vec2 uv = inUV + (1.0 / (100 * textureSize(textureSampler[nonuniformEXT(textureIndex)], 0)));
-    	outColor = texture(textureSampler[nonuniformEXT(textureIndex)], uv) * inColor;
+        const uint index = bitfieldExtract(inTextureIndex, 0, 19);
+        const uint flags = bitfieldExtract(inTextureIndex, 29, 3);
+        outColor = texture(sampler2D(textures[nonuniformEXT(index)], samplers[(flags & 2) + 2 + (flags >> 2)]), inUV) * inColor;
     }
 }

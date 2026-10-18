@@ -54,7 +54,7 @@ static int64_t ProcessPipe(const int inFd, const int outFd)
 		return 0;
 	}
 
-	static char buffer[STDIO_BUFFER_SIZE];
+	static char buffer[STDIO_BUFFER_SIZE + 1];
 
 	const int64_t readSize = read(inFd, buffer, STDIO_BUFFER_SIZE);
 	if (readSize > 0)

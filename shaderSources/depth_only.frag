@@ -7,10 +7,13 @@ layout(location = 0, component = 3) in float inAlpha;
 layout(location = 1) flat in uint inTextureIndex;
 
 void main() {
+    // The new bit magic for selecting sampler was not considered in the optimization of this shader, and will be revisited at some point
+    const uint index = bitfieldExtract(inTextureIndex, 0, 19);
+    const uint flags = bitfieldExtract(inTextureIndex, 29, 3);
     // Contrary to what one might expect, it is faster to sample the texture FIRST here, rather than last, since the memory read latency gets better hidden.
     // This is not normally required as the driver will typically hoist the texture call to be as early as possible, but in this case it fails.
     // From what I can tell both the AMD and NVIDIA drivers won't hoist the fetch to before the branch, but profiling shows that manually hoisting it helps performance.
-    const float textureAlpha = texture(textureSampler[nonuniformEXT(inTextureIndex)], inUv).a;
+    const float textureAlpha = texture(sampler2D(textures[nonuniformEXT(index)], samplers[(flags & 2) + 2 + (flags >> 2)]), inUv).a;
 
     // We intentionally calculate this even before the inAlpha < 0.001 check to reduce wasted cycles waiting for the input variables to actually be available.
     // The wait will happen either way, and most fragments will not have an inAlpha value less than 1, let alone 0.001.
