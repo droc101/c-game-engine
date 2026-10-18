@@ -47,6 +47,14 @@ bool LoadMap(Map *map, Asset *mapData)
 		return false;
 	}
 
+	if (mapData->typeVersion != MAP_ASSET_VERSION)
+	{
+		LogError("Failed to load map from asset due to version mismatch (got %d, expected %d)\n",
+				 mapData->typeVersion,
+				 MAP_ASSET_VERSION);
+		return false;
+	}
+
 	DataReader *reader = CreateDataReaderFromAsset(mapData);
 
 	size_t bytesRemaining = mapData->size;
@@ -268,55 +276,42 @@ bool LoadMap(Map *map, Asset *mapData)
 	const size_t numCollisionMeshes = ReadSizeT(reader);
 	for (size_t i = 0; i < numCollisionMeshes; i++)
 	{
-		EXPECT_BYTES_BOOL((sizeof(float) * 3) + sizeof(size_t), bytesRemaining);
+		EXPECT_BYTES_BOOL((sizeof(float) * 6), bytesRemaining);
 		collisionXfm.position.x = ReadFloat(reader);
 		collisionXfm.position.y = ReadFloat(reader);
 		collisionXfm.position.z = ReadFloat(reader);
-		const size_t subShapeCount = ReadSizeT(reader);
-		if (subShapeCount == 0)
+		Vector3 rotationEuler;
+		rotationEuler.x = ReadFloat(reader);
+		rotationEuler.y = ReadFloat(reader);
+		rotationEuler.z = ReadFloat(reader);
+		JPH_Quat_FromEulerAngles(&rotationEuler, &collisionXfm.rotation);
+
+		ModelStaticCollider staticCollider;
+		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
+		staticCollider.numTriangles = ReadSizeT(reader);
+		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
+		CheckAlloc(staticCollider.tris);
+		for (size_t k = 0; k < staticCollider.numTriangles; k++)
 		{
-			continue;
+			JPH_Triangle *triangle = &staticCollider.tris[k];
+			triangle->materialIndex = 0;
+			EXPECT_BYTES_BOOL(sizeof(float) * 9, bytesRemaining);
+
+			triangle->v1.x = ReadFloat(reader);
+			triangle->v1.y = ReadFloat(reader);
+			triangle->v1.z = ReadFloat(reader);
+
+			triangle->v2.x = ReadFloat(reader);
+			triangle->v2.y = ReadFloat(reader);
+			triangle->v2.z = ReadFloat(reader);
+
+			triangle->v3.x = ReadFloat(reader);
+			triangle->v3.y = ReadFloat(reader);
+			triangle->v3.z = ReadFloat(reader);
 		}
+		JPH_Shape *shape = CreateStaticModelShape(&staticCollider);
 
-		JPH_StaticCompoundShapeSettings *compoundShapeSettings = JPH_StaticCompoundShapeSettings_Create();
-
-		for (size_t j = 0; j < subShapeCount; j++)
-		{
-			ModelStaticCollider staticCollider;
-			EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-			staticCollider.numTriangles = ReadSizeT(reader);
-			staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
-			CheckAlloc(staticCollider.tris);
-			for (size_t k = 0; k < staticCollider.numTriangles; k++)
-			{
-				JPH_Triangle *triangle = &staticCollider.tris[k];
-				triangle->materialIndex = 0;
-				EXPECT_BYTES_BOOL(sizeof(float) * 9, bytesRemaining);
-
-				triangle->v1.x = ReadFloat(reader);
-				triangle->v1.y = ReadFloat(reader);
-				triangle->v1.z = ReadFloat(reader);
-
-				triangle->v2.x = ReadFloat(reader);
-				triangle->v2.y = ReadFloat(reader);
-				triangle->v2.z = ReadFloat(reader);
-
-				triangle->v3.x = ReadFloat(reader);
-				triangle->v3.y = ReadFloat(reader);
-				triangle->v3.z = ReadFloat(reader);
-			}
-			JPH_Shape *subShape = CreateStaticModelShape(&staticCollider);
-
-			JPH_CompoundShapeSettings_AddShape2((JPH_CompoundShapeSettings *)compoundShapeSettings,
-												&Vector3_Zero,
-												&JPH_Quat_Identity,
-												subShape,
-												0);
-
-			JPH_Shape_Destroy(subShape);
-			free(staticCollider.tris);
-		}
-		JPH_Shape *shape = (JPH_Shape *)JPH_StaticCompoundShape_Create(compoundShapeSettings);
+		free(staticCollider.tris);
 
 		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
 																							   &collisionXfm,
@@ -329,7 +324,6 @@ bool LoadMap(Map *map, Asset *mapData)
 																   JPH_Activation_Activate);
 		ListAdd(map->joltBodies, body);
 		JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-		JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)compoundShapeSettings);
 		JPH_Shape_Destroy(shape);
 	}
 

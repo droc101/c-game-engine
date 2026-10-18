@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define MAP_ASSET_VERSION 2
+
 /**
  * Load a map asset
  * @param map The map to load into
