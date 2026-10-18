@@ -191,6 +191,8 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 		.base.enhancedInternalEdgeRemoval = true,
 		.base.shape = shape,
 		.mass = 160.0f,
+		.innerBodyShape = shape,
+		.innerBodyLayer = OBJECT_LAYER_PLAYER,
 	};
 	JPH_CharacterVirtualSettings_Init(&characterSettings);
 	player->joltCharacter = JPH_CharacterVirtual_Create(&characterSettings,
