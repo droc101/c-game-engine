@@ -85,13 +85,8 @@ bool CreateLogicalDevice()
 	const LunaPhysicalDevicePreferenceDefinition devicePreferenceDefinition = {
 		.preferredDeviceType = preferred,
 	};
-	VkPhysicalDeviceSynchronization2Features synchronization2Features = {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES,
-		.synchronization2 = VK_TRUE,
-	};
 	VkPhysicalDeviceVulkan12Features vulkan12Features = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-		.pNext = &synchronization2Features,
 		.drawIndirectCount = VK_TRUE,
 		.scalarBlockLayout = VK_TRUE,
 		.bufferDeviceAddress = VK_TRUE,
@@ -111,10 +106,7 @@ bool CreateLogicalDevice()
 		.pNext = &vulkan12Features,
 		.features = vulkan10Features,
 	};
-	const char *const extensions[] = {
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-		VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
-	};
+	const char *const extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 	const LunaDeviceCreationInfo2 deviceCreationInfo = {
 		.extensionCount = ArrayLength(extensions),
 		.extensionNames = extensions,
