@@ -6,11 +6,10 @@
 #define GAME_VULKANACTORS_H
 
 #include <engine/structs/List.h>
-#include <vulkan/vulkan_core.h>
 
 void InitActorLoadingVariables();
 
-void RequireRealloc();
+void ClearActorLodMaterialSlotsData();
 
 void LoadActors(const LockingList *actors);
 

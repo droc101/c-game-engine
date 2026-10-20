@@ -56,10 +56,10 @@ void VK_DPrintSceneStatistics()
 			COLOR_WHITE,
 			lunaGetBufferSize(buffers.map.vertices) / sizeof(ModelVertex),
 			lunaGetBufferSize(buffers.map.indices) / sizeof(uint32_t));
-	DPrintF("Actor model vertex/index count: %u/%u",
+	DPrintF("Model vertex/index count: %u/%u",
 			COLOR_WHITE,
-			lunaGetBufferSize(buffers.actorModels.vertices) / sizeof(ModelVertex),
-			lunaGetBufferSize(buffers.actorModels.indices) / sizeof(uint32_t));
+			lunaGetBufferSize(buffers.modelVertices) / sizeof(ModelVertex),
+			lunaGetBufferSize(buffers.modelIndices) / sizeof(uint32_t));
 	DPrintF("Actor wall shaded/unshaded count: %u/%u",
 			COLOR_WHITE,
 			buffers.actorWalls.shadedInstanceCount,

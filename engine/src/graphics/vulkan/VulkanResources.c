@@ -3,8 +3,6 @@
 //
 
 #include <cglm/cglm.h>
-#include <engine/assets/AssetReader.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -34,14 +32,8 @@ static LunaBufferCreationInfo storageBufferCreationInfo = {
 
 static inline void CreateModelBuffer(ModelBuffer *buffer, const char *usage)
 {
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->vertices),
-			   "Failed to create shaded %s vertex buffer!",
-			   usage);
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->indices),
-			   "Failed to create shaded %s index buffer!",
-			   usage);
 	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->instanceData),
-			   "Failed to create shaded %s instance data buffer!",
+			   "Failed to create %s instance data buffer!",
 			   usage);
 	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->shadedDrawInfo),
 			   "Failed to create shaded %s draw info buffer!",
@@ -136,10 +128,6 @@ static inline void CreateFrustumsBuffers()
 
 static inline void CreateActorModelsBuffers()
 {
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.actorModels.vertices),
-			   "Failed to create shaded actor models vertex buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.actorModels.indices),
-			   "Failed to create shaded actor models index buffer!");
 	VulkanTest(lunaCreateBuffer(device, &storageBufferCreationInfo, &buffers.actorModels.instanceData),
 			   "Failed to create shaded actor models instance data buffer!");
 	VulkanTest(lunaCreateBuffer(device,
@@ -293,135 +281,6 @@ static inline void CreateSkyBuffers()
 			   "Failed to create sky index buffer!");
 }
 
-// TODO: Only skin 0 of LOD 0 is ever loaded and used currently
-static inline void CreatePlayerBuffers()
-{
-	buffers.player.modelDefinition = LoadModel(MODEL("player"));
-	const ModelDefinition *model = buffers.player.modelDefinition;
-	const ModelLod *lod = model->lods;
-
-	const VkDeviceSize vertexBufferSize = sizeof(ModelVertex) * lod->vertexCount;
-	const LunaBufferCreationInfo vertexBufferCreationInfo = {
-		.size = vertexBufferSize,
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
-	VulkanTest(lunaCreateBuffer(device, &vertexBufferCreationInfo, &buffers.player.buffers.vertices),
-			   "Failed to create player model vertex buffer!");
-	const LunaBufferWriteInfo vertexDataWriteInfo = {
-		.size = vertexBufferSize,
-		.data = lod->vertexData,
-		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.player.buffers.vertices, &vertexDataWriteInfo),
-			   "Failed to write player vertex data to buffer!");
-
-	const VkDeviceSize indexBufferSize = sizeof(uint32_t) * lod->totalIndexCount;
-	const LunaBufferCreationInfo indexBufferCreationInfo = {
-		.size = indexBufferSize,
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
-	VulkanTest(lunaCreateBuffer(device, &indexBufferCreationInfo, &buffers.player.buffers.indices),
-			   "Failed to create player model index buffer!");
-
-	const LunaBufferCreationInfo instanceDataBufferCreationInfo = {
-		.size = sizeof(ModelInstanceData) * model->materialSlotCount,
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
-	VulkanTest(lunaCreateBuffer(device, &instanceDataBufferCreationInfo, &buffers.player.buffers.instanceData),
-			   "Failed to create player model instance data buffer!");
-
-	VkDeviceSize indexOffset = 0;
-	uint32_t shadedDrawCount = 0;
-	uint32_t unshadedDrawCount = 0;
-	uint32_t *indices = malloc(sizeof(uint32_t) * lod->totalIndexCount);
-	CheckAlloc(indices);
-	buffers.player.instanceData = malloc(sizeof(ModelInstanceData) * model->materialSlotCount);
-	CheckAlloc(buffers.player.instanceData);
-	VkDrawIndexedIndirectCommand *shadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) *
-														  model->materialSlotCount);
-	CheckAlloc(shadedDrawInfo);
-	VkDrawIndexedIndirectCommand *unshadedDrawInfo = malloc(sizeof(VkDrawIndexedIndirectCommand) *
-															model->materialSlotCount);
-	CheckAlloc(unshadedDrawInfo);
-	for (uint32_t slotIndex = 0; slotIndex < model->materialSlotCount; slotIndex++)
-	{
-		const Material *material = &model->materials[model->skinMaterialIndices[0][slotIndex]];
-		const ModelComponent *component = &lod->components[slotIndex];
-
-		memcpy(indices + indexOffset, component->indices, component->indexCount * sizeof(uint32_t));
-		indexOffset += component->indexCount;
-
-		buffers.player.instanceData[slotIndex].materialColor = material->color;
-		buffers.player.instanceData[slotIndex].textureIndex = TextureIndex(material->texture);
-
-		if (material->shader == SHADER_SHADED)
-		{
-			shadedDrawInfo[shadedDrawCount].indexCount = component->indexCount;
-			shadedDrawInfo[shadedDrawCount].instanceCount = 1;
-			shadedDrawInfo[shadedDrawCount].firstIndex = 0;
-			shadedDrawInfo[shadedDrawCount].vertexOffset = 0;
-			shadedDrawInfo[shadedDrawCount].firstInstance = 0;
-			shadedDrawCount++;
-		} else if (material->shader == SHADER_UNSHADED)
-		{
-			unshadedDrawInfo[unshadedDrawCount].indexCount = component->indexCount;
-			unshadedDrawInfo[unshadedDrawCount].instanceCount = 1;
-			unshadedDrawInfo[unshadedDrawCount].firstIndex = 0;
-			unshadedDrawInfo[unshadedDrawCount].vertexOffset = 0;
-			unshadedDrawInfo[unshadedDrawCount].firstInstance = 0;
-			unshadedDrawCount++;
-		}
-	}
-
-	const LunaBufferWriteInfo indexDataWriteInfo = {
-		.size = indexBufferSize,
-		.data = indices,
-		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.player.buffers.indices, &indexDataWriteInfo),
-			   "Failed to write player index data to buffer!");
-
-	const VkDeviceSize shadedDrawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * shadedDrawCount;
-	const LunaBufferCreationInfo shadedDrawInfoBufferCreationInfo = {
-		.size = shadedDrawInfoSize,
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
-	VulkanTest(lunaCreateBuffer(device, &shadedDrawInfoBufferCreationInfo, &buffers.player.buffers.shadedDrawInfo),
-			   "Failed to create player model shaded draw info buffer!");
-	const LunaBufferWriteInfo shadedDrawInfoDataWriteInfo = {
-		.size = shadedDrawInfoSize,
-		.data = shadedDrawInfo,
-		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device,
-									 commandBuffer,
-									 buffers.player.buffers.shadedDrawInfo,
-									 &shadedDrawInfoDataWriteInfo),
-			   "Failed to write player shaded draw info data to buffer!");
-
-	const VkDeviceSize unshadedDrawInfoSize = sizeof(VkDrawIndexedIndirectCommand) * unshadedDrawCount;
-	const LunaBufferCreationInfo unshadedDrawInfoBufferCreationInfo = {
-		.size = unshadedDrawInfoSize,
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
-	VulkanTest(lunaCreateBuffer(device, &unshadedDrawInfoBufferCreationInfo, &buffers.player.buffers.unshadedDrawInfo),
-			   "Failed to create player model unshaded draw info buffer!");
-	const LunaBufferWriteInfo unshadedDrawInfoDataWriteInfo = {
-		.size = unshadedDrawInfoSize,
-		.data = unshadedDrawInfo,
-		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device,
-									 commandBuffer,
-									 buffers.player.buffers.unshadedDrawInfo,
-									 &unshadedDrawInfoDataWriteInfo),
-			   "Failed to write player unshaded draw info data to buffer!");
-
-	free(indices);
-	free(shadedDrawInfo);
-	free(unshadedDrawInfo);
-}
-
 static inline void CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
@@ -436,6 +295,11 @@ void CreateBuffers()
 {
 	storageBufferCreationInfo.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment;
 
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.modelVertices),
+			   "Failed to create models vertex buffer!");
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.modelIndices),
+			   "Failed to create models index buffer!");
+
 	CreateUiBuffers();
 	CreateUniformBuffers();
 	CreateFrustumsBuffers();
@@ -445,7 +309,7 @@ void CreateBuffers()
 	CreateMapModelsBuffers(&buffers.map);
 	CreateModelBuffer(&buffers.viewmodel, "viewmodel");
 	CreateSkyBuffers();
-	CreatePlayerBuffers();
+	CreateModelBuffer(&buffers.player, "player");
 	CreateDebugDrawBuffers();
 }
 

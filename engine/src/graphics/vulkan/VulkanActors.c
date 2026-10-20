@@ -6,6 +6,7 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/graphics/vulkan/VulkanModel.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
@@ -28,13 +29,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
-
-typedef struct
-{
-	uint32_t indexCount;
-	uint32_t firstIndex;
-	int32_t vertexOffset;
-} MaterialSlotVertexData;
 
 typedef struct
 {
@@ -66,9 +60,9 @@ typedef struct
 	bool shouldReallocUnshadedWalls;
 } InstanceDataReallocInfo;
 
-static uint32_t allocatedBufferCount;
-static size_t bufferVertexCount;
-static size_t bufferIndexCount;
+/// A list of @c LodMaterialSlotsData structures, indexed using a lod id
+static List lodMaterialSlotsData;
+
 static uint32_t *shadedModelsInstanceIndices;
 static uint32_t *unshadedModelsInstanceIndices;
 static ActorModelInstanceData *modelsInstanceData;
@@ -79,17 +73,13 @@ static ModelActorCullingInfo *unshadedModelsCullingInfo;
 static ActorWallInstanceData *wallsInstanceData;
 static CullingInfo *shadedWallsCullingInfo;
 static CullingInfo *unshadedWallsCullingInfo;
-static ModelVertex *vertices;
-static uint32_t *indices;
 
-/// A list of uint32_t model ids that are currently loaded
-static List loadedModelIds;
-/// A list, indexed with a lod id, that contains lists of @c MaterialSlotVertexData structures for each material slot
-static List lodMaterialSlotsVertexData;
-/// A list of @c LodMaterialSlotsData structures, indexed using a lod id
-static List lodMaterialSlotsData;
+void InitActorLoadingVariables()
+{
+	ListInit(lodMaterialSlotsData, LIST_POINTER);
+}
 
-static inline void ClearLodMaterialSlotsData()
+void ClearActorLodMaterialSlotsData()
 {
 	for (size_t i = 0; i < lodMaterialSlotsData.length; i++)
 	{
@@ -97,110 +87,6 @@ static inline void ClearLodMaterialSlotsData()
 		ListAndContentsFree(materialSlotData->materialSlots);
 	}
 	ListAndContentsFree(lodMaterialSlotsData);
-}
-
-void InitActorLoadingVariables()
-{
-	ListInit(loadedModelIds, LIST_UINT32);
-	ListInit(lodMaterialSlotsVertexData, LIST_NESTED);
-	ListInit(lodMaterialSlotsData, LIST_POINTER);
-}
-
-void RequireRealloc()
-{
-	allocatedBufferCount = 0;
-}
-
-static inline void LoadModelLods(const ModelDefinition *model)
-{
-	if (ListFind(loadedModelIds, model->id) != SIZE_MAX)
-	{
-		// Model is already loaded, so we're done here
-		return;
-	}
-	ListAdd(loadedModelIds, model->id);
-
-	int32_t vertexCount = 0;
-	uint32_t indexCount = 0;
-	for (uint32_t i = 0; i < model->lodCount; i++)
-	{
-		const uint32_t lodId = model->lods[i].id;
-		while (lodId >= lodMaterialSlotsVertexData.length)
-		{
-			ListAdd(lodMaterialSlotsVertexData, NULL);
-		}
-		List *materialSlotsVertexData = &ListGetNestedList(lodMaterialSlotsVertexData, lodId);
-		assert(materialSlotsVertexData->length == 0);
-		for (uint32_t j = 0; j < model->materialSlotCount; j++)
-		{
-			MaterialSlotVertexData *materialSlotVertexData = malloc(sizeof(MaterialSlotVertexData));
-			CheckAlloc(materialSlotVertexData);
-			materialSlotVertexData->indexCount = model->lods[i].components[j].indexCount;
-			materialSlotVertexData->firstIndex = bufferIndexCount + indexCount;
-			materialSlotVertexData->vertexOffset = (int32_t)(bufferVertexCount + vertexCount);
-			ListAdd(*materialSlotsVertexData, materialSlotVertexData);
-
-			indexCount += materialSlotVertexData->indexCount;
-		}
-
-		vertexCount += (int32_t)model->lods[i].vertexCount;
-	}
-	if (vertexCount == 0 || indexCount == 0)
-	{
-		// No vertices to load? Don't load it
-		return;
-	}
-
-	const size_t verticesSize = lunaGetBufferSize(buffers.actorModels.vertices) + vertexCount * sizeof(ModelVertex);
-	const size_t indicesSize = lunaGetBufferSize(buffers.actorModels.indices) + indexCount * sizeof(uint32_t);
-
-	void *newVertices = realloc(vertices, verticesSize);
-	CheckAlloc(newVertices);
-	vertices = newVertices;
-	ModelVertex *vertexData = newVertices + lunaGetBufferSize(buffers.actorModels.vertices);
-
-	void *newIndices = realloc(indices, indicesSize);
-	CheckAlloc(newIndices);
-	indices = newIndices;
-	uint32_t *indexData = newIndices + lunaGetBufferSize(buffers.actorModels.indices);
-
-	VulkanTest(lunaResizeBuffer(device, &buffers.actorModels.vertices, verticesSize),
-			   "Failed to resize actor model vertex buffer!");
-	VulkanTest(lunaResizeBuffer(device, &buffers.actorModels.indices, indicesSize),
-			   "Failed to resize actor model index buffer!");
-
-	size_t vertexOffset = 0;
-	size_t indexOffset = 0;
-	for (uint32_t i = 0; i < model->lodCount; i++)
-	{
-		const ModelLod *lod = &model->lods[i];
-		memcpy(vertexData + vertexOffset, lod->vertexData, lod->vertexCount * sizeof(ModelVertex));
-		vertexOffset += lod->vertexCount;
-		for (uint32_t materialSlotIndex = 0; materialSlotIndex < model->materialSlotCount; materialSlotIndex++)
-		{
-			const ModelComponent *component = &lod->components[materialSlotIndex];
-			memcpy(indexData + indexOffset, component->indices, component->indexCount * sizeof(uint32_t));
-			indexOffset += component->indexCount;
-		}
-	}
-
-	const LunaBufferWriteInfo vertexBufferWriteInfo = {
-		.size = verticesSize,
-		.data = vertices,
-		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.actorModels.vertices, &vertexBufferWriteInfo),
-			   "Failed to write model vertex data to buffer!");
-	const LunaBufferWriteInfo indexBufferWriteInfo = {
-		.size = indicesSize,
-		.data = indices,
-		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
-	};
-	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.actorModels.indices, &indexBufferWriteInfo),
-			   "Failed to write model index data to buffer!");
-
-	bufferVertexCount += vertexCount;
-	bufferIndexCount += indexCount;
 }
 
 void LoadActors(const LockingList *actors)
@@ -333,7 +219,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 		unshadedModelsCullingInfo = malloc(cullingInfoBytes);
 		CheckAlloc(unshadedModelsCullingInfo);
 
-		ClearLodMaterialSlotsData();
+		ClearActorLodMaterialSlotsData();
 		ListInit(lodMaterialSlotsData, LIST_POINTER);
 		for (size_t i = 0; i < reallocInfo->lodInstanceCounts->length; i++)
 		{
@@ -857,24 +743,4 @@ void UpdateActors()
 	ListUnlock(*actors);
 
 	ListFree(lodInstanceCounts);
-}
-
-void ClearModelCache()
-{
-	ListClear(loadedModelIds);
-	ClearLodMaterialSlotsData();
-	for (size_t i = 0; i < lodMaterialSlotsVertexData.length; i++)
-	{
-		ListAndContentsFree(ListGetNestedList(lodMaterialSlotsVertexData, i));
-	}
-	ListClear(lodMaterialSlotsVertexData);
-	VulkanTest(lunaResizeBuffer(device, &buffers.actorModels.vertices, 0),
-			   "Failed to empty actor model vertex buffer!");
-	VulkanTest(lunaResizeBuffer(device, &buffers.actorModels.indices, 0), "Failed to empty actor model index buffer!");
-	bufferVertexCount = 0;
-	bufferIndexCount = 0;
-	free(vertices);
-	vertices = NULL;
-	free(indices);
-	indices = NULL;
 }
