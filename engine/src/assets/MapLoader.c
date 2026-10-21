@@ -40,6 +40,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "joltc/constants.h"
+
 bool LoadMap(Map *map, Asset *mapData)
 {
 	if (!map || !mapData)
@@ -286,34 +288,22 @@ bool LoadMap(Map *map, Asset *mapData)
 		rotationEuler.z = ReadFloat(reader);
 		JPH_Quat_FromEulerAngles(&rotationEuler, &collisionXfm.rotation);
 
-		ModelStaticCollider staticCollider;
 		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-		staticCollider.numTriangles = ReadSizeT(reader);
-		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
-		CheckAlloc(staticCollider.tris);
-		for (size_t k = 0; k < staticCollider.numTriangles; k++)
+		const size_t numVerts = ReadSizeT(reader);
+		Vector3 *verts = malloc(sizeof(Vector3) * numVerts);
+		CheckAlloc(verts);
+		for (size_t k = 0; k < numVerts; k++)
 		{
-			JPH_Triangle *triangle = &staticCollider.tris[k];
-			triangle->materialIndex = 0;
-			EXPECT_BYTES_BOOL(sizeof(float) * 9, bytesRemaining);
-
-			triangle->v1.x = ReadFloat(reader);
-			triangle->v1.y = ReadFloat(reader);
-			triangle->v1.z = ReadFloat(reader);
-
-			triangle->v2.x = ReadFloat(reader);
-			triangle->v2.y = ReadFloat(reader);
-			triangle->v2.z = ReadFloat(reader);
-
-			triangle->v3.x = ReadFloat(reader);
-			triangle->v3.y = ReadFloat(reader);
-			triangle->v3.z = ReadFloat(reader);
+			Vector3 *vertex = &verts[k];
+			EXPECT_BYTES_BOOL(sizeof(float) * 3, bytesRemaining);
+			vertex->x = ReadFloat(reader);
+			vertex->y = ReadFloat(reader);
+			vertex->z = ReadFloat(reader);
 		}
-		JPH_Shape *shape = CreateStaticModelShape(&staticCollider);
+		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(verts, numVerts, JPH_DefaultConvexRadius);
+		free(verts);
 
-		free(staticCollider.tris);
-
-		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(hullShape,
 																							   &collisionXfm,
 																							   JPH_MotionType_Static,
 																							   OBJECT_LAYER_STATIC,
@@ -324,7 +314,7 @@ bool LoadMap(Map *map, Asset *mapData)
 																   JPH_Activation_Activate);
 		ListAdd(map->joltBodies, body);
 		JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-		JPH_Shape_Destroy(shape);
+		JPH_Shape_Destroy(hullShape);
 	}
 
 	JPH_PhysicsSystem_OptimizeBroadPhase(map->physicsSystem);

@@ -27,6 +27,12 @@ static MapMaterial fallbackMaterial = {
 	.texture = MISSING_TEXTURE_NAME,
 };
 
+typedef enum MapMaterialFlags
+{
+	MAP_MATERIAL_FLAG_CASTS_SHADOWS = 1 << 0,
+	MAP_MATERIAL_FLAG_INVISIBLE = 1 << 1,
+} MapMaterialFlags;
+
 MapMaterial *LoadMapMaterial(const char *path)
 {
 	for (int i = 0; i < MAX_MAP_MATERIALS; i++)
@@ -78,12 +84,15 @@ MapMaterial *LoadMapMaterial(const char *path)
 	bytesRemaining -= strLength;
 	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
 	Seek(reader, sizeof(float) * 2); // default scale is lvledit side only
-	EXPECT_BYTES(3, bytesRemaining);
+	EXPECT_BYTES(2, bytesRemaining);
 	material->shader = ReadUint8(reader);
 	material->soundClass = ReadUint8(reader);
-	material->castsShadows = ReadUint8(reader) != 0;
-	EXPECT_BYTES(sizeof(float) + 2, bytesRemaining);
-	Seek(reader, sizeof(float) + 2); // compileInvis, compileNoclip, emissive
+	EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);
+	const uint32_t flags = ReadUint32(reader);
+	material->castsShadows = (flags & MAP_MATERIAL_FLAG_CASTS_SHADOWS) != 0;
+
+	EXPECT_BYTES(sizeof(float), bytesRemaining);
+	Seek(reader, sizeof(float)); // emissive strength
 
 	material->id = mapMaterialId;
 
