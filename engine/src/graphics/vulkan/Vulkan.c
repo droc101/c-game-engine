@@ -19,6 +19,7 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/graphics/vulkan/VulkanRayTracing.h>
 #include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
@@ -607,15 +608,14 @@ static inline void CreatePerFrustumBuffers()
 	ListFree(perFrustumBuffersHandles);
 	ListInit(perFrustumBuffersHandles, LIST_POINTER);
 
-	const LunaBufferCreationInfo drawInfoBufferCreationInfo = {
+	const LunaBufferCreationInfo bufferCreationInfo = {
 		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 	};
 	const LunaBufferCreationInfo actorWallDrawInfoBufferCreationInfo = {
 		.size = sizeof(VkDrawIndirectCommand),
 		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
-	const LunaBufferCreationInfo instanceIndicesBufferCreationInfo = {
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 	};
 	List *drawInfoBufferLists[] = {
 		&buffers.actorModels.shadedDrawInfo,
@@ -656,15 +656,14 @@ static inline void CreatePerFrustumBuffers()
 
 			} else
 			{
-				VulkanTest(lunaCreateBuffer(device, &drawInfoBufferCreationInfo, buffer),
-						   "Failed to create draw info buffer!");
+				VulkanTest(lunaCreateBuffer(device, &bufferCreationInfo, buffer), "Failed to create draw info buffer!");
 			}
 			ListAdd(perFrustumBuffersHandles, *buffer);
 		}
 		for (size_t j = 0; j < ArrayLength(instanceIndicesLists); j++)
 		{
 			LunaBuffer *buffer = ListAdd(*(instanceIndicesLists[j]), LUNA_NULL_HANDLE);
-			VulkanTest(lunaCreateBuffer(device, &instanceIndicesBufferCreationInfo, buffer),
+			VulkanTest(lunaCreateBuffer(device, &bufferCreationInfo, buffer),
 					   "Failed to create instance indices buffer!");
 			ListAdd(perFrustumBuffersHandles, *buffer);
 		}
@@ -1095,7 +1094,7 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 									   const uint32_t frustumIndex,
 									   const LunaGraphicsPipeline shadedPipeline,
 									   const LunaGraphicsPipeline unshadedPipeline,
-									   const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
+									   LunaGraphicsPipelineBindInfo *pipelineBindInfo,
 									   const char *name)
 {
 	const size_t shadedDrawCount = lunaGetBufferSize(buffer->unculledShadedDrawInfo) /
@@ -1123,6 +1122,10 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 
 	if (shadedDrawCount != 0)
 	{
+		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0 && shadedPipeline == pipelines.shadedMap)
+		{
+			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
+		}
 		const LunaDrawIndexedIndirectCountInfo drawInfo = {
 			.pipeline = shadedPipeline,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -1134,6 +1137,10 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 
 	if (unshadedDrawCount != 0)
 	{
+		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0)
+		{
+			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+		}
 		const LunaDrawIndexedIndirectCountInfo drawInfo = {
 			.pipeline = unshadedPipeline,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -1145,7 +1152,7 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 }
 
 static inline void DrawMap(const uint32_t frustumIndex,
-						   const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
+						   LunaGraphicsPipelineBindInfo *pipelineBindInfo,
 						   const bool depthPrepass,
 						   const LunaGraphicsPipeline opaqueShadowMapsPipeline,
 						   const LunaGraphicsPipeline shadowMapsPipeline)
@@ -1197,7 +1204,7 @@ static inline void DrawMap(const uint32_t frustumIndex,
 }
 
 static inline void DrawActors(const uint32_t frustumIndex,
-							  const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
+							  LunaGraphicsPipelineBindInfo *pipelineBindInfo,
 							  const LunaGraphicsPipeline modelShadowMapsPipeline,
 							  const LunaGraphicsPipeline wallShadowMapsPipeline)
 {
@@ -1221,6 +1228,11 @@ static inline void DrawActors(const uint32_t frustumIndex,
 
 		if (shadedDrawCount != 0)
 		{
+			if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0 &&
+				modelShadowMapsPipeline == LUNA_NULL_HANDLE)
+			{
+				pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
+			}
 			const LunaBuffer instanceIndicesBuffer = (LunaBuffer)
 					ListGetPointer(buffers.actorModels.shadedInstanceIndices, frustumIndex);
 			VulkanTest(lunaBindVertexBuffers(device, commandBuffer, &instanceIndicesBuffer, 1, 1),
@@ -1237,6 +1249,10 @@ static inline void DrawActors(const uint32_t frustumIndex,
 
 		if (unshadedDrawCount != 0)
 		{
+			if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0)
+			{
+				pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+			}
 			const LunaBuffer instanceIndicesBuffer = (LunaBuffer)
 					ListGetPointer(buffers.actorModels.unshadedInstanceIndices, frustumIndex);
 			VulkanTest(lunaBindVertexBuffers(device, commandBuffer, &instanceIndicesBuffer, 1, 1),
@@ -1266,6 +1282,11 @@ static inline void DrawActors(const uint32_t frustumIndex,
 
 		if (buffers.actorWalls.shadedInstanceCount != 0)
 		{
+			if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0 &&
+				wallShadowMapsPipeline == LUNA_NULL_HANDLE)
+			{
+				pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
+			}
 			const LunaBuffer drawInfoBuffer = (LunaBuffer)ListGetPointer(buffers.actorWalls.shadedDrawInfo,
 																		 frustumIndex);
 			const LunaBuffer instanceIndicesBuffer = (LunaBuffer)
@@ -1283,6 +1304,10 @@ static inline void DrawActors(const uint32_t frustumIndex,
 
 		if (buffers.actorWalls.unshadedInstanceCount != 0)
 		{
+			if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0)
+			{
+				pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+			}
 			const LunaBuffer drawInfoBuffer = (LunaBuffer)ListGetPointer(buffers.actorWalls.unshadedDrawInfo,
 																		 frustumIndex);
 			const LunaBuffer instanceIndicesBuffer = (LunaBuffer)
@@ -1392,7 +1417,7 @@ static inline VkRect2D GetFrustumScissor(const uint32_t size, uint32_t frustumIn
 
 static inline void UpdateDirectionalLightShadowMap(VkViewport *viewport,
 												   VkRect2D *scissor,
-												   const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+												   LunaGraphicsPipelineBindInfo *pipelineBindInfo)
 {
 	assert(directionalLight);
 
@@ -1454,7 +1479,7 @@ static inline void UpdateLightShadowMap(VulkanLight *light,
 										uint32_t *const frustumIndex,
 										VkViewport *viewport,
 										VkRect2D *scissor,
-										const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+										LunaGraphicsPipelineBindInfo *pipelineBindInfo)
 {
 	assert(light->type != LIGHT_TYPE_DIRECTIONAL);
 
@@ -1481,7 +1506,7 @@ static inline void UpdateLightShadowMap(VulkanLight *light,
 
 static inline void UpdateShadowMaps(const Map *map)
 {
-	if (!ShadowMapsEnabled())
+	if (!ShadowMapsEnabled() || true)
 	{
 		return;
 	}
@@ -1515,7 +1540,7 @@ static inline void UpdateShadowMaps(const Map *map)
 			.bindInfo.scissorBindInfo = &scissorBindInfo,
 		},
 	};
-	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+	LunaGraphicsPipelineBindInfo pipelineBindInfo = {
 		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
@@ -1954,6 +1979,8 @@ bool VK_Init(SDL_Window *window)
 	ListInit(lodMaterialSlotsVertexData, LIST_NESTED);
 	InitActorLoadingVariables();
 
+	InitRayTracing();
+
 	// TODO: Ideally we'd get this right the first time rather than recreating all the pipelines frame one
 	rendererQueuedActions |= QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY;
 
@@ -1994,6 +2021,27 @@ void VK_RenderMap(Map *map, Camera *camera)
 	assert(map == loadedMap);
 
 	HandleMapChangeFlags(map);
+
+	if (camera->showPlayerModel)
+	{
+		const ModelDefinition *playerModel = LoadModel(MODEL("player"));
+		LoadModelToBuffer(playerModel, 0, 0, &buffers.player);
+
+		JPH_RMat44 transformMatrix;
+		JPH_CharacterVirtual_GetWorldTransform(map->player.joltCharacter, &transformMatrix);
+		for (size_t i = 0; i < playerModel->materialSlotCount; i++)
+		{
+			const LunaBufferWriteInfo writeInfo = {
+				.size = sizeof(transformMatrix),
+				.data = &transformMatrix,
+				.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
+				.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
+			};
+			VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.player.instanceData, &writeInfo),
+					   "Failed to write player transform matrix to instance data buffer!");
+		}
+	}
+
 	UpdateCameraUniform(camera);
 	UpdateDynamicLights();
 	UpdateDirectionalLightCascades(GetState()->camera, GetState()->map);
@@ -2038,9 +2086,10 @@ void VK_RenderMap(Map *map, Camera *camera)
 			.bindInfo.scissorBindInfo = &scissorBindInfo,
 		},
 	};
-	const LunaGraphicsPipelineBindInfo pipelineBindInfo = {
+	const LunaDescriptorSet descriptorSetHandles[] = {descriptorSets.common.set, descriptorSets.rayTracing.set};
+	LunaGraphicsPipelineBindInfo pipelineBindInfo = {
 		.descriptorSetBindInfo.descriptorSetCount = 1,
-		.descriptorSetBindInfo.descriptorSets = &descriptorSets.common.set,
+		.descriptorSetBindInfo.descriptorSets = descriptorSetHandles,
 		.dynamicStateCount = ArrayLength(dynamicStateBindInfos),
 		.dynamicStates = dynamicStateBindInfos,
 	};
@@ -2059,22 +2108,6 @@ void VK_RenderMap(Map *map, Camera *camera)
 	DrawDebugRenderer(&pipelineBindInfo);
 	if (camera->showPlayerModel)
 	{
-		const ModelDefinition *playerModel = LoadModel(MODEL("player"));
-		LoadModelToBuffer(playerModel, 0, 0, &buffers.player);
-
-		JPH_RMat44 transformMatrix;
-		JPH_CharacterVirtual_GetWorldTransform(map->player.joltCharacter, &transformMatrix);
-		for (size_t i = 0; i < playerModel->materialSlotCount; i++)
-		{
-			const LunaBufferWriteInfo writeInfo = {
-				.size = sizeof(transformMatrix),
-				.data = &transformMatrix,
-				.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, transformMatrix),
-				.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
-			};
-			VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.player.instanceData, &writeInfo),
-					   "Failed to write player transform matrix to instance data buffer!");
-		}
 		DrawModelBuffer(&buffers.player, &pipelineBindInfo, "player");
 	}
 	// Viewmodel must be drawn last

@@ -26,6 +26,10 @@
 static const LunaBufferCreationInfo UNALIGNED_BUFFER_CREATION_INFO = {
 	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 };
+static const LunaBufferCreationInfo UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO = {
+	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+	.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+};
 static LunaBufferCreationInfo storageBufferCreationInfo = {
 	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 };
@@ -122,7 +126,9 @@ static inline void CreateFrustumsBuffers()
 {
 	VulkanTest(lunaCreateBuffer(device, &storageBufferCreationInfo, &buffers.frustumCullingDatas),
 			   "Failed to create frustum culling datas buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.frustumShadowMaps),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffers.frustumShadowMaps),
 			   "Failed to create frustum shadow maps buffer!");
 }
 
@@ -131,20 +137,24 @@ static inline void CreateActorModelsBuffers()
 	VulkanTest(lunaCreateBuffer(device, &storageBufferCreationInfo, &buffers.actorModels.instanceData),
 			   "Failed to create shaded actor models instance data buffer!");
 	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_BUFFER_CREATION_INFO,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
 								&buffers.actorModels.shadedUnculledInstanceIndices),
 			   "Failed to create shaded actor models unculled instance indices buffer!");
 	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_BUFFER_CREATION_INFO,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
 								&buffers.actorModels.unshadedUnculledInstanceIndices),
 			   "Failed to create unshaded actor models unculled instance indices buffer!");
 	ListInit(buffers.actorModels.shadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorModels.unshadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorModels.shadedDrawInfo, LIST_POINTER);
 	ListInit(buffers.actorModels.unshadedDrawInfo, LIST_POINTER);
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.actorModels.shadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffers.actorModels.shadedCullingInfo),
 			   "Failed to create actor models shaded materials culling info buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.actorModels.unshadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffers.actorModels.unshadedCullingInfo),
 			   "Failed to create actor models unshaded materials culling info buffer!");
 }
 
@@ -236,9 +246,13 @@ static inline void CreateActorWallsBuffers()
 	ListInit(buffers.actorWalls.shadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorWalls.unshadedInstanceIndices, LIST_POINTER);
 
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.actorWalls.shadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffers.actorWalls.shadedCullingInfo),
 			   "Failed to create shaded actor walls culling info buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.actorWalls.unshadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffers.actorWalls.unshadedCullingInfo),
 			   "Failed to create unshaded actor walls culling info buffer!");
 }
 
@@ -250,15 +264,23 @@ static inline void CreateMapModelsBuffers(MapModelsBuffer *buffer)
 			   "Failed to create shaded map models index buffer!");
 	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->instanceData),
 			   "Failed to create shaded map models instance data buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->unculledShadedDrawInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffer->unculledShadedDrawInfo),
 			   "Failed to create shaded map models unculled draw info buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->unculledUnshadedDrawInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffer->unculledUnshadedDrawInfo),
 			   "Failed to create unshaded map models unculled draw info buffer!");
 	ListInit(buffer->shadedDrawInfo, LIST_POINTER);
 	ListInit(buffer->unshadedDrawInfo, LIST_POINTER);
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->shadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffer->shadedCullingInfo),
 			   "Failed to create shaded map models materials culling info buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->unshadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device,
+								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&buffer->unshadedCullingInfo),
 			   "Failed to create unshaded map models materials culling info buffer!");
 }
 

@@ -115,12 +115,14 @@ static LunaPipelineLayoutCreationInfo pipelineLayoutCreationInfo = {
 	.descriptorSetLayoutCount = 1,
 };
 
+static LunaDescriptorSetLayout lightingPipelineDescriptorSetLayouts[2];
 static LunaPushConstantsRange lightingShadersPushConstantsRange = {
 	.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 	.size = sizeof(uint32_t),
 };
 static LunaPipelineLayoutCreationInfo lightingPipelineLayoutCreationInfo = {
-	.descriptorSetLayoutCount = 1,
+	.descriptorSetLayoutCount = ArrayLength(lightingPipelineDescriptorSetLayouts),
+	.descriptorSetLayouts = lightingPipelineDescriptorSetLayouts,
 	.pushConstantRangeCount = 1,
 	.pushConstantsRanges = &lightingShadersPushConstantsRange,
 };
@@ -1706,7 +1708,8 @@ void CreateGraphicsPipelines()
 {
 	multisampling.rasterizationSamples = msaaSamples;
 	pipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
-	lightingPipelineLayoutCreationInfo.descriptorSetLayouts = &descriptorSets.common.layout;
+	lightingPipelineDescriptorSetLayouts[0] = descriptorSets.common.layout;
+	lightingPipelineDescriptorSetLayouts[1] = descriptorSets.rayTracing.layout;
 	lightingShadersPushConstantsRange.dataPointer = &shadowMapFrustumTextureSize;
 	depthOnlySpecializationInfo.pData = &lightCount;
 	unshadedSpecializationInfo.pData = &specializationConstants;

@@ -85,8 +85,18 @@ bool CreateLogicalDevice()
 	const LunaPhysicalDevicePreferenceDefinition devicePreferenceDefinition = {
 		.preferredDeviceType = preferred,
 	};
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR requiredAccelerationStructureFeatures = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR,
+		.accelerationStructure = VK_TRUE,
+	};
+	VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR,
+		.pNext = &requiredAccelerationStructureFeatures,
+		.rayQuery = VK_TRUE,
+	};
 	VkPhysicalDeviceVulkan12Features vulkan12Features = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+		.pNext = &rayQueryFeatures,
 		.drawIndirectCount = VK_TRUE,
 		.scalarBlockLayout = VK_TRUE,
 		.bufferDeviceAddress = VK_TRUE,
@@ -106,7 +116,12 @@ bool CreateLogicalDevice()
 		.pNext = &vulkan12Features,
 		.features = vulkan10Features,
 	};
-	const char *const extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+	const char *const extensions[] = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_RAY_QUERY_EXTENSION_NAME,
+		VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+		VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
+	};
 	const LunaDeviceCreationInfo2 deviceCreationInfo = {
 		.extensionCount = ArrayLength(extensions),
 		.extensionNames = extensions,
@@ -419,6 +434,23 @@ void CreateDescriptorSetLayouts()
 											 &cullingDescriptorSetLayoutCreationInfo,
 											 &descriptorSets.culling.layout),
 			   "Failed to create culling descriptor set layout!");
+
+	const LunaDescriptorSetLayoutBinding rayTracingBindings[] = {
+		{
+			.bindingName = "Acceleration Structure",
+			.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		},
+	};
+	const LunaDescriptorSetLayoutCreationInfo rayTracingDescriptorSetLayoutCreationInfo = {
+		.bindingCount = ArrayLength(rayTracingBindings),
+		.bindings = rayTracingBindings,
+	};
+	VulkanTest(lunaCreateDescriptorSetLayout(device,
+											 &rayTracingDescriptorSetLayoutCreationInfo,
+											 &descriptorSets.rayTracing.layout),
+			   "Failed to create ray tracing descriptor set layout!");
 }
 
 void CreateTextureSamplers()
@@ -597,6 +629,10 @@ void CreateDescriptorSet()
 			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 4,
 		},
+		{
+			.type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
+			.descriptorCount = 1,
+		},
 	};
 	const LunaDescriptorPoolCreationInfo descriptorPoolCreationInfo = {
 		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
@@ -610,10 +646,12 @@ void CreateDescriptorSet()
 	const LunaDescriptorSetLayout layouts[] = {
 		descriptorSets.common.layout,
 		descriptorSets.culling.layout,
+		descriptorSets.rayTracing.layout,
 	};
 	LunaDescriptorSet *descriptorSetHandles[] = {
 		&descriptorSets.common.set,
 		&descriptorSets.culling.set,
+		&descriptorSets.rayTracing.set,
 	};
 	const LunaDescriptorSetAllocationInfo allocationInfo = {
 		.descriptorPool = descriptorPool,

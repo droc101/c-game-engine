@@ -7,6 +7,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/graphics/vulkan/VulkanRayTracing.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <luna/lunaBuffer.h>
@@ -15,6 +16,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <volk.h>
 
 List loadedModelIds = {0};
 List lodMaterialSlotsVertexData = {0};
@@ -117,6 +119,8 @@ void LoadModelLods(const ModelDefinition *model)
 
 	bufferVertexCount += vertexCount;
 	bufferIndexCount += indexCount;
+
+	MakeBLAS(model, vertexCount * sizeof(ModelVertex), vertexData, indexCount * sizeof(uint32_t), indexData);
 }
 
 void ClearModelCache()

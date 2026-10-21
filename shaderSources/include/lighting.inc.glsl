@@ -2,7 +2,10 @@
 
 #include "model_fragment.inc.glsl"
 
+#extension GL_EXT_ray_query : enable
+
 #define USE_CLUSTERED
+#define USE_RAYTRACING
 
 layout(constant_id = 1) const uint LIGHT_COUNT = 1;
 layout(constant_id = 2) const bool HAS_STATIC_LIGHT = true;
@@ -39,6 +42,8 @@ layout(set = 0, binding = 10, scalar) readonly restrict uniform SoftShadowKernel
 layout(set = 0, binding = 7) uniform sampler2DShadow shadowMapAtlases[2];
 #define directionalLightShadowMapAtlas (shadowMapAtlases[0])
 #define shadowMapAtlas (shadowMapAtlases[1])
+
+layout(set = 1, binding = 0) uniform accelerationStructureEXT topLevelAccelerationStructure;
 
 layout(location = 1) in vec3 inPosition;
 layout(location = 2) in vec3 inNormal;
@@ -111,11 +116,19 @@ float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord, cons
     return sampleShadowMapInternal(directionalLightShadowMapAtlas, (coord.xy * 0.25 + 0.25 + vec2(cascadeIndex % 2, cascadeIndex / 2) * 0.5) , coord.z, SAMPLE_RADIUS / (2 * resolution));
 }
 
+bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direction) {
+    rayQueryEXT rayQuery;
+    rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1);
+    rayQueryProceedEXT(rayQuery);
+    return rayQueryGetIntersectionTypeEXT(rayQuery, true) != gl_RayQueryCommittedIntersectionTriangleEXT;
+}
+
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
     if (LIGHT_COUNT == 0) {
         return vec3(0);
     }
     vec3 lightingColor = vec3(0);
+
 #ifdef USE_CLUSTERED
     const uint clusterIndex = getClusterIndex(inPosition, inDistance);
     for (uint i = 0; i < clusters.clusters[clusterIndex].lightCount; i++) {
@@ -125,6 +138,9 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
         #define light lightsData.lights[i]
 #endif
         if (light.type == LIGHT_TYPE_DIRECTIONAL) {
+#ifdef USE_RAYTRACING
+            continue;
+#else
             if (cascadeIndex == 4) {
                 lightingColor += light.brightness * max(dot(light.negativeForwardDirection, normal), 0) * light.color;
                 continue;
@@ -138,6 +154,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 }
                 lightingColor += factor * light.brightness * max(dot(light.negativeForwardDirection, normal), 0) * light.color;
             }
+#endif 
         } else {
             const vec3 lightToWorld = light.position - position;
             const float distance = length(lightToWorld);
@@ -158,6 +175,17 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (normalFactor < EPSILON) {
                     continue;
                 }
+#ifdef USE_RAYTRACING
+                if (isLightVisible(position, lightToWorld, lightToWorldNormalized)) {
+                    if (light.cookieTextureIndex != 0) {
+                        const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
+                        const vec3 cookieColor = sampleTexture(light.cookieTextureIndex - 1, (worldPosition.xy / (worldPosition.w - 0.01)) * 0.5 + 0.5).rgb;
+                        lightingColor += brightness * normalFactor * light.color * cookieColor;
+                    } else {
+                        lightingColor += brightness * normalFactor * light.color;
+                    }
+                }
+#else
                 const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
                 const vec4 coord = worldPosition / (worldPosition.w - 0.01);
                 if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
@@ -172,6 +200,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                         lightingColor += factor * brightness * normalFactor * light.color;
                     }
                 }
+#endif
             } else {
                 const float normalFactor = dot(lightToWorldNormalized, normal);
                 if (normalFactor < EPSILON) {
@@ -181,6 +210,11 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
+#ifdef USE_RAYTRACING
+                if (isLightVisible(position, lightToWorld, lightToWorldNormalized)) {
+                    lightingColor += brightness * normalFactor * light.color;
+                }
+#else
                 const vec3 lightToWorldAbs = abs(lightToWorld);
                 const float scale = max(max(lightToWorldAbs.x, lightToWorldAbs.y), lightToWorldAbs.z);
                 const float comparisonDepth = light.transformMatrix[2][2] + light.transformMatrix[3][2] / (scale - 0.01);
@@ -208,6 +242,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     continue;
                 }
                 lightingColor += factor * brightness * normalFactor * light.color;
+#endif
             }
         }
     }

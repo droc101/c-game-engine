@@ -10,18 +10,20 @@ void main() {
 	}
 
 	getTextureColor();
-	// TODO: Does this branch get compiled out
-	vec3 lightingColor = getLightingColor(inPosition.xyz, normalize(inNormal), getCascadeIndex(inDistance));
-	if (!HAS_STATIC_LIGHT) {
-		lightingColor += vec3(1);
-	}
-	if (DEBUG_RENDERING == DEBUG_RENDERING_ONLY_LIGHTING || DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
-		outColor.rgb = clamp(lightingColor * globalLighting.exposure, 0.0, 1.0);
-		outColor.a = 1.0;
-		return;
-	}
+
+	vec3 lightingColor;
 	if (DEBUG_RENDERING == DEBUG_RENDERING_DISABLE_LIGHTING) {
 		lightingColor = vec3(1);
+	} else {
+		lightingColor = getLightingColor(inPosition.xyz, normalize(inNormal), getCascadeIndex(inDistance));
+		if (!HAS_STATIC_LIGHT) {
+			lightingColor += vec3(1);
+		}
+		if (DEBUG_RENDERING == DEBUG_RENDERING_ONLY_LIGHTING || DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
+			outColor.rgb = clamp(lightingColor * globalLighting.exposure, 0.0, 1.0);
+			outColor.a = 1.0;
+			return;
+		}
 	}
 	float fogFactor = clamp((inDistance - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * inColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);

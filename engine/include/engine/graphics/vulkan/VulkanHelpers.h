@@ -453,6 +453,7 @@ typedef struct DescriptorSets
 {
 	DescriptorSet common;
 	DescriptorSet culling;
+	DescriptorSet rayTracing;
 } DescriptorSets;
 
 typedef struct CullingInfo

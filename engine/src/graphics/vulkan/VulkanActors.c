@@ -7,6 +7,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/graphics/vulkan/VulkanRayTracing.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
@@ -73,6 +74,7 @@ static ModelActorCullingInfo *unshadedModelsCullingInfo;
 static ActorWallInstanceData *wallsInstanceData;
 static CullingInfo *shadedWallsCullingInfo;
 static CullingInfo *unshadedWallsCullingInfo;
+static VkAccelerationStructureInstanceKHR *blasInstances;
 
 void InitActorLoadingVariables()
 {
@@ -218,6 +220,8 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 		CheckAlloc(shadedModelsCullingInfo);
 		unshadedModelsCullingInfo = malloc(cullingInfoBytes);
 		CheckAlloc(unshadedModelsCullingInfo);
+		blasInstances = calloc(reallocInfo->modelInstanceCount, sizeof(VkAccelerationStructureInstanceKHR));
+		CheckAlloc(blasInstances);
 
 		ClearActorLodMaterialSlotsData();
 		ListInit(lodMaterialSlotsData, LIST_POINTER);
@@ -499,6 +503,21 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 		instanceData->modColor = actor->modColor;
 		instanceData->materialColor = material->color;
 		instanceData->textureIndex = TextureIndex(material->texture);
+		VkAccelerationStructureInstanceKHR *blasInstance = &blasInstances[instanceIndex];
+		blasInstance->transform.matrix[0][0] = transformMatrix.m11;
+		blasInstance->transform.matrix[0][1] = transformMatrix.m21;
+		blasInstance->transform.matrix[0][2] = transformMatrix.m31;
+		blasInstance->transform.matrix[0][3] = transformMatrix.m41;
+		blasInstance->transform.matrix[1][0] = transformMatrix.m12;
+		blasInstance->transform.matrix[1][1] = transformMatrix.m22;
+		blasInstance->transform.matrix[1][2] = transformMatrix.m32;
+		blasInstance->transform.matrix[1][3] = transformMatrix.m42;
+		blasInstance->transform.matrix[2][0] = transformMatrix.m13;
+		blasInstance->transform.matrix[2][1] = transformMatrix.m23;
+		blasInstance->transform.matrix[2][2] = transformMatrix.m33;
+		blasInstance->transform.matrix[2][3] = transformMatrix.m43;
+		blasInstance->mask = 0xFF;
+		blasInstance->accelerationStructureReference = GetAccelerationStructureDeviceAddress(actor->model);
 
 		Vector3 position;
 		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &position);
@@ -743,4 +762,6 @@ void UpdateActors()
 	ListUnlock(*actors);
 
 	ListFree(lodInstanceCounts);
+
+	BuildTLAS(reallocInfo.modelInstanceCount, blasInstances);
 }

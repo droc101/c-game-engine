@@ -72,17 +72,19 @@ void main() {
 	}
 
 	getTextureColor();
-    vec3 lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
-	if (ENABLE_BAKED_LIGHTING) {
-		lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
-	}
-	if (DEBUG_RENDERING == DEBUG_RENDERING_ONLY_LIGHTING || DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
-		outColor.rgb = clamp(lightingColor * globalLighting.exposure, 0.0, 1.0);
-		outColor.a = 1.0;
-		return;
-	}
+    vec3 lightingColor;
 	if (DEBUG_RENDERING == DEBUG_RENDERING_DISABLE_LIGHTING) {
 		lightingColor = vec3(1);
+	} else {
+		lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
+		if (ENABLE_BAKED_LIGHTING) {
+			lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
+		}
+		if (DEBUG_RENDERING == DEBUG_RENDERING_ONLY_LIGHTING || DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
+			outColor.rgb = clamp(lightingColor * globalLighting.exposure, 0.0, 1.0);
+			outColor.a = 1.0;
+			return;
+		}
 	}
 	float fogFactor = clamp((inDistance - fog.start) / (fog.end - fog.start), 0.0, 1.0) * fog.colorAlpha;
 	outColor.rgb = mix(outColor.rgb * globalLighting.color.rgb * lightingColor, fog.color, fogFactor);
