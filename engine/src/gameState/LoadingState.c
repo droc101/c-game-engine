@@ -47,7 +47,7 @@ char *loadStateLevelname = NULL;
 MapTransition *loadStateTransition = NULL;
 
 static uint64_t levelLoadStartTime;
-static LoadingStateStage stage;
+static _Atomic LoadingStateStage stage;
 
 static void LoadingStateFixedUpdate(GlobalState *state, const double delta)
 {
@@ -118,7 +118,7 @@ static void LoadingStateRender(GlobalState * /*state*/, const double /*delta*/)
 		rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_ASSETS;
 	} else if (stage == LSS_RELOADING_ASSETS)
 	{
-		stage =  LSS_LOADING_LEVEL;
+		stage = LSS_LOADING_LEVEL;
 	}
 }
 

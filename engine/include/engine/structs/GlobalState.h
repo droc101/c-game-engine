@@ -44,7 +44,7 @@ struct GlobalState
 
 	const GameState *gameState;
 	/// The number of physics frames that have passed since the last game state change
-	uint64_t physicsFrame;
+	_Atomic uint64_t physicsFrame;
 
 	/// The save data (persists between maps)
 	SaveData *saveData;

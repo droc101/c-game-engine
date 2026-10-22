@@ -33,6 +33,7 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_cpuinfo.h>
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_platform.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
@@ -112,11 +113,13 @@ static void DebugEntryPlayerPosition()
 	if (GetState()->map)
 	{
 		const Player *player = &GetState()->map->player;
+		SDL_LockMutex(player->mutex);
 		DPrintF("Position: %.2f %.2f %.2f",
 				COLOR_WHITE,
 				player->transform.position.x,
 				player->transform.position.y,
 				player->transform.position.z);
+		SDL_UnlockMutex(player->mutex);
 	}
 }
 

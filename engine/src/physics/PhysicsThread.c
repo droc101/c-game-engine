@@ -31,6 +31,7 @@
 static SDL_Thread *physicsThread;
 static SDL_Mutex *physicsThreadMutex;
 static SDL_Mutex *physicsTickMutex;
+static SDL_Mutex *tickTimeMutex;
 
 static List physicsThreadInputEventQueue;
 
@@ -144,7 +145,9 @@ static int PhysicsThreadMain(void * /*data*/)
 		if (state->map)
 		{
 			const LockingList *actors = &state->map->actors;
+			SDL_LockMutex(state->map->player.mutex);
 			const Vector3 cameraPosition = state->camera->transform.position;
+			SDL_UnlockMutex(state->map->player.mutex);
 
 			ListLock(*actors);
 			SDL_UnlockMutex(physicsTickMutex);
@@ -158,8 +161,10 @@ static int PhysicsThreadMain(void * /*data*/)
 
 		uint64_t timeEnd = GetTimeNs();
 		uint64_t timeElapsed = timeEnd - timeStart;
+		SDL_LockMutex(tickTimeMutex);
 		tickStart = timeStart;
 		lastTickTime = max(min(PHYSICS_MIN_NS_D, (double)timeElapsed), PHYSICS_TARGET_NS_D);
+		SDL_UnlockMutex(tickTimeMutex);
 		if (timeElapsed < PHYSICS_TARGET_NS)
 		{
 			SDL_DelayPrecise(PHYSICS_TARGET_NS - timeElapsed);
@@ -178,6 +183,7 @@ void PhysicsThreadInit()
 	physicsThreadPostQuit = false;
 	physicsThreadMutex = SDL_CreateMutex();
 	physicsTickMutex = SDL_CreateMutex();
+	tickTimeMutex = SDL_CreateMutex();
 	physicsThread = SDL_CreateThread(PhysicsThreadMain, "GamePhysics", NULL);
 	if (physicsThread == NULL)
 	{
@@ -208,6 +214,7 @@ void PhysicsThreadTerminate()
 
 	DestroyMutex(&physicsThreadMutex);
 	DestroyMutex(&physicsTickMutex);
+	DestroyMutex(&tickTimeMutex);
 }
 
 void PhysicsThreadLockTickMutex()
@@ -222,5 +229,8 @@ void PhysicsThreadUnlockTickMutex()
 
 float PhysicsInterpolationFactor()
 {
-	return min((float)((double)(GetTimeNs() - tickStart) / lastTickTime), 1);
+	SDL_LockMutex(tickTimeMutex);
+	const float factor = min((float)((double)(GetTimeNs() - tickStart) / lastTickTime), 1);
+	SDL_UnlockMutex(tickTimeMutex);
+	return factor;
 }
