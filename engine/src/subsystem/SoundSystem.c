@@ -11,6 +11,7 @@
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/GlobalState.h>
+#include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/SoundSystem.h>
@@ -72,6 +73,7 @@ struct SoundSystem
 	SoundChannel *channels[SOUND_SYSTEM_CHANNEL_COUNT];
 	SDL_Mutex *mutex;
 	SoundHandle nextHandle;
+	LockingList channelsToBeFreed;
 };
 
 static SoundSystem soundSys;
@@ -88,6 +90,7 @@ static void UnlockSoundSystem()
 
 /**
  * callback for when a channel finishes playing (so we can free it)
+ * @warning Locking the main SoundSystem mutex in this function will set up conditions that may cause a deadlock
  */
 static void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 {
@@ -96,20 +99,11 @@ static void ChannelFinished(void *userdata, MIX_Track * /*track*/)
 		LogWarning("ChannelFinished called with NULL userdata!\n");
 		return;
 	}
-	LockSoundSystem();
-	SoundChannel *effect = userdata;
-	if (effect->callback)
-	{
-		effect->callback(effect->callbackData);
-	}
-	if (effect->position)
-	{
-		free(effect->position);
-	}
-	MIX_DestroyAudio(effect->audio);
-	soundSys.channels[effect->channelIndex] = NULL;
-	free(effect);
-	UnlockSoundSystem();
+	SoundChannel *channel = userdata;
+	MIX_Audio *audioPtr = channel->audio;
+	channel->audio = NULL;
+	MIX_DestroyAudio(audioPtr);
+	ListAdd(soundSys.channelsToBeFreed, channel);
 }
 
 void InitSoundSystem()
@@ -161,6 +155,29 @@ void InitSoundSystem()
 	UpdateVolume();
 
 	soundSys.mutex = SDL_CreateMutex();
+	ListInit(soundSys.channelsToBeFreed, LIST_POINTER);
+}
+
+/// @warning Must not call any SDL_Mixer functions from within this function
+static inline void FreeChannels()
+{
+	ListLock(soundSys.channelsToBeFreed);
+	for (uint32_t i = 0; i < soundSys.channelsToBeFreed.length; i++)
+	{
+		SoundChannel *channel = ListGetPointer(soundSys.channelsToBeFreed, i);
+		if (channel->callback)
+		{
+			channel->callback(channel->callbackData);
+		}
+		if (channel->position)
+		{
+			free(channel->position);
+		}
+		soundSys.channels[channel->channelIndex] = NULL;
+		free(channel);
+	}
+	ListClear(soundSys.channelsToBeFreed);
+	ListUnlock(soundSys.channelsToBeFreed);
 }
 
 void DestroySoundSystem()
@@ -168,6 +185,8 @@ void DestroySoundSystem()
 	LogDebug("Cleaning up sound system...\n");
 
 	LockSoundSystem();
+	FreeChannels();
+	ListFree(soundSys.channelsToBeFreed);
 	if (soundSys.isAudioStarted)
 	{
 		for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
@@ -199,6 +218,7 @@ void UpdateSoundSystem()
 		QUAT_TO_VERSOR(GetState()->camera->transform.rotation, listenerRotation);
 	}
 	LockSoundSystem();
+	FreeChannels();
 	for (int i = 0; i < SOUND_SYSTEM_CHANNEL_COUNT; i++)
 	{
 		if (MIX_TrackPlaying(soundSys.tracks[i]) || MIX_TrackPaused(soundSys.tracks[i]))
