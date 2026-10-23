@@ -183,15 +183,15 @@ static void DebugEntrySystem()
 	const Vector2 viewport = ActualWindowSizeIgnoreDPI();
 	DPrintF("Viewport: %.0fx%.0f @ %.0fx", COLOR_WHITE, viewport.x, viewport.y, GetState()->uiScale);
 	DPrintF("Windowing Platform: %s", COLOR_WHITE, SDL_GetCurrentVideoDriver());
-	DPrintGPUInfo();
+	DebugEntryGPUInfo();
 }
 
 static void DebugEntryAssetLoaders()
 {
-	DPrintAssetReader();
-	DPrintTextureLoader();
-	DPrintModelLoader();
-	DPrintFontLoader();
+	DebugEntryAssetReader();
+	DebugEntryTextureLoader();
+	DebugEntryModelLoader();
+	DebugEntryFontLoader();
 }
 
 static void DebugEntryIoQueue()

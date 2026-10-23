@@ -2,6 +2,11 @@
 // Created by droc101 on 4/22/2024.
 //
 
+/**
+ * @file Actor.h
+ * Actor utility functions
+ */
+
 #ifndef GAME_ACTOR_H
 #define GAME_ACTOR_H
 
@@ -23,21 +28,32 @@
 typedef struct Actor Actor;
 typedef struct ActorConnection ActorConnection;
 
+/// Name of input to kill an actor
 #define ACTOR_INPUT_KILL "kill"
+/// Name of input to cancel queued I/O coming from an actor
 #define ACTOR_INPUT_CANCEL_QUEUED_IO "cancel_queued_io"
 
+/// Name of output fired when an actor is spawned
 #define ACTOR_OUTPUT_SPAWNED "spawned"
+/// Name of output fired when an actor is killed
 #define ACTOR_OUTPUT_KILLED "killed"
 
+/// Miscellaneous actor properties
 enum ActorFlags
 {
+	/// This actor can push the player
 	ACTOR_FLAG_CAN_PUSH_PLAYER = 1 << 0,
+	/// This actor is an enemy
 	ACTOR_FLAG_ENEMY = 1 << 1,
+	/// This actor can block lasers
 	ACTOR_FLAG_CAN_BLOCK_LASERS = 1 << 2, // TODO should we split this enum into engine-side and game-side
+	/// This actor can be held
 	ACTOR_FLAG_CAN_BE_HELD = 1 << 3,
+	/// This actor can be interacted with
 	ACTOR_FLAG_INTERACTABLE = 1 << 4,
 };
 
+/// Actor I/O connection
 struct ActorConnection
 {
 	/// The name of the input on the target actor
@@ -54,6 +70,7 @@ struct ActorConnection
 	uint16_t delayMs;
 };
 
+/// Actor instance
 struct Actor
 {
 	/// The actor's definition
@@ -162,13 +179,15 @@ void ActorCreateEmptyBody(Actor *this, const Transform *transform);
 /**
  * Actor kill signal handler
  * @param this The actor this signal was sent to
+ * @private
  */
-void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/);
+void ActorSignalKill(Actor *this, const Actor *sender, const Param *param);
 
 /**
  * Actor cancel queued io signal handler
  * @param this The actor this signal was sent to
+ * @private
  */
-void ActorSignalCancelQueuedIo(Actor *this, const Actor */*sender*/, const Param */*param*/);
+void ActorSignalCancelQueuedIo(Actor *this, const Actor *sender, const Param *param);
 
 #endif //GAME_ACTOR_H

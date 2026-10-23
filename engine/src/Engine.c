@@ -156,7 +156,9 @@ static void WindowAndRenderInit()
 
 	if (!RenderInit())
 	{
-		RenderInitError();
+		FriendlyError("Failed to initialize renderer",
+					  "Failed to start the Vulkan renderer.\nPlease make sure your graphics card and drivers support "
+					  "Vulkan 1.2");
 	}
 
 	UpdateViewportSize();

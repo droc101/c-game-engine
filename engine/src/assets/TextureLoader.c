@@ -242,7 +242,7 @@ void DestroyTextureLoader()
 	textureId = 0;
 }
 
-void DPrintTextureLoader()
+void DebugEntryTextureLoader()
 {
 	DPrintF("Texture Cache: %zu/%zu textures", COLOR_WHITE, textureId, MAX_TEXTURES);
 }

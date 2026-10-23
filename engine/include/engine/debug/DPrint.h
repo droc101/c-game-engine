@@ -2,6 +2,11 @@
 // Created by droc101 on 4/26/2024.
 //
 
+/**
+ * @file DPrint.h
+ * printf-like functions for drawing debug information to the screen
+ */
+
 #ifndef GAME_DPRINT_H
 #define GAME_DPRINT_H
 
@@ -12,6 +17,7 @@
 /**
  * Resets the DPrint Y position to the top of the screen
  * @note Should only be called once at the start of the physicsFrame
+ * @private
  */
 void ResetDPrintYPos();
 

@@ -2,6 +2,11 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file Map.h
+ * Map definitions & management/utility functions
+ */
+
 #ifndef GAME_MAP_H
 #define GAME_MAP_H
 
@@ -29,16 +34,16 @@ typedef struct MapModel MapModel;
 typedef struct MapTransition MapTransition;
 typedef struct QueuedIOConnection QueuedIoConnection;
 
-typedef enum MapChangeFlags MapChangeFlags;
-
-enum MapChangeFlags
+/// Things to reload when next rendering the map
+typedef enum MapChangeFlags
 {
 	MAP_LIGHT_CHANGED = 1 << 1,
 	MAP_EXPOSURE_CHANGED = 1 << 1,
 	MAP_FOG_CHANGED = 1 << 2,
 	MAP_VIEWMODEL_CHANGED = 1 << 3,
-};
+} MapChangeFlags;
 
+/// @private
 struct MapVertex
 {
 	/// The world space position of the vertex
@@ -51,6 +56,7 @@ struct MapVertex
 	Vector3 normal;
 };
 
+/// @private
 struct MapModel
 {
 	/// The material this model uses
@@ -69,6 +75,7 @@ struct MapModel
 	uint32_t *indices;
 };
 
+/// An override for the player's spawn point when loading into a map
 struct MapTransition
 {
 	/// The entrance to spawn the player at
@@ -79,6 +86,7 @@ struct MapTransition
 	Vector3 relativeAngles;
 };
 
+/// An I/O connection that is waiting to be fired
 struct QueuedIOConnection
 {
 	/// The actor that sent this I/O
@@ -95,6 +103,7 @@ struct QueuedIOConnection
 	bool processed;
 };
 
+/// A loaded map asset
 struct Map
 {
 	char *mapName;
@@ -115,6 +124,7 @@ struct Map
 
 	List joltBodies;
 
+	/// Whether the sky should render
 	bool renderSky;
 	/// The fully qualified texture name of the sky
 	char *skyTexture;
@@ -142,6 +152,7 @@ struct Map
 	/// The map of named actors in the map (value portion)
 	List namedActorPointers;
 
+	/// I/O connections waiting to be fired
 	LockingList ioQueue;
 
 	/// A pointer to the I/O proxy actor, if it exists
@@ -168,6 +179,7 @@ struct Map
 	/// The directional light, or NULL if there is not one
 	Light *directionalLight;
 
+	/// Player spawn point override
 	MapTransition *transition;
 };
 
@@ -180,6 +192,7 @@ Map *CreateMap(void);
 /**
  * Free data from a map that is only used when first loading it
  * @param map The map to free data from
+ * @private
  */
 void FreeLoadTimeMapData(Map *map);
 
@@ -239,16 +252,19 @@ void RenderMap(Map *map, Camera *camera);
 
 /**
  * Process a queued I/O connection
+ * @private
  */
 void ProcessQueuedIOConnection(QueuedIoConnection *connection);
 
 /**
  * Free a queued I/O connection
+ * @private
  */
 void FreeQueuedIOConnection(QueuedIoConnection *connection);
 
 /**
  * Process a map's I/O queue
+ * @private
  */
 void ProcessIOQueue(Map *map);
 

@@ -27,9 +27,12 @@ static MapMaterial fallbackMaterial = {
 	.texture = MISSING_TEXTURE_NAME,
 };
 
+/// Misc. options for map materials
 typedef enum MapMaterialFlags
 {
+	/// Casts realtime shadows
 	MAP_MATERIAL_FLAG_CASTS_SHADOWS = 1 << 0,
+	/// Invisible @warning only respected by SDK map compiler
 	MAP_MATERIAL_FLAG_INVISIBLE = 1 << 1,
 } MapMaterialFlags;
 

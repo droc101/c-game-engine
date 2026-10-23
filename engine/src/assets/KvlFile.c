@@ -16,7 +16,6 @@
 #include <string.h>
 
 #define KVL_MAGIC 0x464c564b // "KVLF" in ASCII
-#define KVL_VERSION 1
 
 typedef struct KvlFileHeader KvlFileHeader;
 
@@ -56,9 +55,9 @@ bool ReadKvlFile(const char *path, KvList output)
 		fclose(file);
 		return false;
 	}
-	if (header.version != KVL_VERSION)
+	if (header.version != KVL_FILE_VERSION)
 	{
-		LogError("KvlFile version is incorrect (expected %d, got %d)\n", KVL_VERSION, header.version);
+		LogError("KvlFile version is incorrect (expected %d, got %d)\n", KVL_FILE_VERSION, header.version);
 		fclose(file);
 		return false;
 	}
@@ -92,7 +91,7 @@ bool WriteKvlFile(const char *path, KvList input)
 
 	const KvlFileHeader header = {
 		.magic = KVL_MAGIC,
-		.version = KVL_VERSION,
+		.version = KVL_FILE_VERSION,
 		.checksum = Checksum(DataWriterGetBuffer(writer), DataWriterGetBufferSize(writer)),
 	};
 

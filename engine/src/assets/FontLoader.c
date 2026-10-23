@@ -165,7 +165,7 @@ void DestroyFontLoader()
 	fontId = 0;
 }
 
-void DPrintFontLoader()
+void DebugEntryFontLoader()
 {
 	DPrintF("Font Cache: %zu/%zu fonts", COLOR_WHITE, fontId, MAX_FONTS);
 }

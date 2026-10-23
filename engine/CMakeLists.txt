@@ -195,8 +195,6 @@ target_sources(engine INTERFACE
 
         src/physics/MapPhysics.c
         include/engine/physics/MapPhysics.h
-        src/physics/Navigation.c
-        include/engine/physics/Navigation.h
         src/physics/Physics.c
         include/engine/physics/Physics.h
         src/physics/PhysicsThread.c

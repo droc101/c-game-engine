@@ -2,6 +2,11 @@
 // Created by droc101 on 4/20/2024.
 //
 
+/**
+ * @file Input.h
+ * Input management subsystem
+ */
+
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
 
@@ -15,12 +20,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/// Collection of input states
 typedef struct InputSystem InputSystem;
 
+/// The physics thread input system
 extern InputSystem *physicsThreadInput;
+/// The main thread input system
 extern InputSystem *mainThreadInput;
 
+/// The current gamepad
 extern SDL_JoystickID currentGamepadId;
+/// The currently connected controllers
 extern OptionsButtonOptions controllerOptions;
 
 #define MAX_RECOGNIZED_MOUSE_BUTTONS 32 // *surely* nobody will have a mouse with 33 or more buttons...right?
@@ -31,6 +41,7 @@ extern OptionsButtonOptions controllerOptions;
 #define CONTROLLER_CANCEL \
 	(GetState()->options.controllerSwapOkCancel ? SDL_GAMEPAD_BUTTON_SOUTH : SDL_GAMEPAD_BUTTON_EAST)
 
+/// Mouse wheel directions
 typedef enum MouseWheelAxis
 {
 	MOUSE_WHEEL_UP,
@@ -39,16 +50,23 @@ typedef enum MouseWheelAxis
 	MOUSE_WHEEL_RIGHT,
 } MouseWheelAxis;
 
+/**
+ * Set the controller to use
+ * @param gamepad The controller to use
+ * @return Success/failure
+ */
 bool SetCurrentController(SDL_JoystickID gamepad);
 
 /**
  * Handles controller disconnect event
  * @param which The controller that was disconnected
+ * @private
  */
 void HandleGamepadDisconnect(SDL_JoystickID which);
 
 /**
  * Handles controller connect event
+ * @private
  */
 void HandleGamepadConnect();
 
@@ -57,11 +75,13 @@ void HandleGamepadConnect();
  * @param system The input system to modify
  * @param event The event to process
  * @return Whether the event was processed
+ * @private
  */
 bool InputSystemProcessEvent(InputSystem *system, const SDL_Event *event);
 
 /**
  * Updates input states
+ * @private
  */
 void UpdateInputStates(InputSystem *system);
 
@@ -173,18 +193,53 @@ Vector2 GetMouseWheel(const InputSystem *system);
  */
 Vector2 GetMouseWheelTicks(const InputSystem *system);
 
+/**
+ * Get the relative mouse wheel axis movement in integer ticks
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 int GetMouseWheelAxisTicks(const InputSystem *system, MouseWheelAxis axis);
 
+/**
+ * Get the relative mouse wheel axis movement
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 float GetMouseWheelAxis(const InputSystem *system, MouseWheelAxis axis);
 
+/**
+ * Get the relative mouse wheel axis movement on the previous frame/tick in integer ticks
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 int GetPreviousMouseWheelAxisTicks(const InputSystem *system, MouseWheelAxis axis);
 
+/**
+ * Get the relative mouse wheel axis movement on the previous frame/tick
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 float GetPreviousMouseWheelAxis(const InputSystem *system, MouseWheelAxis axis);
 
+/**
+ * Check if a mouse wheel axis is pressed
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 bool IsMouseWheelAxisPressed(const InputSystem *system, MouseWheelAxis axis);
 
+/**
+ * Check if a mouse wheel axis was just pressed
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 bool IsMouseWheelAxisJustPressed(const InputSystem *system, MouseWheelAxis axis);
 
+/**
+ * Check if a mouse wheel axis was just released
+ * @param system The input system to check
+ * @param axis The mouse wheel axis to check
+ */
 bool IsMouseWheelAxisJustReleased(const InputSystem *system, MouseWheelAxis axis);
 
 /**
@@ -248,8 +303,7 @@ bool ControllerConnected();
  * Rumble the controller (if available)
  * @param strength The base strength of the rumble (0.0 - 1.0)
  * @param time The time to rumble in milliseconds
- * @param system
- * @param system
+ * @param system The InputSystem to rumble for
  */
 void Rumble(float strength, uint32_t time, const InputSystem *system);
 
@@ -277,15 +331,21 @@ uint8_t GetPressedMouseButton(InputSystem *system);
  */
 SDL_GamepadButton GetPressedButton(InputSystem *system);
 
+/**
+ * Get the label of a controller button
+ * @param btn The button to get the label for
+ */
 SDL_GamepadButtonLabel GetButtonLabel(SDL_GamepadButton btn);
 
 /**
  * Initializes the input system
+ * @private
  */
 void InputInit();
 
 /**
  * Destroys the input system
+ * @private
  */
 void InputDestroy();
 

@@ -2,6 +2,11 @@
 // Created by NBT22 on 9/2/25.
 //
 
+/**
+ * @file Realloc.h
+ * Memory reallocation functions
+ */
+
 #ifndef GAME_REALLOC_H
 #define GAME_REALLOC_H
 

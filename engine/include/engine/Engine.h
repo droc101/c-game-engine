@@ -2,6 +2,11 @@
 // Created by droc101 on 10/7/2025.
 //
 
+/**
+ * @file Engine.h
+ * Core engine mainloop
+ */
+
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
@@ -12,7 +17,9 @@
 #include <engine/structs/ControlOptions.h>
 #include <stdbool.h>
 
+/// FPS target, used for delta calculations
 #define TARGET_FPS 60
+/// Target nanoseconds per frame, used for delta calculations
 #define TARGET_FPS_NS_D (1000000000.0 / TARGET_FPS)
 
 #define STR(x) #x
@@ -22,6 +29,7 @@
 #define ENGINE_VERSION_MINOR 0
 #define ENGINE_VERSION_PATCH 1
 #define ENGINE_VERSION_SUFFIX "-brushes"
+/// Engine version string
 #define ENGINE_VERSION \
 	TO_STR(ENGINE_VERSION_MAJOR) \
 	"." TO_STR(ENGINE_VERSION_MINOR) "." TO_STR(ENGINE_VERSION_PATCH) ENGINE_VERSION_SUFFIX \
@@ -35,15 +43,24 @@
 #define EXPORT_SYM __attribute__((visibility("default")))
 #endif
 
+/// Engine startup configuration
 typedef struct EngineInitializationInfo
 {
+	/// Number of process arguments
 	const int argc;
+	/// Process arguments
 	char **argv;
+	/// Game-side actor registration function
 	const RegisterGameActorsFunction RegisterGameActors;
+	/// Game-side control registration function
 	const ControlRegisterFunction RegisterGameControls;
+	/// Game-side achievement and statistic registration function
 	const RegisterGameAchievementsFunction RegisterGameAchievements;
+	/// Default game assets path
 	const char *defaultGamePath;
+	/// Loading state map loaded callback
 	const LoadingStateDoneFunction LoadingStateDoneCallback;
+	/// Loading state load error callback
 	const LoadingStateErrorFunction LoadingStateErrorCallback;
 } EngineInitializationInfo;
 

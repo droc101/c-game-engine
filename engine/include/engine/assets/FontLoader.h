@@ -2,6 +2,11 @@
 // Created by droc101 on 7/23/25.
 //
 
+/**
+ * @file FontLoader.h
+ * Font asset loading & cache system
+ */
+
 #ifndef FONTLOADER_H
 #define FONTLOADER_H
 
@@ -12,12 +17,15 @@
 /// The maximum number of fonts that can be loaded in any one execution of the game
 #define MAX_FONTS 16
 
+/// Font asset version number
 #define FONT_ASSET_VERSION 1
 
 typedef struct Font Font;
 
+/// A loaded Font asset
 struct Font
 {
+	/// The name of this font
 	char *name;
 
 	/// The texture width of one character
@@ -43,23 +51,26 @@ struct Font
 	char *texture;
 	/// The width of each character, index directly by the character
 	uint8_t charWidths[255];
+	/// The horizontal UV that each character starts at
 	float charStartUVs[255];
+	/// The horizontal UV that each character ends at
 	float charEndUVs[255];
 };
 
 /**
  * Load a font from an asset
  * @param asset The asset to load the font from
- * @return The loaded font, or NULL if it failed
- * @note This pointer is not tracked and must be freed manually.
+ * @return The loaded font
  */
 Font *LoadFont(const char *asset);
 
 /**
  * Clean up loaded fonts
+ * @private
  */
 void DestroyFontLoader();
 
-void DPrintFontLoader();
+/// @private
+void DebugEntryFontLoader();
 
 #endif //FONTLOADER_H

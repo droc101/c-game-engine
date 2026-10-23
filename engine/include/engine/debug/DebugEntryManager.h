@@ -2,6 +2,11 @@
 // Created by droc101 on 7/19/26.
 //
 
+/**
+ * @file DebugEntryManager.h
+ * Registers and managed debug entries
+ */
+
 #ifndef GAME_DEBUGENTRYMANAGER_H
 #define GAME_DEBUGENTRYMANAGER_H
 
@@ -9,8 +14,10 @@
 #include <engine/structs/List.h>
 #include <stdbool.h>
 
+/// Function signature for a debug entry
 typedef void (*DebugEntryFunction)();
 
+/// Visibility mode for a debug entry
 typedef enum DebugEntryMode
 {
 	/// This debug entry will never be visible
@@ -23,6 +30,7 @@ typedef enum DebugEntryMode
 	DEBUG_ENTRY_MODE_MAX,
 } DebugEntryMode;
 
+/// Which (if any) side of the screen a debug entry should draw on
 typedef enum DebugEntrySide
 {
 	/// This debug entry will be shown on the left side of the screen
@@ -33,6 +41,7 @@ typedef enum DebugEntrySide
 	DEBUG_ENTRY_NO_SIDE,
 } DebugEntrySide;
 
+/// A registered debug entry
 typedef struct DebugEntry
 {
 	/// The key/name of this debug entry
@@ -63,31 +72,37 @@ bool IsDebugEntryVisible(const char *key);
 
 /**
  * Initialize the debug entry manager
+ * @private
  */
 void InitDebugEntryManager();
 
 /**
  * Render visible debug entries
+ * @private
  */
 void RenderDebugEntries();
 
 /**
  * Load the default debug entry settings
+ * @private
  */
 void DefaultDebugEntrySettings();
 
 /**
  * Load debug entry settings
+ * @private
  */
 void LoadDebugEntrySettings(KvList from);
 
 /**
  * Save debug entry settings
+ * @private
  */
 void SaveDebugEntrySettings(KvList to);
 
 /**
  * Destroy the debug entry manager
+ * @private
  */
 void DestroyDebugEntryManager();
 

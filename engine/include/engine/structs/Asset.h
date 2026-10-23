@@ -2,6 +2,11 @@
 // Created by NBT22 on 8/24/25.
 //
 
+/**
+ * @file Asset.h
+ * Asset utility functions
+ */
+
 #ifndef GAME_ASSET_H
 #define GAME_ASSET_H
 
@@ -9,10 +14,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef enum AssetType AssetType;
 typedef struct Asset Asset;
 
-enum AssetType
+/// Asset content type
+typedef enum AssetType
 {
 	ASSET_TYPE_TEXTURE = 0,
 	ASSET_TYPE_WAV = 1,
@@ -22,8 +27,9 @@ enum AssetType
 	ASSET_TYPE_FONT = 5,
 	ASSET_TYPE_MAP_MATERIAL = 7,
 	ASSET_TYPE_KV_LIST = 8,
-};
+} AssetType;
 
+/// Raw loaded asset
 struct Asset
 {
 	/// The decompressed size of the asset
@@ -36,15 +42,15 @@ struct Asset
 	uint8_t *data;
 };
 
-#define ASSET_ZERO(asset) memset(&(asset), 0, sizeof(asset));
-#define ASSET_COPY(asset, value) \
+#define ASSET_OPLIST_ZERO(asset) memset(&(asset), 0, sizeof(asset));
+#define ASSET_OPLIST_COPY(asset, value) \
 	free((asset).data); \
 	memcpy(&(asset), &(value), sizeof(asset));
-#define ASSET_FREE(asset) \
+#define ASSET_OPLIST_FREE(asset) \
 	free((asset).data); \
-	ASSET_ZERO(asset);
+	ASSET_OPLIST_ZERO(asset);
 
-#define ASSET_OPLIST (INIT(ASSET_ZERO), INIT_SET(ASSET_COPY), SET(ASSET_COPY), CLEAR(ASSET_FREE), TYPE(Asset))
+#define ASSET_OPLIST (INIT(ASSET_OPLIST_ZERO), INIT_SET(ASSET_OPLIST_COPY), SET(ASSET_OPLIST_COPY), CLEAR(ASSET_OPLIST_FREE), TYPE(Asset))
 
 /**
  * Free an asset

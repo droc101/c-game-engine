@@ -2,6 +2,11 @@
 // Created by droc101 on 10/27/2024.
 //
 
+/**
+ * @file CheckBox.h
+ * Simple checkbox control
+ */
+
 #ifndef GAME_CHECKBOX_H
 #define GAME_CHECKBOX_H
 
@@ -12,12 +17,20 @@
 
 typedef struct CheckBoxData CheckBoxData;
 
+/**
+ * Checkbox checked callback signature
+ * @param checked Whether the checkbox is checked
+ */
 typedef void (*CheckboxCallback)(bool checked);
 
+/// @private
 struct CheckBoxData
 {
+	/// The checkbox's label
 	char *label;
+	/// Whether the checkbox is checked
 	bool checked;
+	/// The function to call when the checkbox is checked/unchecked
 	CheckboxCallback callback;
 };
 
@@ -40,10 +53,13 @@ Control *CreateCheckboxControl(Vector2 position,
 							   bool checked,
 							   char *tooltip);
 
+/// @private
 void DestroyCheckbox(const Control *c);
 
+/// @private
 void UpdateCheckbox(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
+/// @private
 void DrawCheckbox(const Control *c, ControlState state, Vector2 position);
 
 #endif //GAME_CHECKBOX_H

@@ -9,26 +9,31 @@
  * Add a message to the DPrint console
  * @param msg The message
  * @param color ANSI color code for the message (30-39, 90-97)
+ * @private
  */
 void AddConsoleMessage(const char *msg, int color);
 
 /**
  * Initialize the DPrint console
+ * @private
  */
 void InitDPrintConsole();
 
 /**
  * Destroy the DPrint console
+ * @private
  */
 void DestroyDPrintConsole();
 
 /**
  * Process the DPrint console
+ * @private
  */
 void ProcessDPrintConsole();
 
 /**
  * Draw the DPrint console
+ * @private
  */
 void DrawDPrintConsole();
 

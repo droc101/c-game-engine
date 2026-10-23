@@ -2,6 +2,11 @@
 // Created by droc101 on 11/10/2024.
 //
 
+/**
+ * @file PlatformHelpers.h
+ * Utility functions for operations that need different implementations on Windows and Linux
+ */
+
 #ifndef PLATFORMHELPERS_H
 #define PLATFORMHELPERS_H
 
@@ -42,6 +47,7 @@ char *CanonicalFilePath(const char *path);
  * @param originalFdCopy Storage for the original file descriptor
  * @return Success/fail
  * @note The write-side of the pipe will be closed before this function returns
+ * @private
  */
 bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
 
@@ -51,6 +57,7 @@ bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
  * @param pipeFds The pipe file descriptors
  * @param originalFd The original file descriptor before redirection
  * @note the read-side of the pipe will be closed by this function
+ * @private
  */
 void RestoreFd(int modifiedFd, int *pipeFds, int originalFd);
 

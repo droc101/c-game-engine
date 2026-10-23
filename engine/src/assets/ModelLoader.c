@@ -368,7 +368,7 @@ inline JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollid
 	return meshShape;
 }
 
-void DPrintModelLoader()
+void DebugEntryModelLoader()
 {
 	DPrintF("Model Cache: %zu/%zu models", COLOR_WHITE, modelId, MAX_MODELS);
 }

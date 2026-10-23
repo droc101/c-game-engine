@@ -2,12 +2,21 @@
 // Created by droc101 on 4/26/2024.
 //
 
+/**
+ * @file Timing.h
+ * Monotonic clock system
+ */
+
 #ifndef GAME_TIMING_H
 #define GAME_TIMING_H
 
 #include <engine/subsystem/Logging.h>
 #include <stdint.h>
 
+/**
+ * Perform a simple timing benchmark of some code
+ * @param thingToTime The code to time
+ */
 #define TIME(thingToTime) \
 	{ \
 		const long double startTime = GetTimeNs(); \
@@ -18,6 +27,7 @@
 
 /**
  * Initialize the timers to count from the start of the program
+ * @private
  */
 void InitTimers();
 

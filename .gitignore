@@ -41,6 +41,7 @@ cmake-build-*/
 !/.idea/codeStyles
 !/.idea/inspectionProfiles
 !/.idea/scopes
+!/.idea/fileTemplates
 
 .idea/.name
 .idea/*.xml
@@ -50,3 +51,5 @@ cmake-build-*/
 .artifacts
 
 *.spv
+
+/doxygen

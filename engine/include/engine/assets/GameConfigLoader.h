@@ -2,6 +2,11 @@
 // Created by droc101 on 10/4/25.
 //
 
+/**
+ * @file GameConfigLoader.h
+ * Game configuration (game.gkvl) asset loader and manager
+ */
+
 #ifndef GAME_GAMECONFIGLOADER_H
 #define GAME_GAMECONFIGLOADER_H
 
@@ -9,28 +14,27 @@
 #include <stddef.h>
 
 typedef struct GameConfig GameConfig;
-
-typedef enum AssetPathType AssetPathType;
-typedef enum AssetPathFlags AssetPathFlags;
-
 typedef struct AssetPath AssetPath;
 
-enum AssetPathType
+/// How to interpret an asset path
+typedef enum AssetPathType
 {
 	RELATIVE_TO_EXECUTABLE_DIRECTORY,
 	/// if game config dir is "/path/to/game.cfg" this would be relative to "/path"
 	RELATIVE_TO_GAME_CONFIG_PARENT_DIRECTORY,
 	ABSOLUTE_PATH,
-};
+} AssetPathType;
 
-enum AssetPathFlags
+/// Miscellaneous information and behavior options for asset paths
+typedef enum AssetPathFlags
 {
 	/// Allow loading code assets from this asset path. This should be used with caution.
 	ASSET_PATH_ALLOW_CODE_EXECUTION = 1 << 0,
 	/// This path was added at runtime and is not part of game.gkvl
 	ASSET_PATH_RUNTIME_LOADED = 1 << 1,
-};
+} AssetPathFlags;
 
+/// A location the engine can search for assets
 struct AssetPath
 {
 	/// The type of this asset path
@@ -41,6 +45,7 @@ struct AssetPath
 	char *path;
 };
 
+/// General game configuration information
 struct GameConfig
 {
 	/// The title of the game, used for the window title
@@ -63,11 +68,13 @@ extern GameConfig gameConfig;
 
 /**
  * Load the game config asset
+ * @private
  */
 void LoadGameConfig(const char *game);
 
 /**
  * Destroy the game config asset
+ * @private
  */
 void DestroyGameConfig();
 

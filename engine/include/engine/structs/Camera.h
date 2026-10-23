@@ -2,6 +2,11 @@
 // Created by droc101 on 8/13/25.
 //
 
+/**
+ * @file Camera.h
+ * Camera definition
+ */
+
 #ifndef GAME_CAMERA_H
 #define GAME_CAMERA_H
 
@@ -11,6 +16,7 @@
 
 typedef struct Camera Camera;
 
+/// A camera that maps can be rendered from
 struct Camera
 {
 	/// The 3d transform of the camera
