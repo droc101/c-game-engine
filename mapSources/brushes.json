@@ -5947,6 +5947,155 @@
                     "units_per_luxel": 1.0
                 }
             ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -160.0,
+            "origin_y": 64.0,
+            "origin_z": -112.0,
+            "rotation_x": 0.0,
+            "rotation_y": 180.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -16.0,
+                    "y": 16.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 16.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 16.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -16.0,
+                    "y": 16.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -16.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -16.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -16.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -16.0,
+                    "z": 16.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/dev/uv_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/dev/uv_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/dev/uv_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/dev/uv_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/dev/uv_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/dev/uv_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
         }
     ],
     "actors": [
