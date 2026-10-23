@@ -145,7 +145,9 @@ static int PhysicsThreadMain(void * /*data*/)
 		if (state->map)
 		{
 			const LockingList *actors = &state->map->actors;
+			SDL_LockMutex(state->map->player.mutex);
 			const Vector3 cameraPosition = state->camera->transform.position;
+			SDL_UnlockMutex(state->map->player.mutex);
 
 			ListLock(*actors);
 			SDL_UnlockMutex(physicsTickMutex);

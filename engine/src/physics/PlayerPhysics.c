@@ -294,7 +294,6 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 		return NULL;
 	}
 	const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(state->map->physicsSystem);
-	SDL_LockMutex(state->map->player.mutex);
 	if (!JPH_NarrowPhaseQuery_CastRay_GAME(narrowPhaseQuery,
 										   &state->map->player.playerCamera.transform,
 										   ACTOR_RAYCAST_MAX_DISTANCE,
@@ -304,7 +303,6 @@ static inline Actor *GetTargetedActor(JPH_BodyInterface *bodyInterface, JPH_RayC
 	{
 		return NULL;
 	}
-	SDL_UnlockMutex(state->map->player.mutex);
 	return (Actor *)JPH_BodyInterface_GetUserData(bodyInterface, raycastResult->bodyID);
 }
 
