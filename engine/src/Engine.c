@@ -52,7 +52,12 @@ static SDL_Event event;
 static bool shouldQuit = false;
 static double lastFrameTime = TARGET_FPS_NS_D;
 
-void ExecPathInit(const int argc, char **argv)
+/**
+ * Attempt to initialize the executable path
+ * @param argc Program argument count
+ * @param argv Program arguments
+ */
+static void ExecPathInit(const int argc, char **argv)
 {
 	if (argc < 1)
 	{
@@ -82,7 +87,10 @@ void ExecPathInit(const int argc, char **argv)
 	LogInfo("Executable folder: %s\n", GetState()->executableFolder);
 }
 
-void InitSDL()
+/**
+ * Initialize the SDL library
+ */
+static void InitSDL()
 {
 	LogDebug("Initializing SDL...\n");
 	SDL_SetHint(SDL_HINT_APP_NAME, gameConfig.gameTitle);
@@ -114,7 +122,10 @@ void InitSDL()
 	LogInfo("SDL Video Driver: %s\n", SDL_GetCurrentVideoDriver());
 }
 
-void WindowAndRenderInit()
+/**
+ * Initialize the game window and renderer
+ */
+static void WindowAndRenderInit()
 {
 	LogDebug("Creating window...\n");
 	const float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
@@ -156,7 +167,10 @@ void WindowAndRenderInit()
 	SetWindowFocused(true);
 }
 
-void HandleEvent(void)
+/**
+ * Handle an SDL event
+ */
+static void HandleEvent(void)
 {
 	if (InputSystemProcessEvent(mainThreadInput, &event))
 	{
@@ -298,7 +312,7 @@ void EngineIteration()
 	BenchFrameStart();
 #endif
 
-	while (SDL_PollEvent(&event) != 0)
+	while (SDL_PollEvent(&event))
 	{
 		HandleEvent();
 	}

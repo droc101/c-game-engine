@@ -6,12 +6,11 @@
 #define GAME_ENGINE_H
 
 #include <engine/Commit.h>
+#include <engine/gameState/LoadingState.h>
 #include <engine/structs/Achievements.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/ControlOptions.h>
 #include <stdbool.h>
-
-#include "gameState/LoadingState.h"
 
 #define TARGET_FPS 60
 #define TARGET_FPS_NS_D (1000000000.0 / TARGET_FPS)
@@ -68,31 +67,5 @@ void DestroyEngine();
  * Check if the engine's main loop should continue
  */
 bool EngineShouldQuit();
-
-//
-// PRIVATE FUNCTIONS
-//
-
-/**
- * Attempt to initialize the executable path
- * @param argc Program argument count
- * @param argv Program arguments
- */
-void ExecPathInit(int argc, char **argv);
-
-/**
- * Initialize the SDL library
- */
-void InitSDL();
-
-/**
- * Initialize the game window and renderer
- */
-void WindowAndRenderInit();
-
-/**
- * Handle an SDL event
- */
-void HandleEvent(void);
 
 #endif //GAME_ENGINE_H
