@@ -23,10 +23,13 @@ void InitDPrintConsole();
 void DestroyDPrintConsole();
 
 /**
- * Process and draw the DPrint console
+ * Process the DPrint console
  */
 void ProcessDPrintConsole();
 
+/**
+ * Draw the DPrint console
+ */
 void DrawDPrintConsole();
 
 #endif //GAME_DPRINTCONSOLE_H

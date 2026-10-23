@@ -12,17 +12,25 @@
 
 typedef struct ControlCategory
 {
+	/// The internal key of this category
 	char key[128];
+	/// The display name of this category
 	char categoryName[128];
+	/// The control options in this category
 	List controlOptions;
 } ControlCategory;
 
 typedef struct ControlOption
 {
+	/// The internal key of this option
 	char key[128];
+	/// The display name of this option
 	char displayName[128];
+	/// The current value of this option
 	InputAction *action;
+	/// Whether to allow binding analog and analog-ish controls to this option
 	bool allowAxisBind;
+	/// The default binding
 	const InputAction *defaultAction;
 } ControlOption;
 

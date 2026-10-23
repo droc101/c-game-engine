@@ -51,7 +51,7 @@ struct GameConfig
 	/// The Discord developer app ID, used for rich presence
 	size_t discordAppId;
 
-	// Asset search paths
+	/// Asset search paths
 	List assetPaths;
 
 	/// The map to load for the menu background

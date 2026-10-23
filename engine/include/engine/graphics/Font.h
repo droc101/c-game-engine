@@ -5,7 +5,6 @@
 #ifndef GAME_FONT_H
 #define GAME_FONT_H
 
-#include <engine/assets/FontLoader.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <stdbool.h>

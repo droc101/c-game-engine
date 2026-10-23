@@ -185,6 +185,10 @@ int32_t GetIntegerStatistic(const char *stat);
  */
 float GetFloatStatistic(const char *stat);
 
+/**
+ * Get the data type of a statistic
+ * @param stat The statistic to get the type of
+ */
 StatType GetStatisticType(const char *stat);
 
 /**

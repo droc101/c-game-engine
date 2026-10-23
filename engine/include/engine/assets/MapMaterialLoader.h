@@ -45,6 +45,9 @@ struct MapMaterial
  */
 MapMaterial *LoadMapMaterial(const char *path);
 
+/**
+ * Clean up loaded map materials
+ */
 void DestroyMapMaterialLoader();
 
 #endif //GAME_MAPMATERIALLOADER_H

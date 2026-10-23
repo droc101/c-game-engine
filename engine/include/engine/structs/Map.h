@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "engine/structs/KVList.h"
 
 #define MAX_ACTORS 8192
 
@@ -70,18 +71,27 @@ struct MapModel
 
 struct MapTransition
 {
+	/// The entrance to spawn the player at
 	char *entranceName;
+	/// The player's position relative to the entrance
 	Vector3 relativePosition;
+	/// The player's rotation relative to the entrance
 	Vector3 relativeAngles;
 };
 
 struct QueuedIOConnection
 {
+	/// The actor that sent this I/O
 	Actor *source;
+	/// The name of the actor(s) that will receive this I/O
 	char *targetActorName;
+	/// The name of the input to activate on the target actor(s)
 	char *targetActorInput;
+	/// When the input should be activated on the target actor(s)
 	size_t scheduledTime;
+	/// The param to send to the input
 	Param param;
+	/// Whether this connection has been processed & sent
 	bool processed;
 };
 
@@ -227,12 +237,28 @@ void GetActorsByName(const char *name, const Map *map, List *actors);
  */
 void RenderMap(Map *map, Camera *camera);
 
+/**
+ * Process a queued I/O connection
+ */
 void ProcessQueuedIOConnection(QueuedIoConnection *connection);
 
+/**
+ * Free a queued I/O connection
+ */
 void FreeQueuedIOConnection(QueuedIoConnection *connection);
 
+/**
+ * Process a map's I/O queue
+ */
 void ProcessIOQueue(Map *map);
 
+/**
+ * Queue an I/O connection
+ * @param map The map to queue into
+ * @param sender The sender of the I/O
+ * @param connection The actor connection to queue
+ * @param param The param to send
+ */
 void QueueIOConnection(Map *map, Actor *sender, ActorConnection *connection, const Param *param);
 
 #endif //GAME_MAP_H

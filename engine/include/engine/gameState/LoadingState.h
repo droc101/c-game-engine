@@ -16,7 +16,9 @@ extern LoadingStateDoneFunction LoadingStateDoneCallback;
 /// Callback run when LoadingState fails to load a map
 extern LoadingStateErrorFunction LoadingStateErrorCallback;
 
+/// The map to load
 extern char *loadStateLevelname;
+/// The map transition to use
 extern MapTransition *loadStateTransition;
 
 extern const GameState LoadingState;

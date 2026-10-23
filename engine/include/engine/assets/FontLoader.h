@@ -55,6 +55,9 @@ struct Font
  */
 Font *LoadFont(const char *asset);
 
+/**
+ * Clean up loaded fonts
+ */
 void DestroyFontLoader();
 
 void DPrintFontLoader();

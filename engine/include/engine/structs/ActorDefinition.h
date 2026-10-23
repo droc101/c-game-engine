@@ -57,6 +57,7 @@ struct ActorDefinition
 	/// The list of input handlers
 	ActorInputHandlerFunctionDict inputHandlers;
 
+	/// The function to call when the interact key is pressed on this actor, if it has the @c ACTOR_FLAG_INTERACTABLE flag
 	ActorInteractFunction Interact;
 
 	/// The function to call to initialize the actor

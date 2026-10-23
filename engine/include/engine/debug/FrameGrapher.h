@@ -11,8 +11,14 @@
 extern DebugGraph *fpsGraph;
 extern DebugGraph *tpsGraph;
 
+/**
+ * Initialize the frame grapher
+ */
 void InitFrameGrapher();
 
+/**
+ * Destroy the frame grapher
+ */
 void DestroyFrameGrapher();
 
 /**

@@ -20,12 +20,14 @@ enum LightType
 {
 	LIGHT_TYPE_POINT,
 	LIGHT_TYPE_SPOT,
+	/// Do not use. Exists for compatibility with SDK tools.
 	LIGHT_TYPE_AREA,
 	LIGHT_TYPE_DIRECTIONAL,
 };
 
 struct Light
 {
+	/// The type of light
 	LightType type;
 	/// The world space position of the light
 	Vector3 position;
@@ -43,6 +45,7 @@ struct Light
 	float brightAngle;
 	/// The angle at which the spotlight will reach 0% brightness
 	float fadingAngle;
+	/// The texture projected by spot lights
 	char *cookie; // mmmmm tasty
 };
 

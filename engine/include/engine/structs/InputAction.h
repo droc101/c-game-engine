@@ -17,11 +17,17 @@ typedef struct InputSystem InputSystem;
 
 typedef enum InputActionBindType
 {
+	/// This input action is not bound
 	IA_UNBOUND,
+	/// This input action is bound to a keyboard key
 	IA_KEY,
+	/// This input action is bound to a mouse button
 	IA_MOUSE_BUTTON,
+	/// This input action is bound to a mouse wheel direction
 	IA_MOUSE_WHEEL,
+	/// This input action is bound to a controller button
 	IA_CONTROLLER_BUTTON,
+	/// This input action is bound to a controller axis direction
 	IA_CONTROLLER_AXIS,
 } InputActionBindType;
 
@@ -43,7 +49,9 @@ typedef struct InputAction InputAction;
 
 struct InputAction
 {
+	/// The keyboard/mouse binding type
 	InputActionBindType keyboardMouseBindType;
+	/// The controller binding type
 	InputActionBindType controllerBindType;
 	union
 	{

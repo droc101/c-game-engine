@@ -76,8 +76,19 @@ void DebugGraphPush(DebugGraph *graph, uint64_t ns);
  */
 void DrawDebugGraph(DebugGraph *graph, Vector2 pos, Vector2 size);
 
+/**
+ * Get the current value of a debug graph
+ */
 double DebugGraphGetValue(DebugGraph *graph);
+
+/**
+ * Get the current linear value of a debug graph
+ */
 double DebugGraphGetLinearValue(DebugGraph *graph);
+
+/**
+ * Get the current raw value of a debug graph
+ */
 double DebugGraphGetRawValue(DebugGraph *graph);
 
 #endif //GAME_DEBUGGRAPH_H

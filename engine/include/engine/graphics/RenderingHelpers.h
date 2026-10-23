@@ -9,8 +9,10 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/Light.h>
 #include <engine/structs/Map.h>
 #include <engine/structs/Vector2.h>
+#include <joltc/Math/Mat44.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -45,13 +47,21 @@ typedef enum RendererQueuedAction RendererQueuedAction;
 
 enum RendererQueuedAction
 {
+	/// MSAA should be updated at the start of the next frame
 	QUEUED_ACTION_UPDATE_MSAA = 1 << 0,
+	/// GPU-side textures should be cleared at the start of the next frame
 	QUEUED_ACTION_CLEAR_ALL_TEXTURES = 1 << 1,
+	/// GPU-side models should be cleared at the start of the next frame
 	QUEUED_ACTION_CLEAR_ALL_MODELS = 1 << 2,
+	/// CPU-side asset caches should be cleared at the start of the next frame
 	QUEUED_ACTION_RELOAD_ALL_ASSETS = 1 << 3,
+	/// VSync should be updated at the start of the next frame
 	QUEUED_ACTION_TOGGLE_VSYNC = 1 << 4,
+	/// Shadow map resolution at the start of the next frame
 	QUEUED_ACTION_UPDATE_SHADOW_MAP_RESOLUTION = 1 << 5,
+	/// GPU shaders should be reloaded at the start of the next frame
 	QUEUED_ACTION_RELOAD_ALL_SHADERS = 1 << 6,
+	/// Shadow map soft shadow quality should be updated at the start of the next frame
 	QUEUED_ACTION_UPDATE_SHADOW_MAP_SOFT_SHADOW_QUALITY = 1 << 7,
 };
 
@@ -144,8 +154,14 @@ bool FrameStart();
  */
 void FrameEnd();
 
+/**
+ * Calculate the UI scale value
+ */
 float GetAutoUiScale();
 
+/**
+ * Update the UI scale value
+ */
 void UpdateUiScale();
 
 /**

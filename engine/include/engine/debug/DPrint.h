@@ -30,8 +30,14 @@ void DPrint(const char *str, Color color);
  */
 void DPrintF(const char *format, Color color, ...);
 
+/**
+ * Add spacing between DPrint entries
+ */
 void DPrintSpacing(uint32_t spacing);
 
+/**
+ * Set whether DPrint should draw to the right side of the screen
+ */
 void DPrintSetSide(bool isRightSide);
 
 #endif //GAME_DPRINT_H

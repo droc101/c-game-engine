@@ -50,6 +50,7 @@ struct ActorConnection
 	Param outParamOverride;
 	/// The number of times this output will fire before it is removed. 0 means unlimited.
 	size_t numRefires;
+	/// The approximate delay from when the output is fired to when the input will be sent
 	uint16_t delayMs;
 };
 
@@ -164,6 +165,10 @@ void ActorCreateEmptyBody(Actor *this, const Transform *transform);
  */
 void ActorSignalKill(Actor *this, const Actor * /*sender*/, const Param * /*param*/);
 
+/**
+ * Actor cancel queued io signal handler
+ * @param this The actor this signal was sent to
+ */
 void ActorSignalCancelQueuedIo(Actor *this, const Actor */*sender*/, const Param */*param*/);
 
 #endif //GAME_ACTOR_H

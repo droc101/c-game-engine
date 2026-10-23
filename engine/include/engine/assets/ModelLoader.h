@@ -10,6 +10,7 @@
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 

@@ -12,6 +12,7 @@
 
 typedef enum AddonType
 {
+	/// An asset pack is intended to override existing assets
 	ADDON_TYPE_ASSET_PACK,
 } AddonType;
 
@@ -34,7 +35,9 @@ typedef struct Addon
 	AddonType type;
 } Addon;
 
+/// All loaded addons
 extern List addons;
+/// Enabled addon IDs
 extern List enabledAddons;
 
 /**
