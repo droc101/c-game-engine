@@ -502,7 +502,12 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 
 		Vector3 position;
 		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &position);
-		Vector3_Add(&position, &lod->components[j].centerOffset, &cullingInfo->position);
+		const Vector3 offset = {
+			lod->components[j].centerOffset.x,
+			lod->components[j].centerOffset.y,
+			-lod->components[j].centerOffset.z,
+		};
+		Vector3_Add(&position, &offset, &cullingInfo->position);
 		cullingInfo->radius = lod->components[j].radius;
 		cullingInfo->castsShadows = material->castsShadows;
 	}
@@ -535,7 +540,7 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 
 	// TODO: This does not take centerOffset into account
 	cullingInfo->position = position;
-	cullingInfo->radius = Vector2Length(actorInstanceData->scale);
+	cullingInfo->radius = Vector2Length(actorInstanceData->scale) / 2.0f;
 	cullingInfo->castsShadows = actor->wall->castsShadows;
 }
 
