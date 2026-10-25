@@ -266,10 +266,6 @@ typedef struct UniformBuffers
 
 typedef struct ActorModelsBuffer
 {
-	/// A buffer containing per-vertex data
-	LunaBuffer vertices;
-	/// A buffer containing the index data to use along-side the per-vertex data
-	LunaBuffer indices;
 	/// A buffer containing the instance data for all instances of all lod components. Should be treated as unsorted
 	LunaBuffer instanceData;
 	/// A buffer containing the instance data index for each instance of each shaded lod component
@@ -338,10 +334,6 @@ typedef struct MapModelsBuffer
 
 typedef struct ModelBuffer
 {
-	/// A buffer containing per-vertex data
-	LunaBuffer vertices;
-	/// A buffer containing the index data to use along-side the per-vertex data
-	LunaBuffer indices;
 	/// A buffer containing the instance data for each instance of each model section
 	LunaBuffer instanceData;
 	/// A buffer containing the structures required for the shaded materials indirect draw call
@@ -355,13 +347,6 @@ typedef struct SkyBuffer
 	LunaBuffer vertices;
 	LunaBuffer indices;
 } SkyBuffer;
-
-typedef struct PlayerModelBuffer
-{
-	ModelBuffer buffers;
-	ModelInstanceData *instanceData;
-	ModelDefinition *modelDefinition;
-} PlayerModelBuffer;
 
 #ifdef JPH_DEBUG_RENDERER
 // TODO: Clean up both this and the whole system
@@ -381,13 +366,17 @@ typedef struct Buffers
 	/// A buffer containing one FrustumCullingData structure per frustum
 	LunaBuffer frustumCullingDatas;
 	LunaBuffer frustumShadowMaps;
+	/// Contains all the vertices for all loaded models, excluding the map geometry
+	LunaBuffer modelVertices;
+	/// Contains all the indices for all loaded models, excluding the map geometry
+	LunaBuffer modelIndices;
 	ActorModelsBuffer actorModels;
 	ActorWallsBuffer actorWalls;
 	MapModelsBuffer opaqueMap;
 	MapModelsBuffer map;
 	ModelBuffer viewmodel;
 	SkyBuffer sky;
-	PlayerModelBuffer player;
+	ModelBuffer player;
 #ifdef JPH_DEBUG_RENDERER
 	DebugDrawBuffer debugDrawLines;
 	DebugDrawBuffer debugDrawTriangles;
@@ -588,8 +577,6 @@ enum PerFrustumBufferMagicConstants : uint32_t
 #pragma endregion variables
 
 void ClearTextureCache();
-
-void ClearModelCache();
 
 void CreateShaderModule(const char *path, ShaderType shaderType, LunaShaderModule *shaderModule);
 

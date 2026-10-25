@@ -34,7 +34,7 @@ message(STATUS "Fetching Luna...")
 FetchContent_Declare(
         Luna
         GIT_REPOSITORY https://github.com/NBT22/Luna
-        GIT_TAG 6f417c37678e3e14149cb0c8d297c901172c1b6e
+        GIT_TAG efa78828f5c53eedbb938a603770544d33cde8dd
         GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(Luna)
@@ -171,15 +171,17 @@ target_sources(engine INTERFACE
         include/engine/graphics/vulkan/Vulkan.h
         src/graphics/vulkan/VulkanActors.c
         include/engine/graphics/vulkan/VulkanActors.h
+        src/graphics/vulkan/VulkanDebug.c
+        include/engine/graphics/vulkan/VulkanDebug.h
         src/graphics/vulkan/VulkanHelpers.c
         include/engine/graphics/vulkan/VulkanHelpers.h
         src/graphics/vulkan/VulkanInternal.c
         include/engine/graphics/vulkan/VulkanInternal.h
+        include/engine/graphics/vulkan/VulkanModel.h
+        src/graphics/vulkan/VulkanModel.c
         src/graphics/vulkan/VulkanPipelines.c
         src/graphics/vulkan/VulkanResources.c
         include/engine/graphics/vulkan/VulkanResources.h
-        src/graphics/vulkan/VulkanDebug.c
-        include/engine/graphics/vulkan/VulkanDebug.h
 
         src/helpers/Arguments.c
         include/engine/helpers/Arguments.h
