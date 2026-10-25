@@ -25,16 +25,27 @@
 #include <string.h>
 #include <winbase.h>
 #include <dbghelp.h>
+
+static HANDLE singleInstanceMutex = NULL;
+
 // clang-format on
 #else
 #include <execinfo.h>
+#include <fcntl.h>
 #include <signal.h>
+#include <sys/file.h>
 #include <sys/stat.h>
+#include <unistd.h>
+
+static int lockfile = 0;
+
+#define LOCK_FILE_NAME ".lock"
 #endif
 
 _Noreturn void RestartProgram()
 {
 	LogWarning("Exiting early to restart engine, resources may not get cleaned properly.\n"); // TODO clean properly
+	DestroyMultiInstanceLock();
 #ifdef WIN32
 	STARTUPINFO si = {0};
 	PROCESS_INFORMATION pi = {0};
@@ -129,6 +140,7 @@ const char *GameStrCaseStr(const char *haystack, const char *needle)
 
 	return NULL;
 }
+
 char *CanonicalFilePath(const char *path)
 {
 #ifdef WIN32
@@ -168,6 +180,9 @@ bool RedirectFd(const int originalFd, int *pipeFds, int *originalFdCopy)
 	close(pipeFds[1]);
 	return true;
 #else
+	(void)originalFd;
+	(void)pipeFds;
+	(void)originalFdCopy;
 	return false;
 #endif
 }
@@ -177,6 +192,10 @@ void RestoreFd(const int modifiedFd, int *pipeFds, const int originalFd)
 #ifdef SDL_PLATFORM_LINUX
 	dup2(originalFd, modifiedFd);
 	close(pipeFds[0]);
+#else
+	(void)modifiedFd;
+	(void)pipeFds;
+	(void)originalFd;
 #endif
 }
 
@@ -339,4 +358,36 @@ void DestroyMutex(SDL_Mutex **mutex)
 	*mutex = NULL;
 	SDL_UnlockMutex(copy);
 	SDL_DestroyMutex(copy);
+}
+
+bool CreateMultiInstanceLock()
+{
+#ifdef WIN32
+	singleInstanceMutex = CreateMutexW(NULL, TRUE, L"Global\\GameSingleInstanceMutex");
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		return false;
+	} else if (GetLastError() != ERROR_SUCCESS)
+	{
+		LogError("Failed to create single instance mutex: 0x%X\n", GetLastError());
+	}
+	return true;
+#else
+	lockfile = open(LOCK_FILE_NAME, O_CREAT | O_RDWR, 0666);
+	return flock(lockfile, LOCK_EX | LOCK_NB) == 0;
+#endif
+}
+
+void DestroyMultiInstanceLock()
+{
+#ifdef WIN32
+	if (singleInstanceMutex)
+	{
+		CloseHandle(singleInstanceMutex);
+	}
+#else
+	flock(lockfile, LOCK_UN);
+	close(lockfile);
+	unlink(LOCK_FILE_NAME);
+#endif
 }
