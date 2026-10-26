@@ -2,6 +2,7 @@
 // Created by droc101 on 11/10/2024.
 //
 
+#include <engine/Engine.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
@@ -25,16 +26,34 @@
 #include <string.h>
 #include <winbase.h>
 #include <dbghelp.h>
+
+static HANDLE singleInstanceMutex = NULL;
+
 // clang-format on
 #else
 #include <execinfo.h>
+#include <fcntl.h>
 #include <signal.h>
+#include <sys/file.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #endif
+
+static void (*DestroyLock)() = NULL;
+
+// ReSharper disable once CppUseInternalLinkage
+EXPORT_SYM void SetUnlockFunction(void (*DestroyLockFunction)()) // NOLINT(*-use-internal-linkage)
+{
+	DestroyLock = DestroyLockFunction;
+}
 
 _Noreturn void RestartProgram()
 {
 	LogWarning("Exiting early to restart engine, resources may not get cleaned properly.\n"); // TODO clean properly
+	if (DestroyLock)
+	{
+		DestroyLock();
+	}
 #ifdef WIN32
 	STARTUPINFO si = {0};
 	PROCESS_INFORMATION pi = {0};
@@ -52,10 +71,12 @@ _Noreturn void RestartProgram()
 			&pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
+	exit(1);
 #else
 	execv(GetState()->executablePath, GetArgv());
-#endif
+	LogError("Failed to restart program: %s\n", strerror(errno));
 	exit(1);
+#endif
 }
 
 bool IsPathAbsolute(const char *path)
@@ -129,6 +150,7 @@ const char *GameStrCaseStr(const char *haystack, const char *needle)
 
 	return NULL;
 }
+
 char *CanonicalFilePath(const char *path)
 {
 #ifdef WIN32
@@ -168,6 +190,9 @@ bool RedirectFd(const int originalFd, int *pipeFds, int *originalFdCopy)
 	close(pipeFds[1]);
 	return true;
 #else
+	(void)originalFd;
+	(void)pipeFds;
+	(void)originalFdCopy;
 	return false;
 #endif
 }
@@ -177,6 +202,10 @@ void RestoreFd(const int modifiedFd, int *pipeFds, const int originalFd)
 #ifdef SDL_PLATFORM_LINUX
 	dup2(originalFd, modifiedFd);
 	close(pipeFds[0]);
+#else
+	(void)modifiedFd;
+	(void)pipeFds;
+	(void)originalFd;
 #endif
 }
 

@@ -10,6 +10,8 @@ add_executable(launcher WIN32
         include/AnsiCodes.h
         src/Filesystem.c
         include/Filesystem.h
+        src/Lock.c
+        include/Lock.h
 )
 set_target_properties(launcher PROPERTIES OUTPUT_NAME "game")
 if (x86_64)

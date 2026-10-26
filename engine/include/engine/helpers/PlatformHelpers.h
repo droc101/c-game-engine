@@ -2,11 +2,15 @@
 // Created by droc101 on 11/10/2024.
 //
 
+/**
+ * @file PlatformHelpers.h
+ * Utility functions for operations that need different implementations on Windows and Linux
+ */
+
 #ifndef PLATFORMHELPERS_H
 #define PLATFORMHELPERS_H
 
 #include <SDL3/SDL_mutex.h>
-#include <SDL3/SDL_video.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -43,6 +47,7 @@ char *CanonicalFilePath(const char *path);
  * @param originalFdCopy Storage for the original file descriptor
  * @return Success/fail
  * @note The write-side of the pipe will be closed before this function returns
+ * @private
  */
 bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
 
@@ -52,11 +57,21 @@ bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
  * @param pipeFds The pipe file descriptors
  * @param originalFd The original file descriptor before redirection
  * @note the read-side of the pipe will be closed by this function
+ * @private
  */
 void RestoreFd(int modifiedFd, int *pipeFds, int originalFd);
 
+/**
+ * Make a zero-initalized heap allocation aligned to AVX requirements
+ * @param size The size of the allocation
+ * @return Pointer to allocated memory, or @c NULL on failure
+ */
 void *AvxAlignedCalloc(size_t size);
 
+/**
+ * Free AVX-aligned memory (such as but not limited to memory allocated by @c AvxAlignedCalloc)
+ * @param data The memory to free
+ */
 void AvxAlignedFree(void *data);
 
 /**

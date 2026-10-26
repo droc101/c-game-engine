@@ -2,25 +2,33 @@
 // Created by droc101 on 11/16/25.
 //
 
+/**
+ * @file MapMaterialLoader.h
+ * Map material asset loader & cache system
+ */
+
 #ifndef GAME_MAPMATERIALLOADER_H
 #define GAME_MAPMATERIALLOADER_H
 
 #include <engine/assets/ModelLoader.h>
+#include <stdbool.h>
 #include <stdint.h>
 
+/// Map material asset version number
 #define MAP_MATERIAL_ASSET_VERSION 1
 
 /// The maximum number of map materials that can be loaded in any one execution of the game
 #define MAX_MAP_MATERIALS 512
 
-typedef enum SoundClass SoundClass;
 typedef struct MapMaterial MapMaterial;
 
-enum SoundClass
+/// The type of sound this material makes
+typedef enum SoundClass
 {
 	SOUND_CLASS_DEFAULT,
-};
+} SoundClass;
 
+/// A loaded map material asset
 struct MapMaterial
 {
 	/// The name/path of this material
@@ -45,6 +53,10 @@ struct MapMaterial
  */
 MapMaterial *LoadMapMaterial(const char *path);
 
+/**
+ * Clean up loaded map materials
+ * @private
+ */
 void DestroyMapMaterialLoader();
 
 #endif //GAME_MAPMATERIALLOADER_H

@@ -254,7 +254,7 @@ void ReloadMap()
 {
 	if (state.map)
 	{
-		free(loadStateLevelname); // For some reason we *sometimes* leave a value in here so this is a saftey free
+		free(loadStateLevelname); // For some reason we *sometimes* leave a value in here so this is a safety free
 		loadStateLevelname = strdup(state.map->mapName);
 		SetGameState(&LoadingState);
 	}

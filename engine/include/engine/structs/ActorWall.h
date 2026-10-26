@@ -2,6 +2,11 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file ActorWall.h
+ * Actor wall utility functions
+ */
+
 #ifndef GAME_WALL_H
 #define GAME_WALL_H
 
@@ -12,18 +17,18 @@
 
 typedef struct Actor Actor;
 
-typedef enum ActorWallOrientation ActorWallOrientation;
-
 typedef struct ActorWall ActorWall;
 
-enum ActorWallOrientation
+/// Which local axis an actor wall extends along
+typedef enum ActorWallOrientation
 {
 	/// Wall should be along the actor's local X axis
 	ACTOR_WALL_ORIENTATION_X_AXIS,
 	/// Wall should be along the actor's local Z axis
 	ACTOR_WALL_ORIENTATION_Z_AXIS,
-};
+} ActorWallOrientation;
 
+/// A flat quad that an actor can use as its visual
 struct ActorWall
 {
 	/// Which axis the wall extends along

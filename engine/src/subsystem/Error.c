@@ -130,30 +130,6 @@ void ShowWarning(const char *title, const char *description)
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, description, NULL);
 }
 
-_Noreturn void RenderInitError()
-{
-	LogError("Failed to initialize renderer\n");
-	SDL_HideWindow(GetGameWindow());
-	SDL_MessageBoxData mb;
-	mb.title = "Failed to initialize renderer";
-	mb.message = "Failed to start the Vulkan renderer.\n"
-				 "Please make sure your graphics card and drivers support Vulkan 1.2";
-
-	mb.numbuttons = 1;
-	SDL_MessageBoxButtonData buttons[1];
-	buttons[0].buttonID = 1;
-	buttons[0].text = "Exit";
-	buttons[0].flags = 0;
-
-	mb.buttons = buttons;
-	mb.window = NULL;
-	mb.flags = SDL_MESSAGEBOX_ERROR;
-
-	int pressedButtonID = 0;
-	SDL_ShowMessageBox(&mb, &pressedButtonID);
-	exit(1);
-}
-
 #ifdef BUILDSTYLE_RELEASE
 static void SignalHandler(const int sig)
 {

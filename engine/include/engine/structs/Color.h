@@ -2,6 +2,11 @@
 // Created by droc101 on 8/13/25.
 //
 
+/**
+ * @file Color.h
+ * Predefined colors and color utilities
+ */
+
 #ifndef GAME_COLOR_H
 #define GAME_COLOR_H
 
@@ -31,11 +36,14 @@
  */
 #define COLOR_TO_ARR(color) ((float *)&(color))
 
+/// White (0xFFFFFFFF)
 #define COLOR_WHITE COLOR(0xFFFFFFFF)
+/// Black (0xFF000000)
 #define COLOR_BLACK COLOR(0xFF000000)
 
 typedef struct Color Color;
 
+/// Floating point RGBA color
 struct Color
 {
 	/// The red component

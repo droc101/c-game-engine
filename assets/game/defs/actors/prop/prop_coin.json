@@ -3,7 +3,22 @@
   "extends": "actor",
   "renderers": [
     {
-      "type": "point"
+      "type": "point",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "orientation",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "wall",
+      "width": 4.0,
+      "height": 4.0,
+      "texture": "texture/actor/coin.gtex",
+      "uv_scale_x": 1.0,
+      "uv_scale_y": 4.0,
+      "uv_offset_x": 0.0,
+      "viewport_mode": "3d"
     }
   ],
   "outputs": {

@@ -2,11 +2,19 @@
 // Created by droc101 on 5/19/26.
 //
 
+/**
+ * @file KvlFile.h
+ * Utilities for reading and writing KvList files
+ */
+
 #ifndef GAME_KVLFILE_H
 #define GAME_KVLFILE_H
 
 #include <engine/structs/KVList.h>
 #include <stdbool.h>
+
+/// KVL file format version
+#define KVL_FILE_VERSION 1
 
 /**
  * Read a KvlFile from a path

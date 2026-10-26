@@ -2,6 +2,11 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file Drawing.h
+ * Drawing/rendering operations
+ */
+
 #ifndef GAME_DRAWING_H
 #define GAME_DRAWING_H
 
@@ -19,10 +24,13 @@
 typedef struct BatchedQuadArray BatchedQuadArray;
 typedef struct UITriangleArray UiTriangleArray;
 
+/// A collection of quads to render in the UI
 struct BatchedQuadArray
 {
-	/// If used in a textured quad, @c verts takes the form of a @c float[quad_count * 16] holding values for X, Y, U, and V for each vertex.
-	/// If used in a colored quad, @c verts takes the form of a @c float[quad_count * 8] holding values for X and Y for each vertex.
+	/**
+	 * If used in a textured quad, @c verts takes the form of a @c float[quad_count * 16] holding values for X, Y, U, and V for each vertex.
+	 * If used in a colored quad, @c verts takes the form of a @c float[quad_count * 8] holding values for X and Y for each vertex.
+	 */
 	float *verts;
 	/// uint32_t[quad_count * 6] with indices
 	uint32_t *indices;
@@ -30,6 +38,7 @@ struct BatchedQuadArray
 	int quadCount;
 };
 
+/// A collection of triangles to render in the UI
 struct UITriangleArray
 {
 	/// The vertices in this triangle array, in the format of X, Y, U, V for each vertex
@@ -58,6 +67,7 @@ void DrawRect(int x, int y, int w, int h, Color color);
  * Convert a texture asset to an SDL_Surface
  * @param texture The texture name
  * @return The @c SDL_Surface
+ * @private
  */
 SDL_Surface *ToSDLSurface(const char *texture);
 
@@ -122,6 +132,12 @@ void DrawTextureRegionMod(Vector2 pos,
 						  Vector2 regionEnd,
 						  Color color);
 
+/**
+ * Draw a texture tiling across an area
+ * @param pos The position of the area
+ * @param size The size of the area
+ * @param texture The texture to draw
+ */
 void DrawTextureTiled(Vector2 pos, Vector2 size, const char *texture);
 
 /**
@@ -166,8 +182,9 @@ void DrawUiTriangles(const UiTriangleArray *triangleArray, const char *texture, 
  * @param from The starting point of the line
  * @param to The ending point of the line
  * @param color The color of the line
+ * @param userData Unused
  */
-void DrawJoltDebugRendererDrawLine(void * /*userData*/, const JPH_RVec3 *from, const JPH_RVec3 *to, JPH_Color color);
+void DrawJoltDebugRendererDrawLine(void *userData, const JPH_RVec3 *from, const JPH_RVec3 *to, JPH_Color color);
 
 /**
  * Draw a triangle. This function is intended to be called from Jolt's built-in debug renderer.
@@ -175,13 +192,15 @@ void DrawJoltDebugRendererDrawLine(void * /*userData*/, const JPH_RVec3 *from, c
  * @param v2 The second vertex of the triangle
  * @param v3 The third vertex of the triangle
  * @param color The color of the triangle
+ * @param userData Unused
+ * @param castShadow Unused
  */
-void DrawJoltDebugRendererDrawTriangle(void * /*userData*/,
+void DrawJoltDebugRendererDrawTriangle(void *userData,
 									   const JPH_RVec3 *v1,
 									   const JPH_RVec3 *v2,
 									   const JPH_RVec3 *v3,
 									   JPH_Color color,
-									   JPH_DebugRenderer_CastShadow /*castShadow*/);
+									   JPH_DebugRenderer_CastShadow castShadow);
 
 /**
  * Render the background of the in-game menu (pause, in-game options, etc.)

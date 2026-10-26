@@ -537,10 +537,10 @@ void UpdatePlayerCamera(GlobalState *state, const double delta)
 		SDL_LockMutex(state->map->player.mutex);
 		Vector3_MultiplyScalar(&state->map->player.deltaPosition, interpolationFactor, &position);
 		Vector3_Add(&state->map->player.transform.position, &position, &playerCamera->transform.position);
-		SDL_UnlockMutex(state->map->player.mutex);
 
 		playerCamera->transform.position.y += 4.0f + state->map->player.viewBobbingHeight * 2.0f;
 		playerCamera->transform.rotation = *rotation;
+		SDL_UnlockMutex(state->map->player.mutex);
 	}
 	playerCamera->showPlayerModel = state->map->player.isFreecamActive;
 }

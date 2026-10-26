@@ -2,32 +2,35 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file Font.h
+ * Text rendering operations
+ */
+
 #ifndef GAME_FONT_H
 #define GAME_FONT_H
 
-#include <engine/assets/FontLoader.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-typedef enum FontHorizontalAlign FontHorizontalAlign;
-typedef enum FontVerticalAlign FontVerticalAlign;
-
-enum FontHorizontalAlign
+/// Horizontal font alignment options
+typedef enum FontHorizontalAlign
 {
 	FONT_HALIGN_LEFT,
 	FONT_HALIGN_CENTER,
 	FONT_HALIGN_RIGHT,
-};
+} FontHorizontalAlign;
 
-enum FontVerticalAlign
+/// Vertical font alignment options
+typedef enum FontVerticalAlign
 {
 	FONT_VALIGN_TOP,
 	FONT_VALIGN_MIDDLE,
 	FONT_VALIGN_BOTTOM,
-};
+} FontVerticalAlign;
 
 /**
  * Draw a string of text to the screen
@@ -36,7 +39,6 @@ enum FontVerticalAlign
  * @param size Size of the font
  * @param color Color of the font
  * @param font The font to use
- * @return Bottom right position of the text
  * @note This is a wrapper for DrawTextAligned with h_align = FONT_HALIGN_LEFT and v_align = FONT_VALIGN_TOP
  */
 void FontDrawString(Vector2 pos, const char *str, uint32_t size, Color color, const char *font);
@@ -45,6 +47,7 @@ void FontDrawString(Vector2 pos, const char *str, uint32_t size, Color color, co
  * Count the number of lines in a string
  * @param str String to count lines of
  * @return Line count
+ * @private
  */
 int StringLineCount(const char *str);
 
@@ -77,6 +80,7 @@ Vector2 MeasureTextNChars(const char *str, uint32_t size, const char *font, size
  * @param outBufferSize Size of the buffer, if the line is longer than this it will be truncated
  * @param convertToUppercase
  * @param outBufferSize
+ * @private
  */
 void TextGetLine(const char *str, int line, char *out, size_t outBufferSize, bool convertToUppercase);
 

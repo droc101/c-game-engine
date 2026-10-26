@@ -2,6 +2,11 @@
 // Created by NBT22 on 10/20/25.
 //
 
+/**
+ * @file PlayerPhysics.h
+ * Player physics and utilities
+ */
+
 #ifndef GAME_PLAYERPHYSICS_H
 #define GAME_PLAYERPHYSICS_H
 
@@ -24,11 +29,13 @@ extern JPH_BodyID playerBodyId;
 /**
  * Initialize the objects used by the player that will persist for the program's lifetime
  * Currently used for the jolt impl structs specifying callbacks for filters and such
+ * @private
  */
 void PlayerPersistentStateInit();
 
 /**
  * Destroy the persistent objects
+ * @private
  */
 void PlayerPersistentStateDestroy();
 
@@ -36,6 +43,7 @@ void PlayerPersistentStateDestroy();
  * Create the physics objects for the player in a given map
  * @param player The map to create the player for
  * @param physicsSystem
+ * @private
  */
 void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem);
 
@@ -43,6 +51,7 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem);
  * Set a player's transform to an arbitrary value
  * @param player The player to set the transform for
  * @param transform The position and rotation to apply to the player
+ * @private
  */
 void SetPlayerTransform(Player *player, const Transform *transform);
 

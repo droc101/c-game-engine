@@ -10,6 +10,7 @@
 #include "../include/DialogSystem.h"
 #include "../include/Filesystem.h"
 #include "../include/LibraryLoader.h"
+#include "../include/Lock.h"
 
 #ifdef __x86_64__
 #include "../include/x86.h"
@@ -17,6 +18,7 @@
 
 /// The signature to the entry point in the game shared libraries
 typedef int (*GameMainFunction)(int argc, char **argv);
+typedef void (*GameSetUnlockFunction)(void(*)());
 
 int main(const int argc, char **argv)
 {
@@ -63,6 +65,13 @@ int main(const int argc, char **argv)
 	}
 	free(argvZero);
 
+	if (!CreateMultiInstanceLock())
+	{
+		printf(ANSI_RED "bootstrap: multi-instance check failed\n" ANSI_RESET);
+		ErrorDialog("Only one instance can be open at a time", "Already Running");
+		return -1;
+	}
+
 	const char *library_basename = NULL;
 #ifdef __x86_64__
 	uint8_t abiLevel = GetX86AbiArgument(argc, argv);
@@ -92,9 +101,12 @@ int main(const int argc, char **argv)
 	const LibraryHandle library = OpenLibrary(library_basename);
 	if (library)
 	{
+		const GameSetUnlockFunction SetUnlockFunction = OpenSymbol(library, "SetUnlockFunction");
 		const GameMainFunction GameMain = OpenSymbol(library, "GameMain");
-		if (GameMain)
+
+		if (GameMain && SetUnlockFunction)
 		{
+			SetUnlockFunction(DestroyMultiInstanceLock);
 			const int ret = GameMain(argc, argv);
 			printf("bootstrap: cleaning up\n");
 			CloseLibrary(library);

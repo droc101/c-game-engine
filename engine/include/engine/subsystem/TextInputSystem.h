@@ -2,6 +2,11 @@
 // Created by droc101 on 3/3/25.
 //
 
+/**
+ * @file TextInputSystem.h
+ * Text input & IME support subsystem
+ */
+
 #ifndef TEXTINPUTSYSTEM_H
 #define TEXTINPUTSYSTEM_H
 
@@ -11,10 +16,21 @@
 
 typedef struct TextInput TextInput;
 
+/**
+ * Callback signature for when new text is input
+ * @param data The active @c TextInput
+ * @param event Text input event
+ */
 typedef void (*TextInputCallback)(TextInput *data, SDL_TextInputEvent *event);
 
+/**
+ * Callback signature for when text is being composed with an IME
+ * @param data The active @c TextInput
+ * @param event Text editing event
+ */
 typedef void (*TextEditingCallback)(TextInput *data, SDL_TextEditingEvent *event);
 
+/// A text input
 struct TextInput
 {
 	/// The position of the cursor in the string. Valid range 0-strlen(text)
@@ -23,10 +39,14 @@ struct TextInput
 	void *userData;
 	/// The function to call when text is input. This is only TEXT input, you must still handle special keys like backspace and arrow keys.
 	TextInputCallback TextInput;
+	/// The function to call when text is being composed with an IME
 	TextEditingCallback TextEditing;
 
+	/// The top-left corner of the text box
 	Vector2 rectOrigin;
+	/// The size of the text box
 	Vector2 rectSize;
+	/// The horizontal offset of the cursor in the text box
 	int cursorOffsetPixels;
 };
 
@@ -36,6 +56,7 @@ struct TextInput
  */
 void SetTextInput(TextInput *input);
 
+/// @private
 void UpdateTextInputRect();
 
 /**
@@ -46,9 +67,11 @@ void StopTextInput();
 /**
  * Handle a text input event
  * @param event The text input event to handle
+ * @private
  */
 void HandleTextInput(SDL_TextInputEvent *event);
 
+/// @private
 void HandleTextEditing(SDL_TextEditingEvent *event);
 
 #endif //TEXTINPUTSYSTEM_H

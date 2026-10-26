@@ -55,7 +55,6 @@ DeclareReadFunction(float, ReadFloat);
  * @param reader The DataReader to read from
  * @param readSize The length of the data to read
  * @param dest The buffer to write the data into
- * @note It is up to the caller to prevent out of bounds access
  */
 void ReadBuffer(DataReader *reader, size_t readSize, void *dest);
 

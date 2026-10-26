@@ -2,6 +2,11 @@
 // Created by droc101 on 11/5/24.
 //
 
+/**
+ * @file Logging.h
+ * Logging subsystem, use instead of @c printf
+ */
+
 #ifndef GAME_LOGGING_H
 #define GAME_LOGGING_H
 
@@ -42,6 +47,7 @@ void LogDestroy();
  * @param flush Whether to flush output after printing
  * @param message The message format string
  * @param ... Format arguments
+ * @private
  */
 void LogInternal(const char *type, int color, bool flush, const char *message, ...);
 
@@ -58,6 +64,10 @@ void LogInternal(const char *type, int color, bool flush, const char *message, .
  */
 #define LogDebug(...) LogInternal("DEBUG", LOGGER_DEBUG_COLOR, FLUSH_ON_DEBUG, __VA_ARGS__)
 #else
+/**
+ * Log an info message, but only in debug builds
+ * @param ... Format arguments
+ */
 #define LogDebug(...)
 #endif
 

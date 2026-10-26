@@ -4,16 +4,20 @@
   "renderers": [
     {
       "type": "point",
-      "color": "$color"
+      "color": "$color",
+      "viewport_mode": "2d"
     },
     {
       "type": "orientation",
-      "color": "$color"
+      "color": "$color",
+      "viewport_mode": "2d"
     },
     {
       "type": "model",
       "model": "$model",
-      "color": "$color"
+      "color": "$color",
+      "mod_color": "$color",
+      "skin": "$skin"
     }
   ],
   "inputs": {

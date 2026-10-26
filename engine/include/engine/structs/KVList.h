@@ -2,6 +2,11 @@
 // Created by droc101 on 5/28/25.
 //
 
+/**
+ * @file KVList.h
+ * @c KvList and @c Param definitions, macros, and functions
+ */
+
 #ifndef KVLIST_H
 #define KVLIST_H
 
@@ -19,46 +24,73 @@
 
 #pragma region Param
 
-#define PARAM_BYTE(x) ((Param){.type = PARAM_TYPE_BYTE, .byteValue = (x)})
-#define PARAM_INT(x) ((Param){.type = PARAM_TYPE_INTEGER, .intValue = (x)})
-#define PARAM_FLOAT(x) ((Param){.type = PARAM_TYPE_FLOAT, .floatValue = (x)})
-#define PARAM_BOOL(x) ((Param){.type = PARAM_TYPE_BOOL, .boolValue = (x)})
-#define PARAM_STRING(x) ((Param){.type = PARAM_TYPE_STRING, .stringValue = (x)})
-#define PARAM_COLOR(x) ((Param){.type = PARAM_TYPE_COLOR, .colorValue = (x)})
-#define PARAM_ARRAY(s, d) ((Param){.type = PARAM_TYPE_ARRAY, .arrayValue.length = (s), .arrayValue.data = (d)})
-#define PARAM_KV_LIST(x) ((Param){.type = PARAM_TYPE_KV_LIST, .kvListValue = (x)})
-#define PARAM_UINT_64(x) ((Param){.type = PARAM_TYPE_UINT_64, .uint64value = (x)})
-#define PARAM_VEC2(x) ((Param){.type = PARAM_TYPE_VEC2, .vec2value = (x)})
-#define PARAM_VEC3(x) ((Param){.type = PARAM_TYPE_VEC3, .vec3value = (x)})
+/// Create a param containing a byte
+#define PARAM_BYTE(byteVal) ((Param){.type = PARAM_TYPE_BYTE, .byteValue = (byteVal)})
+/// Create a param containing an integer
+#define PARAM_INT(intVal) ((Param){.type = PARAM_TYPE_INTEGER, .intValue = (intVal)})
+/// Create a param containing a float
+#define PARAM_FLOAT(floatVal) ((Param){.type = PARAM_TYPE_FLOAT, .floatValue = (floatVal)})
+/// Create a param containing a boolean
+#define PARAM_BOOL(boolVal) ((Param){.type = PARAM_TYPE_BOOL, .boolValue = (boolVal)})
+/// Create a param containing a string
+#define PARAM_STRING(stringVal) ((Param){.type = PARAM_TYPE_STRING, .stringValue = (stringVal)})
+/// Create a param containing a color
+#define PARAM_COLOR(colorVal) ((Param){.type = PARAM_TYPE_COLOR, .colorValue = (colorVal)})
+/// Create a param containing an array of params
+#define PARAM_ARRAY(arraySize, arrayData) ((Param){.type = PARAM_TYPE_ARRAY, .arrayValue.length = (arraySize), .arrayValue.data = (arrayData)})
+/// Create a param containing a KvList
+#define PARAM_KV_LIST(kvListVal) ((Param){.type = PARAM_TYPE_KV_LIST, .kvListValue = (kvListVal)})
+/// Create a param containing a uint64_t
+#define PARAM_UINT_64(uint64Val) ((Param){.type = PARAM_TYPE_UINT_64, .uint64value = (uint64Val)})
+/// Create a param containing a Vector2
+#define PARAM_VEC2(vec2Val) ((Param){.type = PARAM_TYPE_VEC2, .vec2value = (vec2Val)})
+/// Create a param containing a Vector3
+#define PARAM_VEC3(vec3Val) ((Param){.type = PARAM_TYPE_VEC3, .vec3value = (vec3Val)})
+/// Create an empty param
 #define PARAM_NONE ((Param){.type = PARAM_TYPE_NONE})
-
-typedef enum ParamType ParamType;
 
 typedef struct Param Param;
 typedef struct ParamArray ParamArray;
 
-enum ParamType
+/// Types that can be contained within an @c Param
+typedef enum ParamType
 {
+	/// Unsigned 8-bit integer
 	PARAM_TYPE_BYTE,
+	/// Signed 32-bit integer
 	PARAM_TYPE_INTEGER,
+	/// Single precision float
 	PARAM_TYPE_FLOAT,
+	/// Boolean
 	PARAM_TYPE_BOOL,
+	/// String
 	PARAM_TYPE_STRING,
+	/// Nothing
 	PARAM_TYPE_NONE,
+	/// Color
 	PARAM_TYPE_COLOR,
+	/// KvList
 	PARAM_TYPE_KV_LIST,
+	/// Param array
 	PARAM_TYPE_ARRAY,
+	/// Unsigned 64-bit integer
 	PARAM_TYPE_UINT_64,
+	/// Vector2
 	PARAM_TYPE_VEC2,
+	/// Vector3
 	PARAM_TYPE_VEC3,
-};
+} ParamType;
 
+/// Array of Params
 struct ParamArray
 {
+	/// Length of array
 	size_t length;
+	/// Array data
 	Param *data;
 };
 
+/// A multi-type container
 struct Param
 {
 	/// The type contained in this param
@@ -79,15 +111,15 @@ struct Param
 	};
 };
 
-#define PARAM_OPL_ZERO(param) \
+#define PARAM_OPLIST_ZERO(param) \
 	memset(&(param), 0, sizeof(param)); \
 	(param).type = PARAM_TYPE_NONE;
-#define PARAM_OPL_COPY(param, value) CopyParam(&(value), &(param));
-#define PARAM_OPL_FREE(param) \
+#define PARAM_OPLIST_COPY(param, value) CopyParam(&(value), &(param));
+#define PARAM_OPLIST_FREE(param) \
 	FreeParam(&(param)); \
-	PARAM_OPL_ZERO(param);
+	PARAM_OPLIST_ZERO(param);
 
-#define PARAM_OPLIST (INIT(PARAM_OPL_ZERO), INIT_SET(PARAM_OPL_COPY), SET(PARAM_OPL_COPY), CLEAR(PARAM_OPL_FREE))
+#define PARAM_OPLIST (INIT(PARAM_OPLIST_ZERO), INIT_SET(PARAM_OPLIST_COPY), SET(PARAM_OPLIST_COPY), CLEAR(PARAM_OPLIST_FREE))
 
 /**
  * Read a param from bytes
@@ -119,6 +151,7 @@ void FreeParam(Param *param);
 #pragma endregion
 
 // TODO find a way to not leak this into anyone who includes this
+/// @private
 DEFINE_DICT(KvList, const char *, STR_OPLIST, Param, PARAM_OPLIST);
 
 /**
@@ -242,6 +275,13 @@ uint64_t KvGetUint64(const KvList list, const char *key, uint64_t defaultValue);
  */
 ParamArray *KvGetArray(const KvList list, const char *key);
 
+/**
+ * Get a KvList value from the key-value list
+ * @param list The list to get the value from
+ * @param key The key to get the value for
+ * @param out Where to put the output KvList
+ * @return Success/failure
+ */
 bool KvGetList(const KvList list, const char *key, KvList out);
 
 /**
@@ -330,6 +370,12 @@ void KvSetUint64(KvList list, const char *key, uint64_t value);
  */
 void KvSetParamArray(KvList list, const char *key, ParamArray array);
 
+/**
+ * Set a KvList value in the key-value list
+ * @param list The list to set the value in
+ * @param key The key to set the value for
+ * @param value The KvList value to set
+ */
 void KvSetList(KvList list, const char *key, KvList value);
 
 /**

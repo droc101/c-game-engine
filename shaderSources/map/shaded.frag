@@ -2,10 +2,33 @@
 
 #include "../include/lighting.inc.glsl"
 
+#define NEW_SAMPLE_STRATEGY
+
 layout(set = 0, binding = 2) uniform sampler2D lightmap;
 
 layout(location = 0) in vec2 inLightmapUV;
 
+#ifdef NEW_SAMPLE_STRATEGY
+vec3 sampleLightmap() {
+   vec2 size = 1.0 / textureSize(lightmap, 0);
+    if (SAMPLE_COUNT == 0) {
+		const vec4 color = texture(lightmap, inLightmapUV);
+        return color.rgb * color.a;
+    }
+
+    const float r = fract(dot(gl_FragCoord.xy, MAGIC));
+    const float sr = size.x * sin(r);
+    const float cr = size.x * cos(r);
+    const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
+
+    vec3 lightmapColor = vec3(0);
+    for (uint i = 0; i < SAMPLE_COUNT; i++) {
+        const vec4 color = texture(lightmap, inLightmapUV + diskRotation * softShadowKernels.kernels[i]);
+		lightmapColor += color.rgb * color.a / float(SAMPLE_COUNT);
+    }
+	return lightmapColor;
+}
+#else
 // w0, w1, w2, and w3 are the four cubic B-spline basis functions
 float w0(float a) {
 	return (1.0 / 6.0) * (a * (a * (-a + 3.0) - 3.0) + 1.0);
@@ -41,11 +64,11 @@ float h1(float a) {
 	return 1.0 + w3(a) / (w2(a) + w3(a));
 }
 
-vec4 sampleLightmap(const sampler2D lightmap, const vec2 original_uv){
+vec3 sampleLightmap(){
    vec2 lightmap_size = vec2(textureSize(lightmap, 0));
    vec2 luxel_size = 1.0 / lightmap_size;
    
-    vec2 uv = original_uv * lightmap_size - vec2(0.5);
+    vec2 uv = inLightmapUV * lightmap_size - vec2(0.5);
 
     vec2 iuv = floor(uv);
     vec2 fuv = fract(uv);
@@ -62,9 +85,10 @@ vec4 sampleLightmap(const sampler2D lightmap, const vec2 original_uv){
 	vec2 p2 = (vec2(iuv.x + h0x, iuv.y + h1y) - vec2(0.5)) * luxel_size;
 	vec2 p3 = (vec2(iuv.x + h1x, iuv.y + h1y) - vec2(0.5)) * luxel_size;
 
-    return (g0(fuv.y) * (g0x * texture(lightmap, p0) + g1x * texture(lightmap, p1))) +
-		   (g1(fuv.y) * (g0x * texture(lightmap, p2) + g1x * texture(lightmap, p3)));
+    const vec4 color = (g0(fuv.y) * (g0x * texture(lightmap, p0) + g1x * texture(lightmap, p1))) + (g1(fuv.y) * (g0x * texture(lightmap, p2) + g1x * texture(lightmap, p3)));
+	return color.rgb * color.a;
 }
+#endif
 
 void main() {
 	if (debugLighting()) {
@@ -78,7 +102,7 @@ void main() {
 	} else {
 		lightingColor = getLightingColor(inPosition, normalize(inNormal), getCascadeIndex(inDistance));
 		if (ENABLE_BAKED_LIGHTING) {
-			lightingColor += sampleLightmap(lightmap, inLightmapUV).rgb;
+			lightingColor += sampleLightmap();
 		}
 		if (DEBUG_RENDERING == DEBUG_RENDERING_ONLY_LIGHTING || DEBUG_RENDERING == DEBUG_RENDERING_NO_LIGHT_FALLOFF) {
 			outColor.rgb = clamp(lightingColor * globalLighting.exposure, 0.0, 1.0);
