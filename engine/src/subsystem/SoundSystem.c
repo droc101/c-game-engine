@@ -161,6 +161,10 @@ void InitSoundSystem()
 /// @warning Must not call any SDL_Mixer functions from within this function
 static inline void FreeChannels()
 {
+	if (!soundSys.isAudioStarted)
+	{
+		return;
+	}
 	ListLock(soundSys.channelsToBeFreed);
 	for (uint32_t i = 0; i < soundSys.channelsToBeFreed.length; i++)
 	{
