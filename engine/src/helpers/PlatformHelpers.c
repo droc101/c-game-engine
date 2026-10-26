@@ -36,16 +36,11 @@ static HANDLE singleInstanceMutex = NULL;
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-static int lockfile = 0;
-
-#define LOCK_FILE_NAME ".lock"
 #endif
 
 _Noreturn void RestartProgram()
 {
 	LogWarning("Exiting early to restart engine, resources may not get cleaned properly.\n"); // TODO clean properly
-	DestroyMultiInstanceLock();
 #ifdef WIN32
 	STARTUPINFO si = {0};
 	PROCESS_INFORMATION pi = {0};
@@ -358,36 +353,4 @@ void DestroyMutex(SDL_Mutex **mutex)
 	*mutex = NULL;
 	SDL_UnlockMutex(copy);
 	SDL_DestroyMutex(copy);
-}
-
-bool CreateMultiInstanceLock()
-{
-#ifdef WIN32
-	singleInstanceMutex = CreateMutexW(NULL, TRUE, L"Global\\GameSingleInstanceMutex");
-	if (GetLastError() == ERROR_ALREADY_EXISTS)
-	{
-		return false;
-	} else if (GetLastError() != ERROR_SUCCESS)
-	{
-		LogError("Failed to create single instance mutex: 0x%X\n", GetLastError());
-	}
-	return true;
-#else
-	lockfile = open(LOCK_FILE_NAME, O_CREAT | O_RDWR, 0666);
-	return flock(lockfile, LOCK_EX | LOCK_NB) == 0;
-#endif
-}
-
-void DestroyMultiInstanceLock()
-{
-#ifdef WIN32
-	if (singleInstanceMutex)
-	{
-		CloseHandle(singleInstanceMutex);
-	}
-#else
-	flock(lockfile, LOCK_UN);
-	close(lockfile);
-	unlink(LOCK_FILE_NAME);
-#endif
 }

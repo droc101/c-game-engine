@@ -10,6 +10,7 @@
 #include "../include/DialogSystem.h"
 #include "../include/Filesystem.h"
 #include "../include/LibraryLoader.h"
+#include "../include/Lock.h"
 
 #ifdef __x86_64__
 #include "../include/x86.h"
@@ -63,6 +64,13 @@ int main(const int argc, char **argv)
 	}
 	free(argvZero);
 
+	if (!CreateMultiInstanceLock())
+	{
+		printf(ANSI_RED "bootstrap: multi-instance check failed\n" ANSI_RESET);
+		ErrorDialog("Only one instance can be open at a time", "Already Running");
+		return -1;
+	}
+
 	const char *library_basename = NULL;
 #ifdef __x86_64__
 	uint8_t abiLevel = GetX86AbiArgument(argc, argv);
@@ -82,6 +90,7 @@ int main(const int argc, char **argv)
 
 	if (!library_basename)
 	{
+		DestroyMultiInstanceLock();
 		printf(ANSI_RED "bootstrap: failed to find a compatible game library\n" ANSI_RESET);
 		ErrorDialog("Failed to find a game executable compatible with your system's CPU.", "Fatal Error");
 		return -1;
@@ -98,9 +107,12 @@ int main(const int argc, char **argv)
 			const int ret = GameMain(argc, argv);
 			printf("bootstrap: cleaning up\n");
 			CloseLibrary(library);
+			DestroyMultiInstanceLock();
 			return ret;
 		}
 	}
+
+	DestroyMultiInstanceLock();
 	printf(ANSI_RED "bootstrap: error loading game library: %s\n" ANSI_RESET, LibraryLoaderError());
 	ErrorDialog("Failed to load the game executable.", "Fatal Error");
 

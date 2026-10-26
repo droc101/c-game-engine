@@ -236,11 +236,6 @@ void InitEngine(const EngineInitializationInfo initInfo)
 	LogInfo("Full Engine Commit: %s\n", ENGINE_GIT_HASH);
 	LogInfo("Initializing Engine\n");
 
-	if (!CreateMultiInstanceLock())
-	{
-		FriendlyError("Error", "Only one instance may be open at a time.");
-	}
-
 	InitArguments(initInfo.argc, initInfo.argv);
 
 	if (!HasCliArg("--nosteam"))
@@ -432,7 +427,6 @@ void DestroyEngine()
 	DestroyAssetCache(); // Free all assets
 	DestroyAddonLoader();
 	DestroyGameConfig();
-	DestroyMultiInstanceLock();
 	// Need to clean up logging system before cleaning SDL as logging uses and SDL thread
 	// Logs beyond this point will not be written to the log file, but will still print to stdout
 	LogDestroy();

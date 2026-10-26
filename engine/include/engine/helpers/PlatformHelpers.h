@@ -110,17 +110,4 @@ void PrintStackTrace();
  */
 void DestroyMutex(SDL_Mutex **mutex);
 
-/**
- * Create a lock preventing multiple instances from running
- * @return success/failure, where failure indicates another instance is already running
- * @private
- */
-bool CreateMultiInstanceLock();
-
-/**
- * Destroy the lock preventing multiple instances from running
- * @private
- */
-void DestroyMultiInstanceLock();
-
 #endif //PLATFORMHELPERS_H
