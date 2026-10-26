@@ -56,7 +56,8 @@ static void DestroyGame()
 	LaserRaycastFiltersDestroy();
 }
 
-EXPORT_SYM int GameMain(const int argc, char *argv[])
+// ReSharper disable once CppUseInternalLinkage
+EXPORT_SYM int GameMain(const int argc, char *argv[])  // NOLINT(*-use-internal-linkage)
 {
 	const EngineInitializationInfo initInfo = {
 		.argc = argc,

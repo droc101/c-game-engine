@@ -18,6 +18,7 @@
 
 /// The signature to the entry point in the game shared libraries
 typedef int (*GameMainFunction)(int argc, char **argv);
+typedef void (*GameSetUnlockFunction)(void(*)());
 
 int main(const int argc, char **argv)
 {
@@ -90,7 +91,6 @@ int main(const int argc, char **argv)
 
 	if (!library_basename)
 	{
-		DestroyMultiInstanceLock();
 		printf(ANSI_RED "bootstrap: failed to find a compatible game library\n" ANSI_RESET);
 		ErrorDialog("Failed to find a game executable compatible with your system's CPU.", "Fatal Error");
 		return -1;
@@ -101,18 +101,18 @@ int main(const int argc, char **argv)
 	const LibraryHandle library = OpenLibrary(library_basename);
 	if (library)
 	{
+		const GameSetUnlockFunction SetUnlockFunction = OpenSymbol(library, "SetUnlockFunction");
 		const GameMainFunction GameMain = OpenSymbol(library, "GameMain");
-		if (GameMain)
+
+		if (GameMain && SetUnlockFunction)
 		{
+			SetUnlockFunction(DestroyMultiInstanceLock);
 			const int ret = GameMain(argc, argv);
 			printf("bootstrap: cleaning up\n");
 			CloseLibrary(library);
-			DestroyMultiInstanceLock();
 			return ret;
 		}
 	}
-
-	DestroyMultiInstanceLock();
 	printf(ANSI_RED "bootstrap: error loading game library: %s\n" ANSI_RESET, LibraryLoaderError());
 	ErrorDialog("Failed to load the game executable.", "Fatal Error");
 

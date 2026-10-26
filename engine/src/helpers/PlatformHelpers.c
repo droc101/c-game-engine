@@ -2,6 +2,7 @@
 // Created by droc101 on 11/10/2024.
 //
 
+#include <engine/Engine.h>
 #include <engine/helpers/Arguments.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/GlobalState.h>
@@ -38,9 +39,21 @@ static HANDLE singleInstanceMutex = NULL;
 #include <unistd.h>
 #endif
 
+static void (*DestroyLock)() = NULL;
+
+// ReSharper disable once CppUseInternalLinkage
+EXPORT_SYM void SetUnlockFunction(void (*DestroyLockFunction)()) // NOLINT(*-use-internal-linkage)
+{
+	DestroyLock = DestroyLockFunction;
+}
+
 _Noreturn void RestartProgram()
 {
 	LogWarning("Exiting early to restart engine, resources may not get cleaned properly.\n"); // TODO clean properly
+	if (DestroyLock)
+	{
+		DestroyLock();
+	}
 #ifdef WIN32
 	STARTUPINFO si = {0};
 	PROCESS_INFORMATION pi = {0};
@@ -58,10 +71,12 @@ _Noreturn void RestartProgram()
 			&pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
+	exit(1);
 #else
 	execv(GetState()->executablePath, GetArgv());
-#endif
+	LogError("Failed to restart program: %s\n", strerror(errno));
 	exit(1);
+#endif
 }
 
 bool IsPathAbsolute(const char *path)
