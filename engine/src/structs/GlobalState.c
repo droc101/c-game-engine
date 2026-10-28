@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "engine/structs/Asset.h"
 
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80
@@ -233,21 +234,27 @@ bool ChangeMapByName(const char *name)
 		LogError("Failed to load map due to map name %s being too long\n", name);
 		return false;
 	}
-	state.saveData->blueCoins = 0;
-	Map *map = CreateMap();
-	ChangeMap(map);
-	if (!LoadMap(map, LoadAsset(mapPath, false, false)))
+
+	Asset *mapAsset = LoadAsset(mapPath, false, false);
+	if (mapAsset)
 	{
-		// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
-		state.map = NULL;
-		PhysicsThreadLockTickMutex();
-		ChangeMap(NULL);
-		PhysicsThreadUnlockTickMutex();
-		return false;
+		state.saveData->blueCoins = 0;
+		Map *map = CreateMap();
+		ChangeMap(map);
+		if (LoadMap(map, mapAsset))
+		{
+			map->mapName = strdup(name);
+			DiscordUpdateRPC();
+			return true;
+		}
 	}
-	map->mapName = strdup(name);
-	DiscordUpdateRPC();
-	return true;
+
+	// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
+	state.map = NULL;
+	PhysicsThreadLockTickMutex();
+	ChangeMap(NULL);
+	PhysicsThreadUnlockTickMutex();
+	return false;
 }
 
 void ReloadMap()
