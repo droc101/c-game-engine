@@ -84,12 +84,23 @@ char *ReadStringSafe(DataReader *reader, size_t *outLength)
 	{
 		const size_t stringLength = ReadSizeT(reader);
 		remainingSize -= sizeof(size_t);
+		if (stringLength == 0)
+		{
+			return NULL;
+		}
 		if (remainingSize >= sizeof(char) * stringLength)
 		{
 			char *string = calloc(stringLength, sizeof(char));
 			CheckAlloc(string);
 			memcpy(string, reader->data + reader->offset, stringLength);
 			reader->offset += stringLength * sizeof(char);
+
+			if (string[stringLength - 1] != '\0')
+			{
+				free(string);
+				return NULL;
+			}
+
 			if (outLength)
 			{
 				*outLength = stringLength;
