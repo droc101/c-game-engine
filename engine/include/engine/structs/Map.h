@@ -14,6 +14,7 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/KVList.h>
 #include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
@@ -24,7 +25,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "engine/structs/KVList.h"
 
 #define MAX_ACTORS 8192
 

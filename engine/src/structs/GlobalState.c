@@ -9,6 +9,7 @@
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
+#include <engine/structs/Asset.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
@@ -24,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "engine/structs/Asset.h"
 
 #define MAX_HEALTH 100
 #define MAX_MAP_PATH_LENGTH 80
@@ -249,8 +249,7 @@ bool ChangeMapByName(const char *name)
 		}
 	}
 
-	// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
-	state.map = NULL;
+	FreeAsset(mapAsset);
 	PhysicsThreadLockTickMutex();
 	ChangeMap(NULL);
 	PhysicsThreadUnlockTickMutex();

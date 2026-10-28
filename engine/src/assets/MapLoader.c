@@ -7,7 +7,6 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapLoader.h>
 #include <engine/assets/MapMaterialLoader.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
@@ -24,6 +23,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -39,8 +39,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "joltc/constants.h"
 
 bool LoadMap(Map *map, Asset *mapData)
 {
@@ -217,7 +215,7 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 	map->modelCount = ReadSizeT(reader);
-	map->models = malloc(sizeof(MapModel) * map->modelCount);
+	map->models = calloc(map->modelCount, sizeof(MapModel));
 	CheckAlloc(map->models);
 	for (size_t i = 0; i < map->modelCount; i++)
 	{
@@ -231,7 +229,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		bytesRemaining -= sizeof(size_t);
 		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
-		assert(model->material);
+		assert(model->material); // TODO: This should probably be handled better
 		free(materialName);
 
 		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
@@ -289,19 +287,19 @@ bool LoadMap(Map *map, Asset *mapData)
 		JPH_Quat_FromEulerAngles(&rotationEuler, &collisionXfm.rotation);
 
 		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-		const size_t numVerts = ReadSizeT(reader);
-		Vector3 *verts = malloc(sizeof(Vector3) * numVerts);
-		CheckAlloc(verts);
-		for (size_t k = 0; k < numVerts; k++)
+		const size_t vertexCount = ReadSizeT(reader);
+		EXPECT_BYTES_BOOL(sizeof(Vector3) * vertexCount, bytesRemaining);
+		Vector3 *vertices = malloc(sizeof(Vector3) * vertexCount);
+		CheckAlloc(vertices);
+		for (size_t k = 0; k < vertexCount; k++)
 		{
-			Vector3 *vertex = &verts[k];
-			EXPECT_BYTES_BOOL(sizeof(float) * 3, bytesRemaining);
+			Vector3 *vertex = &vertices[k];
 			vertex->x = ReadFloat(reader);
 			vertex->y = ReadFloat(reader);
 			vertex->z = ReadFloat(reader);
 		}
-		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(verts, numVerts, JPH_DefaultConvexRadius);
-		free(verts);
+		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(vertices, vertexCount, JPH_DefaultConvexRadius);
+		free(vertices);
 
 		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(hullShape,
 																							   &collisionXfm,

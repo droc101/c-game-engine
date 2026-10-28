@@ -119,11 +119,14 @@ void DestroyMap(Map *map)
 	free(map->indirectLightmapPixels);
 	free(map->lightmapPixels);
 
-	for (uint32_t i = 0; i < map->lightCount; i++)
+	if (map->lights)
 	{
-		free(map->lights[i].cookie);
+		for (uint32_t i = 0; i < map->lightCount; i++)
+		{
+			free(map->lights[i].cookie);
+		}
+		free(map->lights);
 	}
-	free(map->lights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
@@ -286,8 +289,8 @@ void FreeQueuedIOConnection(QueuedIoConnection *connection)
 
 static int QueuedIOConnectionDelayComparison(const void *pc1, const void *pc2)
 {
-	const QueuedIoConnection *c1 = *(QueuedIoConnection**)pc1;
-	const QueuedIoConnection *c2 = *(QueuedIoConnection**)pc2;
+	const QueuedIoConnection *c1 = *(QueuedIoConnection **)pc1;
+	const QueuedIoConnection *c2 = *(QueuedIoConnection **)pc2;
 	return (int64_t)c1->scheduledTime - (int64_t)c2->scheduledTime;
 }
 
