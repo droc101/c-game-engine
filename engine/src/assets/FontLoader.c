@@ -92,8 +92,7 @@ static Font *LoadFontInternal(const char *asset)
 	font->spaceWidth = ReadUint8(reader);
 	font->defaultSize = ReadUint8(reader);
 	font->uppercaseOnly = ReadUint8(reader) != 0;
-	size_t fontTextureLength = 0;
-	char *fontTexture = ReadStringSafe(reader, &fontTextureLength);
+	char *fontTexture = ReadStringSafe(reader, &bytesRemaining);
 	if (!fontTexture)
 	{
 		LogError("Failed to load font from asset (unable to read texture string)\n");
@@ -101,9 +100,7 @@ static Font *LoadFontInternal(const char *asset)
 		DestroyDataReader(reader);
 		return GenerateFallbackFont(asset);
 	}
-	bytesRemaining -= fontTextureLength;
-	bytesRemaining -= sizeof(size_t);
-	fontTextureLength += strlen(TEXTURE(""));
+	const size_t fontTextureLength = strlen(fontTexture) + 1 + strlen(TEXTURE(""));
 	font->texture = calloc(fontTextureLength, sizeof(char));
 	CheckAlloc(font->texture);
 	snprintf(font->texture, fontTextureLength, TEXTURE("%s"), fontTexture);

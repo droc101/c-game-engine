@@ -58,7 +58,6 @@ bool LoadMap(Map *map, Asset *mapData)
 	DataReader *reader = CreateDataReaderFromAsset(mapData);
 
 	size_t bytesRemaining = mapData->size;
-	size_t strLength = 0;
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
@@ -66,48 +65,39 @@ bool LoadMap(Map *map, Asset *mapData)
 	map->renderSky = ReadUint8(reader);
 	if (map->renderSky)
 	{
-		map->skyTexture = ReadStringSafe(reader, &strLength);
+		map->skyTexture = ReadStringSafe(reader, &bytesRemaining);
 		if (!map->skyTexture)
 		{
 			LogError("Failed to read map sky texture!\n");
 			return false;
 		}
-		bytesRemaining -= strLength;
-		bytesRemaining -= sizeof(size_t);
 	} else
 	{
 		map->skyTexture = NULL;
 	}
-	map->discordRpcIcon = ReadStringSafe(reader, &strLength);
+	map->discordRpcIcon = ReadStringSafe(reader, &bytesRemaining);
 	if (!map->discordRpcIcon)
 	{
 		LogError("Failed to read Discord RPC icon\n");
 		return false;
 	}
-	bytesRemaining -= strLength;
-	bytesRemaining -= sizeof(size_t);
-	map->discordRpcName = ReadStringSafe(reader, &strLength);
+	map->discordRpcName = ReadStringSafe(reader, &bytesRemaining);
 	if (!map->discordRpcName)
 	{
 		LogError("Failed to read Discord RPC name\n");
 		return false;
 	}
-	bytesRemaining -= strLength;
-	bytesRemaining -= sizeof(size_t);
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 	const size_t numActors = ReadSizeT(reader);
 	for (size_t i = 0; i < numActors; i++)
 	{
-		size_t actorClassLength = 0;
-		char *actorClass = ReadStringSafe(reader, &actorClassLength);
+		char *actorClass = ReadStringSafe(reader, &bytesRemaining);
 		if (!actorClass)
 		{
 			LogError("Failed to read actor classname\n");
 			return false;
 		}
-		bytesRemaining -= actorClassLength;
-		bytesRemaining -= sizeof(size_t);
 
 		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
 		Transform xfm;
@@ -128,30 +118,24 @@ bool LoadMap(Map *map, Asset *mapData)
 		{
 			ActorConnection *connection = malloc(sizeof(ActorConnection));
 			CheckAlloc(connection);
-			connection->sourceActorOutput = ReadStringSafe(reader, &strLength);
+			connection->sourceActorOutput = ReadStringSafe(reader, &bytesRemaining);
 			if (!connection->sourceActorOutput)
 			{
 				LogError("Failed to read I/O connection output name\n");
 				return false;
 			}
-			bytesRemaining -= strLength;
-			bytesRemaining -= sizeof(size_t);
-			connection->targetActorName = ReadStringSafe(reader, &strLength);
+			connection->targetActorName = ReadStringSafe(reader, &bytesRemaining);
 			if (!connection->targetActorName)
 			{
 				LogError("Failed to read I/O connection target name\n");
 				return false;
 			}
-			bytesRemaining -= strLength;
-			bytesRemaining -= sizeof(size_t);
-			connection->targetActorInput = ReadStringSafe(reader, &strLength);
+			connection->targetActorInput = ReadStringSafe(reader, &bytesRemaining);
 			if (!connection->targetActorInput)
 			{
 				LogError("Failed to read I/O connection input name\n");
 				return false;
 			}
-			bytesRemaining -= strLength;
-			bytesRemaining -= sizeof(size_t);
 			EXPECT_BYTES_BOOL(1, bytesRemaining);
 			uint8_t hasOverride = ReadUint8(reader);
 			if (hasOverride)
@@ -220,14 +204,12 @@ bool LoadMap(Map *map, Asset *mapData)
 	for (size_t i = 0; i < map->modelCount; i++)
 	{
 		MapModel *model = &map->models[i];
-		char *materialName = ReadStringSafe(reader, &strLength);
+		char *materialName = ReadStringSafe(reader, &bytesRemaining);
 		if (!materialName)
 		{
 			LogError("Failed to read map material name\n");
 			return false;
 		}
-		bytesRemaining -= sizeof(size_t);
-		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
 		assert(model->material); // TODO: This should probably be handled better
 		free(materialName);

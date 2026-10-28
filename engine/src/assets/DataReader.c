@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "engine/assets/AssetReader.h"
+
 struct DataReader
 {
 	const uint8_t *data;
@@ -77,38 +79,28 @@ void ReadBuffer(DataReader *reader, const size_t readSize, void *dest)
 	reader->offset += readSize;
 }
 
-char *ReadStringSafe(DataReader *reader, size_t *outLength)
+char *ReadStringSafe(DataReader *reader, size_t *bytesRemaining)
 {
-	size_t remainingSize = reader->totalBufferSize - reader->offset;
-	if (remainingSize >= sizeof(size_t))
+	assert(bytesRemaining);
+
+	EXPECT_BYTES(sizeof(size_t), *bytesRemaining);
+	const size_t stringLength = ReadSizeT(reader);
+	if (stringLength == 0)
 	{
-		const size_t stringLength = ReadSizeT(reader);
-		remainingSize -= sizeof(size_t);
-		if (stringLength == 0)
-		{
-			return NULL;
-		}
-		if (remainingSize >= sizeof(char) * stringLength)
-		{
-			char *string = calloc(stringLength, sizeof(char));
-			CheckAlloc(string);
-			memcpy(string, reader->data + reader->offset, stringLength);
-			reader->offset += stringLength * sizeof(char);
-
-			if (string[stringLength - 1] != '\0')
-			{
-				free(string);
-				return NULL;
-			}
-
-			if (outLength)
-			{
-				*outLength = stringLength;
-			}
-			return string;
-		}
+		return NULL;
 	}
-	return NULL;
+	const size_t stringByteCount = stringLength * sizeof(char);
+	EXPECT_BYTES(stringByteCount, *bytesRemaining);
+	char *string = calloc(stringLength, sizeof(char));
+	CheckAlloc(string);
+	ReadBuffer(reader, stringByteCount, string);
+
+	if (string[stringLength - 1] != '\0')
+	{
+		free(string);
+		return NULL;
+	}
+	return string;
 }
 
 void Seek(DataReader *reader, const size_t bytes)

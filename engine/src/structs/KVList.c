@@ -47,14 +47,11 @@ bool ReadParam(DataReader *reader, Param *out, size_t *bytesRemaining)
 			out->colorValue.a = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_STRING:
-			size_t stringLength = 0;
-			out->stringValue = ReadStringSafe(reader, &stringLength);
+			out->stringValue = ReadStringSafe(reader, bytesRemaining);
 			if (!out->stringValue)
 			{
 				return false;
 			}
-			*bytesRemaining -= stringLength;
-			*bytesRemaining -= sizeof(size_t);
 			break;
 		case PARAM_TYPE_ARRAY:
 			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
@@ -268,14 +265,11 @@ bool ReadKvList(DataReader *reader, KvList out, size_t *bytesRemaining)
 	const size_t numParams = ReadSizeT(reader);
 	for (size_t _ = 0; _ < numParams; _++)
 	{
-		size_t keyLength = 0;
-		char *key = ReadStringSafe(reader, &keyLength);
+		char *key = ReadStringSafe(reader, bytesRemaining);
 		if (!key)
 		{
 			return false;
 		}
-		*bytesRemaining -= keyLength;
-		*bytesRemaining -= sizeof(size_t);
 		Param param;
 		if (!ReadParam(reader, &param, bytesRemaining))
 		{

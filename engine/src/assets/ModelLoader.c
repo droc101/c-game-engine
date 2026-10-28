@@ -50,7 +50,6 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	}
 
 	size_t bytesRemaining = assetData->size;
-	size_t strLength = 0;
 
 	ModelDefinition *model = malloc(sizeof(ModelDefinition));
 	CheckAlloc(model);
@@ -74,14 +73,12 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	for (uint32_t i = 0; i < model->materialCount; i++)
 	{
 		Material *mat = &model->materials[i];
-		mat->texture = ReadStringSafe(reader, &strLength);
+		mat->texture = ReadStringSafe(reader, &bytesRemaining);
 		if (!mat->texture)
 		{
 			LogError("Failed to read model texture name\n");
 			return NULL;
 		}
-		bytesRemaining -= sizeof(size_t);
-		bytesRemaining -= strLength;
 		EXPECT_BYTES((sizeof(float) * 4) + sizeof(uint32_t) + 1, bytesRemaining);
 		mat->color.r = ReadFloat(reader);
 		mat->color.g = ReadFloat(reader);

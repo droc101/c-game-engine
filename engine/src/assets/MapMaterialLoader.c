@@ -75,16 +75,13 @@ MapMaterial *LoadMapMaterial(const char *path)
 		return &fallbackMaterial;
 	}
 	size_t bytesRemaining = mapMaterialAsset->size;
-	size_t strLength = 0;
 
-	material->texture = ReadStringSafe(reader, &strLength);
+	material->texture = ReadStringSafe(reader, &bytesRemaining);
 	if (!material->texture)
 	{
 		LogError("Failed to read material texture name\n");
 		return NULL;
 	}
-	bytesRemaining -= sizeof(size_t);
-	bytesRemaining -= strLength;
 	EXPECT_BYTES(sizeof(float) * 2, bytesRemaining);
 	Seek(reader, sizeof(float) * 2); // default scale is lvledit side only
 	EXPECT_BYTES(2, bytesRemaining);
