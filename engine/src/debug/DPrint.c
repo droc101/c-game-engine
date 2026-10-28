@@ -44,7 +44,7 @@ void DPrintF(const char *format, const Color color, ...)
 	char buffer[256];
 	va_list args;
 	va_start(args, color);
-	vsprintf(buffer, format, args);
+	vsnprintf(buffer, 256, format, args);
 	va_end(args);
 	DPrint(buffer, color);
 }
