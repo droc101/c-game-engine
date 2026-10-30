@@ -34,18 +34,21 @@ void InitTimers();
 /**
  * Get the time the program has been running in nanoseconds
  * @return Time in nanoseconds
+ * @warning Do not use to track time spent in a map, this increments when the game is paused!
  */
 uint64_t GetTimeNs();
 
 /**
  * Get the time the program has been running in milliseconds
  * @return Time in milliseconds
+ * @warning Do not use to track time spent in a map, this increments when the game is paused!
  */
 uint64_t GetTimeMs();
 
 /**
  * Get the time the program has been running in seconds
  * @return Time in seconds
+ * @warning Do not use to track time spent in a map, this increments when the game is paused!
  */
 uint64_t GetTimeS();
 

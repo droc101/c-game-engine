@@ -29,6 +29,7 @@
 #include <SDL3/SDL_mutex.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -63,6 +64,10 @@ void MapFixedUpdate(GlobalState *state, const double delta)
 	{
 		return;
 	}
+
+	// TODO: is the accumulating drift from truncating here gonna be a problem?
+	//  could change to a double if precision is investigated
+	state->map->msElapsed += (uint64_t)(delta * PHYSICS_TARGET_MS_D);
 
 	SDL_LockMutex(state->map->player.mutex);
 	Vector3_Add(&state->map->player.transform.position,

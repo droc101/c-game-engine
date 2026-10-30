@@ -143,6 +143,7 @@ struct Map
 
 	JPH_PhysicsSystem *physicsSystem;
 	uint64_t physicsTick;
+	uint64_t msElapsed;
 
 	/// The player object
 	Player player;
