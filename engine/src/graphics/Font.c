@@ -180,6 +180,15 @@ void DrawTextAligned(const char *str,
 	{
 		char line[256];
 		TextGetLine(str, i, line, 256, fontAsset->uppercaseOnly);
+		int start = MeasureLine(str, i);
+		// if the start is a newline, skip it
+		if (str[start] == '\n')
+		{
+			start++;
+		}
+		const int end = MeasureLine(str, i + 1);
+		const size_t copySize = start >= end ? 0 : end - start;
+		quads.quadCount -= max(0, copySize - strlen(line));
 		const Vector2 textSize = MeasureText(line, size, font);
 		if (hAlign == FONT_HALIGN_CENTER)
 		{

@@ -786,8 +786,8 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, const 
 	for (uint8_t i = 0; i < 4; i++)
 	{
 		memcpy(vertices, vertices_posXY_uvZW[i], 16);
-		memcpy((char *)(vertices) + 16, &color->r, 16);
-		((uint32_t *)(vertices++))[8] = textureIndex;
+		memcpy((char *)(vertices) + 16, color, 16);
+		(vertices++)->textureIndex = textureIndex;
 	}
 
 	indices[0] = vertexOffset;
