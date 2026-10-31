@@ -9,7 +9,7 @@
         {
             "editor_name": "",
             "origin_x": -36.0,
-            "origin_y": -16.0,
+            "origin_y": -8.0,
             "origin_z": 16.0,
             "rotation_x": 0.0,
             "rotation_y": 0.0,
@@ -17,62 +17,62 @@
             "vertices": [
                 {
                     "x": -52.0,
-                    "y": 16.0,
+                    "y": 8.0,
                     "z": -48.0
                 },
                 {
                     "x": 68.0,
-                    "y": 16.0,
+                    "y": 8.0,
                     "z": -56.0
                 },
                 {
                     "x": 92.0,
-                    "y": 16.0,
+                    "y": 8.0,
                     "z": 8.0
                 },
                 {
                     "x": 76.0,
-                    "y": 16.0,
+                    "y": 8.0,
                     "z": 56.0
                 },
                 {
                     "x": -68.0,
-                    "y": 16.0,
+                    "y": 8.0,
                     "z": 48.0
                 },
                 {
                     "x": -92.0,
-                    "y": 16.0,
+                    "y": 8.0,
                     "z": -8.0
                 },
                 {
                     "x": -52.0,
-                    "y": -16.0,
+                    "y": -8.0,
                     "z": -48.0
                 },
                 {
                     "x": 68.0,
-                    "y": -16.0,
+                    "y": -8.0,
                     "z": -56.0
                 },
                 {
                     "x": 92.0,
-                    "y": -16.0,
+                    "y": -8.0,
                     "z": 8.0
                 },
                 {
                     "x": 76.0,
-                    "y": -16.0,
+                    "y": -8.0,
                     "z": 56.0
                 },
                 {
                     "x": -68.0,
-                    "y": -16.0,
+                    "y": -8.0,
                     "z": 48.0
                 },
                 {
                     "x": -92.0,
-                    "y": -16.0,
+                    "y": -8.0,
                     "z": -8.0
                 }
             ],
@@ -84,7 +84,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -100,7 +100,7 @@
                         8,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -116,7 +116,7 @@
                         9,
                         8
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -132,7 +132,7 @@
                         10,
                         9
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -148,7 +148,7 @@
                         11,
                         10
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -164,7 +164,7 @@
                         6,
                         11
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -269,7 +269,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -301,7 +301,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -317,7 +317,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -418,7 +418,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -450,7 +450,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -466,7 +466,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -567,7 +567,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -615,7 +615,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -716,7 +716,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -732,7 +732,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -764,7 +764,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -865,7 +865,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -881,7 +881,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -913,7 +913,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1014,7 +1014,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1030,7 +1030,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1046,7 +1046,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1062,7 +1062,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1195,7 +1195,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1211,7 +1211,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1322,7 +1322,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1338,7 +1338,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1354,7 +1354,7 @@
                         8,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1370,7 +1370,7 @@
                         9,
                         8
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1505,7 +1505,7 @@
                         6,
                         2
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1521,7 +1521,7 @@
                         7,
                         3
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1537,7 +1537,7 @@
                         4,
                         0
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1638,7 +1638,7 @@
                         5,
                         1
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1654,7 +1654,7 @@
                         6,
                         2
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1670,7 +1670,7 @@
                         7,
                         3
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1797,7 +1797,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1813,7 +1813,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1829,7 +1829,7 @@
                         8,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1845,7 +1845,7 @@
                         9,
                         8
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1861,7 +1861,7 @@
                         5,
                         9
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1964,7 +1964,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -1980,7 +1980,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2012,7 +2012,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2129,7 +2129,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2145,7 +2145,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2161,7 +2161,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2252,7 +2252,7 @@
                         4,
                         3
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2268,7 +2268,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2383,7 +2383,7 @@
                         5,
                         4
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2399,7 +2399,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2415,7 +2415,7 @@
                         7,
                         6
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2431,7 +2431,7 @@
                         4,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2522,7 +2522,7 @@
                         4,
                         1
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2538,7 +2538,7 @@
                         5,
                         2
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -2554,7 +2554,7 @@
                         3,
                         0
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -3218,7 +3218,7 @@
                         30,
                         31
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -5724,7 +5724,7 @@
                         6,
                         5
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
@@ -5937,7 +5937,7 @@
                         6,
                         7
                     ],
-                    "material": "material/dev/uv_test.gmtl",
+                    "material": "material/tools/invisible.gmtl",
                     "texture_scale_x": 16.0,
                     "texture_scale_y": 16.0,
                     "texture_offset_x": 0.0,
