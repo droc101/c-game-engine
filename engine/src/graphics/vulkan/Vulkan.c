@@ -59,6 +59,7 @@
 #include <string.h>
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
+#include "engine/graphics/vulkan/VulkanDebug.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -2045,8 +2046,11 @@ void VK_RenderMap(Map *map, Camera *camera)
 		.dynamicStates = dynamicStateBindInfos,
 	};
 
-	DrawMap(0, &pipelineBindInfo, true, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
-	DrawActors(0, &pipelineBindInfo, pipelines.depthPrepass.modelActors, pipelines.depthPrepass.wallActors);
+	if (specializationConstants.debugRendering != DEBUG_RENDERING_DISABLE_DEPTH_PREPASS)
+	{
+		DrawMap(0, &pipelineBindInfo, true, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
+		DrawActors(0, &pipelineBindInfo, pipelines.depthPrepass.modelActors, pipelines.depthPrepass.wallActors);
+	}
 	lunaNextSubpass(commandBuffer);
 
 	if (map->renderSky)
