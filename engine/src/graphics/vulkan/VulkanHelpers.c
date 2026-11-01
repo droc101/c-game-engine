@@ -261,12 +261,22 @@ void CreateShadowMapRenderPass(const Map *map)
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 		.pDepthStencilAttachment = &depthAttachmentReference,
 	};
-	const VkSubpassDependency dependency = {
-		.srcSubpass = VK_SUBPASS_EXTERNAL,
-		.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-		.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-		.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-		.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	const VkSubpassDependency dependencies[] = {
+		{
+			.srcSubpass = VK_SUBPASS_EXTERNAL,
+			.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | VK_ACCESS_SHADER_READ_BIT,
+			.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		},
+		{
+			.srcSubpass = 0,
+			.dstSubpass = VK_SUBPASS_EXTERNAL,
+			.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+			.dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+		},
 	};
 	const VkRenderPassCreateInfo renderPassCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
@@ -274,8 +284,8 @@ void CreateShadowMapRenderPass(const Map *map)
 		.pAttachments = &depthAttachmentDescription,
 		.subpassCount = 1,
 		.pSubpasses = &subpassDescription,
-		.dependencyCount = 1,
-		.pDependencies = &dependency,
+		.dependencyCount = ArrayLength(dependencies),
+		.pDependencies = dependencies,
 	};
 	VulkanTest(vkCreateRenderPass(vkDevice, &renderPassCreateInfo, NULL, &shadowMapRenderPass),
 			   "Failed to create shadow map render pass!");
