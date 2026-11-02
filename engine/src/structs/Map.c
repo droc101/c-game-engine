@@ -4,6 +4,7 @@
 
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>

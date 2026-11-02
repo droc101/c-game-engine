@@ -7,6 +7,7 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/TextureLoader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/subsystem/Error.h>
@@ -65,8 +66,7 @@ void GenFallbackImage(Image *src)
 	src->mipmaps = false;
 	src->opaque = true;
 	src->pixelFormat = PIXEL_FORMAT_RGBA8;
-	const size_t pixelDataSize = MISSING_TEX_SIZE * MISSING_TEX_SIZE * sizeof(uint32_t);
-	uint32_t *pixelData = malloc(pixelDataSize);
+	uint32_t *pixelData = AllocArray(MISSING_TEX_SIZE * MISSING_TEX_SIZE, sizeof(uint32_t));
 	CheckAlloc(pixelData);
 	src->pixelData = (uint8_t *)pixelData;
 
@@ -109,19 +109,20 @@ bool LoadImageFromAsset(const Asset *asset, Image *image)
 	image->mipmaps = ReadUint8(reader) != 0;
 	image->opaque = ReadUint8(reader) != 0;
 	image->pixelFormat = ReadUint8(reader);
-	size_t pixelDataSize = image->width * image->height;
+	size_t numPixels = image->width * image->height;
+	size_t pixelSize = 0;
 	if (image->pixelFormat == PIXEL_FORMAT_RGBA8)
 	{
-		pixelDataSize *= sizeof(uint32_t);
+		pixelSize = sizeof(uint32_t);
 	} else
 	{
-		pixelDataSize *= sizeof(_Float16) * 4;
+		pixelSize = sizeof(_Float16) * 4;
 	}
-	EXPECT_BYTES_BOOL(pixelDataSize, bytesRemaining);
+	EXPECT_BYTES_BOOL(numPixels * pixelSize, bytesRemaining);
 
-	image->pixelData = malloc(pixelDataSize);
+	image->pixelData = AllocArray(numPixels, pixelSize);
 	CheckAlloc(image->pixelData);
-	ReadBuffer(reader, pixelDataSize, image->pixelData);
+	ReadBuffer(reader, numPixels * pixelSize, image->pixelData);
 
 	EXPECT_EOF_BYTES(bytesRemaining);
 	DestroyDataReader(reader);

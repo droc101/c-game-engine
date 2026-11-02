@@ -6,6 +6,7 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/debug/DPrint.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/subsystem/Error.h>
@@ -68,7 +69,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	model->lodCount = ReadUint32(reader);
 	model->collisionModelType = ReadUint8(reader);
 
-	model->materials = malloc(sizeof(Material) * model->materialCount);
+	model->materials = AllocArray(model->materialCount, sizeof(Material));
 	CheckAlloc(model->materials);
 	for (uint32_t i = 0; i < model->materialCount; i++)
 	{
@@ -88,13 +89,12 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		mat->castsShadows = ReadUint8(reader) != 0;
 	}
 
-	model->skinMaterialIndices = malloc(sizeof(uint32_t *) * model->skinCount);
+	model->skinMaterialIndices = AllocArray(model->skinCount, sizeof(uint32_t *));
 	CheckAlloc(model->skinMaterialIndices);
 
-	const size_t skinSize = sizeof(uint32_t) * model->materialSlotCount;
 	for (uint32_t i = 0; i < model->skinCount; i++)
 	{
-		model->skinMaterialIndices[i] = malloc(skinSize);
+		model->skinMaterialIndices[i] = AllocArray(model->materialSlotCount, sizeof(uint32_t));
 		CheckAlloc(model->skinMaterialIndices[i]);
 		uint32_t *skin = model->skinMaterialIndices[i];
 		EXPECT_BYTES(sizeof(uint32_t) * model->materialSlotCount, bytesRemaining);
@@ -104,7 +104,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		}
 	}
 
-	model->lods = malloc(sizeof(ModelLod) * model->lodCount);
+	model->lods = AllocArray(model->lodCount, sizeof(ModelLod));
 	CheckAlloc(model->lods);
 	for (uint32_t i = 0; i < model->lodCount; i++)
 	{
@@ -129,7 +129,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 
 		EXPECT_BYTES(sizeof(uint32_t), bytesRemaining);
 		lod->totalIndexCount = ReadUint32(reader);
-		lod->components = malloc(model->materialSlotCount * sizeof(ModelComponent));
+		lod->components = AllocArray(model->materialSlotCount, sizeof(ModelComponent));
 		CheckAlloc(lod->components);
 		for (uint32_t j = 0; j < model->materialSlotCount; j++)
 		{
@@ -167,7 +167,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 	{
 		EXPECT_BYTES(sizeof(size_t), bytesRemaining);
 		const size_t numHulls = ReadSizeT(reader);
-		ModelConvexHull *hulls = malloc(sizeof(ModelConvexHull) * numHulls);
+		ModelConvexHull *hulls = AllocArray(numHulls, sizeof(ModelConvexHull));
 		CheckAlloc(hulls);
 		for (size_t i = 0; i < numHulls; i++)
 		{
@@ -177,7 +177,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 			hull->offset.x = ReadFloat(reader);
 			hull->offset.y = ReadFloat(reader);
 			hull->offset.z = ReadFloat(reader);
-			hull->points = malloc(sizeof(Vector3) * hull->numPoints);
+			hull->points = AllocArray(hull->numPoints, sizeof(Vector3));
 			CheckAlloc(hull->points);
 			for (size_t p = 0; p < hull->numPoints; p++)
 			{
@@ -199,7 +199,7 @@ ModelDefinition *LoadModelInternal(const char *asset)
 		ModelStaticCollider staticCollider;
 		EXPECT_BYTES(sizeof(size_t), bytesRemaining);
 		staticCollider.numTriangles = ReadSizeT(reader);
-		staticCollider.tris = malloc(sizeof(JPH_Triangle) * staticCollider.numTriangles);
+		staticCollider.tris = AllocArray(staticCollider.numTriangles, sizeof(JPH_Triangle));
 		CheckAlloc(staticCollider.tris);
 		for (size_t i = 0; i < staticCollider.numTriangles; i++)
 		{

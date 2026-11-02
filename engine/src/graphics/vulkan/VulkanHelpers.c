@@ -14,6 +14,7 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
@@ -757,11 +758,11 @@ void EnsureSpaceForUiElements(const size_t quadCount)
 
 		pendingTasks |= PENDING_TASK_UI_BUFFERS_RESIZE_BIT;
 
-		UiVertex *newVertices = realloc(buffers.ui.vertexData, buffers.ui.allocatedQuads * 4 * sizeof(UiVertex));
+		UiVertex *newVertices = ReallocArray(buffers.ui.vertexData, buffers.ui.allocatedQuads, 4 * sizeof(UiVertex));
 		CheckAlloc(newVertices);
 		buffers.ui.vertexData = newVertices;
 
-		uint32_t *newIndices = realloc(buffers.ui.indexData, buffers.ui.allocatedQuads * 6 * sizeof(uint32_t));
+		uint32_t *newIndices = ReallocArray(buffers.ui.indexData, buffers.ui.allocatedQuads, 6 * sizeof(uint32_t));
 		CheckAlloc(newIndices);
 		buffers.ui.indexData = newIndices;
 	}

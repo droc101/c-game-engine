@@ -192,8 +192,8 @@ target_sources(engine INTERFACE
         include/engine/helpers/MathEx.h
         src/helpers/PlatformHelpers.c
         include/engine/helpers/PlatformHelpers.h
-        src/helpers/Realloc.c
-        include/engine/helpers/Realloc.h
+        src/helpers/AllocHelpers.c
+        include/engine/helpers/AllocHelpers.h
 
         src/physics/MapPhysics.c
         include/engine/physics/MapPhysics.h

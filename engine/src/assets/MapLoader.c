@@ -8,6 +8,7 @@
 #include <engine/assets/MapLoader.h>
 #include <engine/assets/MapMaterialLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -224,7 +225,7 @@ bool LoadMap(Map *map, Asset *mapData)
 
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->vertexCount = ReadUint32(reader);
-		model->vertices = malloc(sizeof(MapVertex) * model->vertexCount);
+		model->vertices = AllocArray(model->vertexCount, sizeof(MapVertex));
 		CheckAlloc(model->vertices);
 		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
@@ -244,7 +245,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->indexCount = ReadUint32(reader);
 		EXPECT_BYTES_BOOL(sizeof(uint32_t) * model->indexCount, bytesRemaining);
-		model->indices = malloc(sizeof(uint32_t) * model->indexCount);
+		model->indices = AllocArray(model->indexCount, sizeof(uint32_t));
 		CheckAlloc(model->indices);
 		ReadBuffer(reader, sizeof(uint32_t) * model->indexCount, model->indices);
 	}
@@ -271,7 +272,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 		const size_t vertexCount = ReadSizeT(reader);
 		EXPECT_BYTES_BOOL(sizeof(Vector3) * vertexCount, bytesRemaining);
-		Vector3 *vertices = malloc(sizeof(Vector3) * vertexCount);
+		Vector3 *vertices = AllocArray(vertexCount, sizeof(Vector3));
 		CheckAlloc(vertices);
 		for (size_t k = 0; k < vertexCount; k++)
 		{

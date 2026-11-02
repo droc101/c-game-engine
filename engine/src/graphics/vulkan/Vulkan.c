@@ -16,9 +16,11 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/Vulkan.h>
 #include <engine/graphics/vulkan/VulkanActors.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/helpers/PlatformHelpers.h>
@@ -59,7 +61,6 @@
 #include <string.h>
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
-#include "engine/graphics/vulkan/VulkanDebug.h"
 
 #ifdef JPH_DEBUG_RENDERER
 #include <engine/graphics/vulkan/VulkanResources.h>
@@ -101,7 +102,7 @@ static inline void LoadSky(const ModelDefinition *model)
 
 	const ModelLod *lod = model->lods;
 
-	SkyVertex *vertices = malloc(sizeof(SkyVertex) * lod->vertexCount);
+	SkyVertex *vertices = AllocArray(lod->vertexCount, sizeof(SkyVertex));
 	CheckAlloc(vertices);
 	for (size_t i = 0; i < lod->vertexCount; i++)
 	{
@@ -321,16 +322,16 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 	VulkanTest(lunaResizeBuffer(device, &buffer->instanceData, instanceDataBufferSize),
 			   "Failed to resize map instance data buffer!");
 
-	const size_t shadedDrawInfoBufferSize = shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
-	const size_t unshadedDrawInfoBufferSize = unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand);
+	const size_t shadedDrawInfoBufferSize = shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand); // TODO overflow check
+	const size_t unshadedDrawInfoBufferSize = unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand); // TODO overflow check
 	VulkanTest(lunaResizeBuffer(device, &buffer->unculledShadedDrawInfo, shadedDrawInfoBufferSize),
 			   "Failed to resize unculled map shaded draw info buffer!");
 	VulkanTest(lunaResizeBuffer(device, &buffer->unculledUnshadedDrawInfo, unshadedDrawInfoBufferSize),
 			   "Failed to resize unculled map unshaded draw info buffer!");
-	const size_t shadedCullingInfoBufferSize = sizeof(uint32_t) + shadedMaterialCount * sizeof(CullingInfo);
+	const size_t shadedCullingInfoBufferSize = sizeof(uint32_t) + shadedMaterialCount * sizeof(CullingInfo); // TODO overflow check
 	VulkanTest(lunaResizeBuffer(device, &buffer->shadedCullingInfo, shadedCullingInfoBufferSize),
 			   "Failed to resize map shaded culling info buffer!");
-	const size_t unshadedCullingInfoBufferSize = sizeof(uint32_t) + unshadedMaterialCount * sizeof(CullingInfo);
+	const size_t unshadedCullingInfoBufferSize = sizeof(uint32_t) + unshadedMaterialCount * sizeof(CullingInfo); // TODO overflow check
 	VulkanTest(lunaResizeBuffer(device, &buffer->unshadedCullingInfo, unshadedCullingInfoBufferSize),
 			   "Failed to resize map unshaded culling info buffer!");
 	CreateMapModelDrawInfos(opaque, buffer, shadedDrawInfoBufferSize, unshadedDrawInfoBufferSize);
@@ -502,7 +503,7 @@ static inline void LoadMapModelsToBuffer(const size_t modelCount,
 static inline void UpdateMapInstanceData(const Map *map, const bool opaque, const MapModelsBuffer *buffer)
 {
 	const size_t materialCount = lunaGetBufferSize(buffer->instanceData) / sizeof(uint32_t);
-	uint32_t *textureIndices = malloc(sizeof(uint32_t) * materialCount);
+	uint32_t *textureIndices = AllocArray(materialCount, sizeof(uint32_t));
 	CheckAlloc(textureIndices);
 	size_t materialIndex = 0;
 	for (size_t i = 0; i < map->modelCount; i++)
@@ -879,10 +880,10 @@ static inline void LoadLights(const Map *map)
 
 	frustumCount = (map->lightCount + dynamicLights.length) * 6 + 1;
 	AvxAlignedFree(frustumCullingDatas);
-	frustumCullingDatas = AvxAlignedCalloc(sizeof(FrustumCullingData) * frustumCount);
+	frustumCullingDatas = AvxAlignedCalloc(sizeof(FrustumCullingData) * frustumCount); // TODO overflow check
 	CheckAlloc(frustumCullingDatas);
 
-	const size_t frustumShadowMapsBufferSize = sizeof(FrustumShadowMap) * frustumCount;
+	const size_t frustumShadowMapsBufferSize = sizeof(FrustumShadowMap) * frustumCount; // TODO overflow check
 	free(frustumShadowMaps);
 	frustumShadowMaps = malloc(frustumShadowMapsBufferSize);
 	CheckAlloc(frustumShadowMaps);
@@ -890,7 +891,7 @@ static inline void LoadLights(const Map *map)
 			   "Failed to resize frustum shadow maps buffer!");
 
 	AvxAlignedFree(lights);
-	lights = AvxAlignedCalloc(sizeof(VulkanLight) * (map->lightCount + dynamicLights.length));
+	lights = AvxAlignedCalloc(sizeof(VulkanLight) * (map->lightCount + dynamicLights.length)); // TODO overflow check
 	CheckAlloc(lights);
 	uint32_t frustumIndex = map->directionalLight == NULL ? 1 : 5;
 	uint32_t shadowMapIndex = 0;

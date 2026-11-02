@@ -67,8 +67,8 @@ void LoadModelLods(const ModelDefinition *model)
 		return;
 	}
 
-	const size_t verticesSize = lunaGetBufferSize(buffers.modelVertices) + vertexCount * sizeof(ModelVertex);
-	const size_t indicesSize = lunaGetBufferSize(buffers.modelIndices) + indexCount * sizeof(uint32_t);
+	const size_t verticesSize = lunaGetBufferSize(buffers.modelVertices) + vertexCount * sizeof(ModelVertex); // TODO overflow check
+	const size_t indicesSize = lunaGetBufferSize(buffers.modelIndices) + indexCount * sizeof(uint32_t); // TODO overflow check
 
 	void *newVertices = realloc(vertices, verticesSize);
 	CheckAlloc(newVertices);

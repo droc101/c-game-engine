@@ -8,6 +8,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/Font.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/Vector2.h>
@@ -143,9 +144,9 @@ void DrawTextAligned(const char *str,
 {
 	const Font *fontAsset = LoadFont(font);
 	const size_t stringLength = strlen(str);
-	float *verts = malloc(stringLength * sizeof(float[4][4]));
+	float *verts = AllocArray(stringLength, sizeof(float[4][4]));
 	CheckAlloc(verts);
-	uint32_t *indices = malloc(stringLength * sizeof(uint32_t[6]));
+	uint32_t *indices = AllocArray(stringLength, sizeof(uint32_t[6]));
 	CheckAlloc(indices);
 	BatchedQuadArray quads;
 	quads.verts = verts;
