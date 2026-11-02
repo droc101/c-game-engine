@@ -283,14 +283,14 @@ static void AddonsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(addonsOptionsMenu);
 }
 
-static void AddonsStateSet()
+static void AddonsStateSet(void)
 {
 	hasMadeChanges = false;
 	ReconstructUiStack();
 	EnterMenuBackgroundState();
 }
 
-static void AddonsStateDestroy()
+static void AddonsStateDestroy(void)
 {
 	if (addonsOptionsMenu != NULL)
 	{

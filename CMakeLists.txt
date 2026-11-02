@@ -49,7 +49,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 endif ()
 
 if (ENABLE_ASAN)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fvisibility=default")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fvisibility=default -shared-libasan -frtlib-add-rpath")
 endif ()
 
 if (WIN32)

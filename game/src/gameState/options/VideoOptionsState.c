@@ -246,7 +246,7 @@ static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(videoOptionsMenu);
 }
 
-static void VideoOptionsStateSet()
+static void VideoOptionsStateSet(void)
 {
 	if (videoOptionsMenu == NULL)
 	{
@@ -476,7 +476,7 @@ static void VideoOptionsStateSet()
 	hasChangedVideoOptions = false;
 }
 
-static void VideoOptionsStateDestroy()
+static void VideoOptionsStateDestroy(void)
 {
 	if (videoOptionsMenu != NULL)
 	{

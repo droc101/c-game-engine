@@ -134,7 +134,7 @@ static void RenderingTogglesStateRender(GlobalState *state, const double /*delta
 	ProcessOptionsMenu(renderingTogglesMenu);
 }
 
-static void RenderingTogglesStateSet()
+static void RenderingTogglesStateSet(void)
 {
 	if (renderingTogglesMenu == NULL)
 	{
@@ -173,7 +173,7 @@ static void RenderingTogglesStateSet()
 	UiStackResetFocus(renderingTogglesMenu->stack);
 }
 
-static void RenderingTogglesStateDestroy()
+static void RenderingTogglesStateDestroy(void)
 {
 	if (renderingTogglesMenu != NULL)
 	{

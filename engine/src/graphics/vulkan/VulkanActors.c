@@ -199,7 +199,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 	{
 		free(shadedModelsInstanceIndices);
 		free(unshadedModelsInstanceIndices);
-		free(modelsInstanceData);
+		AvxAlignedFree(modelsInstanceData);
 		free(shadedModelsDrawInfo);
 		free(unshadedModelsDrawInfo);
 		free(shadedModelsCullingInfo);
@@ -209,7 +209,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 		CheckAlloc(shadedModelsInstanceIndices);
 		unshadedModelsInstanceIndices = malloc(instanceIndicesBytes);
 		CheckAlloc(unshadedModelsInstanceIndices);
-		modelsInstanceData = AllocArray(reallocInfo->modelInstanceCount, sizeof(ActorModelInstanceData));
+		modelsInstanceData = AvxAlignedCalloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
 		CheckAlloc(modelsInstanceData);
 		shadedModelsDrawInfo = calloc(1, drawInfoBytes);
 		CheckAlloc(shadedModelsDrawInfo);

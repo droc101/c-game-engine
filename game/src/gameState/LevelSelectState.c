@@ -134,7 +134,7 @@ static void LoadLevelList()
 	EnumerateAssetsInFolder("map", &levelList, ".gmap");
 }
 
-static void LevelSelectStateSet()
+static void LevelSelectStateSet(void)
 {
 	GetState()->rpcState = IN_MENUS;
 	if (levelList.length == 0)
@@ -144,7 +144,7 @@ static void LevelSelectStateSet()
 	EnterMenuBackgroundState();
 }
 
-static void LevelSelectStateDestroy()
+static void LevelSelectStateDestroy(void)
 {
 	ListAndContentsFree(levelList);
 }
