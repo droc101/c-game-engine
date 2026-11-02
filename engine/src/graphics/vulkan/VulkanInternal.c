@@ -107,16 +107,14 @@ bool CreateLogicalDevice()
 		.features = vulkan10Features,
 	};
 	const char *const extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-	const LunaDeviceCreationInfo2 deviceCreationInfo = {
-		.extensionCount = ArrayLength(extensions),
-		.extensionNames = extensions,
+	const LunaDeviceCreationInfo deviceCreationInfo = {
+		.requiredExtensionCount = ArrayLength(extensions),
+		.requiredExtensionNames = extensions,
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
 		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
-		.allocatorCreateFlags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT |
-								VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
 	};
-	if (lunaCreateDevice2(&deviceCreationInfo, &device) != VK_SUCCESS)
+	if (lunaCreateDevice(&deviceCreationInfo, &device) != VK_SUCCESS)
 	{
 		return false;
 	}
