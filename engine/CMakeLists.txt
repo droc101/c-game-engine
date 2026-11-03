@@ -142,6 +142,8 @@ target_sources(engine INTERFACE
         include/engine/assets/KvlFile.h
         src/assets/AddonLoader.c
         include/engine/assets/AddonLoader.h
+        src/assets/KvlAsset.c
+        include/engine/assets/KvlAsset.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h
