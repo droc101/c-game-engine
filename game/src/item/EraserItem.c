@@ -44,7 +44,7 @@ static bool EraserItemCanTargetFunction(Item * /*this*/,
 	{
 		*crosshairColor = CROSSHAIR_COLOR_ENEMY;
 
-		if (IsInputActionJustPressed(physicsThreadInput, &primaryAttack) || true)
+		if (IsInputActionJustPressed(physicsThreadInput, &primaryAttack))
 		{
 			const GlobalState *state = GetState();
 			IncrementIntegerStatistic(GAME_STAT_ENEMIES_KILLED, 1);
