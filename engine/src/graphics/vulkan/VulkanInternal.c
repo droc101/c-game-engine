@@ -338,7 +338,7 @@ void CreateDescriptorSetLayouts()
 		},
 		{
 			.bindingName = "Lightmap",
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
