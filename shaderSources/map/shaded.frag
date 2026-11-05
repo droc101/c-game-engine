@@ -5,7 +5,7 @@
 #define NEW_SAMPLE_STRATEGY
 
 layout(set = 0, binding = 2) uniform texture2D lightmapImage;
-#define lightmap sampler2D(lightmapImage, samplers[4])
+#define lightmap sampler2D(lightmapImage, samplers[3])
 
 layout(location = 0) in vec2 inLightmapUV;
 
