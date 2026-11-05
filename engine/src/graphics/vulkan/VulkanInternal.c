@@ -573,7 +573,7 @@ void CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-			.descriptorCount = min(MAX_TEXTURES, sampledImageCount),
+			.descriptorCount = min(MAX_TEXTURES + 1, sampledImageCount),
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_SAMPLER,
@@ -581,11 +581,7 @@ void CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 3,
-		},
-		{
-			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 3,
+			.descriptorCount = 2,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
