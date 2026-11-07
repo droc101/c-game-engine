@@ -1,6 +1,6 @@
 {
   "description": "An arbitrary 2D sprite",
-  "extends": "actor",
+  "extends": "generic_prop",
   "renderers": [
     {
       "type": "orientation",
@@ -66,12 +66,6 @@
       "default": false,
       "type": "bool",
       "description": "Whether or not the sprite have solid collision"
-    },
-    "color": {
-      "display": "Tint Color",
-      "default": -1,
-      "type": "color",
-      "description": "The tint color of this sprite"
     }
   }
 }

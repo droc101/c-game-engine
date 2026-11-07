@@ -117,6 +117,8 @@ target_sources(engine INTERFACE
         include/engine/actor/logic/LogicStatistic.h
         src/actor/logic/LogicPrint.c
         include/engine/actor/logic/LogicPrint.h
+        src/actor/prop/DynamicModel.c
+        include/engine/actor/prop/DynamicModel.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h

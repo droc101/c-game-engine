@@ -1,0 +1,25 @@
+{
+  "extends": "generic_model_prop",
+  "description": "An arbitrary model",
+  "renderers": [
+    {
+      "type": "point",
+      "color": "$color",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "orientation",
+      "color": "$color",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "model",
+      "model": "$model",
+      "color": "$color",
+      "mod_color": "$color",
+      "skin": "$skin"
+    }
+  ],
+  "params": {
+  }
+}
