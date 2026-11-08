@@ -338,6 +338,10 @@ static inline uint32_t ImageMetadataBits(const Image *image)
 	{
 		bits |= (1u << 29u);
 	}
+	if (image->opaque)
+	{
+		bits |= (1u << 28u);
+	}
 	return bits;
 }
 
