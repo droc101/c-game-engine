@@ -609,15 +609,18 @@ static inline void CreatePerFrustumBuffers()
 	ListFree(perFrustumBuffersHandles);
 	ListInit(perFrustumBuffersHandles, LIST_POINTER);
 
-	const LunaBufferCreationInfo drawInfoBufferCreationInfo = {
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	};
 	const LunaBufferCreationInfo actorWallDrawInfoBufferCreationInfo = {
 		.size = sizeof(VkDrawIndirectCommand),
 		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+	};
+	const LunaBufferCreationInfo drawInfoBufferCreationInfo = {
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 	};
 	const LunaBufferCreationInfo instanceIndicesBufferCreationInfo = {
 		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 	};
 	List *drawInfoBufferLists[] = {
 		&buffers.actorModels.shadedDrawInfo,
