@@ -25,8 +25,6 @@ typedef enum LightType
 	LIGHT_TYPE_POINT,
 	/// Spotlight
 	LIGHT_TYPE_SPOT,
-	/// @warning Do not use. Exists for compatibility with SDK tools.
-	LIGHT_TYPE_AREA,
 	/**
 	 * Directional light, like a sun
 	 * @warning Do not use on dynamic lights
