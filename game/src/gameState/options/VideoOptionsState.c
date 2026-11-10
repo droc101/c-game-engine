@@ -75,10 +75,12 @@ static OptionsButtonOptions gpuTypeOptions = {
 	.values = gpuTypeButtonValues,
 };
 
+#ifdef SDL_PLATFORM_LINUX
 static OptionsButtonOptions preferWaylandOptions = {
 	.numValues = 2,
 	.values = preferWaylandButtonValues,
 };
+#endif
 
 static void BtnVideoOptionsBack(Control * /*control*/, void * /*extraData*/)
 {

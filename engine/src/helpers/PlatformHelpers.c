@@ -27,8 +27,6 @@
 #include <winbase.h>
 #include <dbghelp.h>
 
-static HANDLE singleInstanceMutex = NULL;
-
 // clang-format on
 #else
 #include <execinfo.h>
