@@ -44,6 +44,7 @@
 #include <vulkan/vulkan_core.h>
 
 #pragma region variables
+bool debugUtils = false;
 bool minimized = false;
 LunaDevice device = LUNA_NULL_HANDLE;
 VkPhysicalDeviceProperties physicalDeviceProperties = {0};
@@ -51,6 +52,7 @@ uint32_t queueFamilyIndex = -1u;
 VkQueue queue = VK_NULL_HANDLE;
 LunaCommandPool commandPool = LUNA_NULL_HANDLE;
 LunaCommandBuffer commandBuffer = LUNA_NULL_HANDLE;
+VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
 LunaCommandBuffer secondaryCommandBuffer = LUNA_NULL_HANDLE;
 LunaSemaphore semaphore = LUNA_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;

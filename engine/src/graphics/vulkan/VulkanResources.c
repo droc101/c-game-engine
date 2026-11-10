@@ -28,7 +28,7 @@ static const LunaBufferCreationInfo UNALIGNED_BUFFER_CREATION_INFO = {
 };
 static const LunaBufferCreationInfo UNALIGNED_BDA_BUFFER_CREATION_INFO = {
 	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-	.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT
+	.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 };
 static LunaBufferCreationInfo storageBufferCreationInfo = {
 	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,

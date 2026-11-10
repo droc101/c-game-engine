@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
@@ -38,25 +39,33 @@ void CreateInstance()
 	const char *const *extensionNames = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
 	VulkanTestBool(extensionNames, "Failed to acquire extensions required for SDL window!\n");
 
-	LunaInstanceCreationInfo instanceCreationInfo = {
+	const char **extensions = NULL;
+	VulkanTest(lunaInitializeVolk(), "Failed to initialize Volk!");
+	debugUtils = lunaIsInstanceExtensionAvailable(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	if (debugUtils)
+	{
+		extensions = malloc(sizeof(const char *) * (extensionCount + 1));
+		CheckAlloc(extensions);
+		for (uint32_t i = 0; i < extensionCount; i++)
+		{
+			extensions[i] = extensionNames[i];
+		}
+		extensions[extensionCount] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+	}
+
+	const LunaInstanceCreationInfo instanceCreationInfo = {
 		.apiVersion = VK_API_VERSION_1_2,
 
-		.extensionCount = extensionCount,
-		.extensionNames = extensionNames,
+		.extensionCount = debugUtils ? extensionCount + 1 : extensionCount,
+		.extensionNames = debugUtils ? extensions : extensionNames,
 
 #ifdef BUILDSTYLE_DEBUG
-		.enableValidation = true,
+		.enableValidation = !HasCliArg("--disable-validation"),
 #endif
 	};
-
-#ifdef BUILDSTYLE_DEBUG
-	if (HasCliArg("--disable-validation"))
-	{
-		instanceCreationInfo.enableValidation = false;
-	}
-#endif
-
 	VulkanTest(lunaCreateInstance(&instanceCreationInfo), "Failed to create instance!");
+
+	free(extensions);
 }
 
 void CreateSurface(SDL_Window *window)
@@ -139,6 +148,7 @@ void CreateCommandBuffers()
 	VulkanTest(lunaCreateCommandPool(device, &commandPoolCreationInfo, &commandPool), "Failed to create command pool!");
 	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &commandBuffer),
 			   "Failed to allocate command buffer!");
+	vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
 	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &secondaryCommandBuffer),
 			   "Failed to allocate secondary command buffer!");
 

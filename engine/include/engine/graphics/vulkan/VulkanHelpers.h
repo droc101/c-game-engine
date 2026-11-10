@@ -518,6 +518,7 @@ typedef struct FrustumData
 #pragma endregion typedefs
 
 #pragma region variables
+extern bool debugUtils;
 extern bool minimized;
 extern LunaDevice device;
 extern VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -525,6 +526,7 @@ extern uint32_t queueFamilyIndex;
 extern VkQueue queue;
 extern LunaCommandPool commandPool;
 extern LunaCommandBuffer commandBuffer;
+extern VkCommandBuffer vkCommandBuffer;
 extern LunaCommandBuffer secondaryCommandBuffer;
 extern LunaSemaphore semaphore;
 extern VkSurfaceKHR surface;

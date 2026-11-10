@@ -29,4 +29,8 @@ void VK_ToggleBakedLighting();
 
 void VK_SetDebugRendering(DebugRendering value);
 
+void VK_BeginDebugLabel(const char *formatString, ...);
+
+void VK_EndDebugLabel();
+
 #endif //GAME_VULKANDEBUG_H
