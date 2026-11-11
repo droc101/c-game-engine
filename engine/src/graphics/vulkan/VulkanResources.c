@@ -54,7 +54,7 @@ static inline void CreateUiBuffers()
 	buffers.ui.allocatedQuads = 0;
 	buffers.ui.freeQuads = MAX_UI_QUADS_INIT;
 
-	const size_t vertexBufferAllocationSize = MAX_UI_QUADS_INIT * 4 * sizeof(UiVertex); // TODO overflow check
+	const size_t vertexBufferAllocationSize = MAX_UI_QUADS_INIT * 4 * sizeof(UiVertex);
 	const LunaBufferCreationInfo vertexBufferCreationInfo = {
 		.size = vertexBufferAllocationSize,
 		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
@@ -64,7 +64,7 @@ static inline void CreateUiBuffers()
 	buffers.ui.vertexData = malloc(vertexBufferAllocationSize);
 	CheckAlloc(buffers.ui.vertexData);
 
-	const size_t indexBufferAllocationSize = MAX_UI_QUADS_INIT * 6 * sizeof(uint32_t); // TODO overflow check
+	const size_t indexBufferAllocationSize = MAX_UI_QUADS_INIT * 6 * sizeof(uint32_t);
 	const LunaBufferCreationInfo indexBufferCreationInfo = {
 		.size = indexBufferAllocationSize,
 		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
