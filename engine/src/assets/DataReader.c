@@ -3,6 +3,7 @@
 //
 
 #include <assert.h>
+#include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/structs/Asset.h>
 #include <engine/subsystem/Error.h>
@@ -10,8 +11,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "engine/assets/AssetReader.h"
 
 struct DataReader
 {

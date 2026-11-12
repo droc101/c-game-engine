@@ -18,9 +18,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static inline void CreateDynamicModelCollider(Actor *this,
-											  const Transform *transform,
-											  const bool useAABB)
+static inline void CreateDynamicModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {
 	// TODO: Created with JPH_MotionType_Static because I don't want it moving on its own, but it will need to be able to move via parenting system once that is added.
 
@@ -59,7 +57,7 @@ static void DynamicModelInit(Actor *this, const KvList params, const Transform *
 	{
 		LogWarning("Tried to create a " DYNAMIC_MODEL_ACTOR_NAME
 				   " with full collision, but the model file (\"%s\") does not have any!\n",
-				   KvGetString(params, "model", "model/quad.gmdl"));
+				   this->model->name);
 		CreateDynamicModelCollider(this, transform, true);
 	} else
 	{
