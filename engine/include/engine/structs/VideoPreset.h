@@ -2,12 +2,18 @@
 // Created by droc101 on 8/5/26.
 //
 
+/**
+ * @file VideoPreset.h
+ * Preset video options management
+ */
+
 #ifndef GAME_VIDEOPRESET_H
 #define GAME_VIDEOPRESET_H
 
 // forward decl.
 typedef struct Options Options;
 
+/// Preset video quality/speed options
 typedef enum VideoPreset
 {
 	VIDEO_PRESET_VERY_LOW,

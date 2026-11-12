@@ -2,6 +2,11 @@
 // Created by droc101 on 6/22/25.
 //
 
+/**
+ * @file Arguments.h
+ * Command-line argument parser
+ */
+
 #ifndef ARGUMENTS_H
 #define ARGUMENTS_H
 
@@ -9,6 +14,7 @@
 
 /**
  * Initialize the argument system with argc and argv from the main function.
+ * @private
  */
 void InitArguments(int processArgc, char **processArgv);
 
@@ -45,6 +51,7 @@ bool HasCliArg(const char *argument);
 
 /**
  * Get the raw argv array
+ * @private
  */
 char **GetArgv();
 

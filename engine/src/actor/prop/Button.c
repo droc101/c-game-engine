@@ -9,7 +9,6 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/subsystem/Timing.h>
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
@@ -47,7 +46,7 @@ static void ButtonUpdate(Actor *this, const double /*delta*/)
 	ButtonData *data = this->extraData;
 	if (data->pressed && data->resetDelay != -1)
 	{
-		const size_t timeDiff = GetTimeMs() - data->timePressed;
+		const size_t timeDiff = GetState()->map->msElapsed - data->timePressed;
 		if (timeDiff >= (size_t)data->resetDelay)
 		{
 			data->pressed = false;
@@ -76,7 +75,7 @@ static void ButtonInit(Actor *this, const KvList params, const Transform *transf
 	data->resetDelay = KvGetInt(params, "reset_delay_ms", -1);
 	if (data->pressed && data->resetDelay != -1)
 	{
-		data->timePressed = GetTimeMs();
+		data->timePressed = GetState()->map->msElapsed;
 	}
 	data->toggleMode = KvGetBool(params, "toggle_mode", false);
 	this->currentSkinIndex = data->pressed ? data->onSkin : data->offSkin;
@@ -91,7 +90,7 @@ static void ButtonInteract(Actor *this)
 	}
 	data->pressed = !data->pressed;
 	this->currentSkinIndex = data->pressed ? data->onSkin : data->offSkin;
-	data->timePressed = GetTimeMs();
+	data->timePressed = GetState()->map->msElapsed;
 	ActorFireOutput(this, data->pressed ? BUTTON_OUTPUT_PRESSED : BUTTON_OUTPUT_UNPRESSED, PARAM_NONE);
 }
 

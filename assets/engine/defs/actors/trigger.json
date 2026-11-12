@@ -4,7 +4,8 @@
   "renderers": [
     {
       "type": "point",
-      "color": "#FFFF00"
+      "color": "#FFFF00",
+      "viewport_mode": "2d"
     },
     {
       "type": "box",

@@ -9,6 +9,7 @@
 #include <engine/helpers/Arguments.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
+#include <engine/structs/Asset.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Item.h>
@@ -233,28 +234,33 @@ bool ChangeMapByName(const char *name)
 		LogError("Failed to load map due to map name %s being too long\n", name);
 		return false;
 	}
-	state.saveData->blueCoins = 0;
-	Map *map = CreateMap();
-	ChangeMap(map);
-	if (!LoadMap(map, LoadAsset(mapPath, false, false)))
+
+	Asset *mapAsset = LoadAsset(mapPath, false, false);
+	if (mapAsset)
 	{
-		// This will leak any previously loaded portions of the map, however it is likely that trying to free it will cause a crash.
-		state.map = NULL;
-		PhysicsThreadLockTickMutex();
-		ChangeMap(NULL);
-		PhysicsThreadUnlockTickMutex();
-		return false;
+		state.saveData->blueCoins = 0;
+		Map *map = CreateMap();
+		ChangeMap(map);
+		if (LoadMap(map, mapAsset))
+		{
+			map->mapName = strdup(name);
+			DiscordUpdateRPC();
+			return true;
+		}
 	}
-	map->mapName = strdup(name);
-	DiscordUpdateRPC();
-	return true;
+
+	FreeAsset(mapAsset);
+	PhysicsThreadLockTickMutex();
+	ChangeMap(NULL);
+	PhysicsThreadUnlockTickMutex();
+	return false;
 }
 
 void ReloadMap()
 {
 	if (state.map)
 	{
-		free(loadStateLevelname); // For some reason we *sometimes* leave a value in here so this is a saftey free
+		free(loadStateLevelname); // For some reason we *sometimes* leave a value in here so this is a safety free
 		loadStateLevelname = strdup(state.map->mapName);
 		SetGameState(&LoadingState);
 	}

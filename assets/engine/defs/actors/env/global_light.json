@@ -1,5 +1,5 @@
 {
-  "description": "Realtime ambient light",
+  "description": "Basic ambient light",
   "extends": "actor",
   "renderers": [
     {

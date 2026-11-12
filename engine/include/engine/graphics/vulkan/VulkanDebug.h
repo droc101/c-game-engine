@@ -18,6 +18,7 @@ typedef enum DebugRendering
 	DEBUG_RENDERING_NO_LIGHT_FALLOFF = 8,
 	DEBUG_RENDERING_DEPTH_ONLY = 9,
 	DEBUG_RENDERING_PRIMITIVES = 10,
+	DEBUG_RENDERING_DISABLE_DEPTH_PREPASS = 11,
 } DebugRendering;
 
 void VK_DPrintDevice();
@@ -27,5 +28,9 @@ void VK_DPrintSceneStatistics();
 void VK_ToggleBakedLighting();
 
 void VK_SetDebugRendering(DebugRendering value);
+
+void VK_BeginDebugLabel(const char *formatString, ...);
+
+void VK_EndDebugLabel();
 
 #endif //GAME_VULKANDEBUG_H

@@ -40,6 +40,9 @@
 #include <windows.h>
 #endif
 
+#define ASSET_FORMAT_MAGIC 0x454D4147
+#define ASSET_HEADER_SIZE (sizeof(uint32_t) + (sizeof(uint8_t) * 3) + (sizeof(size_t) * 2))
+
 DEFINE_DICT(AssetCache, const char *, M_CSTR_OPLIST, Asset, ASSET_OPLIST);
 
 static AssetCache assetCache;
@@ -377,7 +380,7 @@ void HotReloadAssets()
 	rendererQueuedActions |= QUEUED_ACTION_CLEAR_ALL_TEXTURES | QUEUED_ACTION_CLEAR_ALL_MODELS;
 }
 
-void DPrintAssetReader()
+void DebugEntryAssetReader()
 {
 	DPrintF("Primary Asset Cache: %zu asset(s)", COLOR_WHITE, AssetCache_size(assetCache));
 }

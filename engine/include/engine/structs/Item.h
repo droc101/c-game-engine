@@ -2,6 +2,11 @@
 // Created by droc101 on 1/21/26.
 //
 
+/**
+ * @file Item.h
+ * Default item definition functions
+ */
+
 #ifndef GAME_ITEM_H
 #define GAME_ITEM_H
 
@@ -17,13 +22,43 @@ typedef struct GlobalState GlobalState;
 typedef struct Item Item;
 typedef struct ItemDefinition ItemDefinition;
 
+/**
+ * Function signature for constructing a new item
+ * @param this Item to construct
+ */
 typedef void (*ItemConstructFunction)(Item *this);
+/**
+ * Function signature for destructing an item
+ * @param this The item to destruct
+ */
 typedef void (*ItemDestructFunction)(Item *this);
+/**
+ * Function signature for frame updating an item
+ * @param this The item to update
+ * @param state GlobalState
+ */
 typedef void (*ItemUpdateFunction)(Item *this, GlobalState *state);
+/**
+ * Function signature for physics updating an item
+ * @param this The item to update
+ * @param targetedActor The actor the player is looking at, or @c NULL
+ * @param crosshairColor The player's crosshair color
+ * @param delta Physics delta
+ */
 typedef bool (*ItemFixedUpdateFunction)(Item *this, Actor *targetedActor, Color *crosshairColor, double delta);
+/**
+ * Function signature for rendering an item's HUD
+ * @param this The item to render HUD for
+ */
 typedef void (*ItemHudRenderFunction)(Item *this);
+/**
+ * Function signature for when a player switches to an item
+ * @param this The item that was switched to
+ * @param viewmodel The viewmodel
+ */
 typedef void (*ItemSwitchFunction)(Item *this, Viewmodel *viewmodel);
 
+/// An item class definition
 struct ItemDefinition
 {
 	/// The display name of this item type
@@ -47,6 +82,7 @@ struct ItemDefinition
 	ItemSwitchFunction SwitchFrom;
 };
 
+/// An item in the player's inventory
 struct Item
 {
 	/// The definition of this item
@@ -55,18 +91,25 @@ struct Item
 	void *data;
 };
 
-void DefaultItemConstruct(Item *this);
+/// Default item construct function
+void DefaultItemConstruct(Item *);
 
-void DefaultItemDestruct(Item *this);
+/// Default item destruct function
+void DefaultItemDestruct(Item *);
 
-void DefaultItemUpdateFunction(Item *this, GlobalState *state);
+/// Default item update function
+void DefaultItemUpdateFunction(Item *, GlobalState *);
 
-bool DefaultItemCanTargetFunction(Item *this, Actor *targetedActor, Color *crosshairColor, double delta);
+/// Default item can target function
+bool DefaultItemCanTargetFunction(Item *, Actor *, Color *, double);
 
-void DefaultItemHudRenderFunction(Item *this);
+/// Default item HUD render function
+void DefaultItemHudRenderFunction(Item *);
 
-void DefaultItemSwitchToFunction(Item *this, Viewmodel *viewmodel);
+/// Default item switch to function
+void DefaultItemSwitchToFunction(Item *, Viewmodel *);
 
-void DefaultItemSwitchFromFunction(Item *this, Viewmodel *viewmodel);
+/// Default item switch from function
+void DefaultItemSwitchFromFunction(Item *, Viewmodel *);
 
 #endif //GAME_ITEM_H

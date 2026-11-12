@@ -19,10 +19,10 @@ vec4 sampleTexture(const uint textureIndex, const vec2 uv) {
         return texture(sampler2D(textures[nonuniformEXT(index)], samplers[(flags & 2) + 2 + (flags >> 2)]), uv);
     }
     if ((flags & 4) == 0) {
-        const ivec2 size = textureSize(sampler2D(textures[nonuniformEXT(textureIndex)], samplers[flags >> 1]), 0);
+        const ivec2 size = textureSize(sampler2D(textures[nonuniformEXT(index)], samplers[flags >> 1]), 0);
         const vec2 scaledUV = fract(uv) * size + 0.5;
         const vec2 adjustedUV = (ivec2(scaledUV) + clamp((fract(scaledUV) - 0.5) / fwidth(scaledUV), -0.5, 0.5)) / size;
-        return textureGrad(sampler2D(textures[nonuniformEXT(textureIndex)], samplers[flags >> 1]), adjustedUV, dFdx(uv), dFdy(uv));
+        return textureGrad(sampler2D(textures[nonuniformEXT(index)], samplers[flags >> 1]), adjustedUV, dFdx(uv), dFdy(uv));
     }
     return texture(sampler2D(textures[nonuniformEXT(index)], samplers[((flags & 2) >> 1) ^ 1]), uv);
 }

@@ -1,20 +1,29 @@
 {
   "description": "An arbitrary 2D sprite",
-  "extends": "actor",
+  "extends": "generic_prop",
   "renderers": [
     {
       "type": "orientation",
-      "color": "$color"
+      "color": "$color",
+      "viewport_mode": "2d"
     },
     {
       "type": "sprite",
       "texture": "$texture",
-      "tint_color": "$color"
+      "tint_color": "$color",
+      "viewport_mode": "2d"
     },
     {
       "type": "wall",
       "width": "$size:x",
-      "height": "$size:y"
+      "height": "$size:y",
+      "texture": "$texture",
+      "tint_color": "$color",
+      "uv_offset_x": "$uv_offset:x",
+      "uv_offset_y": "$uv_offset:y",
+      "uv_scale_x": "$uv_scale:x",
+      "uv_scale_y": "$uv_scale:y",
+      "unshaded": "$unshaded"
     }
   ],
   "params": {
@@ -57,12 +66,6 @@
       "default": false,
       "type": "bool",
       "description": "Whether or not the sprite have solid collision"
-    },
-    "color": {
-      "display": "Tint Color",
-      "default": -1,
-      "type": "color",
-      "description": "The tint color of this sprite"
     }
   }
 }

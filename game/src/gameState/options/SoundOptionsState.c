@@ -58,7 +58,7 @@ static void SoundOptionsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(soundOptionsMenu);
 }
 
-static void SoundOptionsStateSet()
+static void SoundOptionsStateSet(void)
 {
 	if (soundOptionsMenu == NULL)
 	{
@@ -134,7 +134,7 @@ static void SoundOptionsStateSet()
 	UiStackResetFocus(soundOptionsMenu->stack);
 }
 
-static void SoundOptionsStateDestroy()
+static void SoundOptionsStateDestroy(void)
 {
 	if (soundOptionsMenu != NULL)
 	{

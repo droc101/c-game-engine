@@ -2,6 +2,11 @@
 // Created by droc101 on 8/13/25.
 //
 
+/**
+ * @file Viewmodel.h
+ * Viewmodel definition
+ */
+
 #ifndef GAME_VIEWMODEL_H
 #define GAME_VIEWMODEL_H
 
@@ -12,6 +17,7 @@
 
 typedef struct Viewmodel Viewmodel;
 
+/// A viewmodel shown in first-person
 struct Viewmodel
 {
 	/// Whether to show the viewmodel

@@ -13,16 +13,19 @@
 
 /**
  * Record the start time of the frame for benchmarking
+ * @private
  */
 void BenchFrameStart();
 
 /**
  * Record the end time of the frame for benchmarking and update the highest and lowest frame times
+ * @private
  */
 void BenchFrameEnd();
 
 /**
  * Start or stop the benchmarking system
+ * @private
  */
 void BenchToggle();
 

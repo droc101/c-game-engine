@@ -2,6 +2,11 @@
 // Created by droc101 on 10/7/2024.
 //
 
+/**
+ * @file Slider.h
+ * Simple slider control
+ */
+
 #ifndef GAME_SLIDER_H
 #define GAME_SLIDER_H
 
@@ -11,9 +16,19 @@
 
 typedef struct SliderData SliderData;
 
+/**
+ * Callback signature for when a slider's value changes
+ * @param value The slider's value
+ */
 typedef void (*SliderCallback)(const ControlValue *value);
+/**
+ * Callback signature for getting the slider's label
+ * @param slider The slider to get the label for
+ * @return The text to show on the slider
+ */
 typedef char *(*SliderLabelFunction)(const Control *slider);
 
+/// @private
 struct SliderData
 {
 	char *label;
@@ -29,10 +44,17 @@ struct SliderData
 	SliderLabelFunction getLabel;
 };
 
-char *SliderLabelPercent(const Control *slider);
+/// Slider label function to show a percent
+char *SliderLabelPercent(const Control *);
 
-char *SliderLabelInteger(const Control *slider);
+/// Slider label function to show an integer
+char *SliderLabelInteger(const Control *);
 
+/**
+ * Get a slider's value as a float
+ * @param data The slider data to get the value from
+ * @return The slider's value as a float
+ */
 float GetSliderValueAsFloat(const SliderData *data);
 
 /**
@@ -48,8 +70,7 @@ float GetSliderValueAsFloat(const SliderData *data);
  * @param step The step value of the slider
  * @param altStep The step value of the slider when holding shift
  * @param getLabel The function to get the label of the slider
- * @param tooltip
- * @param tooltip
+ * @param tooltip The tooltip to show on the slider
  * @return The new Slider Control
  */
 Control *CreateSliderControl(Vector2 position,
@@ -65,10 +86,13 @@ Control *CreateSliderControl(Vector2 position,
 							 SliderLabelFunction getLabel,
 							 char *tooltip);
 
+/// @private
 void DestroySlider(const Control *c);
 
+/// @private
 void UpdateSlider(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
+/// @private
 void DrawSlider(const Control *c, ControlState state, Vector2 position);
 
 #endif //GAME_SLIDER_H

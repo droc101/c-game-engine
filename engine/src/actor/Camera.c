@@ -4,6 +4,7 @@
 
 #include <engine/actor/Camera.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>

@@ -2,6 +2,11 @@
 // Created by droc101 on 7/23/25.
 //
 
+/**
+ * @file ModelLoader.h
+ * Model asset loader & cache system
+ */
+
 #ifndef MODELLOADER_H
 #define MODELLOADER_H
 
@@ -10,16 +15,15 @@
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Collision/Shape/Shape.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
+/// Model asset version number
 #define MODEL_ASSET_VERSION 1
 
 /// The maximum number of models that can be loaded in any one execution of the game
 #define MAX_MODELS 128
-
-typedef enum ModelShader ModelShader;
-typedef enum CollisionModelType CollisionModelType;
 
 typedef struct Material Material;
 typedef struct ModelVertex ModelVertex;
@@ -29,10 +33,8 @@ typedef struct ModelDefinition ModelDefinition;
 typedef struct ModelConvexHull ModelConvexHull;
 typedef struct ModelStaticCollider ModelStaticCollider;
 
-/**
- * List of shaders a model can be rendered with
- */
-enum ModelShader
+/// List of shaders a model can be rendered with
+typedef enum ModelShader
 {
 	/// The sky shader. Do not use on standard models.
 	SHADER_SKY,
@@ -40,18 +42,20 @@ enum ModelShader
 	SHADER_UNSHADED,
 	/// A shader with basic lighting based on the vertex normals.
 	SHADER_SHADED,
-};
+} ModelShader;
 
-enum CollisionModelType
+/// The type of collision data a model contains
+typedef enum CollisionModelType
 {
-	/// This model does not contain a collision model.
+	/// This model does not contain a collision model (a bounding box will still be present).
 	COLLISION_MODEL_TYPE_NONE,
 	/// This model contains a static collision mesh (@c JPH_MeshShape)
 	COLLISION_MODEL_TYPE_STATIC,
 	/// This model contains a set of convex hulls in a compound shape (@c JPH_StaticCompoundShape)
 	COLLISION_MODEL_TYPE_DYNAMIC,
-};
+} CollisionModelType;
 
+/// A model material
 struct Material
 {
 	/// The texture name of the material
@@ -64,6 +68,7 @@ struct Material
 	bool castsShadows;
 };
 
+/// A model vertex
 struct ModelVertex
 {
 	/// The position of the vertex, in model space
@@ -78,6 +83,7 @@ struct ModelVertex
 	Vector2 lightmapUv;
 };
 
+/// A sub-mesh in a model
 struct ModelComponent
 {
 	/// The number of indices in this component
@@ -90,6 +96,7 @@ struct ModelComponent
 	float radius;
 };
 
+/// A level of detail mesh inside a model
 struct ModelLod
 {
 	/// The runtime-generated ID of this LOD
@@ -112,6 +119,7 @@ struct ModelLod
 	ModelComponent *components;
 };
 
+/// A loaded model asset
 struct ModelDefinition
 {
 	/// The runtime-generated ID of this model
@@ -151,6 +159,7 @@ struct ModelDefinition
 	JPH_Shape *collisionModelShape;
 };
 
+/// A convex hull collision mesh
 struct ModelConvexHull
 {
 	/// The points of the hull
@@ -161,6 +170,7 @@ struct ModelConvexHull
 	size_t numPoints;
 };
 
+/// A static collision mesh
 struct ModelStaticCollider
 {
 	/// The number of triangles in this mesh
@@ -171,6 +181,7 @@ struct ModelStaticCollider
 
 /**
  * Initialize the model loader and try to load the error model
+ * @private
  */
 void InitModelLoader();
 
@@ -178,6 +189,7 @@ void InitModelLoader();
  * Internal function to load a model.
  * @param asset The path to load
  * @return The loaded model, or @c NULL on error
+ * @private
  */
 ModelDefinition *LoadModelInternal(const char *asset);
 
@@ -192,17 +204,20 @@ ModelDefinition *LoadModel(const char *asset);
  * Fetch a cached model from an ID
  * @param id The model ID to fetch
  * @return The model with the given ID
+ * @private
  */
 extern ModelDefinition *GetModelFromId(size_t id);
 
 /**
  * Free a model asset
  * @param model The model to free
+ * @private
  */
 void FreeModel(ModelDefinition *model);
 
 /**
  * Destroy the model loader
+ * @private
  */
 void DestroyModelLoader();
 
@@ -221,6 +236,7 @@ JPH_Shape *CreateDynamicModelShape(size_t numHulls, const ModelConvexHull *hulls
  */
 JPH_Shape *CreateStaticModelShape(const ModelStaticCollider *staticCollider);
 
-void DPrintModelLoader();
+/// @private
+void DebugEntryModelLoader();
 
 #endif //MODELLOADER_H

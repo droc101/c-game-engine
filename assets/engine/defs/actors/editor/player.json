@@ -2,7 +2,8 @@
   "description": "The spawn point for the player",
   "renderers": [
     {
-      "type": "point"
+      "type": "point",
+      "viewport_mode": "2d"
     },
     {
       "type": "orientation"

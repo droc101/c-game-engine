@@ -2,12 +2,18 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file Error.h
+ * Error reporting and handling
+ */
+
 #ifndef GAME_ERROR_H
 #define GAME_ERROR_H
 
-#include <stdbool.h>
-
-/// Throw a fatal error
+/**
+ * Throw a fatal error with a detailed error handler
+ * @param error The error message
+ */
 #define Error(error) _ErrorInternal(error, __FILE__, __LINE__, __PRETTY_FUNCTION__) // NOLINT(*-include-cleaner)
 
 /**
@@ -19,6 +25,7 @@
 
 /**
  * Internal error handler for memory allocation failures
+ * @private
  */
 _Noreturn void _GameAllocFailure(); // NOLINT(*-reserved-identifier)
 
@@ -29,6 +36,7 @@ _Noreturn void _GameAllocFailure(); // NOLINT(*-reserved-identifier)
  * @param line Line number
  * @param function Function name
  * @warning Do not use this function directly, use the @c Error macro instead
+ * @private
  */
 // NOLINTNEXTLINE(*-reserved-identifier)
 _Noreturn void _ErrorInternal(char *error, const char *file, int line, const char *function);
@@ -48,13 +56,9 @@ _Noreturn void FriendlyError(const char *title, const char *description);
 void ShowWarning(const char *title, const char *description);
 
 /**
- * Shows an error message saying that vk/gl failed to initialize and offers to switch to the other or exit
- */
-_Noreturn void RenderInitError();
-
-/**
  * Sets the signal handler to catch @c SIGSEGV and @c SIGFPE
  * @note This intentionally only functions in release mode
+ * @private
  */
 void ErrorHandlerInit();
 

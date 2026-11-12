@@ -2,6 +2,11 @@
 // Created by droc101 on 8/27/26.
 //
 
+/**
+ * @file Achievements.h
+ * Achievement and statistic management system
+ */
+
 #ifndef GAME_ACHIEVEMENTS_H
 #define GAME_ACHIEVEMENTS_H
 
@@ -9,18 +14,23 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/// The data type tracked by a statistic
 typedef enum StatType
 {
+	/// Signed 32-bit integer
 	STAT_TYPE_INT,
+	/// Single precision float
 	STAT_TYPE_FLOAT,
 } StatType;
 
+/// Statistic value integer or float
 typedef union StatValue
 {
 	int32_t intValue;
 	float floatValue;
 } StatValue;
 
+/// Statistic definition
 typedef struct Stat
 {
 	/// Value type of this stat
@@ -38,6 +48,7 @@ typedef struct Stat
 	StatValue value;
 } Stat;
 
+/// Achievement definition
 typedef struct Achievement
 {
 	/// The icon to use when this achievement is locked
@@ -59,6 +70,7 @@ typedef struct Achievement
 	bool unlocked;
 } Achievement;
 
+/// Function signature used for game-side achievement & statistic registration
 typedef void (*RegisterGameAchievementsFunction)(void);
 
 /**
@@ -137,16 +149,19 @@ void RegisterFloatStatBasedAchievement(const char *key,
 /**
  * Initialize the achievement system
  * @param RegisterGameAchievements The function to call to register achievements
+ * @private
  */
 void InitAchievementSystem(RegisterGameAchievementsFunction RegisterGameAchievements);
 
 /**
  * Save achievements and statistics
+ * @private
  */
 void SaveAchievements();
 
 /**
  * Destroy the achievement system
+ * @private
  */
 void DestroyAchievementSystem();
 
@@ -185,6 +200,10 @@ int32_t GetIntegerStatistic(const char *stat);
  */
 float GetFloatStatistic(const char *stat);
 
+/**
+ * Get the data type of a statistic
+ * @param stat The statistic to get the type of
+ */
 StatType GetStatisticType(const char *stat);
 
 /**

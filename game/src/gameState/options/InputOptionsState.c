@@ -96,7 +96,7 @@ static void InputOptionsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(inputOptionsMenu);
 }
 
-static void InputOptionsStateSet()
+static void InputOptionsStateSet(void)
 {
 	if (inputOptionsMenu == NULL)
 	{
@@ -281,7 +281,7 @@ static void InputOptionsStateSet()
 	UiStackResetFocus(inputOptionsMenu->stack);
 }
 
-static void InputOptionsStateDestroy()
+static void InputOptionsStateDestroy(void)
 {
 	if (inputOptionsMenu != NULL)
 	{

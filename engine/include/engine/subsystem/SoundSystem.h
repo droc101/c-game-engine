@@ -2,6 +2,11 @@
 // Created by droc101 on 8/4/25.
 //
 
+/**
+ * @file SoundSystem.h
+ * Sound & music playback subsystem
+ */
+
 #ifndef SOUNDSYSTEM_H
 #define SOUNDSYSTEM_H
 
@@ -9,23 +14,29 @@
 /// (sounds that can play at the same time)
 #define SOUND_SYSTEM_CHANNEL_COUNT 32
 
+/// An invalid sound handle
 #define SOUND_SYSTEM_INVALID_HANDLE UINT64_MAX
 
-typedef enum SoundCategory SoundCategory;
-
+/**
+ * Callback signature for when a sound finishes
+ * @param data User provided extra data
+ */
 typedef void (*SoundFinishedCallback)(void *data);
 
 typedef struct SoundRequest SoundRequest;
 
+/// @private
 typedef uint64_t SoundHandle;
 
-enum SoundCategory
+/// Sound categories, each has its own volume slider
+typedef enum SoundCategory
 {
 	SOUND_CATEGORY_MUSIC,
 	SOUND_CATEGORY_SFX,
 	SOUND_CATEGORY_UI,
-};
+} SoundCategory;
 
+/// A request to play a sound
 struct SoundRequest
 {
 	/// The path to the sound asset to play
@@ -53,16 +64,19 @@ struct SoundRequest
 
 /**
  * Set up the sound system
+ * @private
  */
 void InitSoundSystem();
 
 /**
  * Clean up the sound system
+ * @private
  */
 void DestroySoundSystem();
 
 /**
  * Update the sound system
+ * @private
  */
 void UpdateSoundSystem();
 
@@ -113,6 +127,7 @@ void StopSound(SoundHandle effect);
  */
 void StopAllSounds();
 
+/// @private
 void DPrintSoundSystem();
 
 #endif //SOUNDSYSTEM_H

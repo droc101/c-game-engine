@@ -2,6 +2,11 @@
 // Created by droc101 on 4/26/2024.
 //
 
+/**
+ * @file AssetReader.h
+ * Manages asset file loading and cachine
+ */
+
 #ifndef GAME_ASSETREADER_H
 #define GAME_ASSETREADER_H
 
@@ -12,9 +17,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
+/// Asset container format version
 #define ASSET_FORMAT_VERSION 2
-#define ASSET_FORMAT_MAGIC 0x454D4147
-#define ASSET_HEADER_SIZE (sizeof(uint32_t) + (sizeof(uint8_t) * 3) + (sizeof(size_t) * 2))
 
 /**
  * Prints an error and returns NULL if there are not enough bytes remaining to read
@@ -31,6 +35,13 @@
 		} \
 		(bytesRemaining) -= (expected); \
 	}
+
+/**
+ * Prints an error and returns false if there are not enough bytes remaining to read
+ * @param expected The number of bytes expected to read
+ * @param bytesRemaining A variable containing the number of bytes remaining in the buffer. This macro will modify it.
+ * @warning This may leak memory due to early returns
+ */
 #define EXPECT_BYTES_BOOL(expected, bytesRemaining) \
 	{ \
 		if ((bytesRemaining) < (expected)) \
@@ -41,6 +52,9 @@
 		(bytesRemaining) -= (expected); \
 	}
 
+/**
+ * Expects bytesRemaining to be zero, and prints a warning if it is not
+ */
 #define EXPECT_EOF_BYTES(bytesRemaining) \
 	{ \
 		if ((bytesRemaining) > 0) \
@@ -51,12 +65,14 @@
 
 /**
  * Initialize the asset cache
+ * @private
  */
 void AssetCacheInit();
 
 /**
  * Invalidate the asset cache
  * @warning If anything still has a pointer to an asset, it will become invalid!
+ * @private
  */
 void DestroyAssetCache();
 
@@ -98,14 +114,22 @@ void RemoveAssetFromCache(const char *relPath);
  */
 void HotReloadAssets();
 
-void DPrintAssetReader();
+/// @private
+void DebugEntryAssetReader();
 
-#define TEXTURE(assetName) ("texture/" assetName ".gtex")
-#define SOUND(assetName) ("sound/" assetName ".gsnd")
-#define MAP(assetName) ("map/" assetName ".gmap")
-#define SHADER(assetName) ("shader/" assetName ".gshd")
-#define MODEL(assetName) ("model/" assetName ".gmdl")
-#define FONT(assetName) ("font/" assetName ".gfon")
-#define MAP_MATERIAL(assetName) ("material/" assetName ".gmtl")
+/// Create a fully qualified texture path
+#define TEXTURE(textureName) ("texture/" textureName ".gtex")
+/// Create a fully qualified sound path
+#define SOUND(soundName) ("sound/" soundName ".gsnd")
+/// Create a fully qualified map path
+#define MAP(mapName) ("map/" mapName ".gmap")
+/// Create a fully qualified shader path
+#define SHADER(shaderName) ("shader/" shaderName ".gshd")
+/// Create a fully qualified model path
+#define MODEL(modelName) ("model/" modelName ".gmdl")
+/// Create a fully qualified font path
+#define FONT(fontName) ("font/" fontName ".gfon")
+/// Create a fully qualified material path
+#define MAP_MATERIAL(materialName) ("material/" materialName ".gmtl")
 
 #endif //GAME_ASSETREADER_H

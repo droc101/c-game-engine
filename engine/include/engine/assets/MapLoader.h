@@ -2,12 +2,20 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file MapLoader.h
+ * Map asset loader
+ */
+
 #ifndef GAME_MAPLOADER_H
 #define GAME_MAPLOADER_H
 
 #include <engine/structs/Map.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+/// Map asset version number
+#define MAP_ASSET_VERSION 2
 
 /**
  * Load a map asset

@@ -2,12 +2,18 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file Vector2.h
+ * Vector2 utility functions
+ */
+
 // ReSharper disable CppRedundantInlineSpecifier
 #ifndef GAME_VECTOR2_H
 #define GAME_VECTOR2_H
 
 typedef struct Vector2 Vector2;
 
+/// A 2-component vector
 struct Vector2
 {
 	float x;
@@ -165,6 +171,11 @@ struct Vector2
 		Vector2Scale(vector, (1 / (divisor))); \
 	})
 
+/**
+ * Get the relative angle between two Vector2s
+ * @param a The first vector
+ * @param b The second vector
+ */
 #define Vector2RelativeAngle(a, b) \
 	({ \
 		static_assert(__builtin_types_compatible_p(typeof(a), Vector2) && \

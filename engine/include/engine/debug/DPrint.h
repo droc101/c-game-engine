@@ -2,6 +2,11 @@
 // Created by droc101 on 4/26/2024.
 //
 
+/**
+ * @file DPrint.h
+ * printf-like functions for drawing debug information to the screen
+ */
+
 #ifndef GAME_DPRINT_H
 #define GAME_DPRINT_H
 
@@ -12,6 +17,7 @@
 /**
  * Resets the DPrint Y position to the top of the screen
  * @note Should only be called once at the start of the physicsFrame
+ * @private
  */
 void ResetDPrintYPos();
 
@@ -30,8 +36,14 @@ void DPrint(const char *str, Color color);
  */
 void DPrintF(const char *format, Color color, ...);
 
+/**
+ * Add spacing between DPrint entries
+ */
 void DPrintSpacing(uint32_t spacing);
 
+/**
+ * Set whether DPrint should draw to the right side of the screen
+ */
 void DPrintSetSide(bool isRightSide);
 
 #endif //GAME_DPRINT_H

@@ -15,8 +15,10 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/structs/Color.h>
 #include <luna/lunaBuffer.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
 
@@ -76,4 +78,31 @@ void VK_SetDebugRendering(const DebugRendering value)
 {
 	specializationConstants.debugRendering = value;
 	rendererQueuedActions |= QUEUED_ACTION_RELOAD_ALL_SHADERS;
+}
+
+void VK_BeginDebugLabel(const char *formatString, ...)
+{
+	if (debugUtils)
+	{
+		char message[1024];
+		va_list args;
+		va_start(args, formatString);
+		vsnprintf(message, 1024, formatString, args);
+		va_end(args);
+		message[1023] = '\0';
+
+		const VkDebugUtilsLabelEXT label = {
+			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
+			.pLabelName = message,
+		};
+		vkCmdBeginDebugUtilsLabelEXT(vkCommandBuffer, &label);
+	}
+}
+
+void VK_EndDebugLabel()
+{
+	if (debugUtils)
+	{
+		vkCmdEndDebugUtilsLabelEXT(vkCommandBuffer);
+	}
 }

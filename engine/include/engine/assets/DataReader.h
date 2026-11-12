@@ -55,18 +55,17 @@ DeclareReadFunction(float, ReadFloat);
  * @param reader The DataReader to read from
  * @param readSize The length of the data to read
  * @param dest The buffer to write the data into
- * @note It is up to the caller to prevent out of bounds access
  */
 void ReadBuffer(DataReader *reader, size_t readSize, void *dest);
 
 /**
  * Reads a length and string from the given data at the given offset
  * @param reader The DataReader to read to
- * @param outLength Where to write the length of the string read
+ * @param bytesRemaining A pointer to the number of bytes remaining in the buffer
  * @return A pointer (must be freed) of the string read
  * @note This can return NULL, check for that
  */
-char *ReadStringSafe(DataReader *reader, size_t *outLength);
+char *ReadStringSafe(DataReader *reader, size_t *bytesRemaining);
 
 /**
  * Seek ahead in a DataReader without performing any reads

@@ -2,6 +2,11 @@
 // Created by droc101 on 4/7/26.
 //
 
+/**
+ * @file MapPhysics.h
+ * Standard map processing operations
+ */
+
 #ifndef GAME_MAPPHYSICS_H
 #define GAME_MAPPHYSICS_H
 

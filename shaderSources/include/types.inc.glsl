@@ -20,7 +20,7 @@ layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer Fru
 
 const uint LIGHT_TYPE_POINT = 0u;
 const uint LIGHT_TYPE_SPOT = 1u;
-const uint LIGHT_TYPE_DIRECTIONAL = 3u;
+const uint LIGHT_TYPE_DIRECTIONAL = 2u;
 
 struct Light {
     uint type; // Maps to an enum in C

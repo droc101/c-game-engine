@@ -2,12 +2,19 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file MathEx.h
+ * Various basic math functions
+ */
+
 #ifndef GAME_MATHEX_H
 #define GAME_MATHEX_H
 
 #include <stdint.h>
 
+/// Pi as a double
 #define PI 3.14159265358979323846
+/// Pi as a float
 #define PIf 3.14159265358979323846f
 
 /**
@@ -27,12 +34,16 @@
 #define max(a, b) ((a) < (b) ? (b) : (a))
 
 // NOLINTBEGIN(*-identifier-naming)
+/// @private
 int wrapi(int x, int min, int max);
 
+/// @private
 uint32_t wrapu(uint32_t x, uint32_t min, uint32_t max);
 
+/// @private
 float wrapf(float x, float min, float max);
 
+/// @private
 double wrapd(double x, double min, double max);
 // NOLINTEND(*-identifier-naming)
 

@@ -358,7 +358,7 @@ static void ControlsOptionsStateRender(GlobalState *state, const double /*delta*
 }
 
 
-static void ControlsOptionsStateSet()
+static void ControlsOptionsStateSet(void)
 {
 	if (controlOptionsMenu == NULL)
 	{
@@ -447,7 +447,7 @@ static void ControlsOptionsStateSet()
 	listenMode = NOT_LISTNENING;
 }
 
-static void ControlsOptionsStateDestroy()
+static void ControlsOptionsStateDestroy(void)
 {
 	if (controlOptionsMenu != NULL)
 	{

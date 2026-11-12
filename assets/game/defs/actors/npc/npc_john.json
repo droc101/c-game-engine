@@ -3,10 +3,19 @@
   "extends": "actor",
   "renderers": [
     {
-      "type": "point"
+      "type": "point",
+      "viewport_mode": "2d"
     },
     {
-      "type": "orientation"
+      "type": "orientation",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "wall",
+      "width": 16.0,
+      "height": 16.0,
+      "texture": "texture/actor/john.gtex",
+      "viewport_mode": "3d"
     }
   ],
   "inputs": {},

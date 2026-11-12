@@ -14,6 +14,7 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/graphics/vulkan/VulkanResources.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/Macros.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
@@ -43,6 +44,7 @@
 #include <vulkan/vulkan_core.h>
 
 #pragma region variables
+bool debugUtils = false;
 bool minimized = false;
 LunaDevice device = LUNA_NULL_HANDLE;
 VkPhysicalDeviceProperties physicalDeviceProperties = {0};
@@ -50,6 +52,7 @@ uint32_t queueFamilyIndex = -1u;
 VkQueue queue = VK_NULL_HANDLE;
 LunaCommandPool commandPool = LUNA_NULL_HANDLE;
 LunaCommandBuffer commandBuffer = LUNA_NULL_HANDLE;
+VkCommandBuffer vkCommandBuffer = VK_NULL_HANDLE;
 LunaCommandBuffer secondaryCommandBuffer = LUNA_NULL_HANDLE;
 LunaSemaphore semaphore = LUNA_NULL_HANDLE;
 VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -251,7 +254,7 @@ void CreateShadowMapRenderPass(const Map *map)
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 	};
 	const VkAttachmentReference depthAttachmentReference = {
@@ -261,12 +264,24 @@ void CreateShadowMapRenderPass(const Map *map)
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 		.pDepthStencilAttachment = &depthAttachmentReference,
 	};
-	const VkSubpassDependency dependency = {
-		.srcSubpass = VK_SUBPASS_EXTERNAL,
-		.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-		.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-		.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-		.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	const VkSubpassDependency dependencies[] = {
+		{
+			.srcSubpass = VK_SUBPASS_EXTERNAL,
+			.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+							VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT |
+							VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | VK_ACCESS_SHADER_READ_BIT,
+			.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		},
+		{
+			.srcSubpass = 0,
+			.dstSubpass = VK_SUBPASS_EXTERNAL,
+			.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+			.dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+		},
 	};
 	const VkRenderPassCreateInfo renderPassCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
@@ -274,8 +289,8 @@ void CreateShadowMapRenderPass(const Map *map)
 		.pAttachments = &depthAttachmentDescription,
 		.subpassCount = 1,
 		.pSubpasses = &subpassDescription,
-		.dependencyCount = 1,
-		.pDependencies = &dependency,
+		.dependencyCount = ArrayLength(dependencies),
+		.pDependencies = dependencies,
 	};
 	VulkanTest(vkCreateRenderPass(vkDevice, &renderPassCreateInfo, NULL, &shadowMapRenderPass),
 			   "Failed to create shadow map render pass!");
@@ -745,11 +760,11 @@ void EnsureSpaceForUiElements(const size_t quadCount)
 
 		pendingTasks |= PENDING_TASK_UI_BUFFERS_RESIZE_BIT;
 
-		UiVertex *newVertices = realloc(buffers.ui.vertexData, buffers.ui.allocatedQuads * 4 * sizeof(UiVertex));
+		UiVertex *newVertices = ReallocArray(buffers.ui.vertexData, buffers.ui.allocatedQuads, 4 * sizeof(UiVertex));
 		CheckAlloc(newVertices);
 		buffers.ui.vertexData = newVertices;
 
-		uint32_t *newIndices = realloc(buffers.ui.indexData, buffers.ui.allocatedQuads * 6 * sizeof(uint32_t));
+		uint32_t *newIndices = ReallocArray(buffers.ui.indexData, buffers.ui.allocatedQuads, 6 * sizeof(uint32_t));
 		CheckAlloc(newIndices);
 		buffers.ui.indexData = newIndices;
 	}
@@ -786,8 +801,8 @@ void DrawQuadInternal(const mat4 vertices_posXY_uvZW, const Color *color, const 
 	for (uint8_t i = 0; i < 4; i++)
 	{
 		memcpy(vertices, vertices_posXY_uvZW[i], 16);
-		memcpy((char *)(vertices) + 16, &color->r, 16);
-		((uint32_t *)(vertices++))[8] = textureIndex;
+		memcpy((char *)(vertices) + 16, color, 16);
+		(vertices++)->textureIndex = textureIndex;
 	}
 
 	indices[0] = vertexOffset;

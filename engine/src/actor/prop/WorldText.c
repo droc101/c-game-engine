@@ -66,6 +66,10 @@ static void WorldTextRenderUi(Actor *this)
 		}
 
 		const Vector2 screenPosition = ProjectPosition((float *)&position, cam);
+		if (screenPosition.x > (1 << 24) || screenPosition.y > (1 << 24))
+		{
+			return;
+		}
 		const Vector2 textSize = MeasureText(data->text, data->size, FONT("small_font"));
 		const Vector2 textPosition = v2(screenPosition.x - textSize.x / 2, screenPosition.y - textSize.y / 2);
 		DrawRect(textPosition.x - 4, textPosition.y - 4, textSize.x + 8, textSize.y + 8, data->backgroundColor);

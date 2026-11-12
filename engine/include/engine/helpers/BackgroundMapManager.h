@@ -2,6 +2,11 @@
 // Created by droc101 on 4/7/26.
 //
 
+/**
+ * @file BackgroundMapManager.h
+ * Menu background map manager
+ */
+
 #ifndef GAME_BACKGROUNDMAPMANAGER_H
 #define GAME_BACKGROUNDMAPMANAGER_H
 

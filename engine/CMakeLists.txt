@@ -34,7 +34,7 @@ message(STATUS "Fetching Luna...")
 FetchContent_Declare(
         Luna
         GIT_REPOSITORY https://github.com/NBT22/Luna
-        GIT_TAG efa78828f5c53eedbb938a603770544d33cde8dd
+        GIT_TAG ba315e8e97589ee269bbe9976ac09d82add149e3
         GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(Luna)
@@ -53,7 +53,7 @@ if (JOLT_BUILD_TYPE_RELWITHDEBINFO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 set(CROSS_PLATFORM_DETERMINISTIC ON)
 message(STATUS "Fetching JoltC/Jolt...")
-fetch_package(https://github.com/NBT22/joltc 226bd1e0afa8552917ffd56bca03ccb5c14ecd27 joltc)
+fetch_package(https://github.com/NBT22/joltc 509a71bff9bac39eadd9fb306e1d8090c8272968 joltc)
 
 if (ENABLE_STEAMWORKS)
     import_steamworks_sdk()
@@ -117,6 +117,8 @@ target_sources(engine INTERFACE
         include/engine/actor/logic/LogicStatistic.h
         src/actor/logic/LogicPrint.c
         include/engine/actor/logic/LogicPrint.h
+        src/actor/prop/DynamicModel.c
+        include/engine/actor/prop/DynamicModel.h
 
         src/assets/AssetReader.c
         include/engine/assets/AssetReader.h
@@ -142,6 +144,8 @@ target_sources(engine INTERFACE
         include/engine/assets/KvlFile.h
         src/assets/AddonLoader.c
         include/engine/assets/AddonLoader.h
+        src/assets/KvlAsset.c
+        include/engine/assets/KvlAsset.h
 
         src/debug/DPrint.c
         include/engine/debug/DPrint.h
@@ -192,13 +196,11 @@ target_sources(engine INTERFACE
         include/engine/helpers/MathEx.h
         src/helpers/PlatformHelpers.c
         include/engine/helpers/PlatformHelpers.h
-        src/helpers/Realloc.c
-        include/engine/helpers/Realloc.h
+        src/helpers/AllocHelpers.c
+        include/engine/helpers/AllocHelpers.h
 
         src/physics/MapPhysics.c
         include/engine/physics/MapPhysics.h
-        src/physics/Navigation.c
-        include/engine/physics/Navigation.h
         src/physics/Physics.c
         include/engine/physics/Physics.h
         src/physics/PhysicsThread.c

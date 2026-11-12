@@ -2,6 +2,11 @@
 // Created by droc101 on 4/21/2024.
 //
 
+/**
+ * @file List.h
+ * Dynamic resizable list
+ */
+
 #ifndef GAME_LIST_H
 #define GAME_LIST_H
 
@@ -14,6 +19,7 @@
 typedef struct List List;
 typedef struct LockingList LockingList;
 
+/// @private
 enum _ListType
 {
 	LIST_POINTER,
@@ -37,6 +43,7 @@ struct _ListData
 	};
 };
 
+/// A dynamic resizable list
 struct List
 {
 	/// The data that the list is storing
@@ -45,6 +52,7 @@ struct List
 	size_t length;
 };
 
+/// A @c List that has a mutex for thread safety
 struct LockingList
 {
 	/// The data that the list is storing
@@ -54,6 +62,8 @@ struct LockingList
 	/// The mutex used to ensure synchronization across threads
 	SDL_Mutex *mutex;
 };
+
+/// @privatesection
 
 void _ListInit(List *list, enum _ListType listType);
 void _LockingListInit(LockingList *list, enum _ListType listType);
@@ -95,6 +105,9 @@ void _LockingListFreeOnlyContents(const LockingList *list);
 void _ListAndContentsFree(List *list);
 void _LockingListAndContentsFree(LockingList *list);
 // NOLINTEND(*-reserved-identifier, *-identifier-naming)
+
+
+/// @publicsection
 
 
 /**

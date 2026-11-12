@@ -2,6 +2,11 @@
 // Created by droc101 on 7/22/26.
 //
 
+/**
+ * @file InputAction.h
+ * Rebindable input action management functions
+ */
+
 #ifndef GAME_INPUTACTION_H
 #define GAME_INPUTACTION_H
 
@@ -15,16 +20,24 @@
 // forward decl. to prevent cyclic includes
 typedef struct InputSystem InputSystem;
 
+/// Types of inputs that can be bound to an input action
 typedef enum InputActionBindType
 {
+	/// This input action is not bound
 	IA_UNBOUND,
+	/// This input action is bound to a keyboard key
 	IA_KEY,
+	/// This input action is bound to a mouse button
 	IA_MOUSE_BUTTON,
+	/// This input action is bound to a mouse wheel direction
 	IA_MOUSE_WHEEL,
+	/// This input action is bound to a controller button
 	IA_CONTROLLER_BUTTON,
+	/// This input action is bound to a controller axis direction
 	IA_CONTROLLER_AXIS,
 } InputActionBindType;
 
+/// Control axis options
 typedef enum InputActionControllerAxis
 {
 	LEFT_STICK_UP,
@@ -41,9 +54,12 @@ typedef enum InputActionControllerAxis
 
 typedef struct InputAction InputAction;
 
+/// A rebindable input action
 struct InputAction
 {
+	/// The keyboard/mouse binding type
 	InputActionBindType keyboardMouseBindType;
+	/// The controller binding type
 	InputActionBindType controllerBindType;
 	union
 	{

@@ -18,6 +18,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <vulkan/vulkan_core.h>
+#include "engine/graphics/vulkan/VulkanDebug.h"
 
 #ifdef JPH_DEBUG_RENDERER
 // Needed to #ifndef JPH_DEBUG_RENDERER_WIREFRAME
@@ -384,7 +385,9 @@ static inline void CreateShadedMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
@@ -461,7 +464,9 @@ static inline void CreateUnshadedMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -865,7 +870,9 @@ static inline void CreateShadedActorModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
@@ -947,7 +954,9 @@ static inline void CreateUnshadedActorModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -1036,7 +1045,9 @@ static inline void CreateActorWallPipelines()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
@@ -1055,7 +1066,9 @@ static inline void CreateActorWallPipelines()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,

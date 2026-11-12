@@ -2,6 +2,11 @@
 // Created by NBT22 on 7/31/25.
 //
 
+/**
+ * @file Player.h
+ * Player definitions & utility functions
+ */
+
 #ifndef PLAYER_H
 #define PLAYER_H
 
@@ -15,14 +20,19 @@
 #include <SDL3/SDL_mutex.h>
 #include <stdbool.h>
 
+/// The crosshair color to use when not looking at anything special
 #define CROSSHAIR_COLOR_NORMAL COLOR(0xFFFFCCCC)
+/// The crosshair color to use when looking at something interactable
 #define CROSSHAIR_COLOR_INTERACTABLE COLOR(0xFF006600)
+/// The crosshair color to use when looking at an enemy
 #define CROSSHAIR_COLOR_ENEMY COLOR(0xffff0000)
-#define CROSSHAIR_COLOR_INVISIBLE COLOR(0x00ff0000)
+/// Invisible crosshair color
+#define CROSSHAIR_COLOR_INVISIBLE COLOR(0x00000000)
 
 typedef struct Map Map;
 typedef struct Player Player;
 
+/// The player
 struct Player
 {
 	/// The player's 3d transform.
@@ -42,8 +52,11 @@ struct Player
 	};
 	/// True if the player is currently holding an actor, false if the player is targeting an actor instead
 	bool hasHeldActor;
+	/// Whether the player is currently in noclip
 	bool isNoclipActive;
+	/// Whether the player is currently in freecam
 	bool isFreecamActive;
+	/// Whether the player's flashlight is currently on
 	bool isFlashlightOn;
 
 	/// The player's camera
@@ -57,8 +70,10 @@ struct Player
 	SDL_Mutex *mutex;
 };
 
+/// @private
 void CreatePlayer(Player *player, JPH_PhysicsSystem *physicsSystem);
 
+/// @private
 void DestroyPlayer(Player *player);
 
 #endif //PLAYER_H

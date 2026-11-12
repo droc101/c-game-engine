@@ -2,6 +2,11 @@
 // Created by NBT22 on 9/10/26.
 //
 
+/**
+ * @file Macros.h
+ * Various utility macros
+ */
+
 #ifndef GAME_MACROS_H
 #define GAME_MACROS_H
 

@@ -1,6 +1,23 @@
 {
   "description": "A goal the player can collect",
   "extends": "actor",
+  "renderers": [
+    {
+      "type": "point",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "orientation",
+      "viewport_mode": "2d"
+    },
+    {
+      "type": "wall",
+      "width": 16.0,
+      "height": 16.0,
+      "texture": "texture/actor/goal0.gtex",
+      "viewport_mode": "3d"
+    }
+  ],
   "inputs": {
     "enable": {
       "description": "Allow the player to collect this goal"

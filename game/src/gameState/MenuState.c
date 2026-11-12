@@ -71,7 +71,7 @@ static void MenuStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(menuStack);
 }
 
-static void MenuStateSet()
+static void MenuStateSet(void)
 {
 	GetState()->rpcState = IN_MENUS;
 	if (menuStack == NULL)
@@ -137,7 +137,7 @@ static void MenuStateSet()
 	EnterMenuBackgroundState();
 }
 
-static void MenuStateDestroy()
+static void MenuStateDestroy(void)
 {
 	if (menuStack != NULL)
 	{

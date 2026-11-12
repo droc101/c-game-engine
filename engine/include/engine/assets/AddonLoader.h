@@ -2,6 +2,11 @@
 // Created by droc101 on 8/20/26.
 //
 
+/**
+ * @file AddonLoader.h
+ * Manages addon loading and configuration
+ */
+
 #ifndef GAME_ADDONLOADER_H
 #define GAME_ADDONLOADER_H
 
@@ -10,11 +15,14 @@
 #include <engine/structs/List.h>
 #include <stdbool.h>
 
+/// The type/expected contents of an addon
 typedef enum AddonType
 {
+	/// An asset pack is intended to override existing assets
 	ADDON_TYPE_ASSET_PACK,
 } AddonType;
 
+/// Addon definition
 typedef struct Addon
 {
 	/// Unique identifier for this addon
@@ -34,21 +42,26 @@ typedef struct Addon
 	AddonType type;
 } Addon;
 
+/// All loaded addons
 extern List addons;
+/// Enabled addon IDs
 extern List enabledAddons;
 
 /**
  * Initialize the addon loader
+ * @private
  */
 void InitAddonLoader();
 
 /**
  * Destroy the addon loader
+ * @private
  */
 void DestroyAddonLoader();
 
 /**
- * Apply enabled addon asset paths to the loaded game config. This does NOT trigger an asset reload, the caller must do that themselves
+ * Apply enabled addon asset paths to the loaded game config.
+ * @note This does NOT trigger an asset reload, the caller must do that themselves
  */
 void ApplyAddonAssetPaths();
 
@@ -66,16 +79,19 @@ char *GetAddonIcon(Addon *addon);
 
 /**
  * Reset enabled addons
+ * @private
  */
 void DefaultAddonSettings();
 
 /**
  * Load enabled addon settings
+ * @private
  */
 void LoadAddonSettings(ParamArray *from);
 
 /**
  * Save enabled addon settings
+ * @private
  */
 ParamArray SaveAddonSettings();
 

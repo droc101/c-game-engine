@@ -23,6 +23,7 @@
 #include <engine/actor/logic/LogicStatistic.h>
 #include <engine/actor/logic/LogicTimer.h>
 #include <engine/actor/prop/Button.h>
+#include <engine/actor/prop/DynamicModel.h>
 #include <engine/actor/prop/PhysicsModel.h>
 #include <engine/actor/prop/Sprite.h>
 #include <engine/actor/prop/StaticModel.h>
@@ -116,6 +117,7 @@ void RegisterActors(const RegisterGameActorsFunction RegisterGameActors)
 	RegisterButton();
 	RegisterWorldText();
 	RegisterPhysicsModel();
+	RegisterDynamicModel();
 
 	//other
 	RegisterIoProxy();

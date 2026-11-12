@@ -6,6 +6,7 @@
 #include <engine/graphics/Drawing.h>
 #include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/helpers/BackgroundMapManager.h>
+#include <engine/helpers/Macros.h>
 #include <engine/structs/GameState.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Options.h>
@@ -79,10 +80,15 @@ static OptionsButtonValue debugRenderingOptionValues[] = {
 		.tooltip = NULL,
 		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_PRIMITIVES},
 	},
+	{
+		.text = "Depth Pre-Pass Disabled",
+		.tooltip = NULL,
+		.value = {.type = CONTROL_VALUE_DWORD, .dwordValue = DEBUG_RENDERING_DISABLE_DEPTH_PREPASS},
+	},
 };
 
 static OptionsButtonOptions debugRenderingOptions = {
-	.numValues = 11,
+	.numValues = ArrayLength(debugRenderingOptionValues),
 	.values = debugRenderingOptionValues,
 };
 
@@ -128,7 +134,7 @@ static void RenderingTogglesStateRender(GlobalState *state, const double /*delta
 	ProcessOptionsMenu(renderingTogglesMenu);
 }
 
-static void RenderingTogglesStateSet()
+static void RenderingTogglesStateSet(void)
 {
 	if (renderingTogglesMenu == NULL)
 	{
@@ -167,7 +173,7 @@ static void RenderingTogglesStateSet()
 	UiStackResetFocus(renderingTogglesMenu->stack);
 }
 
-static void RenderingTogglesStateDestroy()
+static void RenderingTogglesStateDestroy(void)
 {
 	if (renderingTogglesMenu != NULL)
 	{

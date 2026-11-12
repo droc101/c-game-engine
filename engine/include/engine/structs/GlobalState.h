@@ -2,6 +2,11 @@
 // Created by droc101 on 4/22/2024.
 //
 
+/**
+ * @file GlobalState.h
+ * GlobalState management and utility functions
+ */
+
 #ifndef GLOBALSTATE_H
 #define GLOBALSTATE_H
 
@@ -20,6 +25,7 @@
 typedef struct GlobalState GlobalState;
 typedef struct SaveData SaveData;
 
+/// Gameplay session data
 struct SaveData
 {
 	/// Player health
@@ -34,7 +40,7 @@ struct SaveData
 	size_t currentItem;
 };
 
-// Global state of the game
+/// Global state of the engine
 struct GlobalState
 {
 	/// Current map
@@ -44,7 +50,7 @@ struct GlobalState
 
 	const GameState *gameState;
 	/// The number of physics frames that have passed since the last game state change
-	uint64_t physicsFrame;
+	_Atomic uint64_t physicsFrame;
 
 	/// The save data (persists between maps)
 	SaveData *saveData;
@@ -73,12 +79,14 @@ struct GlobalState
 /**
  * Load options
  * @warning This function should only be called once
+ * @private
  */
 void InitOptions();
 
 /**
  * Initialize the global state
  * @warning This function should only be called once
+ * @private
  */
 void InitState();
 
@@ -129,6 +137,7 @@ void SetGameState(const GameState *gameState);
 
 /**
  * Process any queued GameState change
+ * @private
  */
 void ProcessStateChangeQueue();
 
@@ -140,6 +149,7 @@ void ChangeMap(Map *map);
 
 /**
  * Destroy the global state
+ * @private
  */
 void DestroyGlobalState();
 

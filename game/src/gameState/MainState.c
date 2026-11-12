@@ -93,7 +93,7 @@ static void MainStateRender(GlobalState *state, const double /*delta*/)
 	RenderHUD();
 }
 
-static void MainStateSet()
+static void MainStateSet(void)
 {
 	GetState()->rpcState = IN_GAME;
 }

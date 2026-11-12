@@ -5,16 +5,21 @@
 #include <assert.h>
 #include <engine/assets/ModelLoader.h>
 #include <engine/graphics/vulkan/VulkanActors.h>
+#include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/helpers/Macros.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaTypes.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <volk.h>
+#include <vulkan/vulkan_core.h>
 
 List loadedModelIds = {0};
 List lodMaterialSlotsVertexData = {0};
@@ -35,6 +40,8 @@ void LoadModelLods(const ModelDefinition *model)
 		return;
 	}
 	ListAdd(loadedModelIds, model->id);
+
+	VK_BeginDebugLabel("Loading model '%s'", model->name);
 
 	int32_t vertexCount = 0;
 	uint32_t indexCount = 0;
@@ -117,6 +124,104 @@ void LoadModelLods(const ModelDefinition *model)
 
 	bufferVertexCount += vertexCount;
 	bufferIndexCount += indexCount;
+
+	VK_EndDebugLabel();
+}
+
+void LoadModelToBuffer(const ModelDefinition *model,
+					   const uint32_t lodIndex,
+					   const uint32_t skinIndex,
+					   ModelBuffer *buffer)
+{
+	assert(buffer != NULL);
+
+	if (model == NULL)
+	{
+		VulkanTest(lunaResizeBuffer(device, &buffer->instanceData, 0), "Failed to resize instance data buffer!");
+		VulkanTest(lunaResizeBuffer(device, &buffer->shadedDrawInfo, 0),
+				   "Failed to resize shaded material draw info buffer!");
+		VulkanTest(lunaResizeBuffer(device, &buffer->unshadedDrawInfo, 0),
+				   "Failed to resize unshaded material draw info buffer!");
+		return;
+	}
+
+	VK_BeginDebugLabel("Loading model '%s' into buffer", model->name);
+
+	LoadModelLods(model);
+
+	const uint32_t *materialIndices = model->skinMaterialIndices[skinIndex];
+
+	size_t shadedMaterialCount = 0;
+	size_t unshadedMaterialCount = 0;
+	for (size_t i = 0; i < model->materialSlotCount; i++)
+	{
+		if (model->materials[materialIndices[i]].shader == SHADER_SHADED)
+		{
+			shadedMaterialCount++;
+		} else
+		{
+			assert(model->materials[materialIndices[i]].shader == SHADER_UNSHADED);
+			unshadedMaterialCount++;
+		}
+	}
+
+	VulkanTest(lunaResizeBuffer(device,
+								&buffer->instanceData,
+								(shadedMaterialCount + unshadedMaterialCount) * sizeof(ModelInstanceData)),
+			   "Failed to resize instance data buffer!");
+	VulkanTest(lunaResizeBuffer(device,
+								&buffer->shadedDrawInfo,
+								shadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand)),
+			   "Failed to resize shaded material draw info buffer!");
+	VulkanTest(lunaResizeBuffer(device,
+								&buffer->unshadedDrawInfo,
+								unshadedMaterialCount * sizeof(VkDrawIndexedIndirectCommand)),
+			   "Failed to resize unshaded material draw info buffer!");
+
+	uint32_t shadedCount = 0;
+	List *materialSlotsVertexData = &ListGetNestedList(lodMaterialSlotsVertexData, model->lods[lodIndex].id);
+	for (uint32_t i = 0; i < model->materialSlotCount; i++)
+	{
+		const MaterialSlotVertexData *materialSlotVertexData = ListGetPointer(*materialSlotsVertexData, i);
+		const Material *material = model->materials + materialIndices[i];
+
+		ModelInstanceData instanceData;
+		instanceData.materialColor = material->color;
+		instanceData.textureIndex = TextureIndex(material->texture);
+		const LunaBufferWriteInfo instanceDataBufferWriteInfo = {
+			.size = SizeofMember(ModelInstanceData, materialColor) + SizeofMember(ModelInstanceData, textureIndex),
+			.data = &(instanceData.materialColor),
+			.offset = i * sizeof(ModelInstanceData) + offsetof(ModelInstanceData, materialColor),
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
+		};
+		VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffer->instanceData, &instanceDataBufferWriteInfo),
+				   "Failed to write instance data to buffer!");
+
+		VkDrawIndexedIndirectCommand drawInfo = {
+			.indexCount = materialSlotVertexData->indexCount,
+			.instanceCount = 1,
+			.firstIndex = materialSlotVertexData->firstIndex,
+			.vertexOffset = materialSlotVertexData->vertexOffset,
+			.firstInstance = i,
+		};
+		const LunaBufferWriteInfo drawInfoBufferWriteInfo = {
+			.size = sizeof(VkDrawIndexedIndirectCommand),
+			.data = &drawInfo,
+			.offset = (material->shader == SHADER_SHADED ? shadedCount : i - shadedCount) *
+					  sizeof(VkDrawIndexedIndirectCommand),
+			.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDIRECT_BUFFER,
+		};
+		VulkanTest(lunaWriteDataToBuffer(device,
+										 commandBuffer,
+										 material->shader == SHADER_SHADED ? buffer->shadedDrawInfo
+																		   : buffer->unshadedDrawInfo,
+										 &drawInfoBufferWriteInfo),
+				   "Failed to write draw info to buffer!");
+
+		shadedCount += material->shader == SHADER_SHADED ? 1 : 0;
+	}
+
+	VK_EndDebugLabel();
 }
 
 void ClearModelCache()

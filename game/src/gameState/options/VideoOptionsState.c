@@ -75,10 +75,12 @@ static OptionsButtonOptions gpuTypeOptions = {
 	.values = gpuTypeButtonValues,
 };
 
+#ifdef SDL_PLATFORM_LINUX
 static OptionsButtonOptions preferWaylandOptions = {
 	.numValues = 2,
 	.values = preferWaylandButtonValues,
 };
+#endif
 
 static void BtnVideoOptionsBack(Control * /*control*/, void * /*extraData*/)
 {
@@ -246,7 +248,7 @@ static void VideoOptionsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(videoOptionsMenu);
 }
 
-static void VideoOptionsStateSet()
+static void VideoOptionsStateSet(void)
 {
 	if (videoOptionsMenu == NULL)
 	{
@@ -476,7 +478,7 @@ static void VideoOptionsStateSet()
 	hasChangedVideoOptions = false;
 }
 
-static void VideoOptionsStateDestroy()
+static void VideoOptionsStateDestroy(void)
 {
 	if (videoOptionsMenu != NULL)
 	{

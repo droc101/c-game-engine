@@ -2,48 +2,48 @@
 // Created by droc101 on 10/27/24.
 //
 
+/**
+ * @file Options.h
+ * Options loading & saving
+ */
+
 #ifndef GAME_OPTIONS_H
 #define GAME_OPTIONS_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef enum OptionsMsaa OptionsMsaa;
-typedef enum OptionsAnisotropy OptionsAnisotropy;
-typedef enum OptionsGpuType OptionsGpuType;
-typedef enum OptionsShadowMapResolution OptionsShadowMapResolution;
-typedef enum OptionsShadowMapSoftShadowQuality OptionsShadowMapSoftShadowQuality;
-
 typedef struct Options Options;
 
-/**
- * Used the check the MSAA level setting
- */
-enum OptionsMsaa
+/// MSAA options
+typedef enum OptionsMsaa
 {
 	MSAA_NONE = 0,
 	MSAA_2X = 1,
 	MSAA_4X = 2,
 	MSAA_8X = 3,
-};
+} OptionsMsaa;
 
-enum OptionsAnisotropy
+/// Anisotropic filtering options
+typedef enum OptionsAnisotropy
 {
 	ANISOTROPY_NONE = 0,
 	ANISOTROPY_2X = 1,
 	ANISOTROPY_4X = 2,
 	ANISOTROPY_8X = 3,
 	ANISOTROPY_16X = 4,
-};
+} OptionsAnisotropy;
 
-enum OptionsGpuType
+/// Preferred GPU type options
+typedef enum OptionsGpuType
 {
 	GPU_TYPE_INTEGRATED,
 	GPU_TYPE_DEDICATED,
 	GPU_TYPE_SOFTWARE,
-};
+} OptionsGpuType;
 
-enum OptionsShadowMapResolution
+/// Shadow map resolution options
+typedef enum OptionsShadowMapResolution
 {
 	SHADOW_MAP_RESOLUTION_DISABLED = 0,
 	SHADOW_MAP_RESOLUTION_1024 = 1,
@@ -51,17 +51,19 @@ enum OptionsShadowMapResolution
 	SHADOW_MAP_RESOLUTION_4096 = 3,
 	SHADOW_MAP_RESOLUTION_8192 = 4,
 	SHADOW_MAP_RESOLUTION_16384 = 5,
-};
+} OptionsShadowMapResolution;
 
-enum OptionsShadowMapSoftShadowQuality
+/// Soft shadow quality options
+typedef enum OptionsShadowMapSoftShadowQuality
 {
 	SHADOW_MAP_SOFT_SHADOW_QUALITY_LOWEST,
 	SHADOW_MAP_SOFT_SHADOW_QUALITY_LOW,
 	SHADOW_MAP_SOFT_SHADOW_QUALITY_MEDIUM,
 	SHADOW_MAP_SOFT_SHADOW_QUALITY_HIGH,
 	SHADOW_MAP_SOFT_SHADOW_QUALITY_ULTRA,
-};
+} OptionsShadowMapSoftShadowQuality;
 
+/// Engine options
 struct Options
 {
 	bool enableDiscordRpc;
@@ -124,12 +126,14 @@ struct Options
 /**
  * Read options from disk, or load defaults if no options file is found or is invalid
  * @param options The options to load into
+ * @private
  */
 void LoadOptions(Options *options);
 
 /**
  * Save options to disk
  * @param options The options to save
+ * @private
  */
 void SaveOptions(Options *options);
 

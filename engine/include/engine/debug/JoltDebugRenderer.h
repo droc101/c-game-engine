@@ -7,23 +7,28 @@
 
 #include <joltc/joltc.h>
 
-// Use wireframe for the Jolt debug renderer
-// Note: This does NOT actually enable the debug renderer
+/**
+ * Use wireframe for the Jolt debug renderer
+ * @note This does NOT actually enable the debug renderer, you need the CMake option for that
+ */
 #define JPH_DEBUG_RENDERER_WIREFRAME
 
 /**
  * Set up the static variables required for the Jolt debug renderer
+ * @private
  */
 void JoltDebugRendererInit();
 
 /**
  * Destroy the static variables created by the @c JoltDebugRendererInit function
+ * @private
  */
 void JoltDebugRendererDestroy();
 
 /**
  * Draw the bodies of a particular physics system using Jolt's built-in debug rendering system
  * @param physicsSystem The Jolt physics system to draw the bodies of
+ * @private
  */
 void JoltDebugRendererDrawBodies(const JPH_PhysicsSystem *physicsSystem);
 

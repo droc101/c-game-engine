@@ -107,6 +107,7 @@ static JPH_BroadPhaseLayerFilter *tripleLaserBroadPhaseLayerFilter;
 static JPH_ObjectLayerFilter *tripleLaserObjectLayerFilter;
 static JPH_BodyFilter *bodyFilter;
 
+static const float MIN_DISTANCE = 0.01f;
 static const float MAX_DISTANCE = 1024.0f;
 
 static inline void LaserCreateBody(Actor *this, const Transform *transform)
@@ -132,19 +133,18 @@ static void LaserUpdate(Actor *this, const double delta)
 		const JPH_PhysicsSystem *physicsSystem = GetState()->map->physicsSystem;
 		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
 		JPH_RayCastResult result = {};
-		Vector3 hitPointOffset = {};
 		const JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter = data->height == LASER_HEIGHT_TRIPLE
 																		 ? tripleLaserBroadPhaseLayerFilter
 																		 : normalLaserBroadPhaseLayerFilter;
 		const JPH_ObjectLayerFilter *objectLayerFilter = data->height == LASER_HEIGHT_TRIPLE
 																 ? tripleLaserObjectLayerFilter
 																 : normalLaserObjectLayerFilter;
-		const bool hit = JPH_NarrowPhaseQuery_CastRay2_GAME(narrowPhaseQuery,
+		const bool hit = JPH_NarrowPhaseQuery_CastRay3_GAME(narrowPhaseQuery,
 															this->bodyInterface,
 															this->bodyId,
+															MIN_DISTANCE,
 															MAX_DISTANCE,
 															&result,
-															&hitPointOffset,
 															broadPhaseLayerFilter,
 															objectLayerFilter,
 															bodyFilter);

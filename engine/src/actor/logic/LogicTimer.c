@@ -5,9 +5,9 @@
 #include <engine/actor/logic/LogicTimer.h>
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
+#include <engine/structs/GlobalState.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
-#include <engine/subsystem/Timing.h>
 #include <joltc/Math/Transform.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,7 +29,7 @@ static void LogicTimerStopHandler(Actor *this, const Actor * /*sender*/, const P
 static void LogicTimerStartHandler(Actor *this, const Actor * /*sender*/, const Param * /*param*/)
 {
 	LogicTimerData *data = (LogicTimerData *)this->extraData;
-	data->fireTime = GetTimeMs() + data->intervalMsec;
+	data->fireTime = GetState()->map->msElapsed + data->intervalMsec;
 	data->running = true;
 }
 
@@ -52,11 +52,12 @@ static void LogicTimerUpdate(Actor *this, const double /*delta*/)
 	LogicTimerData *data = this->extraData;
 	if (data->running)
 	{
-		if (GetTimeMs() >= data->fireTime)
+		const uint64_t msElapsed = GetState()->map->msElapsed;
+		if (msElapsed >= data->fireTime)
 		{
 			ActorFireOutput(this, LOGIC_TIMER_OUTPUT_ON_TIMER_EXPIRED, PARAM_NONE);
-			const uint64_t timeSinceExpiry = GetTimeMs() - data->fireTime;
-			data->fireTime = GetTimeMs() + (data->intervalMsec - timeSinceExpiry);
+			const uint64_t timeSinceExpiry = msElapsed - data->fireTime;
+			data->fireTime = msElapsed + (data->intervalMsec - timeSinceExpiry);
 		}
 	}
 }

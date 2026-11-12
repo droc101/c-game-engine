@@ -2,6 +2,11 @@
 // Created by droc101 on 10/27/2024.
 //
 
+/**
+ * @file RadioButton.h
+ * Simple radio button control
+ */
+
 #ifndef GAME_RADIOBUTTON_H
 #define GAME_RADIOBUTTON_H
 
@@ -12,8 +17,15 @@
 
 typedef struct RadioButtonData RadioButtonData;
 
-typedef void (*RadioButtonCallback)(bool, uint8_t, uint8_t);
+/**
+ * Callback signature for when a radio button is chosen
+ * @param checked Whether the radio button is checked
+ * @param groupId The group this radio button is in
+ * @param id This radio button's ID
+ */
+typedef void (*RadioButtonCallback)(bool checked, uint8_t groupId, uint8_t id);
 
+/// @private
 struct RadioButtonData
 {
 	char *label;
@@ -46,10 +58,13 @@ Control *CreateRadioButtonControl(Vector2 position,
 								  uint8_t id,
 								  char *tooltip);
 
+/// @private
 void DestroyRadioButton(const Control *c);
 
+/// @private
 void UpdateRadioButton(UiStack *stack, Control *c, Vector2 localMousePos, uint32_t ctlIndex);
 
+/// @private
 void DrawRadioButton(const Control *c, ControlState state, Vector2 position);
 
 #endif //GAME_RADIOBUTTON_H

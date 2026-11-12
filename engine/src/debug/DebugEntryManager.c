@@ -33,6 +33,7 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <SDL3/SDL_cpuinfo.h>
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_platform.h>
 #include <SDL3/SDL_video.h>
 #include <stdbool.h>
@@ -86,6 +87,7 @@ static void DebugEntryMap()
 		DPrintF("Actors: %d", COLOR_WHITE, GetState()->map->actors.length);
 		DPrintF("Models: %d", COLOR_WHITE, GetState()->map->modelCount);
 		DPrintF("Lights: %d", COLOR_WHITE, GetState()->map->lightCount);
+		DPrintF("Elapsed Time: %.2fs", COLOR_WHITE, GetState()->map->msElapsed / 1000.0);
 	}
 }
 
@@ -112,11 +114,13 @@ static void DebugEntryPlayerPosition()
 	if (GetState()->map)
 	{
 		const Player *player = &GetState()->map->player;
+		SDL_LockMutex(player->mutex);
 		DPrintF("Position: %.2f %.2f %.2f",
 				COLOR_WHITE,
 				player->transform.position.x,
 				player->transform.position.y,
 				player->transform.position.z);
+		SDL_UnlockMutex(player->mutex);
 	}
 }
 
@@ -180,15 +184,15 @@ static void DebugEntrySystem()
 	const Vector2 viewport = ActualWindowSizeIgnoreDPI();
 	DPrintF("Viewport: %.0fx%.0f @ %.0fx", COLOR_WHITE, viewport.x, viewport.y, GetState()->uiScale);
 	DPrintF("Windowing Platform: %s", COLOR_WHITE, SDL_GetCurrentVideoDriver());
-	DPrintGPUInfo();
+	DebugEntryGPUInfo();
 }
 
 static void DebugEntryAssetLoaders()
 {
-	DPrintAssetReader();
-	DPrintTextureLoader();
-	DPrintModelLoader();
-	DPrintFontLoader();
+	DebugEntryAssetReader();
+	DebugEntryTextureLoader();
+	DebugEntryModelLoader();
+	DebugEntryFontLoader();
 }
 
 static void DebugEntryIoQueue()

@@ -7,6 +7,7 @@
 #include <engine/graphics/vulkan/VulkanActors.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
@@ -198,7 +199,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 	{
 		free(shadedModelsInstanceIndices);
 		free(unshadedModelsInstanceIndices);
-		free(modelsInstanceData);
+		AvxAlignedFree(modelsInstanceData);
 		free(shadedModelsDrawInfo);
 		free(unshadedModelsDrawInfo);
 		free(shadedModelsCullingInfo);
@@ -208,7 +209,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 		CheckAlloc(shadedModelsInstanceIndices);
 		unshadedModelsInstanceIndices = malloc(instanceIndicesBytes);
 		CheckAlloc(unshadedModelsInstanceIndices);
-		modelsInstanceData = malloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
+		modelsInstanceData = AvxAlignedCalloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
 		CheckAlloc(modelsInstanceData);
 		shadedModelsDrawInfo = calloc(1, drawInfoBytes);
 		CheckAlloc(shadedModelsDrawInfo);

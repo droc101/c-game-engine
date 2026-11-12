@@ -2,6 +2,11 @@
 // Created by droc101 on 7/23/25.
 //
 
+/**
+ * @file TextureLoader.h
+ * Texture asset loader & cache system
+ */
+
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
@@ -10,6 +15,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// Texture asset version number
 #define TEXTURE_ASSET_VERSION 2
 
 /// The maximum number of textures that can be loaded in any one execution of the game
@@ -19,19 +25,21 @@
 #error "The required minimum for the maxPerStageDescriptorUpdateAfterBindSamplers limit is 500000, which should not be exceeded. Additionally, the upper two bits must remain unused, since they're used for texture metadata by the Vulkan code."
 #endif
 
+/// The name of the always-present missing texture
 #define MISSING_TEXTURE_NAME "dynamic/missingtex"
 
 typedef struct Image Image;
-typedef enum ImagePixelFormat ImagePixelFormat;
 
-enum ImagePixelFormat
+/// The format of the pixels in an image
+typedef enum ImagePixelFormat
 {
 	/// RGBA, uint8_t per channel
 	PIXEL_FORMAT_RGBA8,
 	/// RGBA, Float16 per channel
 	PIXEL_FORMAT_RGBA16F,
-};
+} ImagePixelFormat;
 
+/// A loaded texture asset
 struct Image
 {
 	/// The width of the image
@@ -94,14 +102,17 @@ bool RegisterImage(Image *image);
 
 /**
  * Initialize the texture loader
+ * @private
  */
 void InitTextureLoader();
 
 /**
  * Destroy the texture loader and clean up all loaded textures
+ * @private
  */
 void DestroyTextureLoader();
 
-void DPrintTextureLoader();
+/// @private
+void DebugEntryTextureLoader();
 
 #endif //TEXTURELOADER_H
