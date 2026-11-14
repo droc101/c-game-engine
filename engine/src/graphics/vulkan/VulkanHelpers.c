@@ -68,6 +68,7 @@ uint32_t pendingTasks = 0;
 uint32_t skyTextureIndex = 0;
 uint32_t shadowMapSlotsAvailable = 0;
 ShadowMapPushConstants shadowMapPushConstants = {0};
+CullingSpheresPushConstants cullingSpheresPushConstants = {0};
 VkRenderPass shadowMapRenderPass = VK_NULL_HANDLE;
 LunaImage shadowMapAtlas = LUNA_NULL_HANDLE;
 LunaImage directionalLightShadowMapAtlas = LUNA_NULL_HANDLE;

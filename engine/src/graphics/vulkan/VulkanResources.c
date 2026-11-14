@@ -11,6 +11,7 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaImage.h>
@@ -285,6 +286,81 @@ static inline void CreateSkyBuffers()
 			   "Failed to create sky index buffer!");
 }
 
+static inline void CreateCullingSpheresBuffers()
+{
+	static const uint32_t STACK_COUNT = 16;
+	static const uint32_t SLICE_COUNT = 32;
+	static const uint32_t VERTEX_COUNT = (STACK_COUNT + 1) * (SLICE_COUNT + 1);
+	static const uint32_t INDEX_COUNT = STACK_COUNT * SLICE_COUNT * 6;
+	static const uint32_t VERTEX_BUFFER_SIZE = sizeof(Vector3) * VERTEX_COUNT;
+	static const uint32_t INDEX_BUFFER_SIZE = sizeof(uint32_t) * INDEX_COUNT;
+
+
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.size = VERTEX_BUFFER_SIZE,
+	};
+	VulkanTest(lunaCreateBuffer(device, &vertexBufferCreationInfo, &buffers.cullingSpheres.vertices),
+			   "Failed to create culling spheres vertex buffer!");
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.size = INDEX_BUFFER_SIZE,
+	};
+	VulkanTest(lunaCreateBuffer(device, &indexBufferCreationInfo, &buffers.cullingSpheres.indices),
+			   "Failed to create culling spheres index buffer!");
+
+	Vector3 *vertices = malloc(VERTEX_BUFFER_SIZE);
+	CheckAlloc(vertices);
+	uint32_t *indices = malloc(INDEX_BUFFER_SIZE);
+	CheckAlloc(indices);
+
+	const float meshScale = 1.0f / cosf(PIf / (float)STACK_COUNT);
+	for (uint32_t stack = 0; stack <= STACK_COUNT; stack++)
+	{
+		const float theta = PIf * (float)stack / (float)STACK_COUNT;
+		for (uint32_t slice = 0; slice <= SLICE_COUNT; slice++)
+		{
+			const float phi = 2 * PIf * (float)slice / (float)SLICE_COUNT;
+			vertices[stack * (SLICE_COUNT + 1) + slice].x = meshScale * sinf(theta) * cosf(phi);
+			vertices[stack * (SLICE_COUNT + 1) + slice].y = meshScale * cosf(theta);
+			vertices[stack * (SLICE_COUNT + 1) + slice].z = meshScale * sinf(theta) * sinf(phi);
+		}
+	}
+	uint32_t index = 0;
+	for (uint32_t stack = 0; stack < STACK_COUNT; stack++)
+	{
+		for (uint32_t slice = 0; slice < SLICE_COUNT; slice++)
+		{
+			const uint32_t topLeft = stack * (SLICE_COUNT + 1) + slice;
+			const uint32_t bottomLeft = topLeft + SLICE_COUNT + 1;
+			indices[index++] = topLeft;
+			indices[index++] = bottomLeft;
+			indices[index++] = bottomLeft + 1;
+			indices[index++] = topLeft;
+			indices[index++] = bottomLeft + 1;
+			indices[index++] = topLeft + 1;
+		}
+	}
+
+	const LunaBufferWriteInfo vertexWriteInfo = {
+		.size = VERTEX_BUFFER_SIZE,
+		.data = vertices,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.cullingSpheres.vertices, &vertexWriteInfo),
+			   "Failed to write culling spheres vertex buffer!");
+	const LunaBufferWriteInfo indexWriteInfo = {
+		.size = INDEX_BUFFER_SIZE,
+		.data = indices,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.cullingSpheres.indices, &indexWriteInfo),
+			   "Failed to write culling spheres index buffer!");
+
+	free(vertices);
+	free(indices);
+}
+
 static inline void CreateDebugDrawBuffers()
 {
 #ifdef JPH_DEBUG_RENDERER
@@ -314,6 +390,7 @@ void CreateBuffers()
 	CreateModelBuffer(&buffers.viewmodel, "viewmodel");
 	CreateSkyBuffers();
 	CreateModelBuffer(&buffers.player, "player");
+	CreateCullingSpheresBuffers();
 	CreateDebugDrawBuffers();
 }
 

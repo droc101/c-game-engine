@@ -954,6 +954,7 @@ static inline void RecreateGraphicsPipelines()
 	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorModel);
 	lunaDestroyGraphicsPipeline(device, pipelines.shadedActorWall);
 	lunaDestroyGraphicsPipeline(device, pipelines.unshadedActorWall);
+	lunaDestroyGraphicsPipeline(device, pipelines.cullingSpheres);
 
 	CreateGraphicsPipelines();
 
@@ -2165,6 +2166,7 @@ void VK_RenderMap(Map *map, Camera *camera)
 	DrawMap(0, &pipelineBindInfo, false, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
 	DrawActors(0, &pipelineBindInfo, LUNA_NULL_HANDLE, LUNA_NULL_HANDLE);
 	DrawDebugRenderer(&pipelineBindInfo);
+	DrawCullingSpheres(&pipelineBindInfo);
 	if (camera->showPlayerModel)
 	{
 		const ModelDefinition *playerModel = LoadModel(MODEL("player"));

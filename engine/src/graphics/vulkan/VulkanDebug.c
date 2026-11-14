@@ -13,9 +13,14 @@
 #include <engine/graphics/RenderingHelpers.h>
 #include <engine/graphics/vulkan/VulkanDebug.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
+#include <engine/helpers/Macros.h>
 #include <engine/structs/Color.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/lunaBuffer.h>
+#include <luna/lunaDrawing.h>
+#include <luna/lunaTypes.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -105,4 +110,116 @@ void VK_EndDebugLabel()
 	{
 		vkCmdEndDebugUtilsLabelEXT(vkCommandBuffer);
 	}
+}
+
+CullingSpheresFilters cullingSpheresFilters = {
+	.opaqueMapModels = CULLING_SPHERES_FILTER_NONE,
+	.translucentMapModels = CULLING_SPHERES_FILTER_NONE,
+	.actorModels = CULLING_SPHERES_FILTER_BOTH,
+	.actorWalls = CULLING_SPHERES_FILTER_BOTH,
+};
+
+typedef struct CullingSpheresDrawInfo
+{
+	uint32_t filter;
+	CullingSpheresFilter filterBit;
+	VkDeviceAddress cullingInfo;
+	bool isActorModelBuffer;
+	Vector3 color;
+} CullingSpheresDrawInfo;
+
+void DrawCullingSpheres(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
+{
+	if (specializationConstants.debugRendering != DEBUG_RENDERING_CULLING_SPHERES ||
+		maximumCulledInstanceCount == 0 ||
+		frustumCullingDatas == NULL)
+	{
+		return;
+	}
+
+	VK_BeginDebugLabel("Draw culling spheres");
+
+	const CullingSpheresDrawInfo drawInfos[] = {
+		{
+			.filter = cullingSpheresFilters.opaqueMapModels,
+			.filterBit = CULLING_SPHERES_FILTER_SHADED,
+			.cullingInfo = frustumCullingDatas->shadedOpaqueMapModelsCullingInfo,
+			.color = {0.1f, 1.0f, 0.1f},
+		},
+		{
+			.filter = cullingSpheresFilters.opaqueMapModels,
+			.filterBit = CULLING_SPHERES_FILTER_UNSHADED,
+			.cullingInfo = frustumCullingDatas->unshadedOpaqueMapModelsCullingInfo,
+			.color = {1.0f, 0.4f, 0.1f},
+		},
+		{
+			.filter = cullingSpheresFilters.translucentMapModels,
+			.filterBit = CULLING_SPHERES_FILTER_SHADED,
+			.cullingInfo = frustumCullingDatas->shadedMapModelsCullingInfo,
+			.color = {0.1f, 0.5f, 0.1f},
+		},
+		{
+			.filter = cullingSpheresFilters.translucentMapModels,
+			.filterBit = CULLING_SPHERES_FILTER_UNSHADED,
+			.cullingInfo = frustumCullingDatas->unshadedMapModelsCullingInfo,
+			.color = {1.0f, 0.8f, 0.1f},
+		},
+		{
+			.filter = cullingSpheresFilters.actorModels,
+			.filterBit = CULLING_SPHERES_FILTER_SHADED,
+			.cullingInfo = frustumCullingDatas->shadedActorModelsCullingInfo,
+			.isActorModelBuffer = true,
+			.color = {1.0f, 0.1f, 1.0f},
+		},
+		{
+			.filter = cullingSpheresFilters.actorModels,
+			.filterBit = CULLING_SPHERES_FILTER_UNSHADED,
+			.cullingInfo = frustumCullingDatas->unshadedActorModelsCullingInfo,
+			.isActorModelBuffer = true,
+			.color = {0.1f, 1.0f, 1.0f},
+		},
+		{
+			.filter = cullingSpheresFilters.actorWalls,
+			.filterBit = CULLING_SPHERES_FILTER_SHADED,
+			.cullingInfo = frustumCullingDatas->shadedActorWallsCullingInfo,
+			.color = {0.1f, 0.5f, 1.0f},
+		},
+		{
+			.filter = cullingSpheresFilters.actorWalls,
+			.filterBit = CULLING_SPHERES_FILTER_UNSHADED,
+			.cullingInfo = frustumCullingDatas->unshadedActorWallsCullingInfo,
+			.color = {0.6f, 0.2f, 1.0f},
+		},
+	};
+
+	for (uint32_t i = 0; i < ArrayLength(drawInfos); i++)
+	{
+		const CullingSpheresDrawInfo *drawInfo = &drawInfos[i];
+		if ((drawInfo->filter & drawInfo->filterBit) == 0 || drawInfo->cullingInfo == 0)
+		{
+			continue;
+		}
+
+		cullingSpheresPushConstants.cullingInfo = drawInfo->cullingInfo;
+		cullingSpheresPushConstants.color = drawInfo->color;
+		cullingSpheresPushConstants.isActorModelBuffer = drawInfo->isActorModelBuffer;
+		cullingSpheresPushConstants.keptPixelIndexOffset = i;
+		VulkanTest(lunaPushConstants(device, commandBuffer, pipelines.cullingSpheres),
+				   "Failed to push constants for culling spheres pipeline!");
+		const LunaDrawIndexedInfo lunaDrawInfo = {
+			.pipeline = pipelines.cullingSpheres,
+			.pipelineBindInfo = pipelineBindInfo,
+			.indexCount = lunaGetBufferSize(buffers.cullingSpheres.indices) / sizeof(uint32_t),
+			.instanceCount = maximumCulledInstanceCount,
+		};
+		VulkanTest(lunaDrawBufferIndexed(device,
+										 commandBuffer,
+										 buffers.cullingSpheres.vertices,
+										 buffers.cullingSpheres.indices,
+										 VK_INDEX_TYPE_UINT32,
+										 &lunaDrawInfo),
+				   "Failed to draw culling spheres!");
+	}
+
+	VK_EndDebugLabel();
 }
