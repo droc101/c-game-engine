@@ -503,11 +503,12 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 
 		Vector3 position;
 		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &position);
-		const Vector3 offset = {
+		Vector3 offset = {
 			lod->components[j].centerOffset.x,
 			lod->components[j].centerOffset.y,
-			-lod->components[j].centerOffset.z,
+			lod->components[j].centerOffset.z,
 		};
+		JPH_Quat_Rotate(&actor->previousTickEndTransform.rotation, &offset, &offset);
 		Vector3_Add(&position, &offset, &cullingInfo->position);
 		cullingInfo->radius = lod->components[j].radius;
 		cullingInfo->castsShadows = material->castsShadows;
@@ -539,8 +540,13 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 	actorInstanceData->uvOffset = actor->wall->uvOffset;
 	actorInstanceData->modColor = actor->modColor;
 
-	// TODO: This does not take centerOffset into account
-	cullingInfo->position = position;
+	Vector3 centerOffset = {
+		.x = actorInstanceData->centerOffset.x * actorInstanceData->axis.x,
+		.y = actorInstanceData->centerOffset.y,
+		.z = actorInstanceData->centerOffset.x * actorInstanceData->axis.y,
+	};
+	JPH_Quat_Rotate(&rotation, &centerOffset, &centerOffset);
+	Vector3_Add(&position, &centerOffset, &cullingInfo->position);
 	cullingInfo->radius = Vector2Length(actorInstanceData->scale) / 2.0f;
 	cullingInfo->castsShadows = actor->wall->castsShadows;
 }

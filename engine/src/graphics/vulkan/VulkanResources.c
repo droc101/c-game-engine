@@ -289,7 +289,7 @@ static inline void CreateSkyBuffers()
 static inline void CreateCullingSpheresBuffers()
 {
 	static const uint32_t STACK_COUNT = 16;
-	static const uint32_t SLICE_COUNT = 32;
+	static const uint32_t SLICE_COUNT = 2 * STACK_COUNT;
 	static const uint32_t VERTEX_COUNT = (STACK_COUNT + 1) * (SLICE_COUNT + 1);
 	static const uint32_t INDEX_COUNT = STACK_COUNT * SLICE_COUNT * 6;
 	static const uint32_t VERTEX_BUFFER_SIZE = sizeof(Vector3) * VERTEX_COUNT;

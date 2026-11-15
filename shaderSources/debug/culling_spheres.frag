@@ -19,7 +19,7 @@ void main() {
 
     const vec3 toCenter = inCenter - camera.position;
     const float centerDistance = length(toCenter);
-    if (centerDistance > 150) {
+    if (centerDistance > 200) {
         discard;
     }
     const float closestApproach = dot(toCenter, rayDirection);
