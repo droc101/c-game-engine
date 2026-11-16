@@ -33,6 +33,8 @@ static void EntranceUpdate(Actor *this, double /*delta*/)
 			const MapTransition *transition = GetState()->map->transition;
 			LogDebug("Entrance \"%s\" activated\n", data->entranceName);
 
+			// TODO this doesn't properly handle rotation
+
 			Vector3 thisRot;
 			JPH_Quat_GetEulerAngles(&data->xfm.rotation, &thisRot);
 

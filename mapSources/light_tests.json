@@ -16246,6 +16246,3284 @@
                     "units_per_luxel": 1.0
                 }
             ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -224.0,
+            "origin_y": -68.0,
+            "origin_z": 0.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -32.0,
+                    "y": 4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 4.0,
+                    "z": 64.0
+                },
+                {
+                    "x": -32.0,
+                    "y": 4.0,
+                    "z": 64.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -4.0,
+                    "z": 64.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -4.0,
+                    "z": 64.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/dev/floor_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -288.0,
+            "origin_y": -68.0,
+            "origin_z": -9.5367431640625e-07,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -32.0,
+                    "y": 4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 4.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -32.0,
+                    "y": 4.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -4.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -4.0,
+                    "z": 16.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/dev/floor_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -336.0,
+            "origin_y": -68.0,
+            "origin_z": -23.999996185302734,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -16.0,
+                    "y": 4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 4.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -16.0,
+                    "y": 4.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -4.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -4.0,
+                    "z": 40.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/dev/floor_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -356.0,
+            "origin_y": -48.0,
+            "origin_z": -24.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 16.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 16.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 16.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 16.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -16.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -16.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -16.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -16.0,
+                    "z": 40.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -308.0,
+            "origin_y": -48.0,
+            "origin_z": 20.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -44.0,
+                    "y": 16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 44.0,
+                    "y": 16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 44.0,
+                    "y": 16.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -44.0,
+                    "y": 16.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -44.0,
+                    "y": -16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 44.0,
+                    "y": -16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 44.0,
+                    "y": -16.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -44.0,
+                    "y": -16.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -292.0,
+            "origin_y": -48.0,
+            "origin_z": -40.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -28.0,
+                    "y": 16.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 28.0,
+                    "y": 16.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 28.0,
+                    "y": 16.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -28.0,
+                    "y": 16.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -28.0,
+                    "y": -16.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 28.0,
+                    "y": -16.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 28.0,
+                    "y": -16.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -28.0,
+                    "y": -16.0,
+                    "z": 24.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -336.0,
+            "origin_y": -48.0,
+            "origin_z": -68.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -16.0,
+                    "y": 16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 16.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -16.0,
+                    "y": 16.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -16.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -16.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -16.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -292.0,
+            "origin_y": -28.0,
+            "origin_z": -1.9073486328125e-06,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -28.0,
+                    "y": 4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 28.0,
+                    "y": 4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 28.0,
+                    "y": 4.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -28.0,
+                    "y": 4.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -28.0,
+                    "y": -4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 28.0,
+                    "y": -4.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 28.0,
+                    "y": -4.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -28.0,
+                    "y": -4.0,
+                    "z": 16.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/dev/ceiling_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -336.0,
+            "origin_y": -28.0,
+            "origin_z": -23.999996185302734,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -16.0,
+                    "y": 4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 4.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -16.0,
+                    "y": 4.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -4.0,
+                    "z": -40.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -4.0,
+                    "z": 40.0
+                },
+                {
+                    "x": -16.0,
+                    "y": -4.0,
+                    "z": 40.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/dev/ceiling_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -260.0,
+            "origin_y": -24.0,
+            "origin_z": 40.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": 24.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -260.0,
+            "origin_y": -24.0,
+            "origin_z": -40.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": -24.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": 24.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": 24.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -260.0,
+            "origin_y": -8.0,
+            "origin_z": 9.5367431640625e-07,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 24.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 24.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 24.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 24.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -24.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -24.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -24.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -24.0,
+                    "z": 16.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -224.0,
+            "origin_y": -24.0,
+            "origin_z": -68.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -32.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -32.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -40.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -224.0,
+            "origin_y": -24.0,
+            "origin_z": 68.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -32.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -32.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -40.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -188.0,
+            "origin_y": -24.0,
+            "origin_z": 60.0,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -188.0,
+            "origin_y": -24.0,
+            "origin_z": -59.999996185302734,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -40.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -40.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -188.0,
+            "origin_y": -60.0,
+            "origin_z": 0.0,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 4.0,
+                    "z": 56.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 4.0,
+                    "z": 56.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -4.0,
+                    "z": 56.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -4.0,
+                    "z": 56.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -188.0,
+            "origin_y": 12.0,
+            "origin_z": 0.0,
+            "rotation_x": -0.0,
+            "rotation_y": 0.0,
+            "rotation_z": -0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 4.0,
+                    "z": 56.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 4.0,
+                    "z": 56.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -4.0,
+                    "z": -56.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -4.0,
+                    "z": 56.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -4.0,
+                    "z": 56.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/dev/wall_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -224.0,
+            "origin_y": 20.0,
+            "origin_z": 0.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -32.0,
+                    "y": 4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": 4.0,
+                    "z": 64.0
+                },
+                {
+                    "x": -32.0,
+                    "y": 4.0,
+                    "z": 64.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -4.0,
+                    "z": -64.0
+                },
+                {
+                    "x": 32.0,
+                    "y": -4.0,
+                    "z": 64.0
+                },
+                {
+                    "x": -32.0,
+                    "y": -4.0,
+                    "z": 64.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/dev/ceiling_test.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 180.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -260.0,
+            "origin_y": -50.0,
+            "origin_z": -14.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 14.0,
+                    "z": 2.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 14.0,
+                    "z": 2.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -14.0,
+                    "z": 2.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -14.0,
+                    "z": 2.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -260.0,
+            "origin_y": -50.0,
+            "origin_z": 14.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 14.0,
+                    "z": 2.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 14.0,
+                    "z": 2.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -14.0,
+                    "z": -2.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -14.0,
+                    "z": 2.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -14.0,
+                    "z": 2.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -260.0,
+            "origin_y": -34.0,
+            "origin_z": 0.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": 2.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 2.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 2.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 2.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -2.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -2.0,
+                    "z": -16.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -2.0,
+                    "z": 16.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -2.0,
+                    "z": 16.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/floor.gmtl",
+                    "texture_scale_x": 16.0,
+                    "texture_scale_y": 16.0,
+                    "texture_offset_x": 0.0,
+                    "texture_offset_y": 0.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
         }
     ],
     "actors": [
@@ -16647,6 +19925,272 @@
                 "skin": {
                     "type": "int",
                     "value": 0
+                }
+            }
+        },
+        {
+            "class": "entrance",
+            "position": {
+                "x": -272.0,
+                "y": -56.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": -90.0,
+                "z": -0.0
+            },
+            "connections": [],
+            "params": {
+                "name": {
+                    "type": "string",
+                    "value": "from_megatest"
+                }
+            }
+        },
+        {
+            "class": "trigger_map",
+            "position": {
+                "x": -312.0,
+                "y": -48.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "depth": {
+                    "type": "float",
+                    "value": 32.0
+                },
+                "entrance_name": {
+                    "type": "string",
+                    "value": "from_light_tests"
+                },
+                "height": {
+                    "type": "float",
+                    "value": 16.0
+                },
+                "map_name": {
+                    "type": "string",
+                    "value": "megatest"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "start_enabled": {
+                    "type": "bool",
+                    "value": true
+                },
+                "width": {
+                    "type": "float",
+                    "value": 16.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -224.0,
+                "y": 0.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 50.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.25
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -336.0,
+                "y": -48.0,
+                "z": -32.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 25.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.25
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                }
+            }
+        },
+        {
+            "class": "prop_world_text",
+            "position": {
+                "x": -200.0,
+                "y": -56.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "background_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "font_size": {
+                    "type": "int",
+                    "value": 16
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "text": {
+                    "type": "string",
+                    "value": "yeah you gotta use noclip for this map have fun"
+                },
+                "text_color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "visible_distance": {
+                    "type": "float",
+                    "value": 80.0
+                }
+            }
+        },
+        {
+            "class": "prop_sprite",
+            "position": {
+                "x": -188.0,
+                "y": -24.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": -0.0,
+                "y": 90.0,
+                "z": -0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 112.0,
+                        "y": 64.0
+                    }
+                },
+                "solid": {
+                    "type": "bool",
+                    "value": true
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/actor/monster0.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.1428571492433548,
+                        "y": 0.25
+                    }
                 }
             }
         }
