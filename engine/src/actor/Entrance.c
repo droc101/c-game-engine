@@ -33,18 +33,11 @@ static void EntranceUpdate(Actor *this, double /*delta*/)
 			const MapTransition *transition = GetState()->map->transition;
 			LogDebug("Entrance \"%s\" activated\n", data->entranceName);
 
-			// TODO this doesn't properly handle rotation
-
-			Vector3 thisRot;
-			JPH_Quat_GetEulerAngles(&data->xfm.rotation, &thisRot);
-
-			Vector3 absoluteRot;
-			JPH_RVec3_Add(&thisRot, &transition->relativeAngles, &absoluteRot);
-
 			Transform finalXfm;
-			JPH_Quat_FromEulerAngles(&absoluteRot, &finalXfm.rotation);
+			JPH_Quat_Multiply(&data->xfm.rotation, &transition->relativeAngle, &finalXfm.rotation);
 
-			JPH_RVec3_Add(&data->xfm.position, &transition->relativePosition, &finalXfm.position);
+			JPH_Quat_Rotate(&data->xfm.rotation, &transition->relativePosition, &finalXfm.position);
+			JPH_RVec3_Add(&data->xfm.position, &finalXfm.position, &finalXfm.position);
 
 			SetPlayerTransform(&GetState()->map->player, &finalXfm);
 			ActorFireOutput(this, ENTRANCE_OUTPUT_USED, PARAM_NONE);

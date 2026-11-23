@@ -20,6 +20,7 @@
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
@@ -83,7 +84,7 @@ struct MapTransition
 	/// The player's position relative to the entrance
 	Vector3 relativePosition;
 	/// The player's rotation relative to the entrance
-	Vector3 relativeAngles;
+	JPH_Quat relativeAngle;
 };
 
 /// An I/O connection that is waiting to be fired

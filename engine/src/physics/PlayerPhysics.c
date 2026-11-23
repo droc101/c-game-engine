@@ -208,7 +208,8 @@ void CreatePlayerPhysics(Player *player, JPH_PhysicsSystem *physicsSystem)
 void SetPlayerTransform(Player *player, const Transform *transform)
 {
 	JPH_CharacterVirtual_SetPosition(player->joltCharacter, &transform->position);
-	JPH_CharacterVirtual_SetRotation(player->joltCharacter, &transform->rotation);
+	// We intentionally don't set the player's physics rotation, since the player is a pill anyway
+	// This prevents the player's pill from ending up sideways
 	player->transform = *transform;
 }
 

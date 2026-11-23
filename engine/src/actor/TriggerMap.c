@@ -61,14 +61,13 @@ static void TriggerMapChange(const TriggerMapData *data)
 	CheckAlloc(transition);
 	transition->entranceName = strdup(data->entranceName);
 
-	Vector3 thisRot;
-	JPH_Quat_GetEulerAngles(&data->xfm.rotation, &thisRot);
-	Vector3 playerRot;
-	JPH_Quat_GetEulerAngles(&GetState()->map->player.transform.rotation, &playerRot);
-
-	JPH_RVec3_Subtract(&playerRot, &thisRot, &transition->relativeAngles);
-
 	JPH_RVec3_Subtract(&GetState()->map->player.transform.position, &data->xfm.position, &transition->relativePosition);
+	JPH_Quat_Inversed(&data->xfm.rotation, &transition->relativeAngle);
+	JPH_Quat_Rotate(&transition->relativeAngle, &transition->relativePosition, &transition->relativePosition);
+	JPH_Quat_Multiply(&transition->relativeAngle,
+					  &GetState()->map->player.transform.rotation,
+					  &transition->relativeAngle);
+
 
 	loadStateTransition = transition;
 	loadStateLevelname = strdup(data->mapName);

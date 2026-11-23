@@ -23523,14 +23523,14 @@
             },
             "rotation": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 90.0,
                 "z": 0.0
             },
             "connections": [],
             "params": {
                 "depth": {
                     "type": "float",
-                    "value": 32.0
+                    "value": 16.0
                 },
                 "entrance_name": {
                     "type": "string",
@@ -23554,7 +23554,7 @@
                 },
                 "width": {
                     "type": "float",
-                    "value": 16.0
+                    "value": 32.0
                 }
             }
         },
@@ -23607,13 +23607,13 @@
             "class": "entrance",
             "position": {
                 "x": -224.0,
-                "y": 0.0,
+                "y": 8.0,
                 "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
-                "y": -90.0,
-                "z": -0.0
+                "y": 270.0,
+                "z": 0.0
             },
             "connections": [],
             "params": {
