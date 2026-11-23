@@ -37,7 +37,7 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->modColor = COLOR_WHITE;
 	actor->bodyInterface = bodyInterface;
 	JPH_MutableCompoundShapeSettings *shapeSettings = JPH_MutableCompoundShapeSettings_Create();
-	actor->shape = JPH_MutableCompoundShape_Create(shapeSettings);
+	actor->shape = (JPH_Shape *)JPH_MutableCompoundShape_Create(shapeSettings);
 	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)shapeSettings);
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
 	actor->previousTickStartTransform = *transform;
@@ -177,7 +177,7 @@ void ActorSignalCancelQueuedIo(Actor *this, const Actor * /*sender*/, const Para
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_STATIC,
@@ -203,7 +203,7 @@ uint32_t ActorAddShapeWithTransform(Actor *this, const JPH_Shape *shape, const T
 
 	JPH_BodyLockWrite writeLock;
 	JPH_BodyLockInterface_LockWrite(lockInterface, this->bodyId, &writeLock);
-	const uint32_t index = JPH_MutableCompoundShape_AddShape(this->shape,
+	const uint32_t index = JPH_MutableCompoundShape_AddShape((JPH_MutableCompoundShape *)this->shape,
 															 &transform->position,
 															 &transform->rotation,
 															 shape,
@@ -253,7 +253,7 @@ void ActorRemoveParent(Actor *child)
 {
 	assert(child->parent);
 
-	JPH_MutableCompoundShape_RemoveShape(child->parent->shape, child->subShapeIndex);
+	JPH_MutableCompoundShape_RemoveShape((JPH_MutableCompoundShape *)child->parent->shape, child->subShapeIndex);
 
 	Vector3 parentPosition;
 	JPH_BodyInterface_GetPosition(child->parent->bodyInterface, child->parent->bodyId, &parentPosition);

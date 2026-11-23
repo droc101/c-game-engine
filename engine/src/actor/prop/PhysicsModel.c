@@ -26,7 +26,7 @@ static inline void CreatePhysicsModelCollider(Actor *this,
 											  const float massOverride)
 {
 	(void)ActorAddShape(this, useAABB ? this->model->boundingBoxShape : this->model->collisionModelShape);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Dynamic,
 																						   OBJECT_LAYER_DYNAMIC,

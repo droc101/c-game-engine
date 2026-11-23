@@ -32,7 +32,7 @@ struct ItemAxisHelperData
 static inline void CreateItemAxisHelperCollider(Actor *this, const Transform *transform)
 {
 	(void)ActorAddShape(this, this->model->boundingBoxShape);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Dynamic,
 																						   OBJECT_LAYER_DYNAMIC,

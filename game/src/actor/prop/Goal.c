@@ -38,7 +38,7 @@ static inline void CreateGoalSensor(Actor *this, const Transform *transform)
 {
 	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{4.0f, 4.0f, 4.0f}}, JPH_DefaultConvexRadius);
 	(void)ActorAddShape(this, shape);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_SENSOR,

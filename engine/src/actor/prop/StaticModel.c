@@ -22,7 +22,7 @@
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {
 	(void)ActorAddShape(this, useAABB ? this->model->boundingBoxShape : this->model->collisionModelShape);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_STATIC,

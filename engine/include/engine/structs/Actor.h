@@ -114,7 +114,7 @@ struct Actor
 		Transform offsetFromParent;
 	};
 
-	JPH_MutableCompoundShape *shape;
+	JPH_Shape *shape;
 	JPH_BodyID bodyId;
 	JPH_BodyInterface *bodyInterface;
 
