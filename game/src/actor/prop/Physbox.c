@@ -10,20 +10,31 @@
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
 #include <joltc/enums.h>
+#include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
+#include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
-																		  transform,
-																		  JPH_MotionType_Dynamic,
-																		  OBJECT_LAYER_DYNAMIC,
-																		  this);
+	(void)JPH_MutableCompoundShape_AddShape(this->shape,
+											&Vector3_Zero,
+											&JPH_Quat_Identity,
+											this->model->collisionModelShape,
+											0,
+											UINT32_MAX);
+
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+																						   transform,
+																						   JPH_MotionType_Dynamic,
+																						   OBJECT_LAYER_DYNAMIC,
+																						   this);
 	const JPH_MassProperties massProperties = {
 		.mass = 10.0f,
 	};

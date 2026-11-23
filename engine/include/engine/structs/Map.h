@@ -20,8 +20,8 @@
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
-#include <joltc/Math/Quat.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stddef.h>

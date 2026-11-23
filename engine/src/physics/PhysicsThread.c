@@ -15,6 +15,8 @@
 #include <engine/subsystem/Input.h>
 #include <engine/subsystem/Logging.h>
 #include <engine/subsystem/Timing.h>
+#include <joltc/enums.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <SDL3/SDL_error.h>
@@ -68,14 +70,39 @@ static inline void UpdateActorLods(const LockingList *actors, const Vector3 came
 	for (size_t i = 0; i < actorCount; i++)
 	{
 		Actor *actor = ListGetPointer(*actors, i);
-		actor->previousTickStartTransform = actor->previousTickEndTransform;
-		JPH_BodyInterface_GetPositionAndRotation(actor->bodyInterface,
-												 actor->bodyId,
-												 &actor->previousTickEndTransform.position,
-												 &actor->previousTickEndTransform.rotation);
-		Vector3_Subtract(&actor->previousTickEndTransform.position,
-						 &actor->previousTickStartTransform.position,
-						 &actor->deltaPosition);
+		if (actor->parent)
+		{
+			actor->previousTickStartTransform = actor->previousTickEndTransform;
+			JPH_BodyInterface_GetPositionAndRotation(actor->parent->bodyInterface,
+													 actor->parent->bodyId,
+													 &actor->previousTickEndTransform.position,
+													 &actor->previousTickEndTransform.rotation);
+			Vector3 rotatedOffset;
+			JPH_Quat_Rotate(&actor->previousTickEndTransform.rotation,
+							&actor->offsetFromParent.position,
+							&rotatedOffset);
+			JPH_Quat_Multiply(&actor->previousTickEndTransform.rotation,
+							  &actor->offsetFromParent.rotation,
+							  &actor->previousTickEndTransform.rotation);
+			Vector3_Add(&actor->previousTickEndTransform.position,
+						&rotatedOffset,
+						&actor->previousTickEndTransform.position);
+			JPH_BodyInterface_SetPositionAndRotation(actor->bodyInterface,
+													 actor->bodyId,
+													 &actor->previousTickEndTransform.position,
+													 &actor->previousTickEndTransform.rotation,
+													 JPH_Activation_DontActivate);
+		} else
+		{
+			actor->previousTickStartTransform = actor->previousTickEndTransform;
+			JPH_BodyInterface_GetPositionAndRotation(actor->bodyInterface,
+													 actor->bodyId,
+													 &actor->previousTickEndTransform.position,
+													 &actor->previousTickEndTransform.rotation);
+			Vector3_Subtract(&actor->previousTickEndTransform.position,
+							 &actor->previousTickStartTransform.position,
+							 &actor->deltaPosition);
+		}
 		if (!actor->hasModel || actor->model->lodCount == 1)
 		{
 			continue;

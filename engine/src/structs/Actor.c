@@ -15,6 +15,7 @@
 #include <engine/subsystem/Logging.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
@@ -23,6 +24,7 @@
 #include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -34,6 +36,9 @@ Actor *CreateActor(Transform *transform, const char *actorType, KvList params, J
 	actor->visible = true;
 	actor->modColor = COLOR_WHITE;
 	actor->bodyInterface = bodyInterface;
+	JPH_MutableCompoundShapeSettings *shapeSettings = JPH_MutableCompoundShapeSettings_Create();
+	actor->shape = JPH_MutableCompoundShape_Create(shapeSettings);
+	JPH_ShapeSettings_Destroy((JPH_ShapeSettings *)shapeSettings);
 	actor->bodyId = JPH_BodyId_InvalidBodyID;
 	actor->previousTickStartTransform = *transform;
 	actor->previousTickEndTransform = *transform;
@@ -172,15 +177,70 @@ void ActorSignalCancelQueuedIo(Actor *this, const Actor * /*sender*/, const Para
 
 void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 {
-	JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
-																						  transform,
-																						  JPH_MotionType_Static,
-																						  OBJECT_LAYER_STATIC,
-																						  this);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_STATIC,
+																						   this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_DontActivate);
-	JPH_ShapeSettings_Destroy(shapeSettings);
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
+}
+
+void ActorSetParent(Actor *child, Actor *parent)
+{
+	Transform parentTransform;
+	JPH_BodyInterface_GetPositionAndRotation(parent->bodyInterface,
+											 parent->bodyId,
+											 &parentTransform.position,
+											 &parentTransform.rotation);
+
+	JPH_BodyInterface_GetPositionAndRotation(child->bodyInterface,
+											 child->bodyId,
+											 &child->offsetFromParent.position,
+											 &child->offsetFromParent.rotation);
+	Vector3_Subtract(&child->offsetFromParent.position, &parentTransform.position, &child->offsetFromParent.position);
+	JPH_Quat_Inversed(&parentTransform.rotation, &parentTransform.rotation);
+	JPH_Quat_Rotate(&parentTransform.rotation, &child->offsetFromParent.position, &child->offsetFromParent.position);
+	JPH_Quat_Multiply(&parentTransform.rotation, &child->offsetFromParent.rotation, &child->offsetFromParent.rotation);
+
+	child->subShapeIndex = JPH_MutableCompoundShape_AddShape(parent->shape,
+															 &child->offsetFromParent.position,
+															 &child->offsetFromParent.rotation,
+															 (JPH_Shape *)child->shape,
+															 0,
+															 UINT32_MAX);
+
+	JPH_BodyInterface_SetObjectLayer(child->bodyInterface, child->bodyId, OBJECT_LAYER_NO_COLLISION);
+	JPH_BodyInterface_SetMotionType(child->bodyInterface,
+									child->bodyId,
+									JPH_MotionType_Static,
+									JPH_Activation_DontActivate);
+
+	child->parent = parent;
+	child->previousTickStartTransform = child->previousTickEndTransform;
+}
+
+void ActorRemoveParent(Actor *child)
+{
+	assert(child->parent);
+
+	JPH_MutableCompoundShape_RemoveShape(child->parent->shape, child->subShapeIndex);
+
+	Vector3 parentPosition;
+	JPH_BodyInterface_GetPosition(child->parent->bodyInterface, child->parent->bodyId, &parentPosition);
+	Vector3 childPosition;
+	JPH_BodyInterface_GetPosition(child->bodyInterface, child->bodyId, &childPosition);
+
+	Vector3_Add(&childPosition, &parentPosition, &childPosition);
+	TeleportActor(child, &childPosition, JPH_Activation_Activate);
+	// TODO: This could technically turn a static object into a dynamic one
+	JPH_BodyInterface_SetObjectLayer(child->bodyInterface, child->bodyId, OBJECT_LAYER_DYNAMIC);
+	JPH_BodyInterface_SetMotionType(child->bodyInterface,
+									child->bodyId,
+									JPH_MotionType_Dynamic,
+									JPH_Activation_Activate);
+
+	child->parent = NULL;
 }

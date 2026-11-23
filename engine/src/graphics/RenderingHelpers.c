@@ -31,6 +31,7 @@
 #include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
+#include <joltc/Physics/Body/BodyInterface.h>
 #include <math.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_surface.h>
@@ -118,15 +119,22 @@ void ActorTransformMatrix(const Actor *actor, JPH_Mat44 *transformMatrix)
 	if (actor->bodyId != JPH_BodyId_InvalidBodyID && actor->bodyInterface != NULL)
 	{
 		const float interpolationFactor = PhysicsInterpolationFactor();
-		JPH_Quat rotation;
-		JPH_Quat_Slerp(&actor->previousTickStartTransform.rotation,
-					   &actor->previousTickEndTransform.rotation,
-					   interpolationFactor,
-					   &rotation);
+
 		Vector3 interpolatedPosition;
-		Vector3_MultiplyScalar(&actor->deltaPosition, interpolationFactor, &interpolatedPosition);
-		Vector3_Add(&actor->previousTickStartTransform.position, &interpolatedPosition, &interpolatedPosition);
-		JPH_Mat44_RotationTranslation(&rotation, &interpolatedPosition, transformMatrix);
+		JPH_Quat rotation;
+		if (actor->parent)
+		{
+			JPH_BodyInterface_GetCenterOfMassTransform(actor->bodyInterface, actor->bodyId, transformMatrix);
+		} else
+		{
+			JPH_Quat_Slerp(&actor->previousTickStartTransform.rotation,
+						   &actor->previousTickEndTransform.rotation,
+						   interpolationFactor,
+						   &rotation);
+			Vector3_MultiplyScalar(&actor->deltaPosition, interpolationFactor, &interpolatedPosition);
+			Vector3_Add(&actor->previousTickStartTransform.position, &interpolatedPosition, &interpolatedPosition);
+			JPH_Mat44_RotationTranslation(&rotation, &interpolatedPosition, transformMatrix);
+		}
 	} else
 	{
 		LogWarning("ActorTransformMatrix called on actor which has no body!\n");

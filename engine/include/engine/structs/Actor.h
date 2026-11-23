@@ -17,6 +17,7 @@
 #include <engine/structs/KVList.h>
 #include <engine/structs/List.h>
 #include <joltc/enums.h>
+#include <joltc/joltc.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
@@ -26,6 +27,7 @@
 #include <stdint.h>
 
 typedef struct Actor Actor;
+typedef struct ChildActor ChildActor;
 typedef struct ActorConnection ActorConnection;
 
 /// Name of input to kill an actor
@@ -103,9 +105,15 @@ struct Actor
 	/// The color modifier of the actor's model
 	Color modColor;
 
-	/// The change in the actor's position over the last tick
-	Vector3 deltaPosition;
+	union
+	{
+		/// The change in the actor's position over the last tick
+		Vector3 deltaPosition;
+		/// The position and rotation offset from the parent
+		Transform offsetFromParent;
+	};
 
+	JPH_MutableCompoundShape *shape;
 	JPH_BodyID bodyId;
 	JPH_BodyInterface *bodyInterface;
 
@@ -119,6 +127,11 @@ struct Actor
 	Transform previousTickStartTransform;
 	/// The actor's transform as of the end of the last tick
 	Transform previousTickEndTransform;
+
+	/// The parent actor, or NULL if this actor has no parent
+	Actor *parent;
+	/// The index of this actor's subshape in the parent's MutableCompoundShape
+	uint32_t subShapeIndex;
 };
 
 /**
@@ -189,5 +202,9 @@ void ActorSignalKill(Actor *this, const Actor *sender, const Param *param);
  * @private
  */
 void ActorSignalCancelQueuedIo(Actor *this, const Actor *sender, const Param *param);
+
+void ActorSetParent(Actor *child, Actor *parent);
+
+void ActorRemoveParent(Actor *child);
 
 #endif //GAME_ACTOR_H
