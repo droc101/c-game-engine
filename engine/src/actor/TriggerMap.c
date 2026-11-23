@@ -42,7 +42,8 @@ static inline void CreateTriggerMapSensor(Actor *this, const Transform *transfor
 	const TriggerMapData *data = this->extraData;
 	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, data->height, data->depth / 2}},
 														JPH_DefaultConvexRadius);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	(void)ActorAddShape(this, shape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_SENSOR,

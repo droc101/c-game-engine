@@ -14,30 +14,19 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 static inline void CreateDynamicModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {
-	// TODO: Created with JPH_MotionType_Static because I don't want it moving on its own, but it will need to be able to move via parenting system once that is added.
-
-	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
-	if (!useAABB)
-	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
-																	 transform,
-																	 JPH_MotionType_Static,
-																	 OBJECT_LAYER_DYNAMIC,
-																	 this);
-	} else
-	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->boundingBoxShape,
-																	 transform,
-																	 JPH_MotionType_Static,
-																	 OBJECT_LAYER_DYNAMIC,
-																	 this);
-	}
+	(void)ActorAddShape(this, useAABB ? this->model->boundingBoxShape : this->model->collisionModelShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_DYNAMIC,
+																						   this);
 
 	JPH_BodyCreationSettings_SetAllowedDOFs(bodyCreationSettings, 0);
 

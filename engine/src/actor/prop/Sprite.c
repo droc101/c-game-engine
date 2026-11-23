@@ -24,7 +24,8 @@
 static inline void CreateSpriteCollider(Actor *this, const Transform *transform)
 {
 	JPH_Shape *shape = ActorWallCreateCollider(this->wall);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	(void)ActorAddShape(this, shape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
 																						   transform,
 																						   JPH_MotionType_Kinematic,
 																						   OBJECT_LAYER_DYNAMIC,

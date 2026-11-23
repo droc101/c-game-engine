@@ -28,9 +28,16 @@ typedef struct ButtonData
 	uint64_t timePressed;
 } ButtonData;
 
-static inline void CreateButtonCollider(Actor *this, const Transform *transform, JPH_Shape *shape)
+static inline void CreateButtonCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	if (this->model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
+	{
+		(void)ActorAddShape(this, this->model->collisionModelShape);
+	} else
+	{
+		(void)ActorAddShape(this, this->model->boundingBoxShape);
+	}
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_STATIC,
@@ -61,12 +68,7 @@ static void ButtonInit(Actor *this, const KvList params, const Transform *transf
 	this->flags = ACTOR_FLAG_INTERACTABLE;
 	this->hasModel = true;
 	this->model = LoadModel(KvGetString(params, "model", MODEL("wall_button")));
-	JPH_Shape *shape = this->model->boundingBoxShape;
-	if (this->model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
-	{
-		shape = this->model->collisionModelShape;
-	}
-	CreateButtonCollider(this, transform, shape);
+	CreateButtonCollider(this, transform);
 	ButtonData *data = malloc(sizeof(ButtonData));
 	this->extraData = data;
 	data->offSkin = KvGetInt(params, "off_skin", 0);

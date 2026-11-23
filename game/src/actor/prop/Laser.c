@@ -110,21 +110,6 @@ static JPH_BodyFilter *bodyFilter;
 static const float MIN_DISTANCE = 0.01f;
 static const float MAX_DISTANCE = 1024.0f;
 
-static inline void LaserCreateBody(Actor *this, const Transform *transform)
-{
-	JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
-																						  transform,
-																						  JPH_MotionType_Static,
-																						  OBJECT_LAYER_STATIC,
-																						  this);
-	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
-													  bodyCreationSettings,
-													  JPH_Activation_DontActivate);
-	JPH_ShapeSettings_Destroy(shapeSettings);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-}
-
 static void LaserUpdate(Actor *this, const double delta)
 {
 	const LaserData *data = this->extraData;
@@ -209,7 +194,7 @@ static void LaserInit(Actor *this, const KvList params, const Transform *transfo
 			break;
 	}
 
-	LaserCreateBody(this, &adjustedTransform);
+	ActorCreateEmptyBody(this, &adjustedTransform);
 
 	// TODO: Make harmful - Depends on being able to take damage
 }

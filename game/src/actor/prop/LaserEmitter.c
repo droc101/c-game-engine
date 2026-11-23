@@ -17,6 +17,7 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -42,12 +43,12 @@ typedef struct LaserEmitterData
 
 static inline void CreateLaserEmitterCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
-																		  transform,
-																		  JPH_MotionType_Static,
-																		  OBJECT_LAYER_STATIC,
-																		  this);
+	(void)ActorAddShape(this, this->model->collisionModelShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME((JPH_Shape *)this->shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_STATIC,
+																						   this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);

@@ -22,6 +22,7 @@
 #include <joltc/Math/Vector3.h>
 #include <joltc/Physics/Body/BodyID.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -188,6 +189,10 @@ void DestroyActorConnection(ActorConnection *connection);
  * @param transform The transform with which to create the body
  */
 void ActorCreateEmptyBody(Actor *this, const Transform *transform);
+
+uint32_t ActorAddShape(Actor *this, const JPH_Shape *shape);
+
+uint32_t ActorAddShapeWithTransform(Actor *this, const JPH_Shape *shape, const Transform *transform);
 
 /**
  * Actor kill signal handler

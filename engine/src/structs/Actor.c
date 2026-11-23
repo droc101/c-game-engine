@@ -188,6 +188,38 @@ void ActorCreateEmptyBody(Actor *this, const Transform *transform)
 	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
 }
 
+uint32_t ActorAddShape(Actor *this, const JPH_Shape *shape)
+{
+	const Transform transform = {
+		.position = Vector3_Zero,
+		.rotation = JPH_Quat_Identity,
+	};
+	return ActorAddShapeWithTransform(this, shape, &transform);
+}
+
+uint32_t ActorAddShapeWithTransform(Actor *this, const JPH_Shape *shape, const Transform *transform)
+{
+	const JPH_BodyLockInterface *lockInterface = JPH_PhysicsSystem_GetBodyLockInterface(GetState()->map->physicsSystem);
+
+	JPH_BodyLockWrite writeLock;
+	JPH_BodyLockInterface_LockWrite(lockInterface, this->bodyId, &writeLock);
+	const uint32_t index = JPH_MutableCompoundShape_AddShape(this->shape,
+															 &transform->position,
+															 &transform->rotation,
+															 shape,
+															 0,
+															 UINT32_MAX);
+	JPH_BodyLockInterface_UnlockWrite(lockInterface, &writeLock);
+
+	JPH_BodyInterface_NotifyShapeChanged(this->bodyInterface,
+										 this->bodyId,
+										 &Vector3_Zero,
+										 false,
+										 JPH_Activation_DontActivate);
+
+	return index;
+}
+
 void ActorSetParent(Actor *child, Actor *parent)
 {
 	Transform parentTransform;
@@ -205,12 +237,7 @@ void ActorSetParent(Actor *child, Actor *parent)
 	JPH_Quat_Rotate(&parentTransform.rotation, &child->offsetFromParent.position, &child->offsetFromParent.position);
 	JPH_Quat_Multiply(&parentTransform.rotation, &child->offsetFromParent.rotation, &child->offsetFromParent.rotation);
 
-	child->subShapeIndex = JPH_MutableCompoundShape_AddShape(parent->shape,
-															 &child->offsetFromParent.position,
-															 &child->offsetFromParent.rotation,
-															 (JPH_Shape *)child->shape,
-															 0,
-															 UINT32_MAX);
+	child->subShapeIndex = ActorAddShapeWithTransform(parent, (JPH_Shape *)child->shape, &child->offsetFromParent);
 
 	JPH_BodyInterface_SetObjectLayer(child->bodyInterface, child->bodyId, OBJECT_LAYER_NO_COLLISION);
 	JPH_BodyInterface_SetMotionType(child->bodyInterface,
