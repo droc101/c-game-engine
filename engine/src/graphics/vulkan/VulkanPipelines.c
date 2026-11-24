@@ -11,6 +11,7 @@
 #include <engine/graphics/vulkan/VulkanInternal.h>
 #include <engine/helpers/Macros.h>
 #include <engine/structs/Map.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaDrawing.h>
 #include <luna/lunaTypes.h>
@@ -18,6 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <vulkan/vulkan_core.h>
+#include "engine/graphics/vulkan/VulkanDebug.h"
 
 #ifdef JPH_DEBUG_RENDERER
 // Needed to #ifndef JPH_DEBUG_RENDERER_WIREFRAME
@@ -386,7 +388,9 @@ static inline void CreateShadedMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
@@ -463,7 +467,9 @@ static inline void CreateUnshadedMapPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -867,7 +873,9 @@ static inline void CreateShadedActorModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
@@ -949,7 +957,9 @@ static inline void CreateUnshadedActorModelPipeline()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -1038,7 +1048,9 @@ static inline void CreateActorWallPipelines()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = lightingPipelineLayoutCreationInfo,
@@ -1057,7 +1069,9 @@ static inline void CreateActorWallPipelines()
 		.viewportState = &VIEWPORT_STATE,
 		.rasterizationState = &RASTERIZER,
 		.multisampleState = &multisampling,
-		.depthStencilState = &DEPTH_STENCIL_EQUAL_STATE,
+		.depthStencilState = specializationConstants.debugRendering == DEBUG_RENDERING_DISABLE_DEPTH_PREPASS
+									 ? &DEPTH_STENCIL_STATE
+									 : &DEPTH_STENCIL_EQUAL_STATE,
 		.colorBlendState = &COLOR_BLENDING,
 		.dynamicState = &DYNAMIC_STATE,
 		.layoutCreationInfo = pipelineLayoutCreationInfo,
@@ -1069,13 +1083,89 @@ static inline void CreateActorWallPipelines()
 			   "Failed to create unshaded actor wall graphics pipeline!");
 }
 
+static inline void CreateCullingSpheresPipeline()
+{
+	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
+	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
+	CreateShaderModule(SHADER("debug/culling_spheres_v"), SHADER_TYPE_VERT, &vertShaderModule);
+	CreateShaderModule(SHADER("debug/culling_spheres_f"), SHADER_TYPE_FRAG, &fragShaderModule);
+
+	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
+		{
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vertShaderModule,
+		},
+		{
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fragShaderModule,
+		},
+	};
+
+	const VkVertexInputBindingDescription bindingDescription = {
+		.binding = 0,
+		.stride = sizeof(Vector3),
+		.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+	};
+	const VkVertexInputAttributeDescription attributeDescription = {
+		.location = 0,
+		.binding = 0,
+		.format = VK_FORMAT_R32G32B32_SFLOAT,
+	};
+	const VkPipelineVertexInputStateCreateInfo vertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &bindingDescription,
+		.vertexAttributeDescriptionCount = 1,
+		.pVertexAttributeDescriptions = &attributeDescription,
+	};
+
+	static const VkPipelineRasterizationStateCreateInfo CULLING_SPHERES_RASTERIZER = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+		.polygonMode = VK_POLYGON_MODE_FILL,
+		.cullMode = VK_CULL_MODE_NONE,
+		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		.lineWidth = 1,
+	};
+
+	const LunaPushConstantsRange pushConstantsRange = {
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		.size = sizeof(CullingSpheresPushConstants),
+		.dataPointer = &cullingSpheresPushConstants,
+	};
+	const LunaPipelineLayoutCreationInfo layoutCreationInfo = {
+		.descriptorSetLayoutCount = pipelineLayoutCreationInfo.descriptorSetLayoutCount,
+		.descriptorSetLayouts = pipelineLayoutCreationInfo.descriptorSetLayouts,
+		.pushConstantRangeCount = 1,
+		.pushConstantsRanges = &pushConstantsRange,
+	};
+
+	const LunaGraphicsPipelineCreationInfo pipelineInfo = {
+		.shaderStageCount = ArrayLength(shaderStages),
+		.shaderStages = shaderStages,
+		.vertexInputState = &vertexInputInfo,
+		.inputAssemblyState = &INPUT_ASSEMBLY,
+		.viewportState = &VIEWPORT_STATE,
+		.rasterizationState = &CULLING_SPHERES_RASTERIZER,
+		.multisampleState = &multisampling,
+		.depthStencilState = &DEPTH_STENCIL_STATE,
+		.colorBlendState = &COLOR_BLENDING,
+		.dynamicState = &DYNAMIC_STATE,
+		.layoutCreationInfo = layoutCreationInfo,
+	};
+	VulkanTest(lunaCreateGraphicsPipeline(device,
+										  &pipelineInfo,
+										  lunaGetRenderPassSubpassByName(renderPass, "Main Pass"),
+										  &pipelines.cullingSpheres),
+			   "Failed to create culling spheres graphics pipeline!");
+}
+
 static inline void CreateDebugDrawPipeline()
 {
 #ifdef JPH_DEBUG_RENDERER
 	LunaShaderModule vertShaderModule = LUNA_NULL_HANDLE;
 	LunaShaderModule fragShaderModule = LUNA_NULL_HANDLE;
-	CreateShaderModule(SHADER("debug_draw_v"), SHADER_TYPE_VERT, &vertShaderModule);
-	CreateShaderModule(SHADER("debug_draw_f"), SHADER_TYPE_FRAG, &fragShaderModule);
+	CreateShaderModule(SHADER("debug/generic_v"), SHADER_TYPE_VERT, &vertShaderModule);
+	CreateShaderModule(SHADER("debug/generic_f"), SHADER_TYPE_FRAG, &fragShaderModule);
 
 	const LunaPipelineShaderStageCreationInfo shaderStages[] = {
 		{
@@ -1727,6 +1817,7 @@ void CreateGraphicsPipelines()
 	CreateShadedActorModelPipeline();
 	CreateUnshadedActorModelPipeline();
 	CreateActorWallPipelines();
+	CreateCullingSpheresPipeline();
 	CreateDebugDrawPipeline();
 }
 

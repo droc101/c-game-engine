@@ -5,6 +5,6 @@
 #ifndef GAME_GAMEACTORREGISTRATION_H
 #define GAME_GAMEACTORREGISTRATION_H
 
-void RegisterGameActors();
+void RegisterGameActors(void);
 
 #endif //GAME_GAMEACTORREGISTRATION_H

@@ -43,7 +43,8 @@ typedef struct CoinData
 static inline void CreateCoinSensor(Actor *this, const Transform *transform)
 {
 	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{SIZE, SIZE, SIZE}}, JPH_DefaultConvexRadius);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	(void)ActorAddShape(this, shape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_SENSOR,

@@ -4,6 +4,7 @@
 
 #include <engine/debug/JoltDebugRenderer.h>
 #include <engine/graphics/Drawing.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PhysicsThread.h>
@@ -119,11 +120,14 @@ void DestroyMap(Map *map)
 	free(map->indirectLightmapPixels);
 	free(map->lightmapPixels);
 
-	for (uint32_t i = 0; i < map->lightCount; i++)
+	if (map->lights)
 	{
-		free(map->lights[i].cookie);
+		for (uint32_t i = 0; i < map->lightCount; i++)
+		{
+			free(map->lights[i].cookie);
+		}
+		free(map->lights);
 	}
-	free(map->lights);
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
@@ -286,8 +290,8 @@ void FreeQueuedIOConnection(QueuedIoConnection *connection)
 
 static int QueuedIOConnectionDelayComparison(const void *pc1, const void *pc2)
 {
-	const QueuedIoConnection *c1 = *(QueuedIoConnection**)pc1;
-	const QueuedIoConnection *c2 = *(QueuedIoConnection**)pc2;
+	const QueuedIoConnection *c1 = *(QueuedIoConnection **)pc1;
+	const QueuedIoConnection *c2 = *(QueuedIoConnection **)pc2;
 	return (int64_t)c1->scheduledTime - (int64_t)c2->scheduledTime;
 }
 
@@ -306,7 +310,7 @@ void ProcessIOQueue(Map *map)
 		  sizeof(QueuedIoConnection *),
 		  QueuedIOConnectionDelayComparison);
 
-	const size_t time = GetTimeMs();
+	const size_t time = map->msElapsed;
 	for (size_t i = 0; i < map->ioQueue.length; i++)
 	{
 		QueuedIoConnection *connection = ListGetPointer(map->ioQueue, i);
@@ -337,7 +341,7 @@ void QueueIOConnection(Map *map, Actor *sender, ActorConnection *connection, con
 	qc->source = sender;
 	qc->targetActorName = strdup(connection->targetActorName);
 	qc->targetActorInput = strdup(connection->targetActorInput);
-	qc->scheduledTime = GetTimeMs() + connection->delayMs;
+	qc->scheduledTime = map->msElapsed + connection->delayMs;
 	CopyParam(param, &qc->param);
 	qc->processed = false;
 	ListLock(map->ioQueue);

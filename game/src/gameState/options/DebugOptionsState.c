@@ -163,7 +163,7 @@ static void DebugOptionsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(debugOptionsMenu);
 }
 
-static void DebugOptionsStateSet()
+static void DebugOptionsStateSet(void)
 {
 	if (debugOptionsMenu == NULL)
 	{
@@ -240,7 +240,7 @@ static void DebugOptionsStateSet()
 	UiStackResetFocus(debugOptionsMenu->stack);
 }
 
-static void DebugOptionsStateDestroy()
+static void DebugOptionsStateDestroy(void)
 {
 	if (debugOptionsMenu != NULL)
 	{

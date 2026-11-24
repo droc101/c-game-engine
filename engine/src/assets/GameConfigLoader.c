@@ -3,8 +3,8 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
 #include <engine/assets/GameConfigLoader.h>
+#include <engine/assets/KvlAsset.h>
 #include <engine/helpers/PlatformHelpers.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/GlobalState.h>
@@ -84,18 +84,11 @@ void LoadGameConfig(const char *game)
 		Error("Failed to open game configuration");
 	}
 	Asset *asset = LoadAssetFromFile(file);
-	if (!asset || asset->type != ASSET_TYPE_KV_LIST || asset->typeVersion != 1)
-	{
-		Error("Invalid game configuration");
-	}
-	DataReader *reader = CreateDataReaderFromAsset(asset);
-	size_t bytesRemaining = asset->size;
 	KvList configList = {};
-	if (!ReadKvList(reader, configList, &bytesRemaining))
+	if (!LoadKvlAsset(configList, asset))
 	{
-		Error("Failed to read game configuration!");
+		Error("Failed to read game configuration");
 	}
-	DestroyDataReader(reader);
 
 	gameConfig.gameTitle = strdup(KvGetString(configList, "game_title", "Untitled"));
 	gameConfig.gameCopyright = strdup(KvGetString(configList, "game_copyright", ""));

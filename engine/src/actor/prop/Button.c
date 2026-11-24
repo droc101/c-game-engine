@@ -9,7 +9,6 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/ActorDefinition.h>
 #include <engine/structs/KVList.h>
-#include <engine/subsystem/Timing.h>
 #include <joltc/enums.h>
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
@@ -29,9 +28,16 @@ typedef struct ButtonData
 	uint64_t timePressed;
 } ButtonData;
 
-static inline void CreateButtonCollider(Actor *this, const Transform *transform, JPH_Shape *shape)
+static inline void CreateButtonCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	if (this->model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
+	{
+		(void)ActorAddShape(this, this->model->collisionModelShape);
+	} else
+	{
+		(void)ActorAddShape(this, this->model->boundingBoxShape);
+	}
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_STATIC,
@@ -47,7 +53,7 @@ static void ButtonUpdate(Actor *this, const double /*delta*/)
 	ButtonData *data = this->extraData;
 	if (data->pressed && data->resetDelay != -1)
 	{
-		const size_t timeDiff = GetTimeMs() - data->timePressed;
+		const size_t timeDiff = GetState()->map->msElapsed - data->timePressed;
 		if (timeDiff >= (size_t)data->resetDelay)
 		{
 			data->pressed = false;
@@ -62,12 +68,7 @@ static void ButtonInit(Actor *this, const KvList params, const Transform *transf
 	this->flags = ACTOR_FLAG_INTERACTABLE;
 	this->hasModel = true;
 	this->model = LoadModel(KvGetString(params, "model", MODEL("wall_button")));
-	JPH_Shape *shape = this->model->boundingBoxShape;
-	if (this->model->collisionModelType != COLLISION_MODEL_TYPE_NONE)
-	{
-		shape = this->model->collisionModelShape;
-	}
-	CreateButtonCollider(this, transform, shape);
+	CreateButtonCollider(this, transform);
 	ButtonData *data = malloc(sizeof(ButtonData));
 	this->extraData = data;
 	data->offSkin = KvGetInt(params, "off_skin", 0);
@@ -76,7 +77,7 @@ static void ButtonInit(Actor *this, const KvList params, const Transform *transf
 	data->resetDelay = KvGetInt(params, "reset_delay_ms", -1);
 	if (data->pressed && data->resetDelay != -1)
 	{
-		data->timePressed = GetTimeMs();
+		data->timePressed = GetState()->map->msElapsed;
 	}
 	data->toggleMode = KvGetBool(params, "toggle_mode", false);
 	this->currentSkinIndex = data->pressed ? data->onSkin : data->offSkin;
@@ -91,7 +92,7 @@ static void ButtonInteract(Actor *this)
 	}
 	data->pressed = !data->pressed;
 	this->currentSkinIndex = data->pressed ? data->onSkin : data->offSkin;
-	data->timePressed = GetTimeMs();
+	data->timePressed = GetState()->map->msElapsed;
 	ActorFireOutput(this, data->pressed ? BUTTON_OUTPUT_PRESSED : BUTTON_OUTPUT_UNPRESSED, PARAM_NONE);
 }
 

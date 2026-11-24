@@ -14,16 +14,17 @@
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 
 static inline void CreatePhysboxCollider(Actor *this, const Transform *transform)
 {
-	JPH_BodyCreationSettings
-			*bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
-																		  transform,
-																		  JPH_MotionType_Dynamic,
-																		  OBJECT_LAYER_DYNAMIC,
-																		  this);
+	(void)ActorAddShape(this, this->model->collisionModelShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
+																						   transform,
+																						   JPH_MotionType_Dynamic,
+																						   OBJECT_LAYER_DYNAMIC,
+																						   this);
 	const JPH_MassProperties massProperties = {
 		.mass = 10.0f,
 	};

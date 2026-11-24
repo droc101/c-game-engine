@@ -46,6 +46,8 @@
 /// Types of physics object
 enum ObjectLayers
 {
+	/// Never collides with anything
+	OBJECT_LAYER_NO_COLLISION,
 	/// Static/unmoving
 	OBJECT_LAYER_STATIC,
 	/// Dynamic/moving
@@ -58,6 +60,7 @@ enum ObjectLayers
 
 enum BroadPhaseLayers
 {
+	BROAD_PHASE_LAYER_NO_COLLISION,
 	BROAD_PHASE_LAYER_STATIC,
 	BROAD_PHASE_LAYER_DYNAMIC,
 

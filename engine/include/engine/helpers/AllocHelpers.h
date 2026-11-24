@@ -3,7 +3,7 @@
 //
 
 /**
- * @file Realloc.h
+ * @file AllocHelpers.h
  * Memory reallocation functions
  */
 
@@ -12,6 +12,8 @@
 
 #include <stddef.h>
 
+void *AllocArray(size_t arrayLength, size_t elementSize);
+
 /**
  * Reallocates memory for an array of arrayLength elements of size bytes each.
  * @param ptr Pointer to the memory block to be reallocated.
@@ -19,7 +21,7 @@
  * @param elementSize Size of each element.
  * @return Pointer to the reallocated memory block.
  */
-void *GameReallocArray(void *ptr, size_t arrayLength, size_t elementSize);
+void *ReallocArray(void *ptr, size_t arrayLength, size_t elementSize);
 
 /**
  * Reallocate a pointer with a new size while keeping the contents
@@ -30,5 +32,18 @@ void *GameReallocArray(void *ptr, size_t arrayLength, size_t elementSize);
  * @warning This will crash the engine on allocation failure. It does *not* return NULL.
  */
 void *Recalloc(void *ptr, size_t oldSize, size_t newSize);
+
+/**
+ * Make a zero-initalized heap allocation aligned to AVX requirements
+ * @param size The size of the allocation
+ * @return Pointer to allocated memory, or @c NULL on failure
+ */
+void *AvxAlignedCalloc(size_t size);
+
+/**
+ * Free AVX-aligned memory (such as but not limited to memory allocated by @c AvxAlignedCalloc)
+ * @param data The memory to free
+ */
+void AvxAlignedFree(void *data);
 
 #endif //GAME_REALLOC_H

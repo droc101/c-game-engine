@@ -28,7 +28,7 @@ static const InputAction DEFAULT_SPAWN_CUBE = {
 InputAction spawnTestActor;
 InputAction spawnCube;
 
-void RegisterGameControls()
+void RegisterGameControls(void)
 {
 	ControlCategory *debugCat = GetControlCategory("debug");
 	RegisterControl("spawn_test_actor",

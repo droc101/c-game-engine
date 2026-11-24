@@ -13,7 +13,6 @@
 #define GAME_ACHIEVEMENT_COLLECT_ONE_HUNDRED_COINS "collect_one_hundred_coins"
 #define GAME_ACHIEVEMENT_GET_GOAL "get_goal"
 
-void RegisterGameAchievements();
+void RegisterGameAchievements(void);
 
 #endif //GAME_GAMEACHIEVEMENTS_H
-

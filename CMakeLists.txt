@@ -37,16 +37,22 @@ set(CMAKE_PLATFORM_NO_VERSIONED_SONAME ON)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
-endif()
+endif ()
 
 get_filename_component(DEPS_ABS_PATH "${FETCHCONTENT_BASE_DIR}" ABSOLUTE)
 get_filename_component(REPO_ABS_PATH "${CMAKE_SOURCE_DIR}" ABSOLUTE)
 
 set(COMPILER_WARNING_FLAGS -Wall -Wextra -Wno-missing-field-initializers -Wno-c23-extensions -Wundef -Wvla)
-set(CMAKE_C_FLAGS "-fPIC -fcanon-prefix-map -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS "-fPIC -fmacro-prefix-map=${REPO_ABS_PATH}=/repo -fmacro-prefix-map=${DEPS_ABS_PATH}=/deps ${CMAKE_C_FLAGS}")
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_C_FLAGS "-fcanon-prefix-map ${CMAKE_C_FLAGS}")
+endif ()
 
 if (ENABLE_ASAN)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fvisibility=default")
+    if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -shared-libasan -frtlib-add-rpath")
+    endif ()
 endif ()
 
 if (WIN32)

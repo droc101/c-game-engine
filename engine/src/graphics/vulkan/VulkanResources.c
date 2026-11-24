@@ -11,6 +11,7 @@
 #include <engine/structs/List.h>
 #include <engine/structs/Options.h>
 #include <engine/subsystem/Error.h>
+#include <joltc/Math/Vector3.h>
 #include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaImage.h>
@@ -26,7 +27,7 @@
 static const LunaBufferCreationInfo UNALIGNED_BUFFER_CREATION_INFO = {
 	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 };
-static const LunaBufferCreationInfo UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO = {
+static const LunaBufferCreationInfo UNALIGNED_BDA_BUFFER_CREATION_INFO = {
 	.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
 	.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 };
@@ -126,9 +127,7 @@ static inline void CreateFrustumsBuffers()
 {
 	VulkanTest(lunaCreateBuffer(device, &storageBufferCreationInfo, &buffers.frustumCullingDatas),
 			   "Failed to create frustum culling datas buffer!");
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffers.frustumShadowMaps),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.frustumShadowMaps),
 			   "Failed to create frustum shadow maps buffer!");
 }
 
@@ -137,24 +136,20 @@ static inline void CreateActorModelsBuffers()
 	VulkanTest(lunaCreateBuffer(device, &storageBufferCreationInfo, &buffers.actorModels.instanceData),
 			   "Failed to create shaded actor models instance data buffer!");
 	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&UNALIGNED_BDA_BUFFER_CREATION_INFO,
 								&buffers.actorModels.shadedUnculledInstanceIndices),
 			   "Failed to create shaded actor models unculled instance indices buffer!");
 	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
+								&UNALIGNED_BDA_BUFFER_CREATION_INFO,
 								&buffers.actorModels.unshadedUnculledInstanceIndices),
 			   "Failed to create unshaded actor models unculled instance indices buffer!");
 	ListInit(buffers.actorModels.shadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorModels.unshadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorModels.shadedDrawInfo, LIST_POINTER);
 	ListInit(buffers.actorModels.unshadedDrawInfo, LIST_POINTER);
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffers.actorModels.shadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.actorModels.shadedCullingInfo),
 			   "Failed to create actor models shaded materials culling info buffer!");
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffers.actorModels.unshadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.actorModels.unshadedCullingInfo),
 			   "Failed to create actor models unshaded materials culling info buffer!");
 }
 
@@ -246,13 +241,9 @@ static inline void CreateActorWallsBuffers()
 	ListInit(buffers.actorWalls.shadedInstanceIndices, LIST_POINTER);
 	ListInit(buffers.actorWalls.unshadedInstanceIndices, LIST_POINTER);
 
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffers.actorWalls.shadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.actorWalls.shadedCullingInfo),
 			   "Failed to create shaded actor walls culling info buffer!");
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffers.actorWalls.unshadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.actorWalls.unshadedCullingInfo),
 			   "Failed to create unshaded actor walls culling info buffer!");
 }
 
@@ -264,23 +255,15 @@ static inline void CreateMapModelsBuffers(MapModelsBuffer *buffer)
 			   "Failed to create shaded map models index buffer!");
 	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->instanceData),
 			   "Failed to create shaded map models instance data buffer!");
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffer->unculledShadedDrawInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffer->unculledShadedDrawInfo),
 			   "Failed to create shaded map models unculled draw info buffer!");
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffer->unculledUnshadedDrawInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffer->unculledUnshadedDrawInfo),
 			   "Failed to create unshaded map models unculled draw info buffer!");
 	ListInit(buffer->shadedDrawInfo, LIST_POINTER);
 	ListInit(buffer->unshadedDrawInfo, LIST_POINTER);
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffer->shadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffer->shadedCullingInfo),
 			   "Failed to create shaded map models materials culling info buffer!");
-	VulkanTest(lunaCreateBuffer(device,
-								&UNALIGNED_SHADER_DEVICE_ADDRESS_BUFFER_CREATION_INFO,
-								&buffer->unshadedCullingInfo),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffer->unshadedCullingInfo),
 			   "Failed to create unshaded map models materials culling info buffer!");
 }
 
@@ -301,6 +284,81 @@ static inline void CreateSkyBuffers()
 	};
 	VulkanTest(lunaCreateBuffer(device, &indicesBufferCreationInfo, &buffers.sky.indices),
 			   "Failed to create sky index buffer!");
+}
+
+static inline void CreateCullingSpheresBuffers()
+{
+	static const uint32_t STACK_COUNT = 16;
+	static const uint32_t SLICE_COUNT = 2 * STACK_COUNT;
+	static const uint32_t VERTEX_COUNT = (STACK_COUNT + 1) * (SLICE_COUNT + 1);
+	static const uint32_t INDEX_COUNT = STACK_COUNT * SLICE_COUNT * 6;
+	static const uint32_t VERTEX_BUFFER_SIZE = sizeof(Vector3) * VERTEX_COUNT;
+	static const uint32_t INDEX_BUFFER_SIZE = sizeof(uint32_t) * INDEX_COUNT;
+
+
+	const LunaBufferCreationInfo vertexBufferCreationInfo = {
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.size = VERTEX_BUFFER_SIZE,
+	};
+	VulkanTest(lunaCreateBuffer(device, &vertexBufferCreationInfo, &buffers.cullingSpheres.vertices),
+			   "Failed to create culling spheres vertex buffer!");
+	const LunaBufferCreationInfo indexBufferCreationInfo = {
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.size = INDEX_BUFFER_SIZE,
+	};
+	VulkanTest(lunaCreateBuffer(device, &indexBufferCreationInfo, &buffers.cullingSpheres.indices),
+			   "Failed to create culling spheres index buffer!");
+
+	Vector3 *vertices = malloc(VERTEX_BUFFER_SIZE);
+	CheckAlloc(vertices);
+	uint32_t *indices = malloc(INDEX_BUFFER_SIZE);
+	CheckAlloc(indices);
+
+	const float meshScale = 1.0f / cosf(PIf / (float)STACK_COUNT);
+	for (uint32_t stack = 0; stack <= STACK_COUNT; stack++)
+	{
+		const float theta = PIf * (float)stack / (float)STACK_COUNT;
+		for (uint32_t slice = 0; slice <= SLICE_COUNT; slice++)
+		{
+			const float phi = 2 * PIf * (float)slice / (float)SLICE_COUNT;
+			vertices[stack * (SLICE_COUNT + 1) + slice].x = meshScale * sinf(theta) * cosf(phi);
+			vertices[stack * (SLICE_COUNT + 1) + slice].y = meshScale * cosf(theta);
+			vertices[stack * (SLICE_COUNT + 1) + slice].z = meshScale * sinf(theta) * sinf(phi);
+		}
+	}
+	uint32_t index = 0;
+	for (uint32_t stack = 0; stack < STACK_COUNT; stack++)
+	{
+		for (uint32_t slice = 0; slice < SLICE_COUNT; slice++)
+		{
+			const uint32_t topLeft = stack * (SLICE_COUNT + 1) + slice;
+			const uint32_t bottomLeft = topLeft + SLICE_COUNT + 1;
+			indices[index++] = topLeft;
+			indices[index++] = bottomLeft;
+			indices[index++] = bottomLeft + 1;
+			indices[index++] = topLeft;
+			indices[index++] = bottomLeft + 1;
+			indices[index++] = topLeft + 1;
+		}
+	}
+
+	const LunaBufferWriteInfo vertexWriteInfo = {
+		.size = VERTEX_BUFFER_SIZE,
+		.data = vertices,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_VERTEX_BUFFER,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.cullingSpheres.vertices, &vertexWriteInfo),
+			   "Failed to write culling spheres vertex buffer!");
+	const LunaBufferWriteInfo indexWriteInfo = {
+		.size = INDEX_BUFFER_SIZE,
+		.data = indices,
+		.synchronizationType = LUNA_BUFFER_SYNCHRONIZATION_TYPE_INDEX_BUFFER,
+	};
+	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, buffers.cullingSpheres.indices, &indexWriteInfo),
+			   "Failed to write culling spheres index buffer!");
+
+	free(vertices);
+	free(indices);
 }
 
 static inline void CreateDebugDrawBuffers()
@@ -332,6 +390,7 @@ void CreateBuffers()
 	CreateModelBuffer(&buffers.viewmodel, "viewmodel");
 	CreateSkyBuffers();
 	CreateModelBuffer(&buffers.player, "player");
+	CreateCullingSpheresBuffers();
 	CreateDebugDrawBuffers();
 }
 
@@ -359,6 +418,10 @@ static inline uint32_t ImageMetadataBits(const Image *image)
 	if (image->mipmaps && GetState()->options.mipmaps && GetState()->options.anisotropy)
 	{
 		bits |= (1u << 29u);
+	}
+	if (image->opaque)
+	{
+		bits |= (1u << 28u);
 	}
 	return bits;
 }

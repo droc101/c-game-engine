@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
@@ -38,25 +39,33 @@ void CreateInstance()
 	const char *const *extensionNames = SDL_Vulkan_GetInstanceExtensions(&extensionCount);
 	VulkanTestBool(extensionNames, "Failed to acquire extensions required for SDL window!\n");
 
-	LunaInstanceCreationInfo instanceCreationInfo = {
+	const char **extensions = NULL;
+	VulkanTest(lunaInitializeVolk(), "Failed to initialize Volk!");
+	debugUtils = lunaIsInstanceExtensionAvailable(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	if (debugUtils)
+	{
+		extensions = malloc(sizeof(const char *) * (extensionCount + 1));
+		CheckAlloc(extensions);
+		for (uint32_t i = 0; i < extensionCount; i++)
+		{
+			extensions[i] = extensionNames[i];
+		}
+		extensions[extensionCount] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+	}
+
+	const LunaInstanceCreationInfo instanceCreationInfo = {
 		.apiVersion = VK_API_VERSION_1_2,
 
-		.extensionCount = extensionCount,
-		.extensionNames = extensionNames,
+		.extensionCount = debugUtils ? extensionCount + 1 : extensionCount,
+		.extensionNames = debugUtils ? extensions : extensionNames,
 
 #ifdef BUILDSTYLE_DEBUG
-		.enableValidation = true,
+		.enableValidation = !HasCliArg("--disable-validation"),
 #endif
 	};
-
-#ifdef BUILDSTYLE_DEBUG
-	if (HasCliArg("--disable-validation"))
-	{
-		instanceCreationInfo.enableValidation = false;
-	}
-#endif
-
 	VulkanTest(lunaCreateInstance(&instanceCreationInfo), "Failed to create instance!");
+
+	free(extensions);
 }
 
 void CreateSurface(SDL_Window *window)
@@ -122,16 +131,14 @@ bool CreateLogicalDevice()
 		VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
 		VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
 	};
-	const LunaDeviceCreationInfo2 deviceCreationInfo = {
-		.extensionCount = ArrayLength(extensions),
-		.extensionNames = extensions,
+	const LunaDeviceCreationInfo deviceCreationInfo = {
+		.requiredExtensionCount = ArrayLength(extensions),
+		.requiredExtensionNames = extensions,
 		.requiredFeatures = requiredFeatures,
 		.surface = surface,
 		.physicalDevicePreferenceDefinition = &devicePreferenceDefinition,
-		.allocatorCreateFlags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT |
-								VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
 	};
-	if (lunaCreateDevice2(&deviceCreationInfo, &device) != VK_SUCCESS)
+	if (lunaCreateDevice(&deviceCreationInfo, &device) != VK_SUCCESS)
 	{
 		return false;
 	}
@@ -156,6 +163,7 @@ void CreateCommandBuffers()
 	VulkanTest(lunaCreateCommandPool(device, &commandPoolCreationInfo, &commandPool), "Failed to create command pool!");
 	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &commandBuffer),
 			   "Failed to allocate command buffer!");
+	vkCommandBuffer = lunaGetVkCommandBuffer(commandBuffer);
 	VulkanTest(lunaAllocateCommandBuffer(device, commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, &secondaryCommandBuffer),
 			   "Failed to allocate secondary command buffer!");
 
@@ -283,16 +291,16 @@ void CreateRenderPass()
 		{
 			.srcSubpass = VK_SUBPASS_EXTERNAL,
 			.dstSubpass = 0,
-			.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
 			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 			.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 		},
 		{
 			.srcSubpass = 0,
 			.dstSubpass = 1,
-			.srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
 			.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 			.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
 		},
@@ -355,7 +363,7 @@ void CreateDescriptorSetLayouts()
 		},
 		{
 			.bindingName = "Lightmap",
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		},
@@ -607,7 +615,7 @@ void CreateDescriptorSet()
 	const VkDescriptorPoolSize poolSizes[] = {
 		{
 			.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-			.descriptorCount = min(MAX_TEXTURES, sampledImageCount),
+			.descriptorCount = min(MAX_TEXTURES + 1, sampledImageCount),
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_SAMPLER,
@@ -615,11 +623,7 @@ void CreateDescriptorSet()
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 3,
-		},
-		{
-			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 3,
+			.descriptorCount = 2,
 		},
 		{
 			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

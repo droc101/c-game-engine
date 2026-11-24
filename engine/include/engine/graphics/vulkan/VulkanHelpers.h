@@ -342,11 +342,11 @@ typedef struct ModelBuffer
 	LunaBuffer unshadedDrawInfo;
 } ModelBuffer;
 
-typedef struct SkyBuffer
+typedef struct IndexedVertexBuffer
 {
 	LunaBuffer vertices;
 	LunaBuffer indices;
-} SkyBuffer;
+} IndexedVertexBuffer;
 
 #ifdef JPH_DEBUG_RENDERER
 // TODO: Clean up both this and the whole system
@@ -375,8 +375,9 @@ typedef struct Buffers
 	MapModelsBuffer opaqueMap;
 	MapModelsBuffer map;
 	ModelBuffer viewmodel;
-	SkyBuffer sky;
+	IndexedVertexBuffer sky;
 	ModelBuffer player;
+	IndexedVertexBuffer cullingSpheres;
 #ifdef JPH_DEBUG_RENDERER
 	DebugDrawBuffer debugDrawLines;
 	DebugDrawBuffer debugDrawTriangles;
@@ -418,6 +419,7 @@ typedef struct Pipelines
 	LunaGraphicsPipeline unshadedActorWall;
 	DepthPipelines shadowMaps;
 	DirectionalShadowMapPipelines directionalLightShadowMaps;
+	LunaGraphicsPipeline cullingSpheres;
 #ifdef JPH_DEBUG_RENDERER
 	LunaGraphicsPipeline debugDrawLines;
 	LunaGraphicsPipeline debugDrawTriangles;
@@ -442,6 +444,14 @@ typedef struct ShadowMapPushConstants
 	uint32_t faceIndex;
 	uint32_t cascadeIndex;
 } ShadowMapPushConstants;
+
+typedef struct CullingSpheresPushConstants
+{
+	VkDeviceAddress cullingInfo;
+	Vector3 color;
+	uint32_t isActorModelBuffer;
+	uint32_t keptPixelIndexOffset;
+} CullingSpheresPushConstants;
 
 typedef struct DescriptorSet
 {
@@ -519,6 +529,7 @@ typedef struct FrustumData
 #pragma endregion typedefs
 
 #pragma region variables
+extern bool debugUtils;
 extern bool minimized;
 extern LunaDevice device;
 extern VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -526,6 +537,7 @@ extern uint32_t queueFamilyIndex;
 extern VkQueue queue;
 extern LunaCommandPool commandPool;
 extern LunaCommandBuffer commandBuffer;
+extern VkCommandBuffer vkCommandBuffer;
 extern LunaCommandBuffer secondaryCommandBuffer;
 extern LunaSemaphore semaphore;
 extern VkSurfaceKHR surface;
@@ -541,6 +553,7 @@ extern uint32_t pendingTasks; // Bits set with PendingTasksBitFlags
 extern uint32_t skyTextureIndex;
 extern uint32_t shadowMapSlotsAvailable;
 extern ShadowMapPushConstants shadowMapPushConstants;
+extern CullingSpheresPushConstants cullingSpheresPushConstants;
 extern VkRenderPass shadowMapRenderPass;
 extern LunaImage shadowMapAtlas;
 extern LunaImage directionalLightShadowMapAtlas;
@@ -606,6 +619,8 @@ void UpdateSoftShadowKernels();
 void ClearCullingData();
 
 void CullModels();
+
+void DrawCullingSpheres(const LunaGraphicsPipelineBindInfo *pipelineBindInfo);
 
 void PopulateClusters();
 

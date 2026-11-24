@@ -8,6 +8,7 @@
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
 #include <engine/graphics/vulkan/VulkanRayTracing.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/PhysicsThread.h>
 #include <engine/structs/Actor.h>
@@ -200,7 +201,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 	{
 		free(shadedModelsInstanceIndices);
 		free(unshadedModelsInstanceIndices);
-		free(modelsInstanceData);
+		AvxAlignedFree(modelsInstanceData);
 		free(shadedModelsDrawInfo);
 		free(unshadedModelsDrawInfo);
 		free(shadedModelsCullingInfo);
@@ -210,7 +211,7 @@ static inline void ReallocateInstanceData(const LockingList *actors, const Insta
 		CheckAlloc(shadedModelsInstanceIndices);
 		unshadedModelsInstanceIndices = malloc(instanceIndicesBytes);
 		CheckAlloc(unshadedModelsInstanceIndices);
-		modelsInstanceData = malloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
+		modelsInstanceData = AvxAlignedCalloc(reallocInfo->modelInstanceCount * sizeof(ActorModelInstanceData));
 		CheckAlloc(modelsInstanceData);
 		shadedModelsDrawInfo = calloc(1, drawInfoBytes);
 		CheckAlloc(shadedModelsDrawInfo);
@@ -521,11 +522,12 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 
 		Vector3 position;
 		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &position);
-		const Vector3 offset = {
+		Vector3 offset = {
 			lod->components[j].centerOffset.x,
 			lod->components[j].centerOffset.y,
-			-lod->components[j].centerOffset.z,
+			lod->components[j].centerOffset.z,
 		};
+		JPH_Quat_Rotate(&actor->previousTickEndTransform.rotation, &offset, &offset);
 		Vector3_Add(&position, &offset, &cullingInfo->position);
 		cullingInfo->radius = lod->components[j].radius;
 		cullingInfo->castsShadows = material->castsShadows;
@@ -557,8 +559,13 @@ static inline void UpdateActorWallInstanceData(const Actor *actor,
 	actorInstanceData->uvOffset = actor->wall->uvOffset;
 	actorInstanceData->modColor = actor->modColor;
 
-	// TODO: This does not take centerOffset into account
-	cullingInfo->position = position;
+	Vector3 centerOffset = {
+		.x = actorInstanceData->centerOffset.x * actorInstanceData->axis.x,
+		.y = actorInstanceData->centerOffset.y,
+		.z = actorInstanceData->centerOffset.x * actorInstanceData->axis.y,
+	};
+	JPH_Quat_Rotate(&rotation, &centerOffset, &centerOffset);
+	Vector3_Add(&position, &centerOffset, &cullingInfo->position);
 	cullingInfo->radius = Vector2Length(actorInstanceData->scale) / 2.0f;
 	cullingInfo->castsShadows = actor->wall->castsShadows;
 }

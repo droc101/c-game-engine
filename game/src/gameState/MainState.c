@@ -68,6 +68,22 @@ static void MainStateFixedUpdate(GlobalState *state, const double delta)
 
 	if (spawnActorOnce)
 	{
+		// Transform parentTransform = state->map->player.transform;
+		// parentTransform.rotation = JPH_Quat_Identity;
+		// parentTransform.position.x += 24;
+		// Transform childTransform = state->map->player.transform;
+		// childTransform.position.x += 48;
+		// Actor *parent = CreateActor(&parentTransform,
+		// 							spawnActorOnce,
+		// 							NULL,
+		// 							JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
+		// AddActor(parent);
+		// Actor *child = CreateActor(&childTransform,
+		// 						   spawnActorOnce,
+		// 						   NULL,
+		// 						   JPH_PhysicsSystem_GetBodyInterface(state->map->physicsSystem));
+		// AddActor(child);
+		// ActorSetParent(child, parent);
 		Actor *actor = CreateActor(&state->map->player.transform,
 								   spawnActorOnce,
 								   NULL,
@@ -93,7 +109,7 @@ static void MainStateRender(GlobalState *state, const double /*delta*/)
 	RenderHUD();
 }
 
-static void MainStateSet()
+static void MainStateSet(void)
 {
 	GetState()->rpcState = IN_GAME;
 }

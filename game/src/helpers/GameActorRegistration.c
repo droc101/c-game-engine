@@ -14,7 +14,7 @@
 #include "actor/prop/LaserEmitter.h"
 #include "actor/prop/Physbox.h"
 
-void RegisterGameActors()
+void RegisterGameActors(void)
 {
 	RegisterCoin();
 	RegisterDoor();

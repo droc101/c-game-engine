@@ -26,6 +26,8 @@ static JPH_BroadPhaseLayer GetBroadPhaseLayer(const JPH_ObjectLayer inLayer)
 		case OBJECT_LAYER_DYNAMIC:
 		case OBJECT_LAYER_PLAYER:
 			return BROAD_PHASE_LAYER_DYNAMIC;
+		case OBJECT_LAYER_NO_COLLISION:
+			return BROAD_PHASE_LAYER_NO_COLLISION;
 		default:
 			return JPH_BroadPhaseLayerInvalid;
 	}
@@ -51,11 +53,14 @@ static bool ObjectLayerShouldCollide(const JPH_ObjectLayer inLayer1, const JPH_O
 static bool ObjectVsBroadPhaseLayerShouldCollide(const JPH_ObjectLayer inObjectLayer,
 												 const JPH_BroadPhaseLayer /*inBroadPhaseLayer*/)
 {
-	if (GetBroadPhaseLayer(inObjectLayer) == BROAD_PHASE_LAYER_STATIC)
+	switch (GetBroadPhaseLayer(inObjectLayer))
 	{
-		return false;
+		case BROAD_PHASE_LAYER_NO_COLLISION:
+		case BROAD_PHASE_LAYER_STATIC:
+			return false;
+		default:
+			return true;
 	}
-	return true;
 }
 
 static const JPH_ObjectVsBroadPhaseLayerFilter_Impl OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL = {

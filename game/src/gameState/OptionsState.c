@@ -117,7 +117,7 @@ static void CbOptionsEnableDiscordRpc(const OptionsButtonValue * /*value*/, void
 	}
 }
 
-static void OptionsStateSet()
+static void OptionsStateSet(void)
 {
 	if (optionsStack == NULL)
 	{
@@ -182,7 +182,7 @@ static void OptionsStateSet()
 	UiStackResetFocus(optionsStack);
 }
 
-static void OptionsStateDestroy()
+static void OptionsStateDestroy(void)
 {
 	if (optionsStack != NULL)
 	{

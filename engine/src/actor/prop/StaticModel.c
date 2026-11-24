@@ -14,28 +14,19 @@
 #include <joltc/Math/Transform.h>
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 static inline void CreateStaticModelCollider(Actor *this, const Transform *transform, const bool useAABB)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
-	if (!useAABB)
-	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
-																	 transform,
-																	 JPH_MotionType_Static,
-																	 OBJECT_LAYER_STATIC,
-																	 this);
-	} else
-	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->boundingBoxShape,
-																	 transform,
-																	 JPH_MotionType_Static,
-																	 OBJECT_LAYER_STATIC,
-																	 this);
-	}
+	(void)ActorAddShape(this, useAABB ? this->model->boundingBoxShape : this->model->collisionModelShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
+																						   transform,
+																						   JPH_MotionType_Static,
+																						   OBJECT_LAYER_STATIC,
+																						   this);
 	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
 													  bodyCreationSettings,
 													  JPH_Activation_Activate);

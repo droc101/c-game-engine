@@ -10,6 +10,6 @@
 extern InputAction spawnTestActor;
 extern InputAction spawnCube;
 
-void RegisterGameControls();
+void RegisterGameControls(void);
 
 #endif //GAME_GAMECONTROLS_H

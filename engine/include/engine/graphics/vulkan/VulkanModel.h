@@ -31,6 +31,8 @@ extern size_t bufferIndexCount;
 
 void LoadModelLods(const ModelDefinition *model);
 
+void LoadModelToBuffer(const ModelDefinition *model, uint32_t lodIndex, uint32_t skinIndex, ModelBuffer *buffer);
+
 void ClearModelCache();
 
 #endif //GAME_VULKANMODEL_H

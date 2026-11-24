@@ -87,6 +87,7 @@ static void DebugEntryMap()
 		DPrintF("Actors: %d", COLOR_WHITE, GetState()->map->actors.length);
 		DPrintF("Models: %d", COLOR_WHITE, GetState()->map->modelCount);
 		DPrintF("Lights: %d", COLOR_WHITE, GetState()->map->lightCount);
+		DPrintF("Elapsed Time: %.2fs", COLOR_WHITE, GetState()->map->msElapsed / 1000.0);
 	}
 }
 

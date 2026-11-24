@@ -62,7 +62,7 @@ static void RestartPromptStateRender(GlobalState *state, const double /*delta*/)
 	DrawUiStack(menuStack);
 }
 
-static void RestartPromptStateSet()
+static void RestartPromptStateSet(void)
 {
 	GetState()->rpcState = IN_MENUS;
 	if (menuStack == NULL)
@@ -100,7 +100,7 @@ static void RestartPromptStateSet()
 	UiStackResetFocus(menuStack);
 }
 
-static void RestartPromptStateDestroy()
+static void RestartPromptStateDestroy(void)
 {
 	if (menuStack != NULL)
 	{

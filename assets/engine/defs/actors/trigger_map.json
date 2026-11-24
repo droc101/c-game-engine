@@ -13,6 +13,10 @@
       "height": "$height",
       "depth": "$depth",
       "color": "#FFFF00"
+    },
+    {
+      "type": "orientation",
+      "color": "#FFFF00"
     }
   ],
   "inputs": {

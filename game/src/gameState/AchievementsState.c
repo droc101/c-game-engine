@@ -58,7 +58,7 @@ static void AchievementsStateRender(GlobalState *state, const double /*delta*/)
 	ProcessOptionsMenu(achievementsOptionsMenu);
 }
 
-static void AchievementsStateSet()
+static void AchievementsStateSet(void)
 {
 	if (achievementsOptionsMenu == NULL)
 	{
@@ -239,7 +239,7 @@ static void AchievementsStateSet()
 	EnterMenuBackgroundState();
 }
 
-static void AchievementsStateDestroy()
+static void AchievementsStateDestroy(void)
 {
 	if (achievementsOptionsMenu != NULL)
 	{

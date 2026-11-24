@@ -28,7 +28,7 @@
 #define ENGINE_VERSION_MAJOR 0
 #define ENGINE_VERSION_MINOR 0
 #define ENGINE_VERSION_PATCH 1
-#define ENGINE_VERSION_SUFFIX "-brushes"
+#define ENGINE_VERSION_SUFFIX "-dev"
 /// Engine version string
 #define ENGINE_VERSION \
 	TO_STR(ENGINE_VERSION_MAJOR) \

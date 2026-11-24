@@ -49,28 +49,31 @@ float GetSliderValueAsFloat(const SliderData *data)
 static char *DefaultSliderLabelCallback(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
-	char *buf = malloc(64);
-	CheckAlloc(buf);
-	sprintf(buf, "%s: %.2f", data->label, GetSliderValueAsFloat(data));
-	return buf;
+	char *buffer = malloc(64);
+	CheckAlloc(buffer);
+	snprintf(buffer, 64, "%s: %.2f", data->label, GetSliderValueAsFloat(data));
+	buffer[63] = '\0';
+	return buffer;
 }
 
 char *SliderLabelPercent(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
-	char *buf = malloc(64);
-	CheckAlloc(buf);
-	sprintf(buf, "%s: %.0f%%", data->label, GetSliderValueAsFloat(data) * 100);
-	return buf;
+	char *buffer = malloc(64);
+	CheckAlloc(buffer);
+	snprintf(buffer, 64, "%s: %.0f%%", data->label, GetSliderValueAsFloat(data) * 100);
+	buffer[63] = '\0';
+	return buffer;
 }
 
 char *SliderLabelInteger(const Control *slider)
 {
 	const SliderData *data = (SliderData *)slider->controlData;
-	char *buf = malloc(64);
-	CheckAlloc(buf);
-	sprintf(buf, "%s: %.0f", data->label, GetSliderValueAsFloat(data));
-	return buf;
+	char *buffer = malloc(64);
+	CheckAlloc(buffer);
+	snprintf(buffer, 64, "%s: %.0f", data->label, GetSliderValueAsFloat(data));
+	buffer[63] = '\0';
+	return buffer;
 }
 
 static void ClampSliderValue(SliderData *data)

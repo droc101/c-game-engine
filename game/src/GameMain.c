@@ -13,12 +13,12 @@
 
 #undef main // Leaked by SDL_main.h
 
-static void LoadingStateDone()
+static void LoadingStateDone(void)
 {
 	SetGameState(&MainState);
 }
 
-static void LoadingStateError()
+static void LoadingStateError(void)
 {
 	menuStateFadeIn = false;
 	SetGameState(&MenuState); // get out before crash
@@ -57,7 +57,7 @@ static void DestroyGame()
 }
 
 // ReSharper disable once CppUseInternalLinkage
-EXPORT_SYM int GameMain(const int argc, char *argv[])  // NOLINT(*-use-internal-linkage)
+EXPORT_SYM int GameMain(const int argc, char *argv[]) // NOLINT(*-use-internal-linkage)
 {
 	const EngineInitializationInfo initInfo = {
 		.argc = argc,

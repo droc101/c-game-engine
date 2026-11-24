@@ -62,19 +62,6 @@ bool RedirectFd(int originalFd, int *pipeFds, int *originalFdCopy);
 void RestoreFd(int modifiedFd, int *pipeFds, int originalFd);
 
 /**
- * Make a zero-initalized heap allocation aligned to AVX requirements
- * @param size The size of the allocation
- * @return Pointer to allocated memory, or @c NULL on failure
- */
-void *AvxAlignedCalloc(size_t size);
-
-/**
- * Free AVX-aligned memory (such as but not limited to memory allocated by @c AvxAlignedCalloc)
- * @param data The memory to free
- */
-void AvxAlignedFree(void *data);
-
-/**
  * Opens a file with the default program. Depends on xdg-open on Linux
  * @param filePath The file to open
  */

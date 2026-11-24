@@ -6,6 +6,7 @@
 #include <engine/assets/AssetReader.h>
 #include <engine/assets/DataReader.h>
 #include <engine/assets/DataWriter.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
 #include <engine/subsystem/Error.h>
@@ -47,19 +48,16 @@ bool ReadParam(DataReader *reader, Param *out, size_t *bytesRemaining)
 			out->colorValue.a = ReadFloat(reader);
 			break;
 		case PARAM_TYPE_STRING:
-			size_t stringLength = 0;
-			out->stringValue = ReadStringSafe(reader, &stringLength);
+			out->stringValue = ReadStringSafe(reader, bytesRemaining);
 			if (!out->stringValue)
 			{
 				return false;
 			}
-			*bytesRemaining -= stringLength;
-			*bytesRemaining -= sizeof(size_t);
 			break;
 		case PARAM_TYPE_ARRAY:
 			EXPECT_BYTES_BOOL(sizeof(size_t), *bytesRemaining);
 			out->arrayValue.length = ReadSizeT(reader);
-			out->arrayValue.data = malloc(sizeof(Param) * out->arrayValue.length);
+			out->arrayValue.data = AllocArray(out->arrayValue.length, sizeof(Param));
 			// TODO: If `out->arrayValue.length` is large enough this will cause an unrecoverable error
 			CheckAlloc(out->arrayValue.data);
 			for (size_t i = 0; i < out->arrayValue.length; i++)
@@ -108,7 +106,7 @@ void CopyParam(const Param *source, Param *dest)
 	} else if (source->type == PARAM_TYPE_ARRAY)
 	{
 		dest->arrayValue.length = source->arrayValue.length;
-		dest->arrayValue.data = malloc(sizeof(Param) * source->arrayValue.length);
+		dest->arrayValue.data = AllocArray(source->arrayValue.length, sizeof(Param));
 		for (size_t i = 0; i < source->arrayValue.length; i++)
 		{
 			// Can't simply memcpy because might not be POD
@@ -268,14 +266,11 @@ bool ReadKvList(DataReader *reader, KvList out, size_t *bytesRemaining)
 	const size_t numParams = ReadSizeT(reader);
 	for (size_t _ = 0; _ < numParams; _++)
 	{
-		size_t keyLength = 0;
-		char *key = ReadStringSafe(reader, &keyLength);
+		char *key = ReadStringSafe(reader, bytesRemaining);
 		if (!key)
 		{
 			return false;
 		}
-		*bytesRemaining -= keyLength;
-		*bytesRemaining -= sizeof(size_t);
 		Param param;
 		if (!ReadParam(reader, &param, bytesRemaining))
 		{

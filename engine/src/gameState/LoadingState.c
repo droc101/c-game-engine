@@ -122,7 +122,7 @@ static void LoadingStateRender(GlobalState * /*state*/, const double /*delta*/)
 	}
 }
 
-static void LoadingStateSet()
+static void LoadingStateSet(void)
 {
 	levelLoadStartTime = GetTimeMs();
 	assert(loadStateLevelname);
@@ -131,7 +131,7 @@ static void LoadingStateSet()
 	GetState()->rpcState = UNKNOWN;
 }
 
-static void LoadingStateDestroy()
+static void LoadingStateDestroy(void)
 {
 	free(loadStateLevelname);
 	loadStateLevelname = NULL;

@@ -7,8 +7,8 @@
 #include <engine/assets/DataReader.h>
 #include <engine/assets/MapLoader.h>
 #include <engine/assets/MapMaterialLoader.h>
-#include <engine/assets/ModelLoader.h>
 #include <engine/graphics/RenderingHelpers.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/MathEx.h>
 #include <engine/physics/Physics.h>
 #include <engine/physics/PlayerPhysics.h>
@@ -24,6 +24,7 @@
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
 #include <engine/subsystem/Logging.h>
+#include <joltc/constants.h>
 #include <joltc/enums.h>
 #include <joltc/joltc.h>
 #include <joltc/Math/Quat.h>
@@ -39,8 +40,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "joltc/constants.h"
 
 bool LoadMap(Map *map, Asset *mapData)
 {
@@ -60,7 +59,6 @@ bool LoadMap(Map *map, Asset *mapData)
 	DataReader *reader = CreateDataReaderFromAsset(mapData);
 
 	size_t bytesRemaining = mapData->size;
-	size_t strLength = 0;
 
 	JPH_BodyInterface *bodyInterface = JPH_PhysicsSystem_GetBodyInterface(map->physicsSystem);
 
@@ -68,48 +66,39 @@ bool LoadMap(Map *map, Asset *mapData)
 	map->renderSky = ReadUint8(reader);
 	if (map->renderSky)
 	{
-		map->skyTexture = ReadStringSafe(reader, &strLength);
+		map->skyTexture = ReadStringSafe(reader, &bytesRemaining);
 		if (!map->skyTexture)
 		{
 			LogError("Failed to read map sky texture!\n");
 			return false;
 		}
-		bytesRemaining -= strLength;
-		bytesRemaining -= sizeof(size_t);
 	} else
 	{
 		map->skyTexture = NULL;
 	}
-	map->discordRpcIcon = ReadStringSafe(reader, &strLength);
+	map->discordRpcIcon = ReadStringSafe(reader, &bytesRemaining);
 	if (!map->discordRpcIcon)
 	{
 		LogError("Failed to read Discord RPC icon\n");
 		return false;
 	}
-	bytesRemaining -= strLength;
-	bytesRemaining -= sizeof(size_t);
-	map->discordRpcName = ReadStringSafe(reader, &strLength);
+	map->discordRpcName = ReadStringSafe(reader, &bytesRemaining);
 	if (!map->discordRpcName)
 	{
 		LogError("Failed to read Discord RPC name\n");
 		return false;
 	}
-	bytesRemaining -= strLength;
-	bytesRemaining -= sizeof(size_t);
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 	const size_t numActors = ReadSizeT(reader);
 	for (size_t i = 0; i < numActors; i++)
 	{
-		size_t actorClassLength = 0;
-		char *actorClass = ReadStringSafe(reader, &actorClassLength);
+		char *actorClass = ReadStringSafe(reader, &bytesRemaining);
 		if (!actorClass)
 		{
 			LogError("Failed to read actor classname\n");
 			return false;
 		}
-		bytesRemaining -= actorClassLength;
-		bytesRemaining -= sizeof(size_t);
 
 		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
 		Transform xfm;
@@ -130,30 +119,24 @@ bool LoadMap(Map *map, Asset *mapData)
 		{
 			ActorConnection *connection = malloc(sizeof(ActorConnection));
 			CheckAlloc(connection);
-			connection->sourceActorOutput = ReadStringSafe(reader, &strLength);
+			connection->sourceActorOutput = ReadStringSafe(reader, &bytesRemaining);
 			if (!connection->sourceActorOutput)
 			{
 				LogError("Failed to read I/O connection output name\n");
 				return false;
 			}
-			bytesRemaining -= strLength;
-			bytesRemaining -= sizeof(size_t);
-			connection->targetActorName = ReadStringSafe(reader, &strLength);
+			connection->targetActorName = ReadStringSafe(reader, &bytesRemaining);
 			if (!connection->targetActorName)
 			{
 				LogError("Failed to read I/O connection target name\n");
 				return false;
 			}
-			bytesRemaining -= strLength;
-			bytesRemaining -= sizeof(size_t);
-			connection->targetActorInput = ReadStringSafe(reader, &strLength);
+			connection->targetActorInput = ReadStringSafe(reader, &bytesRemaining);
 			if (!connection->targetActorInput)
 			{
 				LogError("Failed to read I/O connection input name\n");
 				return false;
 			}
-			bytesRemaining -= strLength;
-			bytesRemaining -= sizeof(size_t);
 			EXPECT_BYTES_BOOL(1, bytesRemaining);
 			uint8_t hasOverride = ReadUint8(reader);
 			if (hasOverride)
@@ -217,21 +200,19 @@ bool LoadMap(Map *map, Asset *mapData)
 
 	EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
 	map->modelCount = ReadSizeT(reader);
-	map->models = malloc(sizeof(MapModel) * map->modelCount);
+	map->models = calloc(map->modelCount, sizeof(MapModel));
 	CheckAlloc(map->models);
 	for (size_t i = 0; i < map->modelCount; i++)
 	{
 		MapModel *model = &map->models[i];
-		char *materialName = ReadStringSafe(reader, &strLength);
+		char *materialName = ReadStringSafe(reader, &bytesRemaining);
 		if (!materialName)
 		{
 			LogError("Failed to read map material name\n");
 			return false;
 		}
-		bytesRemaining -= sizeof(size_t);
-		bytesRemaining -= strLength;
 		model->material = LoadMapMaterial(materialName);
-		assert(model->material);
+		assert(model->material); // TODO: This should probably be handled better
 		free(materialName);
 
 		EXPECT_BYTES_BOOL(sizeof(float) * 6, bytesRemaining);
@@ -244,7 +225,7 @@ bool LoadMap(Map *map, Asset *mapData)
 
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->vertexCount = ReadUint32(reader);
-		model->vertices = malloc(sizeof(MapVertex) * model->vertexCount);
+		model->vertices = AllocArray(model->vertexCount, sizeof(MapVertex));
 		CheckAlloc(model->vertices);
 		for (uint32_t j = 0; j < model->vertexCount; j++)
 		{
@@ -264,7 +245,7 @@ bool LoadMap(Map *map, Asset *mapData)
 		EXPECT_BYTES_BOOL(sizeof(uint32_t), bytesRemaining);
 		model->indexCount = ReadUint32(reader);
 		EXPECT_BYTES_BOOL(sizeof(uint32_t) * model->indexCount, bytesRemaining);
-		model->indices = malloc(sizeof(uint32_t) * model->indexCount);
+		model->indices = AllocArray(model->indexCount, sizeof(uint32_t));
 		CheckAlloc(model->indices);
 		ReadBuffer(reader, sizeof(uint32_t) * model->indexCount, model->indices);
 	}
@@ -289,19 +270,19 @@ bool LoadMap(Map *map, Asset *mapData)
 		JPH_Quat_FromEulerAngles(&rotationEuler, &collisionXfm.rotation);
 
 		EXPECT_BYTES_BOOL(sizeof(size_t), bytesRemaining);
-		const size_t numVerts = ReadSizeT(reader);
-		Vector3 *verts = malloc(sizeof(Vector3) * numVerts);
-		CheckAlloc(verts);
-		for (size_t k = 0; k < numVerts; k++)
+		const size_t vertexCount = ReadSizeT(reader);
+		EXPECT_BYTES_BOOL(sizeof(Vector3) * vertexCount, bytesRemaining);
+		Vector3 *vertices = AllocArray(vertexCount, sizeof(Vector3));
+		CheckAlloc(vertices);
+		for (size_t k = 0; k < vertexCount; k++)
 		{
-			Vector3 *vertex = &verts[k];
-			EXPECT_BYTES_BOOL(sizeof(float) * 3, bytesRemaining);
+			Vector3 *vertex = &vertices[k];
 			vertex->x = ReadFloat(reader);
 			vertex->y = ReadFloat(reader);
 			vertex->z = ReadFloat(reader);
 		}
-		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(verts, numVerts, JPH_DefaultConvexRadius);
-		free(verts);
+		JPH_Shape *hullShape = (JPH_Shape *)JPH_ConvexHullShape_Create(vertices, vertexCount, JPH_DefaultConvexRadius);
+		free(vertices);
 
 		JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(hullShape,
 																							   &collisionXfm,

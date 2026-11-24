@@ -15,6 +15,7 @@
 #include <joltc/Physics/Body/BodyCreationSettings.h>
 #include <joltc/Physics/Body/BodyInterface.h>
 #include <joltc/Physics/Body/MassProperties.h>
+#include <joltc/Physics/Collision/Shape/Shape.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -24,22 +25,12 @@ static inline void CreatePhysicsModelCollider(Actor *this,
 											  const bool useAABB,
 											  const float massOverride)
 {
-	JPH_BodyCreationSettings *bodyCreationSettings = NULL;
-	if (!useAABB)
-	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->collisionModelShape,
-																	 transform,
-																	 JPH_MotionType_Dynamic,
-																	 OBJECT_LAYER_DYNAMIC,
-																	 this);
-	} else
-	{
-		bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->model->boundingBoxShape,
-																	 transform,
-																	 JPH_MotionType_Dynamic,
-																	 OBJECT_LAYER_DYNAMIC,
-																	 this);
-	}
+	(void)ActorAddShape(this, useAABB ? this->model->boundingBoxShape : this->model->collisionModelShape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
+																						   transform,
+																						   JPH_MotionType_Dynamic,
+																						   OBJECT_LAYER_DYNAMIC,
+																						   this);
 
 	if (massOverride > 0)
 	{

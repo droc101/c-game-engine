@@ -1,0 +1,19 @@
+{
+  "extends": "actor",
+  "virtual": true,
+  "inputs": {
+    "set_color": {
+      "type": "color",
+      "description": "Set this actor's tint color"
+    }
+  },
+  "params": {
+    "color": {
+      "display": "Color",
+      "type": "color",
+      "show_alpha": true,
+      "default": 4294967295,
+      "description": "The tint color of this prop"
+    }
+  }
+}

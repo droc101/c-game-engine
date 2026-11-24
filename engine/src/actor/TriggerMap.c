@@ -42,7 +42,8 @@ static inline void CreateTriggerMapSensor(Actor *this, const Transform *transfor
 	const TriggerMapData *data = this->extraData;
 	JPH_Shape *shape = (JPH_Shape *)JPH_BoxShape_Create((Vector3[]){{data->width / 2, data->height, data->depth / 2}},
 														JPH_DefaultConvexRadius);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(shape,
+	(void)ActorAddShape(this, shape);
+	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create2_GAME(this->shape,
 																						   transform,
 																						   JPH_MotionType_Static,
 																						   OBJECT_LAYER_SENSOR,
@@ -61,14 +62,13 @@ static void TriggerMapChange(const TriggerMapData *data)
 	CheckAlloc(transition);
 	transition->entranceName = strdup(data->entranceName);
 
-	Vector3 thisRot;
-	JPH_Quat_GetEulerAngles(&data->xfm.rotation, &thisRot);
-	Vector3 playerRot;
-	JPH_Quat_GetEulerAngles(&GetState()->map->player.transform.rotation, &playerRot);
-
-	JPH_RVec3_Subtract(&playerRot, &thisRot, &transition->relativeAngles);
-
 	JPH_RVec3_Subtract(&GetState()->map->player.transform.position, &data->xfm.position, &transition->relativePosition);
+	JPH_Quat_Inversed(&data->xfm.rotation, &transition->relativeAngle);
+	JPH_Quat_Rotate(&transition->relativeAngle, &transition->relativePosition, &transition->relativePosition);
+	JPH_Quat_Multiply(&transition->relativeAngle,
+					  &GetState()->map->player.transform.rotation,
+					  &transition->relativeAngle);
+
 
 	loadStateTransition = transition;
 	loadStateLevelname = strdup(data->mapName);

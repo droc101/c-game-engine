@@ -3,8 +3,8 @@
 //
 
 #include <assert.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/helpers/PlatformHelpers.h>
-#include <engine/helpers/Realloc.h>
 #include <engine/structs/List.h>
 #include <engine/subsystem/Error.h>
 #include <limits.h>
@@ -94,31 +94,31 @@ void **_ListAdd(List *list, void *data)
 	switch (list->data->type)
 	{
 		case LIST_POINTER:
-			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length + 1, sizeof(void *));
+			list->data->pointerData = ReallocArray(list->data->pointerData, list->length + 1, sizeof(void *));
 			CheckAlloc(list->data->pointerData);
 			list->data->pointerData[list->length] = data;
 			result = &list->data->pointerData[list->length];
 			break;
 		case LIST_UINT64:
-			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length + 1, sizeof(uint64_t));
+			list->data->uint64Data = ReallocArray(list->data->uint64Data, list->length + 1, sizeof(uint64_t));
 			CheckAlloc(list->data->uint64Data);
 			list->data->uint64Data[list->length] = (uint64_t)(uintptr_t)data;
 			result = (void **)&list->data->uint64Data[list->length];
 			break;
 		case LIST_UINT32:
-			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length + 1, sizeof(uint32_t));
+			list->data->uint32Data = ReallocArray(list->data->uint32Data, list->length + 1, sizeof(uint32_t));
 			CheckAlloc(list->data->uint32Data);
 			list->data->uint32Data[list->length] = (uint32_t)(uintptr_t)data;
 			result = (void **)&list->data->uint32Data[list->length];
 			break;
 		case LIST_INT32:
-			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length + 1, sizeof(int32_t));
+			list->data->int32Data = ReallocArray(list->data->int32Data, list->length + 1, sizeof(int32_t));
 			CheckAlloc(list->data->int32Data);
 			list->data->int32Data[list->length] = (int32_t)(uintptr_t)data;
 			result = (void **)&list->data->int32Data[list->length];
 			break;
 		case LIST_NESTED:
-			list->data->nestedListData = GameReallocArray(list->data->nestedListData, list->length + 1, sizeof(List));
+			list->data->nestedListData = ReallocArray(list->data->nestedListData, list->length + 1, sizeof(List));
 			CheckAlloc(list->data->nestedListData);
 			if (data)
 			{
@@ -192,28 +192,28 @@ static void ListRemoveAtHelper(const List *list, const size_t index)
 			memmove(&list->data->pointerData[index],
 					&list->data->pointerData[index + 1],
 					sizeof(void *) * (list->length - index));
-			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length, sizeof(void *));
+			list->data->pointerData = ReallocArray(list->data->pointerData, list->length, sizeof(void *));
 			CheckAlloc(list->data->pointerData);
 			break;
 		case LIST_UINT64:
 			memmove(&list->data->uint64Data[index],
 					&list->data->uint64Data[index + 1],
 					sizeof(uint64_t) * (list->length - index));
-			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length, sizeof(uint64_t));
+			list->data->uint64Data = ReallocArray(list->data->uint64Data, list->length, sizeof(uint64_t));
 			CheckAlloc(list->data->uint64Data);
 			break;
 		case LIST_UINT32:
 			memmove(&list->data->uint32Data[index],
 					&list->data->uint32Data[index + 1],
 					sizeof(uint32_t) * (list->length - index));
-			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length, sizeof(uint32_t));
+			list->data->uint32Data = ReallocArray(list->data->uint32Data, list->length, sizeof(uint32_t));
 			CheckAlloc(list->data->uint32Data);
 			break;
 		case LIST_INT32:
 			memmove(&list->data->int32Data[index],
 					&list->data->int32Data[index + 1],
 					sizeof(int32_t) * (list->length - index));
-			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
+			list->data->int32Data = ReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
 			CheckAlloc(list->data->int32Data);
 			break;
 		case LIST_NESTED:
@@ -221,7 +221,7 @@ static void ListRemoveAtHelper(const List *list, const size_t index)
 			memmove(&list->data->nestedListData[index],
 					&list->data->nestedListData[index + 1],
 					sizeof(List) * (list->length - index));
-			list->data->nestedListData = GameReallocArray(list->data->nestedListData, list->length, sizeof(List));
+			list->data->nestedListData = ReallocArray(list->data->nestedListData, list->length, sizeof(List));
 			CheckAlloc(list->data->nestedListData);
 			break;
 	}
@@ -277,7 +277,7 @@ void _ListInsert(List *list, const size_t index, void *data)
 	switch (list->data->type)
 	{
 		case LIST_POINTER:
-			list->data->pointerData = GameReallocArray(list->data->pointerData, list->length, sizeof(void *));
+			list->data->pointerData = ReallocArray(list->data->pointerData, list->length, sizeof(void *));
 			CheckAlloc(list->data->pointerData);
 			memmove(&list->data->pointerData[index + 1],
 					&list->data->pointerData[index],
@@ -285,7 +285,7 @@ void _ListInsert(List *list, const size_t index, void *data)
 			list->data->pointerData[index] = data;
 			break;
 		case LIST_UINT64:
-			list->data->uint64Data = GameReallocArray(list->data->uint64Data, list->length, sizeof(uint64_t));
+			list->data->uint64Data = ReallocArray(list->data->uint64Data, list->length, sizeof(uint64_t));
 			CheckAlloc(list->data->uint64Data);
 			memmove(&list->data->uint64Data[index + 1],
 					&list->data->uint64Data[index],
@@ -293,7 +293,7 @@ void _ListInsert(List *list, const size_t index, void *data)
 			list->data->uint64Data[index] = (uint64_t)(uintptr_t)data;
 			break;
 		case LIST_UINT32:
-			list->data->uint32Data = GameReallocArray(list->data->uint32Data, list->length, sizeof(uint32_t));
+			list->data->uint32Data = ReallocArray(list->data->uint32Data, list->length, sizeof(uint32_t));
 			CheckAlloc(list->data->uint32Data);
 			memmove(&list->data->uint32Data[index + 1],
 					&list->data->uint32Data[index],
@@ -301,7 +301,7 @@ void _ListInsert(List *list, const size_t index, void *data)
 			list->data->uint32Data[index] = (uint32_t)(uintptr_t)data;
 			break;
 		case LIST_INT32:
-			list->data->int32Data = GameReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
+			list->data->int32Data = ReallocArray(list->data->int32Data, list->length, sizeof(int32_t));
 			CheckAlloc(list->data->int32Data);
 			memmove(&list->data->int32Data[index + 1],
 					&list->data->int32Data[index],

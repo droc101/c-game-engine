@@ -107,22 +107,8 @@ static JPH_BroadPhaseLayerFilter *tripleLaserBroadPhaseLayerFilter;
 static JPH_ObjectLayerFilter *tripleLaserObjectLayerFilter;
 static JPH_BodyFilter *bodyFilter;
 
+static const float MIN_DISTANCE = 0.01f;
 static const float MAX_DISTANCE = 1024.0f;
-
-static inline void LaserCreateBody(Actor *this, const Transform *transform)
-{
-	JPH_ShapeSettings *shapeSettings = (JPH_ShapeSettings *)JPH_EmptyShapeSettings_Create(&Vector3_Zero);
-	JPH_BodyCreationSettings *bodyCreationSettings = JPH_BodyCreationSettings_Create_GAME(shapeSettings,
-																						  transform,
-																						  JPH_MotionType_Static,
-																						  OBJECT_LAYER_STATIC,
-																						  this);
-	this->bodyId = JPH_BodyInterface_CreateAndAddBody(this->bodyInterface,
-													  bodyCreationSettings,
-													  JPH_Activation_DontActivate);
-	JPH_ShapeSettings_Destroy(shapeSettings);
-	JPH_BodyCreationSettings_Destroy(bodyCreationSettings);
-}
 
 static void LaserUpdate(Actor *this, const double delta)
 {
@@ -132,19 +118,18 @@ static void LaserUpdate(Actor *this, const double delta)
 		const JPH_PhysicsSystem *physicsSystem = GetState()->map->physicsSystem;
 		const JPH_NarrowPhaseQuery *narrowPhaseQuery = JPH_PhysicsSystem_GetNarrowPhaseQuery(physicsSystem);
 		JPH_RayCastResult result = {};
-		Vector3 hitPointOffset = {};
 		const JPH_BroadPhaseLayerFilter *broadPhaseLayerFilter = data->height == LASER_HEIGHT_TRIPLE
 																		 ? tripleLaserBroadPhaseLayerFilter
 																		 : normalLaserBroadPhaseLayerFilter;
 		const JPH_ObjectLayerFilter *objectLayerFilter = data->height == LASER_HEIGHT_TRIPLE
 																 ? tripleLaserObjectLayerFilter
 																 : normalLaserObjectLayerFilter;
-		const bool hit = JPH_NarrowPhaseQuery_CastRay2_GAME(narrowPhaseQuery,
+		const bool hit = JPH_NarrowPhaseQuery_CastRay3_GAME(narrowPhaseQuery,
 															this->bodyInterface,
 															this->bodyId,
+															MIN_DISTANCE,
 															MAX_DISTANCE,
 															&result,
-															&hitPointOffset,
 															broadPhaseLayerFilter,
 															objectLayerFilter,
 															bodyFilter);
@@ -209,7 +194,7 @@ static void LaserInit(Actor *this, const KvList params, const Transform *transfo
 			break;
 	}
 
-	LaserCreateBody(this, &adjustedTransform);
+	ActorCreateEmptyBody(this, &adjustedTransform);
 
 	// TODO: Make harmful - Depends on being able to take damage
 }

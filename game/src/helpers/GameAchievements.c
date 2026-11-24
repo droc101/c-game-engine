@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-void RegisterGameAchievements()
+void RegisterGameAchievements(void)
 {
 	RegisterIntegerStatistic(GAME_STAT_ENEMIES_KILLED, 0, 0, INT32_MAX, false);
 	RegisterIntegerStatistic(GAME_STAT_COINS_COLLECTED, 0, 0, INT32_MAX, true);

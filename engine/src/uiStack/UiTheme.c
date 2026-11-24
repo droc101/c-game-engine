@@ -3,7 +3,7 @@
 //
 
 #include <engine/assets/AssetReader.h>
-#include <engine/assets/DataReader.h>
+#include <engine/assets/KvlAsset.h>
 #include <engine/structs/Asset.h>
 #include <engine/structs/Color.h>
 #include <engine/structs/KVList.h>
@@ -17,18 +17,11 @@ UiTheme uiTheme;
 void LoadUiTheme()
 {
 	Asset *asset = LoadAsset("ui_theme.gkvl", false, false);
-	if (!asset || asset->type != ASSET_TYPE_KV_LIST || asset->typeVersion != 1)
-	{
-		Error("Invalid UI theme!");
-	}
-	DataReader *reader = CreateDataReaderFromAsset(asset);
-	size_t bytesRemaining = asset->size;
 	KvList themeList = {};
-	if (!ReadKvList(reader, themeList, &bytesRemaining))
+	if (!LoadKvlAsset(themeList, asset))
 	{
 		Error("Failed to read UI theme!");
 	}
-	DestroyDataReader(reader);
 
 	uiTheme.primaryText.textColor = KvGetColor(themeList, "primary_text", COLOR_WHITE);
 	uiTheme.primaryText.shadowColor = KvGetColor(themeList, "primary_text_shadow", COLOR_BLACK);

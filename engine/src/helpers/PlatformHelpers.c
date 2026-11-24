@@ -27,8 +27,6 @@
 #include <winbase.h>
 #include <dbghelp.h>
 
-static HANDLE singleInstanceMutex = NULL;
-
 // clang-format on
 #else
 #include <execinfo.h>
@@ -206,37 +204,6 @@ void RestoreFd(const int modifiedFd, int *pipeFds, const int originalFd)
 	(void)modifiedFd;
 	(void)pipeFds;
 	(void)originalFd;
-#endif
-}
-
-void *AvxAlignedCalloc(const size_t size)
-{
-#ifdef __AVX__
-#ifdef WIN32
-	void *data = _aligned_malloc(size, 32);
-#else
-	void *data = aligned_alloc(32, size);
-#endif
-	if (data)
-	{
-		return memset(data, 0, size);
-	}
-	return NULL;
-#else
-	return calloc(1, size);
-#endif
-}
-
-void AvxAlignedFree(void *data)
-{
-	if (!data)
-	{
-		return;
-	}
-#if defined(__AVX__) && defined(WIN32)
-	_aligned_free(data);
-#else
-	free(data);
 #endif
 }
 

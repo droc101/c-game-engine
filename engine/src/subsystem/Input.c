@@ -3,7 +3,7 @@
 //
 
 #include <assert.h>
-#include <engine/helpers/Realloc.h>
+#include <engine/helpers/AllocHelpers.h>
 #include <engine/structs/GlobalState.h>
 #include <engine/structs/Vector2.h>
 #include <engine/subsystem/Error.h>
@@ -98,7 +98,7 @@ static bool UpdateAvailableGamepads()
 		if (SDL_IsGamepad(gamepad))
 		{
 			controllerOptions.numValues++;
-			controllerOptions.values = GameReallocArray(controllerOptions.values, controllerOptions.numValues, sizeof(OptionsButtonValue));
+			controllerOptions.values = ReallocArray(controllerOptions.values, controllerOptions.numValues, sizeof(OptionsButtonValue));
 			OptionsButtonValue *value = &controllerOptions.values[controllerOptions.numValues - 1];
 			value->value.type = CONTROL_VALUE_DWORD;
 			value->value.dwordValue = gamepad;

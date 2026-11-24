@@ -14,17 +14,18 @@
 #include <engine/structs/Actor.h>
 #include <engine/structs/Camera.h>
 #include <engine/structs/Color.h>
+#include <engine/structs/KVList.h>
 #include <engine/structs/Light.h>
 #include <engine/structs/List.h>
 #include <engine/structs/Player.h>
 #include <engine/structs/Vector2.h>
 #include <engine/structs/Viewmodel.h>
 #include <joltc/joltc.h>
+#include <joltc/Math/Quat.h>
 #include <joltc/Math/Vector3.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "engine/structs/KVList.h"
 
 #define MAX_ACTORS 8192
 
@@ -83,7 +84,7 @@ struct MapTransition
 	/// The player's position relative to the entrance
 	Vector3 relativePosition;
 	/// The player's rotation relative to the entrance
-	Vector3 relativeAngles;
+	JPH_Quat relativeAngle;
 };
 
 /// An I/O connection that is waiting to be fired
@@ -143,6 +144,7 @@ struct Map
 
 	JPH_PhysicsSystem *physicsSystem;
 	uint64_t physicsTick;
+	uint64_t msElapsed;
 
 	/// The player object
 	Player player;
