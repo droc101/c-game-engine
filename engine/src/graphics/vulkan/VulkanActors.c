@@ -460,9 +460,11 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 	const ModelLod *lod = &actor->model->lods[actor->currentLod];
 	const uint32_t lodId = lod->id;
 	const LodMaterialSlotsData *materialSlotsData = ListGetPointer(lodMaterialSlotsData, lodId);
+	List *materialSlotsVertexData = &ListGetNestedList(lodMaterialSlotsVertexData, lodId);
 	assert(lodInstanceCounts->length == lodMaterialSlotsData.length &&
 		   ListGetUint32(*lodInstanceCounts, lodId) <= materialSlotsData->instanceCount);
 	assert(actor->model->materialSlotCount == materialSlotsData->materialSlots.length);
+	assert(actor->model->materialSlotCount == materialSlotsVertexData->length);
 	const uint32_t remainingInstances = ListGetUint32(*lodInstanceCounts, lodId) - 1;
 	ListSet(*lodInstanceCounts, lodId, remainingInstances);
 	JPH_Mat44 transformMatrix;
@@ -499,11 +501,18 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 				assert(material->shader != SHADER_SKY);
 				continue;
 		}
+
+		const MaterialSlotVertexData *materialSlotVertexData = ListGetPointer(*materialSlotsVertexData, j);
 		ActorModelInstanceData *instanceData = &modelsInstanceData[instanceIndex];
 		memcpy(instanceData->transformMatrix, &transformMatrix, sizeof(transformMatrix));
 		instanceData->modColor = actor->modColor;
 		instanceData->materialColor = material->color;
 		instanceData->textureIndex = TextureIndex(material->texture);
+		instanceData->vertexBuffer = lunaGetBufferDeviceAddress(device, buffers.modelVertices) +
+									 materialSlotVertexData->vertexOffset * sizeof(ModelVertex);
+		instanceData->indexBuffer = lunaGetBufferDeviceAddress(device, buffers.modelIndices) +
+									materialSlotVertexData->firstIndex * sizeof(uint32_t);
+
 		VkAccelerationStructureInstanceKHR *blasInstance = &blasInstances[instanceIndex];
 		blasInstance->transform.matrix[0][0] = transformMatrix.m11;
 		blasInstance->transform.matrix[0][1] = transformMatrix.m21;
@@ -517,8 +526,9 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 		blasInstance->transform.matrix[2][1] = transformMatrix.m23;
 		blasInstance->transform.matrix[2][2] = transformMatrix.m33;
 		blasInstance->transform.matrix[2][3] = transformMatrix.m43;
+		blasInstance->instanceCustomIndex = (1u << 22) | (instanceIndex & ((1u << 22) - 1));
 		blasInstance->mask = 0xFF;
-		blasInstance->accelerationStructureReference = GetAccelerationStructureDeviceAddress(actor->model);
+		blasInstance->accelerationStructureReference = GetAccelerationStructureDeviceAddress(actor->model, j);
 
 		Vector3 position;
 		JPH_BodyInterface_GetPosition(actor->bodyInterface, actor->bodyId, &position);

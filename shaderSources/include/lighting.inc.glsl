@@ -32,6 +32,9 @@ layout(set = 0, binding = 6, scalar) readonly restrict uniform LightsData {
 	mat4 cascadeMatrices[4];
     Light lights[LIGHT_COUNT == 0 ? 1 : LIGHT_COUNT];
 } lightsData;
+layout(binding = 8, scalar) readonly restrict buffer InstanceData {
+    ActorModelInstanceData instanceDatas[];
+} instanceDatas[2];
 layout(set = 0, binding = 9, scalar) readonly restrict buffer Clusters {
     Cluster clusters[512];
 } clusters;
@@ -93,7 +96,7 @@ float sampleShadowMapInternal(nonuniformEXT sampler2DShadow shadowMap, const vec
         return texture(shadowMap, vec3(uv, depth));
     }
 
-    const float r = fract(dot(gl_FragCoord.xy, MAGIC));
+    const float r = coordHash();
     const float sr = size * sin(r);
     const float cr = size * cos(r);
     const mat2 diskRotation = mat2(vec2(cr, -sr), vec2(sr, cr));
@@ -116,12 +119,45 @@ float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord, cons
     return sampleShadowMapInternal(directionalLightShadowMapAtlas, (coord.xy * 0.25 + 0.25 + vec2(cascadeIndex % 2, cascadeIndex / 2) * 0.5) , coord.z, SAMPLE_RADIUS / (2 * resolution));
 }
 
+#ifdef USE_RAYTRACING
 bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direction) {
     rayQueryEXT rayQuery;
-    rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1);
-    rayQueryProceedEXT(rayQuery);
-    return rayQueryGetIntersectionTypeEXT(rayQuery, true) != gl_RayQueryCommittedIntersectionTriangleEXT;
+    rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, 0, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1);
+    float visibility = 1;
+    while (visibility > EPSILON && rayQueryProceedEXT(rayQuery)) {
+        if (rayQueryGetIntersectionTypeEXT(rayQuery, false) != gl_RayQueryCandidateIntersectionTriangleEXT) {
+            continue;
+        }
+        const uint instanceIndex = rayQueryGetIntersectionInstanceCustomIndexEXT(rayQuery, false);
+        const uint type = bitfieldExtract(instanceIndex, 22, 2);
+        if (type != 1) {
+            continue;
+        }
+        const uint baseIndex = 3 * rayQueryGetIntersectionPrimitiveIndexEXT(rayQuery, false);
+        ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[bitfieldExtract(instanceIndex, 0, 22)];
+        const ActorModelVertex v0 = instanceData.vertexBuffer.vertices[instanceData.indexBuffer.indices[baseIndex + 0]];
+        const ActorModelVertex v1 = instanceData.vertexBuffer.vertices[instanceData.indexBuffer.indices[baseIndex + 1]];
+        const ActorModelVertex v2 = instanceData.vertexBuffer.vertices[instanceData.indexBuffer.indices[baseIndex + 2]];
+        const vec2 barycentricCoords = rayQueryGetIntersectionBarycentricsEXT(rayQuery, false);
+        const vec3 interpolationFactor = vec3(1 - barycentricCoords.x - barycentricCoords.y, barycentricCoords.x, barycentricCoords.y);
+        const vec2 uv = interpolationFactor.x * v0.uv + interpolationFactor.y * v1.uv + interpolationFactor.z * v2.uv;
+        const uint index = bitfieldExtract(instanceData.textureIndex, 0, 19);
+        const uint flags = bitfieldExtract(instanceData.textureIndex, 29, 3);
+        const float textureAlpha = textureLod(sampler2D(textures[nonuniformEXT(index)], samplers[(flags & 2) + 2 + (flags >> 2)]), uv, 0).a;
+        float alpha = dot(interpolationFactor, vec3(v0.color.a, v1.color.a, v2.color.a)) * instanceData.modColor.a * instanceData.materialColor.a;
+        const float cutoff = coordHash();
+        if (alpha < 0.001 || alpha < cutoff) {
+            continue;
+        }
+        alpha *= textureAlpha;
+        if (alpha < 0.001 || alpha < cutoff) {
+            continue;
+        }
+        return false;
+    }
+    return rayQueryGetIntersectionTypeEXT(rayQuery, true) == gl_RayQueryCommittedIntersectionNoneEXT;
 }
+#endif
 
 vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascadeIndex) {
     if (LIGHT_COUNT == 0) {
@@ -146,7 +182,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 continue;
             }
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
-            const vec4 coord = worldPosition / worldPosition.w;
+            const vec4 coord = worldPosition / worldPosition.interpolationFactor;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
                 const float factor = sampleDirectionalShadowMap(cascadeIndex, coord.xyz, light.frustumShadowMaps.shadowMaps[cascadeIndex].resolution);
                 if (factor < EPSILON) {

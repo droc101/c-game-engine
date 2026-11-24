@@ -21,7 +21,7 @@ void main() {
         // We intentionally calculate this even before the inAlpha < 0.001 check to reduce wasted cycles waiting for the input variables to actually be available.
         // The wait will happen either way, and most fragments will not have an inAlpha value less than 1, let alone 0.001.
         // Therefore, calculating the cutoff before the check allows us to use the ALU while we're waiting for inAlpha.
-        const float cutoff = fract(dot(gl_FragCoord.xy, MAGIC));
+        const float cutoff = coordHash();
         if (inAlpha < 0.001 || inAlpha < cutoff) {
             discard;
         }
@@ -32,7 +32,7 @@ void main() {
             discard;
         }
     } else {
-        if (inAlpha < 0.001 || inAlpha < fract(dot(gl_FragCoord.xy, MAGIC))) {
+        if (inAlpha < 0.001 || inAlpha < coordHash()) {
             discard;
         }
     }

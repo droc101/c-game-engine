@@ -10,6 +10,11 @@
 layout(constant_id = 0) const uint DEBUG_RENDERING = 0;
 #       endif
 #   endif
+
+float coordHash() {
+    return fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+}
+
 layout(set = 0, binding = 0) uniform texture2D textures[];
 layout(set = 0, binding = 1) uniform sampler samplers[6];
 vec4 sampleTexture(const uint textureIndex, const vec2 uv) {
@@ -37,4 +42,3 @@ layout(binding = 3, scalar) readonly restrict uniform CameraBuffer {
     float frustumPlanes[4];
 } camera;
 
-const vec2 MAGIC = vec2(0.06711056, 0.00583715) * 52.9829189;

@@ -183,7 +183,10 @@ typedef struct ActorModelInstanceData
 	Color modColor;
 	Color materialColor;
 	uint32_t textureIndex;
-	float _padding[7]; // I hate alignment
+	float _padding[1]; // I hate alignment
+	VkDeviceAddress vertexBuffer;
+	VkDeviceAddress indexBuffer;
+	float _padding2[2]; // I hate alignment
 } ActorModelInstanceData;
 
 typedef struct ActorWallInstanceData

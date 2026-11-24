@@ -58,7 +58,7 @@ void InitRayTracing()
 	ListInit(accelerationStructures.bottomLevelAccelerationStructures, LIST_UINT64);
 	ListInit(accelerationStructures.bottomLevelBuffers, LIST_UINT64);
 	ListInit(accelerationStructures.bottomLevelScratchBuffers, LIST_UINT64);
-	ListInit(lodAccelerationStructureDeviceAddresses, LIST_UINT64);
+	ListInit(lodAccelerationStructureDeviceAddresses, LIST_NESTED);
 
 	const LunaBufferCreationInfo topLevelBufferCreationInfo = {
 		.alignment = 256, // 256 is directly required by the spec
@@ -139,26 +139,45 @@ void MakeBLAS(const ModelDefinition *model,
 	VulkanTest(lunaWriteDataToBuffer(device, commandBuffer, *indexScratchBuffer, &indexScratchBufferWriteInfo),
 			   "Failed to write index data to scratch buffer!");
 
-	VkAccelerationStructureGeometryKHR *geometries = calloc(model->materialSlotCount,
-															sizeof(VkAccelerationStructureGeometryKHR));
+	const uint32_t componentCount = model->materialSlotCount;
+	VkAccelerationStructureGeometryKHR *geometries = calloc(componentCount, sizeof(VkAccelerationStructureGeometryKHR));
 	CheckAlloc(geometries);
-	uint32_t *triangleCounts = malloc(model->materialSlotCount * sizeof(uint32_t));
-	CheckAlloc(triangleCounts);
-	VkAccelerationStructureBuildRangeInfoKHR *ranges = calloc(model->materialSlotCount,
+	VkAccelerationStructureBuildRangeInfoKHR *ranges = calloc(componentCount,
 															  sizeof(VkAccelerationStructureBuildRangeInfoKHR));
 	CheckAlloc(ranges);
+	const VkAccelerationStructureBuildRangeInfoKHR **rangePointers = malloc(componentCount * sizeof(*rangePointers));
+	CheckAlloc(rangePointers);
+	VkAccelerationStructureBuildGeometryInfoKHR
+			*buildGeometryInfos = calloc(componentCount, sizeof(VkAccelerationStructureBuildGeometryInfoKHR));
+	CheckAlloc(buildGeometryInfos);
 
-	List *materialSlotsVertexData = &ListGetNestedList(lodMaterialSlotsVertexData, lodId);
-	for (uint32_t i = 0; i < model->materialSlotCount; i++)
+	while (lodId >= lodAccelerationStructureDeviceAddresses.length)
+	{
+		ListAdd(lodAccelerationStructureDeviceAddresses, NULL);
+	}
+	List *componentAccelerationStructureAddresses = &ListGetNestedList(lodAccelerationStructureDeviceAddresses, lodId);
+	ListFree(*componentAccelerationStructureAddresses);
+	ListInit(*componentAccelerationStructureAddresses, LIST_UINT64);
+
+	const MaterialSlotVertexData
+			*modelFirstMaterialSlotVertexData = ListGetPointer(ListGetNestedList(lodMaterialSlotsVertexData,
+																				 model->lods[0].id),
+															   0);
+	const uint32_t modelFirstIndex = modelFirstMaterialSlotVertexData->firstIndex;
+	const int32_t modelVertexOffset = modelFirstMaterialSlotVertexData->vertexOffset;
+
+	const VkDeviceOrHostAddressConstKHR vertexDataAddress = {
+		.deviceAddress = lunaGetBufferDeviceAddress(device, *vertexScratchBuffer),
+	};
+	const VkDeviceOrHostAddressConstKHR indexDataAddress = {
+		.deviceAddress = lunaGetBufferDeviceAddress(device, *indexScratchBuffer),
+	};
+
+	const List *materialSlotsVertexData = &ListGetNestedList(lodMaterialSlotsVertexData, lodId);
+	for (uint32_t i = 0; i < componentCount; i++)
 	{
 		const MaterialSlotVertexData *materialSlotVertexData = ListGetPointer(*materialSlotsVertexData, i);
 
-		const VkDeviceOrHostAddressConstKHR vertexDataAddress = {
-			.deviceAddress = lunaGetBufferDeviceAddress(device, *vertexScratchBuffer),
-		};
-		const VkDeviceOrHostAddressConstKHR indexDataAddress = {
-			.deviceAddress = lunaGetBufferDeviceAddress(device, *indexScratchBuffer),
-		};
 		const VkAccelerationStructureGeometryTrianglesDataKHR geometryTrianglesData = {
 			.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR,
 			.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT,
@@ -174,100 +193,96 @@ void MakeBLAS(const ModelDefinition *model,
 		geometries[i].sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
 		geometries[i].geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
 		geometries[i].geometry = geometryData;
-		geometries[i].flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-		triangleCounts[i] = materialSlotVertexData->indexCount / 3;
-		ranges[i].primitiveCount = triangleCounts[i];
-		// ranges[i].firstVertex = materialSlotVertexData->vertexOffset;
+
+		const uint32_t triangleCount = materialSlotVertexData->indexCount / 3;
+		ranges[i].primitiveCount = triangleCount;
+		ranges[i].primitiveOffset = (materialSlotVertexData->firstIndex - modelFirstIndex) * sizeof(uint32_t);
+		ranges[i].firstVertex = (uint32_t)(materialSlotVertexData->vertexOffset - modelVertexOffset);
+		rangePointers[i] = &ranges[i];
+
+		const VkAccelerationStructureBuildGeometryInfoKHR buildSizesGeometryInfo = {
+			.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
+			.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+			.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,
+			.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
+			.geometryCount = 1,
+			.pGeometries = &geometries[i],
+		};
+		VkAccelerationStructureBuildSizesInfoKHR buildSizesInfo = {
+			.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR,
+		};
+		vkGetAccelerationStructureBuildSizesKHR(lunaGetVkDevice(device),
+												VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+												&buildSizesGeometryInfo,
+												&triangleCount,
+												&buildSizesInfo);
+
+		const LunaBufferCreationInfo bufferCreationInfo = {
+			.size = buildSizesInfo.accelerationStructureSize,
+			.alignment = 256, // 256 is directly required by the spec
+			.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+			.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT |
+									VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
+		};
+		LunaBuffer *buffer = ListAdd(accelerationStructures.bottomLevelBuffers, LUNA_NULL_HANDLE);
+		VulkanTest(lunaCreateBuffer(device, &bufferCreationInfo, buffer),
+				   "Failed to create buffer for bottom level acceleration structure!");
+
+		const LunaBufferCreationInfo scratchBufferCreationInfo = {
+			.size = buildSizesInfo.buildScratchSize,
+			.alignment = physicalDeviceAccelerationStructureProperties.minAccelerationStructureScratchOffsetAlignment,
+			.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+			.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		};
+		LunaBuffer *scratchBuffer = ListAdd(accelerationStructures.bottomLevelScratchBuffers, LUNA_NULL_HANDLE);
+		VulkanTest(lunaCreateBuffer(device, &scratchBufferCreationInfo, scratchBuffer),
+				   "Failed to create bottom level acceleration structure scratch buffer!");
+
+		const VkAccelerationStructureCreateInfoKHR createInfo = {
+			.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR,
+			.buffer = lunaGetVkBuffer(*buffer),
+			.offset = lunaGetBufferOffset(*buffer),
+			.size = lunaGetBufferSize(*buffer),
+			.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+		};
+		VkAccelerationStructureKHR *accelerationStructure = ListAdd(accelerationStructures
+																			.bottomLevelAccelerationStructures,
+																	LUNA_NULL_HANDLE);
+		VulkanTest(vkCreateAccelerationStructureKHR(lunaGetVkDevice(device), &createInfo, NULL, accelerationStructure),
+				   "Failed to create bottom level acceleration stucture!");
+
+		const VkDeviceOrHostAddressKHR scratchDataAddress = {
+			.deviceAddress = lunaGetBufferDeviceAddress(device, *scratchBuffer),
+		};
+		buildGeometryInfos[i] = buildSizesGeometryInfo;
+		buildGeometryInfos[i].dstAccelerationStructure = *accelerationStructure;
+		buildGeometryInfos[i].scratchData = scratchDataAddress;
+
+		const VkAccelerationStructureDeviceAddressInfoKHR accelerationStructureDeviceAddressInfo = {
+			.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR,
+			.accelerationStructure = *accelerationStructure,
+		};
+		ListAdd(*componentAccelerationStructureAddresses,
+				vkGetAccelerationStructureDeviceAddressKHR(lunaGetVkDevice(device),
+														   &accelerationStructureDeviceAddressInfo));
 	}
 
-	const VkAccelerationStructureBuildGeometryInfoKHR buildSizesGeometryInfo = {
-		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
-		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-		.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,
-		.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
-		.geometryCount = model->materialSlotCount,
-		.pGeometries = geometries,
-	};
-	VkAccelerationStructureBuildSizesInfoKHR buildSizesInfo = {
-		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR,
-	};
-	vkGetAccelerationStructureBuildSizesKHR(lunaGetVkDevice(device),
-											VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
-											&buildSizesGeometryInfo,
-											triangleCounts,
-											&buildSizesInfo);
-
-	const LunaBufferCreationInfo bufferCreationInfo = {
-		.size = buildSizesInfo.accelerationStructureSize,
-		.alignment = 256, // 256 is directly required by the spec
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT |
-								VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
-	};
-	LunaBuffer *buffer = ListAdd(accelerationStructures.bottomLevelBuffers, LUNA_NULL_HANDLE);
-	VulkanTest(lunaCreateBuffer(device, &bufferCreationInfo, buffer),
-			   "Failed to create buffer for bottom level acceleration structure!");
-
-	const LunaBufferCreationInfo scratchBufferCreationInfo = {
-		.size = buildSizesInfo.buildScratchSize,
-		.alignment = physicalDeviceAccelerationStructureProperties.minAccelerationStructureScratchOffsetAlignment,
-		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
-		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-	};
-	LunaBuffer *scratchBuffer = ListAdd(accelerationStructures.bottomLevelScratchBuffers, LUNA_NULL_HANDLE);
-	VulkanTest(lunaCreateBuffer(device, &scratchBufferCreationInfo, scratchBuffer),
-			   "Failed to create bottom level acceleration structure scratch buffer!");
-
-	const VkAccelerationStructureCreateInfoKHR createInfo = {
-		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR,
-		.buffer = lunaGetVkBuffer(*buffer),
-		.offset = lunaGetBufferOffset(*buffer),
-		.size = lunaGetBufferSize(*buffer),
-		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-	};
-	VkAccelerationStructureKHR *
-			accelerationStructure = ListAdd(accelerationStructures.bottomLevelAccelerationStructures, LUNA_NULL_HANDLE);
-	VulkanTest(vkCreateAccelerationStructureKHR(lunaGetVkDevice(device), &createInfo, NULL, accelerationStructure),
-			   "Failed to create bottom level acceleration stucture!");
-
-	const VkDeviceOrHostAddressKHR scratchDataAddress = {
-		.deviceAddress = lunaGetBufferDeviceAddress(device, *scratchBuffer),
-	};
-	const VkAccelerationStructureBuildGeometryInfoKHR buildGeometryInfo = {
-		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
-		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-		.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,
-		.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
-		.dstAccelerationStructure = *accelerationStructure,
-		.geometryCount = model->materialSlotCount,
-		.pGeometries = geometries,
-		.scratchData = scratchDataAddress,
-	};
 	vkCmdBuildAccelerationStructuresKHR(lunaGetVkCommandBuffer(commandBuffer),
-										1,
-										&buildGeometryInfo,
-										(const VkAccelerationStructureBuildRangeInfoKHR *const *)&ranges);
-
-	while (lodId >= lodAccelerationStructureDeviceAddresses.length)
-	{
-		ListAdd(lodAccelerationStructureDeviceAddresses, VK_NULL_HANDLE);
-	}
-	VkDeviceAddress *accelerationStructureAddress = &ListGetUint64(lodAccelerationStructureDeviceAddresses, lodId);
-	const VkAccelerationStructureDeviceAddressInfoKHR accelerationStructureDeviceAddressInfo = {
-		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR,
-		.accelerationStructure = *accelerationStructure,
-	};
-	*accelerationStructureAddress = vkGetAccelerationStructureDeviceAddressKHR(lunaGetVkDevice(device),
-																			   &accelerationStructureDeviceAddressInfo);
+										componentCount,
+										buildGeometryInfos,
+										rangePointers);
 
 	free(geometries);
-	free(triangleCounts);
 	free(ranges);
+	free(rangePointers);
+	free(buildGeometryInfos);
 }
 
-VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *model)
+VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *model, const uint32_t componentIndex)
 {
-	return (VkDeviceAddress)ListGetUint64(lodAccelerationStructureDeviceAddresses, model->lods[LOD_INDEX].id);
+	return (VkDeviceAddress)ListGetUint64(ListGetNestedList(lodAccelerationStructureDeviceAddresses,
+															model->lods[LOD_INDEX].id),
+										  componentIndex);
 }
 
 void BuildTLAS(const uint32_t instanceCount, const VkAccelerationStructureInstanceKHR *instances)

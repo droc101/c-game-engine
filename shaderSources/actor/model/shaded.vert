@@ -20,7 +20,7 @@ layout(location = 10) out vec2 outUV;
 layout(location = 11) flat out uint outTextureIndex;
 
 void main() {
-    const ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
+    ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
     outColor = inColor * instanceData.materialColor * instanceData.modColor;
     const vec4 transformedPosition = instanceData.transformMatrix * vec4(inPosition, 1);
 	outPosition = transformedPosition.xyz;

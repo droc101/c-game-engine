@@ -73,13 +73,32 @@ struct ModelInstanceData
 	uint textureIndex;
 };
 
+struct ActorModelVertex {
+    vec3 position;
+	vec2 uv;
+	vec4 color;
+	vec3 normal;
+	vec2 lightmapUv;
+};
+
+layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer ActorModelVertexBuffer {
+	ActorModelVertex vertices[];
+};
+
+layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer ReadonlyIndexBuffer {
+    uint indices[];
+};
+
 struct ActorModelInstanceData
 {
 	mat4 transformMatrix;
 	vec4 modColor;
 	vec4 materialColor;
 	uint textureIndex;
-    float _padding[7];
+    float _padding[1];
+    ActorModelVertexBuffer vertexBuffer;
+    ReadonlyIndexBuffer indexBuffer;
+    float _padding2[2];
 };
 
 struct ActorWallInstanceData
@@ -116,10 +135,6 @@ layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer Act
 
 layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer DrawIndexedIndirectBuffer {
     VkDrawIndexedIndirectCommand drawInfos[];
-};
-
-layout(scalar, buffer_reference, buffer_reference_align = 4) readonly buffer UnculledInstanceIndicesBuffer {
-    uint indices[];
 };
 
 layout(scalar, buffer_reference, buffer_reference_align = 4) writeonly buffer OutputInstanceIndicesBuffer {
@@ -168,12 +183,12 @@ struct FrustumCullingData
     ActorWallsDrawInfoBuffer unshadedActorWallsDrawInfo;
 
     ActorModelCullingInfoBuffer shadedActorModelsCullingInfo;
-    UnculledInstanceIndicesBuffer shadedActorModelsUnculledInstanceIndices;
+    ReadonlyIndexBuffer shadedActorModelsUnculledInstanceIndices;
     OutputInstanceIndicesBuffer shadedActorModelsInstanceIndices;
     DrawIndexedIndirectBuffer shadedActorModelsDrawInfo;
 
     ActorModelCullingInfoBuffer unshadedActorModelsCullingInfo;
-    UnculledInstanceIndicesBuffer unshadedActorModelsUnculledInstanceIndices;
+    ReadonlyIndexBuffer unshadedActorModelsUnculledInstanceIndices;
     OutputInstanceIndicesBuffer unshadedActorModelsInstanceIndices;
     DrawIndexedIndirectBuffer unshadedActorModelsDrawInfo;
 };

@@ -16,7 +16,7 @@ layout(location = 0, component = 3) out float outAlpha;
 layout(location = 1) flat out uint outTextureIndex;
 
 void main() {
-    const ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
+    ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[inInstanceIndex];
     outUv = inUV;
 	outAlpha = inColor.a * instanceData.materialColor.a * instanceData.modColor.a;
     outTextureIndex = instanceData.textureIndex;

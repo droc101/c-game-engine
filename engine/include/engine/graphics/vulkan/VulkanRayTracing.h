@@ -16,7 +16,7 @@ void MakeBLAS(const ModelDefinition *modelDefinition,
 			  uint32_t indexBufferSize,
 			  const uint32_t *modelIndices);
 
-VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *modelDefinition);
+VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *modelDefinition, uint32_t componentIndex);
 
 void BuildTLAS(uint32_t instanceCount, const VkAccelerationStructureInstanceKHR *instances);
 

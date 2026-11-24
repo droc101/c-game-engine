@@ -375,9 +375,9 @@ void CreateBuffers()
 {
 	storageBufferCreationInfo.alignment = physicalDeviceProperties.limits.minStorageBufferOffsetAlignment;
 
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.modelVertices),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.modelVertices),
 			   "Failed to create models vertex buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffers.modelIndices),
+	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BDA_BUFFER_CREATION_INFO, &buffers.modelIndices),
 			   "Failed to create models index buffer!");
 
 	CreateUiBuffers();
