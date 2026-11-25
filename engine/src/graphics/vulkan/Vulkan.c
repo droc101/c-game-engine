@@ -1819,7 +1819,11 @@ static inline void HandleDeferredWork()
 		return;
 	}
 
-	VK_BeginDebugLabel("Handle deferred work");
+	const VkDebugUtilsLabelEXT label = {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
+		.pLabelName = "Handle deferred work",
+	};
+	vkQueueInsertDebugUtilsLabelEXT(queue, &label);
 
 	VulkanTest(lunaDeviceWaitIdle(device), "Failed to wait for device idle!");
 	if (rendererQueuedActions & QUEUED_ACTION_CLEAR_ALL_MODELS)
@@ -1976,8 +1980,6 @@ static inline void HandleDeferredWork()
 
 		pendingTasks &= ~PENDING_TASK_RECREATE_GRAPHICS_PIPELINES;
 	}
-
-	VK_EndDebugLabel();
 }
 
 bool VK_Init(SDL_Window *window)
@@ -2391,8 +2393,8 @@ void VK_LoadMap(const Map *map)
 	CreateShadowMaps(map);
 	LoadMapModelsToBuffer(map->modelCount, map->models, true, &buffers.opaqueMap);
 	LoadMapModelsToBuffer(map->modelCount, map->models, false, &buffers.map);
-	LoadModelToBuffer(map->viewmodel.model, 0, map->viewmodel.modelSkin, &buffers.viewmodel);
 	LoadMapForRaytracing(map);
+	LoadModelToBuffer(map->viewmodel.model, 0, map->viewmodel.modelSkin, &buffers.viewmodel);
 	LoadActors(&map->actors);
 	UpdateGlobalLightingUniform(map);
 	UpdateFogUniform(map);
