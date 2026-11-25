@@ -1004,7 +1004,7 @@ static inline void DrawSky(const LunaGraphicsPipelineBindInfo *pipelineBindInfo)
 }
 
 static inline void DrawModelBuffer(const ModelBuffer *buffer,
-								   const LunaGraphicsPipelineBindInfo *pipelineBindInfo,
+								   LunaGraphicsPipelineBindInfo *pipelineBindInfo,
 								   const char *name)
 {
 	VK_BeginDebugLabel("Draw %s", name);
@@ -1034,6 +1034,7 @@ static inline void DrawModelBuffer(const ModelBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw shaded %s", name);
 
+		pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
 		const LunaDrawIndexedIndirectInfo drawInfo = {
 			.pipeline = pipelines.shadedModel,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -1049,6 +1050,7 @@ static inline void DrawModelBuffer(const ModelBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw unshaded %s", name);
 
+		pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
 		const LunaDrawIndexedIndirectInfo drawInfo = {
 			.pipeline = pipelines.unshadedModel,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -1097,7 +1099,7 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw shaded %s models", name);
 
-		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0 && shadedPipeline == pipelines.shadedMap)
+		if (shadedPipeline == pipelines.shadedMap)
 		{
 			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
 		}
@@ -1116,10 +1118,7 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw unshaded %s models", name);
 
-		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount != 0)
-		{
-			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
-		}
+		pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
 		const LunaDrawIndexedIndirectCountInfo drawInfo = {
 			.pipeline = unshadedPipeline,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -2393,6 +2392,7 @@ void VK_LoadMap(const Map *map)
 	LoadMapModelsToBuffer(map->modelCount, map->models, true, &buffers.opaqueMap);
 	LoadMapModelsToBuffer(map->modelCount, map->models, false, &buffers.map);
 	LoadModelToBuffer(map->viewmodel.model, 0, map->viewmodel.modelSkin, &buffers.viewmodel);
+	LoadMapForRaytracing(map);
 	LoadActors(&map->actors);
 	UpdateGlobalLightingUniform(map);
 	UpdateFogUniform(map);

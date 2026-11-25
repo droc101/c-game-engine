@@ -785,5 +785,6 @@ void UpdateActors()
 
 	ListFree(lodInstanceCounts);
 
-	BuildTLAS(reallocInfo.modelInstanceCount, blasInstances);
+	UpdateAccelerationStructureInstances(reallocInfo.modelInstanceCount, blasInstances, 0, NULL);
+	BuildTLAS();
 }

@@ -3,21 +3,24 @@
 //
 
 #include <engine/assets/ModelLoader.h>
+#include <engine/assets/TextureLoader.h>
 #include <engine/graphics/vulkan/VulkanHelpers.h>
 #include <engine/graphics/vulkan/VulkanModel.h>
+#include <engine/helpers/Macros.h>
 #include <engine/structs/List.h>
+#include <engine/structs/Map.h>
 #include <engine/subsystem/Error.h>
+#include <luna/luna.h>
 #include <luna/lunaBuffer.h>
 #include <luna/lunaCommandBuffer.h>
 #include <luna/lunaDevice.h>
 #include <luna/lunaTypes.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <volk.h>
 #include <vulkan/vulkan_core.h>
-#include <wchar.h>
-
-#include "luna/luna.h"
 
 // TODO: Split into opaque vs not opaque
 
@@ -48,6 +51,9 @@ static VkPhysicalDeviceProperties2 physicalDeviceProperties2 = {
 static AccelerationStructures accelerationStructures;
 static List lodAccelerationStructureDeviceAddresses;
 static LunaBuffer topLevelAccelerationStructureInstancesBuffer;
+static uint32_t mapBottomLevelAccelerationStructureInstanceCount;
+static VkAccelerationStructureInstanceKHR *mapBottomLevelAccelerationStructureInstances;
+static uint32_t totalBottomLevelAccelerationStructureInstanceCount;
 
 void InitRayTracing()
 {
@@ -91,11 +97,11 @@ void InitRayTracing()
 			   "Failed to create top level acceleration structure instances buffer!");
 }
 
-void MakeBLAS(const ModelDefinition *model,
-			  const uint32_t vertexBufferSize,
-			  const ModelVertex *modelVertices,
-			  const uint32_t indexBufferSize,
-			  const uint32_t *modelIndices)
+void MakeModelBLAS(const ModelDefinition *model,
+				   const uint32_t vertexBufferSize,
+				   const ModelVertex *modelVertices,
+				   const uint32_t indexBufferSize,
+				   const uint32_t *modelIndices)
 {
 	const uint32_t lodId = model->lods[LOD_INDEX].id;
 
@@ -267,10 +273,7 @@ void MakeBLAS(const ModelDefinition *model,
 														   &accelerationStructureDeviceAddressInfo));
 	}
 
-	vkCmdBuildAccelerationStructuresKHR(lunaGetVkCommandBuffer(commandBuffer),
-										componentCount,
-										buildGeometryInfos,
-										rangePointers);
+	vkCmdBuildAccelerationStructuresKHR(vkCommandBuffer, componentCount, buildGeometryInfos, rangePointers);
 
 	free(geometries);
 	free(ranges);
@@ -278,28 +281,278 @@ void MakeBLAS(const ModelDefinition *model,
 	free(buildGeometryInfos);
 }
 
-VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *model, const uint32_t componentIndex)
+// TODO: Investigate using a single BLAS with multiple instances for rectangular faces
+void MakeMapModelBLAS(const MapModelsBuffer *buffer,
+					  const VkDeviceSize vertexOffset,
+					  const VkDeviceSize indexOffset,
+					  const uint32_t triangleCount,
+					  const uint32_t instanceIndex)
 {
-	return (VkDeviceAddress)ListGetUint64(ListGetNestedList(lodAccelerationStructureDeviceAddresses,
-															model->lods[LOD_INDEX].id),
-										  componentIndex);
+	const VkDevice vkDevice = lunaGetVkDevice(device);
+	const VkDeviceOrHostAddressConstKHR vertexDataAddress = {
+		.deviceAddress = lunaGetBufferDeviceAddress(device, buffer->vertices),
+	};
+	const VkDeviceOrHostAddressConstKHR indexDataAddress = {
+		.deviceAddress = lunaGetBufferDeviceAddress(device, buffer->indices) + indexOffset,
+	};
+
+
+	const VkAccelerationStructureGeometryTrianglesDataKHR geometryTrianglesData = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR,
+		.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT,
+		.vertexData = vertexDataAddress,
+		.vertexStride = sizeof(MapVertex),
+		.maxVertex = lunaGetBufferSize(buffer->vertices) / sizeof(MapVertex) - 1,
+		.indexType = VK_INDEX_TYPE_UINT32,
+		.indexData = indexDataAddress,
+	};
+	const VkAccelerationStructureGeometryDataKHR geometryData = {
+		.triangles = geometryTrianglesData,
+	};
+	const VkAccelerationStructureGeometryKHR geometry = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR,
+		.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR,
+		.geometry = geometryData,
+		.flags = VK_GEOMETRY_OPAQUE_BIT_KHR,
+	};
+
+	const VkAccelerationStructureBuildGeometryInfoKHR buildSizesGeometryInfo = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
+		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+		.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,
+		.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
+		.geometryCount = 1,
+		.pGeometries = &geometry,
+	};
+	VkAccelerationStructureBuildSizesInfoKHR buildSizesInfo = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR,
+	};
+	vkGetAccelerationStructureBuildSizesKHR(vkDevice,
+											VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+											&buildSizesGeometryInfo,
+											&triangleCount,
+											&buildSizesInfo);
+
+	LunaBuffer *accelerationStructureBuffer = ListAdd(accelerationStructures.bottomLevelBuffers, LUNA_NULL_HANDLE);
+	const LunaBufferCreationInfo bufferCreationInfo = {
+		.size = buildSizesInfo.accelerationStructureSize,
+		.alignment = 256, // 256 is directly required by the spec
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR |
+								VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+	};
+	VulkanTest(lunaCreateBuffer(device, &bufferCreationInfo, accelerationStructureBuffer),
+			   "Failed to create map model bottom level acceleration structure buffer!");
+
+	VkAccelerationStructureKHR
+			*accelerationStructure = ListAdd(accelerationStructures.bottomLevelAccelerationStructures, VK_NULL_HANDLE);
+	const VkAccelerationStructureCreateInfoKHR createInfo = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR,
+		.buffer = lunaGetVkBuffer(*accelerationStructureBuffer),
+		.offset = lunaGetBufferOffset(*accelerationStructureBuffer),
+		.size = lunaGetBufferSize(*accelerationStructureBuffer),
+		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+	};
+	VulkanTest(vkCreateAccelerationStructureKHR(vkDevice, &createInfo, NULL, accelerationStructure),
+			   "Failed to create map model bottom level acceleration structure!");
+
+	LunaBuffer *scratchBuffer = ListAdd(accelerationStructures.bottomLevelScratchBuffers, LUNA_NULL_HANDLE);
+	const LunaBufferCreationInfo scratchBufferCreationInfo = {
+		.size = buildSizesInfo.buildScratchSize,
+		.alignment = physicalDeviceAccelerationStructureProperties.minAccelerationStructureScratchOffsetAlignment,
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+	};
+	VulkanTest(lunaCreateBuffer(device, &scratchBufferCreationInfo, scratchBuffer),
+			   "Failed to create map model bottom level acceleration structure scratch buffer!");
+
+	const VkDeviceOrHostAddressKHR scratchDataAddress = {
+		.deviceAddress = lunaGetBufferDeviceAddress(device, *scratchBuffer),
+	};
+	const VkAccelerationStructureBuildGeometryInfoKHR buildGeometryInfo = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR,
+		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+		.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,
+		.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR,
+		.dstAccelerationStructure = *accelerationStructure,
+		.geometryCount = 1,
+		.pGeometries = &geometry,
+		.scratchData = scratchDataAddress,
+	};
+	const VkAccelerationStructureBuildRangeInfoKHR buildRangeInfo = {
+		.primitiveCount = triangleCount,
+		.firstVertex = vertexOffset,
+	};
+	const VkAccelerationStructureBuildRangeInfoKHR *pBuildRangeInfo = &buildRangeInfo;
+	vkCmdBuildAccelerationStructuresKHR(vkCommandBuffer, 1, &buildGeometryInfo, &pBuildRangeInfo);
+
+	VkAccelerationStructureInstanceKHR *instance = &mapBottomLevelAccelerationStructureInstances[instanceIndex];
+	instance->transform.matrix[0][0] = 1;
+	instance->transform.matrix[1][1] = 1;
+	instance->transform.matrix[2][2] = 1;
+	instance->instanceCustomIndex = (instanceIndex & ((1u << 22) - 1));
+	instance->mask = 0xFF;
+	const VkAccelerationStructureDeviceAddressInfoKHR deviceAddressInfo = {
+		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR,
+		.accelerationStructure = *accelerationStructure,
+	};
+	instance->accelerationStructureReference = vkGetAccelerationStructureDeviceAddressKHR(vkDevice, &deviceAddressInfo);
 }
 
-void BuildTLAS(const uint32_t instanceCount, const VkAccelerationStructureInstanceKHR *instances)
+void ClearLunaBufferList(List *list)
 {
-	VulkanTest(lunaResizeBuffer(device,
-								&topLevelAccelerationStructureInstancesBuffer,
-								instanceCount * sizeof(*instances)),
-			   "Failed to resize top level acceleration structure instances buffer!");
-	const LunaBufferWriteInfo instancesBufferWriteInfo = {
-		.size = instanceCount * sizeof(*instances),
-		.data = instances,
+	for (size_t i = 0; i < list->length; i++)
+	{
+		lunaDestroyBuffer((LunaBuffer)ListGetUint64(*list, i));
+	}
+	ListClear(*list);
+}
+
+void LoadMapForRaytracing(const Map *map)
+{
+	ClearLunaBufferList(&accelerationStructures.vertexScratchBuffers);
+	ClearLunaBufferList(&accelerationStructures.indexScratchBuffers);
+	ClearLunaBufferList(&accelerationStructures.bottomLevelBuffers);
+	ClearLunaBufferList(&accelerationStructures.bottomLevelScratchBuffers);
+	for (size_t i = 0; i < accelerationStructures.bottomLevelAccelerationStructures.length; i++)
+	{
+		vkDestroyAccelerationStructureKHR(lunaGetVkDevice(device),
+										  (VkAccelerationStructureKHR)
+												  ListGetUint64(accelerationStructures
+																		.bottomLevelAccelerationStructures,
+																i),
+										  NULL);
+	}
+	ListClear(accelerationStructures.bottomLevelAccelerationStructures);
+
+	mapBottomLevelAccelerationStructureInstanceCount = map->modelCount;
+	free(mapBottomLevelAccelerationStructureInstances);
+	mapBottomLevelAccelerationStructureInstances = calloc(map->modelCount, sizeof(VkAccelerationStructureInstanceKHR));
+	CheckAlloc(mapBottomLevelAccelerationStructureInstances);
+
+	LunaBuffer mapBuffers[] = {
+		buffers.opaqueMap.vertices,
+		buffers.opaqueMap.indices,
+		buffers.map.vertices,
+		buffers.map.indices,
 	};
-	VulkanTest(lunaWriteDataToBuffer(device,
-									 commandBuffer,
-									 topLevelAccelerationStructureInstancesBuffer,
-									 &instancesBufferWriteInfo),
-			   "Failed to write TLAS instance buffer!");
+	const LunaMultiBufferMemoryBarrier multiBufferMemoryBarrier = {
+		.sourceStageMask = VK_PIPELINE_STAGE_2_CLEAR_BIT | VK_PIPELINE_STAGE_2_COPY_BIT,
+		.sourceAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+		.destinationStageMask = VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+		.destinationAccessMask = VK_ACCESS_2_ACCELERATION_STRUCTURE_READ_BIT_KHR |
+								 VK_ACCESS_2_ACCELERATION_STRUCTURE_WRITE_BIT_KHR,
+		.bufferCount = ArrayLength(mapBuffers),
+		.buffers = mapBuffers,
+	};
+	const LunaDependencyInfo dependencyInfo = {
+		.multiBufferMemoryBarrierCount = 1,
+		.multiBufferMemoryBarriers = &multiBufferMemoryBarrier,
+	};
+	VulkanTest(lunaPipelineBarrier(device, commandBuffer, &dependencyInfo),
+			   "Failed to insert pipeline barrier before building map model acceleration structures!");
+
+	VkDeviceSize opaqueVertexOffset = 0;
+	VkDeviceSize opaqueIndexOffset = 0;
+	VkDeviceSize translucentVertexOffset = 0;
+	VkDeviceSize translucentIndexOffset = 0;
+	for (size_t i = 0; i < map->modelCount; i++)
+	{
+		const MapModel *model = map->models + i;
+		const bool opaque = LoadImage(model->material->texture)->opaque;
+		VkDeviceSize *const vertexOffset = opaque ? &opaqueVertexOffset : &translucentVertexOffset;
+		VkDeviceSize *const indexOffset = opaque ? &opaqueIndexOffset : &translucentIndexOffset;
+		MakeMapModelBLAS(opaque ? &buffers.opaqueMap : &buffers.map,
+						 *vertexOffset,
+						 *indexOffset,
+						 model->indexCount / 3,
+						 i);
+		*vertexOffset += model->vertexCount;
+		*indexOffset += model->indexCount * sizeof(uint32_t);
+	}
+
+	VulkanTest(lunaResizeBuffer(device, &topLevelAccelerationStructureInstancesBuffer, 0),
+			   "Failed to clear top level acceleration structure instances buffer!");
+}
+
+void UpdateAccelerationStructureInstances(const uint32_t modelInstanceCount,
+										  const VkAccelerationStructureInstanceKHR *modelInstances,
+										  const uint32_t wallInstanceCount,
+										  const VkAccelerationStructureInstanceKHR *wallInstances)
+{
+	static const VkPipelineStageFlags2 STAGE_MASK = VK_PIPELINE_STAGE_2_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
+													VK_PIPELINE_STAGE_2_CLEAR_BIT |
+													VK_PIPELINE_STAGE_2_COPY_BIT;
+	static const VkAccessFlags2 ACCESS_MASK = VK_ACCESS_2_ACCELERATION_STRUCTURE_READ_BIT_KHR |
+											  VK_ACCESS_2_ACCELERATION_STRUCTURE_WRITE_BIT_KHR |
+											  VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
+	totalBottomLevelAccelerationStructureInstanceCount = mapBottomLevelAccelerationStructureInstanceCount +
+														 modelInstanceCount +
+														 wallInstanceCount;
+	const VkDeviceSize mapModelInstancesSize = mapBottomLevelAccelerationStructureInstanceCount *
+											   sizeof(VkAccelerationStructureInstanceKHR);
+	const VkDeviceSize newSize = totalBottomLevelAccelerationStructureInstanceCount *
+								 sizeof(VkAccelerationStructureInstanceKHR);
+	if (newSize > lunaGetBufferSize(topLevelAccelerationStructureInstancesBuffer))
+	{
+		VulkanTest(lunaResizeBuffer(device, &topLevelAccelerationStructureInstancesBuffer, newSize),
+				   "Failed to resize top level acceleration structure instances buffer!");
+		const LunaBufferWriteInfo instancesBufferWriteInfo = {
+			.size = mapModelInstancesSize,
+			.data = mapBottomLevelAccelerationStructureInstances,
+			.sourceStageMask = STAGE_MASK,
+			.sourceAccessMask = ACCESS_MASK,
+			.destinationStageMask = STAGE_MASK,
+			.destinationAccessMask = ACCESS_MASK,
+		};
+		VulkanTest(lunaWriteDataToBuffer(device,
+										 commandBuffer,
+										 topLevelAccelerationStructureInstancesBuffer,
+										 &instancesBufferWriteInfo),
+				   "Failed to write map model instances to TLAS instance buffer!");
+	}
+	if (modelInstanceCount > 0 && modelInstances != NULL)
+	{
+		const LunaBufferWriteInfo instancesBufferWriteInfo = {
+			.size = modelInstanceCount * sizeof(VkAccelerationStructureInstanceKHR),
+			.data = modelInstances,
+			.offset = mapModelInstancesSize,
+			.sourceStageMask = STAGE_MASK,
+			.sourceAccessMask = ACCESS_MASK,
+			.destinationStageMask = STAGE_MASK,
+			.destinationAccessMask = ACCESS_MASK,
+		};
+		VulkanTest(lunaWriteDataToBuffer(device,
+										 commandBuffer,
+										 topLevelAccelerationStructureInstancesBuffer,
+										 &instancesBufferWriteInfo),
+				   "Failed to write actor model instances to TLAS instance buffer!");
+	}
+	if (wallInstanceCount > 0 && wallInstances != NULL)
+	{
+		const LunaBufferWriteInfo instancesBufferWriteInfo = {
+			.size = wallInstanceCount * sizeof(VkAccelerationStructureInstanceKHR),
+			.data = wallInstances,
+			.offset = mapModelInstancesSize + modelInstanceCount * sizeof(VkAccelerationStructureInstanceKHR),
+			.sourceStageMask = STAGE_MASK,
+			.sourceAccessMask = ACCESS_MASK,
+			.destinationStageMask = STAGE_MASK,
+			.destinationAccessMask = ACCESS_MASK,
+		};
+		VulkanTest(lunaWriteDataToBuffer(device,
+										 commandBuffer,
+										 topLevelAccelerationStructureInstancesBuffer,
+										 &instancesBufferWriteInfo),
+				   "Failed to write actor wall instances to TLAS instance buffer!");
+	}
+}
+
+void BuildTLAS()
+{
+	vkDestroyAccelerationStructureKHR(lunaGetVkDevice(device),
+									  accelerationStructures.topLevelAccelerationStructure,
+									  NULL);
 
 	const VkDeviceOrHostAddressConstKHR instancesDataAddress = {
 		.deviceAddress = lunaGetBufferDeviceAddress(device, topLevelAccelerationStructureInstancesBuffer),
@@ -332,7 +585,7 @@ void BuildTLAS(const uint32_t instanceCount, const VkAccelerationStructureInstan
 	vkGetAccelerationStructureBuildSizesKHR(lunaGetVkDevice(device),
 											VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
 											&buildSizesGeometryInfo,
-											&instanceCount,
+											&totalBottomLevelAccelerationStructureInstanceCount,
 											&buildSizesInfo);
 
 	VulkanTest(lunaResizeBuffer(device,
@@ -369,7 +622,7 @@ void BuildTLAS(const uint32_t instanceCount, const VkAccelerationStructureInstan
 		.scratchData = scratchDataAddress,
 	};
 	const VkAccelerationStructureBuildRangeInfoKHR buildRangeInfo = {
-		.primitiveCount = instanceCount,
+		.primitiveCount = totalBottomLevelAccelerationStructureInstanceCount,
 	};
 	const VkAccelerationStructureBuildRangeInfoKHR *pBuildRangeInfo = &buildRangeInfo;
 	vkCmdBuildAccelerationStructuresKHR(lunaGetVkCommandBuffer(commandBuffer), 1, &buildGeometryInfo, &pBuildRangeInfo);
@@ -387,4 +640,11 @@ void BuildTLAS(const uint32_t instanceCount, const VkAccelerationStructureInstan
 		.descriptorCount = 1,
 	};
 	lunaWriteDescriptorSets(device, 1, &descriptorWrite);
+}
+
+VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *model, const uint32_t componentIndex)
+{
+	return (VkDeviceAddress)ListGetUint64(ListGetNestedList(lodAccelerationStructureDeviceAddresses,
+															model->lods[LOD_INDEX].id),
+										  componentIndex);
 }

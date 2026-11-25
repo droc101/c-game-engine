@@ -126,7 +126,7 @@ void LoadModelLods(const ModelDefinition *model)
 	bufferVertexCount += vertexCount;
 	bufferIndexCount += indexCount;
 
-	MakeBLAS(model, vertexCount * sizeof(ModelVertex), vertexData, indexCount * sizeof(uint32_t), indexData);
+	MakeModelBLAS(model, vertexCount * sizeof(ModelVertex), vertexData, indexCount * sizeof(uint32_t), indexData);
 
 	VK_EndDebugLabel();
 }

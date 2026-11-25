@@ -10,14 +10,21 @@
 
 void InitRayTracing();
 
-void MakeBLAS(const ModelDefinition *modelDefinition,
-			  uint32_t vertexBufferSize,
-			  const ModelVertex *modelVertices,
-			  uint32_t indexBufferSize,
-			  const uint32_t *modelIndices);
+void MakeModelBLAS(const ModelDefinition *modelDefinition,
+				   uint32_t vertexBufferSize,
+				   const ModelVertex *modelVertices,
+				   uint32_t indexBufferSize,
+				   const uint32_t *modelIndices);
+
+void LoadMapForRaytracing(const Map *map);
+
+void UpdateAccelerationStructureInstances(uint32_t modelInstanceCount,
+										  const VkAccelerationStructureInstanceKHR *modelInstances,
+										  uint32_t wallInstanceCount,
+										  const VkAccelerationStructureInstanceKHR *wallInstances);
+
+void BuildTLAS();
 
 VkDeviceAddress GetAccelerationStructureDeviceAddress(const ModelDefinition *modelDefinition, uint32_t componentIndex);
-
-void BuildTLAS(uint32_t instanceCount, const VkAccelerationStructureInstanceKHR *instances);
 
 #endif //GAME_VULKANRAYTRACING_H

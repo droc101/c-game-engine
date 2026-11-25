@@ -249,9 +249,14 @@ static inline void CreateActorWallsBuffers()
 
 static inline void CreateMapModelsBuffers(MapModelsBuffer *buffer)
 {
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->vertices),
+	static const LunaBufferCreationInfo ACCELERATION_STRUCTURE_INPUT_BUFFER_CREATION_INFO = {
+		.memoryType = LUNA_MEMORY_TYPE_DEVICE_LOCAL,
+		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT |
+								VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+	};
+	VulkanTest(lunaCreateBuffer(device, &ACCELERATION_STRUCTURE_INPUT_BUFFER_CREATION_INFO, &buffer->vertices),
 			   "Failed to create shaded map models vertex buffer!");
-	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->indices),
+	VulkanTest(lunaCreateBuffer(device, &ACCELERATION_STRUCTURE_INPUT_BUFFER_CREATION_INFO, &buffer->indices),
 			   "Failed to create shaded map models index buffer!");
 	VulkanTest(lunaCreateBuffer(device, &UNALIGNED_BUFFER_CREATION_INFO, &buffer->instanceData),
 			   "Failed to create shaded map models instance data buffer!");

@@ -130,6 +130,9 @@ bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direc
         }
         const uint instanceIndex = rayQueryGetIntersectionInstanceCustomIndexEXT(rayQuery, false);
         const uint type = bitfieldExtract(instanceIndex, 22, 2);
+        if (type == 0) {
+            return false;
+        }
         if (type != 1) {
             continue;
         }

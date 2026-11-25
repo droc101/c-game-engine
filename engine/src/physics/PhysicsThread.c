@@ -107,7 +107,7 @@ static inline void UpdateActorLods(const LockingList *actors, const Vector3 came
 		{
 			continue;
 		}
-		actor->currentLod = 0;
+		actor->currentLod = 0; // TODO: Fix this
 		continue;
 		Vector3_Subtract(&actor->previousTickEndTransform.position, &cameraPosition, &offsetFromCamera);
 		const float distanceSquared = Vector3_LengthSquared(&offsetFromCamera);
