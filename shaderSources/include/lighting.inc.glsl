@@ -6,6 +6,7 @@
 
 #define USE_CLUSTERED
 #define USE_RAYTRACING
+#define TRUE_ALPHA_SHADOWS
 
 layout(constant_id = 1) const uint LIGHT_COUNT = 1;
 layout(constant_id = 2) const bool HAS_STATIC_LIGHT = true;
@@ -120,7 +121,7 @@ float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord, cons
 }
 
 #ifdef USE_RAYTRACING
-bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direction) {
+float lightVisibility(const vec3 origin, const vec3 lightToWorld, const vec3 direction) {
     rayQueryEXT rayQuery;
     rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, 0, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1);
     float visibility = 1;
@@ -131,13 +132,16 @@ bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direc
         const uint instanceIndex = rayQueryGetIntersectionInstanceCustomIndexEXT(rayQuery, false);
         const uint type = bitfieldExtract(instanceIndex, 22, 2);
         if (type == 0) {
-            return false;
+            return 0;
         }
         if (type != 1) {
             continue;
         }
         const uint baseIndex = 3 * rayQueryGetIntersectionPrimitiveIndexEXT(rayQuery, false);
         ActorModelInstanceData instanceData = instanceDatas[1].instanceDatas[bitfieldExtract(instanceIndex, 0, 22)];
+        if (instanceData.castsShadows == 0) {
+            continue;
+        }
         const ActorModelVertex v0 = instanceData.vertexBuffer.vertices[instanceData.indexBuffer.indices[baseIndex + 0]];
         const ActorModelVertex v1 = instanceData.vertexBuffer.vertices[instanceData.indexBuffer.indices[baseIndex + 1]];
         const ActorModelVertex v2 = instanceData.vertexBuffer.vertices[instanceData.indexBuffer.indices[baseIndex + 2]];
@@ -147,6 +151,11 @@ bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direc
         const uint index = bitfieldExtract(instanceData.textureIndex, 0, 19);
         const uint flags = bitfieldExtract(instanceData.textureIndex, 29, 3);
         const float textureAlpha = textureLod(sampler2D(textures[nonuniformEXT(index)], samplers[(flags & 2) + 2 + (flags >> 2)]), uv, 0).a;
+#ifdef TRUE_ALPHA_SHADOWS
+        visibility -= dot(interpolationFactor, vec3(v0.color.a, v1.color.a, v2.color.a)) * instanceData.modColor.a * instanceData.materialColor.a * textureAlpha;
+    }
+    return rayQueryGetIntersectionTypeEXT(rayQuery, true) == gl_RayQueryCommittedIntersectionNoneEXT ? max(visibility, 0) : 0;
+#else
         float alpha = dot(interpolationFactor, vec3(v0.color.a, v1.color.a, v2.color.a)) * instanceData.modColor.a * instanceData.materialColor.a;
         const float cutoff = coordHash();
         if (alpha < 0.001 || alpha < cutoff) {
@@ -156,9 +165,10 @@ bool isLightVisible(const vec3 origin, const vec3 lightToWorld, const vec3 direc
         if (alpha < 0.001 || alpha < cutoff) {
             continue;
         }
-        return false;
+        return 0;
     }
-    return rayQueryGetIntersectionTypeEXT(rayQuery, true) == gl_RayQueryCommittedIntersectionNoneEXT;
+    return rayQueryGetIntersectionTypeEXT(rayQuery, true) == gl_RayQueryCommittedIntersectionNoneEXT ? 1 : 0;
+#endif
 }
 #endif
 
@@ -185,7 +195,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 continue;
             }
             const vec4 worldPosition = lightsData.cascadeMatrices[cascadeIndex] * vec4(position, 1);
-            const vec4 coord = worldPosition / worldPosition.interpolationFactor;
+            const vec4 coord = worldPosition / worldPosition.w;
             if (coord.x >= -1 && coord.x <= 1 && coord.y >= -1 && coord.y <= 1) {
                 const float factor = sampleDirectionalShadowMap(cascadeIndex, coord.xyz, light.frustumShadowMaps.shadowMaps[cascadeIndex].resolution);
                 if (factor < EPSILON) {
@@ -206,23 +216,25 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (dottedDirection < light.fadingCos) {
                     continue;
                 }
-                const float brightness = getLightBrightness(light, distance, sqrt(1 - dottedDirection * dottedDirection));
+                float brightness = getLightBrightness(light, distance, sqrt(1 - dottedDirection * dottedDirection));
                 if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
-                const float normalFactor = dot(lightToWorldNormalized, normal);
-                if (normalFactor < EPSILON) {
+                brightness *= dot(lightToWorldNormalized, normal);
+                if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
 #ifdef USE_RAYTRACING
-                if (isLightVisible(position, lightToWorld, lightToWorldNormalized)) {
-                    if (light.cookieTextureIndex != 0) {
-                        const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
-                        const vec3 cookieColor = sampleTexture(light.cookieTextureIndex - 1, (worldPosition.xy / (worldPosition.w - 0.01)) * 0.5 + 0.5).rgb;
-                        lightingColor += brightness * normalFactor * light.color * cookieColor;
-                    } else {
-                        lightingColor += brightness * normalFactor * light.color;
-                    }
+                brightness *= lightVisibility(position, lightToWorld, lightToWorldNormalized);
+                if (brightness < MIN_BRIGHTNESS) {
+                    continue;
+                }
+                if (light.cookieTextureIndex != 0) {
+                    const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
+                    const vec3 cookieColor = sampleTexture(light.cookieTextureIndex - 1, (worldPosition.xy / (worldPosition.w - 0.01)) * 0.5 + 0.5).rgb;
+                    lightingColor += brightness * light.color * cookieColor;
+                } else {
+                    lightingColor += brightness * light.color;
                 }
 #else
                 const vec4 worldPosition = light.transformMatrix * vec4(position, 1);
@@ -234,25 +246,27 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                     }
                     if (light.cookieTextureIndex != 0) {
                         const vec3 cookieColor = sampleTexture(light.cookieTextureIndex - 1, coord.xy * 0.5 + 0.5).rgb;
-                        lightingColor += factor * brightness * normalFactor * light.color * cookieColor;
+                        lightingColor += factor * brightness * light.color * cookieColor;
                     } else {
-                        lightingColor += factor * brightness * normalFactor * light.color;
+                        lightingColor += factor * brightness * light.color;
                     }
                 }
 #endif
             } else {
-                const float normalFactor = dot(lightToWorldNormalized, normal);
-                if (normalFactor < EPSILON) {
+                float brightness = getLightBrightness(light, distance, 0);
+                if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
-                const float brightness = getLightBrightness(light, distance, 0);
+                brightness *= dot(lightToWorldNormalized, normal);
                 if (brightness < MIN_BRIGHTNESS) {
                     continue;
                 }
 #ifdef USE_RAYTRACING
-                if (isLightVisible(position, lightToWorld, lightToWorldNormalized)) {
-                    lightingColor += brightness * normalFactor * light.color;
+                brightness *= lightVisibility(position, lightToWorld, lightToWorldNormalized);
+                if (brightness < MIN_BRIGHTNESS) {
+                    continue;
                 }
+                lightingColor += brightness * light.color;
 #else
                 const vec3 lightToWorldAbs = abs(lightToWorld);
                 const float scale = max(max(lightToWorldAbs.x, lightToWorldAbs.y), lightToWorldAbs.z);
@@ -280,7 +294,7 @@ vec3 getLightingColor(const vec3 position, const vec3 normal, const uint cascade
                 if (factor < EPSILON) {
                     continue;
                 }
-                lightingColor += factor * brightness * normalFactor * light.color;
+                lightingColor += factor * brightness * light.color;
 #endif
             }
         }

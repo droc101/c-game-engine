@@ -508,6 +508,7 @@ static inline void UpdateActorModelInstanceData(const Actor *actor,
 		instanceData->modColor = actor->modColor;
 		instanceData->materialColor = material->color;
 		instanceData->textureIndex = TextureIndex(material->texture);
+		instanceData->castsShadows = material->castsShadows ? VK_TRUE : VK_FALSE;
 		instanceData->vertexBuffer = lunaGetBufferDeviceAddress(device, buffers.modelVertices) +
 									 materialSlotVertexData->vertexOffset * sizeof(ModelVertex);
 		instanceData->indexBuffer = lunaGetBufferDeviceAddress(device, buffers.modelIndices) +

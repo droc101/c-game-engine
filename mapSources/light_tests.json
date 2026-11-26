@@ -5052,7 +5052,7 @@
                     "texture_offset_y": 0.0,
                     "texture_rotation": 0.0,
                     "world_aligned_texture": true,
-                    "units_per_luxel": 1.0
+                    "units_per_luxel": 0.25
                 },
                 {
                     "indices": [
@@ -7239,7 +7239,7 @@
                     "texture_offset_y": 0.0,
                     "texture_rotation": 0.0,
                     "world_aligned_texture": true,
-                    "units_per_luxel": 1.0
+                    "units_per_luxel": 0.25
                 },
                 {
                     "indices": [
@@ -10235,7 +10235,7 @@
                     "texture_offset_y": 0.0,
                     "texture_rotation": 0.0,
                     "world_aligned_texture": true,
-                    "units_per_luxel": 1.0
+                    "units_per_luxel": 0.25
                 },
                 {
                     "indices": [
@@ -11544,7 +11544,7 @@
                     "texture_offset_y": 0.0,
                     "texture_rotation": 0.0,
                     "world_aligned_texture": true,
-                    "units_per_luxel": 1.0
+                    "units_per_luxel": 0.25
                 },
                 {
                     "indices": [
@@ -11890,7 +11890,7 @@
                     "texture_offset_y": 0.0,
                     "texture_rotation": 0.0,
                     "world_aligned_texture": true,
-                    "units_per_luxel": 1.0
+                    "units_per_luxel": 0.25
                 },
                 {
                     "indices": [
@@ -13561,7 +13561,7 @@
                     "texture_offset_y": 0.0,
                     "texture_rotation": 0.0,
                     "world_aligned_texture": true,
-                    "units_per_luxel": 1.0
+                    "units_per_luxel": 0.25
                 }
             ]
         },
@@ -19524,6 +19524,155 @@
                     "units_per_luxel": 1.0
                 }
             ]
+        },
+        {
+            "editor_name": "",
+            "origin_x": -64.0,
+            "origin_y": -64.0,
+            "origin_z": -16.0,
+            "rotation_x": 0.0,
+            "rotation_y": 0.0,
+            "rotation_z": 0.0,
+            "vertices": [
+                {
+                    "x": -4.0,
+                    "y": -4.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -4.0,
+                    "z": -4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 4.0,
+                    "z": -4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 4.0,
+                    "z": -4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": -4.0,
+                    "z": 4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": -4.0,
+                    "z": 4.0
+                },
+                {
+                    "x": 4.0,
+                    "y": 4.0,
+                    "z": 4.0
+                },
+                {
+                    "x": -4.0,
+                    "y": 4.0,
+                    "z": 4.0
+                }
+            ],
+            "faces": [
+                {
+                    "indices": [
+                        0,
+                        1,
+                        5,
+                        4
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 8.0,
+                    "texture_scale_y": 8.0,
+                    "texture_offset_x": 4.0,
+                    "texture_offset_y": 4.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        1,
+                        2,
+                        6,
+                        5
+                    ],
+                    "material": "material/alpha.gmtl",
+                    "texture_scale_x": 8.0,
+                    "texture_scale_y": 8.0,
+                    "texture_offset_x": 4.0,
+                    "texture_offset_y": 4.0,
+                    "texture_rotation": 270.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        2,
+                        3,
+                        7,
+                        6
+                    ],
+                    "material": "material/tools/invisible.gmtl",
+                    "texture_scale_x": 8.0,
+                    "texture_scale_y": 8.0,
+                    "texture_offset_x": 4.0,
+                    "texture_offset_y": 4.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        3,
+                        0,
+                        4,
+                        7
+                    ],
+                    "material": "material/alpha.gmtl",
+                    "texture_scale_x": 8.0,
+                    "texture_scale_y": 8.0,
+                    "texture_offset_x": 4.0,
+                    "texture_offset_y": 4.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        0,
+                        3,
+                        2,
+                        1
+                    ],
+                    "material": "material/alpha.gmtl",
+                    "texture_scale_x": 8.0,
+                    "texture_scale_y": 8.0,
+                    "texture_offset_x": 4.0,
+                    "texture_offset_y": 4.0,
+                    "texture_rotation": 90.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                },
+                {
+                    "indices": [
+                        4,
+                        5,
+                        6,
+                        7
+                    ],
+                    "material": "material/alpha.gmtl",
+                    "texture_scale_x": 8.0,
+                    "texture_scale_y": 8.0,
+                    "texture_offset_x": 4.0,
+                    "texture_offset_y": 4.0,
+                    "texture_rotation": 0.0,
+                    "world_aligned_texture": true,
+                    "units_per_luxel": 1.0
+                }
+            ]
         }
     ],
     "actors": [
@@ -20191,6 +20340,191 @@
                         "x": 0.1428571492433548,
                         "y": 0.25
                     }
+                }
+            }
+        },
+        {
+            "class": "prop_model_static",
+            "position": {
+                "x": -100.0,
+                "y": -100.0,
+                "z": 20.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "affect_lightmap": {
+                    "type": "bool",
+                    "value": true
+                },
+                "collision": {
+                    "type": "byte",
+                    "value": 2
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 0.125490203499794
+                    }
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/orb.gmdl"
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                }
+            }
+        },
+        {
+            "class": "prop_model_dynamic",
+            "position": {
+                "x": -60.0,
+                "y": -100.0,
+                "z": 20.0
+            },
+            "rotation": {
+                "x": 45.0,
+                "y": 45.000003814697266,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "model": {
+                    "type": "string",
+                    "value": "model/error.gmdl"
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "skin": {
+                    "type": "int",
+                    "value": 0
+                }
+            }
+        },
+        {
+            "class": "prop_sprite",
+            "position": {
+                "x": -96.0,
+                "y": -64.0,
+                "z": -16.0
+            },
+            "rotation": {
+                "x": -45.0,
+                "y": 225.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 0.501960813999176
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "value": ""
+                },
+                "size": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 12.0,
+                        "y": 12.0
+                    }
+                },
+                "solid": {
+                    "type": "bool",
+                    "value": false
+                },
+                "texture": {
+                    "type": "string",
+                    "value": "texture/level/uvtest.gtex"
+                },
+                "unshaded": {
+                    "type": "bool",
+                    "value": false
+                },
+                "uv_offset": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "uv_scale": {
+                    "type": "vec2",
+                    "value": {
+                        "x": 1.3333333730697632,
+                        "y": 1.3333333730697632
+                    }
+                }
+            }
+        },
+        {
+            "class": "light_point",
+            "position": {
+                "x": -80.0,
+                "y": -80.0,
+                "z": -0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "connections": [],
+            "params": {
+                "attenuation_multiplier": {
+                    "type": "float",
+                    "value": 25.0
+                },
+                "brightness": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "color": {
+                    "type": "color",
+                    "value": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    }
+                },
+                "constant_attenuation": {
+                    "type": "float",
+                    "value": 0.25
+                },
+                "linear_attenuation": {
+                    "type": "float",
+                    "value": 1.0
+                },
+                "quadratic_attenuation": {
+                    "type": "float",
+                    "value": 1.0
                 }
             }
         }

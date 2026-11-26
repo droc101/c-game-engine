@@ -95,7 +95,7 @@ struct ActorModelInstanceData
 	vec4 modColor;
 	vec4 materialColor;
 	uint textureIndex;
-    float _padding[1];
+    uint castsShadows;
     ActorModelVertexBuffer vertexBuffer;
     ReadonlyIndexBuffer indexBuffer;
     float _padding2[2];

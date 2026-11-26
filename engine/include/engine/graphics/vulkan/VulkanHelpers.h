@@ -183,7 +183,7 @@ typedef struct ActorModelInstanceData
 	Color modColor;
 	Color materialColor;
 	uint32_t textureIndex;
-	float _padding[1]; // I hate alignment
+	VkBool32 castsShadows;
 	VkDeviceAddress vertexBuffer;
 	VkDeviceAddress indexBuffer;
 	float _padding2[2]; // I hate alignment

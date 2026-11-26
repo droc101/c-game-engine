@@ -1034,7 +1034,10 @@ static inline void DrawModelBuffer(const ModelBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw shaded %s", name);
 
-		pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
+		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSets)
+		{
+			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
+		}
 		const LunaDrawIndexedIndirectInfo drawInfo = {
 			.pipeline = pipelines.shadedModel,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -1050,7 +1053,10 @@ static inline void DrawModelBuffer(const ModelBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw unshaded %s", name);
 
-		pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSets)
+		{
+			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+		}
 		const LunaDrawIndexedIndirectInfo drawInfo = {
 			.pipeline = pipelines.unshadedModel,
 			.pipelineBindInfo = pipelineBindInfo,
@@ -1099,7 +1105,7 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw shaded %s models", name);
 
-		if (shadedPipeline == pipelines.shadedMap)
+		if (shadedPipeline == pipelines.shadedMap && pipelineBindInfo->descriptorSetBindInfo.descriptorSets)
 		{
 			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 2;
 		}
@@ -1118,7 +1124,10 @@ static inline void DrawMapModelsBuffer(const MapModelsBuffer *buffer,
 	{
 		VK_BeginDebugLabel("Draw unshaded %s models", name);
 
-		pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+		if (pipelineBindInfo->descriptorSetBindInfo.descriptorSets)
+		{
+			pipelineBindInfo->descriptorSetBindInfo.descriptorSetCount = 1;
+		}
 		const LunaDrawIndexedIndirectCountInfo drawInfo = {
 			.pipeline = unshadedPipeline,
 			.pipelineBindInfo = pipelineBindInfo,
