@@ -7,6 +7,7 @@
 #define USE_CLUSTERED
 #define USE_RAYTRACING
 #define TRUE_ALPHA_SHADOWS
+// #define DISABLE_SHADOWS
 
 layout(constant_id = 1) const uint LIGHT_COUNT = 1;
 layout(constant_id = 2) const bool HAS_STATIC_LIGHT = true;
@@ -122,8 +123,15 @@ float sampleDirectionalShadowMap(const uint cascadeIndex, const vec3 coord, cons
 
 #ifdef USE_RAYTRACING
 float lightVisibility(const vec3 origin, const vec3 lightToWorld, const vec3 direction) {
+#ifdef DISABLE_SHADOWS
+    return 1;
+#endif
     rayQueryEXT rayQuery;
-    rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, 0, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1);
+#ifdef TRUE_ALPHA_SHADOWS
+    rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, 0, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1 + 0.01);
+#else
+    rayQueryInitializeEXT(rayQuery, topLevelAccelerationStructure, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin + direction * 0.01, EPSILON, lightToWorld, 1);
+#endif
     float visibility = 1;
     while (visibility > EPSILON && rayQueryProceedEXT(rayQuery)) {
         if (rayQueryGetIntersectionTypeEXT(rayQuery, false) != gl_RayQueryCandidateIntersectionTriangleEXT) {
@@ -131,9 +139,6 @@ float lightVisibility(const vec3 origin, const vec3 lightToWorld, const vec3 dir
         }
         const uint instanceIndex = rayQueryGetIntersectionInstanceCustomIndexEXT(rayQuery, false);
         const uint type = bitfieldExtract(instanceIndex, 22, 2);
-        if (type == 0) {
-            return 0;
-        }
         if (type != 1) {
             continue;
         }
