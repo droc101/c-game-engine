@@ -281,19 +281,19 @@ void MakeModelBLAS(const ModelDefinition *model,
 	free(buildGeometryInfos);
 }
 
-// TODO: Investigate using a single BLAS with multiple instances for rectangular faces
-void MakeMapModelBLAS(const MapModelsBuffer *buffer,
-					  const VkDeviceSize vertexOffset,
-					  const VkDeviceSize indexOffset,
-					  const uint32_t triangleCount,
-					  const uint32_t instanceIndex)
+static inline VkAccelerationStructureKHR MakeTrianglesBLAS(const LunaBuffer vertexBuffer,
+														   const VkDeviceSize firstVertex,
+														   const size_t vertexStride,
+														   const LunaBuffer indexBuffer,
+														   const VkDeviceSize indexOffset,
+														   const uint32_t triangleCount)
 {
 	const VkDevice vkDevice = lunaGetVkDevice(device);
 	const VkDeviceOrHostAddressConstKHR vertexDataAddress = {
-		.deviceAddress = lunaGetBufferDeviceAddress(device, buffer->vertices),
+		.deviceAddress = lunaGetBufferDeviceAddress(device, vertexBuffer),
 	};
 	const VkDeviceOrHostAddressConstKHR indexDataAddress = {
-		.deviceAddress = lunaGetBufferDeviceAddress(device, buffer->indices) + indexOffset,
+		.deviceAddress = lunaGetBufferDeviceAddress(device, indexBuffer) + indexOffset,
 	};
 
 
@@ -301,8 +301,8 @@ void MakeMapModelBLAS(const MapModelsBuffer *buffer,
 		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR,
 		.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT,
 		.vertexData = vertexDataAddress,
-		.vertexStride = sizeof(MapVertex),
-		.maxVertex = lunaGetBufferSize(buffer->vertices) / sizeof(MapVertex) - 1,
+		.vertexStride = vertexStride,
+		.maxVertex = lunaGetBufferSize(vertexBuffer) / vertexStride - 1,
 		.indexType = VK_INDEX_TYPE_UINT32,
 		.indexData = indexDataAddress,
 	};
@@ -342,7 +342,7 @@ void MakeMapModelBLAS(const MapModelsBuffer *buffer,
 								VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 	};
 	VulkanTest(lunaCreateBuffer(device, &bufferCreationInfo, accelerationStructureBuffer),
-			   "Failed to create map model bottom level acceleration structure buffer!");
+			   "Failed to create bottom level acceleration structure buffer!");
 
 	VkAccelerationStructureKHR
 			*accelerationStructure = ListAdd(accelerationStructures.bottomLevelAccelerationStructures, VK_NULL_HANDLE);
@@ -354,7 +354,7 @@ void MakeMapModelBLAS(const MapModelsBuffer *buffer,
 		.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
 	};
 	VulkanTest(vkCreateAccelerationStructureKHR(vkDevice, &createInfo, NULL, accelerationStructure),
-			   "Failed to create map model bottom level acceleration structure!");
+			   "Failed to create bottom level acceleration structure!");
 
 	LunaBuffer *scratchBuffer = ListAdd(accelerationStructures.bottomLevelScratchBuffers, LUNA_NULL_HANDLE);
 	const LunaBufferCreationInfo scratchBufferCreationInfo = {
@@ -364,7 +364,7 @@ void MakeMapModelBLAS(const MapModelsBuffer *buffer,
 		.additionalUsageFlags = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
 	};
 	VulkanTest(lunaCreateBuffer(device, &scratchBufferCreationInfo, scratchBuffer),
-			   "Failed to create map model bottom level acceleration structure scratch buffer!");
+			   "Failed to create bottom level acceleration structure scratch buffer!");
 
 	const VkDeviceOrHostAddressKHR scratchDataAddress = {
 		.deviceAddress = lunaGetBufferDeviceAddress(device, *scratchBuffer),
@@ -381,10 +381,27 @@ void MakeMapModelBLAS(const MapModelsBuffer *buffer,
 	};
 	const VkAccelerationStructureBuildRangeInfoKHR buildRangeInfo = {
 		.primitiveCount = triangleCount,
-		.firstVertex = vertexOffset,
+		.firstVertex = firstVertex,
 	};
 	const VkAccelerationStructureBuildRangeInfoKHR *pBuildRangeInfo = &buildRangeInfo;
 	vkCmdBuildAccelerationStructuresKHR(vkCommandBuffer, 1, &buildGeometryInfo, &pBuildRangeInfo);
+
+	return *accelerationStructure;
+}
+
+// TODO: Investigate using a single BLAS with multiple instances for brushes that are rectangular prisms
+void MakeMapModelBLAS(const MapModelsBuffer *buffer,
+					  const VkDeviceSize firstVertex,
+					  const VkDeviceSize indexOffset,
+					  const uint32_t triangleCount,
+					  const uint32_t instanceIndex)
+{
+	const VkAccelerationStructureKHR accelerationStructure = MakeTrianglesBLAS(buffer->vertices,
+																			   firstVertex,
+																			   sizeof(MapVertex),
+																			   buffer->indices,
+																			   indexOffset,
+																			   triangleCount);
 
 	VkAccelerationStructureInstanceKHR *instance = &mapBottomLevelAccelerationStructureInstances[instanceIndex];
 	instance->transform.matrix[0][0] = 1;
@@ -394,9 +411,10 @@ void MakeMapModelBLAS(const MapModelsBuffer *buffer,
 	instance->mask = 0xFF;
 	const VkAccelerationStructureDeviceAddressInfoKHR deviceAddressInfo = {
 		.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR,
-		.accelerationStructure = *accelerationStructure,
+		.accelerationStructure = accelerationStructure,
 	};
-	instance->accelerationStructureReference = vkGetAccelerationStructureDeviceAddressKHR(vkDevice, &deviceAddressInfo);
+	instance->accelerationStructureReference = vkGetAccelerationStructureDeviceAddressKHR(lunaGetVkDevice(device),
+																						  &deviceAddressInfo);
 }
 
 void ClearLunaBufferList(List *list)
@@ -424,6 +442,9 @@ void LoadMapForRaytracing(const Map *map)
 										  NULL);
 	}
 	ListClear(accelerationStructures.bottomLevelAccelerationStructures);
+
+	VulkanTest(lunaResizeBuffer(device, &topLevelAccelerationStructureInstancesBuffer, 0),
+			   "Failed to clear top level acceleration structure instances buffer!");
 
 	mapBottomLevelAccelerationStructureInstanceCount = map->modelCount;
 	free(mapBottomLevelAccelerationStructureInstances);
@@ -470,9 +491,6 @@ void LoadMapForRaytracing(const Map *map)
 		*vertexOffset += model->vertexCount;
 		*indexOffset += model->indexCount * sizeof(uint32_t);
 	}
-
-	VulkanTest(lunaResizeBuffer(device, &topLevelAccelerationStructureInstancesBuffer, 0),
-			   "Failed to clear top level acceleration structure instances buffer!");
 }
 
 void UpdateAccelerationStructureInstances(const uint32_t modelInstanceCount,
